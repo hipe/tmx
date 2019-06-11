@@ -1,8 +1,8 @@
-from kiss_rdb_test._common_state import (
+from kiss_rdb_test.common_initial_state import (
         pretend_file_via_path_and_big_string,
         PretendFile,
         unindent_with_dot_hack,
-        fixture_directory_path,
+        functions_for,
         fixture_directories_path,
         )
 from kiss_rdb_test import storage_adapter_canon
@@ -60,7 +60,7 @@ class Case2510_collection_not_found(_CommonCase):
         return self.build_end_state_expecting_failure()
 
     def given_path(self):
-        return fixture_directory_path('000-no-ent')
+        return functions_for('toml').fixture_directory_path('000-no-ent')
 
 
 class Case2513_file_has_no_table(_CommonCase):

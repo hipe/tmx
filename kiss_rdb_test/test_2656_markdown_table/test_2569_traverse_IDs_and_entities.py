@@ -1,4 +1,4 @@
-from kiss_rdb_test._common_state import (
+from kiss_rdb_test.common_initial_state import (
         pretend_file_via_path_and_big_string,
         )
 from kiss_rdb_test import storage_adapter_canon

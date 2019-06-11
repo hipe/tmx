@@ -46,7 +46,7 @@ class CUD_BIG_SUCCESS_METHODS:
 
         this_listener = None  # _DEBUGGING_LISTENER
 
-        from . import _common_state as lib
+        from . import common_initial_state as lib
 
         _lines = _unindent(self.given_entity_body_lines())
         _tslo = lib.TSLO_via('A', 'meta')
@@ -174,7 +174,8 @@ def request_via_tuples(tuples, listener):
 
 @memoize
 def _default_business_schema():
-    from kiss_rdb.magnetics_ import business_schema_via_definition as lib
+    from kiss_rdb.storage_adapters_.toml import (
+            business_schema_via_definition as lib)
     return lib.DEFAULT_BUSINESS_SCHEMA
 
 

@@ -61,15 +61,15 @@ def lazy(f):  # #meh
 
 
 def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
-    import kiss_rdb.magnetics_.entities_via_collection as ents_lib
+    import kiss_rdb.storage_adapters_.toml.entities_via_collection as ents_lib
     _tb = ents_lib.table_block_via_lines_and_table_start_line_object_(
             lines, tslo, listener)
     return _tb.to_mutable_document_entity_(listener)
 
 
 def TSLO_via(identifier_string, meta_or_attributes):
-    import kiss_rdb.magnetics_.identifiers_via_file_lines as ids_lib
-    return ids_lib.TSLO_via(identifier_string, meta_or_attributes)
+    import kiss_rdb.storage_adapters_.toml.identifiers_via_file_lines as lib
+    return lib.TSLO_via(identifier_string, meta_or_attributes)
 
 
 def pretend_file_via_path_and_big_string(path, big_string):
@@ -125,8 +125,44 @@ def debugging_listener():
     return se_lib.debugging_listener()
 
 
-def fixture_directory_path(stem):
-    return os_path.join(fixture_directories_path(), stem)
+def _make_functions_for():
+    def functions_for(who):
+        if who in cache:
+            return cache[who]
+        if 'toml' == who:
+            res = _functions_for_toml()
+        else:
+            raise Exception(f"add functions for '{who}'")
+        cache[who] = res
+        return res
+    cache = {}
+    return functions_for
+
+
+functions_for = _make_functions_for()
+
+
+class _functions_for_toml:
+
+    def __init__(self):
+        self.fixture_dir_name = '4219-toml'
+        self._ca_head = None
+        self._fd_path = None
+
+    def common_args_head(self):
+        if self._ca_head is None:
+            _ = self.fixture_directories_path()
+            self._ca_head = ('--collections-hub', _)
+        return self._ca_head
+
+    def fixture_directory_path(self, tail):
+        return os_path.join(self.fixture_directories_path(), tail)
+
+    def fixture_directories_path(self):
+        if self._fd_path is None:
+            self._fd_path = os_path.join(
+                    fixture_directories_path(), self.fixture_dir_name)
+        return self._fd_path
 
 
 @lazy

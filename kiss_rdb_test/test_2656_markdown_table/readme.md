@@ -2,7 +2,7 @@ this whole node is mostly created to drive the
 unifying test cannon
 
   - number of storage adapters: 8
-  - area staring number: 2500
+  - area starting number: 2500
   - area space: 2500
   - your storage adapter offset: 0
   - number of verb cases: 9

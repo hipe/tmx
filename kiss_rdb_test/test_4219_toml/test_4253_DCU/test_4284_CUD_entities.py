@@ -1,4 +1,4 @@
-from _common_state import unindent
+from kiss_rdb_test.common_initial_state import unindent
 import unittest
 
 
@@ -446,7 +446,8 @@ class Case688_update_at_end(_CommonCase):
 
 
 def _subj_mod():
-    from kiss_rdb.magnetics_ import file_lines_via_CUD_entity_and_file_lines as _  # noqa: E501
+    from kiss_rdb.storage_adapters_.toml import (
+            file_lines_via_CUD_entity_and_file_lines as _)
     return _
 
 

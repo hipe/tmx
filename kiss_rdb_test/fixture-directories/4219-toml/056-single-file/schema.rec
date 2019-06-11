@@ -1,3 +1,7 @@
+# NOTE - at #history-A.1 we renamed this to look like a recutils recfile
+# but it's still toml .. work in progress..
+
 "storage schema" = "32^2"
 
+# #history-A.1
 # born.

@@ -1,4 +1,4 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
         debugging_listener as _debugging_listener,
         unindent as _unindent,
         )
@@ -218,7 +218,7 @@ class Case243_two_yes_head(_CommonCase):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import blocks_via_file_lines as _
+    from kiss_rdb.storage_adapters_.toml import blocks_via_file_lines as _
     return _
 
 

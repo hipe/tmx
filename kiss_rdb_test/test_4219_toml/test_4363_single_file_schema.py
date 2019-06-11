@@ -1,6 +1,6 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
         debugging_listener,
-        fixture_directory_path,
+        functions_for,
         unindent,
         )
 from kiss_rdb_test.CUD import (
@@ -210,17 +210,17 @@ def _build_collection(dir_path, filesystem, random_number_generator=None):
 
 @memoize
 def _dir_path_most_common():
-    return fixture_directory_path('056-single-file')
+    return functions_for('toml').fixture_directory_path('056-single-file')
 
 
 @memoize
 def _always_same_schema():
-    from kiss_rdb.magnetics_ import schema_via_file_lines as _
+    from kiss_rdb.storage_adapters_.toml import schema_via_file_lines as _
     return _._Schema(storage_schema='32^2')
 
 
 def _main_module():
-    from kiss_rdb.magnetics_ import collection_via_directory as _
+    from kiss_rdb.storage_adapters_.toml import collection_via_directory as _
     return _
 
 

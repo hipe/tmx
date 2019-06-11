@@ -1,7 +1,7 @@
-import _common_state  # noqa: F401
+from kiss_rdb_test.common_initial_state import (
+        functions_for)
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
-    common_args_head,
     build_filesystem_expecting_num_file_rewrites,
     )
 import unittest
@@ -101,6 +101,9 @@ class Case831_multi_line_create(_CommonCase):
 
     def filesystem(self):
         return build_filesystem_expecting_num_file_rewrites(2)
+
+
+common_args_head = functions_for('toml').common_args_head
 
 
 _common_collection = '050-rumspringa'

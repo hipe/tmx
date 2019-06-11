@@ -99,7 +99,8 @@ class _CommonFunctions:
             injections_dictionary=_empty_mapping,
             ):
 
-        from kiss_rdb.magnetics_ import schema_via_file_lines as lib
+        from kiss_rdb.storage_adapters_.toml import (
+                schema_via_file_lines as lib)
         import os.path as os_path
 
         hub = self.unsanitized_collections_hub
@@ -113,7 +114,8 @@ class _CommonFunctions:
             return  # (Case812)
 
         # money
-        from kiss_rdb.magnetics_ import collection_via_directory as lib
+        from kiss_rdb.storage_adapters_.toml import (
+                collection_via_directory as lib)
         return lib.collection_via_directory_and_schema(
                 collection_directory_path=coll_path,
                 collection_schema=schema,
@@ -204,7 +206,7 @@ def cli_for_production():
             argv[i] = argv[i].encode('utf-8').decode('unicode_escape')  # ..
     # == END
 
-    import kiss_rdb.magnetics_.collection_via_directory as _
+    import kiss_rdb.storage_adapters_.toml.collection_via_directory as _
     _inj = _.INJECTIONS(random_number_generator=rng, filesystemer=filesystem)
     _ = cli.main(obj=_inj)
     cover_me(f'do you ever see this? {_}')

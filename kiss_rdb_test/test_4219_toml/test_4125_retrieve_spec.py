@@ -1,9 +1,9 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
         TSLO_via,
         debugging_listener as _debugging_listener,
         unindent as _unindent,
         )
-from kiss_rdb.magnetics_.entities_via_collection import (
+from kiss_rdb.storage_adapters_.toml.entities_via_collection import (
         table_block_via_lines_and_table_start_line_object_,
         )
 from modality_agnostic.test_support import structured_emission as se_lib
@@ -571,7 +571,7 @@ def _vendor_parse(body_string, listener):
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import entity_via_identifier_and_file_lines as _
+    from kiss_rdb.storage_adapters_.toml import entity_via_identifier_and_file_lines as _  # noqa: E501
     return _
 
 

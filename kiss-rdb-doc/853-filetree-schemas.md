@@ -314,7 +314,7 @@ and then here's an imagined filetree (view):
          |
          +- songs
              |
-             +- schema.toml  # (not specified (anywhere) what this is yet)
+             +- schema.rec  # (not specified (anywhere) what this is yet)
              |
              +- entities
                  |

@@ -1,4 +1,4 @@
-from _common_state import unindent
+from kiss_rdb_test.common_initial_state import unindent
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -292,7 +292,8 @@ _limit = 79
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import string_encoder_via_definition as _
+    from kiss_rdb.storage_adapters_.toml import (
+            string_encoder_via_definition as _)
     return _
 
 
@@ -303,5 +304,4 @@ def cover_me():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: move this to before the CUD attributes test unit
 # #born.

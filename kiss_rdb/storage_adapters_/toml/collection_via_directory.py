@@ -129,8 +129,8 @@ class collection_via_directory_and_schema:
         # with the index file locked, provision a new identifier
 
         with self._open_locked_mutable_indexy_file() as indexy_file:
-
-            from . import provision_ID_randomly_via_identifiers as _
+            from kiss_rdb.magnetics_ import (
+                provision_ID_randomly_via_identifiers as _)
 
             tup = _.PROVISION_NEW_IDENTIFIER(
                     random_number_generator=self._random_number_generator,
@@ -361,7 +361,7 @@ def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
                 )
 
     def rewrite_index_file(orig_lines, my_listener):
-        from . import index_via_identifiers as _
+        from kiss_rdb.magnetics_ import index_via_identifiers as _
         return _.new_lines_via_delete_identifier_from_index__(
                 orig_lines, identifier, my_listener)
 
@@ -432,7 +432,7 @@ def _create_entity(
                 my_listener)
 
     def rewrite_index_file(orig_lines, my_listener):
-        from . import index_via_identifiers as _
+        from kiss_rdb.magnetics_ import index_via_identifiers as _
         return _.new_lines_via_add_identifier_into_index__(
                 identifier, iids, my_listener)
 
@@ -473,7 +473,8 @@ def _create_MDE_via_ID_and_request(identifier_string, req, coll, listener):
 
 
 def _request_via_cuds(cuds, listener):
-    from .CUD_attributes_request_via_tuples import request_via_tuples as _
+    from kiss_rdb.magnetics_.CUD_attributes_request_via_tuples import (
+            request_via_tuples as _)
     return _(cuds, listener)
 
 

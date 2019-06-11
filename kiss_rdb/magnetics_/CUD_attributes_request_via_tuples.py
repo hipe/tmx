@@ -6,7 +6,8 @@ def request_via_tuples(tuples, listener):
     if not len(tuples):
         return reason('request was empty')  # (Case011)
 
-    from . import blocks_via_file_lines as ent_lib
+    from kiss_rdb.storage_adapters_.toml import (
+        blocks_via_file_lines as ent_lib)
 
     gist_via = ent_lib.attribute_name_functions_().name_gist_via_name
 
@@ -49,7 +50,8 @@ class _CUD_Attributes_Request:
         self.components = tuple(components)
 
     def edit_mutable_document_entity_(self, mde, bs, listener):
-        from . import CUD_attributes_via_request as lib
+        from kiss_rdb.storage_adapters_.toml import (
+            CUD_attributes_via_request as lib)  # #todo
         _enc = bs.BUILD_ENTITY_ENCODER(listener)
         return lib.apply_CUD_attributes_request_to_MDE___(
                 mde, self, _enc, listener)

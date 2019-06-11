@@ -1,4 +1,4 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
         unindent,
         )
 from modality_agnostic.test_support import structured_emission as se_lib
@@ -289,7 +289,7 @@ class Case150_first_touch_of_multi_line(_CommonCase):  # #mutli-line-case
 
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import identifiers_via_file_lines as _
+    from kiss_rdb.storage_adapters_.toml import identifiers_via_file_lines as _
     return _
 
 

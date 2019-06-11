@@ -9,7 +9,7 @@ def SCHEMA_VIA_COLLECTION_PATH(collection_path, listener):
     from os import path as os_path
     import toml  # stay close to #here2.
 
-    schema_path = os_path.join(collection_path, 'schema.toml')
+    schema_path = os_path.join(collection_path, 'schema.rec')
 
     e = None
     try:
@@ -43,7 +43,8 @@ class _IndexyFileWhenDeepTree:
     def to_identifier_stream(self, listener_NOT_USED):
         # if there's an error in your index file it's considered corruption
         # and we just raise the exception
-        from . import identifiers_via_index as _
+
+        from kiss_rdb.magnetics_ import identifiers_via_index as _
         return _.identifiers_via_lines_of_index(self.handle)
 
     is_of_single_file_schema = False
@@ -210,8 +211,7 @@ class _StorageSchema:
         self.filetree_depth = filetree_depth
 
     def _build_identifier_via_string(self):
-
-        from .identifier_via_string import (
+        from kiss_rdb.magnetics_.identifier_via_string import (
             identifier_via_string__ as unsanitized_iid_via_string,
             )
 

@@ -1,4 +1,4 @@
-from _common_state import unindent_with_dot_hack
+from common_initial_state import unindent_with_dot_hack
 import unittest
 
 

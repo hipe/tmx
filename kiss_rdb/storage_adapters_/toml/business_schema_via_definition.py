@@ -113,7 +113,8 @@ def _build_semi_encoder(listener, o):
 
 @memoize
 def _default_string_encoder():
-    from kiss_rdb.magnetics_ import string_encoder_via_definition as se_lib
+    from kiss_rdb.storage_adapters_.toml import (
+        string_encoder_via_definition as se_lib)
     return se_lib.string_encoder_via_definition(
             smaller_string_max_length=56,   # 79 - tmx longest subproject name
             paragraph_line_max_width=79,  # the 80th column is special idk

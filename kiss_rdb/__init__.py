@@ -35,7 +35,7 @@ def COLLECTION_VIA_DIRECTORY(directory, listener=THROWING_LISTENER):
     if schema is None:
         return
 
-    from .magnetics_ import collection_via_directory
+    from kiss_rdb.storage_adapters_.toml import collection_via_directory
 
     return collection_via_directory.collection_via_directory_and_schema(
             collection_directory_path=directory,
@@ -44,9 +44,8 @@ def COLLECTION_VIA_DIRECTORY(directory, listener=THROWING_LISTENER):
 
 
 def SCHEMA_VIA_COLLECTION_PATH(collection_path, listener=THROWING_LISTENER):
-    from .magnetics_ import (
-        schema_via_file_lines,
-        )
+    from kiss_rdb.storage_adapters_.toml import (
+        schema_via_file_lines)
     return schema_via_file_lines.SCHEMA_VIA_COLLECTION_PATH(
         collection_path, listener)
 

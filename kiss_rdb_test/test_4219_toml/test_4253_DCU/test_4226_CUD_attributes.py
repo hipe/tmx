@@ -1,4 +1,4 @@
-import _common_state  # noqa: F401
+import kiss_rdb_test.common_initial_state  # noqa: F401
 from kiss_rdb_test import CUD as CUD_support
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
@@ -583,7 +583,7 @@ def _request_via_tuples(aa, bb):
 # ==
 
 def _subject_module():
-    from kiss_rdb.magnetics_ import CUD_attributes_via_request as _
+    from kiss_rdb.storage_adapters_.toml import CUD_attributes_via_request as _
     return _
 
 

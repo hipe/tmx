@@ -12,9 +12,6 @@
 """
 
 
-from ._common_state import (
-        fixture_directories_path,
-        )
 from script_lib.test_support import expect_STDs as es
 from modality_agnostic.memoization import memoize
 
@@ -236,16 +233,16 @@ def _write_receiver_via_function(receive_write):
     return es.ProxyingWriteReceiver(receive_write)
 
 
-def _expecting_no_emissions(x):
+def _expecting_no_writes(s):
     assert(False)
 
 
-_no_WR = _write_receiver_via_function(_expecting_no_emissions)
+_no_WR = _write_receiver_via_function(_expecting_no_writes)
 
 
 def _invoke_CLI(given_args, injections_dictionary):
 
-    from kiss_rdb.magnetics_.collection_via_directory import (
+    from kiss_rdb.storage_adapters_.toml.collection_via_directory import (
             INJECTIONS as INJECTIONS)
 
     from kiss_rdb.cli import cli
@@ -281,7 +278,7 @@ def _NASTY_HACK_once():
     # don't ever parse the same schema file more than once
     # (at writing it saves from 4 extranous constructons)
 
-    from kiss_rdb.magnetics_ import schema_via_file_lines as mod
+    from kiss_rdb.storage_adapters_.toml import schema_via_file_lines as mod
 
     real_function = mod.SCHEMA_VIA_COLLECTION_PATH
 
@@ -380,10 +377,6 @@ def tree_via_lines(lines):
     return _(lines)
 
 
-def common_args_head():
-    return '--collections-hub', fixture_directories_path()
-
-
 def build_filesystem_expecting_num_file_rewrites(expected_num):
     from kiss_rdb_test import filesystem_spy as fs_lib
     return fs_lib.build_filesystem_expecting_num_file_rewrites(expected_num)
@@ -430,7 +423,7 @@ def _write_only_facade(receiver):
 
 
 def _lines_via_big_string_as_is(big_string):
-    import kiss_rdb.magnetics_.CUD_attributes_via_request as lib
+    import kiss_rdb.storage_adapters_.toml.CUD_attributes_via_request as lib
     return lib.lines_via_big_string_(big_string)
 
 

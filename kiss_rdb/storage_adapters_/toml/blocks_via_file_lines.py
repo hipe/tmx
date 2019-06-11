@@ -41,7 +41,7 @@ class _MutableDocumentEntity:
 
     def __init__(self, table_start_line_object):
 
-        from . import doubly_linked_list_functions as _
+        from kiss_rdb.magnetics_ import doubly_linked_list_functions as _
         self._LL = _.build_new_doubly_linked_list()  # #testpoint (attr name)
 
         self._table_start_line_object = table_start_line_object  # #testpoint
@@ -154,7 +154,7 @@ MDE_via_TSLO_ = _MutableDocumentEntity
 
 @memoize
 def attribute_name_functions_():
-    from .string_scanner_via_definition import (
+    from kiss_rdb.magnetics_.string_scanner_via_definition import (
             Scanner,
             pattern_via_description_and_regex_string as o,
             )

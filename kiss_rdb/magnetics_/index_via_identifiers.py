@@ -173,7 +173,9 @@ class _CLI:
         # coll_path = self.os_path.abspath(coll_path)
 
         from kiss_rdb.magnetics_ import (
-                index_via_identifiers as index_lib,
+                index_via_identifiers as index_lib)
+
+        from kiss_rdb.storage_adapters_.toml import (
                 schema_via_file_lines as schema_lib)
 
         schm = schema_lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)

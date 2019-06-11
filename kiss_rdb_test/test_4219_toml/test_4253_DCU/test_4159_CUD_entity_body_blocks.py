@@ -1,4 +1,4 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
         MDE_via_lines_and_table_start_line_object,
         TSLO_via,
         unindent,
@@ -456,7 +456,7 @@ def _doc_entity_via_lines(given, listener=None):
 
 
 def _block_via_line(line, mde, listener):
-    import kiss_rdb.magnetics_.blocks_via_file_lines as blk_lib
+    import kiss_rdb.storage_adapters_.toml.blocks_via_file_lines as blk_lib
     if '#' == line[0]:  # #[#867.F]
         return blk_lib.AppendableDiscretionaryBlock_(line)
     else:

@@ -1,9 +1,9 @@
-from _common_state import (
+from kiss_rdb_test.common_initial_state import (
+        functions_for,
         unindent,
         )
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
-    common_args_head,
     build_filesystem_expecting_num_file_rewrites,
     )
 from modality_agnostic.memoization import (
@@ -11,29 +11,6 @@ from modality_agnostic.memoization import (
         memoize,
         )
 import unittest
-
-
-"""GENERAL DISCUSSION of this test file
-
-on the test case number allocation here:
-
-  - originally in [#868], CLI was allocated the number range ~"790-799 lol"
-  - we expect to want more cases than that but hope we don't need much more
-  - 50 is a nice round number
-  - so for now we'll allocate ourselves the numberspace 790-839 (50 count)
-  - we start with an item count of FIVE: TR-CDU
-    (that's CRUD plus traverse, in [#010.6] regression-friendly order) PLUS:
-  - one more for unforseen housekeeping & setup (the equivalent of USE,
-    maybe of `CREATE DATABASE` etc..) so SIX but PLUS:
-  - for now we'll stake ONE placeholder item in there for some kind of
-    query thing but A) this should explode and B) this precedes the
-    "modality" layer, mostly (i.e it's not a CLI thing, mainly) so SEVEN:
-  - `${tmx subdivide} 790:839:7` gives us all the case numbers that appear here
-  - NOTE *all* these cases are "the CLI adaptation of..". abstract later.
-
-
-(:#here2: is [#817] (our main test support module)
-"""
 
 
 class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
@@ -233,7 +210,7 @@ class Case812_traverse_fail(_CommonCase):
         _actual, = self.end_state().lines
         reason, path = _actual.split(' - ')
         self.assertEqual(reason, 'collection does not exist because no schema file')  # noqa: E501
-        self.assertEqual(path, 'qq/pp/schema.toml\n')
+        self.assertEqual(path, 'qq/pp/schema.rec\n')
 
     @shared_subject
     def end_state(self):
@@ -389,8 +366,10 @@ class Case822_create(_CommonCase):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_stdout_lines_are_toml_lines_of_created_fellow(self):
+        # (the leading blank line belo keeps the first line out of test output)
+        """
 
-        """currently what is written to stdout on successful create is simply
+        currently what is written to stdout on successful create is simply
         the same lines of the mutable document entity that were inserted into
         this entities file.
 
@@ -613,8 +592,11 @@ class _StructTreeAndExitCode:
 
 
 def _lines_via_big_string_as_is(big_string):
-    import kiss_rdb.magnetics_.CUD_attributes_via_request as lib
+    import kiss_rdb.storage_adapters_.toml.CUD_attributes_via_request as lib
     return lib.lines_via_big_string_(big_string)
+
+
+common_args_head = functions_for('toml').common_args_head
 
 
 # == general
