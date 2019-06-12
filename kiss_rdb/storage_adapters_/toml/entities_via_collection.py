@@ -111,8 +111,8 @@ def _table_start_line_stream_via_dir_path(paths_function, monitor):
     from .identifiers_via_file_lines import (
             table_start_line_stream_via_file_lines_)
 
-    def when_entities_dir_empty(entities_dir_pp):  # (Case720) pp=posix path
-        """(Case720): the library function we call acts the same whether the
+    def when_entities_dir_empty(entities_dir_pp):  # (Case4298) pp=posix path
+        """(Case4298): the library function we call acts the same whether the
         directory was no ent or merely just empty. here we go the extra step
         and hit the filesystem again to complain iff noent.
         """

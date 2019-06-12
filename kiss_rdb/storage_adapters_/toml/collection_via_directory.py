@@ -150,7 +150,7 @@ class collection_via_directory_and_schema:
             mde = _create_MDE_via_ID_and_request(
                     id_s, cuds_request, self, listener)
             if mde is None:
-                return  # (Case830) (CLI) #here6
+                return  # (Case6067) (CLI) #here6
 
             # from the identifier derive the entities path
 
@@ -162,7 +162,7 @@ class collection_via_directory_and_schema:
             # the locking idiom requires that the file already exist, so in
             # those cases we create an empty file first. doing so incurs a
             # cleanup responsibility: if something fails, don't leave behind
-            # the empty file. es muss sein. more at (Case765) (ghost)
+            # the empty file. es muss sein. more at (Case4260) (ghost)
 
             if indexy_file.is_of_single_file_schema:
 
@@ -212,7 +212,7 @@ class collection_via_directory_and_schema:
 
             if res is not None:
                 assert(res is True)
-                res = mde  # (Case822)
+                res = mde  # (Case6129)
 
         return res
 
@@ -371,7 +371,7 @@ def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
 
         if indexy_file.is_of_single_file_schema:
-            pass  # hi. in single-file mode, no no index to update (Case775)
+            pass  # hi. in single-file mode, no no index to update (Case4364)
         else:
             trans.rewrite_file(indexy_file.handle, rewrite_index_file)
 
@@ -401,11 +401,11 @@ def _create_entity(
 
         if yes_do_cleanup:  # the file did not exist #here4
             if transaction_almost_completed:
-                pass  # because transaction OK, no cleanup to do (Case766)
+                pass  # because transaction OK, no cleanup to do (Case4303)
             else:
                 # ==
                 cover_me('NEVER BEEN COVERED - LEAVING BLANK FILE! (readme)')
-                """(Case765): the whole purpose of "cleanup functions" is to
+                """(Case4260): the whole purpose of "cleanup functions" is to
                 enable us to handle the case of when we have created a new
                 entities file and the transaction fails. as it turns out, this
                 case is perhaps logically impossible for us to trigger except
@@ -416,7 +416,7 @@ def _create_entity(
                 import os
                 os.unlink(locked_ents_file.name)  # can u do this when locked?
         else:  # if the file already existed, no cleanup (#here)
-            pass  # hi. (Case764)
+            pass  # hi. (Case4302)
 
     trans.REGISTER_CLEANUP_FUNCTION(f)
 
@@ -438,7 +438,7 @@ def _create_entity(
 
     if indexy_file.is_of_single_file_schema:
         # it was at the end because we read it to provision the id.
-        # re-read the whole file. meh. (Case779)
+        # re-read the whole file. meh. (Case4368)
         locked_ents_file.seek(0)
 
     # (per [#867.Q] do index file second)
@@ -467,9 +467,9 @@ def _create_MDE_via_ID_and_request(identifier_string, req, coll, listener):
     _ok = req.edit_mutable_document_entity_(mde, _bs, listener)
 
     if not _ok:
-        return  # (Case830) (CLI) #here6
+        return  # (Case6067) (CLI) #here6
 
-    return mde  # (Case764)
+    return mde  # (Case4302)
 
 
 def _request_via_cuds(cuds, listener):
@@ -498,9 +498,9 @@ def _retrieve_entity(identifier, file_path, listener):
         de = DE_via(id_s, lines, listener)
 
     if de is None:
-        return  # (Case710)
+        return  # (Case4130)
 
-    # (Case711):
+    # (Case4292):
 
     assert(de.table_type == 'attributes')
     assert(de.identifier_string == id_s)
@@ -541,10 +541,10 @@ def _whine_about_no_path(pieces, listener):
         num_not_exist = num
 
     if length == num_not_exist:
-        reason = f'no such file - {no_ent}'  # (Case704)
+        reason = f'no such file - {no_ent}'  # (Case4284)
     else:
         _ = os_path.join(*pieces[num:])
-        reason = f'for {repr(_)}, no such directory - {no_ent}'  # (Case703)
+        reason = f'for {repr(_)}, no such directory - {no_ent}'  # (Case4126)
 
     _emit_input_error_structure(lambda: {'reason': reason}, listener)
 

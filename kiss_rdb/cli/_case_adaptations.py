@@ -21,7 +21,7 @@ def _attribute_value_error(
         suggestion_sentence_phrase=None,
         ):
 
-    def f():  # (Case830)
+    def f():  # (Case6067)
         yield f'Could not set {repr(attribute_name)}'
 
         if len(unsanitized_attribute_value) <= 22:  # see 22
@@ -45,7 +45,7 @@ def _not_found(
         line,
         ):
 
-    echo(reason)  # (Case818)
+    echo(reason)  # (Case6064)
 
 
 def _collection_not_found(
@@ -53,7 +53,7 @@ def _collection_not_found(
         reason,
         ):
 
-    echo(reason)  # (Case812)
+    echo(reason)  # (Case5918)
 
 
 _these = {

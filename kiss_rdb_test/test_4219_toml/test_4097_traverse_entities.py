@@ -51,7 +51,7 @@ class _CommonCase(unittest.TestCase):
         return _subject_module().block_stream_via_file_lines(_given_linz, lstn)
 
 
-class Case157_simplified_typical(_CommonCase):
+class Case4094_simplified_typical(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 2)
@@ -88,7 +88,7 @@ class Case157_simplified_typical(_CommonCase):
         """)
 
 
-class Case171_effectively_empty_file_of_course_has_head_block(_CommonCase):
+class Case4095_effectively_empty_file_of_course_has_head_block(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         lines = self.head_block()._head_block_lines
@@ -112,7 +112,7 @@ class Case171_effectively_empty_file_of_course_has_head_block(_CommonCase):
         """)
 
 
-class Case186_truly_empty_file_has_no_head_block(_CommonCase):
+class Case4096_truly_empty_file_has_no_head_block(_CommonCase):
 
     def test_100_whatever(self):
         itr = self.when_expecting_success_iterator()
@@ -123,7 +123,7 @@ class Case186_truly_empty_file_has_no_head_block(_CommonCase):
         return ()
 
 
-class Case200_error_in_table_start_line(_CommonCase):
+class Case4097_error_in_table_start_line(_CommonCase):  # #midpoint
 
     def test_100_some_error_structure_detail(self):
         sct = self.count_and_structure()[1]
@@ -146,7 +146,7 @@ class Case200_error_in_table_start_line(_CommonCase):
         """)
 
 
-class Case215_error_in_attribute_value_passes_thru_for_now(_CommonCase):
+class Case4098_error_in_attribute_value_passes_thru_for_now(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 1)
@@ -169,7 +169,7 @@ class Case215_error_in_attribute_value_passes_thru_for_now(_CommonCase):
         """)
 
 
-class Case229_one_no_head(_CommonCase):
+class Case4100_one_no_head(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 0)
@@ -189,7 +189,7 @@ class Case229_one_no_head(_CommonCase):
         """)
 
 
-class Case243_two_yes_head(_CommonCase):
+class Case4101_two_yes_head(_CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 1)

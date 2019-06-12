@@ -38,7 +38,7 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
             if not check(delete):
                 return
         if len(problems):
-            _emit_comment_proximity_problems(problems, listener)  # (Case239)
+            _emit_comment_proximity_problems(problems, listener)  # (Case4226)
             return
         __flush_deletes(mde, deletes)
 
@@ -52,7 +52,7 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
             if not check(update):
                 return
         if len(problems):
-            _emit_comment_proximity_problems(problems, listener)  # (Case261)
+            _emit_comment_proximity_problems(problems, listener)  # (Case4227)
             return
 
     # -- CREATEs at end
@@ -63,14 +63,14 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
             return
         i, groups, apnds, qits = tup
     elif has_updates:  # ick/meh
-        i, groups, apnds, qits = (None, (), (), None)  # (Case352)
+        i, groups, apnds, qits = (None, (), (), None)  # (Case4232)
 
     if has_creates or has_updates:
         if not __apply_C_and_U(
                 i, mde, groups, apnds, qits, updates, eenc, listener):
             return
 
-    return _okay  # whenever failure happened, we short circuited (Case405_404)
+    return _okay  # whenever failure happened, we short circuited (Case4234)
 
 
 # == CRAZY INSERTION (CREATE) ALGORITHM
@@ -120,7 +120,7 @@ def __check_comment_proximity_for_inserts(hed_ok_i, groups, qits, listener):
         if not _is_comment_line(blk_above.discretionary_block_lines[-1]):
             return
 
-        # (Case405_330)
+        # (Case4230)
         problems.append((inserts[0], (True, False, False)))  # as #here3
 
     itr = iter(groups)
@@ -222,7 +222,7 @@ def __determine_insertion_groupings(qits, creates):
     o_a = sorted(creates, key=lambda o: o.attribute_name.name_string)
 
     if not len(i_a):
-        # when there are no attributes in the entity, just append (Case466)
+        # when there are no attributes in the entity, just append (Case4236)
         return ((), tuple(o_a))  # no groups, all appends
 
     doc_scn = _Scanner(i_a)
@@ -270,7 +270,7 @@ def __determine_insertion_groupings(qits, creates):
         roll_over_line_and_maybe_group()
         if doc_scn.eos:
             # when you reach the end of the excerpt & you still have inserts
-            # (CREATEs) to make, this is where appends come from. (Case405_404)
+            # (CREATEs) to make, this is where appends come from. (Case4234)
 
             a = [req_scn.value]
             req_scn.advance()
@@ -388,7 +388,7 @@ def __U_and_D_comment_proximity_checkerer(problems, mde, listener):
                 if _first_line_is_comment(body_blocks[body_block_offset + 1]):
                     is_comment_below = True
 
-            # does this line contain a comment? (Case239).
+            # does this line contain a comment? (Case4226).
 
             # NOTE bc gists are guaranteed unique per request, no need to cache
             ok, yes = two_for_has_comment_via(attr_name.name_string, listener)
@@ -481,7 +481,7 @@ def __check_for_necessary_presence_or_absence(mde, req, listener):
             # it must already exist in entity..
 
             if blk is None:  # .. but no such attr by gist
-                add_problem('missing', cmpo)  # (Case148)
+                add_problem('missing', cmpo)  # (Case4221)
             else:
                 # .. and is found by gist
 
@@ -489,15 +489,15 @@ def __check_for_necessary_presence_or_absence(mde, req, listener):
                 surface_existent_name = blk.attribute_name_string
 
                 if surface_requested_name == surface_existent_name:
-                    pass  # win! maybe you can UPDATE/DELETE this (Case239)
+                    pass  # win! maybe you can UPDATE/DELETE this (Case4226)
                 else:
                     add_problem('missing', cmpo, blk)
         elif blk is None:
             # it must not already exist in entity and was not found by gist
-            pass  # win! maybe you can CREATE this component (Case420)
+            pass  # win! maybe you can CREATE this component (Case4230)
         else:
             # it must not already exist in entity but was found by gist
-            add_problem('collision', cmpo, blk)  # (Case125)
+            add_problem('collision', cmpo, blk)  # (Case4077)
 
     if len(problems):
         __complain_about_presence_problems(problems, listener)
@@ -518,8 +518,7 @@ def __complain_about_presence_problems(problems, listener):
         else:
             a = []
             via_verb[verb] = (cmpo.__class__, colli_or_miss, a)
-
-        a.append((cmpo, blk))  # include blk as none for (Case170)
+        a.append((cmpo, blk))  # include blk as none for (Case4220)
 
     long_sp_a = []
     for verb, (cls, colli_or_miss, arg_a) in via_verb.items():
@@ -569,7 +568,7 @@ def __apply_C_and_U(
         iid = qits[qits_i].IID
 
         if head_ok_i == qits_i:
-            # finish #here4 (Case405_443)
+            # finish #here4 (Case4235)
             # don't insert before the attribute line, insert before
             # the top comment (which must be the top of the world item)
 
@@ -588,13 +587,13 @@ def __apply_C_and_U(
     # insertion does not break an association.)
 
     if len(appends) and len(qits) and _first_line_is_comment(qits[-1].body_block):  # noqa: E501
-        mde.append_body_block(_blank_line())  # (Case405_404), (Case715)
+        mde.append_body_block(_blank_line())  # (Case4234), (Case4134)
 
     for append in appends:
-        mde.append_body_block(new_attr(append))  # (Case405_404)
+        mde.append_body_block(new_attr(append))  # (Case4234)
 
     for update in updates:
-        mde.replace_attribute_block__(new_attr(update))  # (Case352)
+        mde.replace_attribute_block__(new_attr(update))  # (Case4232)
 
     return _okay
 
@@ -607,7 +606,7 @@ def _blank_line():
 def __make_new_blocks(updates, groups, appends, eenc, listener):
     """in order to "encode" the values, use the real life toml library..
 
-    (Case405_352)
+    (Case4232)
     """
 
     # turn everything into two dictionaries,
@@ -622,7 +621,7 @@ def __make_new_blocks(updates, groups, appends, eenc, listener):
     semi_encoded_dct, vendor_lib_dct = tup
 
     # start by using the vendor lib to parse the one dict to get a big string
-    # (remarkably, the empty case just works (Case407_100):
+    # (remarkably, the empty case just works (Case4257):
     # empty dict -> empty big string -> no lines -> table_block w/ no childs)
 
     from toml import dumps as toml_dumps  # another #[#867.K]
@@ -640,7 +639,7 @@ def __make_new_blocks(updates, groups, appends, eenc, listener):
     # if you have any semi-encoded values to add, add them woot
 
     for attr_s, semi_encoded_lines in semi_encoded_dct.items():
-        # (Case407_100)
+        # (Case4257)
         table_block.append_multi_line_attribute_block_via_lines__(
                 attr_s, semi_encoded_lines)
 
@@ -673,7 +672,7 @@ def __PLAN_VIA(updates, groups, appends, eenc):
 
         tup = eenc.semi_encode(mixed, attr_name_s)
         if tup is None:
-            # (Case407_120)
+            # (Case4258)
             return
 
         name_value_plan, o = tup
@@ -686,20 +685,20 @@ def __PLAN_VIA(updates, groups, appends, eenc):
             semi_encoded_lines = o.semi_encoded_lines
             num_lines = len(semi_encoded_lines)
 
-            assert(num_lines)  # (Case407_120) empty string
+            assert(num_lines)  # (Case4258) empty string
 
             if 1 == num_lines:
                 if o.has_special_characters:
-                    # (Case407_140) one line, special chars
+                    # (Case4259) one line, special chars
                     vendor_lib_dct[attr_name_s] = mixed  # RE-ENCODE
                 else:
-                    # one line, no special chars (Case405_404)
+                    # one line, no special chars (Case4234)
                     vendor_lib_dct[attr_name_s] = mixed  # RE-ENCODE
             elif o.has_special_characters:
-                # (Case407_160) multiple lines, special chars
+                # (Case4260) multiple lines, special chars
                 semi_encoded_dct[attr_name_s] = semi_encoded_lines
             else:
-                # multiple lines, no special chars (Case407_100)
+                # multiple lines, no special chars (Case4257)
                 semi_encoded_dct[attr_name_s] = semi_encoded_lines
 
     return semi_encoded_dct, vendor_lib_dct

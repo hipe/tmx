@@ -123,7 +123,7 @@ class _SchemaPather:
         length = len(nds)
         assert(1 < length)
 
-        if self._is_single_file_schema:  # (Case775)
+        if self._is_single_file_schema:  # (Case4364)
             # single file path doesn't derive from iid, but we play along
             return (self._dir_path, 'entities.toml')  # #here4
 
@@ -294,7 +294,7 @@ def _paths_functions():
 
         absolutely do *not* rely on the filesystem to sort dir listings!
 
-        (Case720)
+        (Case4298)
         """
         _generator = posix_path.glob('*')  # ..
         _entries = list(_generator)
@@ -325,7 +325,7 @@ def vendor_parse_toml_or_catch_exception__(big_string):
 # == whiners
 
 def _whine_about_ID_depth(identifier, expected_length, listener):
-    def f():  # (Case703)
+    def f():  # (Case4126)
         act = len(identifier.native_digits)
         if act < expected_length:
             head = 'not enough'

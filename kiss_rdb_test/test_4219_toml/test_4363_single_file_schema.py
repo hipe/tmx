@@ -21,12 +21,10 @@ class _CommonCase(CUD_Methods, unittest.TestCase):
             return debugging_listener()
 
 
-# (is Case770 thru Case779)
-
-# Case770 traverse when fail
+# Case4358 traverse when fail
 
 
-class Case771_traversal_OK(_CommonCase):
+class Case4359_traversal_OK(_CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
 
@@ -53,10 +51,10 @@ class Case771_traversal_OK(_CommonCase):
                 filesystem=None)
 
 
-# Case772 retrieve fail
+# Case4360 retrieve fail
 
 
-class Case773_retrieve_OK(_CommonCase):
+class Case4361_retrieve_OK(_CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
         dct = self._result_value()
@@ -76,10 +74,10 @@ class Case773_retrieve_OK(_CommonCase):
         return _col.retrieve_entity('68', _listener)
 
 
-# Case774 delete fail
+# Case4362 delete fail
 
 
-class Case775_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(_CommonCase):
+class Case4364_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(_CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
 
@@ -109,10 +107,10 @@ class Case775_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(_CommonCase):
                 filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
-# Case776 update fail
+# Case4365 update fail
 
 
-class Case777_update_OK(_CommonCase):
+class Case4366_update_OK(_CommonCase):
     # remarkably, update for single file works with no modifcation to code
     # (beyond what we did to modify code for delete).
 
@@ -143,10 +141,10 @@ class Case777_update_OK(_CommonCase):
                 filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
-# Case778 create fail
+# Case4367 create fail
 
 
-class Case779_333_create_into_existing_file(_CommonCase):
+class Case4368_create_into_existing_file(_CommonCase):
     """note that we only expect one file rewrite here as opposed to the usual 2
     """
 

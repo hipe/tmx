@@ -18,7 +18,7 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
     might_debug = False
 
 
-class Case830_modality_specific_whiner(_CommonCase):
+class Case6067_modality_specific_whiner(_CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
         self.expect_exit_code_for_bad_request()
@@ -56,7 +56,7 @@ class Case830_modality_specific_whiner(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(0)  # ..
 
 
-class Case831_multi_line_create(_CommonCase):
+class Case6075_multi_line_create(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()

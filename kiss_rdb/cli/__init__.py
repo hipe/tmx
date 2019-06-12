@@ -44,7 +44,7 @@ def require_hub(orig_f):
             ec = orig_f(ctx, **kwargs)
             assert(isinstance(ec, int))
             if ec is 0:
-                return 0  # (Case822) (test_100)
+                return 0  # (Case6129) (test_100)
             else:
                 return __crazy_time(ec)  # should throw an exception
 
@@ -111,7 +111,7 @@ class _CommonFunctions:
         # derive the schema
         schema = lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
         if schema is None:
-            return  # (Case812)
+            return  # (Case5918)
 
         # money
         from kiss_rdb.storage_adapters_.toml import (
@@ -125,7 +125,7 @@ class _CommonFunctions:
         return _Monitor(_express_error_structure, _echo_error)
 
 
-def _express_error_structure(error_category, struct):  # (Case819)
+def _express_error_structure(error_category, struct):  # (Case6080)
     """FOR NOW, this is just a messy attempt at making contact with all the
 
     components we expect to see for different cases..
@@ -357,9 +357,9 @@ def get(ctx, collection, internal_identifier):
 
     dct = col.retrieve_entity(internal_identifier, listener)
     if dct is None:
-        return mon.max_errno or 404  # (Case818)  ##here1
+        return mon.max_errno or 404  # (Case6064)  ##here1
 
-    # (Case819):
+    # (Case6080):
     # don't get overly attached to the use of JSON here.
     # it's done out of the convenience of implementation here..
 
@@ -435,7 +435,7 @@ def traverse(ctx, collection):
 
     echo = click.echo
     for iid in _iids:
-        # (Case813)
+        # (Case5934)
         echo(iid.to_string())
 
     # (make contact with what went wrong..)
@@ -484,7 +484,7 @@ class _Monitor:
         error_categories_box = _Box()
 
         def listener(mood, *rest):
-            # (Case812)
+            # (Case5918)
             if 'error' == mood:
                 when_error(rest)
             else:

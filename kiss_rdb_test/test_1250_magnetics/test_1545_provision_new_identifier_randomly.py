@@ -35,7 +35,7 @@ _yes_no = {
         }
 
 
-class Case748_simplified(_CommonCase):
+class Case1545_simplified(_CommonCase):
 
     def test_07_load_module(self):
         self.assertIsNotNone(_subject_module())

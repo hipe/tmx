@@ -132,7 +132,7 @@ class _CommonCase(unittest.TestCase):
         return structurer()
 
 
-class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
+class Case4116_simplified_typical_retrieve_in_mid(_CommonCase):
 
     def test_100_runs(self):
         self.assertIsNotNone(self.entity())
@@ -168,7 +168,7 @@ class Case253_simplified_typical_retrieve_in_mid(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case259_not_found(_CommonCase):
+class Case4117_not_found(_CommonCase):
 
     def test_100_input_error_type_is_not_found(self):
         self.expect_not_found_input_error_type()
@@ -194,7 +194,7 @@ class Case259_not_found(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case263_not_found_anywhere(_CommonCase):
+class Case4118_not_found_anywhere(_CommonCase):
 
     def test_300_tells_you_it_traversed_the_whole_thing(self):
         self.assertTrue(self.error_structure_at('did_traverse_whole_file'))
@@ -214,7 +214,7 @@ class Case263_not_found_anywhere(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case266_at_head(_CommonCase):
+class Case4120_at_head(_CommonCase):
 
     def test_300_attributes(self):
         a = self.body_block_index()
@@ -240,7 +240,7 @@ class Case266_at_head(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case272_at_tail(_CommonCase):
+class Case4121_at_tail(_CommonCase):
 
     def test_300_attributes(self):
         a = self.body_block_index()
@@ -282,7 +282,7 @@ def _given_ABC_lines():
     """))
 
 
-class Case278_against_empty(_CommonCase):
+class Case4122_against_empty(_CommonCase):
 
     # #wish [#867.G] empty files would tell you they're empty in this case
 
@@ -306,7 +306,7 @@ class Case278_against_empty(_CommonCase):
         return ()
 
 
-class Case282_meta_not_yet_implemented(_CommonCase):
+class Case4123_meta_not_yet_implemented(_CommonCase):
 
     def test_100_message(self):
         es = self.retrieve_expecting_failure()
@@ -334,7 +334,7 @@ class Case282_meta_not_yet_implemented(_CommonCase):
         """)
 
 
-class Case284_duplicate_identifiers_can_get_shadowed(_CommonCase):
+class Case4124_duplicate_identifiers_can_get_shadowed(_CommonCase):
 
     # [#864.provision-3.1]: stop at the first one
 
@@ -370,7 +370,10 @@ class Case284_duplicate_identifiers_can_get_shadowed(_CommonCase):
         """)
 
 
-class Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
+# Case4125 # #midpoint
+
+
+class Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):  # noqa: E501
 
     """(note we don't actually run this thru a coarse parse)"""
 
@@ -395,7 +398,7 @@ class Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
         """
 
 
-class Case296_touch_multi_line(_CommonCase):  # #mutli-line-case
+class Case4127_touch_multi_line(_CommonCase):  # #mutli-line-case
     # before #history-A.1, the case around these input lines captured how it
     # was possible to use multi-line strings to "trick" our parser. now that
     # we attempt to support multi-line strings..
@@ -416,7 +419,7 @@ class Case296_touch_multi_line(_CommonCase):  # #mutli-line-case
         """
 
 
-class Case303_array_not_suported_yet(_CommonCase):
+class Case4128_array_not_suported_yet(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('array')
@@ -428,7 +431,7 @@ class Case303_array_not_suported_yet(_CommonCase):
         return 'array'
 
 
-class Case309_inline_tables_not_suported_yet(_CommonCase):
+class Case4129_inline_tables_not_suported_yet(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('inline table')
@@ -440,34 +443,41 @@ class Case309_inline_tables_not_suported_yet(_CommonCase):
         return 'inline-table'
 
 
-class Case316_the_easy_cases(_CommonCase):
+class Case4130_the_easy_cases(_CommonCase):
 
-    def test_316_bool_no_comment(self):  # Case316
+    def test_316_bool_no_comment(self):
         self.expect_no_comment_easy('bool-no-comment')
 
-    def test_322_bool_yes_comment(self):  # Case322
+    # Case4130.05
+    def test_322_bool_yes_comment(self):
         self.expect_yes_comment_easy('bool-yes-comment')
 
-    def test_328_int_no_comment(self):  # Case328
+    # Case4127.10
+    def test_328_int_no_comment(self):
         self.expect_no_comment_easy('int-no-comment')
 
-    def test_334_int_yes_comment(self):  # Case334
+    # Case4130.15
+    def test_334_int_yes_comment(self):
         self.expect_yes_comment_easy('int-yes-comment')
 
-    def test_341_float_no_comment(self):  # Case341
+    # Case4868.20
+    def test_341_float_no_comment(self):
         self.expect_no_comment_easy('float-no-comment')
 
-    def test_347_float_yes_comment(self):  # Case347
+    # Case4868.25
+    def test_347_float_yes_comment(self):
         self.expect_yes_comment_easy('float-yes-comment')
 
-    def test_353_datetime_no_comment(self):  # Case353
+    # Case4868.30
+    def test_353_datetime_no_comment(self):
         self.expect_no_comment_easy('datetime-no-comment')
 
-    def test_359_datetime_yes_comment(self):  # Case359
+    # Case4868.35
+    def test_359_datetime_yes_comment(self):
         self.expect_yes_comment_easy('datetime-yes-comment')
 
 
-class Case366_literal_string_not_yet_supported(_CommonCase):
+class Case4132_literal_string_not_yet_supported(_CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('literal string')
@@ -479,28 +489,31 @@ class Case366_literal_string_not_yet_supported(_CommonCase):
         return 'single-line-literal-string'
 
 
-class Case372_multi_line(_CommonCase):
+class Case4133_multi_line(_CommonCase):
 
     # (#tombstone-A.2 remembers when these were not yet supported)
 
-    def test_372_multi_line_literal_never_has_comment(self):  # Case372
+    def test_372_multi_line_literal_never_has_comment(self):
         self.expect_no_comment_easy('multi-line-literal')
 
-    def test_378_multi_line_basic_never_has_comment(self):  # Case378
+    # Case4133.20
+    def test_378_multi_line_basic_never_has_comment(self):
         self.expect_no_comment_easy('multi-line-basic')
 
 
-class Case384_the_hard_but_money_cases(_CommonCase):
+class Case4134_the_hard_but_money_cases(_CommonCase):
 
     # these are ones where we parse the string by hand and it works
 
-    def test_384_basic_string_simple(self):  # Case384
+    def test_384_basic_string_simple(self):
         self.expect_no_comment('basic-string-050-simple')
 
-    def test_391_basic_string_empty(self):  # Case391
+    # Case4134.20
+    def test_391_basic_string_empty(self):
         self.expect_yes_comment('basic-string-000-empty')
 
-    def test_397_escape(self):  # Case397
+    # Case4134.30
+    def test_397_escape(self):
         self.expect_yes_comment('basic-string-100-escape')
 
 

@@ -296,7 +296,7 @@ def _define_state_machine(funcs):  # interface here is VERY experimental!
     # --
 
     # BIG HACK: the function names for the below simple "testers"
-    # are used in UI !! eek (Case085) (e.g "blank line or comment line")
+    # are used in UI !! eek (Case4072) (e.g "blank line or comment line")
 
     def blank_line_or_comment(line):
         if '\n' == line:

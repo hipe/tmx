@@ -118,7 +118,7 @@ class _CommonCase(unittest.TestCase):
 # == 000's: INTRO, BASICS
 
 
-class Case402_000_empty(_CommonCase):
+class Case4153_empty(_CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -143,7 +143,7 @@ class Case402_000_empty(_CommonCase):
         return _doc_entity_via_lines(())
 
 
-class Case402_050_all_three_kinds_of_lines(_CommonCase):
+class Case4154_all_three_kinds_of_lines(_CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -168,7 +168,7 @@ class Case402_050_all_three_kinds_of_lines(_CommonCase):
         return _doc_entity_via_lines(_given)
 
 
-class Case402_060_index_gist_collision_in_entity(_CommonCase):
+class Case4155_index_gist_collision_in_entity(_CommonCase):
 
     def test_100_expect_run_failed_to_produce_value(self):
         self.expect_run_failed_to_produce_value()
@@ -225,7 +225,7 @@ class Case402_060_index_gist_collision_in_entity(_CommonCase):
 # == APPENDS/INSERTS
 
 
-class Case402_100_append_to_empty(_CommonCase):
+class Case4156_append_to_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -243,7 +243,7 @@ class Case402_100_append_to_empty(_CommonCase):
         return ()
 
 
-class Case402_110_append_to_non_empty(_CommonCase):
+class Case4157_append_to_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -264,7 +264,7 @@ class Case402_110_append_to_non_empty(_CommonCase):
         """)
 
 
-class Case402_120_insert_at_head(_CommonCase):
+class Case4159_insert_at_head(_CommonCase):  # #midpoint
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -287,7 +287,7 @@ class Case402_120_insert_at_head(_CommonCase):
         """)
 
 
-class Case402_130_insert_into_mid(_CommonCase):
+class Case4160_insert_into_mid(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -351,7 +351,7 @@ class Case402_130_insert_into_mid(_CommonCase):
 """
 
 
-class Case402_200_delete_at_head_to_make_non_empty(_CommonCase):
+class Case4151_delete_at_head_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -373,7 +373,7 @@ class Case402_200_delete_at_head_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case402_210_delete_from_mid_to_make_non_empty(_CommonCase):
+class Case4162_delete_from_mid_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -395,7 +395,7 @@ class Case402_210_delete_from_mid_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case402_230_delete_from_tail_to_make_non_empty(_CommonCase):
+class Case4163_delete_from_tail_to_make_non_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -417,7 +417,7 @@ class Case402_230_delete_from_tail_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case402_240_delete_to_make_empty(_CommonCase):
+class Case4165_delete_to_make_empty(_CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()

@@ -201,7 +201,7 @@ def identifier_via_string__(id_s, listener):
     for s in s_a:
         nd = native_digit_via_character_(s, listener)
         if nd is None:
-            return  # (Case702)
+            return  # (Case4282)
         digits.append(nd)
 
     return Identifier_(tuple(digits))
@@ -234,10 +234,10 @@ class Identifier_:
         self.native_digits = native_digits  # assume tuple #wish #[#008.D]
 
     def __lt__(self, other):  # :#here5
-        return self.native_digits < other.native_digits  # (Case764) and ..
+        return self.native_digits < other.native_digits  # (Case4302) and ..
 
     def __eq__(self, other):  # :#here4
-        return self.native_digits == other.native_digits  # (Case712)
+        return self.native_digits == other.native_digits  # (Case4294)
 
     def to_string(self):
         return ''.join(nd.character for nd in self.native_digits)
@@ -306,7 +306,7 @@ class _NativeDigit:
         return self.integer < other.integer
 
     def __eq__(self, other):
-        return self.integer == other.integer  # (Case712)
+        return self.integer == other.integer  # (Case4294)
 
 
 # FOR NOW every time this file is loaded, we're gonna build our thing here
@@ -323,7 +323,7 @@ _int_via_digit_char = {_digits[i]: i for i in range(0, _num_digits)}
 # == whiners
 
 def __whine_about_bad_digit(s, listener):
-    def f():  # (Case702)
+    def f():  # (Case4282)
         _reason = (
                 f'invalid character {repr(s)} in identifier - '
                 'identifier digits must be [0-9A-Z] minus 0, 1, O and I.'

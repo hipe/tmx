@@ -95,7 +95,7 @@ def __block_stream_via(args, CUD_function, block_itr, monitor):
 
     if head_block is None:
         # the only OK way there can be head block None is when the file is
-        # truly empty (or non-existent) (Case408). our hope is that for all
+        # truly empty (or non-existent) (Case4276). our hope is that for all
         # of C, U and D the CUD_function can implement itself indifferently.
         pass
     else:
@@ -179,7 +179,7 @@ def __blocks_for_DELETE(id_s, recv_doc_ent, block_itr, monitor):
         return
 
     if not did_find:
-        _whine_about_entity_not_found(id_s, monitor.listener)  # (Case707)
+        _whine_about_entity_not_found(id_s, monitor.listener)  # (Case4288)
         return
 
     # output any remaining entities in the file (this might fail at any point)

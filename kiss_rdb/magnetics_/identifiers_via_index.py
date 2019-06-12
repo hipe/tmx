@@ -232,7 +232,7 @@ class _StateMachineIsh():
         if 1 == indent_depth:
             self.process_line = self.process_what_should_be_rack_line
         else:
-            # (only for an unlikely depth of four) (Case739)
+            # (only for an unlikely depth of four) (Case1470)
             self.process_line = self.process_what_should_be_context_line
 
     # == BEGIN SHALLOW INVASION
@@ -344,7 +344,7 @@ class _StateMachineIsh():
             yield identifier_via_NDs(*significants, nd)
 
     def when_empty_file(self):
-        """(Case736) empty files
+        """(Case1466) empty files
         for now we introduce an asymmetry: blow up when an empty file is read
         (although we do not blow up when writing an empty collection - the
         client should check for no lines emitted..)

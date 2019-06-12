@@ -361,7 +361,7 @@ contiguous span of them _anchored to the end_ of the entity body that
 are in lexical order (when reading the file in the normal way).
 
 so like, if all the attributes are ordered with respect to each other,
-then this (Case443):
+then this:
 
      <--here
     A
@@ -378,7 +378,7 @@ then this:
      <--here
     C
 
-if some of them are, then this (Case404):
+if some of them are, then this:
 
     A
     B

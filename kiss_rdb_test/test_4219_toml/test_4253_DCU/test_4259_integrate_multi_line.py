@@ -20,7 +20,7 @@ class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
     pass
 
 
-class Case407_100_simplifed_typical(_CommonCase):
+class Case4257_simplifed_typical(_CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -46,7 +46,7 @@ class Case407_100_simplifed_typical(_CommonCase):
         """
 
 
-class Case407_120_empty_string(_CommonCase):
+class Case4258_empty_string(_CommonCase):
 
     def test_100_reason(self):
         self.assertIn('not allowed generally', self.error_structure['reason'])
@@ -72,7 +72,7 @@ class Case407_120_empty_string(_CommonCase):
         return ''
 
 
-class Case407_140_one_line_special_char(_CommonCase):
+class Case4259_one_line_special_char(_CommonCase):  # #midpoint
 
     def test_100_stores_as_one_line_not_multi_line(self):
         self.expect_big_success()
@@ -89,7 +89,7 @@ class Case407_140_one_line_special_char(_CommonCase):
         return ''
 
 
-class Case407_160_multiple_lines_and_special_chars(_CommonCase):
+class Case4260_multiple_lines_and_special_chars(_CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -115,7 +115,7 @@ class Case407_160_multiple_lines_and_special_chars(_CommonCase):
         """
 
 
-class Case407_180_no_newline_on_final_line(_CommonCase):
+class Case4261_no_newline_on_final_line(_CommonCase):
 
     def test_100_reason(self):
         self.assertIn('must have a newline', self.error_structure['reason'])

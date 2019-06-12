@@ -48,9 +48,9 @@ def _write_lower_level_methods(attrs):
         attrs._tail_IID = iid
 
         if old_tail is None:
-            attrs._head_IID = iid  # detroit become non empty (Case100)
+            attrs._head_IID = iid  # detroit become non empty (Case1369)
         else:
-            next_dct[old_tail] = iid  # append to non-empty (Case110)
+            next_dct[old_tail] = iid  # append to non-empty (Case1371)
 
         prev_dct[iid] = old_tail  # None ok
         next_dct[iid] = None
@@ -68,16 +68,16 @@ def _write_lower_level_methods(attrs):
         prev_dct[idd] = old_prev  # None ok
 
         if old_prev is None:
-            attrs._head_IID = idd  # insert at head (Case120)
+            attrs._head_IID = idd  # insert at head (Case1373)
         else:
-            next_dct[old_prev] = idd  # insert into mid (Case130)
+            next_dct[old_prev] = idd  # insert into mid (Case1375)
 
         next_dct[idd] = right_idd
         return idd
 
     def provision_IID():
         if len(holes):
-            # delete then add (Case320)
+            # delete then add (Case1385)
             iid = holes.pop()
         else:
             iid = len(items)
@@ -92,17 +92,17 @@ def _write_lower_level_methods(attrs):
         old_prev = prev_dct.pop(iid)
         old_next = next_dct.pop(iid)
 
-        if old_prev is None:  # delete at head (Case200)
+        if old_prev is None:  # delete at head (Case4097)
             attrs._head_IID = old_next  # None ok
-        else:  # if i had a previous update its next (Case210)
+        else:  # if i had a previous update its next (Case1379)
             next_dct[old_prev] = old_next  # None ok
 
-        if old_next is None:  # delete at tail (Case230)
+        if old_next is None:  # delete at tail (Case1381)
             attrs._tail_IID = old_prev  # None ok
-        else:  # if i had a next update its previous (Case200)
+        else:  # if i had a next update its previous (Case4097)
             prev_dct[old_next] = old_prev  # None ok
 
-        # detroit become empty is (Case240)
+        # detroit become empty is (Case1377)
 
         return item
 

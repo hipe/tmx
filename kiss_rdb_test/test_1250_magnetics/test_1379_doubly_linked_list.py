@@ -42,7 +42,7 @@ def _common_shared_state(orig_f):
     return new_f
 
 
-class Case000_empty(_CommonCase):
+class Case1367_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -58,7 +58,7 @@ class Case000_empty(_CommonCase):
         pass
 
 
-class Case100_append_to_empty(_CommonCase):
+class Case1369_append_to_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -74,7 +74,7 @@ class Case100_append_to_empty(_CommonCase):
         dll.append_item('A')
 
 
-class Case110_append_to_non_empty(_CommonCase):
+class Case1371_append_to_non_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -91,7 +91,7 @@ class Case110_append_to_non_empty(_CommonCase):
         dll.append_item('B')
 
 
-class Case120_insert_at_head(_CommonCase):
+class Case1373_insert_at_head(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -108,7 +108,7 @@ class Case120_insert_at_head(_CommonCase):
         dll.insert_item_before_item('B', iid)
 
 
-class Case130_insert_into_mid(_CommonCase):
+class Case1375_insert_into_mid(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -126,7 +126,7 @@ class Case130_insert_into_mid(_CommonCase):
         dll.insert_item_before_item('C', iid)
 
 
-class Case200_delete_at_head_to_make_non_empty(_CommonCase):
+class Case1377_delete_at_head_to_make_non_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -144,7 +144,7 @@ class Case200_delete_at_head_to_make_non_empty(_CommonCase):
         dll.delete_item(iid)
 
 
-class Case210_delete_from_mid_to_make_non_empty(_CommonCase):
+class Case1379_delete_from_mid_to_make_non_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -163,7 +163,7 @@ class Case210_delete_from_mid_to_make_non_empty(_CommonCase):
         dll.delete_item(iid)
 
 
-class Case230_delete_from_tail_to_make_non_empty(_CommonCase):
+class Case1381_delete_from_tail_to_make_non_empty(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -181,7 +181,7 @@ class Case230_delete_from_tail_to_make_non_empty(_CommonCase):
         dll.delete_item(iid)
 
 
-class Case240_delete_to_make_empty_SIMPLE(_CommonCase):
+class Case1383_delete_to_make_empty_SIMPLE(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -198,7 +198,7 @@ class Case240_delete_to_make_empty_SIMPLE(_CommonCase):
         dll.delete_item(iid)
 
 
-class Case320_integrate_delete_and_add(_CommonCase):
+class Case1385_integrate_delete_and_add(_CommonCase):
     """internally this covers that IID's from the "hole pool" are re-used"""
 
     def test_100_edit(self):
@@ -221,7 +221,7 @@ class Case320_integrate_delete_and_add(_CommonCase):
         dll.append_item('E')
 
 
-class Case410_replace_when_one(_CommonCase):
+class Case1389_replace_when_one(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -238,7 +238,7 @@ class Case410_replace_when_one(_CommonCase):
         dll.replace_item(iid, 'B')
 
 
-class Case420_replace_at_head(_CommonCase):
+class Case1391_replace_at_head(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()
@@ -256,7 +256,7 @@ class Case420_replace_at_head(_CommonCase):
         dll.replace_item(iid, 'C')
 
 
-class Case430_replace_at_tail(_CommonCase):
+class Case1393_replace_at_tail(_CommonCase):
 
     def test_100_edit(self):
         self.expect_edit()

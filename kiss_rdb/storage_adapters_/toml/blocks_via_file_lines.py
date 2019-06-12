@@ -51,7 +51,7 @@ class _MutableDocumentEntity:
     # -- write
 
     def delete_attribute_body_block_via_gist__(self, gist):
-        _iid = self._IID_via_gist[gist]  # (Case405_375)
+        _iid = self._IID_via_gist[gist]  # (Case4233)
         self._delete_block_via_iid(_iid)
 
     def _delete_block_via_iid(self, iid):  # #testpoint
@@ -108,7 +108,7 @@ class _MutableDocumentEntity:
         if gist in self._IID_via_gist:
             assert(listener)
             _item = self._LL.item_via_IID(self._IID_via_gist[gist])
-            _whine_about_collision(  # (Case402_060)
+            _whine_about_collision(  # (Case4155)
                     listener=listener,
                     new_name=attr_blk.attribute_name_string,
                     existing_name=_item.attribute_name_string,
@@ -223,7 +223,7 @@ class ActionsForCoarseBlockParse_(BaseActions_):
             return stop
         self.begin_table_with_(ts)
 
-        # (Case229): even if there are no head lines in file, yield out
+        # (Case4100): even if there are no head lines in file, yield out
         # this empty head block so consumers can be written more simply
         return (okay, _empty_head_block)
 
@@ -232,7 +232,7 @@ class ActionsForCoarseBlockParse_(BaseActions_):
         self._current_appendable_head_block = _mhb
 
     def ready__to__done(self):
-        return nothing  # (Case186) truly empty file yields out nothing
+        return nothing  # (Case4096) truly empty file yields out nothing
 
     def discretionary_block_1__to__discretionary_block_1(self):
         self._current_appendable_head_block._append_line(self._current_line())
@@ -246,7 +246,7 @@ class ActionsForCoarseBlockParse_(BaseActions_):
         return (okay, hb)
 
     def discretionary_block_1__to__done(self):
-        return (okay, self._release_head_block())  # (Case171) virt. empty file
+        return (okay, self._release_head_block())  # (Case4095) virt. empty file
 
     def table_begun__to__inside_table(self):
         self._add_single_line_KV_to_table()
@@ -359,7 +359,7 @@ class ActionsForCoarseBlockParse_(BaseActions_):
 
     # -- multi-line
 
-    def _begin_multi_line(self):  # (Case296)
+    def _begin_multi_line(self):  # (Case4127)
         _md = self._parse_state.current_matchdata  # #here1
         _mlab = _MultiLineAttributeBlock(_md)
         self._current_appendable_table_block._append_block(_mlab)
@@ -440,7 +440,7 @@ class _AppendableTableBlock:
 
     def to_line_stream(self):
         yield self._table_start_line_object.line
-        for blk in self._body_blocks:  # (Case441)
+        for blk in self._body_blocks:  # (Case4278)
             for line in blk.to_line_stream():
                 yield line
 
@@ -473,7 +473,7 @@ class _multi_line_attribute_block_via:  # ..
                 yield last_line
                 yield '"""\n'
             else:
-                # (Case407_180) - currently never allowed
+                # (Case4261) - currently never allowed
                 assert(False)
                 yield f'{last_line}"""\n'
 
@@ -482,7 +482,7 @@ class _multi_line_attribute_block_via:  # ..
     def to_line_stream(self):
         return self._lines
 
-    is_attribute_block = True  # (Case831)
+    is_attribute_block = True  # (Case6075)
 
 
 class _MultiLineAttributeBlock:

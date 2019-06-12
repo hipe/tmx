@@ -11,7 +11,7 @@ from modality_agnostic.memoization import (  # noqa: E402
 _CommonCase = unittest.TestCase
 
 
-class Case100_works(_CommonCase):
+class Case1293_works(_CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_function())
@@ -27,7 +27,7 @@ class Case100_works(_CommonCase):
         self.assertEqual(a, ["hello Xx Yy\n"])
 
 
-class Case200_fails(_CommonCase):
+class Case1299_fails(_CommonCase):
 
     def test_100_channel(self):
         chan = self._channel_and_lines()[0]

@@ -96,7 +96,7 @@ class _CommonCase(unittest.TestCase):
         return depth, _identifiers
 
 
-class Case731_simplified_typical_NO_rerack_at_first(_CommonCase):
+class Case1452_simplified_typical_NO_rerack_at_first(_CommonCase):
 
     def test_050_load_module(self):
         self.assertIsNotNone(_subject_module())
@@ -121,7 +121,7 @@ class Case731_simplified_typical_NO_rerack_at_first(_CommonCase):
                 )
 
 
-class Case734_simplified_typical_YES_rerack_at_first(_CommonCase):
+class Case1458_simplified_typical_YES_rerack_at_first(_CommonCase):
 
     def test_100_write_file(self):
         self.writes_file()
@@ -145,7 +145,7 @@ class Case734_simplified_typical_YES_rerack_at_first(_CommonCase):
                 )
 
 
-class Case735_simplified_multiple_rack_lines_in_a_row(_CommonCase):
+class Case1462_simplified_multiple_rack_lines_in_a_row(_CommonCase):
 
     def test_100_write_file(self):
         self.writes_file()
@@ -172,7 +172,7 @@ class Case735_simplified_multiple_rack_lines_in_a_row(_CommonCase):
                 )
 
 
-class Case736_none(_CommonCase):
+class Case1466_none(_CommonCase):
 
     def test_100_write_file(self):
         self.writes_file()
@@ -192,7 +192,7 @@ class Case736_none(_CommonCase):
         return ()
 
 
-class Case739_deeper(_CommonCase):
+class Case1470_deeper(_CommonCase):
 
     def test_100_write_file(self):
         self.writes_file()
@@ -222,7 +222,7 @@ class Case739_deeper(_CommonCase):
                 )
 
 
-class Case740_shallowest(_CommonCase):
+class Case1474_shallowest(_CommonCase):
 
     def test_100_write_file(self):
         self.writes_file()

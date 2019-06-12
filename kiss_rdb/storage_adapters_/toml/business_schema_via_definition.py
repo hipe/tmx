@@ -65,7 +65,7 @@ def _build_semi_encoder(listener, o):
         """
 
         if str == typ:
-            # (Case405_404)
+            # (Case4234)
             _se = _default_string_encoder()
             ses = _se.encode(mixed, listener)  # ses = semi-encoded string
             if ses is None:
@@ -75,13 +75,13 @@ def _build_semi_encoder(listener, o):
             length = len(lines)
 
             if 0 == length:
-                # (Case407_120_empty_string)
+                # (Case4258_empty_string)
                 assert(not allow_empty_strings)  # ..
                 _whine_about_empty_string(listener, name)
                 return
 
             if 1 != length and '\n' != lines[-1][-1]:
-                # (Case407_180)
+                # (Case4261)
                 assert(not allow_unclean_blocks)
                 _whine_about_unclean_blocks(listener, mixed, name)
                 return
@@ -92,11 +92,11 @@ def _build_semi_encoder(listener, o):
             cover_me('boolean no problem')
 
         if int == typ:
-            # (Case405_352)
+            # (Case4232)
             return _use_vendor_lib, None
 
         if float == typ:
-            # (Case405_404)
+            # (Case4234)
             return _use_vendor_lib, None
 
         if hasattr(typ, 'utcfromtimestamp'):

@@ -56,7 +56,7 @@ class _Main:
         for appendable_table_block in self._item_itr:  # once
             break
 
-        return appendable_table_block  # (Case253) (again)
+        return appendable_table_block  # (Case4116) (again)
 
     def __init__(self, id_s, all_lines, listener):
 
@@ -82,7 +82,7 @@ class _Main:
     def change_the_parse_actions(self):
         """this is the craziest thing...
 
-        CHANGE THE PARSE ACTIONS MID PARSE (Case253)
+        CHANGE THE PARSE ACTIONS MID PARSE (Case4116)
         """
 
         # hack a new parse actions to be as if it has started w/ the new table
@@ -142,7 +142,7 @@ class _Main:
             return
 
         if 'attributes' != ts.table_type:
-            # future feature 1 - meta tables (Case282)
+            # future feature 1 - meta tables (Case4123)
             _emit_table_type_not_yet_implemented(self._use_listener(), ts)
             self.OK = False
             return
@@ -171,7 +171,7 @@ def comment_tester_via_body_blocks_(body_blocks, listener):
     _big_string = ''.join(to_body_line_stream())
     dct = _vendor_parse(_big_string, listener)
     if dct is None:
-        return  # (Case290)
+        return  # (Case4126)
 
     # does it look like the coarse parse parsed it correctly?
 
@@ -209,16 +209,16 @@ def comment_tester_via_body_blocks_(body_blocks, listener):
             # step into the fun part of the problem.
             return __yes_no_string_attribute_line_has_commment(attr_blk, listener)  # noqa: E501
         elif isinstance(x, bool):  # NOTE test bool before int! is-a
-            return the_easy_way()  # (Case316) (Case322)
+            return the_easy_way()  # (Case4130) (Case4130.05)
         elif isinstance(x, int):
-            return the_easy_way()  # (Case328) (Case334)
+            return the_easy_way()  # (Case4127.10) (Case4130.15)
         elif isinstance(x, float):
-            return the_easy_way()  # (Case341) (Case347)
+            return the_easy_way()  # (Case4868.20) (Case4868.25)
         elif isinstance(x, datetime.datetime):
-            return the_easy_way()  # (Case353) (Case359)
+            return the_easy_way()  # (Case4868.30) (Case4868.35)
         elif isinstance(x, list):
-            return _toml_type_not_supported('array', listener)  # (Case303)
-        elif hasattr(x, 'items'):  # don't reach deep into. (Case309)
+            return _toml_type_not_supported('array', listener)  # (Case4128)
+        elif hasattr(x, 'items'):  # don't reach deep into. (Case4129)
             return _toml_type_not_supported('inline table', listener)
         else:
             assert(False)  # that's all the types there is according to the doc
@@ -284,13 +284,13 @@ def __yes_no_single_line_string_attribute_block_has_comment(attr_blk, listener):
         return stop  # #here1
 
     if multi_basic is not None:
-        assert(False)  # this was (Case378), is now elsewhere
+        assert(False)  # this was (Case4133.20), is now elsewhere
 
     elif multi_literal is not None:
-        assert(False)  # this was (Case366)
+        assert(False)  # this was (Case4132)
 
     elif literal is not None:
-        return _not_yet('literal string')  # (Case372)
+        return _not_yet('literal string')  # (Case4133)
 
     assert(basic)
 
@@ -300,7 +300,7 @@ def __yes_no_single_line_string_attribute_block_has_comment(attr_blk, listener):
     # step along each of the zero or more characters in the body of the
     # surface string looking for the first '"' that isn't escaped.
 
-    # simple string: (Case381)  empty string: (Case391)
+    # simple string: (Case4134)  empty string: (Case4134.20)
 
     while True:
         # advance over any boring characters
@@ -323,7 +323,7 @@ def __yes_no_single_line_string_attribute_block_has_comment(attr_blk, listener):
         # we advanced over any ordinary characters above. therefor (right?)
         # the only thing this could possibly be is an escape sequence:
 
-        assert('\\' == c)  # (Case397)
+        assert('\\' == c)  # (Case4134.30)
         position += 1
 
         md = _escape_tail.match(line, position)
@@ -409,7 +409,7 @@ def __check_name_sets(dct, body_blocks, listener):
     however we leave this intact because it is a good sanity check for our
     coarse-parse hack.
 
-    this is discusseed in [#866]. (Case303)
+    this is discusseed in [#866]. (Case4128)
     """
 
     by_coarse = set(o.attribute_name_string for o in body_blocks if o.is_attribute_block)  # noqa: E501
@@ -421,7 +421,7 @@ def __check_name_sets(dct, body_blocks, listener):
         cover_me('this became detached and uncoverable')  # (see 2 lines below)
 
         def f():
-            # (used to get hit by (Case297) before #history-A.4. now cannot.)
+            cover_me("this used to be covered but now is not")  # #history-A.4
 
             from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
                     oxford_AND)
@@ -444,7 +444,7 @@ def entity_dict_via_entity_big_string__(big_string, listener):
 
     this will expand when we get to [#864.future-feature-1] meta
 
-    (Case711) (retrieve)
+    (Case4292) (retrieve)
     """
 
     dct = _vendor_parse(big_string, listener)
@@ -483,9 +483,9 @@ def _vendor_parse(big_string, listener):  # #testpoint
 def _emit_not_found(listener, did_traverse_whole_file, identifier_string):
     def f():
         if did_traverse_whole_file:
-            which = 'not in file'  # (Case263)
+            which = 'not in file'  # (Case4118)
         else:
-            which = 'not found'  # (Case259)
+            which = 'not found'  # (Case4117)
         return {
                 'reason': f'{repr(identifier_string)} { which }',
                 'did_traverse_whole_file': did_traverse_whole_file,

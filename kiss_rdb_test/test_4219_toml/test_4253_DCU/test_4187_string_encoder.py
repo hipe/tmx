@@ -77,7 +77,7 @@ class _CommonCase(unittest.TestCase):
         return _common_subject().encode(_big_s, listener)
 
 
-class Case657_basics(_CommonCase):
+class Case4181_basics(_CommonCase):
 
     def test_100_this_library_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -86,7 +86,7 @@ class Case657_basics(_CommonCase):
         self.assertIsNotNone(_common_subject())
 
 
-class Case660_empty_string(_CommonCase):
+class Case4182_empty_string(_CommonCase):
 
     def test_100_no_lines(self):
         _ = self.semi_encoded_lines()
@@ -103,7 +103,7 @@ class Case660_empty_string(_CommonCase):
         return ''
 
 
-class Case662_first_line_too_long(_CommonCase):
+class Case4183_first_line_too_long(_CommonCase):
 
     def test_100(self):
         self.whines_talkinbout(
@@ -113,7 +113,7 @@ class Case662_first_line_too_long(_CommonCase):
         return _ninety_character_long_string
 
 
-class Case666_non_first_line_too_long(_CommonCase):
+class Case4184_non_first_line_too_long(_CommonCase):
 
     def test_100(self):
         self.assertEqual(
@@ -138,7 +138,7 @@ class Case666_non_first_line_too_long(_CommonCase):
         return ''.join(these())
 
 
-class Case671_too_many_lines(_CommonCase):
+class Case4185_too_many_lines(_CommonCase):
 
     def test_100(self):
         self.whines_talkinbout(
@@ -153,7 +153,7 @@ class Case671_too_many_lines(_CommonCase):
                 """))
 
 
-class Case675_character_to_avoid_for_now(_CommonCase):
+class Case4187_character_to_avoid_for_now(_CommonCase):  # #midpoint
 
     def test_100(self):
         _expect = (
@@ -175,7 +175,7 @@ class Case675_character_to_avoid_for_now(_CommonCase):
         return 'abc\n12\t3\n'
 
 
-class Case677_things_to_escape_but_only_one_line(_CommonCase):
+class Case4188_things_to_escape_but_only_one_line(_CommonCase):
 
     def test_100_things_were_escaped(self):
         _ = self.semi_encoded_lines()
@@ -192,7 +192,7 @@ class Case677_things_to_escape_but_only_one_line(_CommonCase):
         return 'aa "\\t" cc'  # not a real tab character
 
 
-class Case680_a_shorter_line_encodes_for_single_line(_CommonCase):
+class Case4189_a_shorter_line_encodes_for_single_line(_CommonCase):
 
     def test_100(self):
         o = self.build_encoding_plan_expecting_success()
@@ -203,7 +203,7 @@ class Case680_a_shorter_line_encodes_for_single_line(_CommonCase):
         return 'one.......ten.......twenty....thirty....fourty....fifty..'
 
 
-class Case684_a_long_but_not_too_long_line(_CommonCase):
+class Case4190_a_long_but_not_too_long_line(_CommonCase):
 
     def test_100_one_line(self):
         self.expect_encodes_as_single_line_string()
@@ -223,7 +223,7 @@ class Case684_a_long_but_not_too_long_line(_CommonCase):
         return _seventy_nine_chars
 
 
-class Case689_typical_simplified(_CommonCase):
+class Case4191_typical_simplified(_CommonCase):
 
     def test_100_mutli_line(self):
         self.expect_encodes_as_multi_line_string()
@@ -244,7 +244,7 @@ class Case689_typical_simplified(_CommonCase):
         return "line 1\nline 2\nline 3\n"
 
 
-class Case693_no_trailing_newline(_CommonCase):
+class Case4193_no_trailing_newline(_CommonCase):
 
     def test_300_didnt_add_newline(self):
         _actual = self.semi_encoded_lines()

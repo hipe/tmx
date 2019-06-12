@@ -74,11 +74,11 @@ def _encode(string, o, listener):
         if first_too_high_paragraph_line == line_no:
             _yn = has_one_more_line()  # silly feature
             _whine_about_too_many_lines(listener, _yn, line_no, line, o)
-            return  # (Case671)
+            return  # (Case4185)
 
         if paragraph_line_max_width < len(line):
             _whine_about_line_too_long(listener, use_line_no(), line, o)
-            return  # (Case662)
+            return  # (Case4183)
 
         itr = _special_chars_rx.finditer(line)
 
@@ -95,7 +95,7 @@ def _encode(string, o, listener):
 
         escd_line = _escape_line(md, itr, line_no, listener)
         if not escd_line:
-            return  # (Case675)
+            return  # (Case4187)
 
         semi_encoded_lines.append(escd_line)
 
@@ -116,8 +116,8 @@ def _encode(string, o, listener):
     to store the thing..
     """
 
-    # (Case677) - one line
-    # (Case660) - the empty string
+    # (Case4188) - one line
+    # (Case4182) - the empty string
 
     return _SemiEncodedString(
             has_special_characters=paragraph_had_one,
@@ -149,7 +149,7 @@ def _escape_line(md, itr, line_no, listener):
         _special_char_ord = ord(special_char)
         name, is_supported, *rest = _special_chars[_special_char_ord]
         if not is_supported:
-            _whine_about_special_character_not_supported(  # (Case675)
+            _whine_about_special_character_not_supported(  # (Case4187)
                     span_begin, name, line, line_no, listener)
             return
         escape_expession_right_hand_side, = rest

@@ -4,7 +4,7 @@ def request_via_tuples(tuples, listener):
         _emit_request_error_via_reason(msg, listener)
 
     if not len(tuples):
-        return reason('request was empty')  # (Case011)
+        return reason('request was empty')  # (Case4214)
 
     from kiss_rdb.storage_adapters_.toml import (
         blocks_via_file_lines as ent_lib)
@@ -24,7 +24,7 @@ def request_via_tuples(tuples, listener):
 
         gist = gist_via(attr_name_string, listener)
         if not gist:  # life is easier to fail on the first one, meh
-            return  # meh just short circuit b.c emitted (Case057)
+            return  # meh just short circuit b.c emitted (Case4216)
 
         an = _AttributeName(gist, attr_name_string)
 
@@ -35,7 +35,7 @@ def request_via_tuples(tuples, listener):
 
     if strange_verbs is not None:
         _ = ', '.join(strange_verbs.keys())
-        return reason(f'unrecognized verb(s): ({_})')  # (Case034)
+        return reason(f'unrecognized verb(s): ({_})')  # (Case4215)
 
     if not name_index.validate_uniqueness_of_names():
         return
@@ -194,18 +194,18 @@ def _express_collisions(collisions, listener):
 
     and_join = []
 
-    # -- (Case080)
+    # --
     if has_SF_collision:
-        and_join.append(
+        and_join.append(  # (Case4217)
                 'an attribute name cannot appear more than once per request')
     for sn, count in more_than_one_count_via_surface_form.items():
         _N_times = 'twice' if 2 == count else f'{count} times'
         and_join.append(f'{repr(sn)} appeared {_N_times}')
     # --
 
-    # -- (Case102)
+    # --
     for gist, sns in list_of_gist_and_surface_names:
-        _ = _oxford_AND(repr(x) for x in sns)
+        _ = _oxford_AND(repr(x) for x in sns)  # (Case4218)
         and_join.append(
                 f'{_} are too similar to co-exist validly in one request')
     # --

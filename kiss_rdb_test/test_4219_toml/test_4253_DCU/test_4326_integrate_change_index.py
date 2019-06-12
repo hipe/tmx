@@ -34,13 +34,13 @@ class _CommonCase(CUD_Methods, unittest.TestCase):
             return _debugging_listener()
 
 
-class Case701_collection_can_be_built_with_noent_dir(_CommonCase):
+class Case4316_collection_can_be_built_with_noent_dir(_CommonCase):
 
     def test_100(self):
         self.assertIsNotNone(_collection_with_noent_dir())
 
 
-class Case702_identifier_with_invalid_chars(_CommonCase):
+class Case4317_identifier_with_invalid_chars(_CommonCase):
 
     def test_100_reason(self):
         _actual = self.left_half
@@ -60,7 +60,7 @@ class Case702_identifier_with_invalid_chars(_CommonCase):
         return _collection_with_NO_filesystem()
 
 
-class Case703_identifier_too_short_or_long(_CommonCase):
+class Case4318_identifier_too_short_or_long(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -79,7 +79,7 @@ class Case703_identifier_too_short_or_long(_CommonCase):
         return _collection_with_NO_filesystem()
 
 
-class Case704_some_top_directory_not_found(_CommonCase):
+class Case4319_some_top_directory_not_found(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -100,7 +100,7 @@ class Case704_some_top_directory_not_found(_CommonCase):
         return _collection_with_noent_dir()
 
 
-class Case705_file_not_found(_CommonCase):
+class Case4320_file_not_found(_CommonCase):
 
     def test_100_complaint(self):
         _actual = self.left_half
@@ -121,7 +121,7 @@ class Case705_file_not_found(_CommonCase):
                 filesystem=None)
 
 
-class Case706_entity_not_found(_CommonCase):
+class Case4322_entity_not_found(_CommonCase):
 
     def test_100_failed_to_rewrite(self):
         self._structure_and_recordings()  # because #here2
@@ -145,14 +145,14 @@ class Case706_entity_not_found(_CommonCase):
                 filesystem=filesystem_expecting_no_rewrites())
 
 
-# Case707 - not found because bad ID
-# Case708 - not found because no dir
-# Case709 - not found because no file
-# Case710 - not found because no ent in file
-# Case711 - win
+# Case4323 - not found because bad ID
+# Case4324 - not found because no dir
+# Case4325 - not found because no file
+# ✔️ Case4326 - not found because no ent in file
+# ✔️ Case4259 - win
 
 
-class Case710_retrieve_no_ent_in_file(_CommonCase):
+class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
 
     def test_100_emits_error_structure(self):
         col = _collection_with_NO_filesystem()
@@ -161,14 +161,14 @@ class Case710_retrieve_no_ent_in_file(_CommonCase):
             return col.retrieve_entity('B9F', listener)
         sct = self.run_this_expecting_failure(f)
 
-        # ~(Case253-Case384) cover the detailed components from this.
+        # ~(Case4116-Case4134) cover the detailed components from this.
         # this is just sort of a "curb-check" contact point integration check
 
         self.assertEqual(sct['input_error_type'], 'not_found')
         self.assertEqual(sct['identifier_string'], 'B9F')
 
 
-class Case711_retrieve(_CommonCase):
+class Case4328_retrieve(_CommonCase):
 
     def test_100_identifier_is_in_result_dictionary(self):
         _actual = self._this_dict()['identifier_string']
@@ -185,7 +185,7 @@ class Case711_retrieve(_CommonCase):
         return _col.retrieve_entity('B9H', _no_listener)
 
 
-class Case712_delete_simplified_typical(_CommonCase):
+class Case4329_delete_simplified_typical(_CommonCase):
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
         self.recorded_file_rewrites()
@@ -221,7 +221,7 @@ class Case712_delete_simplified_typical(_CommonCase):
         return _build_collection_expecting_common_number_of_rewrites()
 
 
-class Case713_delete_that_leaves_file_empty(_CommonCase):
+class Case4330_delete_that_leaves_file_empty(_CommonCase):
 
     def test_100_would_have_succeeded(self):
         self.recorded_file_rewrites()
@@ -252,10 +252,10 @@ class Case713_delete_that_leaves_file_empty(_CommonCase):
         return _build_collection_expecting_common_number_of_rewrites()
 
 
-# Case714: delete when index file is left empty! (delete the last entity)
+# Case4331: delete when index file is left empty! (delete the last entity)
 
 
-class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
+class Case4332_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     """
     .#open [#867.H] it "thinks of" {whitespace|comments} as being
 
@@ -302,7 +302,7 @@ class Case715_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
                 filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
-class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
+class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):  # noqa: E501
 
     def test_100_channel(self):
         _channel = self._these_two()[0]
@@ -343,7 +343,7 @@ class Case720_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
                 filesystem=None)
 
 
-class Case725_simplified_typical_traversal(_CommonCase):
+class Case4335_simplified_typical_traversal(_CommonCase):
 
     def test_100_everything(self):
 
@@ -374,7 +374,7 @@ class Case725_simplified_typical_traversal(_CommonCase):
                 filesystem=None)
 
 
-class Case764_create_into_existing_file(_CommonCase):
+class Case4336_create_into_existing_file(_CommonCase):
 
     def test_100_succeeds(self):
         self.recorded_file_rewrites()
@@ -426,9 +426,9 @@ class Case764_create_into_existing_file(_CommonCase):
                 filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
-# class Case765_create_failure_cleans_up_created_file(_CommonCase):
+# class Case4305_create_failure_cleans_up_created_file(_CommonCase):
 
-"""(Case765): the whole purpose of "cleanup functions" is to enable us to
+"""(Case4305): the whole purpose of "cleanup functions" is to enable us to
 handle the case of when we have created a new entities file and the
 transaction fails. as it turns out, this case is perhaps logically impossible
 for us to trigger except under exceedingly contrived circumstances:
@@ -444,7 +444,7 @@ as far as creating the new entities file.
 """
 
 
-class Case766_create_into_noent_file(_CommonCase):
+class Case4337_create_into_noent_file(_CommonCase):
 
     def test_100_succeeds(self):
         self.recorded_file_rewrites()

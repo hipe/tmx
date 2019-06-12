@@ -20,7 +20,7 @@ canon = storage_adapter_canon.produce_agent()
 _CommonCase = unittest.TestCase
 
 
-class Case2535_traverse_whole_collection_as_IDs(_CommonCase):
+class Case2557_traverse_whole_collection_as_IDs(_CommonCase):
 
     def test_100_all_IDs_are_there_in_any_order_none_repeated(self):
         _ = canon.case_of_traverse_IDs_from_non_empty_collection

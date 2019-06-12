@@ -19,7 +19,7 @@ class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
         self.assertEqual(_actual, ' because names must match exactly')
 
 
-class Case405_011_when_request_empty(_CommonCase):
+class Case4214_when_request_empty(_CommonCase):
 
     def test_100_reason(self):
         self.expect_reason('request was empty')
@@ -28,7 +28,7 @@ class Case405_011_when_request_empty(_CommonCase):
         return _request_via_tuples((), listener)
 
 
-class Case405_034_strange_verbs(_CommonCase):
+class Case4215_strange_verbs(_CommonCase):
 
     def test_100_reason(self):
         self.expect_reason('unrecognized verb(s): (fiz, bru-zuz)')
@@ -38,7 +38,7 @@ class Case405_034_strange_verbs(_CommonCase):
             (('fiz', 'a'), ('delete', 'x'), ('bru-zuz', 'x')), listener)
 
 
-class Case405_057_wrong_looking_attribute_name(_CommonCase):
+class Case4216_wrong_looking_attribute_name(_CommonCase):
 
     def test_100_input_error(self):
         chan, sct = self.expect_error_structure()
@@ -54,7 +54,7 @@ class Case405_057_wrong_looking_attribute_name(_CommonCase):
             ), listener)
 
 
-class Case405_080_duplicate_names_within_request(_CommonCase):
+class Case4217_duplicate_names_within_request(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -77,7 +77,7 @@ class Case405_080_duplicate_names_within_request(_CommonCase):
             ), listener)
 
 
-class Case405_102_names_too_similar_within_request(_CommonCase):
+class Case4218_names_too_similar_within_request(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[1]
@@ -101,7 +101,7 @@ class Case405_102_names_too_similar_within_request(_CommonCase):
             ), listener)
 
 
-class Case405_125_cannot_create_when_attributes_already_exist(_CommonCase):
+class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._right()
@@ -137,7 +137,7 @@ class Case405_125_cannot_create_when_attributes_already_exist(_CommonCase):
         """
 
 
-class Case405_148_cannot_delete_because_attributes_not_found(_CommonCase):
+class Case4221_cannot_delete_because_attributes_not_found(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -165,7 +165,7 @@ class Case405_148_cannot_delete_because_attributes_not_found(_CommonCase):
         """
 
 
-class Case405_170_cannot_delete_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
+class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
 
     def test_100_context(self):
         _actual = self._three_parts()[0]
@@ -190,7 +190,7 @@ class Case405_170_cannot_delete_because_attributes_not_exact_match(_CommonCase):
         """
 
 
-class Case405_193_cannot_update_because_attributes_not_found(_CommonCase):
+class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
 
     def test_100_reason(self):
         _actual = self._two_parts()[0]
@@ -213,7 +213,7 @@ class Case405_193_cannot_update_because_attributes_not_found(_CommonCase):
         """
 
 
-class Case405_216_cannot_update_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
+class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
 
     def test_100_context(self):
         _actual = self._three_parts()[0]
@@ -238,7 +238,8 @@ class Case405_216_cannot_update_because_attributes_not_exact_match(_CommonCase):
         """
 
 
-class Case405_239_cannot_delete_because_comment_line_above(_CommonCase):
+class Case4226_cannot_delete_because_comment_line_above(_CommonCase):
+    # #midpoint in file
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
         _actual = self._two_parts()[0]
@@ -263,7 +264,7 @@ class Case405_239_cannot_delete_because_comment_line_above(_CommonCase):
         """
 
 
-class Case405_261_cannot_update_because_comment_line_below(_CommonCase):
+class Case4227_cannot_update_because_comment_line_below(_CommonCase):
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
         _actual = self._two_parts()[0]
@@ -288,7 +289,7 @@ class Case405_261_cannot_update_because_comment_line_below(_CommonCase):
         """
 
 
-class Case405_284_cannot_update_because_attribute_line_has_comment(_CommonCase):  # noqa: E501
+class Case4228_cannot_update_because_attribute_line_has_comment(_CommonCase):  # noqa: E501
 
     def test_100_unable(self):
         _actual = self._two_parts()[0]
@@ -311,7 +312,7 @@ class Case405_284_cannot_update_because_attribute_line_has_comment(_CommonCase):
         """
 
 
-class Case405_307_aggregate_multiple_comment_based_failures(_CommonCase):
+class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
 
     def test_100_broken_up_into_two_sentences(self):
         self.assertEqual(len(self._two_sentences()), 2)
@@ -343,7 +344,7 @@ class Case405_307_aggregate_multiple_comment_based_failures(_CommonCase):
         """
 
 
-class Case405_330_cannot_create_because_comment_line_above(_CommonCase):
+class Case4230_cannot_create_because_comment_line_above(_CommonCase):
 
     def test_100_produces_two_sentences(self):
         self.assertIsNotNone(self._two_sentences())
@@ -392,7 +393,7 @@ class Case405_330_cannot_create_because_comment_line_above(_CommonCase):
         """
 
 
-class Case405_352_can_update_idk(_CommonCase):
+class Case4232_can_update_idk(_CommonCase):
 
     # this almost touches #multi-line
 
@@ -415,7 +416,7 @@ class Case405_352_can_update_idk(_CommonCase):
         """
 
 
-class Case405_375_can_delete(_CommonCase):
+class Case4233_can_delete(_CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -441,7 +442,7 @@ class Case405_375_can_delete(_CommonCase):
 # (available: 398)
 
 
-class Case405_404_can_create_when_comment_line_at_tail(_CommonCase):
+class Case4234_can_create_when_comment_line_at_tail(_CommonCase):
 
     # this tests for #multi-line but is not
 
@@ -485,7 +486,7 @@ class Case405_404_can_create_when_comment_line_at_tail(_CommonCase):
         """
 
 
-class Case405_443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
+class Case4235_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -516,7 +517,7 @@ class Case405_443_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
         """
 
 
-class Case405_466_create_into_truly_empty(_CommonCase):
+class Case4236_create_into_truly_empty(_CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()
@@ -536,7 +537,7 @@ class Case405_466_create_into_truly_empty(_CommonCase):
         """
 
 
-class Case405_489_create_into_empty_with_comments(_CommonCase):
+class Case4238_create_into_empty_with_comments(_CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()

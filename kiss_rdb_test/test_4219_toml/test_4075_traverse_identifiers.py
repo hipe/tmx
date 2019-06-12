@@ -86,7 +86,7 @@ class _CommonCase(unittest.TestCase):
         raise Exception('ha ha')
 
 
-class Case055_truly_blank_file_produces_empty_stream(_CommonCase):
+class Case4070_truly_blank_file_produces_empty_stream(_CommonCase):
     """
     (language production for "no lines in input" in #tombstone-A.1)
     """
@@ -99,7 +99,7 @@ class Case055_truly_blank_file_produces_empty_stream(_CommonCase):
         return ()
 
 
-class Case075_effectively_empty_file_produces_empty_stream(_CommonCase):
+class Case4071_effectively_empty_file_produces_empty_stream(_CommonCase):
 
     # lost a message production at #tombstone-A.1:
     # 'file has no sections (so no entities)'
@@ -112,7 +112,7 @@ class Case075_effectively_empty_file_produces_empty_stream(_CommonCase):
         return ('# comment line\n', '# comment line 2\n')
 
 
-class Case085_an_ordinary_looking_line(_CommonCase):
+class Case4072_an_ordinary_looking_line(_CommonCase):
 
     def test_100_you_can_see_that_EOS_was_NOT_reached(self):
         self.you_can_see_that_EOS_was_NOT_reached()
@@ -132,7 +132,7 @@ class Case085_an_ordinary_looking_line(_CommonCase):
         return ('# comment line\n', '\n', 'Huh ZAH!\n')
 
 
-class Case095_not_quite_section_line(_CommonCase):
+class Case4073_not_quite_section_line(_CommonCase):
 
     def test_100_says_this_one_ad_hoc_description_of_expecting(self):
         o = self.emitted_elements()
@@ -167,7 +167,7 @@ class Case095_not_quite_section_line(_CommonCase):
         return ('# comment line\n', '\n', '[fun time]\n')
 
 
-class Case105_section_but_no_dots(_CommonCase):
+class Case4074_section_but_no_dots(_CommonCase):
 
     def test_100_our_first_structured_emisson(self):
         o = self.emitted_elements()
@@ -190,7 +190,10 @@ class Case105_section_but_no_dots(_CommonCase):
         return ('[woot]\n',)
 
 
-class Case115_wrong_keyword_for_third_component(_CommonCase):
+# Case4075  # #midpoint
+
+
+class Case4076_wrong_keyword_for_third_component(_CommonCase):
 
     def test_100_expecting(self):
         o = self.emitted_elements()
@@ -213,7 +216,7 @@ class Case115_wrong_keyword_for_third_component(_CommonCase):
         return ('[item.0O1L.attribute]\n',)
 
 
-class Case125_too_many_components(_CommonCase):
+class Case4077_too_many_components(_CommonCase):
 
     def test_100_structured_emission(self):
         o = self.emitted_elements()
@@ -236,7 +239,7 @@ class Case125_too_many_components(_CommonCase):
         return ('[item.0O1L.attributes.huzzah]\n',)
 
 
-class Case135_non_validated_ID_traversal_one(_CommonCase):
+class Case4078_non_validated_ID_traversal_one(_CommonCase):
 
     def test_100_everything(self):
         _ = self.run_non_validating_ID_traversal_expecting_success()
@@ -246,7 +249,7 @@ class Case135_non_validated_ID_traversal_one(_CommonCase):
         return ('[item.0O1L.attributes]\n',)
 
 
-class Case145_non_validated_ID_traversal_two(_CommonCase):
+class Case4079_non_validated_ID_traversal_two(_CommonCase):
 
     # this is invalid (meta must come before attributes for the same thing)
     # but the point is we aren't validating that at this level.
@@ -259,7 +262,7 @@ class Case145_non_validated_ID_traversal_two(_CommonCase):
         return ('[item.B.attributes]\n', '[item.B.meta]\n')
 
 
-class Case150_first_touch_of_multi_line(_CommonCase):  # #mutli-line-case
+class Case4080_first_touch_of_multi_line(_CommonCase):  # #mutli-line-case
 
     def test_100_EVERYTHING(self):
         _actual = self.run_non_validating_ID_traversal_expecting_success()
