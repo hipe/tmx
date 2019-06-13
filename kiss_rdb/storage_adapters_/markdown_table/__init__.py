@@ -1311,7 +1311,7 @@ class _IdentifierCodec:  # experiment
         def f(s, listener=None):
             return use(s, listener)
 
-        use = lib.identifier_via_string__  # #todo: change this name
+        use = lib.identifier_via_string_
 
         self.identifier_via_string = f
         self.identifier_via_integer = lib.identifier_via_integer__

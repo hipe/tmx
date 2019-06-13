@@ -84,7 +84,7 @@ class _CommonCase(unittest.TestCase):
                 yield s
 
         from kiss_rdb.magnetics_.identifier_via_string import (
-                identifier_via_string__ as id_via_s)
+                identifier_via_string_ as id_via_s)
 
         def identifier_via_string(s):
             id_o = id_via_s(s, None)

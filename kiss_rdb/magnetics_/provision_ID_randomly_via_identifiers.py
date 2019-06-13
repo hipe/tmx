@@ -30,6 +30,7 @@ identifier".
 in this ASCII visualization, X'es are already occupied integers and
 "|"s are open slots:
 
+      time ->
                   -      -      -      -      -      -      -
                 0 |    0 |    0 |    0 |    0 X    0 X    0 X
                 1 |    1 |    1 |    1 |    1 |    1 |    1 X
@@ -62,6 +63,10 @@ note:
 there's a variety of ways we considered implementing this, with things
 like B-trees or custom data structures so that we don't have to traverse
 the whole collection of identifiers twice. but MEH:
+
+(And having all the supposedly already allocated identifiers in one index
+file means we don't actually have to traverse the whole collection to
+provision a new identifier.)
 """
 
 # == BEGIN GLUE

@@ -1,7 +1,7 @@
 import os.path as os_path
 
 
-def _normalize_sys_path():  # see [#019]
+def _normalize_sys_path():  # may or may not be necessary. tracked with [#019]
     from sys import path as a
 
     dn = os_path.dirname

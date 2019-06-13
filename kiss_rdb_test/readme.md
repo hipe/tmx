@@ -13,8 +13,10 @@ our manifestation of regression-friendliness at this level.
   - 5000-9999  modality adaptations (7500)
 
 
-## magnetics
+## storage support
 
+  - 0001-1249  models
+  - 1250-2499  magnetics
 
 
 ## storage adapters
@@ -34,14 +36,17 @@ py -c 'print(tuple(round(2500 + (2500/16) + (2500 * (i/8))) for i in range(0, 8)
 ## modality adaptations
 
 py -c 'print(tuple(round(5000 + (5000/14) + (5000 * (i/7))) for i in range(0, 7)))'
+py -c 'print(tuple(round(5000 + (5000 * (i/7))) for i in range(0, 8)))'
 
-  - API (5357)
-  - niCLI (6071)
-  - iCLI (6786)
-  - web/React-ish (7500)
-  - desktop (8214)
-  - mobile (8929)
-  - secrets of the universe (9643)
+5357 API
+5715
+6071 niCLI
+6429
+6786 iCLI
+7500 web/React-ish
+8214 desktop
+8929 mobile
+9643 secrets of the universe
 
 
 

@@ -94,7 +94,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         if 1 is not ln:
             return invite(f'need 1 had {ln} argument(s) for IDENTIFIER.')
         arg, = stack
-        iid = identifier_via_string__(arg, listener)
+        iid = identifier_via_string_(arg, listener)
         if iid is None:
             return 3
 
@@ -190,7 +190,7 @@ def three_via_depth_(depth):
     return iid_via_int, int_via_iid, _capacity
 
 
-def identifier_via_string__(id_s, listener):
+def identifier_via_string_(id_s, listener):
 
     digits = []
 

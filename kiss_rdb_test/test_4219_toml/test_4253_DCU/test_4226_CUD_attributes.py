@@ -1,4 +1,3 @@
-import kiss_rdb_test.common_initial_state  # noqa: F401
 from kiss_rdb_test import CUD as CUD_support
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest

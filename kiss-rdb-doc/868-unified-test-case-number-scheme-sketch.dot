@@ -4,122 +4,138 @@ rankdir=LR
 
 node[shape=record]
 
+nl030[label="
+<010> test file 1296: lines via template|
+<020> test file 1379: doubly linked list|
+<030> test file 1462: indexes|
+<040> test file 1545: provision new identifier
+"
+]
 
-/*
-test file 100 and 650 were the "goal posts". here's the one-off:
-ruby -e 'base=100;span=550; (1..5).each{|i| puts base + (1.0 * i / 6 * span)}'
-*/
 
+nl040[label="
+<000> test file (none yet or unknown)|
+do me
+"
+]
 
 
 nl050[label="
-test file 192: ID's via file lines|
-<055>Case055_truly_blank_file_produces_empty_stream|
-<065>Case065_sneak_oxford_join_coverage_into_here|
-<075>Case075_effectively_empty_file_produces_empty_stream|
-<085>Case085_an_ordinary_looking_line|
-<095>Case095_not_quite_section_line|
-<105>Case105_section_but_no_dots|
-<115>Case115_wrong_keyword_for_third_component|
-<125>Case125_too_many_components|
-<135>Case135_non_validated_ID_traversal_one|
-<145>Case145_non_validated_ID_traversal_two
+test file 4075: traverse identifiers|
+<055>Case4070_truly_blank_file_produces_empty_stream|
+<070>Case4071_effectively_empty_file_produces_empty_stream|
+<085>Case4072_an_ordinary_looking_line|
+<095>Case4073_not_quite_section_line|
+<105>Case4074_section_but_no_dots|
+<115>Case4076_wrong_keyword_for_third_component|
+<125>Case4077_too_many_components|
+<135>Case4078_non_validated_ID_traversal_one|
+<145>Case4079_non_validated_ID_traversal_two
 "
 ]
 
 nl063[label="
-test file 329: block stream (\"coarse parse\")|
-<157>Case157_simplified_typical|
-<171>Case171_effectively_empty_file_of_course_has_head_block|
-<186>Case186_truly_empty_file_has_no_head_block|
-<200>Case200_error_in_open_table_line|
-<215>Case215_error_in_attribute_value_passes_thru_for_now|
-<229>Case229_one_no_head|
-<243>Case243_two_yes_head
+test file 4097: traverse entities|
+<157>Case4094_simplified_typical|
+<171>Case4095_effectively_empty_file_of_course_has_head_block|
+<186>Case4096_truly_empty_file_has_no_head_block|
+<200>Case4097_error_in_open_table_line|
+<215>Case4098_error_in_attribute_value_passes_thru_for_now|
+<229>Case4100_one_no_head|
+<243>Case4101_two_yes_head
 "
 ]
 
 nl075[label="
-test file 375: entity via identifier and file lines|
-<253>Case253_simplified_typical_retrieve_in_mid|
-<259>Case259_not_found|
-<263>Case263_not_found_anywhere|
-<266>Case266_at_head|
-<272>Case272_at_tail|
-<278>Case278_against_empty|
-<282>Case282_too_many_adjacent_same_identifiers|
-<284>Case284_duplicate_identifiers_can_get_shadowed|
-<290>Case290_invalid_toml_gets_thru_coarse_parse_then_parse_fail|
-<297>Case297_trick_the_coarse_parse_with_valid_toml|
-<303>Case303_array_not_suported_yet|
-<309>Case309_inline_tables_not_suported_yet|
-<316>test_316_bool_no_comment  # Case316|
-<322>test_322_bool_yes_comment  # Case322|
-<328>test_328_int_no_comment  # Case328|
-<334>test_334_int_yes_comment  # Case334|
-<341>test_341_float_no_comment  # Case341|
-<347>test_347_float_yes_comment  # Case347|
-<353>test_353_datetime_no_comment  # Case353|
-<359>test_359_datetime_yes_comment  # Case359|
-<366>Case366_literal_string_not_yet_supported|
-<372>Case372_multi_line_literal_string_not_yet_supported|
-<378>Case378_multi_line_basic_not_yet_supported|
-<384>test_384_basic_string_simple  # Case384|
-<391>test_391_basic_string_empty  # Case391|
-<397>test_397_escape  # Case397
+test file 4125: retrieve|
+<253>Case4116_simplified_typical_retrieve_in_mid|
+<259>Case4117_not_found|
+<263>Case4118_not_found_anywhere|
+<266>Case4120_at_head|
+<272>Case4121_at_tail|
+<278>Case4122_against_empty|
+<282>WHAT too many adjacent same|
+<284>Case4124_duplicate_identifiers_can_get_shadowed|
+<290>Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail|
+<303>Case4128_array_not_suported_yet|
+<309>Case4129_inline_tables_not_suported_yet|
+<316>test_316_bool_no_comment  # Case4130|
+<322>test_322_bool_yes_comment  # Case4130.05|
+<328>test_328_int_no_comment  # Case4127.10|
+<334>test_334_int_yes_comment  # Case4130.15|
+<341>test_341_float_no_comment  # Case4868.20|
+<347>test_347_float_yes_comment  # Case4868.25|
+<353>test_353_datetime_no_comment  # Case4868.30|
+<359>test_359_datetime_yes_comment  # Case4868.35|
+<366>Case4132_literal_string_not_yet_supported|
+<372>Case4133_multi_line_literal_string_not_yet_supported|
+<378>Case4133.20_multi_line_basic_not_yet_supported|
+<384>test_384_basic_string_simple  # Case4134|
+<391>test_391_basic_string_empty  # Case4134.20|
+<397>test_397_escape  # Case4134.30
 "
 ]
 
 nl085[label="
-test file 650: CUD entities|
-<408>Case408_create_against_truly_empty_file|
-<425>Case425_create_against_effectively_empty_file_with_comments|
-<441>Case441_create_that_appends_entity_to_the_very_end|
-<458>Case458_create_that_inserts_at_the_front|
-<475>Case475_create_that_inserts_in_between|
-<492>Case492_create_that_inserts_in_between_no_props|
-<510>Case510_delete_at_head_no_fluff|
-<530>Case530_delete_at_head_yes_fluff|
-<550>Case550_delete_in_middle|
-<570>Case570_delete_at_end|
-<590>Case590_delete_leaving_effectively_empty_file|
-<613>Case613_update_at_beginning|
-<638>Case638_update_beginning_no_props|
-<663>Case663_update_in_middle|
-<688>Case688_update_at_end
+<398> test file 4159: CUD entity body blocks|
+<399> test file 4187: string encoder|
+<400> test file 4226: CUD attributes|
+<402> test file 4259: integretate ML string|
+|
+<403> test file 4284: CUD entities|
+<408>Case4276_create_against_truly_empty_file|
+<425>Case4277_create_against_effectively_empt|
+<441>Case4278_create_that_appends_entity_to_t|
+<458>Case4279_create_that_inserts_at_the_front|
+<475>Case4280_create_that_inserts_in_between|
+<492>Case4282_create_that_inserts_in_between_|
+<510>Case4283_delete_at_head_no_fluff|
+<530>Case4284_delete_at_head_yes_fluff|
+<550>Case4285_delete_in_middle|
+<570>Case4286_delete_at_end|
+<613>Case4289_update_at_beginning|
+<638>Case4290_update_beginning_no_props|
+<663>Case4291_update_in_middle|
+<688>Case4292_update_at_end|
+|
+<401> test file 4326: integrate with change index
 "
 ]
 
 nl100[label="
-test file 680: file rewrite request via collection (test cases 700-799)|
-<705>700-725: collection intro, RDUT|
-<735>730-744: index files|
-<745>745-750: provision new ID pseudo-randomly|
-<765>764-766: create entity integ. w/ provision & locking|
-<775>770-779: single-file schema CUD+RT
+<775>test file 4363: single-file schema CUD+RT
 "]
 
 nl110[label="
-the one CLI test file|
-<820>800-840: CUD+RT adaptations for CLI
+<820>test file 5834: CLI top level|
+<830>test file 6071: command-specfic
 "]
 
 nodeRight[label="
-<100>\n\n\n\n(100) traverse entity ID's in document\n\n\n\n\n|
-<200>\n\n\n\n(200) traverse entities in document\n\n\n\n\n|
-<300>\n\n\n\n\n\n\n\n\n\n(300) retrieve one entity\n\n\n\n\n\n\n\n\n\n\n\n|
-<400>\n\n(400) create\n\n\n|
-<500>\n\n(500) delete\n\n\n|
-<600>\n(600) update\n\n|
-<700>\n\n(700) the collection\nfaçade\n\n\n|
-<800>\n(800-840) CLI\n\n
+<050>\n\n(1875) magnetics \n\n\n|
+<070>\n(4080) resolve collection\n\n|
+<100>\n\n\n\n(4115) traverse all ID's\n\n\n\n\n|
+<200>\n\n\n\n(4149) traverse all entities\n\n\n\n\n|
+<300>\n\n\n\n\n\n\n\n\n\n(4814) retrieve \n\n\n\n\n\n\n\n\n\n\n\n|
+\n\n\n\n\n\n\n\n|
+<400>\n\n(4219) delete\n\n\n|
+<500>\n\n(4253) create\n\n\n|
+<600>\n(4288) update\n\n|
+<700>\n\n(4340) integration & expansion\n\n\n|
+<800>\n(6071) CLI\n\n
 "
 fontsize=22
 ]
 
+nl030:010->nodeRight:050
+nl030:020->nodeRight:050
+nl030:030->nodeRight:050
+nl030:040->nodeRight:050
+
+nl040:000->nodeRight:070
+
 nl050:055->nodeRight:100
-nl050:065->nodeRight:100
-nl050:075->nodeRight:100
+nl050:070->nodeRight:100
 nl050:085->nodeRight:100
 nl050:095->nodeRight:100
 nl050:105->nodeRight:100
@@ -147,7 +163,6 @@ nl075:278->nodeRight:300
 nl075:282->nodeRight:300
 nl075:284->nodeRight:300
 nl075:290->nodeRight:300
-nl075:297->nodeRight:300
 nl075:303->nodeRight:300
 nl075:309->nodeRight:300
 nl075:316->nodeRight:300
@@ -166,43 +181,41 @@ nl075:391->nodeRight:300
 nl075:397->nodeRight:300
 
 
-nl085:408->nodeRight:400
-nl085:425->nodeRight:400
-nl085:441->nodeRight:400
-nl085:458->nodeRight:400
-nl085:475->nodeRight:400
-nl085:492->nodeRight:400
-nl085:510->nodeRight:500
-nl085:530->nodeRight:500
-nl085:550->nodeRight:500
-nl085:570->nodeRight:500
-nl085:590->nodeRight:500
+nl085:510->nodeRight:400
+nl085:530->nodeRight:400
+nl085:550->nodeRight:400
+nl085:570->nodeRight:400
+nl085:408->nodeRight:500
+nl085:425->nodeRight:500
+nl085:441->nodeRight:500
+nl085:458->nodeRight:500
+nl085:475->nodeRight:500
+nl085:492->nodeRight:500
+
 nl085:613->nodeRight:600
 nl085:638->nodeRight:600
 nl085:663->nodeRight:600
 nl085:688->nodeRight:600
 
 
-nl100:705->nodeRight:700
-nl100:735->nodeRight:700
-nl100:745->nodeRight:700
-nl100:755->nodeRight:700
-nl100:765->nodeRight:700
 nl100:775->nodeRight:700
-nl100:795->nodeRight:700
 
 
 nl110:820->nodeRight:800
+nl110:830->nodeRight:800
 
 
 label="
+NOTE this may be just a rough sketch, not complete or correct.
 
-almost universal \"regression-friendly\" test number allocation guide.
+This was designed before we supported multiple storage adapters.
 "
 
 /* (reference to [#010.6] regression-friendly test ordering) */
 
 }
+
 /*
+#history.A-1 renames for adapter overhaul
 #born.
-*/
+*'b/

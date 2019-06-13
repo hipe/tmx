@@ -24,7 +24,7 @@ things like:
   - delete to make empty
 
 trivia: midway through the initial development of this test file,
-we realized we needed to develop our doubly-linked list alon.
+we realized we needed to develop our doubly-linked list alone.
 
 see also a long note below about the test case ordering locally #here1.
 """

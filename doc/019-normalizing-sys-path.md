@@ -5,6 +5,15 @@ date: 2018-03-30T05:58:28-04:00
 
 # our inelegant `sys.path` hacking
 
+## UPDATE:
+
+We are learning that perhaps we are saved because pipenv (?) puts our
+project directory ~somewhere~ in the `sys.path`. So the rest of this
+might be no longer necessary..
+
+
+
+
 ## overview
 
 this is perhaps a design consequence of our [sub projects][sub_projects]
@@ -344,6 +353,13 @@ test files require this file, it's still in the `sys.path`.
 
 
 
+## <a name='file-type-F'></a>(placeheld)
+
+This has a face but not a name yet. born at .#history-A.1.
+
+
+
+
 [sub_projects]: ../README.md#sub-projects
 [here1]: https://docs.python.org/3/tutorial/modules.html#intra-package-references
 
@@ -352,4 +368,5 @@ test files require this file, it's still in the `sys.path`.
 
 ## (document-meta)
 
+  - #history-A.1
   - #born.

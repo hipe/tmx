@@ -212,8 +212,7 @@ class _StorageSchema:
 
     def _build_identifier_via_string(self):
         from kiss_rdb.magnetics_.identifier_via_string import (
-            identifier_via_string__ as unsanitized_iid_via_string,
-            )
+            identifier_via_string_ as unsanitized_iid_via_string)
 
         identifier_depth = self.identifier_depth
 

@@ -1,0 +1,79 @@
+#!/usr/bin/env python3 -W error::Warning::0
+
+from sys import argv, stdin, stderr
+from functools import reduce
+
+
+def _help():
+    from os.path import basename as bn
+    me = bn(argv[0])
+    yield f'usage: cat some.table | {me} BEGIN END'
+    yield f'synopsis: distribute available space proportionally'
+    yield f'example: echo "thing-A 3\\nthing-B 4" | {me} 4063 4375'
+
+
+if len(argv) is not 3 or stdin.isatty():
+    for s in _help():
+        stderr.write(f'{s}\n')
+    exit(1)
+
+
+begin, end = tuple(int(s) for s in argv[1:])
+
+
+def _label_and_casecount():
+    import re
+    for line in stdin:
+        label, count = re.split(' +', line)
+        yield (label, int(count))
+
+
+label_and_casecounts = tuple(_label_and_casecount())
+
+
+tw = end - begin  # total width
+
+
+# total num cases
+tc = reduce(lambda m, x: m + x, (tup[1] for tup in label_and_casecounts))
+
+
+wpc = tw / tc  # width per case
+
+
+# my startingpoint is begin plus the num cases behind me times tw divded by tc
+
+# my width is my number of cases times tw divided by tc
+
+
+def fmt(num):
+    return '%.3f' % num
+
+
+first = True
+num_cases_behind_me = 0
+
+
+for label, num_cases in label_and_casecounts:
+    my_startpoint = begin + num_cases_behind_me * wpc
+
+    my_width = num_cases * wpc
+
+    my_midpoint = my_startpoint + my_width / 2
+
+    if first:
+        first = False
+    else:
+        print('')
+
+    print(f'{label}:')
+    print(f'  starting point: {fmt(my_startpoint)}')
+    print(f'  midpoint: {fmt(my_midpoint)}')
+
+    num_cases_behind_me += num_cases
+
+
+print('')
+print(f'endpoint: {end}')
+
+# #born.

@@ -1,3 +1,3 @@
-# This file is necessary so you can run the tests for only this storage
-# adapter (with [#001] `pud`). It is necessarily empty because [#019].
+# See [#019.F] *in this project* for why this is necessary & necessarily empty.
+
 # #born.

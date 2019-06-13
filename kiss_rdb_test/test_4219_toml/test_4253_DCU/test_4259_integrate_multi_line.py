@@ -1,17 +1,17 @@
-import kiss_rdb_test.common_initial_state  # noqa: F401
 from kiss_rdb_test import CUD as CUD_support
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
 """
-DISCUSSION: immediately previous to this test module is the test module
-for CUD of entity attributes. those cases employ the C and U of string
-attributes, which fires up the string encoder, which essentially exists
-to process #multi-line strings. even strings that are not multi-line undergo
+DISCUSSION: nominally the scope of this test module is to test how well
+multi-line strings integrate (for C and U). However the test module
+immediately previous to it tests C and U for *non* multi-line strings;
+which fires up the string encoder, which primarily exists only to process
+multi-line strings -- even strings that are not multi-line strings undergo
 validation closely related to multi-line processing (because the
 "business schema" decides what dimensions of string are allowable for all
-kinds of strngs..") anyway this separation of m.l strings from non-line
+kinds of strings..") anyway this separation of m.l strings from non-line
 strings is more a conceptual separation than anything else.
 """
 
@@ -79,11 +79,11 @@ class Case4259_one_line_special_char(_CommonCase):  # #midpoint
 
     def expect_entity_body_lines(self):
         return """
-        aa-aa = \"\\\" <- a quote\"
+        aa-aa = \"\\\" 👈 a quote\"
         """
 
     def given_request_tuples(self):
-        return (('create', 'aa-aa', '" <- a quote'),)  # #todo point left
+        return (('create', 'aa-aa', '" 👈 a quote'),)
 
     def given_entity_body_lines(self):
         return ''

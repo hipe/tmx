@@ -1,1 +1,7 @@
+# NOTE at #history-A.1 we renamed this from "toml" to "rec"
+# (to be a recutils recfile)
+# but at writing it is is till toml! work in progress..
+
 "storage schema" = "32x32x32"
+
+# #history-A.1

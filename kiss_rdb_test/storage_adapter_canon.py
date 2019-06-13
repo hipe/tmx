@@ -15,7 +15,7 @@ our real API "organically" into this file.
 
 We take into account:
   - the [#867] entities CUD roadmap,
-  - the [#868] CUD entities number allocation, which will change now #todo
+  - the [#868] CUD entities number allocation (a rough guideline)
 
 
 .## our imagined suite:
@@ -528,7 +528,7 @@ yes_value_dictionary_of = _yes_value_dict
 def _identifier_via_string(s):
     from kiss_rdb import THROWING_LISTENER as listener
     from kiss_rdb.magnetics_ import identifier_via_string as lib
-    return lib.identifier_via_string__(s, listener)
+    return lib.identifier_via_string_(s, listener)
 
 
 # == support that helps set up state
