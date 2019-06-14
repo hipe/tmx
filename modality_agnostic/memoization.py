@@ -34,6 +34,8 @@ def lazy(f_f):
     compare to the simpler `memoize`.
     #not-threadsafe
     #open #[#008.B]
+
+    NOTE consider using [#872.02] which gets around use of nonlocal
     """
 
     def g(*a):

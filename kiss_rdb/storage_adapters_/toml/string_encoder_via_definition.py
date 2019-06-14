@@ -186,7 +186,7 @@ def _escape_line(md, itr, line_no, listener):
     return ''.join(pieces)
 
 
-# == WHINERS
+# == whiners
 
 def _whine_about_special_character_not_supported(
         pos, name, line, line_no, listener):

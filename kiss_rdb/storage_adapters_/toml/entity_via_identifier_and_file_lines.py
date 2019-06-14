@@ -439,7 +439,16 @@ def __check_name_sets(dct, body_blocks, listener):
     return okay
 
 
-def entity_dict_via_entity_big_string__(big_string, listener):
+def dictionary_two_deep_via_entity_line_stream_(de):
+
+    # bringing this code over in to here, at #birth it now pains us,
+    # knowing just what kind of code we are passing this off to 😬
+
+    big_string = ''.join(de.to_line_stream())
+    from kiss_rdb import THROWING_LISTENER as listener  # #todo just 4 dbg
+
+    # --
+
     """most of this is validating etc.
 
     this will expand when we get to [#864.future-feature-1] meta

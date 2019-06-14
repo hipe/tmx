@@ -63,7 +63,7 @@ class Case6075_multi_line_create(_CommonCase):
 
     def test_200_announces_created(self):
         _actual = self.common_entity_screen().stderr_line
-        self.assertEqual(_actual, 'created:\n')
+        self.assertEqual(_actual, "created '2HF' with 1 attribute\n")
 
     def test_300_outputs_created(self):
         from script_lib.test_support import unindent

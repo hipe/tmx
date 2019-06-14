@@ -27,7 +27,8 @@ class CUD_BIG_SUCCESS_METHODS:
         return chan, payloader()
 
     def expect_big_success(self):
-        listener = None  # _DEBUGGING_LISTENER
+        from kiss_rdb import THROWING_LISTENER as listener
+
         _mde = self.given_run(listener)
 
         def f():  # TO_BODY_BLOCK_LINES
@@ -44,7 +45,7 @@ class CUD_BIG_SUCCESS_METHODS:
 
     def given_run(self, listener):  # formerly "run_CUD_attributes"
 
-        this_listener = None  # _DEBUGGING_LISTENER
+        this_listener = None  # _DEBUGGING_LISTENER()
 
         from . import common_initial_state as lib
 
@@ -57,7 +58,7 @@ class CUD_BIG_SUCCESS_METHODS:
         req = request_via_tuples(self.given_request_tuples(), this_listener)
         assert(req)
 
-        x = req.edit_mutable_document_entity_(
+        x = req.mutate_created_document_entity__(
             mde, _default_business_schema(), listener)
 
         if x is not None:
@@ -215,7 +216,7 @@ def _fs_lib():
     return _
 
 
-def _DEBUGGING_LISTENER(self):
+def _DEBUGGING_LISTENER():
     from modality_agnostic.test_support import structured_emission as se_lib
     return se_lib.debugging_listener()
 

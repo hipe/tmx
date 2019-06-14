@@ -9,12 +9,16 @@ from kiss_rdb_test.CUD import (
         filesystem_expecting_no_rewrites,
         build_filesystem_expecting_num_file_rewrites,
         )
+from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
         )
 import unittest
+
+
+canon = storage_adapter_canon.produce_agent()
 
 
 class _CommonCase(CUD_Methods, unittest.TestCase):
@@ -255,8 +259,11 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
 # Case4331: delete when index file is left empty! (delete the last entity)
 
 
-class Case4332_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
+class Case4332_update_OK(_CommonCase):
     """
+    at #history-A.1 we had to un-cover this issue, but re-cover it by creating
+    "thing-C" instead of "thing-2" (numbers come before leters lexically)
+
     .#open [#867.H] it "thinks of" {whitespace|comments} as being
 
     associated with the attribute not the entity block so the behavior
@@ -264,13 +271,34 @@ class Case4332_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
     be expected..
     """
 
-    def test_100_everything(self):
+    def test_100_result_is_a_two_tuple_of_before_and_after_entities(self):
+        self._canon_case.confirm_result_is_before_and_after_entities(self)
 
-        recs = self.update_expecting_success('B9H', (
-            ('delete', 'thing-A'),
-            ('update', 'thing-B', 'modified hey'),
-            ('create', 'thing-C', 'woot'),
-            ))
+    def test_200_the_before_entity_has_the_before_values(self):
+        self._canon_case.confirm_the_before_entity_has_the_before_values(self)
+
+    def test_300_the_after_entity_has_the_after_values(self):
+        self._canon_case.confirm_the_after_entity_has_the_after_values(self)
+
+    def test_400_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
+
+    """ABOUT THIS:
+
+    def test_500_retrieve_afterwards_shows_updated_value(self):
+       self._canon_case.confirm_retrieve_after_shows_updated_value(self)
+
+    ☝️ that sure would be cool. but out of scope. Either ☞ use the real FS
+    ☞ mock our fake FS ☞ just live with the fact that we aren't fully
+    compliant ☞ introduce graded compliant where we aren't "long-running"
+    certified (which, we aren't)
+    """
+
+    def test_600_new_file_content_looks_okay(self):
+
+        es = self.end_state()
+        coll = es['collection']
+        recs = coll._filesystem.FINISH_AS_HACKY_SPY()
 
         rec, = recs  # onyl one file rewrite
         path = rec.path
@@ -284,22 +312,37 @@ class Case4332_update_CAPTURE_FORMATTING_ISSUE(_CommonCase):
         self.assertSequenceEqual(lines, _expected)
 
     def _expecting_these(self):
-        return """
+        return '''
         [item.B9G.attributes]
         hi-G = "hey G"
 
         [item.B9H.attributes]
-        thing-B = "modified hey"
+        thing-2 = "I'm created \\"thing-2\\""
+        thing-B = "I'm modified \\"thing-B\\""
 
-        thing-C = "woot"
         [item.B9J.attributes]
         hi-J = "hey J"
-        """
+        '''
+
+    @shared_subject
+    def end_state(self):
+        return self._canon_case.build_end_state(self)
+
+    def request_tuple_for_update_that_will_succeed(self):
+        # #todo should be delete_attribute etc
+        return 'B9H', (
+            ('delete', 'thing-A'),
+            ('update', 'thing-B', "I'm modified \"thing-B\""),
+            ('create', 'thing-2', "I'm created \"thing-2\""))
 
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=build_filesystem_expecting_num_file_rewrites(1))
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_update_OK
 
 
 class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):  # noqa: E501
@@ -415,6 +458,9 @@ class Case4336_create_into_existing_file(_CommonCase):
 
         return self.create_expecting_success(cuds)
 
+    def listener(self):
+        return _throwing_listener()
+
     def subject_collection(self):
 
         random_number_generator = _random_number_generator_for(494)
@@ -426,9 +472,10 @@ class Case4336_create_into_existing_file(_CommonCase):
                 filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
-# class Case4305_create_failure_cleans_up_created_file(_CommonCase):
+# Case4337 create failure cleans up created file
 
-"""(Case4305): the whole purpose of "cleanup functions" is to enable us to
+
+"""☝️ The whole purpose of "cleanup functions" is to enable us to
 handle the case of when we have created a new entities file and the
 transaction fails. as it turns out, this case is perhaps logically impossible
 for us to trigger except under exceedingly contrived circumstances:
@@ -444,7 +491,9 @@ as far as creating the new entities file.
 """
 
 
-class Case4337_create_into_noent_file(_CommonCase):
+class Case4338_create_into_noent_file(_CommonCase):
+    """Case4338 Create into noent file - cleanup to this is NASTY
+    """
 
     def test_100_succeeds(self):
         self.recorded_file_rewrites()
@@ -483,6 +532,9 @@ class Case4337_create_into_noent_file(_CommonCase):
         # == END
 
         return res
+
+    def listener(self):
+        return _throwing_listener()
 
     def subject_collection(self):
         random_number_generator = _random_number_generator_for(512)  # 2J2 but
@@ -580,6 +632,11 @@ def _subject_module():
     return _
 
 
+def _throwing_listener():
+    from kiss_rdb import THROWING_LISTENER
+    return THROWING_LISTENER
+
+
 def _no_listener(*chan, payloader):
     assert(False)  # when this trips, use _debugging_listener()
 
@@ -587,4 +644,5 @@ def _no_listener(*chan, payloader):
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1
 # #born.

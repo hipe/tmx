@@ -290,7 +290,7 @@ def _update(lines, iden, tup, schema, listener):
 
         before_and_after = before_ent, after_ent  # complete the future
 
-        _express_edit(listener, UCDs, iden, 'updated')
+        express_edit_(listener, UCDs, iden, 'updated')
 
     itr = future_then_new_lines()
     return itr, next(itr)  # use the hack
@@ -924,7 +924,7 @@ class _RowAsEntity:
             yield last_cel.to_cel_string_with_head_padding_only()  # #todo
         yield '\n'  # ..
 
-    def TO_YES_VALUE_DICTIONARY(self):
+    def to_yes_value_dictionary_as_storage_adapter_entity(self):
         return {k: v for k, v in self.__to_key_and_non_empty_value_pairs()}
 
     def __to_key_and_non_empty_value_pairs(self):
@@ -1092,7 +1092,7 @@ class _Stop(BaseException):
 
 # == whiners
 
-def _express_edit(listener, UCDs, identifier, created_or_updated_or_deleted):
+def express_edit_(listener, UCDs, identifier, created_or_updated_or_deleted):
     # (Case2716) (Case2682)
 
     def structer():
@@ -1141,6 +1141,9 @@ def _express_edit(listener, UCDs, identifier, created_or_updated_or_deleted):
     listener('info', 'structure', tail_channel, structer)
 
 
+_express_edit = express_edit_
+
+
 def __these_pieces(updates, creates, deletes):
 
     lc = len(creates)
@@ -1150,16 +1153,16 @@ def __these_pieces(updates, creates, deletes):
 
     lu = len(updates)
     if lu:
-        yield f'updated {lc}'
+        yield f'updated {lu}'
         last_was_many = 1 < lu
 
     ld = len(deletes)
     if ld:
-        yield f'deleted {lc}'
+        yield f'deleted {ld}'
         last_was_many = 1 < ld
 
     if lc or lu or ld:
-        yield last_was_many
+        yield last_was_many  # (Case6226)
 
 
 def __whine_about_cannot_prepare_edit(

@@ -4,15 +4,18 @@ import unittest
 
 
 """
-DISCUSSION: nominally the scope of this test module is to test how well
-multi-line strings integrate (for C and U). However the test module
-immediately previous to it tests C and U for *non* multi-line strings;
+Cover what happens when multi-line strings are passed (for CREATE and UPDATE).
+
+Nominally that is our scope, but note that a previous test module tests
+aganst *non* mult-line strings;
 which fires up the string encoder, which primarily exists only to process
 multi-line strings -- even strings that are not multi-line strings undergo
 validation closely related to multi-line processing (because the
 "business schema" decides what dimensions of string are allowable for all
-kinds of strings..") anyway this separation of m.l strings from non-line
-strings is more a conceptual separation than anything else.
+kinds of strings..) Anyway this separation of multi-line strings from non
+is more a logical separation than a practical one.
+
+Orthogonal to canon.
 """
 
 

@@ -122,7 +122,9 @@ class _CommonFunctions:
                 **injections_dictionary)
 
     def build_monitor(self):
-        return _Monitor(_express_error_structure, _echo_error)
+        return _Monitor(
+                _express_error_structure, _echo_error,
+                _express_info_structure)
 
 
 def _express_error_structure(error_category, struct):  # (Case6080)
@@ -149,6 +151,12 @@ def _express_error_structure(error_category, struct):  # (Case6080)
 
 def __express_just_reason(reason):
     _echo_error(reason)
+
+
+def _express_info_structure(info_category, dct):  # (Case6129)
+
+    # click.utils._default_text_stderr()
+    _echo_error(dct['message'])
 
 
 _coll_hub_opt = '--collections-hub'
@@ -262,9 +270,8 @@ def create(ctx, collection, value):
         return mon.some_error_code()
 
     sout = click.utils._default_text_stdout()
-    serr = click.utils._default_text_stderr()
 
-    serr.write('created:\n')
+    # (hand-written confrmation message gone at #history-A.2)
 
     for line in doc_ent.to_line_stream():
         sout.write(line)
@@ -312,19 +319,20 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     for n in delete:
         cuds.append(('delete', n))
 
-    doc_ent = col.update_entity(internal_identifier, cuds, listener)
+    before_after = col.update_entity(internal_identifier, cuds, listener)
 
     # exact same thing as 2 others #here3:
 
-    if doc_ent is None:
+    if before_after is None:
         return mon.some_error_code()
 
+    before_ent, after_ent = before_after
+
     sout = click.utils._default_text_stdout()
-    serr = click.utils._default_text_stderr()
 
-    serr.write('updated. new entity:\n')
+    # #history-A.2 got rid of manually created message
 
-    for line in doc_ent.to_line_stream():
+    for line in after_ent.to_line_stream():
         sout.write(line)
 
     return _success_exit_code
@@ -477,7 +485,9 @@ class _Monitor:
     the highest level of "errno" was..
     """
 
-    def __init__(self, express_error_structure, echo_error_line):
+    def __init__(
+            self, express_error_structure, echo_error_line,
+            express_info_structure):
 
         self._init_errno_stuff()
 
@@ -488,7 +498,14 @@ class _Monitor:
             if 'error' == mood:
                 when_error(rest)
             else:
-                assert(False)
+                assert('info' == mood)
+                when_info(rest)
+
+        def when_info(rest):
+            shape, info_category, *detail, payloader = rest
+            assert('structure' == shape)
+            dct = payloader()
+            express_info_structure(info_category, *detail, dct)
 
         def when_error(rest):
             shape, error_category, *detail, payloader = rest
@@ -568,5 +585,6 @@ _failure_exit_code_bad_request = 400  # Bad Request lol ##here1
 _success_exit_code = 0
 
 
+# #history-A.2 as referenced
 # #history-A.1: make first production-only injections for CLI
 # #born.

@@ -403,7 +403,7 @@ class Case6129_create(_CommonCase):
 
     def test_300_stderr_line_is_decorative(self):
         line = self.common_entity_screen().stderr_line
-        self.assertEqual(line, 'created:\n')
+        self.assertEqual(line, "created '2H3' with 2 attributes\n")
 
     @shared_subject
     def common_entity_screen(self):
@@ -519,7 +519,8 @@ class Case6226_update(_CommonCase):
 
     def test_300_stderr_line_is_decorative(self):
         line = self.common_entity_screen().stderr_line
-        self.assertEqual(line, 'updated. new entity:\n')
+        exp = "updated 'B7F' (created 2, updated 1 and deleted 1 attribute)\n"
+        self.assertEqual(line, exp)
 
     @shared_subject
     def common_entity_screen(self):

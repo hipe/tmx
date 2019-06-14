@@ -29,6 +29,7 @@ woah boy.
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
 |[#880-899]                 |       | narrow allocation for "pho" for now
+|[#872.02                   |       | external tracking: new lazy implementation
 |[#872]                     |       | multi-line strings: the document
 |[#871]                     |       | this one thing (see inline)
 |[#870]                     |       | "backend roadmap again"

@@ -424,7 +424,7 @@ state_machine_ = sm_lib.StateMachine(_define_state_machine)
 # ==
 
 
-def TSLO_via(identifier_string, meta_or_attributes):
+def TSLO_via(identifier_string, meta_or_attributes):  # table start line object
     _meh = f'[item.{identifier_string}.{meta_or_attributes}]\n'
     return _TableStartLine(identifier_string, meta_or_attributes, _meh)
 
@@ -435,6 +435,16 @@ class _TableStartLine:
         self.identifier_string = identifier_string
         self.table_type = table_type
         self.line = line
+        self._identifier = None
+
+    def identifier__(self):
+        # it looks like we accomplish RETRIEVE without creating identifiers..
+        if self._identifier is None:
+            from kiss_rdb.magnetics_.identifier_via_string import (
+                identifier_via_string_)
+            self._identifier = identifier_via_string_(
+                    self.identifier_string, None)
+        return self._identifier
 
 
 # ==
@@ -464,11 +474,11 @@ class ErrorMonitor_:
         self.ok = True
         self.experimental_mutex = None  # go this away if it's annoying
 
-        def my_listener(*chan):
-            if 'error' == chan[0]:
+        def my_listener(*a):
+            if 'error' == a[0]:
                 del self.experimental_mutex
                 self.ok = False
-                listener(*chan)
+            listener(*a)
 
         self.listener = my_listener
 

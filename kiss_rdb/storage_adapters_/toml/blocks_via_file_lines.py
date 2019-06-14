@@ -13,147 +13,31 @@ from .identifiers_via_file_lines import (
         table_start_line_via_line_,
         nothing, stop, okay,
         )
-from modality_agnostic.memoization import memoize
 
 
-def _MDE_via_ATB(table_block, listener):
+# == BEGIN EXPERIMENT [#872.02]
+def lazy(f):
+    class _Lazy:
+        def __init__(self):
+            self._is_first_call = True
 
-    mde = MDE_via_TSLO_(table_block._table_start_line_object)
-
-    for blk in table_block.to_body_block_stream_as_table_block_():
-        _ok = mde.append_body_block(blk, listener)
-        if not _ok:
-            return
-    return mde
-
-
-class _MutableDocumentEntity:
-    """
-    we follow the double responsibility principle:
-
-    1) expose a mutable list API that the operations can layer on top of.
-    the operations are concerned with things like ensuring that the lines
-    adjacent to edited lines are not comments. we do not effectuate such
-    assurances here but we make them possible with the API we expose.
-
-    2) gist API. help prevent gist collisions, with procurement.
-    """
-
-    def __init__(self, table_start_line_object):
-
-        from kiss_rdb.magnetics_ import doubly_linked_list_functions as _
-        self._LL = _.build_new_doubly_linked_list()  # #testpoint (attr name)
-
-        self._table_start_line_object = table_start_line_object  # #testpoint
-        self._IID_via_gist = {}
-        self._ = None
-
-    # -- write
-
-    def delete_attribute_body_block_via_gist__(self, gist):
-        _iid = self._IID_via_gist[gist]  # (Case4233)
-        self._delete_block_via_iid(_iid)
-
-    def _delete_block_via_iid(self, iid):  # #testpoint
-
-        blk = self._LL.delete_item(iid)
-        if _yes_gist(blk):
-            # (or keep two dictionaries)
-            for gist, this_iid in self._IID_via_gist.items():
-                if iid == this_iid:
-                    found_gist = gist
-                    break
-            self._IID_via_gist.pop(found_gist)
-        return blk
-
-    def replace_attribute_block__(self, blk):
-        _gist = self._gist_no_check(blk)
-        _iid = self._IID_via_gist[_gist]
-        return self._LL.replace_item(_iid, blk)
-
-    def insert_body_block(self, blk, iid):
-
-        yes = _yes_gist(blk)
-        if yes:
-            gist = self._gist_yes_check(blk)
-
-        new_iid = self._LL.insert_item_before_item(blk, iid)
-
-        if yes:
-            self._IID_via_gist[gist] = new_iid
-
-        return new_iid
-
-    def append_body_block(self, blk, listener=None):
-
-        yes = _yes_gist(blk)
-        if yes:
-            gist = self._gist_yes_check(blk, listener)
-            if gist is None:
-                return
-
-        iid = self._LL.append_item(blk)
-
-        if yes:
-            self._IID_via_gist[gist] = iid
-
-        return okay
-
-    def _gist_yes_check(self, attr_blk, listener=None):
-
-        gist = self._gist_no_check(attr_blk, listener)
-        if gist is None:
-            return
-
-        if gist in self._IID_via_gist:
-            assert(listener)
-            _item = self._LL.item_via_IID(self._IID_via_gist[gist])
-            _whine_about_collision(  # (Case4155)
-                    listener=listener,
-                    new_name=attr_blk.attribute_name_string,
-                    existing_name=_item.attribute_name_string,
-                    )
-            return
-
-        return gist
-
-    def _gist_no_check(self, attr_blk, listener=None):
-
-        if self._ is None:  # OCD meh
-            self._ = attribute_name_functions_().name_gist_via_name
-
-        return self._(attr_blk.attribute_name_string, listener)
-
-    # -- read
-
-    def to_line_stream(self):
-        yield self._table_start_line_object.line
-        for blk in self.to_body_block_stream_as_MDE_():
-            for line in blk.to_line_stream():
-                yield line
-
-    def to_body_block_stream_as_MDE_(self):
-        for blk in self._LL.to_item_stream():
-            yield blk
-
-    def any_block_via_gist__(self, gist):
-        if gist in self._IID_via_gist:
-            return self._LL.item_via_IID(self._IID_via_gist[gist])
+        def __call__(self):
+            if self._is_first_call:
+                self._is_first_call = False
+                self._value = f()
+            return self._value
+    return _Lazy()
+# == END
 
 
-def _yes_gist(blk):
-    if blk.is_attribute_block:
-        return True
-    if blk.is_discretionary_block:
-        return False
-    assert(False)
+@lazy
+class attribute_name_functions_:
+    def __init__(self):
+        self.name_gist_via_name = _build_name_gist_via_name()
 
 
-MDE_via_TSLO_ = _MutableDocumentEntity
+def _build_name_gist_via_name():
 
-
-@memoize
-def attribute_name_functions_():
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
             Scanner,
             pattern_via_description_and_regex_string as o,
@@ -189,11 +73,7 @@ def attribute_name_functions_():
                 return
         return ''.join(s.lower() for s in pieces)
 
-    class these:  # #as-namespace-only
-        pass
-
-    setattr(these, 'name_gist_via_name', name_gist_via_name)  # really?
-    return these
+    return name_gist_via_name
 
 
 def block_stream_via_file_lines(file_lines, listener):
@@ -246,7 +126,7 @@ class ActionsForCoarseBlockParse_(BaseActions_):
         return (okay, hb)
 
     def discretionary_block_1__to__done(self):
-        return (okay, self._release_head_block())  # (Case4095) virt. empty file
+        return (okay, self._release_head_block())  # (Case4095) virtually empty
 
     def table_begun__to__inside_table(self):
         self._add_single_line_KV_to_table()
@@ -426,7 +306,13 @@ class _AppendableTableBlock:
         self._body_blocks.append(x)
 
     def to_mutable_document_entity_(self, listener):
-        return _MDE_via_ATB(self, listener)
+        from .mutable_document_entity_via_table_start_line import MDE_via_TSLO
+        mde = MDE_via_TSLO(self._table_start_line_object)
+        for blk in self.to_body_block_stream_as_table_block_():
+            _ok = mde.append_body_block(blk, listener)
+            if not _ok:
+                return
+        return mde
 
     # == BEGIN ..
     @property
@@ -437,6 +323,11 @@ class _AppendableTableBlock:
     def table_type(self):
         return self._table_start_line_object.table_type
     # == END
+
+    def to_dictionary_two_deep_(self):
+        from .entity_via_identifier_and_file_lines import (
+                dictionary_two_deep_via_entity_line_stream_)
+        return dictionary_two_deep_via_entity_line_stream_(self)
 
     def to_line_stream(self):
         yield self._table_start_line_object.line
@@ -553,24 +444,10 @@ class AppendableDiscretionaryBlock_:
     is_discretionary_block = True
 
 
-# == WHINERS
-
-def _whine_about_collision(listener, new_name, existing_name):
-    def structer():
-        return {
-                'reason': (
-                    f'new name {repr(new_name)} too similar to '
-                    f'existing name {repr(existing_name)}'),
-                'expecting': 'available name',
-                }
-    listener('error', 'structure', 'input_error', structer)
-
-
-# ==
-
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
+# #history-A.2: mutable document entity breaks out
 # #history-A.1: massive rewrite to accomodate multi-line
 # #born.

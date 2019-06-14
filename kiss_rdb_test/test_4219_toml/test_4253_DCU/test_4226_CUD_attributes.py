@@ -3,6 +3,20 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
+"""Concerned with processing internal "edit requests" on a single entity
+
+This effort became the now familiar prepare-edit and flush-edit two-step, one
+we duplicated blindly and much less code and fanfare in our toy SA.
+
+Although it's tempting to abstract something generic out of this (and
+we probably will); there's adapter-specific behavior covered in here,
+around the comment policy.
+
+This is close to being canon-relevant, but because it's not integrated with
+a collecton façade here, it's not.
+"""
+
+
 class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
 
     def _same_because_sho_madjozi_not_found_in_entity(self):
@@ -437,8 +451,6 @@ class Case4233_can_delete(_CommonCase):
 
         thing-2 = 456
         """
-
-# (available: 398)
 
 
 class Case4234_can_create_when_comment_line_at_tail(_CommonCase):

@@ -85,9 +85,8 @@ class _SchemaPather:
 
             self._index_file = os_path.join(coll_path, '.entity-index.txt')
 
+        self._check_depth = schema.check_depth
         self._is_single_file_schema = is_single_file_schema
-
-        self._identifier_via_string = schema.identifier_via_string
         self._dir_path = coll_path
         self._storage_schema = storage_schema
 
@@ -106,10 +105,24 @@ class _SchemaPather:
 
     def to_identifier_stream(self, listener):
 
+        # == moved here now #history-A.1
+        from kiss_rdb.magnetics_.identifier_via_string import (
+           identifier_via_string_)
+
+        def id_via_string(s, my_listener):
+            iden = identifier_via_string_(s, my_listener)
+            if iden is None:
+                return
+            if not check_depth(iden, my_listener):
+                return
+            return iden
+        check_depth = self._check_depth
+        # ==
+
         from . import entities_via_collection as _
         return _.identifiers_via__(
                 paths_function=self._to_entities_file_paths,
-                id_via_string=self._identifier_via_string,
+                id_via_string=id_via_string,
                 listener=listener)
 
     def _to_entities_file_paths(self, when_no_entries):
@@ -140,7 +153,7 @@ class _Schema:  # #testpoint
 
     def __init__(self, storage_schema):
         o = _storage_schemas[storage_schema]()
-        self.identifier_via_string = o._build_identifier_via_string()
+        self.check_depth = o._build_check_depth()
         self._storage_schema = o
 
     def build_pather_(self, coll_path):
@@ -210,25 +223,15 @@ class _StorageSchema:
         self.identifier_depth = identifier_depth
         self.filetree_depth = filetree_depth
 
-    def _build_identifier_via_string(self):
-        from kiss_rdb.magnetics_.identifier_via_string import (
-            identifier_via_string_ as unsanitized_iid_via_string)
-
-        identifier_depth = self.identifier_depth
-
-        def identifier_via_string(id_s, listener):
-
-            id_obj = unsanitized_iid_via_string(id_s, listener)
-            if id_obj is None:
-                return
-
+    def _build_check_depth(self):
+        def check_depth(id_obj, listener):
             length = len(id_obj.native_digits)
             if identifier_depth != length:
                 _whine_about_ID_depth(id_obj, identifier_depth, listener)
                 return
             return id_obj
-
-        return identifier_via_string
+        identifier_depth = self.identifier_depth
+        return check_depth
 
 
 # ==
@@ -360,4 +363,5 @@ def _emit_input_error_structure(f, listener):
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.1
 # #birth: abstracted

@@ -2,7 +2,30 @@ from kiss_rdb_test.common_initial_state import unindent
 import unittest
 
 
-# (subject under test explained exhaustively in [#864] the toml adaptation)
+"""
+Adapter-specific edge-cases of CUD,
+
+like what happens when creating into an empty collection (and more broadly,
+what does "empty collection" mean exactly, here); do appends at the end and
+inserts at the beginning work.
+
+These are the generic cases we want to cover for all adapters:
+
+    Can you {create|delete} into/from {an empty|a not empty} collection?
+
+That ☝️ produces four cases to cover.
+
+But there are more adapter-specific concerns we have:
+
+    What if {insert/append |delete} at/from the {beginning|middle|end}?
+
+This sounds overblown but invariably weird behavior emerges around comments &
+whitespace when you start adding and removing blocks (like #open [#867.H]).
+
+It *appears* that this is not integrated with the collection façade (using
+a very document-line-centric interface, for both input and output) so it may
+by orthogonal to canon.
+"""
 
 
 def expect_everything(orig_f):
@@ -98,7 +121,7 @@ class Case4277_create_against_effectively_empty_file_with_comments(_CommonCase):
         """
 
     def given_identifer_and_lines_for_new_entity(self):
-        return ('TODO', """
+        return ('no see 1234', """
         new line 1
         new line 2
         """)

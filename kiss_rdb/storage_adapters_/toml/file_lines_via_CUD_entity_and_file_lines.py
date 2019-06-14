@@ -25,12 +25,11 @@ def new_lines_via_update_and_existing_lines(
         new_lines_via_entity,
         existing_lines,
         listener,
-        receive_updated_document_entity=None,
         ):
 
     _args_for_CUD_function = (
             identifier_string, new_lines_via_entity,
-            receive_updated_document_entity)
+            )
 
     return _line_stream_via_CUD_function(
             _args_for_CUD_function,
@@ -113,7 +112,7 @@ def __block_stream_via(args, CUD_function, block_itr, monitor):
 
 # ==
 
-def __blocks_for_UPDATE(id_s, new_lines_via_entity, recv, block_itr, monitor):
+def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
 
     # this is a copy-paste-modify of DELETE that's unabstracted for clarity.
 
@@ -141,8 +140,7 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, recv, block_itr, monitor):
     if mde is None:
         return
 
-    if recv is not None:
-        recv(mde)  # to be cute we are yielding it out now, before the edit..
+    # got rid of recv_doc_ent at #history-A.3
 
     new_entity_lines = new_lines_via_entity(mde, monitor.listener)
     if new_entity_lines is None:
@@ -275,6 +273,7 @@ def _whine_about_entity_not_found(id_s, listener):
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.3
 # #history-A.2: begin rewrite of CUD using block stream not parse actions
 # #tombstone-A.1: got rid of mutate state machine,now empty files OK everywhere
 # #born.

@@ -37,18 +37,7 @@ that is:
 
   - unlike sane, production-grade databases; we offer the mischiveous
     mis-feature of whitespace and comments being allowed in the storage
-    text files. more on this provision now:
-
-the provision is something like this: when machine-editing a document,
-we never want to break an existing association between a comment line an
-attribute (key-value) line; and as far as the machine is concerned, this
-association exists (or might exist) if the comment line and the attribute
-line are touching (in either order).
-
-most of the algorithmic work, then, in this document (and its counterpart
-asset) is concerned with checking this comment provision, working around it
-where possible, and the deterministic determination (eek) of groupings and
-insertion points for CREATE (explored below).
+    text files. More at "Do you have a comment policy?" below.
 
 
 
@@ -100,6 +89,47 @@ insertion points for CREATE (explored below).
     - a key-value pair (always one line)
     - a blank line (always just a newline)
     - a comment line (for now always flush left)
+
+
+
+
+## Do you have a comment policy?
+
+We as a sofware simply cannot know exactly what a comment means to say.
+Or to put it less philosophically, it is _out of our scope_ to determine
+what comments mean; because after all, comments are these places in the
+code where the programmer gets this brief respite from talking to the
+machine.
+
+(In real life there are the interesting grey-area counterpoints to this
+assertion like javadoc and python docstrings and the rest (and all their
+interesting byproducts (like doctest!)) but we counter that, as these
+various facilities require the comment to follow simple markup rules, that
+this is not the kind of "deriving meaning" we mean.)
+
+As such, in order to involve all kinds of low-value document states, we
+maintain a provision about comments: When machine-editing a document, we
+never break an existing association between a comment line and an attribute
+line (or block, if it's a multi-line attribute).
+
+(And the eyes of the machine, they are associated if they are touching.)
+
+
+
+
+## The practical implications of our comment policy
+
+👉 Use comments when they make life easier but note that any attribute
+immediately above or below your comment lines (if no interceding lines)
+become not machine-editable.
+
+👉 To work around this issue (when it's an issue), just make sure there is
+at least one blank line between your block of comment lines and any above
+or below attribute lines. If you do _this_, in turn, write the comment
+without assuming what the value of the (any) attribute being referred to is.
+Like if you're talking about a particular value, include that value in the
+comment, so if the machine edits the attribute to be a different value,
+your comment still makes sense.
 
 
 
@@ -160,19 +190,6 @@ insertion points for CREATE (explored below).
 
   - the exact same principle holds as for DELETE above.
 
-
-
-
-## the practical implications of our comment behavior
-
-  - they should be used when they make your life easier but note that
-    the lines comments touch can no longer be machine edited.
-
-  - to avoid this issue, have one blank line between blocks of comments
-    and any attribute lines. if you do _this_, in turn, write the comment
-    without assuming what the value of the (any) attribute being referred
-    to. like, if you're talking about a particular value, include that value
-    in the comment.
 
 
 
@@ -412,7 +429,7 @@ dict (or not)) to simulate something like a linked list..
 
 ## validating/normalizing values
 
-TODO :#here2. we hate this. separately there's concerns for
+EDIT :#here2. we hate this. separately there's concerns for
 validating/normalizing those values in request vs validating those
 values present in the document. there's type-ism to worry about..
 
@@ -471,21 +488,33 @@ file!
 
 
 
-## in-depth code explanation
+## Implementing our comment policy
 
-assume the attribute name of each request component is unique and that
-the necessary in-document presence/absence of each key-value is checked.
+What our "comment policy" is is introduced above. Here we explain the code
+implementing it.
 
-derive an array of the line objects and for those that are attributes,
-create a dictionary that produces a line offset given a gist.
+The mutable document entity is composed only of blocks (let's say) and
+each block either is or isn't of the "discretionary" variety. Only
+"discretionary" blocks can have comments.
 
+At writing, those blocks that are not discretionary blocks must be
+attribute blocks (one attribute per block, attribute values may span
+multiple lines).
+
+We maintain an index that maps a "gist" (a lossfully over-normalized
+attribute name) to an internal identifier in our linked list. Then,
 with this "index", for each attribute that we are going to UPDATE or
-DELETE, we can immediately get its line offset and from that, retrieve
-the any line above and below it and see if those lines are comments.
+DELETE, we can dereference its internal identifier (immediately) and from
+that, ask the link list what item (block) comes before it and/or after it
+(if any). When we have these any blocks we can see if they are discretionary
+and if so, look at their first or last line and find out if it is a comment.
 
-whenever you change the tentative composition of the document entity you
-should stale this index (rebuilding it when still needed) unless you
-*really* know what you're doing! (more below.)
+(This could be made simpler if you wanted to make some abstact base
+class of Block that is comment-aware in this manner.)
+
+Note this index (dictionary) MUST be kept in sync when we add or remove
+blocks to our linked list. Perhaps we will only ever make it on-the-fly
+instead.
 
 UPDATEs are distinct in that they never change the "comment signature"
 of the document entity.

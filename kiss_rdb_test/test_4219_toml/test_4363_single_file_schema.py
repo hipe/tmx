@@ -135,6 +135,9 @@ class Case4366_update_OK(_CommonCase):
             ('create', 'xw', 'nü'),
             ))
 
+    def listener(self):
+        return _throwing_listener()
+
     def subject_collection(self):  # (same as #here1)
         return _build_collection(
                 dir_path=_dir_path_most_common(),
@@ -176,6 +179,9 @@ class Case4368_create_into_existing_file(_CommonCase):
             )
 
         return self.create_expecting_success(cuds)
+
+    def listener(self):
+        return _throwing_listener()
 
     def subject_collection(self):
 
@@ -220,6 +226,11 @@ def _always_same_schema():
 def _main_module():
     from kiss_rdb.storage_adapters_.toml import collection_via_directory as _
     return _
+
+
+def _throwing_listener():
+    from kiss_rdb import THROWING_LISTENER
+    return THROWING_LISTENER
 
 
 _no_listener = None

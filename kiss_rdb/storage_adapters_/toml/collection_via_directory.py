@@ -64,15 +64,26 @@ class collection_via_directory_and_schema:
         self._schema = collection_schema
 
     def update_entity(self, id_s, cuds, listener):
+        # #todo this interface will move up to the façade
         tup = self._ID_and_path_that_must_already_exist(id_s, listener)
         if tup is None:
             return
-        iid, path = tup
+        iden, path = tup
+        return self._temporary_bridge_for_update(path, iden, cuds, listener)
+
+    def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
+
+        path = self._path_that_must_already_exist_for(iden, listener)
+        if path is None:
+            return
+        return self._temporary_bridge_for_update(path, iden, tup, listener)
+
+    def _temporary_bridge_for_update(self, path, iden, tup, listener):
 
         with self._open_locked_mutable_entities_file(path) as lmef:
-            res = _update_entity(lmef, iid, cuds, self, listener)
+            two = _update_entity(lmef, iden, tup, self, listener)
 
-        return res
+        return two
 
     # == BEGIN create and delete are more complicated
 
@@ -250,19 +261,35 @@ class collection_via_directory_and_schema:
         return _retrieve_entity(iid, path, listener)
 
     def _ID_and_path_that_must_already_exist(self, id_s, listener):
+        # #todo - SA collections won't need to decode identifiers in the future
 
-        iid = self._schema.identifier_via_string(id_s, listener)
-        if iid is None:
+        from kiss_rdb.magnetics_.identifier_via_string import (
+            identifier_via_string_)
+
+        iden = identifier_via_string_(id_s, listener)
+        if iden is None:
             return
 
-        pieces = self._file_path_pieces_via_identifier(iid)
+        path = self._path_that_must_already_exist_for(iden, listener)
+        if path is None:
+            return
+
+        return iden, path
+
+    def _path_that_must_already_exist_for(self, iden, listener):
+
+        _ok = self._schema.check_depth(iden, listener)
+        if not _ok:
+            return
+
+        pieces = self._file_path_pieces_via_identifier(iden)
         path = os_path.join(*pieces)
 
         if not os_path.exists(path):  # :##here1
             _whine_about_no_path(pieces, listener)
             return
 
-        return iid, path
+        return path
 
     def _open_locked_mutable_indexy_file(self):
 
@@ -302,13 +329,9 @@ class _PassthruContextManager:
 
 def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
-    doc_ent = None
+    before_and_after = []  # like nonlocal. meh
 
-    def recv_new_doc_ent(de):
-        nonlocal doc_ent  # oops
-        doc_ent = de
-
-    def new_lines_via_entity(mde, my_listener):
+    def new_lines_via_entity(doc_ent, my_listener):
         # unlike both CREATE and DELETE, UPDATE determines its modified entity
         # lines *as a function of* the existing entity, so more complicated.
 
@@ -316,13 +339,18 @@ def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
         if req is None:
             return  # not covered - blind faith
 
-        _bs = coll.BUSINESS_SCHEMA()
-        _ok = req.edit_mutable_document_entity_(mde, _bs, my_listener)
+        _busi_schema = coll.BUSINESS_SCHEMA()
+        new_de = req.update_document_entity__(
+                doc_ent, _busi_schema, my_listener)
 
-        if not _ok:
+        if new_de is None:
             return  # not covered - blind faith
 
-        return tuple(mde.to_line_stream())
+        assert(0 == len(before_and_after))
+        before_and_after.append(doc_ent)
+        before_and_after.append(new_de)
+
+        return tuple(new_de.to_line_stream())
 
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_update_and_existing_lines(
@@ -330,18 +358,16 @@ def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
                 new_lines_via_entity,
                 orig_lines,
                 my_listener,
-                recv_new_doc_ent,
                 )
 
     with coll._filesystem.FILE_REWRITE_TRANSACTION(listener) as trans:
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
         res = trans.finish()
 
-    if res is not None:
-        assert(res is True)
-        res = doc_ent
-
-    return res
+    if res is None:
+        return
+    assert(res is True)
+    return tuple(before_and_after)
 
 
 def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
@@ -458,13 +484,13 @@ def _create_MDE_via_ID_and_request(identifier_string, req, coll, listener):
 
     _tslo = ids_lib.TSLO_via(identifier_string, 'attributes')
 
-    from . import blocks_via_file_lines as blk_lib
+    from .mutable_document_entity_via_table_start_line import MDE_via_TSLO
 
-    mde = blk_lib.MDE_via_TSLO_(_tslo)
+    mde = MDE_via_TSLO(_tslo)
 
-    _bs = coll.BUSINESS_SCHEMA()
+    _business_schema = coll.BUSINESS_SCHEMA()
 
-    _ok = req.edit_mutable_document_entity_(mde, _bs, listener)
+    _ok = req.mutate_created_document_entity__(mde, _business_schema, listener)
 
     if not _ok:
         return  # (Case6067) (CLI) #here6
@@ -489,7 +515,6 @@ def _retrieve_entity(identifier, file_path, listener):
 
     from .entity_via_identifier_and_file_lines import (
             entity_via_identifier_and_file_lines as DE_via,
-            entity_dict_via_entity_big_string__ as dict_via,
             )
 
     id_s = identifier.to_string()
@@ -505,9 +530,9 @@ def _retrieve_entity(identifier, file_path, listener):
     assert(de.table_type == 'attributes')
     assert(de.identifier_string == id_s)
 
-    _big_string = ''.join(de.to_line_stream())
+    # below became a call at #history-A.2
 
-    return dict_via(_big_string, listener)
+    return de.to_dictionary_two_deep_()
 
 
 """
@@ -564,5 +589,7 @@ def _sib_lib():
 
 _okay = True
 
+
+# #history-A.2 (can be temporary)
 # #history: production only: create directories
 # #born.

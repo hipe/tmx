@@ -2,9 +2,20 @@ from kiss_rdb_test.common_initial_state import unindent
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        memoize)
 import unittest
+
+
+"""The string encoder's responsibility is to take an input string and decide
+
+whether and how it will be represented in storage. This involves decisions
+like whether a string should be represented as multi-line or not, whether it
+has characters that need escaping (and if so what kind of surface string
+should be used), and whether the string's content exceeds our "threshold of
+simplicity" (to coin a term).
+
+This scope of conern is orthogonal to canon compliance, being at a lower level.
+"""
 
 
 class _CommonCase(unittest.TestCase):

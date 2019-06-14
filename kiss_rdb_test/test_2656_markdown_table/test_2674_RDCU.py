@@ -287,7 +287,7 @@ class Case2716_update_OK(_CommonCase):
         self._canon_case.confirm_emitted_accordingly(self)
 
     def test_500_retrieve_afterwards_shows_updated_value(self):
-        self._canon_case.confirm_retrieve_after_shows_updaed_value(self)
+        self._canon_case.confirm_retrieve_after_shows_updated_value(self)
 
     """
     given:
@@ -295,9 +295,10 @@ class Case2716_update_OK(_CommonCase):
         | i De nTi Fier zz | thing 1  | thing-2 | Thing_A |thing-B|    hi-G|
         |  B9H ||   | hi i'm B9H | hey i'm B9H
 
-    and:    'B9H', (('delete_attribute', 'thing-A'),
-                    ('update_attribute', 'thing-B', "hello I'm etc"),
-                    ('create_attribute', 'thing-2', 'xx yy'))
+    and:    'B9H', (
+        ('delete_attribute', 'thing-A'),
+        ('update_attribute', 'thing-B', "I'm modified \"thing-B\""),
+        ('create_attribute', 'thing-2', "I'm created \"thing-2\""))
 
     expect these:
       - identifier cel is exactly unchanged (that extra space)
@@ -319,7 +320,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_656_field_two_is_created_and_clobbers_the_weird_padding(self):
         s = self.cel_at(2)
-        self.assertEqual(s, ' xx yy ')
+        self.assertEqual(s, ' I\'m created "thing-2" ')
 
     def test_719_deleted_cel_is_now_zero_width(self):
         s = self.cel_at(3)
@@ -327,7 +328,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_781_updating_DOES_inherit_the_leading_padding(self):
         s = self.cel_at(4)
-        exp = "  hello I'm etc"
+        exp = '  I\'m modified "thing-B"'
         self.assertEqual(s.index(exp), 0)
 
     def test_844_still_no_trailing_pipe(self):
@@ -346,7 +347,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_969_no_trailing_whitespace_because_no_trailing_pipe(self):
         s = self.cel_at(4)
-        exp = "hello I'm etc"
+        exp = 'I\'m modified "thing-B"'
         act = s[-len(exp):]
         self.assertEqual(act, exp)
 
@@ -381,9 +382,11 @@ class Case2716_update_OK(_CommonCase):
         return self._canon_case.build_end_state(self)
 
     def request_tuple_for_update_that_will_succeed(self):
-        return 'B9H', (('delete_attribute', 'thing-A'),
-                       ('update_attribute', 'thing-B', "hello I'm etc"),
-                       ('create_attribute', 'thing-2', 'xx yy'))
+        return 'B9H', (
+            ('delete_attribute', 'thing-A'),
+            ('update_attribute', 'thing-B', "I'm modified \"thing-B\""),
+            ('create_attribute', 'thing-2', "I'm created \"thing-2\""),
+            )
 
     def subject_collection(self):
         return _collection_ordinary_will_mutate()

@@ -11,10 +11,10 @@ class _DoublyLinkedList:
 
     def to_item_stream(self):
         item_via_IID = self.item_via_IID
-        for iid in self.TO_IID_STREAM():
+        for iid in self.to_internal_identifier_stream():
             yield item_via_IID(iid)
 
-    def TO_IID_STREAM(self):
+    def to_internal_identifier_stream(self):  # #testpoint
         next_IID_via_IID = self.next_IID_via_IID
         iid = self._head_IID
         while iid is not None:
@@ -57,23 +57,23 @@ def _write_lower_level_methods(attrs):
 
         return iid
 
-    def insert_item_before_item(item, right_idd):
-        assert(right_idd)  # #[008.D]
+    def insert_item_before_item(item, right_iid):
+        assert(right_iid)  # #[008.D]
 
-        idd = provision_IID()
-        items[idd] = item
+        iid = provision_IID()
+        items[iid] = item
 
-        old_prev = prev_dct[right_idd]  # None ok
-        prev_dct[right_idd] = idd
-        prev_dct[idd] = old_prev  # None ok
+        old_prev = prev_dct[right_iid]  # None ok
+        prev_dct[right_iid] = iid
+        prev_dct[iid] = old_prev  # None ok
 
         if old_prev is None:
-            attrs._head_IID = idd  # insert at head (Case1373)
+            attrs._head_IID = iid  # insert at head (Case1373)
         else:
-            next_dct[old_prev] = idd  # insert into mid (Case1375)
+            next_dct[old_prev] = iid  # insert into mid (Case1375)
 
-        next_dct[idd] = right_idd
-        return idd
+        next_dct[iid] = right_iid
+        return iid
 
     def provision_IID():
         if len(holes):

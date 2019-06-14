@@ -49,12 +49,19 @@ class _CUD_Attributes_Request:
         assert(components)
         self.components = tuple(components)
 
-    def edit_mutable_document_entity_(self, mde, bs, listener):
+    def update_document_entity__(self, de, bs, listener):
+        return self._same(de, bs, listener, 'update')
+
+    def mutate_created_document_entity__(self, mde, bs, listener):
+        # #testpoint
+        return self._same(mde, bs, listener, 'create')
+
+    def _same(self, de, bs, listener, create_or_update):
         from kiss_rdb.storage_adapters_.toml import (
             CUD_attributes_via_request as lib)  # #todo
         _enc = bs.BUILD_ENTITY_ENCODER(listener)
         return lib.apply_CUD_attributes_request_to_MDE___(
-                mde, self, _enc, listener)
+                de, self, _enc, listener, create_or_update)
 
 
 class _RequestLocalNameUniquenessValidatorIndex:
@@ -144,7 +151,7 @@ class _AttributeName:
         self.name_string = s
 
 
-# == WHINERS
+# == whiners
 
 def _express_collisions(collisions, listener):
     """

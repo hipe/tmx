@@ -3,9 +3,9 @@ from modality_agnostic.memoization import (
         )
 
 
-def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
+def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
 
-    # (long explanation extracted into [#865] "in-depth code explanation")
+    # this is the counterpart to [#865] "Implementing our comment policy".
 
     # eenc = entity encoder
     # qits = "Qualified Items", a tail-anchored excerpt list
@@ -25,6 +25,15 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
     has_updates = len(updates)
     has_deletes = len(deletes)
     # --
+
+    if 'create' == C_or_U:
+        created_or_updated = 'created'
+        mutate_orig = True
+    else:
+        assert('update' == C_or_U)
+        mde = mde.BUILD_MUTABLE_COPY__()  # lose access to orginal here
+        created_or_updated = 'updated'
+        mutate_orig = False
 
     checker = __U_and_D_comment_proximity_checkerer(problems, mde, listener)
 
@@ -70,7 +79,20 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener):
                 i, mde, groups, apnds, qits, updates, eenc, listener):
             return
 
-    return _okay  # whenever failure happened, we short circuited (Case4234)
+    # Any failure should have short-circuited out by now.
+    # At this point, success is guaranteed (Case4234).
+
+    # ==
+    # #todo the below should move out of the SA if we're gonna use it like this
+    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
+    _UCDs = (updates, creates, deletes)
+    express_edit_(listener, _UCDs, mde.identifier, created_or_updated)
+    # ==
+
+    if mutate_orig:
+        return True
+    else:
+        return mde
 
 
 # == CRAZY INSERTION (CREATE) ALGORITHM
@@ -742,7 +764,8 @@ class _Scanner():
         advance()
 
 
-# == WHINERS
+# == whiners
+
 
 def _emit_request_error_via_reason(msg, listener):
     def structurer():
@@ -769,4 +792,5 @@ def _blocks_lib():
 _not_ok = False
 _okay = True
 
+# #history-A.1
 # #born.

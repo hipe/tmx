@@ -12,6 +12,18 @@ import unittest
 
 
 """
+TL;DR: A low-level test module meant to come at the front of the mutation suite
+
+The lexicon of this module is the block-centric nature of the entity (blocks
+are lists of lines, each attribute spans one or more lines), and the entity's
+internal API for editing itself in light of how it is represented internally.
+
+(In fact the doubly-linked-list (and its dedicated test suite) was abstracted
+from this effort mid-way.)
+
+This has little to do with how the entity integrates with the outside world.
+As such you will see no assertion of canon compliance here.
+
 this module tests:
 the CUD of body blocks ({ attribute | discretionary }) in/from a doc entity.
 
@@ -23,10 +35,7 @@ things like:
   - delete at/from { head | mid | tail } to make non-empty
   - delete to make empty
 
-trivia: midway through the initial development of this test file,
-we realized we needed to develop our doubly-linked list alone.
-
-see also a long note below about the test case ordering locally #here1.
+See #here1 below for justification of our ad-hoc case ordering raionale.
 """
 
 
@@ -441,7 +450,7 @@ class Case4165_delete_to_make_empty(_CommonCase):
 def _internal_identifier_via_component_offset(offset, mde):
 
     i = -1
-    for iid in mde._LL.TO_IID_STREAM():
+    for iid in mde._LL.to_internal_identifier_stream():
         i += 1
         if offset == i:
             found_iid = iid

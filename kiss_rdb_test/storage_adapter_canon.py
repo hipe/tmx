@@ -457,7 +457,7 @@ class case_of_update_OK:  # #as-namespace-only
         before_ent, after_ent = tc.end_state()['result_value']
         _same_confirmation_of_after_update(tc, after_ent)
 
-    def confirm_retrieve_after_shows_updaed_value(tc):
+    def confirm_retrieve_after_shows_updated_value(tc):
         es = tc.end_state()
         identi = es['identifier']
         coll = es['collection']
@@ -473,8 +473,10 @@ class case_of_update_OK:  # #as-namespace-only
 
 def _same_confirmation_of_after_update(tc, after_ent):
     dct = _yes_value_dict(after_ent)
-    tc.assertEqual(dct['thing-B'], "hello I'm etc")
-    tc.assertEqual(dct['thing-2'], 'xx yy')
+    act_left = dct['thing-B']
+    act_right = dct['thing-2']
+    tc.assertEqual(act_left, "I'm modified \"thing-B\"")
+    tc.assertEqual(act_right, "I'm created \"thing-2\"")
     tc.assertEqual(len(dct), 2)  # to confirm deletes
 
 
@@ -519,7 +521,7 @@ def _confirm_collection_empty(tc, coll):
 
 
 def _yes_value_dict(ent):
-    return ent.TO_YES_VALUE_DICTIONARY()
+    return ent.to_yes_value_dictionary_as_storage_adapter_entity()
 
 
 yes_value_dictionary_of = _yes_value_dict
