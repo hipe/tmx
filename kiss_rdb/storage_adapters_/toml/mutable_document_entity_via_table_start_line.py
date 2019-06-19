@@ -112,13 +112,19 @@ class _MutableDocumentEntity:
 
     # -- read
 
-    def to_yes_value_dictionary_as_storage_adapter_entity(self):
-        return self.to_dictionary_two_deep_()['core_attributes']
+    # == THE STORAGE ADAPTER ENTITY INTERFACE (experimental) (currently C/P)
 
-    def to_dictionary_two_deep_(self):
+    def to_yes_value_dictionary_as_storage_adapter_entity(self):
+        _ = self.to_dictionary_two_deep_as_storage_adapter_entity()
+        return _['core_attributes']
+
+    def to_dictionary_two_deep_as_storage_adapter_entity(self):
         from .entity_via_identifier_and_file_lines import (
                 dictionary_two_deep_via_entity_line_stream_)
         return dictionary_two_deep_via_entity_line_stream_(self)
+
+    # (and `identifier` defined below)
+    # ==
 
     def to_line_stream(self):
         yield self._table_start_line_object.line
@@ -135,7 +141,7 @@ class _MutableDocumentEntity:
 
     @property
     def identifier(self):
-        return self._table_start_line_object.identifier__()
+        return self._table_start_line_object.identifier_for_storage_adapter()
 
 
 def _complicated_deep_copy(old_LL):

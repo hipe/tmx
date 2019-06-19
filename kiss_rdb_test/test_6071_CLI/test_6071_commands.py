@@ -62,8 +62,9 @@ class Case6075_multi_line_create(_CommonCase):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_announces_created(self):
-        _actual = self.common_entity_screen().stderr_line
+        _actual, line2 = self.common_entity_screen().stderr_lines_one_and_two
         self.assertEqual(_actual, "created '2HF' with 1 attribute\n")
+        self.assertIsNone(line2)
 
     def test_300_outputs_created(self):
         from script_lib.test_support import unindent

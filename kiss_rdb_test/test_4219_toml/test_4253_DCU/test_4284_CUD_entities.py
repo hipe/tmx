@@ -31,16 +31,24 @@ by orthogonal to canon.
 def expect_everything(orig_f):
     def new_f(self):
 
+        # resolve expect lines
+
         x = self.expect_these_lines()
         _expect_lines = () if x is None else tuple(unindent(x))  # #here1
 
+        # resolve existing lines
+
         _existing_lines = unindent(self.given_big_string())
 
-        _listener = None  # _debugging_listener
+        # resolve listener
+
+        from kiss_rdb import THROWING_LISTENER as listener
+
+        # work
 
         _out_lines_itr = orig_f(self, {
-            'existing_lines': _existing_lines,
-            'listener': _listener,
+            'existing_file_lines': _existing_lines,
+            'listener': listener,
             })
 
         _actual = tuple(_out_lines_itr)
@@ -76,10 +84,12 @@ class _CommonCase(unittest.TestCase):
 
     @expect_everything
     def _expect_everything_for_delete(self, kwargs):
-        return _subj_mod().new_lines_via_delete_and_existing_lines(
+        two = _subj_mod().new_lines_and_future_deleted_via_existing_lines(
                 identifier_string=self.given_identifer_for_entity_to_delete(),
                 **kwargs
                 )
+        lines, future = two
+        return lines  # ignore the future
 
 
 _empty_dict_OCD = {}
@@ -301,18 +311,18 @@ class Case4285_delete_in_middle(_CommonCase):
 
     def expect_these_lines(self):
         return """
-        [item.050.meta]
-        [item.150.meta]
+        [item.234.meta]
+        [item.89A.meta]
         """
 
     def given_identifer_for_entity_to_delete(self):
-        return '100'
+        return '567'
 
     def given_big_string(self):
         return """
-        [item.050.meta]
-        [item.100.attributes]
-        [item.150.meta]
+        [item.234.meta]
+        [item.567.attributes]
+        [item.89A.meta]
         """
 
 
@@ -348,11 +358,11 @@ class Case4288_delete_leaving_effectively_empty_file(_CommonCase):
         return None
 
     def given_identifer_for_entity_to_delete(self):
-        return 'TheOnlyFellow'
+        return 'XYZ'
 
     def given_big_string(self):
         return """
-        [item.TheOnlyFellow.attributes]
+        [item.XYZ.attributes]
         attr-one = value 1
         """
 
@@ -366,21 +376,21 @@ class Case4289_update_at_beginning(_CommonCase):
         return """
         hallo line 1
         hallo line 2
-        [item.bbb.meta]
+        [item.BBB.meta]
         prop-b = val-b
         """
 
     def given_identifer_and_new_lines_for_existing_entity(self):
-        return ('aaa', """
+        return ('AAA', """
         hallo line 1
         hallo line 2
         """)
 
     def given_big_string(self):
         return """
-        [item.aaa.meta]
+        [item.AAA.meta]
         prob-a = val-a
-        [item.bbb.meta]
+        [item.BBB.meta]
         prop-b = val-b
         """
 
@@ -393,18 +403,18 @@ class Case4290_update_beginning_no_props(_CommonCase):
     def expect_these_lines(self):
         return """
         hallo line 1
-        [item.bbb.meta]
+        [item.BBB.meta]
         """
 
     def given_identifer_and_new_lines_for_existing_entity(self):
-        return ('aaa', """
+        return ('AAA', """
         hallo line 1
         """)
 
     def given_big_string(self):
         return """
-        [item.aaa.meta]
-        [item.bbb.meta]
+        [item.AAA.meta]
+        [item.BBB.meta]
         """
 
 
@@ -472,10 +482,6 @@ def _subj_mod():
     from kiss_rdb.storage_adapters_.toml import (
             file_lines_via_CUD_entity_and_file_lines as _)
     return _
-
-
-def cover_me():
-    raise Exception('cover me')
 
 
 if __name__ == '__main__':

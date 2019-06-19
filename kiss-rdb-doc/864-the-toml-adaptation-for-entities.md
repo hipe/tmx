@@ -318,6 +318,46 @@ anything.)
 
 
 
+## implementation note:
+
+"important: set the future value only once stream is exhausted"
+
+As developed in the preceding section, CREATE, UPDATE and DELETE in their
+implementation share a general approach; one where the edit happens
+along-the-way while traversing across the whole document in a stream-based
+pass with no lookahead, a thing we'll call a "rewrite traversal".
+
+There is a necessary trade-off in realizing the vision of the one-pass
+rewrite traversal, and that is that the client (some client) *must* exhaust
+the whole stream then check `monitor.ok` before the produced lines can be
+considered comittable; so that for example if there were any issues
+traversing the remainder of the file, we don't commit the rewrite.
+
+Issues could be:
+
+  - We might determine that the file was out of order only after processing
+    and yielding the area of the edit.
+
+  - We might hit a parse error (either because of our hackish parsing or
+    a real parse error) somewhere in the remainder of the file.
+
+So, each verb has its "main" result which is the lines of the file
+rewritten, but also it can have an "auxiliary" result, which is:
+
+  - for DELETE, the entity (in some form) that was deleted.
+  - for CREATE, the entity that was created
+  - for UPDATE, formally we want *both* the "before" *and* the "after",
+    immutable entities (as snapshots)
+
+Although the client must check `monitor.ok`, we want to wabi-sabi reinforce
+this provision *by only setting the auxiliary result (future?) once the
+stream is exhausted*. Under no circumstances should the client be able to
+access the auxiliary result before we have determined if there were any of
+these kinds of errors in the rewrite traversal.
+
+
+
+
 ## future feature 1
 
 the meta section

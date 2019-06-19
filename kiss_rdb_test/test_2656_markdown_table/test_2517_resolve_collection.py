@@ -50,10 +50,13 @@ class _CommonCase(unittest.TestCase):
 class Case2510_collection_not_found(_CommonCase):
 
     def test_100_result_is_none(self):
-        canon.case_of_collection_not_found.confirm_result_is_none(self)
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_emitted_accordingly(self):
-        canon.case_of_collection_not_found.confirm_emitted_accordingly(self)
+    def test_200_channel_looks_right(self):
+        self._canon_case.confirm_channel_looks_right(self)
+
+    def test_300_expression_looks_right(self):
+        self._canon_case.confirm_expression_looks_right(self)
 
     @shared_subject
     def end_state(self):
@@ -62,15 +65,22 @@ class Case2510_collection_not_found(_CommonCase):
     def given_path(self):
         return functions_for('toml').fixture_directory_path('000-no-ent')
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_collection_not_found
+
 
 class Case2513_file_has_no_table(_CommonCase):
 
     def test_100_result_is_none(self):
-        canon.case_of_collection_not_found.confirm_result_is_none(self)
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_emitted_accordingly(self):
-        canon.case_of_collection_not_found.confirm_emitted_accordingly(self)
-        reason = reason_from(self.end_state())
+    def test_200_channel_looks_right(self):
+        self._canon_case.confirm_channel_looks_right(self)
+
+    def test_300_expression_looks_right(self):
+        self._canon_case.confirm_expression_looks_right(self)
+        reason = reason_via_end_state(self.end_state())
         self.assertIn(': no markdown table found in 7 lines - ', reason)
 
     @shared_subject
@@ -80,15 +90,22 @@ class Case2513_file_has_no_table(_CommonCase):
     def given_path(self):
         return my_fixture_directory_path('2515-has-no-table.md')
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_collection_not_found
+
 
 class Case2516_file_has_multiple_tables(_CommonCase):
 
     def test_100_result_is_none(self):
-        canon.case_of_collection_not_found.confirm_result_is_none(self)
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_emitted_accordingly(self):
-        canon.case_of_collection_not_found.confirm_emitted_accordingly(self)
-        reason = reason_from(self.end_state())
+    def test_200_channel_looks_right(self):
+        self._canon_case.confirm_channel_looks_right(self)
+
+    def test_300_expression_looks_right(self):
+        self._canon_case.confirm_expression_looks_right(self)
+        reason = reason_via_end_state(self.end_state())
         needle = ': found 3 markdown tables, for now can only have one - '
         self.assertIn(needle, reason)
 
@@ -118,11 +135,16 @@ class Case2516_file_has_multiple_tables(_CommonCase):
 
             """)
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_collection_not_found
+
 
 class Case2519_empty_collection_found(_CommonCase):
 
     def test_100_result_is_not_none(self):
-        canon.case_of_empty_collection_found.confirm_result_is_not_none(self)
+        _canon_case = canon.case_of_empty_collection_found
+        _canon_case.confirm_collection_is_not_none(self)
 
     def subject_collection(self):
         return self.resolve_collection(None)
@@ -144,7 +166,8 @@ class Case2519_empty_collection_found(_CommonCase):
 class Case2522_non_empty_collection_found(_CommonCase):
 
     def test_100_result_is_not_none(self):
-        canon.case_of_non_empty_collection_found.confirm_result_is_not_none(self)  # noqa: E501
+        _canon_case = canon.case_of_non_empty_collection_found
+        _canon_case.confirm_collection_is_not_none(self)
 
     def subject_collection(self):
         return self.resolve_collection(None)
@@ -159,7 +182,7 @@ class Case2522_non_empty_collection_found(_CommonCase):
             """)
 
 
-reason_from = canon.reason_from
+reason_via_end_state = canon.reason_via_end_state
 
 
 def my_fixture_directory_path(tail):  # ..

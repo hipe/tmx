@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+prog_name=$(basename "$0")
+file_arg_name="«python-file»"
+
+show_help () {
+  show_primary_usage_line
+  echo "usage: $prog_name -h" >&2
+  echo "" >&2
+  echo "description: hackishly list the test cases in a $file_arg_name." >&2
+  echo "" >&2
+  echo "options:" >&2
+  echo "  -e      only show \"real\" cases (exclude placeholders)" >&2
+  echo "  -s      short: output only the case number, not the line" >&2
+}
+
+bork () {
+  show_primary_usage_line
+  echo "see '$prog_name -h' for help"
+  exit 2
+}
+
+show_primary_usage_line () {
+  echo "usage: $prog_name [-e] [-f] $file_arg_name" >&2
+}
+
+# Our command-line options/syntax are currently minimal so we are keeping it
+# simple and using optparse (with code adapted directly from its manpage)
+
+
+args=`getopt h?es $*`
+
+if [ $? != 0 ] ; then
+  bork
+fi
+
+set -- $args
+
+for i ; do
+  case "$i" in
+    -h|-\?)
+      help_was_requested=true
+      shift;;
+    -e)
+      real_was_requested=true
+      shift;;
+    -s)
+      short_was_requested=true
+      shift;;
+    --)
+      shift; break;;
+  esac
+done
+
+if [ -n "$help_was_requested" ] ; then
+  show_help
+  exit 0
+fi
+
+if [ "$#" -lt 1 ] ; then
+  echo "expecting $file_arg_name" >&2
+  bork
+fi
+
+file=$1
+shift
+
+if [ "$#" -ne 0 ] ; then
+  echo "unexpected argument: '$1'" >&2
+  bork
+fi
+
+if [ ! -e "$file" ]; then
+  echo "$file_arg_name not found: $file" >&2
+  exit 2
+fi
+
+if [ -n "$real_was_requested" ] ; then
+  match_what='class'
+else
+  match_what='(?:class| *#)'
+fi
+
+if [ -n "$short_was_requested" ] ; then
+  print_what='"$1\n"'
+else
+  print_what='$_'
+fi
+
+perl -ne "/^${match_what} Case(\d{4}(?!\.))/ && print $print_what" "$file"
+
+# #born.

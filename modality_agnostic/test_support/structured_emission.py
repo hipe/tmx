@@ -5,7 +5,7 @@ def expect(tc, expect_channel):  # EXPERIMENTAL name for 1 line
     return ExpectEmission(tc, expect_channel=expect_channel)
 
 
-def one_and_none(run, tc):
+def one_and_none(tc, run):
     ee = ExpectEmission(tc)
     result_value = run(ee.listener)
     tc.assertIsNone(result_value)
@@ -21,7 +21,7 @@ def listener_and_emissioner_for(tc):
     return ee.listener, emissioner
 
 
-def one_and_done(recv, tc):
+def one_and_done(tc, recv):  # 1x
     ee = ExpectEmission(tc, receive_emission=recv)
     return ee.listener, ee.ran
 

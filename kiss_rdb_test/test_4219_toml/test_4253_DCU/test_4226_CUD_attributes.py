@@ -1,4 +1,9 @@
-from kiss_rdb_test import CUD as CUD_support
+from kiss_rdb_test.CUD import (
+        expect_big_success,
+        emission_payload_expecting_error_given_run,
+        run_given_edit_tuples,
+        request_via_tuples as _request_via_tuples,
+        )
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -17,7 +22,7 @@ a collecton façade here, it's not.
 """
 
 
-class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
+class _CommonCase(unittest.TestCase):
 
     def _same_because_sho_madjozi_not_found_in_entity(self):
         _actual = self._two_parts()[1]
@@ -31,11 +36,31 @@ class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
         _actual = self._three_parts()[1]
         self.assertEqual(_actual, ' because names must match exactly')
 
+    expect_big_success = expect_big_success
+
+    def expect_request_error_reason(self, reason):
+        _actual_reason = self.reason_via_expect_request_error()
+        self.assertEqual(_actual_reason, reason)
+
+    def reason_via_expect_cannot_update_error(self):
+        return self._reason_via_which('cannot_update')
+
+    def reason_via_expect_request_error(self):
+        return self._reason_via_which('request_error')
+
+    def _reason_via_which(self, which):
+        sct = emission_payload_expecting_error_given_run(self, which)
+        return sct['reason']
+
+    def given_run(self, listener):
+        run = run_given_edit_tuples(self)
+        return run(listener)
+
 
 class Case4214_when_request_empty(_CommonCase):
 
     def test_100_reason(self):
-        self.expect_reason('request was empty')
+        self.expect_request_error_reason('request was empty')
 
     def given_run(self, listener):
         return _request_via_tuples((), listener)
@@ -44,7 +69,8 @@ class Case4214_when_request_empty(_CommonCase):
 class Case4215_strange_verbs(_CommonCase):
 
     def test_100_reason(self):
-        self.expect_reason('unrecognized verb(s): (fiz, bru-zuz)')
+        self.expect_request_error_reason(
+                'unrecognized verb(s): (fiz, bru-zuz)')
 
     def given_run(self, listener):
         return _request_via_tuples(
@@ -54,8 +80,7 @@ class Case4215_strange_verbs(_CommonCase):
 class Case4216_wrong_looking_attribute_name(_CommonCase):
 
     def test_100_input_error(self):
-        chan, sct = self.expect_error_structure()
-        self.assertEqual(chan, ('error', 'structure', 'input_error'))
+        sct = emission_payload_expecting_error_given_run(self, 'input_error')
         self.assertEqual(sct['position'], 9)
         self.assertEqual(sct['line'], 'xxe-sesf-')  # ick/meh
 
@@ -79,7 +104,7 @@ class Case4217_duplicate_names_within_request(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        _rsn = self.expect_reason()
+        _rsn = self.reason_via_expect_request_error()
         return _rsn.split(' and ')
 
     def given_run(self, listener):
@@ -102,7 +127,7 @@ class Case4218_names_too_similar_within_request(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        _rsn = self.expect_reason()
+        _rsn = self.reason_via_expect_request_error()
         return _split_hack(' are ', _rsn)
 
     def given_run(self, listener):
@@ -138,7 +163,7 @@ class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        _rsn = self.expect_reason()
+        _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
     def given_request_tuples(self):
@@ -161,7 +186,7 @@ class Case4221_cannot_delete_because_attributes_not_found(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        _rsn = self.expect_reason()
+        _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
     def given_request_tuples(self):
@@ -192,7 +217,7 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  #
 
     @shared_subject
     def _three_parts(self):
-        return _same_three_split(self.expect_reason())
+        return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
         return (('delete', 'sho-madjozi'),)
@@ -205,25 +230,42 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  #
 
 class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
 
-    def test_100_reason(self):
-        _actual = self._two_parts()[0]
-        self.assertEqual(_actual, "can't update")
+    def test_100_result_is_none(self):
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_detail(self):
-        self._same_because_sho_madjozi_not_found_in_entity()
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def _two_parts(self):
-        _rsn = self.expect_reason()
+        _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
+    @shared_subject
+    def end_state(self):
+        class identifier_lol:
+            def to_string():
+                return 'thing-1'
+        es = self._canon.end_state_via_run(self, self.given_run)
+        es['identifier'] = identifier_lol
+        return es
+
     def given_request_tuples(self):
-        return (('update', 'sho-madjozi', 'q'),)
+        return (('update', 'thing-1', 'q'),)
 
     def given_entity_body_lines(self):
         return """
         aa = bb
         """
+
+    @property
+    def _canon_case(self):
+        return self._canon.case_of_update_but_attribute_not_found
+
+    @property
+    def _canon(self):
+        from kiss_rdb_test import storage_adapter_canon as lib
+        return lib
 
 
 class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
@@ -240,7 +282,7 @@ class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  #
 
     @shared_subject
     def _three_parts(self):
-        return _same_three_split(self.expect_reason())
+        return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
         return (('update', 'sho-madjozi', 'q'),)
@@ -264,7 +306,7 @@ class Case4226_cannot_delete_because_comment_line_above(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        return self.expect_reason().split(' because ')
+        return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
         return (('delete', 'ab-fab'),)
@@ -289,7 +331,7 @@ class Case4227_cannot_update_because_comment_line_below(_CommonCase):
 
     @shared_subject
     def _two_parts(self):
-        return self.expect_reason().split(' because ')
+        return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
         return (('update', 'ab-fab', 'qq'),)
@@ -314,7 +356,7 @@ class Case4228_cannot_update_because_attribute_line_has_comment(_CommonCase):  #
 
     @shared_subject
     def _two_parts(self):
-        return self.expect_reason().split(' because ')
+        return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
         return (('update', 'ab-fab', 'qq'),)
@@ -342,7 +384,7 @@ class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
 
     @shared_subject
     def _two_sentences(self):
-        return self.expect_reason().split('. ')
+        return self.reason_via_expect_request_error().split('. ')
 
     def given_request_tuples(self):
         return (('delete', 'ab-fab-1'),
@@ -376,7 +418,7 @@ class Case4230_cannot_create_because_comment_line_above(_CommonCase):
 
     @shared_subject
     def _two_sentences(self):
-        _ = self.expect_reason()
+        _ = self.reason_via_expect_request_error()
         sp1, sp2 = _.split('. ')
         return (sp1, sp2)
 
@@ -586,10 +628,6 @@ def _split_because_hack(reason):
 def _split_hack(sep, reason):
     left, right = reason.split(sep)
     return (left, f'{ sep }{ right }')  # ick/meh
-
-
-def _request_via_tuples(aa, bb):
-    return CUD_support.request_via_tuples(aa, bb)
 
 
 # ==

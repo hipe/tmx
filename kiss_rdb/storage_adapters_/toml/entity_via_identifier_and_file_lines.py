@@ -63,8 +63,9 @@ class _Main:
         # build our parser "by hand" so we have a handle on the parse state
 
         from . import identifiers_via_file_lines as grammar_lib
+        from kiss_rdb import ErrorMonitor_
 
-        mon = grammar_lib.ErrorMonitor_(listener)
+        mon = ErrorMonitor_(listener)
 
         _sm = grammar_lib.state_machine_
 
@@ -445,7 +446,7 @@ def dictionary_two_deep_via_entity_line_stream_(de):
     # knowing just what kind of code we are passing this off to 😬
 
     big_string = ''.join(de.to_line_stream())
-    from kiss_rdb import THROWING_LISTENER as listener  # #todo just 4 dbg
+    from kiss_rdb import THROWING_LISTENER as listener
 
     # --
 
@@ -490,7 +491,7 @@ def _vendor_parse(big_string, listener):  # #testpoint
 # == all emissions in one place because why not
 
 def _emit_not_found(listener, did_traverse_whole_file, identifier_string):
-    def f():
+    def structurer():
         if did_traverse_whole_file:
             which = 'not in file'  # (Case4118)
         else:
@@ -501,7 +502,7 @@ def _emit_not_found(listener, did_traverse_whole_file, identifier_string):
                 'identifier_string': identifier_string,
                 'input_error_type': 'not_found',
                 }
-    _emit_input_error_via_structurer(f, listener)
+    listener('error', 'structure', 'entity_not_found', structurer)
 
 
 def _emit_table_type_not_yet_implemented(listener, ts):

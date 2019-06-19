@@ -1,4 +1,7 @@
-from kiss_rdb_test import CUD as CUD_support
+from kiss_rdb_test.CUD import (
+        expect_big_success,
+        emission_payload_expecting_error_given_edit_tuples,
+        )
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -19,8 +22,13 @@ Orthogonal to canon.
 """
 
 
-class _CommonCase(CUD_support.CUD_BIG_SUCCESS_METHODS, unittest.TestCase):
-    pass
+class _CommonCase(unittest.TestCase):
+
+    expect_big_success = expect_big_success
+
+    def expect_input_error(self):
+        return emission_payload_expecting_error_given_edit_tuples(
+                self, 'input_error')
 
 
 class Case4257_simplifed_typical(_CommonCase):

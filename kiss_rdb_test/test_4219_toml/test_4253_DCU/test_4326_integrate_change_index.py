@@ -1,16 +1,15 @@
 from kiss_rdb_test.common_initial_state import (
-        debugging_listener as _debugging_listener,
         functions_for,
         unindent_with_dot_hack,
         unindent as _unindent,
         )
 from kiss_rdb_test.CUD import (
-        CUD_Methods,
+        run_for,
+        filesystem_recordings_of,
         filesystem_expecting_no_rewrites,
         build_filesystem_expecting_num_file_rewrites,
         )
 from kiss_rdb_test import storage_adapter_canon
-from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -21,44 +20,89 @@ import unittest
 canon = storage_adapter_canon.produce_agent()
 
 
-class _CommonCase(CUD_Methods, unittest.TestCase):
+def common_component(f):  # decorator
+    def use_f(tc):
+        return getattr(tc.end_components(), component_name)
+    component_name = f.__name__
+    return use_f
+
+
+class _CommonCase(unittest.TestCase):
 
     @property
+    @common_component
     def left_half(self):
-        return self.two_halves()[0]
+        pass
 
     @property
+    @common_component
     def right_half(self):
-        return self.two_halves()[1]
+        pass
 
-    # == THESE
+    @property
+    @common_component
+    def error_category(self):
+        pass
+
+    def entity_file_rewrite(self):
+        return self.recorded_file_rewrites()[0]  # (per [#867.Q], is first)
+
+    def index_file_rewrite(self):
+        return self.recorded_file_rewrites()[1]  # (per [#867.Q], is second)
+
+    # -- used when preparing end states
+
+    def build_common_components_for_failed_delete(self, id_s):
+        coll = self.subject_collection()
+        run = run_for(coll, 'delete', id_s)
+        chan, payloader = _se_lib().one_and_none(self, run)
+        return three_components_via_channel_and_payloader(
+                self, chan, payloader)
+
+    def flush_filesystem_recordings(self):
+        coll = self.end_state()['collection']
+        return coll._filesystem.FINISH_AS_HACKY_SPY()
 
     def listener(self):
-        if False:
-            return _debugging_listener()
+        pass
 
 
-class Case4316_collection_can_be_built_with_noent_dir(_CommonCase):
+# (Case4334) is a "collection not found" case
+
+
+class Case4315_collection_can_be_built_with_noent_dir(_CommonCase):
 
     def test_100(self):
-        self.assertIsNotNone(_collection_with_noent_dir())
+        self._canon_case.confirm_collection_is_not_none(self)
+
+    def subject_collection(self):
+        return _collection_with_noent_dir()
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_empty_collection_found
+
+
+# Case4316 non-empty collection found
 
 
 class Case4317_identifier_with_invalid_chars(_CommonCase):
 
-    def test_100_reason(self):
+    def test_100_channel(self):
+        self.assertEqual(self.error_category, 'input_error')
+
+    def test_200_reason(self):
         _actual = self.left_half
         self.assertEqual(_actual, "invalid character 'b' in identifier")
 
-    def test_200_suggestion(self):
+    def test_300_suggestion(self):
         _actual = self.right_half
         _expected = 'identifier digits must be [0-9A-Z] minus 0, 1, O and I.'
         self.assertEqual(_actual, _expected)
 
     @shared_subject
-    def two_halves(self):
-        _ = self.delete_expecting_failure('AbC')
-        return _['reason'].split(' - ')
+    def end_components(self):
+        return self.build_common_components_for_failed_delete('AbC')
 
     def subject_collection(self):
         return _collection_with_NO_filesystem()
@@ -66,87 +110,120 @@ class Case4317_identifier_with_invalid_chars(_CommonCase):
 
 class Case4318_identifier_too_short_or_long(_CommonCase):
 
-    def test_100_complaint(self):
-        _actual = self.left_half
-        self.assertEqual(_actual, "too many digits in identifier 'ABCD'")
+    def test_100_result_is_none(self):
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_reason(self):
-        _actual = self.right_half
-        self.assertEqual(_actual, "need 3, had 4")
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
-    def two_halves(self):
-        _ = self.delete_expecting_failure('ABCD')
-        return _['reason'].split(' - ')
+    def end_state(self):
+        return self._canon_case.build_end_state(self)
 
     def subject_collection(self):
         return _collection_with_NO_filesystem()
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_entity_not_found_because_identifier_too_deep
+
 
 class Case4319_some_top_directory_not_found(_CommonCase):
 
-    def test_100_complaint(self):
+    def test_100_channel(self):
+        self.assertEqual(self.error_category, 'entity_not_found')
+
+    def test_200_complaint(self):
         _actual = self.left_half
         _expect = "for 'entities/A/B.toml', no such directory"
-        self.assertEqual(_actual, _expect)
+        self.assertIn(_expect, _actual)
 
-    def test_200_reason(self):
+    def test_300_reason(self):
         actual = self.right_half
         _tail = actual[(actual.rindex('/') + 1):]
         self.assertEqual(_tail, '000-no-ent')
 
     @shared_subject
-    def two_halves(self):
-        _ = self.delete_expecting_failure('ABC')
-        return _['reason'].split(' - ')
+    def end_components(self):
+        return self.build_common_components_for_failed_delete('ABC')
 
     def subject_collection(self):
         return _collection_with_noent_dir()
 
 
-class Case4320_file_not_found(_CommonCase):
+class Case4320_delete_but_file_not_found(_CommonCase):
 
-    def test_100_complaint(self):
+    def test_050_channel(self):
+        self.assertEqual(self.error_category, 'entity_not_found')
+
+    def test_100_result_is_none(self):
+        self._canon_case.confirm_result_is_none(self)
+
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
+
+    def test_600_complaint(self):
         _actual = self.left_half
-        self.assertEqual(_actual, 'no such file')
+        self.assertIn('no such file', _actual)
 
-    def test_200_reason(self):
+    def test_700_reason(self):
         _tail = _last_three_path_parts(self.right_half)
         self.assertEqual(_tail, 'entities/B/4.toml')
 
     @shared_subject
-    def two_halves(self):
-        _ = self.delete_expecting_failure('B4F')
-        return _['reason'].split(' - ')
+    def end_components(self):
+        es = self.end_state()
+        return three_components_via_channel_and_payloader(
+                self, es['channel'], es['payloader_CAUTION_HOT'])
+
+    @shared_subject
+    def end_state(self):
+        return self._canon_case.build_end_state(self)
+
+    def IDENTIFIER_STRING(self):
+        return 'B42'
 
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=None)
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_delete_but_entity_not_found
+
 
 class Case4322_entity_not_found(_CommonCase):
 
-    def test_100_failed_to_rewrite(self):
-        self._structure_and_recordings()  # because #here2
+    def test_100_result_is_none(self):
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_message_sadly_has_no_context_yet(self):
-        sct = self._structure_and_recordings()[0]
-        self.assertEqual(sct['reason'], "entity 'B7D' is not in file")
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
 
-    def test_300_no_files_rewritten(self):
-        recs = self._structure_and_recordings()[1]
+    def test_600_message_sadly_has_no_context_yet(self):
+        sct = self.end_state()['payloader_CAUTION_HOT']()
+        self.assertEqual(sct['reason'], "'B7J' not in file")
+
+    def test_700_no_files_rewritten(self):
+        recs = self.flush_filesystem_recordings()  # NOTE
         self.assertEqual(recs, 'hi there were no file rewrites')
 
     @shared_subject
-    def _structure_and_recordings(self):
-        sct, recs = self.delete_expecting_failure_and_recordings('B7D')
-        return sct, recs
+    def end_state(self):
+        return self._canon_case.build_end_state(self)
+
+    def IDENTIFIER_STRING(self):
+        return 'B7J'
 
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=filesystem_expecting_no_rewrites())
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_entity_not_found
 
 
 # Case4323 - not found because bad ID
@@ -159,11 +236,10 @@ class Case4322_entity_not_found(_CommonCase):
 class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
 
     def test_100_emits_error_structure(self):
-        col = _collection_with_NO_filesystem()
-
-        def f(listener):
-            return col.retrieve_entity('B9F', listener)
-        sct = self.run_this_expecting_failure(f)
+        coll = _collection_with_NO_filesystem()
+        run = run_for(coll, 'retrieve', 'B9F')
+        _, payloader = _se_lib().one_and_none(self, run)
+        sct = payloader()
 
         # ~(Case4116-Case4134) cover the detailed components from this.
         # this is just sort of a "curb-check" contact point integration check
@@ -172,24 +248,42 @@ class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
         self.assertEqual(sct['identifier_string'], 'B9F')
 
 
-class Case4328_retrieve(_CommonCase):
+class Case4327_retrieve_OK(_CommonCase):
 
-    def test_100_identifier_is_in_result_dictionary(self):
-        _actual = self._this_dict()['identifier_string']
-        self.assertEqual(_actual, 'B9H')
+    def test_100_entity_is_retrieved_and_looks_ok(self):
+        self._canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
-    def test_200_simple_immediate_values_are_there(self):
-        dct = self._this_dict()['core_attributes']
-        self.assertEqual(dct['thing-A'], "hi i'm B9H")
-        self.assertEqual(dct['thing-B'], "hey i'm B9H")
+    def end_state(self):  # NOTE  not memoized
+        return self._canon_case.build_end_state(self)
 
-    @shared_subject
-    def _this_dict(self):
-        _col = _collection_with_NO_filesystem()
-        return _col.retrieve_entity('B9H', _no_listener)
+    def subject_collection(self):
+        return _collection_with_NO_filesystem()
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_retrieve_OK
 
 
-class Case4329_delete_simplified_typical(_CommonCase):
+# #hole
+
+
+class Case4329_delete_OK(_CommonCase):
+
+    def test_100_result_is_the_deleted_entity(self):
+        self._canon_case.confirm_result_is_the_deleted_entity(self)
+
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
+
+    def CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(self, table_block):
+        _expected = tuple(_unindent("""
+        [item.B7F.attributes]
+        thing-1 = "hi F"
+        thing-2 = "hey F"
+
+        """))
+        _actual = tuple(table_block.to_line_stream())
+        self.assertSequenceEqual(_actual, _expected)
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
         self.recorded_file_rewrites()
@@ -219,10 +313,18 @@ class Case4329_delete_simplified_typical(_CommonCase):
 
     @shared_subject
     def recorded_file_rewrites(self):
-        return self.delete_expecting_success('B7F')
+        return self.flush_filesystem_recordings()
+
+    @shared_subject
+    def end_state(self):
+        return self._canon_case.build_end_state_for_delete(self, 'B7F')
 
     def subject_collection(self):
         return _build_collection_expecting_common_number_of_rewrites()
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_delete_OK_resulting_in_non_empty_collection
 
 
 class Case4330_delete_that_leaves_file_empty(_CommonCase):
@@ -250,7 +352,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
 
     @shared_subject
     def recorded_file_rewrites(self):
-        return self.delete_expecting_success('B8H')
+        return filesystem_recordings_of(self, 'delete', 'B8H')
 
     def subject_collection(self):
         return _build_collection_expecting_common_number_of_rewrites()
@@ -262,7 +364,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
 class Case4332_update_OK(_CommonCase):
     """
     at #history-A.1 we had to un-cover this issue, but re-cover it by creating
-    "thing-C" instead of "thing-2" (numbers come before leters lexically)
+    "thing-C" instead of "thing-2" (numbers come before letters lexically)
 
     .#open [#867.H] it "thinks of" {whitespace|comments} as being
 
@@ -296,11 +398,8 @@ class Case4332_update_OK(_CommonCase):
 
     def test_600_new_file_content_looks_okay(self):
 
-        es = self.end_state()
-        coll = es['collection']
-        recs = coll._filesystem.FINISH_AS_HACKY_SPY()
-
-        rec, = recs  # onyl one file rewrite
+        recs = self.flush_filesystem_recordings()
+        rec, = recs  # only one file rewrite
         path = rec.path
         lines = rec.lines
 
@@ -347,69 +446,58 @@ class Case4332_update_OK(_CommonCase):
 
 class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):  # noqa: E501
 
-    def test_100_channel(self):
-        _channel = self._these_two()[0]
-        _expect = (
-                'error',
-                'expression',
-                'argument_error',
-                'no_such_directory')
-        self.assertSequenceEqual(_channel, _expect)
+    def test_100_result_is_none(self):
+        self._canon_case.confirm_result_is_none(self)
 
-    def test_200_message(self):
-        _payloader = self._these_two()[1]
-        message, = tuple(_payloader())  # assert only one line
-        head, path = message.split(' - ')  # assert has a dash in it
-        _expect = 'collection does not exist because no such directory'
-        self.assertEqual(head, _expect)
+    def test_200_channel_looks_right(self):
+        self._canon_case.confirm_channel_looks_right(self)
 
+    def test_300_expression_looks_right(self):
+        self._canon_case.confirm_expression_looks_right(self)
+
+    def test_550_reason(self):
+        self.assertEqual(
+                self.left_half,
+                'collection does not exist because no such directory')
+
+    def test_575_detail(self):
         # regexp schmegex
         expect = '000-no-ent/entities'
-        _actual = path[-len(expect):]
+        _actual = self.right_half[-len(expect):]
         self.assertEqual(_actual, expect)
 
     @shared_subject
-    def _these_two(self):
+    def end_components(self):
+        # build the whole message again, meh
+        _payloader = self.end_state()['payloader_CAUTION_HOT']
+        message, = tuple(_payloader())  # assert only one line
+        return _TwoComponents(* two_strings_via_message(message))
 
-        listener, emissioner = se_lib.listener_and_emissioner_for(self)
-
-        _itr = self.subject_collection().to_identifier_stream(listener)
-        for x in _itr:
-            self.fail()
-
-        channel, payloader = emissioner()
-        return channel, payloader
+    @shared_subject
+    def end_state(self):
+        def run(listener):
+            _itr = coll.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
+            for _ in _itr:
+                self.fail()
+        coll = self.subject_collection()
+        return canon.end_state_via_run(self, run)
 
     def subject_collection(self):
         return _build_collection(
                 dir_path=_dir_path_of_no_ent(),
                 filesystem=None)
 
+    @property
+    def _canon_case(self):
+        return canon.case_of_collection_not_found
 
-class Case4335_simplified_typical_traversal(_CommonCase):
+
+class Case4335_traverse_IDs_ok(_CommonCase):
+    # "simplified typical traversal"
 
     def test_100_everything(self):
-
-        def f(id_obj):
-            return id_obj.to_string()  # ..
-
-        _these = self.subject_collection().to_identifier_stream(None)
-        _actual = (f(o) for o in _these)
-
-        _expected = (
-                '2HJ',
-                'B7E',
-                'B7F',
-                'B7G',
-                'B8H',
-                'B9G',
-                'B9H',
-                'B9J',
-                )
-
-        _actual = tuple(_actual)
-
-        self.assertSequenceEqual(_actual, _expected)
+        _ = canon.case_of_traverse_IDs_from_non_empty_collection
+        _.confirm_all_IDs_in_any_order_no_repeats(self)
 
     def subject_collection(self):
         return _build_collection(
@@ -419,8 +507,14 @@ class Case4335_simplified_typical_traversal(_CommonCase):
 
 class Case4336_create_into_existing_file(_CommonCase):
 
-    def test_100_succeeds(self):
-        self.recorded_file_rewrites()
+    def test_100_result_is_created_entity(self):
+        self._canon_case.confirm_result_is_the_created_entity(self)
+
+    def test_200_emitted_accordingly(self):
+        self._canon_case.confirm_emitted_accordingly(self)
+
+    # #pending-long-running #pending-mock-filesystem
+    # self._canon_case.confirm_entity_now_in_collection(self)
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
@@ -428,8 +522,8 @@ class Case4336_create_into_existing_file(_CommonCase):
 
         expect = tuple(_unindent("""
         [item.2HG.attributes]
-        abc = "123"
-        de-fg = "true"
+        thing-2 = -2.718
+        thing-B = false
         [item.2HJ.attributes]
         """))
 
@@ -451,15 +545,11 @@ class Case4336_create_into_existing_file(_CommonCase):
 
     @shared_subject
     def recorded_file_rewrites(self):
-        cuds = (
-            ('create', 'abc', '123'),
-            ('create', 'de-fg', 'true'),
-            )
+        return self.flush_filesystem_recordings()
 
-        return self.create_expecting_success(cuds)
-
-    def listener(self):
-        return _throwing_listener()
+    @shared_subject
+    def end_state(self):
+        return self._canon_case.build_end_state(self)
 
     def subject_collection(self):
 
@@ -470,6 +560,10 @@ class Case4336_create_into_existing_file(_CommonCase):
                 dir_path=_dir_path_most_common(),
                 random_number_generator=random_number_generator,
                 filesystem=build_filesystem_expecting_num_file_rewrites(2))
+
+    @property
+    def _canon_case(self):
+        return canon.case_of_create_OK_into_non_empty_collection
 
 
 # Case4337 create failure cleans up created file
@@ -517,14 +611,14 @@ class Case4338_create_into_noent_file(_CommonCase):
 
     @shared_subject
     def recorded_file_rewrites(self):
-        cuds = (
-            ('create', 'abc', '456'),
-            ('create', 'de-fg', 'false'),
-            )
+        dct = {
+                'abc': '456',
+                'de-fg': 'false',
+                }
 
         entities_path = _entities_file_path_for_2J()
 
-        res = self.create_expecting_success(cuds)
+        res = filesystem_recordings_of(self, 'create', dct)
 
         # == BEGIN NASTY - don't actually leave that new file in the fixture
         import os
@@ -532,9 +626,6 @@ class Case4338_create_into_noent_file(_CommonCase):
         # == END
 
         return res
-
-    def listener(self):
-        return _throwing_listener()
 
     def subject_collection(self):
         random_number_generator = _random_number_generator_for(512)  # 2J2 but
@@ -627,10 +718,36 @@ def _always_same_schema():
     return _._Schema(storage_schema='32x32x32')
 
 
+def three_components_via_channel_and_payloader(tc, chan, payloader):
+    sev, shape, ec = chan  # ..
+    tc.assertEqual((sev, shape), ('error', 'structure'))
+    left, right = two_strings_via_message(payloader()['reason'])
+    return _ThreeComponents(left, right, ec)
+
+
+def two_strings_via_message(message):
+    left, right = message.split(' - ')  # assert exactly 2
+    return left, right
+
+
+class _TwoComponents:
+    def __init__(self, aa, bb):
+        self.left_half = aa
+        self.right_half = bb
+
+
+class _ThreeComponents(_TwoComponents):
+    def __init__(self, aa, bb, cc):
+        super().__init__(aa, bb)
+        self.error_category = cc
+
+
 def _subject_module():
     from kiss_rdb.storage_adapters_.toml import collection_via_directory as _
     return _
 
+
+# ==
 
 def _throwing_listener():
     from kiss_rdb import THROWING_LISTENER
@@ -640,6 +757,15 @@ def _throwing_listener():
 def _no_listener(*chan, payloader):
     assert(False)  # when this trips, use _debugging_listener()
 
+
+# ==
+
+def _se_lib():
+    from modality_agnostic.test_support import structured_emission as se_lib
+    return se_lib
+
+
+# ==
 
 if __name__ == '__main__':
     unittest.main()

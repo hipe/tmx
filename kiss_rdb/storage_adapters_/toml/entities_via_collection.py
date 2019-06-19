@@ -58,8 +58,7 @@ def table_block_via_lines_and_table_start_line_object_(
 
 def identifiers_via__(paths_function, id_via_string, listener):
 
-    from .identifiers_via_file_lines import ErrorMonitor_
-
+    from kiss_rdb import ErrorMonitor_
     monitor = ErrorMonitor_(listener)
     my_listener = monitor.listener
 
@@ -139,7 +138,7 @@ def __whine_about_not_exists(listener, pp):
         _ = pp.as_posix()
         yield f'collection does not exist because no such directory - {_}'
 
-    listener('error', 'expression', 'argument_error', 'no_such_directory', msg)  # noqa: E501
+    listener('error', 'expression', 'collection_not_found', msg)  # noqa: E501
 
 
 def cover_me(msg=None):

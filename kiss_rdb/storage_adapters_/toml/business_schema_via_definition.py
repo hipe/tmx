@@ -89,15 +89,13 @@ def _build_semi_encoder(listener, o):
             return 'semi-encoded string', ses
 
         if bool == typ:
-            cover_me('boolean no problem')
+            return _use_vendor_lib, None  # (Case4336)
 
         if int == typ:
-            # (Case4232)
-            return _use_vendor_lib, None
+            return _use_vendor_lib, None  # (Case4232)
 
         if float == typ:
-            # (Case4234)
-            return _use_vendor_lib, None
+            return _use_vendor_lib, None  # (Case4234)
 
         if hasattr(typ, 'utcfromtimestamp'):
             # wickedly infer type (class) without adding a dependency

@@ -23,19 +23,45 @@ class CLI_Test_Case_Methods:
     def expect_common_entity_screen(self):
         # (see #HERE3 in the first CLI test file)
 
+        # partition the lines into stdout vs stderr, counting how many times it
+
+        sout_lines = []
+        serr_lines = []
+        which_lines = {'sout': sout_lines, 'serr': serr_lines}
+
         qualified_lines_itr = self.end_state().lines
 
-        which, stderr_line = next(qualified_lines_itr)
+        which, line = next(qualified_lines_itr)
+        curr_lines = which_lines[which]
+        curr_lines.append(line)
 
-        self.assertEqual(which, 'serr')
+        order = [which]
+        prev_which = which
 
-        stdout_lines = []
+        for which, line in qualified_lines_itr:
+            if prev_which != which:
+                if 1 < len(order):
+                    raise Exception("screen flipped between sout & serr > 1x")
+                order.append(which)
+                curr_lines = which_lines[which]
+                prev_which = which
+            curr_lines.append(line)
 
-        for (which, stdout_line) in qualified_lines_itr:
-            self.assertEqual(which, 'sout')
-            stdout_lines.append(stdout_line)
+        # assert that both were expressed, and stderr came before stdout
 
-        return _CommonEntityScreen(stderr_line, tuple(stdout_lines))
+        self.assertSequenceEqual(order, ('serr', 'sout'))
+
+        # assert max two stderr lines, hackishly
+
+        if 1 == len(serr_lines):
+            serr_lines.append(None)
+
+        first_stderr_line, second_stderr_line = serr_lines
+
+        #
+
+        return _CommonEntityScreen(
+                first_stderr_line, second_stderr_line, tuple(sout_lines))
 
     def expect_exit_code_for_bad_request(self):
         self.expect_exit_code(400)
@@ -386,9 +412,9 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
 
 class _CommonEntityScreen:
 
-    def __init__(self, aa, bb):
-        self.stderr_line = aa
-        self.stdout_lines = bb
+    def __init__(self, aa, bb, cc):
+        self.stderr_lines_one_and_two = (aa, bb)
+        self.stdout_lines = cc
 
 
 # ==

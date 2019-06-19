@@ -18,6 +18,5 @@ graph viz for fragments and generate docs from current frags
 migrate real doc fragments to eno
 have full on eno
 introduce recfiles pseudo-SA (just for that one thing, a refactor)
-refactor toml test to be canon based
 todo's in asset and test
-get rid of update_expecting_success
+big refactor to introduce collection injection

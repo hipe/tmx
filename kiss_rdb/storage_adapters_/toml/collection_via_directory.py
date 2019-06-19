@@ -72,8 +72,10 @@ class collection_via_directory_and_schema:
         return self._temporary_bridge_for_update(path, iden, cuds, listener)
 
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
+        # #todo when we integrate adapters with a UI, we will need to
+        # change `update` to `update_attribute` and the other 2 #here7
 
-        path = self._path_that_must_already_exist_for(iden, listener)
+        path = self._path_that_must_already_exist_for(iden, listener, 'update')
         if path is None:
             return
         return self._temporary_bridge_for_update(path, iden, tup, listener)
@@ -88,16 +90,24 @@ class collection_via_directory_and_schema:
     # == BEGIN create and delete are more complicated
 
     def delete_entity(self, id_s, listener):
+        # #todo this will move up & out
+
+        iden = _identifier_via_string(id_s, listener)
+        if not iden:
+            return
+
+        return self.delete_entity_as_storage_adapter_collection(iden, listener)
+
+    def delete_entity_as_storage_adapter_collection(self, iden, listener):
 
         # certainly, the entities file must first exist
 
         # before attempting to lock the index file, see if we can resolve the
         # valid path for the entities file (so we get nicer error message)
 
-        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
-        if tup is None:
+        path = self._path_that_must_already_exist_for(iden, listener, 'delete')
+        if path is None:
             return
-        iid, path = tup
 
         # then after the above, try to get the two locks:
 
@@ -109,11 +119,10 @@ class collection_via_directory_and_schema:
                 locked_file = self._open_locked_mutable_entities_file(path)
 
             with locked_file as lmef:
-                res = _delete_entity(
-                        lmef, indexy_file, iid, self._filesystem, listener)
-        return res
+                return _delete_entity(
+                        lmef, indexy_file, iden, self._filesystem, listener)
 
-    def create_entity(self, cuds, listener):
+    def create_entity_as_storage_adapter_collection(self, dct, listener):
         """
         create is the most complicated per [#864.C] this table.
 
@@ -131,6 +140,17 @@ class collection_via_directory_and_schema:
 
         and the above is only for if the entities file already exists
         """
+
+        # DISCUSSION: because in Python 3.7 dictionaries are insertion-ordered,
+        # the KISS-iest interface here is that CREATE should take an isomorphic
+        # dictionary as an argument in the expected way..
+
+        assert(isinstance(dct, dict))  # [#008.D]
+
+        # internally we want to use our "prepare & flush edit" pattern which
+        # is fine, but we have to upgrade the dict into:
+
+        cuds = tuple(('create', k, v) for k, v in dct.items())  # #here7
 
         cuds_request = _request_via_cuds(cuds, listener)
         if cuds_request is None:
@@ -227,6 +247,9 @@ class collection_via_directory_and_schema:
 
         return res
 
+    create_entity = create_entity_as_storage_adapter_collection
+    # #todo this is the façade version. for CREATE it's pass-thru
+
     # == END
 
     def __CREATE_DIRECTORIES(self, parent_dir):
@@ -254,19 +277,36 @@ class collection_via_directory_and_schema:
         in one invocation.. :#here2
         """
 
-        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
-        if tup is None:
+        iden = _identifier_via_string(id_s, listener)
+        if iden is None:
             return
-        iid, path = tup
-        return _retrieve_entity(iid, path, listener)
+
+        de = self.retrieve_entity_as_storage_adapter_collection(iden, listener)
+        if de is None:
+            return  # (Case4130)
+
+        # (Case4292):
+
+        assert(de.table_type == 'attributes')
+        assert(de.identifier_string == id_s)
+
+        # below became a call at #history-A.2
+
+        return de.to_dictionary_two_deep_as_storage_adapter_entity()
+
+    def retrieve_entity_as_storage_adapter_collection(self, iden, listener):
+        # NOTE - after the cool thing, make sure to use the above comment
+
+        path = self._path_that_must_already_exist_for(iden, listener)
+        if path is None:
+            return
+        return _retrieve_entity(iden, path, listener)
 
     def _ID_and_path_that_must_already_exist(self, id_s, listener):
-        # #todo - SA collections won't need to decode identifiers in the future
+        # #todo this goes away after injecton becasue SA collections
+        # won't decode argument identifiers soon..
 
-        from kiss_rdb.magnetics_.identifier_via_string import (
-            identifier_via_string_)
-
-        iden = identifier_via_string_(id_s, listener)
+        iden = _identifier_via_string(id_s, listener)
         if iden is None:
             return
 
@@ -276,7 +316,7 @@ class collection_via_directory_and_schema:
 
         return iden, path
 
-    def _path_that_must_already_exist_for(self, iden, listener):
+    def _path_that_must_already_exist_for(self, iden, listener, verb=None):
 
         _ok = self._schema.check_depth(iden, listener)
         if not _ok:
@@ -286,7 +326,9 @@ class collection_via_directory_and_schema:
         path = os_path.join(*pieces)
 
         if not os_path.exists(path):  # :##here1
-            _whine_about_no_path(pieces, listener)
+            def structurer():
+                return _whine_about_no_path(pieces, iden, verb)
+            listener('error', 'structure', 'entity_not_found', structurer)
             return
 
         return path
@@ -302,8 +344,10 @@ class collection_via_directory_and_schema:
     def _open_locked_mutable_entities_file(self, path):
         return self._filesystem.open_locked_file(path)
 
-    def to_identifier_stream(self, listener):
+    def to_identifier_stream_as_storage_adapter_collection(self, listener):
         return self._schema_pather.to_identifier_stream(listener)
+
+    to_identifier_stream = to_identifier_stream_as_storage_adapter_collection
 
     def _file_path_pieces_via_identifier(self, iid):
         return self._schema_pather.file_path_pieces_via__(iid)
@@ -329,7 +373,7 @@ class _PassthruContextManager:
 
 def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
-    before_and_after = []  # like nonlocal. meh
+    before_and_after = []  # nonlocаl adjacent
 
     def new_lines_via_entity(doc_ent, my_listener):
         # unlike both CREATE and DELETE, UPDATE determines its modified entity
@@ -354,11 +398,10 @@ def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_update_and_existing_lines(
-                identifier.to_string(),
-                new_lines_via_entity,
-                orig_lines,
-                my_listener,
-                )
+                identifier_string=identifier.to_string(),
+                new_lines_via_entity=new_lines_via_entity,
+                existing_file_lines=orig_lines,
+                listener=my_listener)
 
     with coll._filesystem.FILE_REWRITE_TRANSACTION(listener) as trans:
         trans.rewrite_file(locked_ents_file, rewrite_ents_file)
@@ -372,19 +415,19 @@ def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
 def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
 
-    deleted_doc_ent = None
+    class _RewriteEntsFile:  # avoid use of nonlocаl lol
 
-    def rec_deleted_doc_ent(de):
-        nonlocal deleted_doc_ent  # oops
-        deleted_doc_ent = de
+        def __call__(self, orig_lines, my_listener):
+            two = _sib_lib().new_lines_and_future_deleted_via_existing_lines(
+                    identifier_string=identifier.to_string(),
+                    existing_file_lines=orig_lines,
+                    listener=my_listener)
+            lines, future = two
+            for line in lines:
+                yield line
+            self.deleted_document_entity_IFF_succeeded = future()  # None IFF f
 
-    def rewrite_ents_file(orig_lines, my_listener):
-        return _sib_lib().new_lines_via_delete_and_existing_lines(
-                identifier.to_string(),
-                orig_lines,
-                my_listener,
-                rec_deleted_doc_ent,
-                )
+    rewrite_ents_file = _RewriteEntsFile()
 
     def rewrite_index_file(orig_lines, my_listener):
         from kiss_rdb.magnetics_ import index_via_identifiers as _
@@ -401,13 +444,14 @@ def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
         else:
             trans.rewrite_file(indexy_file.handle, rewrite_index_file)
 
-        res = trans.finish()
+        ok = trans.finish()
 
-    if res is not None:
-        assert(res is True)
-        res = deleted_doc_ent
+    if ok is None:
+        return
 
-    return res
+    assert(ok is True)
+
+    return rewrite_ents_file.deleted_document_entity_IFF_succeeded
 
 
 def _create_entity(
@@ -452,10 +496,10 @@ def _create_entity(
 
     def rewrite_ents_file(orig_lines, my_listener):
         return _sib_lib().new_lines_via_create_and_existing_lines(
-                identifier_string,
-                _new_entity_lines,
-                orig_lines,
-                my_listener)
+                new_entity_lines=_new_entity_lines,
+                identifier_string=identifier_string,
+                existing_file_lines=orig_lines,
+                listener=my_listener)
 
     def rewrite_index_file(orig_lines, my_listener):
         from kiss_rdb.magnetics_ import index_via_identifiers as _
@@ -514,25 +558,18 @@ def _retrieve_entity(identifier, file_path, listener):
     """
 
     from .entity_via_identifier_and_file_lines import (
-            entity_via_identifier_and_file_lines as DE_via,
-            )
+            entity_via_identifier_and_file_lines as DE_via)
 
-    id_s = identifier.to_string()
+    _id_s = identifier.to_string()
 
     with open(file_path) as lines:  # file existed last we checked #here1
-        de = DE_via(id_s, lines, listener)
+        return DE_via(_id_s, lines, listener)
 
-    if de is None:
-        return  # (Case4130)
 
-    # (Case4292):
-
-    assert(de.table_type == 'attributes')
-    assert(de.identifier_string == id_s)
-
-    # below became a call at #history-A.2
-
-    return de.to_dictionary_two_deep_()
+def _identifier_via_string(identifier_string, listener):
+    from kiss_rdb.magnetics_.identifier_via_string import (
+        identifier_via_string_)
+    return identifier_via_string_(identifier_string, listener)
 
 
 """
@@ -544,7 +581,7 @@ that's only in CLI so etc
 
 # == whiners
 
-def _whine_about_no_path(pieces, listener):
+def _whine_about_no_path(pieces, iden, verb):
     """given a filesystem path that does not exist, determine the longest
 
     head of the path that *does*.
@@ -571,11 +608,10 @@ def _whine_about_no_path(pieces, listener):
         _ = os_path.join(*pieces[num:])
         reason = f'for {repr(_)}, no such directory - {no_ent}'  # (Case4126)
 
-    _emit_input_error_structure(lambda: {'reason': reason}, listener)
+    if verb is not None:
+        reason = f"cannot {verb} '{iden.to_string()}' because {reason}"
 
-
-def _emit_input_error_structure(f, listener):
-    listener('error', 'structure', 'input_error', f)
+    return {'reason': reason}
 
 
 def cover_me(msg=None):

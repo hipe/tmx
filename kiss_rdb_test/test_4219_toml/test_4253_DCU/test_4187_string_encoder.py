@@ -74,7 +74,7 @@ class _CommonCase(unittest.TestCase):
         return res
 
     def expect_input_error_structure(self):
-        chan, structer = se_lib.one_and_none(self.execute, self)
+        chan, structer = se_lib.one_and_none(self, self.execute)
         self.assertSequenceEqual(chan, ('error', 'structure', 'input_error'))
         return structer()
 

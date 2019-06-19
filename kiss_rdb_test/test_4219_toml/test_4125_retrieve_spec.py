@@ -14,6 +14,9 @@ from modality_agnostic.memoization import (
 import unittest
 
 
+# NOTE canon for retrieve is covered in that one file
+
+
 class _CommonCase(unittest.TestCase):
 
     # -- comment yes/no
@@ -36,7 +39,11 @@ class _CommonCase(unittest.TestCase):
 
     def expect_toml_type_not_supported(self, which):
         _expect_message = f"no support (yet) for toml's '{which}' type"
-        self.expect_reason(_expect_message)
+        _sct = self.emission_payload_via_run_expecting_channel(
+                self.given_run,
+                'error', 'structure', 'input_error')  # #here1
+        _actual_reason = _sct['reason']
+        self.assertEqual(_actual_reason, _expect_message)
 
     def run_comment_test_expecting_failure(self, listener):
         _an_s = self.given_attribute()
@@ -48,13 +55,6 @@ class _CommonCase(unittest.TestCase):
         _tester = _comment_tester_one()  # abstract 2 #hook-out when necessary
         ok, x = _tester(an_s, listener)
         return (ok, x)
-
-    def vendor_parse_expecting_failure(self):
-        return self._expecting_failure(self.run_vendor_parse)
-
-    def run_vendor_parse(self, listener):
-        _body_string = self.given_entity_body_lines()
-        return _vendor_parse(_body_string, listener)
 
     # -- retrieve
 
@@ -97,12 +97,29 @@ class _CommonCase(unittest.TestCase):
     def build_body_block_index(self):
         return self.entity()._body_blocks
 
-    def retrieve_expecting_failure(self):
-        return self._expecting_failure(self.run_retrieve)
-
     def retrieve_expecting_success(self):
         listener = _debugging_listener() if False else _no_listener
         return self.run_retrieve(listener)
+
+    def error_structure_at(self, nm):
+        return self.error_structure()[nm]
+
+    def emission_payload_expecting_entity_not_found(self):
+        return self.emission_payload_expecting_channel(
+                'error', 'structure', 'entity_not_found')
+
+    def emission_payload_expecting_generic_error(self):
+        return self.emission_payload_expecting_channel(
+                'error', 'structure', 'input_error')  # #here1
+
+    def emission_payload_expecting_channel(self, *chan):
+        return self.emission_payload_via_run_expecting_channel(
+                self.run_retrieve, *chan)
+
+    def emission_payload_via_run_expecting_channel(self, run, *chan):  # #c/p
+        actual_channel, structurer = se_lib.one_and_none(self, run)
+        self.assertSequenceEqual(actual_channel, chan)
+        return structurer()
 
     def run_retrieve(self, listener):
         _id_s = self.given_identifier()
@@ -110,26 +127,6 @@ class _CommonCase(unittest.TestCase):
 
         return _subject_module().entity_via_identifier_and_file_lines(
                 _id_s, _all_lines, listener)
-
-    # -- general negative
-
-    def expect_reason(self, reason):
-        _actual_reason = self.reason_via_expect_input_error()
-        self.assertEqual(_actual_reason, reason)
-
-    def reason_via_expect_input_error(self):
-        return self.structure_via_expect_input_error()['reason']
-
-    def error_structure_at(self, nm):
-        return self.error_structure()[nm]
-
-    def structure_via_expect_input_error(self):
-        return self._expecting_failure(self.given_run)
-
-    def _expecting_failure(self, run):
-        chan, structurer = se_lib.one_and_none(run, self)
-        self.assertEqual(chan, ('error', 'structure', 'input_error'))
-        return structurer()
 
 
 class Case4116_simplified_typical_retrieve_in_mid(_CommonCase):
@@ -185,7 +182,7 @@ class Case4117_not_found(_CommonCase):
 
     @shared_subject
     def error_structure(self):
-        return self.retrieve_expecting_failure()
+        return self.emission_payload_expecting_entity_not_found()
 
     def given_identifier(self):
         return 'BBCC'
@@ -205,7 +202,7 @@ class Case4118_not_found_anywhere(_CommonCase):
 
     @shared_subject
     def error_structure(self):
-        return self.retrieve_expecting_failure()
+        return self.emission_payload_expecting_entity_not_found()
 
     def given_identifier(self):
         return 'DD'
@@ -297,7 +294,7 @@ class Case4122_against_empty(_CommonCase):
 
     @shared_subject
     def error_structure(self):
-        return self.retrieve_expecting_failure()
+        return self.emission_payload_expecting_entity_not_found()
 
     def given_identifier(self):
         return 'FF'
@@ -309,7 +306,7 @@ class Case4122_against_empty(_CommonCase):
 class Case4123_meta_not_yet_implemented(_CommonCase):
 
     def test_100_message(self):
-        es = self.retrieve_expecting_failure()
+        es = self.emission_payload_expecting_generic_error()
 
         # [item.B.meta]
         # --------^       (offset 8)
@@ -390,7 +387,10 @@ class Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
 
     @shared_subject
     def _structure(self):
-        return self.vendor_parse_expecting_failure()
+        def run(listener):
+            return _vendor_parse(self.given_entity_body_lines(), listener)
+        return self.emission_payload_via_run_expecting_channel(
+                run, 'error', 'structure', 'input_error')  # #here1
 
     def given_entity_body_lines(self):
         return """

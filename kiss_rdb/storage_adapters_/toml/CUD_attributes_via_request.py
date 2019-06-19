@@ -10,7 +10,7 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
     # eenc = entity encoder
     # qits = "Qualified Items", a tail-anchored excerpt list
 
-    if not __check_for_necessary_presence_or_absence(mde, req, listener):
+    if not __check_for_necessary_presence_or_absence(mde, req, C_or_U, listener):  # noqa: E501
         return
 
     problems = []
@@ -36,6 +36,8 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
         mutate_orig = False
 
     checker = __U_and_D_comment_proximity_checkerer(problems, mde, listener)
+
+    # (interesting: order is UCD elsewhere for reasons, but DUC here)
 
     # -- DELETEs first
 
@@ -82,12 +84,8 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
     # Any failure should have short-circuited out by now.
     # At this point, success is guaranteed (Case4234).
 
-    # ==
-    # #todo the below should move out of the SA if we're gonna use it like this
-    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
     _UCDs = (updates, creates, deletes)
-    express_edit_(listener, _UCDs, mde.identifier, created_or_updated)
-    # ==
+    _express_edit(listener, _UCDs, mde.identifier, created_or_updated)
 
     if mutate_orig:
         return True
@@ -483,12 +481,13 @@ def _emit_comment_proximity_problems(problems, listener):
              f'{repr(cmpo.attribute_name.name_string)} '
              f'attribute line because {_}')
         sp_a.append(_)
+
     _emit_request_error_via_reason('. '.join(sp_a), listener)
 
 
 # == CHECK FOR NECESSARY PRESENCE OR ABSENCE
 
-def __check_for_necessary_presence_or_absence(mde, req, listener):
+def __check_for_necessary_presence_or_absence(mde, req, C_or_U, listener):
 
     def add_problem(typ, cmpo, blk=None):
         problems.append((typ, cmpo, blk))
@@ -522,13 +521,15 @@ def __check_for_necessary_presence_or_absence(mde, req, listener):
             add_problem('collision', cmpo, blk)  # (Case4077)
 
     if len(problems):
-        __complain_about_presence_problems(problems, listener)
+        def structurer():
+            return __complain_about_presence_problems(problems, C_or_U)
+        listener('error', 'structure', 'cannot_update', structurer)
         return _not_ok
     else:
         return _okay
 
 
-def __complain_about_presence_problems(problems, listener):
+def __complain_about_presence_problems(problems, C_or_U):
     """each problem is ('collision'|'missing', cmpo [,blk])"""
 
     via_verb = {}
@@ -551,7 +552,7 @@ def __complain_about_presence_problems(problems, listener):
         long_sp_a += sp_a
 
     _long_reason = '. '.join(long_sp_a)
-    _emit_request_error_via_reason(_long_reason, listener)
+    return {'reason': _long_reason}
 
 
 _function_name_via_presence_problem_type = {
@@ -766,7 +767,6 @@ class _Scanner():
 
 # == whiners
 
-
 def _emit_request_error_via_reason(msg, listener):
     def structurer():
         return {'reason': msg}
@@ -775,6 +775,12 @@ def _emit_request_error_via_reason(msg, listener):
 
 def _emit_request_error(listener, structurer):  # one of several
     listener('error', 'structure', 'request_error', structurer)
+
+
+def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
+    # #todo the below should move out of the SA if we're gonna use it like this
+    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
+    express_edit_(listener, UCDs, identifier, verb_preterite)
 
 
 # ==

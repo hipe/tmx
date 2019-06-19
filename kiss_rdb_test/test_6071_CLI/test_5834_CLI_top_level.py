@@ -402,8 +402,9 @@ class Case6129_create(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line = self.common_entity_screen().stderr_line
+        line, line2 = self.common_entity_screen().stderr_lines_one_and_two
         self.assertEqual(line, "created '2H3' with 2 attributes\n")
+        self.assertIsNone(line2)
 
     @shared_subject
     def common_entity_screen(self):
@@ -462,7 +463,8 @@ class Case6177_delete(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line = self.common_entity_screen().stderr_line
+        line1, line = self.common_entity_screen().stderr_lines_one_and_two
+        self.assertEqual(line1.index("deleted 'B7G' with "), 0)
         self.assertEqual(line, 'deleted:\n')
 
     @shared_subject
@@ -518,9 +520,10 @@ class Case6226_update(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line = self.common_entity_screen().stderr_line
+        line, line2 = self.common_entity_screen().stderr_lines_one_and_two
         exp = "updated 'B7F' (created 2, updated 1 and deleted 1 attribute)\n"
         self.assertEqual(line, exp)
+        self.assertIsNone(line2)
 
     @shared_subject
     def common_entity_screen(self):

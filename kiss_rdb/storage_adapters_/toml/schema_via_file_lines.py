@@ -327,7 +327,7 @@ def vendor_parse_toml_or_catch_exception__(big_string):
 # == whiners
 
 def _whine_about_ID_depth(identifier, expected_length, listener):
-    def f():  # (Case4126)
+    def structer():  # (Case4318)
         act = len(identifier.native_digits)
         if act < expected_length:
             head = 'not enough'
@@ -339,7 +339,7 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
                 f'need {expected_length}, had {act}'
                 )
         return {'reason': _reason}  # ..
-    _emit_input_error_structure(f, listener)
+    listener('error', 'structure', 'entity_not_found', structer)
 
 
 def __whine_about_schema_file_not_found(listener, e):
@@ -352,12 +352,7 @@ def __whine_about_schema_file_not_found(listener, e):
                 'errno': e.errno,
                 'input_error_type': 'collection_not_found',
                 }
-
-    _emit_input_error_structure(structer, listener)
-
-
-def _emit_input_error_structure(f, listener):
-    listener('error', 'structure', 'input_error', f)
+    listener('error', 'structure', 'input_error', structer)
 
 
 def cover_me(msg=None):

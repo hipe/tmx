@@ -123,17 +123,16 @@ class _CommonFunctions:
 
     def build_monitor(self):
         return _Monitor(
-                _express_error_structure, _echo_error,
-                _express_info_structure)
+                _express_error_structure, _echo_error, _express_info_structure)
 
 
-def _express_error_structure(error_category, struct):  # (Case6080)
+def _express_error_structure(echo_error_line, channel_tail, struct):
     """FOR NOW, this is just a messy attempt at making contact with all the
 
     components we expect to see for different cases..
-
     eventually we will want per-action handlers to be integrated somehow
     """
+    # (Case6080)
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 
@@ -142,11 +141,8 @@ def _express_error_structure(error_category, struct):  # (Case6080)
     if 1 == len(dim_pool):
         __express_just_reason(** dim_pool)
     else:
-        assert('input_error' == error_category)
-        # when the above fails, consider just adding it to the dictionary
-
         from . import _case_adaptations as cases
-        cases.WHINE_ABOUT(_echo_error, dim_pool)
+        cases.WHINE_ABOUT(echo_error_line, channel_tail, dim_pool)
 
 
 def __express_just_reason(reason):
@@ -260,7 +256,7 @@ def create(ctx, collection, value):
         return mon.some_error_code()
     # end
 
-    _cuds = tuple(('create', name_s, val_s) for name_s, val_s in value)
+    _cuds = {name_s: val_s for name_s, val_s in value}  # ..
 
     doc_ent = col.create_entity(_cuds, listener)
 
@@ -493,12 +489,12 @@ class _Monitor:
 
         error_categories_box = _Box()
 
-        def listener(mood, *rest):
+        def listener(severity, *rest):
             # (Case5918)
-            if 'error' == mood:
+            if 'error' == severity:
                 when_error(rest)
             else:
-                assert('info' == mood)
+                assert('info' == severity)
                 when_info(rest)
 
         def when_info(rest):
@@ -515,13 +511,6 @@ class _Monitor:
             # express the emission appropriately for the shape
             if 'expression' == shape:
 
-                if len(detail):
-                    typ, = detail
-                    if typ == 'no_such_directory':
-                        pass  # #cover-me
-                    else:
-                        cover_me(f'type: {typ}')
-
                 # (error category & detail is disregarded here - meh for now)
                 for line in payloader():
                     echo_error_line(line)
@@ -533,7 +522,9 @@ class _Monitor:
                 dct = payloader()
                 if 'errno' in dct:
                     self._see_errno(dct['errno'])  # #here2
-                express_error_structure(error_category, dct)
+
+                express_error_structure(
+                        echo_error_line, (error_category, *detail), dct)
             else:
                 assert(False)
 

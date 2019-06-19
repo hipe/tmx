@@ -49,7 +49,7 @@ class Case1299_fails(_CommonCase):
                     data_source_key_via_template_variable_name=lambda x: f'Q{x}',  # noqa: E501
                     listener=listener)
 
-        chan, payloader = se_lib.one_and_none(run, self)
+        chan, payloader = se_lib.one_and_none(self, run)
         _lines = payloader()
         return (chan, _lines)
 

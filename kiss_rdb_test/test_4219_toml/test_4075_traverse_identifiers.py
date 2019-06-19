@@ -59,7 +59,7 @@ class _CommonCase(unittest.TestCase):
             self.assertEqual(chan, ('error', shape, 'input_error'))
             receive_payloader(payloader)
 
-        listener, ran = se_lib.one_and_done(receive_emission, self)
+        listener, ran = se_lib.one_and_done(self, receive_emission)
 
         itr = self._run_non_validating_ID_traversal(listener)
 

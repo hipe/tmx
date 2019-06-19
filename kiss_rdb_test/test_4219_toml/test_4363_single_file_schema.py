@@ -4,7 +4,7 @@ from kiss_rdb_test.common_initial_state import (
         unindent,
         )
 from kiss_rdb_test.CUD import (
-        CUD_Methods,
+        filesystem_recordings_of,
         build_filesystem_expecting_num_file_rewrites,
         )
 from modality_agnostic.memoization import (
@@ -14,11 +14,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(CUD_Methods, unittest.TestCase):
-
-    def listener(self):
-        if False:
-            return debugging_listener()
+_CommonCase = unittest.TestCase
 
 
 # Case4358 traverse when fail
@@ -99,7 +95,7 @@ class Case4364_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(_CommonCase):
 
     # NOTE not memoized
     def recorded_file_rewrites(self):
-        return self.delete_expecting_success('68')
+        return filesystem_recordings_of(self, 'delete', '68')
 
     def subject_collection(self):  # (same as #here1)
         return _build_collection(
@@ -130,13 +126,10 @@ class Case4366_update_OK(_CommonCase):
 
     # NOTE not memoized
     def recorded_file_rewrites(self):  # NOTE not memoized
-        return self.update_expecting_success('24', (
+        return filesystem_recordings_of(self, 'update', '24', (
             ('update', 'xx', 'xx of 24 updated'),
             ('create', 'xw', 'nü'),
             ))
-
-    def listener(self):
-        return _throwing_listener()
 
     def subject_collection(self):  # (same as #here1)
         return _build_collection(
@@ -173,15 +166,11 @@ class Case4368_create_into_existing_file(_CommonCase):
 
     @shared_subject
     def recorded_file_rewrites(self):
-        cuds = (
-            ('create', 'abc', '123'),
-            ('create', 'de-fg', 'true'),
-            )
-
-        return self.create_expecting_success(cuds)
-
-    def listener(self):
-        return _throwing_listener()
+        cuds = {
+                'abc': '123',
+                'de-fg': 'true',
+                }
+        return filesystem_recordings_of(self, 'create', cuds)
 
     def subject_collection(self):
 

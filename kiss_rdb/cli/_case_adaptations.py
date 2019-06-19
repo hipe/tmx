@@ -7,10 +7,18 @@ we don't use all the metadata.)
 """
 
 
-def WHINE_ABOUT(echo, dim_pool):
+def WHINE_ABOUT(echo, channel_tail, dim_pool):
     # dim_pool = "diminishing pool"
-    _type = dim_pool.pop('input_error_type')
-    _these[_type](echo, **dim_pool)
+
+    if 'input_error_type' in dim_pool:
+        # (the presence of this component does not necessarily imply
+        #  `error_category == "input_error"` as of #history-A.1)
+
+        use_error_type = dim_pool.pop('input_error_type')
+    else:
+        raise Exception(f'Cover me wahoo: {channel_tail[0]}')
+
+    _these[use_error_type](echo, **dim_pool)
 
 
 def _attribute_value_error(
@@ -40,9 +48,9 @@ def _not_found(
         reason,
         identifier_string,
         did_traverse_whole_file,
-        did_reach_end_of_stream,
-        lineno,
-        line,
+        did_reach_end_of_stream=None,
+        lineno=None,
+        line=None,
         ):
 
     echo(reason)  # (Case6064)
@@ -63,4 +71,5 @@ _these = {
         }
 
 
+# #history-A.1
 # #abstracted.

@@ -109,11 +109,14 @@ class case_of_collection_not_found:  # #as-namespace-only
 
     confirm_result_is_none = _confirm_result_is_none
 
-    def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
-        tc.assertSequenceEqual(
-            es['channel'], ('error', 'structure', 'collection_not_found'))
-        reason = _reason_from(es)
+    def confirm_channel_looks_right(tc):
+        chan = tc.end_state()['channel']
+        tc.assertEqual(chan[0], 'error')
+        # for historical and flex reasons, we are allowing expressions here
+        tc.assertEqual(chan[2], 'collection_not_found')
+
+    def confirm_expression_looks_right(tc):
+        reason = _reason_from(tc.end_state())
         tc.assertRegex(reason, r'^collection not found: [\[a-zA-Z0-9]')
 
 
@@ -123,12 +126,12 @@ def _confirm_collection_is_not_none(tc):
 
 class case_of_empty_collection_found:  # #as-namespace-only
 
-    confirm_result_is_not_none = _confirm_collection_is_not_none
+    confirm_collection_is_not_none = _confirm_collection_is_not_none
 
 
 class case_of_non_empty_collection_found:  # #as-namespace-only
 
-    confirm_result_is_not_none = _confirm_collection_is_not_none
+    confirm_collection_is_not_none = _confirm_collection_is_not_none
 
 
 class case_of_traverse_IDs_from_non_empty_collection:  # #as-namespace-only
@@ -159,7 +162,7 @@ class case_of_traverse_all_entities:  # #as-namespace
     def confirm_particular_entity_knows_one_of_its_field(tc):
         _tup = tc.flattened_collection_for_traversal_case()
         ent = next(ent for ent in _tup if 'B9H' == ent.identifier.to_string())
-        _actual = _yes_value_dict(ent)['thing-A']  # .. #todo
+        _actual = _yes_value_dict(ent)['thing-A']  # #todo API for getter?
         tc.assertEqual(_actual, "hi i'm B9H")
 
     def confirm_featherweighting_isnt_biting(tc):
@@ -193,7 +196,7 @@ def build_flattened_collection_for_traversal_case(tc):  # similar to #here1
     return tuple(_ents)
 
 
-class case_of_entity_not_found_because_of_too_deep_identifier:
+class case_of_entity_not_found_because_identifier_too_deep:
     # #as-namespace-only
 
     confirm_result_is_none = _confirm_result_is_none
@@ -209,7 +212,11 @@ class case_of_entity_not_found_because_of_too_deep_identifier:
         reason = _reason_from(es)
 
         import re
-        two = tuple(re.findall(r'\((\d)\)', reason))  # ..
+        md = re.search(r'\bneed(?:ed)? (\d+), had (\d+)', reason)
+        if md is not None:
+            two = md.groups()
+        else:
+            two = tuple(re.findall(r'\((\d)\)', reason))  # ..
         two = tuple(int(s) for s in two)
         two = sorted(two)
         tc.assertSequenceEqual(two, (3, 4))
@@ -231,11 +238,26 @@ class case_of_entity_not_found:  # #as-namespace-only
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
-        _assert_says_identifier_probably(tc, reason, 'AB2')
+        _assert_says_identifier_probably(tc, reason, tc.IDENTIFIER_STRING())
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
-        return _end_state_for_retrieve_via_string(tc, 'AB2')
+        return _end_state_for_retrieve_via_string(tc, tc.IDENTIFIER_STRING())
+
+
+class case_of_retrieve_OK:  # #as-namespace-only
+
+    def confirm_entity_is_retrieved_and_looks_ok(tc):
+        # assume no emissions bc we built it belo with this implicit assumption
+        ent = tc.end_state()['result_value']
+        _same_confirmation_of_before_update(tc, ent)
+
+    def build_end_state(tc):
+        # we have to deconstruct and duplicate "build end state" b.c no emmiss
+        iden = _identifier_via_string('B9H')
+        coll = tc.subject_collection()
+        wat = _do_retrieve(coll, iden, None)
+        return {'result_value': wat, 'collection': coll, 'identifier': iden}
 
 
 class case_of_delete_but_entity_not_found:  # #as-namespace-only
@@ -250,12 +272,12 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
 
         _assert_says_cannot_verb(tc, reason, 'delete')
 
-        _assert_says_identifier_probably(tc, reason, 'AB2')
+        _assert_says_identifier_probably(tc, reason, tc.IDENTIFIER_STRING())
 
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
-        return _end_state_for_delete_via_string(tc, 'AB2')
+        return _end_state_for_delete_via_string(tc, tc.IDENTIFIER_STRING())
 
 
 class _common_delete:  # as-namespace-only
@@ -420,9 +442,7 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
         _assert_says_identifier_probably(
                 tc, reason, es['identifier'].to_string())
 
-        # pretty stringent..:
-        tc.assertIn(
-            "cannot update 'thing-1' because it has no existing value", reason)
+        tc.assertRegex(reason, r'\b(?:has no existing value|not found in entity)\b')  # noqa: E501
 
     def build_end_state(tc):
         iid_s, tup = tc.request_tuple_for_update_that_will_fail_because_attr()
@@ -448,10 +468,7 @@ class case_of_update_OK:  # #as-namespace-only
 
     def confirm_the_before_entity_has_the_before_values(tc):
         before_ent, after_ent = tc.end_state()['result_value']
-        dct = _yes_value_dict(before_ent)
-        tc.assertEqual(dct['thing-A'], "hi i'm B9H")
-        tc.assertEqual(dct['thing-B'], "hey i'm B9H")
-        tc.assertEqual(len(dct), 2)  # to confirm deletes in after
+        _same_confirmation_of_before_update(tc, before_ent)
 
     def confirm_the_after_entity_has_the_after_values(tc):
         before_ent, after_ent = tc.end_state()['result_value']
@@ -472,12 +489,22 @@ class case_of_update_OK:  # #as-namespace-only
 # == support that helps make asssertions of states
 
 def _same_confirmation_of_after_update(tc, after_ent):
+    _ = after_ent.identifier.to_string()
+    tc.assertEqual(_, 'B9H')  # might become own test
     dct = _yes_value_dict(after_ent)
     act_left = dct['thing-B']
     act_right = dct['thing-2']
     tc.assertEqual(act_left, "I'm modified \"thing-B\"")
     tc.assertEqual(act_right, "I'm created \"thing-2\"")
     tc.assertEqual(len(dct), 2)  # to confirm deletes
+
+
+def _same_confirmation_of_before_update(tc, ent):
+    tc.assertEqual(ent.identifier.to_string(), 'B9H')  # might become own test
+    dct = _yes_value_dict(ent)
+    tc.assertEqual(dct['thing-A'], "hi i'm B9H")
+    tc.assertEqual(dct['thing-B'], "hey i'm B9H")
+    tc.assertEqual(len(dct), 2)  # to confirm deletes in after
 
 
 def _assert_says_identifier_probably(tc, reason, iid_s):
@@ -503,15 +530,25 @@ def _assert_says_cannot_verb(tc, reason, verb):
     tc.assertRegex(reason, _)
 
 
-def _reason_from(es):
-    return es['payloader_CAUTION_HOT']()['reason']
+def reason_via_end_state(es):
+    return _message_or_reason_from('error', es)
 
 
-reason_from = _reason_from
+_reason_from = reason_via_end_state
 
 
 def _message_from(es):
-    return es['payloader_CAUTION_HOT']()['message']
+    return _message_or_reason_from('info', es)
+
+
+def _message_or_reason_from(which, es):
+    import kiss_rdb as lib
+    severity, *rest = *es['channel'], es['payloader_CAUTION_HOT']
+    if 'error' == which:
+        assert('error' == severity)
+        return lib.reason_via_error_emission_(*rest)
+    assert('info' == severity)
+    return lib.message_via_info_emission_(*rest)
 
 
 def _confirm_collection_empty(tc, coll):
@@ -580,7 +617,7 @@ def _end_state_for_retrieve_via_string(tc, iid_s):
 def _end_state_for_retrieve_via_identifier(tc, iden, coll):
     def run(listener):
         return _do_retrieve(coll, iden, listener)
-    return _end_state_via(tc, run)
+    return _end_state_plus(tc, run, coll, iden)
 
 
 def _do_retrieve(coll, identi, listener):
@@ -600,7 +637,7 @@ def _end_state_plus(tc, run, coll, identifier):
     return es
 
 
-def _end_state_via(tc, run):
+def end_state_via_run(tc, run):
     listener, emissioner = _listener_and_emissioner_for(tc)
     x = run(listener)
     chan, payloader = emissioner()
@@ -628,6 +665,9 @@ def _end_state_via(tc, run):
             'channel': chan,
             'payloader_CAUTION_HOT': payloader,
             }
+
+
+_end_state_via = end_state_via_run
 
 
 def _listener_and_emissioner_for(tc):

@@ -1,128 +1,97 @@
-"""(everything in this module is explained by everything
-in [#864] the toml adaptation for entities)"""
+"""Expose CREATE, UPDATE and DELETE.
+
+These three implementatons are exactly based on the pseudocode in
+in [#864] the toml adaptation for entites at "synthesis".
+"""
 
 
-def new_lines_via_delete_and_existing_lines(
-        identifier_string,
-        existing_lines,
-        listener,
-        receive_deleted_document_entity=None,
-        ):
-
-    _args_for_CUD_function = (
-            identifier_string, receive_deleted_document_entity)
-
-    return _line_stream_via_CUD_function(
-            _args_for_CUD_function,
-            __blocks_for_DELETE,
-            existing_lines,
-            listener,
-            )
+def _verb(future):  # decorator
+    def use_decorator(f):
+        return _do_verb(f, future)
+    return use_decorator
 
 
-def new_lines_via_update_and_existing_lines(
-        identifier_string,
-        new_lines_via_entity,
-        existing_lines,
-        listener,
-        ):
-
-    _args_for_CUD_function = (
-            identifier_string, new_lines_via_entity,
-            )
-
-    return _line_stream_via_CUD_function(
-            _args_for_CUD_function,
-            __blocks_for_UPDATE,
-            existing_lines,
-            listener,
-            )
+def _do_verb(f, do_future):
+    def use_f(existing_file_lines, listener, **client_args):
+        return _do_do_verb(
+                existing_file_lines, listener, client_args, f, do_future)
+    return use_f
 
 
-def new_lines_via_create_and_existing_lines(
-        identifier_string,
-        new_entity_lines,
-        existing_lines,
-        listener,
-        ):
+def _do_do_verb(existing_file_lines, listener, client_args, f, do_future):
 
-    _args_for_CUD_function = (identifier_string, new_entity_lines)
+    # what a ride:
 
-    return _line_stream_via_CUD_function(
-            _args_for_CUD_function,
-            __blocks_for_CREATE,
-            existing_lines,
-            listener,
-            )
+    monitor = __monitor_via_listener(listener)  # peek when an iterator failed
 
+    # monitor.DEBUGGING_TURN_ON()
 
-def _line_stream_via_CUD_function(
-        args_for_CUD_function,
-        CUD_function,
-        existing_lines,
-        listener):
+    # convert the stream of file lines into a stream of blocks
 
-    from . import blocks_via_file_lines as block_lib
-    from . import identifiers_via_file_lines as grammar_lib
+    blocks = __block_stream_via_file_lines(
+            existing_file_lines, monitor.listener)
 
-    monitor = grammar_lib.ErrorMonitor_(listener)
-
-    _block_itr = block_lib.block_stream_via_file_lines(
-            existing_lines, monitor.listener)
-
-    _block_itr = __block_stream_via(
-            args_for_CUD_function,
-            CUD_function,
-            _block_itr,
-            monitor)
-
-    for block in _block_itr:
-        for line in block.to_line_stream():
-            yield line
-
-
-def __block_stream_via(args, CUD_function, block_itr, monitor):
-
-    # == always same for head block
+    # shear off the any head block now, it's not an entity block. used below
 
     head_block = None
-    for head_block in block_itr:
+    for head_block in blocks:  # #once
         break
+
+    # cut out early if the file failed to parse the first block
 
     if not monitor.ok:
         return
 
-    if head_block is None:
-        # the only OK way there can be head block None is when the file is
-        # truly empty (or non-existent) (Case4276). our hope is that for all
-        # of C, U and D the CUD_function can implement itself indifferently.
-        pass
+    # if input entity blocks are out of order, you're gonna have a bad time.
+
+    blocks = __check_order(blocks, listener)
+
+    # give these will-sanitize entity blocks to the injected function to edit
+
+    mixed_client_itr = f(block_itr=blocks, monitor=monitor, **client_args)
+
+    # if the client does future, get it immediately before we get crazy
+
+    if do_future:
+        future = next(mixed_client_itr)  # used below
+
+    # for almost final output, stitch that head block on to the front again
+
+    def re_unified_blocks():
+        """head block is None IFF the input file was truly empty (Case4276)
+        or non-existent. The injected functions must behave the same whether
+        the input is a truly empty file or a file with some existing non-
+        entity content (from their perspective), so we hide this from them.
+        """
+
+        if head_block is not None:
+            yield head_block
+
+        for block in mixed_client_itr:
+            yield block
+
+    output_lines = __lines_via_blocks(re_unified_blocks())
+
+    if do_future:
+        return output_lines, future
     else:
-        yield head_block
-
-    # ==
-
-    _block_itr = __block_stream_check_order(block_itr, monitor.listener)
-
-    _block_itr = CUD_function(*args, _block_itr, monitor)
-
-    for block in _block_itr:
-        yield block
+        return output_lines
 
 
-# ==
-
-def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
+@_verb(future=False)
+def new_lines_via_update_and_existing_lines(
+        identifier_string, new_lines_via_entity, block_itr, monitor):
 
     # this is a copy-paste-modify of DELETE that's unabstracted for clarity.
-
     # output entities that are lesser while searching for one that is equal.
-
     # de = document entity
+
+    # this doesn't yet do the "future" thing with the twin snapshots (before/
+    # after, introduced #history-A.4) but it could.
 
     did_find = False
     for de in block_itr:
-        if id_s == de.identifier_string:
+        if identifier_string == de.identifier_string:
             # do NOT yield the one we are updating. break.
             did_find = True
             break
@@ -133,7 +102,7 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
         return
 
     if not did_find:
-        _whine_about_entity_not_found(id_s, monitor.listener)
+        _whine_about_entity_not_found(identifier_string, monitor.listener)
         return  # not covered - blind faith
 
     mde = de.to_mutable_document_entity_(monitor.listener)
@@ -154,7 +123,14 @@ def __blocks_for_UPDATE(id_s, new_lines_via_entity, block_itr, monitor):
         yield de
 
 
-def __blocks_for_DELETE(id_s, recv_doc_ent, block_itr, monitor):
+@_verb(future=True)
+def new_lines_and_future_deleted_via_existing_lines(
+        identifier_string, block_itr, monitor):
+
+    def future():
+        return deleted_document_entity
+    deleted_document_entity = None
+    yield future
 
     # this is a copy-paste-modify of UPDATE that's unabstracted for clarity.
 
@@ -162,13 +138,10 @@ def __blocks_for_DELETE(id_s, recv_doc_ent, block_itr, monitor):
 
     did_find = False
     for de in block_itr:
-        if id_s == de.identifier_string:
+        if identifier_string == de.identifier_string:
             # do NOT yield the one we are deleting. break.
-
-            if recv_doc_ent is not None:
-                recv_doc_ent(de)
-
             did_find = True
+            document_entity_that_will_be_deleted = de
             break
 
         yield de
@@ -177,24 +150,33 @@ def __blocks_for_DELETE(id_s, recv_doc_ent, block_itr, monitor):
         return
 
     if not did_find:
-        _whine_about_entity_not_found(id_s, monitor.listener)  # (Case4288)
-        return
+        _whine_about_entity_not_found(identifier_string, monitor.listener)
+        return  # (Case4288)
 
     # output any remaining entities in the file (this might fail at any point)
 
     for de in block_itr:
         yield de
 
+    # [#864]: "important: set the future value only once stream is exhausted"
 
-def __blocks_for_CREATE(id_s, new_entity_lines, block_itr, monitor):
+    if monitor.ok:
+        deleted_document_entity = document_entity_that_will_be_deleted
+        _express_joy_at_having_deleted(
+                monitor.listener, deleted_document_entity)
+
+
+@_verb(future=False)
+def new_lines_via_create_and_existing_lines(
+        identifier_string, new_entity_lines, block_itr, monitor):
 
     # find the first item that is greater. output those that are lesser.
 
     first_greater = None
     for de in block_itr:
-        if de.identifier_string < id_s:
+        if de.identifier_string < identifier_string:
             yield de
-        elif de.identifier_string == id_s:
+        elif de.identifier_string == identifier_string:
             cover_me('erroneous monk - this has a case')
         else:
             # NOTE this means we have found a first document entity that
@@ -222,22 +204,21 @@ def __blocks_for_CREATE(id_s, new_entity_lines, block_itr, monitor):
 
 # ==
 
-
-def __block_stream_check_order(block_itr, listener):
+def __check_order(block_itr, listener):
 
     # new in #history-A.2, for each of CUD, ensure this
+    # pass the stream through unchanged, but bork if it's out of order
 
-    none = True
-    for de in block_itr:
-        none = False
+    done = True
+    for de in block_itr:  # #once
+        done = False
         break
 
-    if none:
+    if done:
         return
 
-    yield de
-
     curr_id_s = de.identifier_string
+    yield de
 
     for de in block_itr:
         next_id_s = de.identifier_string
@@ -261,6 +242,12 @@ class _LinesAsBlock:
 
 # == whiners
 
+def _express_joy_at_having_deleted(listener, table_block):
+    _ = tuple(table_block.to_body_block_stream_as_table_block_())
+    _wee = tuple(None for o in _ if o.is_attribute_block)
+    _express_edit(listener, ((), (), _wee), table_block.identifier, 'deleted')
+
+
 def _whine_about_entity_not_found(id_s, listener):
     def structurer():
         _reason = f'entity {repr(id_s)} is not in file'
@@ -268,11 +255,36 @@ def _whine_about_entity_not_found(id_s, listener):
     listener('error', 'structure', 'input_error', structurer)
 
 
+def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
+    # #todo the below should move out of the SA if we're gonna use it like this
+    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
+    express_edit_(listener, UCDs, identifier, verb_preterite)
+
+
+# == trivial & wrappers
+
+def __lines_via_blocks(blocks):  # #c/p
+    for block in blocks:
+        for line in block.to_line_stream():
+            yield line
+
+
+def __block_stream_via_file_lines(existing_file_lines, listener):
+    from . import blocks_via_file_lines as block_lib
+    return block_lib.block_stream_via_file_lines(existing_file_lines, listener)
+
+
+def __monitor_via_listener(listener):
+    from kiss_rdb import ErrorMonitor_
+    return ErrorMonitor_(listener)
+
+
 # ==
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.4: futures, decorator
 # #history-A.3
 # #history-A.2: begin rewrite of CUD using block stream not parse actions
 # #tombstone-A.1: got rid of mutate state machine,now empty files OK everywhere

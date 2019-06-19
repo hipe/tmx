@@ -921,7 +921,7 @@ class _RowAsEntity:
             yield last_cel.to_cel_string_with_full_padding()
             yield '|'
         else:
-            yield last_cel.to_cel_string_with_head_padding_only()  # #todo
+            yield last_cel.to_cel_string_with_head_padding_only()
         yield '\n'  # ..
 
     def to_yes_value_dictionary_as_storage_adapter_entity(self):
@@ -969,7 +969,7 @@ class _IdentifierInFirstCel(_Cel):
     def _to_main_piece_(self):
         return self.identifier_in_first_cel.to_string()
 
-    _HELLO_ID_IN_FIRST_CEL_ = None  # #todo, also sorta ##[#008.D]
+    _HELLO_ID_IN_FIRST_CEL_ = None  # #todo rid after hot dev. also ##[#008.D]
 
 
 class _AttributeCel(_Cel):
