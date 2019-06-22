@@ -21,6 +21,13 @@ def listener_and_emissioner_for(tc):
     return ee.listener, emissioner
 
 
+def channel_and_payloader_and_result_via_run(tc, run):
+    ee = ExpectEmission(tc)
+    result_value = run(ee.listener)
+    ee.ran_and_zero_emissions_is_OK()
+    return ee.channel, ee.payloader, result_value
+
+
 def one_and_done(tc, recv):  # 1x
     ee = ExpectEmission(tc, receive_emission=recv)
     return ee.listener, ee.ran
@@ -77,8 +84,14 @@ class ExpectEmission:
 
         # --
 
+        self.channel = None
+        self.payloader = None
+
         self.listener = listener
         self.ran = ran
+
+    def ran_and_zero_emissions_is_OK(self):
+        del self._mutex
 
 
 def debugging_listener():

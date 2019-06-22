@@ -129,7 +129,7 @@ Why a tail-anchored pipe is hard to interpret correctly :#here5
             surface forms. Two, we don't *want* to support the distinction,
             because in practice this infects business code with the smell of
             not knowing whether you need to check for null/empty/blank for a
-            given value, a smell that oftens spreads deep into the code.
+            given value, a smell that can spread deep into the code. :[#867.Y]
 
             Rather, we conflate all such cases into one we call "no-value",
             and we leave it up to the client to decide how or whether to

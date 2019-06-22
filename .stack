@@ -20,3 +20,4 @@ have full on eno
 introduce recfiles pseudo-SA (just for that one thing, a refactor)
 todo's in asset and test
 big refactor to introduce collection injection
+schema file API

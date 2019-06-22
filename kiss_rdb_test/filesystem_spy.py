@@ -54,7 +54,58 @@ def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):
     return fs
 
 
-# ==
+class build_fake_filesystem:
+    # (currently separate from the recording filesystem. just for reads)
+
+    def __init__(self, *tups):
+        self._tups = tups
+
+    def open_file_for_reading(self, path):
+        rec = self._lookup(path)
+        if rec is None:
+            raise Exception('this is stashed')
+        shape = rec[0]
+        assert('file' == shape)  # we could cover etc but we don't plan on need
+
+        _lines = _LINES_VIA_STRINGS_CRAZILY(rec[2]())
+        return _FakeFile(_lines, path)
+
+    def _lookup(self, path):
+        found = False
+        for rec in self._tups:
+            if path == rec[1]:
+                found = True
+                break
+        if found:
+            return rec
+
+    @property
+    def first_path(self):
+        return self._tups[0][1]
+
+
+# == model-ishes
+
+class _FakeFile:
+    # we have PretendFile as a (at writing) sibling, but this makes 1 change
+    # so that the object passed into the block has the `path` property
+
+    def __init__(self, lines, path):
+        self._lines = lines
+        self.path = path
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, typ, err, stack):
+        pass
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self._lines)
+
 
 class _RecordOfFileRewrite:
 
@@ -62,4 +113,36 @@ class _RecordOfFileRewrite:
         self.path = path
         self.lines = lines
 
+
+# == support functions
+
+
+def _LINES_VIA_STRINGS_CRAZILY(lines):  # #todo
+    """EXPERIMENTAL: allow the client to represent a stream of lines without
+
+    newline terminating each one *optionally*. The first line is peeked at
+    and it is used to determine whether or not this behavior is desired.
+    """
+
+    assert(hasattr(lines, '__next__'))  # if not, nasty bugs below #[#008.D]
+
+    empty = True
+    for line in lines:  # #once
+        empty = False
+        break
+
+    if empty:
+        return
+
+    if len(line) and '\n' == line[-1]:  # ..
+        yield line
+        for line in lines:
+            yield line
+        return
+
+    yield f'{line}\n'
+    for line in lines:
+        yield f'{line}\n'
+
+# #history-A.1: introduce fake filesystem
 # #abstracted.
