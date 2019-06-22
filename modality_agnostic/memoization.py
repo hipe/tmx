@@ -1,3 +1,26 @@
+def dangerous_memoize_in_child_classes(attr_name, builder_method_name):
+    """decorator takes two parameters: an attribute to set the value in
+
+    IN THE CLASS, and the name of a builder method to call.
+    .#todo we need to integrate this with teardown so the memory is reclaimed
+    """
+
+    def decorate(f):
+        return __do_wicked_memoizer(f, attr_name, builder_method_name)
+    return decorate
+
+
+def __do_wicked_memoizer(f, attr_name, builder_method_name):
+    def use_f(tc):  # tc = test case
+        o = tc.__class__
+        if hasattr(o, attr_name):
+            return getattr(o, attr_name)
+        x = getattr(tc, builder_method_name)()
+        setattr(o, attr_name, x)
+        return x
+    return use_f
+
+
 def dangerous_memoize(f):
     """decorator for lazy memoization of MONADIC method result
 
@@ -74,6 +97,7 @@ def memoize(f):
     return g
 
 
+# #history-A.5: experimental memoizing into a class attribute
 # #history-A.4: fun bit of trivia, things were even uglier before nonlocal
 # #history-A.3: a memoizer method moved here from elsewhere
 # #history-A.2: a memoizer method moved here from elsewhere

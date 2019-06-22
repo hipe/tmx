@@ -16,7 +16,7 @@ py -c 'beg=1255;jump=(2499-beg)/15;first=beg+jump/2;print(tuple(round(first+jump
 1296 lines via template
 1379 doubly linked list
 1393 parse recfile for schema
-1421 (expansion 2/3)
+1416 collection via path
 1448 (expansion 3/3)
 1462 indexes
 1545 provision new identifier randomly

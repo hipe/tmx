@@ -74,8 +74,9 @@ class ErrorMonitor_:
         self._debug = f
 
 
-def reason_via_error_emission_(shape, error_category, payloader):
-    return _ErrorEmission(shape, error_category, payloader)._flush_to_reason_()
+def reason_via_error_emission_(shape, error_category, union, *rest):
+    _ee = _ErrorEmission(shape, error_category, union, *rest)
+    return _ee._flush_to_reason_()
 
 
 def message_via_info_emission_(shape, info_category, payloader):

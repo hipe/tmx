@@ -63,12 +63,26 @@ class build_fake_filesystem:
     def open_file_for_reading(self, path):
         rec = self._lookup(path)
         if rec is None:
-            raise Exception('this is stashed')
+            raise self._file_not_found_error(path)
         shape = rec[0]
         assert('file' == shape)  # we could cover etc but we don't plan on need
 
-        _lines = _LINES_VIA_STRINGS_CRAZILY(rec[2]())
+        _lines = _lines_via_strings_with_optimistic_peek(rec[2]())
         return _FakeFile(_lines, path)
+
+    def stat_via_path(self, path):
+        rec = self._lookup(path)
+        if rec is None:
+            raise self._file_not_found_error(path)
+        shape = rec[0]
+        if 'directory' == shape:
+            return _fake_dir_stat
+        assert('file' == shape)
+        return _fake_file_stat
+
+    def _file_not_found_error(self, path):
+        return FileNotFoundError(
+                2, f"No such file or directory: '{path}'", path)
 
     def _lookup(self, path):
         found = False
@@ -114,10 +128,18 @@ class _RecordOfFileRewrite:
         self.lines = lines
 
 
+class _fake_dir_stat:  # #as-namespace-only
+    st_mode = 16877
+
+
+class _fake_file_stat:  # #as-namespace-only
+    st_mode = 33188
+
+
 # == support functions
 
 
-def _LINES_VIA_STRINGS_CRAZILY(lines):  # #todo
+def _lines_via_strings_with_optimistic_peek(lines):
     """EXPERIMENTAL: allow the client to represent a stream of lines without
 
     newline terminating each one *optionally*. The first line is peeked at

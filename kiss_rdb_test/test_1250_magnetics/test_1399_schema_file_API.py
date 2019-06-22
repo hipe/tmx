@@ -28,28 +28,9 @@ recutils project, we would strongly consider refactoring the implementaton.)
 from kiss_rdb_test.filesystem_spy import build_fake_filesystem
 from modality_agnostic.test_support.structured_emission import (
         channel_and_payloader_and_result_via_run)
+from modality_agnostic.memoization import (
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes)
 import unittest
-
-
-# == NASTY EXPERIMENT
-
-def WICKED_MEMOIZER(attr_name, builder_method_name):  # #decorator
-    def decorate(f):
-        return __do_wicked_memoizer(f, attr_name, builder_method_name)
-    return decorate
-
-
-def __do_wicked_memoizer(f, attr_name, builder_method_name):
-    def use_f(tc):  # tc = test case
-        o = tc.__class__
-        if hasattr(o, attr_name):
-            return getattr(o, attr_name)
-        x = getattr(tc, builder_method_name)()
-        setattr(o, attr_name, x)
-        return x
-    return use_f
-
-# ==
 
 
 class _CommonCase(unittest.TestCase):
@@ -89,7 +70,7 @@ class _CommonCase(unittest.TestCase):
 
     # -- setup
 
-    @WICKED_MEMOIZER('_end_state', 'build_end_state')
+    @shared_subject_in_child_classes('_end_state', 'build_end_state')
     def end_state(self):
         pass
 
@@ -300,7 +281,7 @@ class Case1406_flush_as_config_but_missing_requireds(_CommonCase):
         yield 'Field_G: gg'
 
 
-class Case1407_flush_as_cofig_money(_CommonCase):
+class Case1407_flush_as_config_money(_CommonCase):
 
     def test_100_all_the_fields_are_there_plus_values(self):
         self.assertIsNone(self.end_state()['channel'])  # sneak in somewhere

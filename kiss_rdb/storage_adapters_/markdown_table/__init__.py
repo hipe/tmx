@@ -902,9 +902,6 @@ class _RowAsEntity:
 
     def __init__(self, identifier_cel, attribute_cels, has_trailing_pipe):
         assert(isinstance(attribute_cels, tuple))  # #[#008.D]
-        if identifier_cel is not None:
-            identifier_cel._HELLO_ID_IN_FIRST_CEL_
-
         self._identifier_cel_ = identifier_cel
         self._attribute_cels_ = attribute_cels
         self._has_trailing_pipe_ = has_trailing_pipe
@@ -968,8 +965,6 @@ class _IdentifierInFirstCel(_Cel):
 
     def _to_main_piece_(self):
         return self.identifier_in_first_cel.to_string()
-
-    _HELLO_ID_IN_FIRST_CEL_ = None  # #todo rid after hot dev. also ##[#008.D]
 
 
 class _AttributeCel(_Cel):

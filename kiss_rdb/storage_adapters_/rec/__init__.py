@@ -95,7 +95,7 @@ def _field_via_line(line, parse_state, listener):
 
     field_name = scn.scan_required(_field_name)
     if field_name is None:
-        return
+        return  # (Case1414)
 
     # recfiles does not allow space between field name and colon
 

@@ -98,10 +98,17 @@ class schema_file_scanner_via_recfile_scanner:
                  'unrecognized_config_attribute', structur)
 
     def contextualize_about_field_name(self, dct, field):
-        scn = self.recfile_scanner
-        dct['position'] = 0
-        dct['line'] = scn.line
-        dct['lineno'] = scn.lineno
-        dct['path'] = scn.path
+        dct['position'] = field.position_of_start_of_field_name
+        self._common_contextualize(dct)
+
+    def contextualize_about_field_value(self, dct, field):
+        dct['position'] = field.position_of_start_of_value
+        self._common_contextualize(dct)
+
+    def _common_contextualize(self, dct):
+        parse_state = self.recfile_scanner
+        dct['line'] = parse_state.line
+        dct['lineno'] = parse_state.lineno
+        dct['path'] = parse_state.path
 
 # #born.
