@@ -41,7 +41,7 @@ class _CommonCase(unittest.TestCase):
         else:
             opened = None
             use_path = path
-        return lib.resolve_collection_via_file(opened, use_path, listener)
+        return lib._resolve_collection_via_file(opened, use_path, listener)
 
     def given_path(self):
         pass

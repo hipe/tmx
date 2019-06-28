@@ -1,32 +1,21 @@
+"""SO:
+
+👉 Before you can do anything interesting with the typical collection, you
+   have to parse its schema file. toml *used to* be the format of schema files.
+   At that time this module was the first point of contact with the vendor
+   library, so it came to hold the dual responsibility of schema stuff *and*
+   the internal API/façade through which we interact with vendor (#here2).
+
+👉 at #history-A.2 we switched from toml- to recfiles-based schema files,
+   leaving this file with two disparate purposes that are no longer related
+   to each other. We're leaving this nonsensical dual-purpose intact for now,
+   but as soon as there's a compelling reason to, we'll probably push this
+   vendor lib abstraction layer to (e.g) the storage adapter root module.
+
+👉 So this is :[#867.K] the main internal API for doing vendor stuff, but
+   we use this same tag to mark the (at writing) one other place we have too.
+"""
 from modality_agnostic.memoization import memoize
-
-
-# (this is :[#867.K] the main place we use the toml vendor lib
-# but there may be more.)
-
-
-def SCHEMA_VIA_COLLECTION_PATH(collection_path, listener):
-    from os import path as os_path
-    import toml  # stay close to #here2.
-
-    schema_path = os_path.join(collection_path, 'schema.rec')
-
-    e = None
-    try:
-        doc = toml.load(schema_path)  # for once in our lives we
-        # want to use the thing that reads from the filesystem itself
-    except FileNotFoundError as e_:
-        e = e_
-
-    if e is not None:
-        __whine_about_schema_file_not_found(listener, e)
-        return
-
-    storage_schema = doc.pop('storage schema')  # ..
-
-    assert(0 == len(doc))  # ..
-
-    return _Schema(storage_schema)
 
 
 # == injection for locking and mutating index
@@ -148,7 +137,7 @@ class _SchemaPather:
         return (self._dir_path, 'entities', *these)  # #here3
 
 
-class _Schema:  # #testpoint
+class Schema_:
     """EXPERIMENTAL. at #birth this was a pure abstraction"""
 
     def __init__(self, storage_schema):
@@ -317,7 +306,7 @@ def vendor_parse_toml_or_catch_exception__(big_string):
     e = None
     res = None
     try:
-        res = toml.loads(big_string)  # #here2
+        res = toml.loads(big_string)  # :#here2
     except toml.TomlDecodeError as e_:
         e = e_
 
@@ -342,21 +331,9 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
     listener('error', 'structure', 'entity_not_found', structer)
 
 
-def __whine_about_schema_file_not_found(listener, e):
-    def structer():
-        assert(e.strerror == 'No such file or directory')
-        _head = "collection does not exist because no schema file"
-        _path = e.filename
-        return {
-                'reason': f'{_head} - {_path}',
-                'errno': e.errno,
-                'input_error_type': 'collection_not_found',
-                }
-    listener('error', 'structure', 'input_error', structer)
-
-
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.2 toml is no longer used to parse schema files
 # #history-A.1
 # #birth: abstracted

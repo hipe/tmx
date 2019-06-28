@@ -1,7 +1,8 @@
-# NOTE - at #history-A.1 we renamed this to look like a recutils recfile
-# but it's still toml .. work in progress..
+# #history-A.1 was rename and #history-A.2 was change from toml to recfile
 
-"storage schema" = "32x32x32"
+storage_adapter: toml
+storage_schema: 32x32x32
 
+# #history-A.2
 # #history-A.1
 # born.

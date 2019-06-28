@@ -147,16 +147,16 @@ class Case4073_not_quite_section_line(_CommonCase):
     def test_400_the_module_has_this_ASCII_art_function(self):
 
         # at #tombstone-A.1 we severed this behavior from "production"
-        # but we know we will want it again later at CLI integration
+        # but at #tombstone-A.3 it was restored
 
         from kiss_rdb.magnetics_.string_scanner_via_definition import (
-                two_lines_of_ascii_art_via_position_and_line_USE_ME as subject,
-                )
+                two_lines_of_ascii_art_via_position_and_line__)
         _all_these = self.emitted_elements()
-        _itr = subject(**_all_these)  # this is really clever by the way
+        _two = _two_via_these(**_all_these)
+        _itr = two_lines_of_ascii_art_via_position_and_line__(**_two)
         last_lines = list(_itr)
-        _1 = "    '[fun time…'"
-        _2 = "     ----^"
+        _1 = "    [fun time]"
+        _2 = "    ----^"
         self.assertEqual(last_lines, [_1, _2])
 
     @shared_subject
@@ -165,6 +165,18 @@ class Case4073_not_quite_section_line(_CommonCase):
 
     def given_lines(self):
         return ('# comment line\n', '\n', '[fun time]\n')
+
+
+def _two_via_these(
+        position,
+        line,
+        lineno,  # *
+        expecting,  # *
+        did_reach_end_of_stream,
+        ):
+    # position, line, lineno=None, expecting=None, expecting_any_of=None,
+    # did_reach_end_of_stream=None,
+    return {'position': position, 'line': line}
 
 
 class Case4074_section_but_no_dots(_CommonCase):
@@ -299,6 +311,7 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #tombstone-A.3
 # #tombstone-A.2: blank files become OK,remove discussion of how great SM's are
 # #tombstone-A.1: as referenced
 # #born.

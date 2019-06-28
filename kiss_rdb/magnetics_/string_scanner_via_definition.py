@@ -101,10 +101,7 @@ class Scanner:
         return pattern.regex.match(self._line, self._position)
 
 
-def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
-        position, line, lineno=None, expecting=None, expecting_any_of=None,
-        did_reach_end_of_stream=None,
-        ):
+def two_lines_of_ascii_art_via_position_and_line__(position, line):
     """given a possibly long line and a position, render it in 2 lines.
 
     something like this:
@@ -116,14 +113,11 @@ def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
     in effect, "zoom the camera in" to the area of interest in the string,
     possibly cutting of some left portion and some right portion of the
     string. use ellipsis to show cut-off as necessary.
-
-    although this ONLY uses those first two arguments, for convenience this
-    accepts the known superset of components of structured input errorrs.
     """
 
     pos = position
     left_side_max_context_characters = 8
-    right_side_max_context_characters = 5
+    right_side_max_context_characters = 20  # was 5 before #history-A.1
     indent = '    '  # 4x
     ellipsis_CHARACTER = '…'
     # --
@@ -135,6 +129,11 @@ def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
     else:
         camera_left_pos = 0
         did_cut_off_left_side = False
+
+    # don't count a trailing newline in width calculations *or* production
+
+    if len(line) and '\n' == line[-1]:
+        line = line[:-1]
 
     # show at most M characters to the right of the position
     # so we might cut off a right portion of the string
@@ -157,13 +156,13 @@ def two_lines_of_ascii_art_via_position_and_line_USE_ME(  # #open [#867.B]
     if did_cut_off_right_side:
         _ = f"{_[0:-1]}{ellipsis_CHARACTER}"
 
-    _styled_excerpted_line_excerpt = repr(_)  # :#here
+    _styled_excerpted_line_excerpt = _
+
+    # (used to do repr() above, gone at #history-A.1)
 
     # --
     _num_bars = pos - camera_left_pos
-    _ascii_arrow = f" { '-' * _num_bars }^"  # glyphs ..
-    # YIKES leading space above to jump over open quote from #here, BUT
-    # by using `repr` you could get screwed in indeterminite ways..
+    _ascii_arrow = f"{'-' * _num_bars}^"  # glyphs ..
     # --
 
     yield f"{indent}{_styled_excerpted_line_excerpt}"
@@ -176,4 +175,5 @@ class pattern_via_description_and_regex_string:
         self.description = desc
         self.regex = re.compile(rx_string, *flags)
 
+# #history-A.1
 # #born.

@@ -93,6 +93,15 @@ class Filesystem_EXPERIMENTAL:  # #testpoint
     def open_locked_file(self, path):
         return _LockedFile(path, 'r+')  # not create if doesn't exist
 
+    # -- for read (only) operations
+
+    def open_file_for_reading(self, path):
+        return open(path)  # throws
+
+    def stat_via_path(self, path):
+        from os import stat
+        return stat(path)  # throws
+
 
 class _FILE_REWRITE_TRANSACTION:
 

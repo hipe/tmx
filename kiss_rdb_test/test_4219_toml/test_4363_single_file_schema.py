@@ -4,6 +4,7 @@ from kiss_rdb_test.common_initial_state import (
         unindent,
         )
 from kiss_rdb_test.CUD import (
+        wrap_collection,
         filesystem_recordings_of,
         build_filesystem_expecting_num_file_rewrites,
         )
@@ -65,6 +66,8 @@ class Case4361_retrieve_OK(_CommonCase):
                 dir_path=_dir_path_most_common(),
                 filesystem=None)
 
+        _col = wrap_collection(_col)
+
         # _listener = _no_listener
         _listener = debugging_listener
         return _col.retrieve_entity('68', _listener)
@@ -98,9 +101,9 @@ class Case4364_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(_CommonCase):
         return filesystem_recordings_of(self, 'delete', '68')
 
     def subject_collection(self):  # (same as #here1)
-        return _build_collection(
+        return wrap_collection(_build_collection(
                 dir_path=_dir_path_most_common(),
-                filesystem=build_filesystem_expecting_num_file_rewrites(1))
+                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
 
 
 # Case4365 update fail
@@ -127,14 +130,14 @@ class Case4366_update_OK(_CommonCase):
     # NOTE not memoized
     def recorded_file_rewrites(self):  # NOTE not memoized
         return filesystem_recordings_of(self, 'update', '24', (
-            ('update', 'xx', 'xx of 24 updated'),
-            ('create', 'xw', 'nü'),
+            ('update_attribute', 'xx', 'xx of 24 updated'),
+            ('create_attribute', 'xw', 'nü'),
             ))
 
     def subject_collection(self):  # (same as #here1)
-        return _build_collection(
+        return wrap_collection(_build_collection(
                 dir_path=_dir_path_most_common(),
-                filesystem=build_filesystem_expecting_num_file_rewrites(1))
+                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
 
 
 # Case4367 create fail
@@ -178,10 +181,10 @@ class Case4368_create_into_existing_file(_CommonCase):
             assert(pool_size == 1022)  # 1024 - 2
             return 64  # (as iid) 42 per [#867.S] CLI
 
-        return _build_collection(
+        return wrap_collection(_build_collection(
                 dir_path=_dir_path_most_common(),
                 random_number_generator=random_number_generator,
-                filesystem=build_filesystem_expecting_num_file_rewrites(1))
+                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
 
 
 # == assertion support
@@ -193,12 +196,11 @@ def _last_1_of_path(path):
 
 # == setup support
 
-def _build_collection(dir_path, filesystem, random_number_generator=None):
+def _build_collection(dir_path, **injections):
     return _main_module().collection_via_directory_and_schema(
             collection_directory_path=dir_path,
             collection_schema=_always_same_schema(),
-            random_number_generator=random_number_generator,
-            filesystem=filesystem)
+            **injections)
 
 
 @memoize
@@ -208,8 +210,8 @@ def _dir_path_most_common():
 
 @memoize
 def _always_same_schema():
-    from kiss_rdb.storage_adapters_.toml import schema_via_file_lines as _
-    return _._Schema(storage_schema='32^2')
+    from kiss_rdb.storage_adapters_.toml.schema_via_file_lines import Schema_
+    return Schema_(storage_schema='32^2')
 
 
 def _main_module():

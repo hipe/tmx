@@ -96,30 +96,13 @@ class _CommonFunctions:
     def collection_via_unsanitized_argument(
             self, collection_argument,
             listener,
-            injections_dictionary=_empty_mapping,
+            **injections,
             ):
-
-        from kiss_rdb.storage_adapters_.toml import (
-                schema_via_file_lines as lib)
+        from kiss_rdb import collection_via_path_
         import os.path as os_path
-
-        hub = self.unsanitized_collections_hub
-
-        # derive collection path
-        coll_path = os_path.join(hub, collection_argument)
-
-        # derive the schema
-        schema = lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
-        if schema is None:
-            return  # (Case5918)
-
-        # money
-        from kiss_rdb.storage_adapters_.toml import (
-                collection_via_directory as lib)
-        return lib.collection_via_directory_and_schema(
-                collection_directory_path=coll_path,
-                collection_schema=schema,
-                **injections_dictionary)
+        _coll_path = os_path.join(
+                self.unsanitized_collections_hub, collection_argument)
+        return collection_via_path_(_coll_path, listener, **injections)
 
     def build_monitor(self):
         return _Monitor(
@@ -127,26 +110,15 @@ class _CommonFunctions:
 
 
 def _express_error_structure(echo_error_line, channel_tail, struct):
-    """FOR NOW, this is just a messy attempt at making contact with all the
-
-    components we expect to see for different cases..
-    eventually we will want per-action handlers to be integrated somehow
-    """
     # (Case6080)
+
+    from ._case_adaptations import WHINE_ABOUT
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 
     dim_pool.pop('errno', None)  # get rid of it, if any. was handled #here2
 
-    if 1 == len(dim_pool):
-        __express_just_reason(** dim_pool)
-    else:
-        from . import _case_adaptations as cases
-        cases.WHINE_ABOUT(echo_error_line, channel_tail, dim_pool)
-
-
-def __express_just_reason(reason):
-    _echo_error(reason)
+    WHINE_ABOUT(echo_error_line, channel_tail, dim_pool)
 
 
 def _express_info_structure(info_category, dct):  # (Case6129)
@@ -210,8 +182,9 @@ def cli_for_production():
             argv[i] = argv[i].encode('utf-8').decode('unicode_escape')  # ..
     # == END
 
-    import kiss_rdb.storage_adapters_.toml.collection_via_directory as _
-    _inj = _.INJECTIONS(random_number_generator=rng, filesystemer=filesystem)
+    from kiss_rdb import ModalityAdaptationInjections_
+    _inj = ModalityAdaptationInjections_(
+            random_number_generator=rng, filesystemer=filesystem)
     _ = cli.main(obj=_inj)
     cover_me(f'do you ever see this? {_}')
     return 0
@@ -232,7 +205,7 @@ def cli(ctx, collections_hub):
     attribute. the semantics of this get overloaded, because we need to
     exploit it for two purposes: one, it's how we get arbitrary config into
     our CLI at all, and two, it's how our specific actions can access this
-    and the rest. more at the INJECTIONS class elsewhere.
+    and the rest. more at the ModalityAdaptationInjections_ class elsewhere.
     """
 
 
@@ -251,7 +224,7 @@ def create(ctx, collection, value):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if col is None:
         return mon.some_error_code()
     # end
@@ -302,18 +275,18 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if col is None:
         return mon.some_error_code()
     # end
 
     cuds = []
     for n, v in add:
-        cuds.append(('create', n, v))
+        cuds.append(('create_attribute', n, v))
     for n, v in change:
-        cuds.append(('update', n, v))
+        cuds.append(('update_attribute', n, v))
     for n in delete:
-        cuds.append(('delete', n))
+        cuds.append(('delete_attribute', n))
 
     before_after = col.update_entity(internal_identifier, cuds, listener)
 
@@ -354,7 +327,8 @@ def get(ctx, collection, internal_identifier):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    col = cf.collection_via_unsanitized_argument(collection, listener)
+    _inj = cf.release_these_injections('filesystem')
+    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if col is None:
         return mon.some_error_code()
     # end
@@ -390,7 +364,7 @@ def delete(ctx, collection, internal_identifier):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, _inj)
+    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if col is None:
         return mon.some_error_code()
     # end
@@ -430,7 +404,8 @@ def traverse(ctx, collection):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    col = cf.collection_via_unsanitized_argument(collection, listener)
+    _inj = cf.release_these_injections('filesystem')
+    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if col is None:
         return mon.some_error_code()
     # end
@@ -442,9 +417,7 @@ def traverse(ctx, collection):
         # (Case5934)
         echo(iid.to_string())
 
-    # (make contact with what went wrong..)
     if len(mon.error_categories_box.set):
-        assert(mon.error_categories_box.list == ['argument_error'])
         return mon.some_error_code()
     else:
         return _success_exit_code
@@ -515,9 +488,6 @@ class _Monitor:
                 for line in payloader():
                     echo_error_line(line)
             elif 'structure' == shape:
-
-                if len(detail):
-                    cover_me('meh')
 
                 dct = payloader()
                 if 'errno' in dct:

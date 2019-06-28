@@ -74,7 +74,8 @@ class Case4215_strange_verbs(_CommonCase):
 
     def given_run(self, listener):
         return _request_via_tuples(
-            (('fiz', 'a'), ('delete', 'x'), ('bru-zuz', 'x')), listener)
+            (('fiz', 'a'), ('delete_attribute', 'x'), ('bru-zuz', 'x')),
+            listener)
 
 
 class Case4216_wrong_looking_attribute_name(_CommonCase):
@@ -86,9 +87,9 @@ class Case4216_wrong_looking_attribute_name(_CommonCase):
 
     def given_run(self, listener):
         return _request_via_tuples((
-            ('create', 'foo-bar', '1'),
-            ('create', 'xxe-sesf-', '1'),
-            ('create', '^___^', '1'),
+            ('create_attribute', 'foo-bar', '1'),
+            ('create_attribute', 'xxe-sesf-', '1'),
+            ('create_attribute', '^___^', '1'),
             ), listener)
 
 
@@ -109,9 +110,9 @@ class Case4217_duplicate_names_within_request(_CommonCase):
 
     def given_run(self, listener):
         return _request_via_tuples((
-            ('create', 'foo-bar', '1'),
-            ('update', 'biz-baz', '1'),
-            ('delete', 'foo-bar'),
+            ('create_attribute', 'foo-bar', '1'),
+            ('update_attribute', 'biz-baz', '1'),
+            ('delete_attribute', 'foo-bar'),
             ), listener)
 
 
@@ -132,10 +133,10 @@ class Case4218_names_too_similar_within_request(_CommonCase):
 
     def given_run(self, listener):
         return _request_via_tuples((
-            ('delete', 'xx-zz'),
-            ('delete', 'blink-182'),
-            ('delete', 'xxz-z'),
-            ('delete', 'xx-ZZ'),
+            ('delete_attribute', 'xx-zz'),
+            ('delete_attribute', 'blink-182'),
+            ('delete_attribute', 'xxz-z'),
+            ('delete_attribute', 'xx-ZZ'),
             ), listener)
 
 
@@ -167,7 +168,7 @@ class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
         return _split_because_hack(_rsn)
 
     def given_request_tuples(self):
-        return (('create', 'foo-fani', 'x'),)
+        return (('create_attribute', 'foo-fani', 'x'),)
 
     def given_entity_body_lines(self):
         return """
@@ -190,7 +191,7 @@ class Case4221_cannot_delete_because_attributes_not_found(_CommonCase):
         return _split_because_hack(_rsn)
 
     def given_request_tuples(self):
-        return (('delete', 'sho-madjozi'),)
+        return (('delete_attribute', 'sho-madjozi'),)
 
     def given_entity_body_lines(self):
         return """
@@ -220,7 +221,7 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  #
         return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
-        return (('delete', 'sho-madjozi'),)
+        return (('delete_attribute', 'sho-madjozi'),)
 
     def given_entity_body_lines(self):
         return """
@@ -251,7 +252,7 @@ class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
         return es
 
     def given_request_tuples(self):
-        return (('update', 'thing-1', 'q'),)
+        return (('update_attribute', 'thing-1', 'q'),)
 
     def given_entity_body_lines(self):
         return """
@@ -285,7 +286,7 @@ class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  #
         return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
-        return (('update', 'sho-madjozi', 'q'),)
+        return (('update_attribute', 'sho-madjozi', 'q'),)
 
     def given_entity_body_lines(self):
         return """
@@ -309,7 +310,7 @@ class Case4226_cannot_delete_because_comment_line_above(_CommonCase):
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
-        return (('delete', 'ab-fab'),)
+        return (('delete_attribute', 'ab-fab'),)
 
     def given_entity_body_lines(self):
         return """
@@ -334,7 +335,7 @@ class Case4227_cannot_update_because_comment_line_below(_CommonCase):
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
-        return (('update', 'ab-fab', 'qq'),)
+        return (('update_attribute', 'ab-fab', 'qq'),)
 
     def given_entity_body_lines(self):
         return """
@@ -359,7 +360,7 @@ class Case4228_cannot_update_because_attribute_line_has_comment(_CommonCase):  #
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
-        return (('update', 'ab-fab', 'qq'),)
+        return (('update_attribute', 'ab-fab', 'qq'),)
 
     def given_entity_body_lines(self):
         return """
@@ -387,8 +388,8 @@ class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
         return self.reason_via_expect_request_error().split('. ')
 
     def given_request_tuples(self):
-        return (('delete', 'ab-fab-1'),
-                ('delete', 'ab-fab-2'))
+        return (('delete_attribute', 'ab-fab-1'),
+                ('delete_attribute', 'ab-fab-2'))
 
     def given_entity_body_lines(self):
         return """
@@ -423,9 +424,9 @@ class Case4230_cannot_create_because_comment_line_above(_CommonCase):
         return (sp1, sp2)
 
     def given_request_tuples(self):
-        return (('create', 'dd-dd', '123'),
-                ('create', 'ee-ee', '123'),
-                ('create', 'hh-hh', '123'),
+        return (('create_attribute', 'dd-dd', '123'),
+                ('create_attribute', 'ee-ee', '123'),
+                ('create_attribute', 'hh-hh', '123'),
                 )
 
     def given_entity_body_lines(self):
@@ -462,7 +463,7 @@ class Case4232_can_update_idk(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('update', 'thing-2', 789),)
+        return (('update_attribute', 'thing-2', 789),)
 
     def given_entity_body_lines(self):
         return """
@@ -484,7 +485,7 @@ class Case4233_can_delete(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('delete', 'thing-2'),)
+        return (('delete_attribute', 'thing-2'),)
 
     def given_entity_body_lines(self):
         return """
@@ -520,9 +521,9 @@ class Case4234_can_create_when_comment_line_at_tail(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('create', 'dd-dd', 123),
-                ('create', 'ee-ee', '123'),
-                ('create', 'hh-hh', 123.0),
+        return (('create_attribute', 'dd-dd', 123),
+                ('create_attribute', 'ee-ee', '123'),
+                ('create_attribute', 'hh-hh', 123.0),
                 )
 
     def given_entity_body_lines(self):
@@ -557,8 +558,8 @@ class Case4235_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('create', 'bb-bb', 123),
-                ('create', 'cc-cc', 123))
+        return (('create_attribute', 'bb-bb', 123),
+                ('create_attribute', 'cc-cc', 123))
 
     def given_entity_body_lines(self):
         return """
@@ -582,8 +583,8 @@ class Case4236_create_into_truly_empty(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('create', 'cc-cc', 456),
-                ('create', 'bb-bb', 123))
+        return (('create_attribute', 'cc-cc', 456),
+                ('create_attribute', 'bb-bb', 123))
 
     def given_entity_body_lines(self):
         return """
@@ -605,8 +606,8 @@ class Case4238_create_into_empty_with_comments(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('create', 'cc-cc', 456),
-                ('create', 'bb-bb', 123))
+        return (('create_attribute', 'cc-cc', 456),
+                ('create_attribute', 'bb-bb', 123))
 
     def given_entity_body_lines(self):
         return """

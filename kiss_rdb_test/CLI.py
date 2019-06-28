@@ -267,13 +267,22 @@ _no_WR = _write_receiver_via_function(_expecting_no_writes)
 
 
 def _invoke_CLI(given_args, injections_dictionary):
-
-    from kiss_rdb.storage_adapters_.toml.collection_via_directory import (
-            INJECTIONS as INJECTIONS)
-
     from kiss_rdb.cli import cli
+    from kiss_rdb import ModalityAdaptationInjections_
 
-    _NASTY_HACK_once()
+    """:[#867.U] "why we inject": There are two aspects of testing that would
+    be difficult or impossible without exposing these points of dependency
+    injection: 1) The psuedo-randomness behind identifier allocation 2)
+    interactions with the filesystem.
+
+    Corraling our interactions with the filesystem into a unified (and small!)
+    abstraction layer will also assist us in moving to containerized hosting..
+
+    Not every operation needs every facility, so if you know before you build
+    the collecton which operation(s) you need from it, you may avoid some
+    unnecessary coupling and overhead by not injecting those facilities.
+    (Although this is not as relevant from #history-A.1 when we mock read-only)
+    """
 
     if injections_dictionary is None:
         injections_obj = None
@@ -282,8 +291,7 @@ def _invoke_CLI(given_args, injections_dictionary):
         random_number, filesystem = __flatten_these(**injections_dictionary)
         _random_number_generator = __rng_via(random_number)
         filesystemer, filesystem_finish = __these_two_via_filesystem(filesystem)  # noqa: E501
-
-        injections_obj = INJECTIONS(
+        injections_obj = ModalityAdaptationInjections_(
                 random_number_generator=_random_number_generator,
                 filesystemer=filesystemer)
 
@@ -296,30 +304,6 @@ def _invoke_CLI(given_args, injections_dictionary):
             )
 
     return filesystem_finish, _exit_code
-
-
-@memoize
-def _NASTY_HACK_once():
-    # OCD for tests (this is a common OCD we run into when testing CLI):
-    # don't ever parse the same schema file more than once
-    # (at writing it saves from 4 extranous constructons)
-
-    from kiss_rdb.storage_adapters_.toml import schema_via_file_lines as mod
-
-    real_function = mod.SCHEMA_VIA_COLLECTION_PATH
-
-    cache = {}
-
-    def use_function(path, listener):
-
-        if path in cache:
-            return cache[path]
-        res = real_function(path, listener)
-        if res is not None:
-            cache[path] = res
-        return res
-
-    mod.SCHEMA_VIA_COLLECTION_PATH = use_function
 
 
 def __rng_via(random_number):
@@ -467,4 +451,5 @@ _success_exit_code = 0
 
 # == END support for stdout capture
 
+# #history-A.1
 # #abstracted.

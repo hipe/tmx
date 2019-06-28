@@ -106,7 +106,7 @@ class _FakeFile:
 
     def __init__(self, lines, path):
         self._lines = lines
-        self.path = path
+        self.name = path  # be like `_io.TextIOWrapper`
 
     def __enter__(self):
         return self

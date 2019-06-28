@@ -4,8 +4,7 @@ from kiss_rdb_test.common_initial_state import (
         )
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
-    build_filesystem_expecting_num_file_rewrites,
-    )
+        build_filesystem_expecting_num_file_rewrites)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -209,8 +208,8 @@ class Case5918_traverse_fail(_CommonCase):
     def test_200_message_lines(self):
         _actual, = self.end_state().lines
         reason, path = _actual.split(' - ')
-        self.assertEqual(reason, 'collection does not exist because no schema file')  # noqa: E501
-        self.assertEqual(path, 'qq/pp/schema.rec\n')
+        self.assertEqual(reason, 'collection not found: No such file or directory')  # noqa: E501
+        self.assertEqual(path, 'qq/pp\n')
 
     @shared_subject
     def end_state(self):
@@ -218,6 +217,9 @@ class Case5918_traverse_fail(_CommonCase):
 
     def given_args(self):
         return ('--collections-hub', 'qq', 'traverse', 'pp')
+
+    def filesystem(self):
+        return real_filesystem_read_only()
 
 
 class Case5934_traverse(_CommonCase):
@@ -239,6 +241,9 @@ class Case5934_traverse(_CommonCase):
 
     def given_args(self):
         return (*common_args_head(), 'traverse', _common_collection)
+
+    def filesystem(self):
+        return real_filesystem_read_only()
 
 
 class Case5950_select_help(_CommonCase):
@@ -282,7 +287,8 @@ class Case6064_get_fail(_CommonCase):
 
     def test_200_says_only_not_found__with_ID(self):
         line, = self.end_state().lines
-        self.assertEqual(line, "'B9F' not found\n")
+        self.assertEqual(line, (
+            "entity not found: not found: 'B9F' not found\n"))  # #wish
 
     @shared_subject
     def end_state(self):
@@ -290,6 +296,9 @@ class Case6064_get_fail(_CommonCase):
 
     def given_args(self):
         return (*common_args_head(), 'get', _common_collection, 'B9F')
+
+    def filesystem(self):
+        return real_filesystem_read_only()
 
 
 class Case6080_get(_CommonCase):
@@ -321,6 +330,9 @@ class Case6080_get(_CommonCase):
 
     def given_args(self):
         return (*common_args_head(), 'get', _common_collection, 'B9H')
+
+    def filesystem(self):
+        return real_filesystem_read_only()
 
 
 class Case6096_create_help(_CommonCase):
@@ -357,7 +369,7 @@ class Case6113_create_fail(_CommonCase):
         return (*common_args_head(), 'create', _common_collection)
 
     def filesystem(self):
-        return None
+        return real_filesystem_read_only()
 
 
 class Case6129_create(_CommonCase):
@@ -593,6 +605,16 @@ class _StructUsageLineAndFirstDescLine:
 class _StructTreeAndExitCode:
     def __init__(self, *two):
         self.tree, self.exit_code = two
+
+
+@memoize
+def real_filesystem_read_only():
+    # push this up whenever - use the real filesystem but the same testy hook
+    from kiss_rdb import memoized_
+    fs = memoized_.real_filesystem_read_only  # not really necessary
+    otr = fs.__class__(commit_file_rewrite=None)
+    otr.FINISH_AS_HACKY_SPY = lambda: None
+    return otr
 
 
 def _lines_via_big_string_as_is(big_string):

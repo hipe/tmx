@@ -1,13 +1,70 @@
 from os import path as os_path
 
 
+def _thing(f):
+    def use_f(self, identifier_string, *rest):
+        from kiss_rdb.magnetics_.identifier_via_string import (
+            identifier_via_string_)
+        iden = identifier_via_string_(identifier_string, rest[-1])
+        if iden is None:
+            return
+        return f(self, iden, *rest)
+    return use_f
+
+
+class _Collection:  # #tespoint
+    """Clients don't interact with the remote collection directly, reather they
+
+    do so through this façade that bundles common logic mostly having to do
+    with decoding identifiers, so that the implementatons don't have to.
+    """
+
+    def __init__(self, impl):
+        self._impl = impl  # #testpoint
+
+    @_thing
+    def update_entity(self, *a):
+        return self._impl.update_entity_as_storage_adapter_collection(*a)
+
+    def create_entity(self, *a):
+        return self._impl.create_entity_as_storage_adapter_collection(*a)
+
+    @_thing
+    def delete_entity(self, *a):
+        return self._impl.delete_entity_as_storage_adapter_collection(*a)
+
+    @_thing
+    def retrieve_entity(self, iden, listener):
+        de = self._impl.retrieve_entity_as_storage_adapter_collection(
+                iden, listener)
+        if de is None:
+            return  # (Case4130)
+        # (Case4292):
+        assert(de.table_type == 'attributes')
+        return de.to_dictionary_two_deep_as_storage_adapter_entity()
+
+    def to_identifier_stream(self, listener):
+        return self._impl.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
+
+
+def _wrap_in_facade(f):  # decorator
+    def use_f(*a):
+        injected_coll = f(*a)
+        if injected_coll is None:
+            return
+        return _Collection(injected_coll)
+    return use_f
+
+
 class _ResolveCollection:
 
-    def __init__(self, path, listener, fs, meta_collection):
-        self.path = path
+    def __init__(self, collection_path, meta_collection, listener,
+                 random_number_generator=None, filesystem=None):
+        self.path = collection_path
         self.listener = listener
         self.meta_collection = meta_collection
-        self.FS = fs
+        self.random_number_generator = random_number_generator
+        self.FS = filesystem
 
     def execute(self):
         st = self.__stat_via_path()
@@ -24,6 +81,7 @@ class _ResolveCollection:
     # -- when directory
 
     def __when_directory(self):
+        self._schema_path = os_path.join(self.path, 'schema.rec')
         open_file = self.__resolve_open_schema_file()
         if open_file is None:
             return
@@ -58,7 +116,7 @@ class _ResolveCollection:
         if not sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
             return _emit_about_not_directory_based(
                     self.listener, sa, contextualize)
-        if sa.module.STORAGE_ADAPTER_IS_NONWORKNG_STUB:
+        if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
             _emit_about_nonworking_stub(self.listener, sa, contextualize)
             return
         return self.__finish_for_schema_based_collection(sa)
@@ -89,10 +147,9 @@ class _ResolveCollection:
         _emit_about_empty_schema_file(self.listener, which, _parse_state)
 
     def __resolve_open_schema_file(self):
-        path = os_path.join(self.path, 'schema.rec')
         failed = True
         try:
-            fh = self.FS.open_file_for_reading(path)
+            fh = self.FS.open_file_for_reading(self._schema_path)
             failed = False
         except FileNotFoundError as e_:
             e = e_
@@ -114,20 +171,30 @@ class _ResolveCollection:
                 self._extname, self.listener)
         if sa is None:
             return
+        if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
+            def contextualize(dct):
+                dct['path'] = self.path
+            _emit_about_nonworking_stub(self.listener, sa, contextualize)
+            return
         return self.__finish_for_single_file_based_collection(sa)
 
     # -- shared/similar/low-level
 
+    @_wrap_in_facade
     def __finish_for_schema_based_collection(self, sa):
         return sa.module.RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(
-                schema_file_scanner=self._scanner,
-                collection_path=self.path,
-                listener=self.listener)
+                schema_file_scanner=self._scanner, ** self._these_N())
 
+    @_wrap_in_facade
     def __finish_for_single_file_based_collection(self, sa):
         return sa.module.RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(  # noqa: E501
-                collection_path=self.path,
-                listener=self.listener)
+                ** self._these_N())
+
+    def _these_N(self):
+        return {'collection_path': self.path,
+                'random_number_generator': self.random_number_generator,
+                'filesystem': self.FS,
+                'listener': self.listener}
 
     def __stat_via_path(self):
         did_fail = True
@@ -167,8 +234,11 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         self._SAs_module_name = module_name
         self._key_via_extname = None
 
-    def COLLECTION_VIA_PATH(self, path, listener, fs):
-        return _ResolveCollection(path, listener, fs, self).execute()
+    def COLLECTION_VIA_PATH_AND_INJECTIONS(
+            self, collection_path, listener, **injections):
+        return _ResolveCollection(
+                collection_path=collection_path, meta_collection=self,
+                listener=listener, **injections).execute()
 
     def _storage_adapter_via_extname_(self, extname, listener):
         if self._key_via_extname is None:
@@ -234,11 +304,23 @@ class _NOT_YET_LOADED:  # #as-namespace-only
 # == whiners
 
 def _emit_about_nonworking_stub(listener, sa, contextualize):
-    def structurer():  # #not-covered
-        dct = {'reason_tail': repr(sa.key)}
+    def structurer():  # #not-covered, kind of crazy
+        dct = {}
+        mod = sa.module
+        moniker = repr(sa.key)
+        if hasattr(mod, 'STORAGE_ADAPTER_UNAVAILABLE_REASON'):
+            def f(s):
+                return f"the {moniker} storage adapter is"
+            msg = mod.STORAGE_ADAPTER_UNAVAILABLE_REASON
+            import re
+            use_msg = re.sub(r"^[Ii]t( is|'s)\b", f, msg)
+            dct['reason_tail'] = use_msg
+        else:
+            dct['reason_tail'] = repr(sa.key)
         contextualize(dct)
         return dct
-    listener(*_this_head, 'storage_adapter_is_nonworking_stub', structurer)
+    listener(*_EC_for_cannot_load,
+             'storage_adapter_is_not_available', structurer)
 
 
 def _emit_about_not_directory_based(listener, sa, contextualize):
@@ -247,7 +329,8 @@ def _emit_about_not_directory_based(listener, sa, contextualize):
         dct = {'reason': _long_reason}
         contextualize(dct)
         return dct
-    listener(*_this_head, 'storage_adapter_is_not_directory_based', structurer)
+    listener(*_EC_for_cannot_load,
+             'storage_adapter_is_not_directory_based', structurer)
 
 
 def __pieces_for_not_dir_based(sa):
@@ -255,7 +338,7 @@ def __pieces_for_not_dir_based(sa):
     can_single = mod.STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES
     if can_single:
         extensions = mod.STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS
-    is_nonworking_stub = mod.STORAGE_ADAPTER_IS_NONWORKNG_STUB
+    is_available = mod.STORAGE_ADAPTER_IS_AVAILABLE
     if can_single:
         yield f"the '{sa.key}' storage adapter is single-file only, "
         yield "so the collection cannot have a directory and a schema file"
@@ -265,11 +348,11 @@ def __pieces_for_not_dir_based(sa):
         else:
             yield ", however there are no file extensions associated with "
             yield "the storage adapter, so nothing makes any sense"
-    elif is_nonworking_stub:
-        yield f"the '{sa.key}' storage adapter is a non-working stub"
-    else:
+    elif is_available:
         yield f"the '{sa.key}' storage adapter "
         yield "has no relationship to the filesystem"
+    else:
+        yield f"the '{sa.key} storage adapter is not available"
 
 
 def _emit_about_first_field_name(listener, contextualize):
@@ -278,7 +361,8 @@ def _emit_about_first_field_name(listener, contextualize):
         dct['expecting'] = '"storage_adapter" as field name'
         contextualize(dct)
         return dct
-    listener(*_this_head, 'unexpected_first_field_of_schema_file', structurer)
+    listener(*_EC_for_cannot_load,
+             'unexpected_first_field_of_schema_file', structurer)
 
 
 def _emit_about_empty_schema_file(listener, reason_head, parse_state):
@@ -292,23 +376,23 @@ def _emit_about_empty_schema_file(listener, reason_head, parse_state):
         path = parse_state.path
         _reason = f"{use_head} - {path}"
         return {'reason': _reason, 'path': path}
-    listener(*_this_head, 'first_field_of_schema_file_not_found', structurer)
+    listener(*_EC_for_cannot_load,
+             'first_field_of_schema_file_not_found', structurer)
 
 
 def _emit_about_no_schema_file(listener, file_not_found):
     def structurer():  # (Case1413)
         return _payload_via_file_not_found_error(file_not_found)
-    listener(*_this_head, 'no_schema_file', structurer)
+    listener(*_EC_for_cannot_load, 'no_schema_file', structurer)
 
 
 def _emit_about_no_extname(listener, path):
-
     def structurer():  # (Case1411)
         _reason = (
             f"cannot infer storage adapter from file with no extension - "
             f"{path}")
         return {'reason': _reason}
-    listener(*_this_head, 'file_has_no_extname', structurer)
+    listener(*_EC_for_cannot_load, 'file_has_no_extname', structurer)
 
 
 def _emit_about_extname(listener, extname, key_via_extname):
@@ -318,24 +402,24 @@ def _emit_about_extname(listener, extname, key_via_extname):
         _tail = f"known extension(s): ({_these})"
         _reason = f'{_head}. {_tail}'
         return {'reason': _reason}
-    listener(*_this_head, 'unrecognized_extname', structurer)
+    listener(*_EC_for_cannot_load, 'unrecognized_extname', structurer)
 
 
 def _emit_about_SA_key(listener, key, order, contextualize):
     def structurer():  # (Case1419)
         dct = {}
         _these = ', '.join(repr(s) for s in order)
-        dct['reason'] = (f"uknown storage adapter {repr(key)}. "
+        dct['reason'] = (f"unknown storage adapter {repr(key)}. "
                          f"known storage adapters: ({_these})")
         contextualize(dct)
         return dct
-    listener(*_this_head, 'unknown_storage_adapter', structurer)
+    listener(*_EC_for_cannot_load, 'unknown_storage_adapter', structurer)
 
 
 def _emit_about_collection_not_found_because_noent(listener, file_not_found):
     def structurer():  # (Case1409)
         return _payload_via_file_not_found_error(file_not_found)
-    listener(*_this_head, 'no_such_file_or_directory', structurer)
+    listener(*_EC_for_not_found, 'no_such_file_or_directory', structurer)
 
 
 def _payload_via_file_not_found_error(file_not_found):
@@ -351,6 +435,8 @@ def _say_extname_collision(en, first_key, second_key):
         return _reason
 
 
-_this_head = ('error', 'structure', 'collection_not_found')
+_this_shape = ('error', 'structure')
+_EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
+_EC_for_not_found = (*_this_shape, 'collection_not_found')
 
 # #born.

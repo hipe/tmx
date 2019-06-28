@@ -110,21 +110,20 @@ class _MutableDocumentEntity:
 
         return gist
 
-    # -- read
+    # == THE STORAGE ADAPTER ENTITY INTERFACE (experimental)
 
-    # == THE STORAGE ADAPTER ENTITY INTERFACE (experimental) (currently C/P)
-
-    def to_yes_value_dictionary_as_storage_adapter_entity(self):
-        _ = self.to_dictionary_two_deep_as_storage_adapter_entity()
-        return _['core_attributes']
+    @property
+    def identifier(self):
+        return self._table_start_line_object.identifier_for_storage_adapter()
 
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
         from .entity_via_identifier_and_file_lines import (
                 dictionary_two_deep_via_entity_line_stream_)
         return dictionary_two_deep_via_entity_line_stream_(self)
 
-    # (and `identifier` defined below)
     # ==
+
+    # -- read
 
     def to_line_stream(self):
         yield self._table_start_line_object.line
@@ -139,9 +138,9 @@ class _MutableDocumentEntity:
         if gist in self._IID_via_gist:
             return self._LL.item_via_IID(self._IID_via_gist[gist])
 
-    @property
-    def identifier(self):
-        return self._table_start_line_object.identifier_for_storage_adapter()
+    def identifier_string(self):
+        # (note this does not derive from identifier. the other way around)
+        return self._table_start_line_object.identifier_string
 
 
 def _complicated_deep_copy(old_LL):

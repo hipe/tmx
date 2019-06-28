@@ -47,7 +47,7 @@ class Case4257_simplifed_typical(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('update', 'bb-bb', "line 1\nline 2\n"),)
+        return (('update_attribute', 'bb-bb', "line 1\nline 2\n"),)
 
     def given_entity_body_lines(self):
         return """
@@ -77,7 +77,7 @@ class Case4258_empty_string(_CommonCase):
         return self.expect_input_error()
 
     def given_request_tuples(self):
-        return (('create', 'aa-aa', ''),)
+        return (('create_attribute', 'aa-aa', ''),)
 
     def given_entity_body_lines(self):
         return ''
@@ -94,7 +94,7 @@ class Case4259_one_line_special_char(_CommonCase):  # #midpoint
         """
 
     def given_request_tuples(self):
-        return (('create', 'aa-aa', '" 👈 a quote'),)
+        return (('create_attribute', 'aa-aa', '" 👈 a quote'),)
 
     def given_entity_body_lines(self):
         return ''
@@ -116,7 +116,7 @@ class Case4260_multiple_lines_and_special_chars(_CommonCase):
         """
 
     def given_request_tuples(self):
-        return (('update', 'bb-bb', "line 1\na quote: \"\n"),)
+        return (('update_attribute', 'bb-bb', "line 1\na quote: \"\n"),)
 
     def given_entity_body_lines(self):
         return """
@@ -142,7 +142,7 @@ class Case4261_no_newline_on_final_line(_CommonCase):
         return self.expect_input_error()
 
     def given_request_tuples(self):
-        return (('create', 'aa-aa', "line 1\nline 2"),)
+        return (('create_attribute', 'aa-aa', "line 1\nline 2"),)
 
     def given_entity_body_lines(self):
         return ''

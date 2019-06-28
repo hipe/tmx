@@ -1,0 +1,12 @@
+[item.VXW.attributes]
+heading = "recfiles intro"
+body = """
+👉 the [recutils splashpage] has a feature tree that would be fun to scrape.
+
+
+
+
+[1]: https://www.gnu.org/software/recutils/
+"""
+
+# #born.

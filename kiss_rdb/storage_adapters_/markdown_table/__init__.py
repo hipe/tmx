@@ -3,7 +3,22 @@
 import re
 
 
-def resolve_collection_via_file(opened, path, listener):
+STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
+STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
+STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.md',)
+STORAGE_ADAPTER_IS_AVAILABLE = True
+STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
+
+
+def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+        collection_path,
+        random_number_generator,
+        filesystem,
+        listener):
+    return _resolve_collection_via_file(None, collection_path, listener)
+
+
+def _resolve_collection_via_file(opened, path, listener):  # #testpoint
 
     if opened is None:
         try:
@@ -674,7 +689,12 @@ def _retrieve(lines, identi, schema, listener):
 def _IDs_via_lines(lines, listener):
     asts_via_line = _ASTs_via_line_via_listener(listener)
     for line in lines:
-        yield next(asts_via_line(line)).identifier_in_first_cel  # ..
+        asts = asts_via_line(line)  # hi.
+        ast = next(asts)  # hi.
+        iden = ast.identifier_in_first_cel
+        if iden is None:
+            break
+        yield iden
 
 
 def _entities_via_lines_and_schema(lines, schema, listener):
@@ -921,7 +941,10 @@ class _RowAsEntity:
             yield last_cel.to_cel_string_with_head_padding_only()
         yield '\n'  # ..
 
-    def to_yes_value_dictionary_as_storage_adapter_entity(self):
+    def to_dictionary_two_deep_as_storage_adapter_entity(self):
+        return {'core_attributes': self._to_yes_value_dict()}
+
+    def _to_yes_value_dict(self):
         return {k: v for k, v in self.__to_key_and_non_empty_value_pairs()}
 
     def __to_key_and_non_empty_value_pairs(self):
@@ -934,6 +957,8 @@ class _RowAsEntity:
     @property
     def identifier(self):
         return self._identifier_cel_.identifier_in_first_cel
+
+    table_type = 'attributes'  # #cover-me:w
 
 
 class _Cel:  # #abstract

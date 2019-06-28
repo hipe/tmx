@@ -162,7 +162,7 @@ class case_of_traverse_all_entities:  # #as-namespace
     def confirm_particular_entity_knows_one_of_its_field(tc):
         _tup = tc.flattened_collection_for_traversal_case()
         ent = next(ent for ent in _tup if 'B9H' == ent.identifier.to_string())
-        _actual = _yes_value_dict(ent)['thing-A']  # #todo API for getter?
+        _actual = _yes_value_dict(ent)['thing-A']  # #watch [#867.B] getters?
         tc.assertEqual(_actual, "hi i'm B9H")
 
     def confirm_featherweighting_isnt_biting(tc):
@@ -558,7 +558,8 @@ def _confirm_collection_empty(tc, coll):
 
 
 def _yes_value_dict(ent):
-    return ent.to_yes_value_dictionary_as_storage_adapter_entity()
+    from kiss_rdb import yes_value_dictionary_via_remote_entity
+    return yes_value_dictionary_via_remote_entity(ent)
 
 
 yes_value_dictionary_of = _yes_value_dict

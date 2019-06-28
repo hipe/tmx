@@ -9,10 +9,15 @@ seems almost certain that we can future-fit the below implementation while
 preserving this "block scanner"-style interface for our one client.
 """
 
-
 from kiss_rdb.magnetics_.string_scanner_via_definition import (
         Scanner,
         pattern_via_description_and_regex_string as o)
+
+
+STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
+STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
+STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
+STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 class ErsatzScanner:
@@ -22,7 +27,7 @@ class ErsatzScanner:
         self._lineno_via = next(toks)
         self._line_via = next(toks)
         self._tokens = toks
-        self.path = open_filehandle.path  # as parser_state
+        self.path = open_filehandle.name  # as parser_state
         self._has_on_deck = False
 
     def next_block(self, listener):

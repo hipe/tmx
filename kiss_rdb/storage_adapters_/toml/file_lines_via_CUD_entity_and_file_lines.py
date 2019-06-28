@@ -256,7 +256,7 @@ def _whine_about_entity_not_found(id_s, listener):
 
 
 def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
-    # #todo the below should move out of the SA if we're gonna use it like this
+    # [#867.E] one day abstract this out to a better location
     from kiss_rdb.storage_adapters_.markdown_table import express_edit_
     express_edit_(listener, UCDs, identifier, verb_preterite)
 

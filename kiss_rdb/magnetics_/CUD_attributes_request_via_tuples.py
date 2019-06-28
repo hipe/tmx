@@ -50,15 +50,15 @@ class _CUD_Attributes_Request:
         self.components = tuple(components)
 
     def update_document_entity__(self, de, bs, listener):
-        return self._same(de, bs, listener, 'update')
+        return self._same(de, bs, listener, 'update_attribute')
 
     def mutate_created_document_entity__(self, mde, bs, listener):
         # #testpoint
-        return self._same(mde, bs, listener, 'create')
+        return self._same(mde, bs, listener, 'create_attribute')
 
     def _same(self, de, bs, listener, create_or_update):
         from kiss_rdb.storage_adapters_.toml import (
-                CUD_attributes_via_request as lib)  # #todo this breaks abtrac
+                CUD_attributes_via_request as lib)  # #open [#867.Z] !abstractd
         _enc = bs.BUILD_ENTITY_ENCODER(listener)
         return lib.apply_CUD_attributes_request_to_MDE___(
                 de, self, _enc, listener, create_or_update)
@@ -108,7 +108,7 @@ class _CreateAttributeValueUnsanitized:
         one_sp = f"can't create {mid} in entity (use update?)"
         return (one_sp,)
 
-    lowercase_verb_string = 'create'
+    edit_component_key = 'create_attribute'
     attribute_must_already_exist_in_entity = False
 
 
@@ -121,7 +121,7 @@ class _UpdateAttributeValueUnsanitized:
     def sentence_phrases_for_missings(tups):  # function not method
         return _sentence_phrases_for_missings('update', tups)
 
-    lowercase_verb_string = 'update'
+    edit_component_key = 'update_attribute'
     attribute_must_already_exist_in_entity = True
 
 
@@ -133,14 +133,14 @@ class _DeleteAttribute:
     def sentence_phrases_for_missings(tups):  # function not method
         return _sentence_phrases_for_missings('delete', tups)
 
-    lowercase_verb_string = 'delete'
+    edit_component_key = 'delete_attribute'
     attribute_must_already_exist_in_entity = True
 
 
 _component_class_via_verb = {
-        'create': _CreateAttributeValueUnsanitized,
-        'update': _UpdateAttributeValueUnsanitized,
-        'delete': _DeleteAttribute,
+        'create_attribute': _CreateAttributeValueUnsanitized,
+        'update_attribute': _UpdateAttributeValueUnsanitized,
+        'delete_attribute': _DeleteAttribute,
         }
 
 

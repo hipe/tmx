@@ -51,15 +51,12 @@ class _CommonCase(unittest.TestCase):
     # -- assertions against end state
 
     def emits_error_case(self, ec):
-        self._sneak_in_confirmation_of_no_result_value()
-        chan = self.end_state()['channel']
-        expect = ('error', 'structure', 'collection_not_found', ec)
-        self.assertSequenceEqual(chan, expect)
+        self.emits_error_category('cannot_load_collection', ec)
 
-    def emits_error_category(self, ec):  # C/P, modified
+    def emits_error_category(self, ec, *error_case):  # C/P, modified
         self._sneak_in_confirmation_of_no_result_value()
         chan = self.end_state()['channel']
-        expect = ('error', 'structure', ec)
+        expect = ('error', 'structure', ec, *error_case)
         self.assertSequenceEqual(chan, expect)
 
     def emits_reason(self, reason):
@@ -88,7 +85,8 @@ class _CommonCase(unittest.TestCase):
 
     def build_end_state(self):
         def run(listener):
-            return _collectioner().COLLECTION_VIA_PATH(path, listener, fs)
+            return _collectioner().COLLECTION_VIA_PATH_AND_INJECTIONS(
+                    collection_path=path, filesystem=fs, listener=listener)
         fs = self.given_fake_filesystem()
 
         # rather that memoize the filesystem for every case just for the
@@ -115,7 +113,8 @@ class Case1409_collection_not_found(_CommonCase):
         self.assertIsNotNone(_collectioner())
 
     def test_100_channel(self):
-        self.emits_error_case('no_such_file_or_directory')
+        self.emits_error_category(
+                'collection_not_found', 'no_such_file_or_directory')
 
     def test_200_reason(self):
         self.emits_reason("No such file or directory: 'this-path/is-no-ent'")
@@ -270,7 +269,7 @@ class Case1419_has_schema_that_indicates_SA_but_unknown_SA(_CommonCase):
     def test_200_custom_stuff_for_long_reason(self):
         _reason = self.end_state()['payload']['reason']
         line1, li2 = _reason.split('. ')
-        self.assertEqual(line1, "uknown storage adapter 'xx yy'")
+        self.assertEqual(line1, "unknown storage adapter 'xx yy'")
         self.assertEqual(
                 li2,
                 "known storage adapters: ('storo_adapto_1', 'storo_adapto_2')")
@@ -333,6 +332,7 @@ class Case1422_directory_based_money(_CommonCase):
         es = self.build_end_state()
         assert(es['channel'] is None)
         rv = es['result_value']
+        rv = unwrap_collection(rv)
         ae(rv['message for the test'], 'hello from storage adapter 1')
         ae(rv['also this'], "it's me, this one test")
 
@@ -365,6 +365,7 @@ class Case1423_single_file_based_money(_CommonCase):
 
     def test_200_the_SA_can_result(self):
         _rv = self.end_state()['result_value']
+        _rv = unwrap_collection(_rv)
         self.assertEqual(_rv, (
             "hello from storo adapto 2. you know you want this - abc/xyz.xtc"))
 
@@ -386,6 +387,10 @@ def _collectioner():
     return collectioner_via_storage_adapters_module(
             module_name='kiss_rdb_test.fixture_code._1416_SAs._33_SAs',
             module_directory=_)
+
+
+def unwrap_collection(coll):
+    return coll._impl  # ick/meh
 
 
 same_schema_path = 'abc/xyz/schema.rec'

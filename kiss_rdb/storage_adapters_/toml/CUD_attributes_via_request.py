@@ -16,21 +16,21 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
     problems = []
 
     # --
-    cud = ('create', 'update', 'delete')
+    cud = ('create_attribute', 'update_attribute', 'delete_attribute')
     by_verb = {k: [] for k in cud}
     for cmpo in req.components:
-        by_verb[cmpo.lowercase_verb_string].append(cmpo)
+        by_verb[cmpo.edit_component_key].append(cmpo)
     creates, updates, deletes = (by_verb[verb] for verb in cud)
     has_creates = len(creates)
     has_updates = len(updates)
     has_deletes = len(deletes)
     # --
 
-    if 'create' == C_or_U:
+    if 'create_attribute' == C_or_U:
         created_or_updated = 'created'
         mutate_orig = True
     else:
-        assert('update' == C_or_U)
+        assert('update_attribute' == C_or_U)
         mde = mde.BUILD_MUTABLE_COPY__()  # lose access to orginal here
         created_or_updated = 'updated'
         mutate_orig = False
@@ -476,8 +476,8 @@ def _emit_comment_proximity_problems(problems, listener):
             bc_join.append('it has comment')
 
         _ = en.oxford_join(iter(bc_join), ' and because ')
-
-        _ = (f'cannot {cmpo.lowercase_verb_string} '
+        _verb_lexeme = _verb_lexeme_via_key[cmpo.edit_component_key]
+        _ = (f'cannot {_verb_lexeme} '
              f'{repr(cmpo.attribute_name.name_string)} '
              f'attribute line because {_}')
         sp_a.append(_)
@@ -535,7 +535,7 @@ def __complain_about_presence_problems(problems, C_or_U):
     via_verb = {}
 
     for colli_or_miss, cmpo, blk in problems:
-        verb = cmpo.lowercase_verb_string
+        verb = cmpo.edit_component_key
         if verb in via_verb:
             a = via_verb[verb][1]
         else:
@@ -778,12 +778,19 @@ def _emit_request_error(listener, structurer):  # one of several
 
 
 def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
-    # #todo the below should move out of the SA if we're gonna use it like this
+    # [#867.E] one day abstract this out to a better location
     from kiss_rdb.storage_adapters_.markdown_table import express_edit_
     express_edit_(listener, UCDs, identifier, verb_preterite)
 
 
 # ==
+
+_verb_lexeme_via_key = {
+        'update_attribute': 'update',
+        'create_attribute': 'create',
+        'delete_attribute': 'delete',
+        }
+
 
 def lines_via_big_string_(big_s):  # (copy-paste of [#610].)
     import re

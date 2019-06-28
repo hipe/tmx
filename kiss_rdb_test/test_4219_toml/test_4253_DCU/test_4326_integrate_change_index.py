@@ -5,6 +5,7 @@ from kiss_rdb_test.common_initial_state import (
         )
 from kiss_rdb_test.CUD import (
         run_for,
+        wrap_collection,
         filesystem_recordings_of,
         filesystem_expecting_no_rewrites,
         build_filesystem_expecting_num_file_rewrites,
@@ -105,7 +106,7 @@ class Case4317_identifier_with_invalid_chars(_CommonCase):
         return self.build_common_components_for_failed_delete('AbC')
 
     def subject_collection(self):
-        return _collection_with_NO_filesystem()
+        return _wrapped_collection_with_NO_filesystem()
 
 
 class Case4318_identifier_too_short_or_long(_CommonCase):
@@ -148,7 +149,7 @@ class Case4319_some_top_directory_not_found(_CommonCase):
         return self.build_common_components_for_failed_delete('ABC')
 
     def subject_collection(self):
-        return _collection_with_noent_dir()
+        return wrap_collection(_collection_with_noent_dir())
 
 
 class Case4320_delete_but_file_not_found(_CommonCase):
@@ -236,7 +237,7 @@ class Case4322_entity_not_found(_CommonCase):
 class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
 
     def test_100_emits_error_structure(self):
-        coll = _collection_with_NO_filesystem()
+        coll = _wrapped_collection_with_NO_filesystem()
         run = run_for(coll, 'retrieve', 'B9F')
         _, payloader = _se_lib().one_and_none(self, run)
         sct = payloader()
@@ -355,7 +356,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
         return filesystem_recordings_of(self, 'delete', 'B8H')
 
     def subject_collection(self):
-        return _build_collection_expecting_common_number_of_rewrites()
+        return wrap_collection(_build_collection_expecting_common_number_of_rewrites())
 
 
 # Case4331: delete when index file is left empty! (delete the last entity)
@@ -428,11 +429,10 @@ class Case4332_update_OK(_CommonCase):
         return self._canon_case.build_end_state(self)
 
     def request_tuple_for_update_that_will_succeed(self):
-        # #todo should be delete_attribute etc
         return 'B9H', (
-            ('delete', 'thing-A'),
-            ('update', 'thing-B', "I'm modified \"thing-B\""),
-            ('create', 'thing-2', "I'm created \"thing-2\""))
+            ('delete_attribute', 'thing-A'),
+            ('update_attribute', 'thing-B', "I'm modified \"thing-B\""),
+            ('create_attribute', 'thing-2', "I'm created \"thing-2\""))
 
     def subject_collection(self):
         return _build_collection(
@@ -630,10 +630,10 @@ class Case4338_create_into_noent_file(_CommonCase):
     def subject_collection(self):
         random_number_generator = _random_number_generator_for(512)  # 2J2 but
 
-        return _build_collection(
+        return wrap_collection(_build_collection(
                 dir_path=_dir_path_most_common(),
                 random_number_generator=random_number_generator,
-                filesystem=build_filesystem_expecting_num_file_rewrites(2))
+                filesystem=build_filesystem_expecting_num_file_rewrites(2)))
 
 
 def _last_3_of_path(path):
@@ -653,6 +653,11 @@ def _collection_with_noent_dir():
     return _build_collection(
             dir_path=_dir_path_of_no_ent(),
             filesystem='no filesystem xyz121')
+
+
+@memoize
+def _wrapped_collection_with_NO_filesystem():
+    return wrap_collection(_collection_with_NO_filesystem())
 
 
 @memoize
@@ -704,18 +709,17 @@ def _build_collection_expecting_common_number_of_rewrites():
             filesystem=build_filesystem_expecting_num_file_rewrites(2))
 
 
-def _build_collection(dir_path, filesystem, random_number_generator=None):
+def _build_collection(dir_path, **injections):
     return _subject_module().collection_via_directory_and_schema(
             collection_directory_path=dir_path,
             collection_schema=_always_same_schema(),
-            random_number_generator=random_number_generator,
-            filesystem=filesystem)
+            **injections)
 
 
 @memoize
 def _always_same_schema():
-    from kiss_rdb.storage_adapters_.toml import schema_via_file_lines as _
-    return _._Schema(storage_schema='32x32x32')
+    from kiss_rdb.storage_adapters_.toml.schema_via_file_lines import Schema_
+    return Schema_(storage_schema='32x32x32')
 
 
 def three_components_via_channel_and_payloader(tc, chan, payloader):

@@ -14,7 +14,7 @@ with each next identifier,
 
     take that number,
     take the "number of slots left in the line",
-    if that number is greater:
+    if that number is zero:
         start a new line
     otherwise:
         place the new item in the line and update the "number of slots left .."
@@ -56,7 +56,7 @@ and also the semantics of "indenting" are *negative* depth:
     (like this:)
     +-----------------
     | A
-    |B(C D)
+    |B (C D)
 
 
 or when deeper. at the unlikely depth of four:
@@ -172,15 +172,16 @@ class _CLI:
         del(self._argument)
         # coll_path = self.os_path.abspath(coll_path)
 
+        # resolve collection
+        from kiss_rdb import COLLECTION_VIA_COLLECTION_PATH
+        coll = COLLECTION_VIA_COLLECTION_PATH(coll_path, listener)
+        if coll is None:
+            return
+
         from kiss_rdb.magnetics_ import (
                 index_via_identifiers as index_lib)
 
-        from kiss_rdb.storage_adapters_.toml import (
-                schema_via_file_lines as schema_lib)
-
-        schm = schema_lib.SCHEMA_VIA_COLLECTION_PATH(coll_path, listener)
-        if schm is None:
-            return 3333
+        schm = coll._impl._schema
 
         _pather = schm.build_pather_(coll_path)
 
@@ -220,15 +221,29 @@ class _CLI:
         del(self._arg_stack)
 
     def build_listener(self):
+        # build a "error case expressor" (listener) that is similar in spirit
+        # to our real CLI but worse in several observed ways. We don't want to
+        # depend on the CLI because that defeats the purpose of a quarantined
+        # one-off, but #wish [#873.A] is to abstract it to be more accessible
+
         def listener(*args):
-            mood, shape, typ, payloader = args
+            mood, shape, typ, *rest, payloader = args
+            error_case = (None, rest[0])[len(rest)]
             if 'expression' == shape:
                 for line in payloader():
                     self.stderr.write(f'{line}\n')
             elif 'structure' == shape:
-                _line = payloader()['reason']
+                _line = self.__line_via_these_REDUNDANT(
+                        typ, error_case, payloader().get('reason', None))
                 self.stderr.write(f'{_line}\n')
         return listener
+
+    def __line_via_these_REDUNDANT(self, error_category, error_case, reason):
+        _ = (error_category, error_case)
+        _ = [None if s is None else s.replace('_', ' ') for s in _]
+        _.append(reason)
+        _ = tuple(s for s in _ if s is not None)
+        return ': '.join(_)
 
     def express_usage_and_invite(self):
         self.express_usage()

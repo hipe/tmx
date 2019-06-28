@@ -120,7 +120,7 @@ def _build_empty_collection():
 def _build_collection_via_path_and_big_string(path, big_string):
     pfile = pretend_file_via_path_and_big_string(path, big_string)
     from kiss_rdb.storage_adapters_ import markdown_table as lib
-    return lib.resolve_collection_via_file(pfile, pfile.path, None)
+    return lib._resolve_collection_via_file(pfile, pfile.path, None)
 
 
 if __name__ == '__main__':

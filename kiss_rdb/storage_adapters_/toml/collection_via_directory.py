@@ -10,41 +10,6 @@ several different *separate* responsibilities:
 """
 
 
-class INJECTIONS:
-    """for several reasons, certain facilities are injected as dependencies.
-
-    not every operation uses every facility. if you know before you build
-    the collection that you will be doing only certain operation(s), you can
-    avoid some unnecessary coupling and overhead.. #[#867.U]
-    """
-
-    def __init__(
-            self,
-            random_number_generator,
-            filesystemer):
-
-        o = {}
-
-        def fs():
-            nonlocal filesystemer
-            res = filesystemer()
-            del(filesystemer)
-            return res
-        o['filesystem'] = fs
-
-        def rng():
-            nonlocal random_number_generator
-            res = random_number_generator
-            del(random_number_generator)
-            return res
-        o['random_number_generator'] = rng
-
-        def release(names):
-            return {k: o[k]() for k in names}
-
-        self.RELEASE_THESE = release
-
-
 class collection_via_directory_and_schema:
 
     def __init__(
@@ -63,40 +28,16 @@ class collection_via_directory_and_schema:
 
         self._schema = collection_schema
 
-    def update_entity(self, id_s, cuds, listener):
-        # #todo this interface will move up to the façade
-        tup = self._ID_and_path_that_must_already_exist(id_s, listener)
-        if tup is None:
-            return
-        iden, path = tup
-        return self._temporary_bridge_for_update(path, iden, cuds, listener)
-
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
-        # #todo when we integrate adapters with a UI, we will need to
-        # change `update` to `update_attribute` and the other 2 #here7
 
         path = self._path_that_must_already_exist_for(iden, listener, 'update')
         if path is None:
             return
-        return self._temporary_bridge_for_update(path, iden, tup, listener)
-
-    def _temporary_bridge_for_update(self, path, iden, tup, listener):
 
         with self._open_locked_mutable_entities_file(path) as lmef:
-            two = _update_entity(lmef, iden, tup, self, listener)
-
-        return two
+            return _update_entity(lmef, iden, tup, self, listener)
 
     # == BEGIN create and delete are more complicated
-
-    def delete_entity(self, id_s, listener):
-        # #todo this will move up & out
-
-        iden = _identifier_via_string(id_s, listener)
-        if not iden:
-            return
-
-        return self.delete_entity_as_storage_adapter_collection(iden, listener)
 
     def delete_entity_as_storage_adapter_collection(self, iden, listener):
 
@@ -150,7 +91,7 @@ class collection_via_directory_and_schema:
         # internally we want to use our "prepare & flush edit" pattern which
         # is fine, but we have to upgrade the dict into:
 
-        cuds = tuple(('create', k, v) for k, v in dct.items())  # #here7
+        cuds = tuple(('create_attribute', k, v) for k, v in dct.items())
 
         cuds_request = _request_via_cuds(cuds, listener)
         if cuds_request is None:
@@ -247,9 +188,6 @@ class collection_via_directory_and_schema:
 
         return res
 
-    create_entity = create_entity_as_storage_adapter_collection
-    # #todo this is the façade version. for CREATE it's pass-thru
-
     # == END
 
     def __CREATE_DIRECTORIES(self, parent_dir):
@@ -268,7 +206,7 @@ class collection_via_directory_and_schema:
         else:
             cover_me('eek you want mkdir -p')
 
-    def retrieve_entity(self, id_s, listener):
+    def retrieve_entity_as_storage_adapter_collection(self, iden, listener):
         """NOTICE
 
         to retrieve one entity; this opens a file, reads some or all of the
@@ -277,44 +215,10 @@ class collection_via_directory_and_schema:
         in one invocation.. :#here2
         """
 
-        iden = _identifier_via_string(id_s, listener)
-        if iden is None:
-            return
-
-        de = self.retrieve_entity_as_storage_adapter_collection(iden, listener)
-        if de is None:
-            return  # (Case4130)
-
-        # (Case4292):
-
-        assert(de.table_type == 'attributes')
-        assert(de.identifier_string == id_s)
-
-        # below became a call at #history-A.2
-
-        return de.to_dictionary_two_deep_as_storage_adapter_entity()
-
-    def retrieve_entity_as_storage_adapter_collection(self, iden, listener):
-        # NOTE - after the cool thing, make sure to use the above comment
-
         path = self._path_that_must_already_exist_for(iden, listener)
         if path is None:
             return
         return _retrieve_entity(iden, path, listener)
-
-    def _ID_and_path_that_must_already_exist(self, id_s, listener):
-        # #todo this goes away after injecton becasue SA collections
-        # won't decode argument identifiers soon..
-
-        iden = _identifier_via_string(id_s, listener)
-        if iden is None:
-            return
-
-        path = self._path_that_must_already_exist_for(iden, listener)
-        if path is None:
-            return
-
-        return iden, path
 
     def _path_that_must_already_exist_for(self, iden, listener, verb=None):
 
@@ -564,12 +468,6 @@ def _retrieve_entity(identifier, file_path, listener):
 
     with open(file_path) as lines:  # file existed last we checked #here1
         return DE_via(_id_s, lines, listener)
-
-
-def _identifier_via_string(identifier_string, listener):
-    from kiss_rdb.magnetics_.identifier_via_string import (
-        identifier_via_string_)
-    return identifier_via_string_(identifier_string, listener)
 
 
 """
