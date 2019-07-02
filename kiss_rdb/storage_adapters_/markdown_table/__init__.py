@@ -185,6 +185,7 @@ class _MutableFreezableCollection:
         self._is_mutable = True
         self._entity_lines = lines
         self._schema = schema
+        self._grammar = _stateful_grammar_via(schema)
 
     def _update_(self, identi, tup, listener):
         """because we store every table line in memory anyway (the two-pass
@@ -196,7 +197,8 @@ class _MutableFreezableCollection:
         """
 
         lines = iter(self._entity_lines)
-        new_lines, future = _update(lines, identi, tup, self._schema, listener)
+        new_lines, future = _update(
+                lines, identi, tup, self._schema, self._grammar, listener)
         new_lines_tup = tuple(new_lines)  # before below
         two = future()  # after above
         if two is None:
@@ -209,7 +211,8 @@ class _MutableFreezableCollection:
     def _create_(self, dct, listener):
 
         lines = iter(self._entity_lines)
-        new_lines, future = _create(lines, dct, self._schema, listener)
+        new_lines, future = _create(
+                lines, dct, self._schema, self._grammar, listener)
         new_lines_tup = tuple(new_lines)  # before below
         new_ent = future()  # after above
         if new_ent is None:
@@ -221,7 +224,8 @@ class _MutableFreezableCollection:
     def _delete_(self, identi, listener):
 
         lines = iter(self._entity_lines)
-        new_lines, future = _delete(lines, identi, self._schema, listener)
+        new_lines, future = _delete(
+                lines, identi, self._schema, self._grammar, listener)
         new_lines_tup = tuple(new_lines)  # before below
         deleted_ent = future()  # after above
         if deleted_ent is None:
@@ -230,14 +234,15 @@ class _MutableFreezableCollection:
         return deleted_ent
 
     def _retrieve_(self, iden, listener):
-        return _retrieve(self._entity_lines, iden, self._schema, listener)
+        return _retrieve(self._entity_lines, iden, self._schema,
+                         self._grammar, listener)
 
     def _traverse_IDs_(self, listener):
-        return _IDs_via_lines(self._entity_lines, listener)
+        return _IDs_via_lines(self._entity_lines, self._grammar, listener)
 
     def _traverse_entities_(self, listener):
         return _entities_via_lines_and_schema(
-                self._entity_lines, self._schema, listener)
+                self._entity_lines, self._schema, self._grammar, listener)
 
     def _on_new_entity_lines(self, lines):
         assert(self._is_mutable)
@@ -248,8 +253,8 @@ class _MutableFreezableCollection:
         self._is_mutable = False
 
 
-def _update(lines, iden, tup, schema, listener):
-    asts_via_line = _ASTs_via_line_via_listener(listener, schema)
+def _update(lines, iden, tup, schema, g, listener):
+    asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
 
     def future_then_new_lines():
         """.#here2 is a hack-or-pattern (used 3x in this file) which allows us
@@ -311,7 +316,7 @@ def _update(lines, iden, tup, schema, listener):
     return itr, next(itr)  # use the hack
 
 
-def _create(lines, dct, schema, listener):
+def _create(lines, dct, schema, g, listener):
     """Create and insert the entity in an appropriate place in the table.
 
     If the table is empty (has no body lines (entities)), chose integer 1
@@ -349,7 +354,7 @@ def _create(lines, dct, schema, listener):
     passing through every existing line.
     """
 
-    asts_via_line = _ASTs_via_line_via_listener(listener)
+    asts_via_line = g.ASTs_via_line_via_listener(listener)
 
     codec = _memoized.identifier_codec
     iden_via_s = codec.identifier_via_string
@@ -451,9 +456,9 @@ def _create(lines, dct, schema, listener):
     return itr, next(itr)
 
 
-def _delete(lines, iden, schema, listener):
+def _delete(lines, iden, schema, g, listener):
 
-    asts_via_line = _ASTs_via_line_via_listener(listener, schema)
+    asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
 
     def future_then_new_lines():
 
@@ -668,10 +673,10 @@ def _prepare_edit(ent, tups, schema, create_or_update, listener):
     return updates, creates, deletes
 
 
-def _retrieve(lines, identi, schema, listener):
+def _retrieve(lines, identi, schema, g, listener):
     if _max_depth < len(identi.native_digits):
         return __whine_about_identifier_depth(listener, identi)
-    asts_via_line = _ASTs_via_line_via_listener(listener, schema)
+    asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
     found = False
     count = 0
     for line in lines:
@@ -686,19 +691,27 @@ def _retrieve(lines, identi, schema, listener):
     return _entity_from_these_two(curr_ID_cel, asts)
 
 
-def _IDs_via_lines(lines, listener):
-    asts_via_line = _ASTs_via_line_via_listener(listener)
+def _IDs_via_lines(lines, g, listener):
+    asts_via_line = g.ASTs_via_line_via_listener(listener)
     for line in lines:
         asts = asts_via_line(line)  # hi.
-        ast = next(asts)  # hi.
+
+        failed = True
+        for ast in asts:  # #once
+            failed = False
+            break
+
+        if failed:
+            return
+
         iden = ast.identifier_in_first_cel
         if iden is None:
             break
         yield iden
 
 
-def _entities_via_lines_and_schema(lines, schema, listener):
-    asts_via_line = _ASTs_via_line_via_listener(listener, schema)
+def _entities_via_lines_and_schema(lines, schema, g, listener):
+    asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
     for line in lines:
         identi_cel, *attr_cels, has_t = asts_via_line(line)  # ..
         yield _RowAsEntity(identi_cel, tuple(attr_cels), has_t)
@@ -710,7 +723,7 @@ def _entity_from_these_two(identi_cel, asts):
     return _RowAsEntity(identi_cel, tuple(asts), _has_trailing_pipe)
 
 
-def _ASTs_via_line_via_listener(listener, schema=None):
+def _stateful_grammar_via(schema):
 
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
             Scanner,
@@ -734,23 +747,10 @@ def _ASTs_via_line_via_listener(listener, schema=None):
 
     eos = o('end of line', r'\n')  # ..
 
-    def throwing_listener(*args):
-        listener(*args)
-        raise _Stop
+    peek_open_bracket = o('open square bracket', r'(?=\[)')
 
-    def asts_via_line(line):
-        try:
-            for tup in asts_via_line_inner(line):
-                yield tup
-        except _Stop:
-            pass
-
-    identi_via_s = _memoized.identifier_codec.identifier_via_string
-
-    def asts_via_line_inner(line):
+    def asts_via_scanner(scn):
         # implement exactly this [#873] state machine illustration (see)
-
-        scn = Scanner(line, throwing_listener)
 
         def skip_any_whitespace():
             w = scn.skip(whitespace)
@@ -766,8 +766,7 @@ def _ASTs_via_line_via_listener(listener, schema=None):
 
         w_left = skip_any_whitespace()
 
-        s = scn.scan_required(some_non_empty_cel_content)
-        identi = identi_via_s(s, listener)
+        identi = grammar.parse_identifier(scn)
 
         w_right = skip_any_whitespace()
 
@@ -818,7 +817,46 @@ def _ASTs_via_line_via_listener(listener, schema=None):
         assert(scn.eos())
         yield _HasTrailingPipeYesNo(has_trailing_pipe)
 
-    return asts_via_line
+    class Grammar:
+
+        def __init__(self):
+            self._parse_identifier = parse_identifier_the_first_time
+
+        def ASTs_via_line_via_listener(self, listener, schema=None):
+            def asts_via_line(line):
+                def throwing_listener(*args):
+                    listener(*args)
+                    raise _Stop
+                scn = Scanner(line, throwing_listener)
+                try:
+                    for tup in asts_via_scanner(scn):
+                        yield tup
+                except _Stop:
+                    pass
+            return asts_via_line
+
+        def parse_identifier(self, scn):
+            return self._parse_identifier(scn)
+
+    def parse_identifier_the_first_time(scn):
+        _d = scn.skip(peek_open_bracket)
+        if _d is None:
+            use = parse_identifier_normally
+        else:
+            from .issue_identifier_ import build_parser
+            use = build_parser()
+        grammar._parse_identifier = use  # STATE CHANGE
+        return grammar._parse_identifier(scn)
+
+    def parse_identifier_normally(scn):
+        s = scn.scan_required(some_non_empty_cel_content)
+        return identi_via_s(s, scn.listener)
+
+    identi_via_s = _memoized.identifier_codec.identifier_via_string
+
+    grammar = Grammar()
+
+    return grammar
 
 
 # == RESOLVING THE CACHED LINES FROM A FILE

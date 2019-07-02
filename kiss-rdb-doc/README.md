@@ -26,13 +26,13 @@ woah boy.
 
 ## (the identifier registry)
 
-|Id                         | Main Tag | Content
-|---------------------------|:-----:|---
+|Id                         | Main Tag | Content |
+|---------------------------|:-----:|---|
 |[#880-899]                 |       | narrow allocation for "pho" for now
 |[#873.B]                   | #wish | this one smell in emissions
 |[#873.A]                   | #wish | make CLI error case expression more abstracted
 |[#873]                     |       | internal tracking (extended)
-|[#872.02                   |       | external tracking: new lazy implementation
+|[#872.02]                  |       | external tracking: new lazy implementation
 |[#872]                     |       | multi-line strings: the document
 |[#871]                     |       | this one thing (see inline)
 |[#870]                     |       | "backend roadmap again"

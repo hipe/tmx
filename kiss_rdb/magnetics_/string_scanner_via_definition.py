@@ -77,6 +77,10 @@ class Scanner:
     def pos(self):
         return self._position
 
+    @property
+    def listener(self):
+        return self._listener
+
     # ==
 
     def _required(self, pattern):

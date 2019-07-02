@@ -239,19 +239,27 @@ def __lines_for_context_for_parse_error(dim_pool):
 
     # this will fail eventually, not all PE's provide all these (right?)
     o = dim_pool.pop
-    path = o('path')
+    path = o('path', None)
     line = o('line')
-    lineno = o('lineno')
+    lineno = o('lineno', None)
     position = o('position')
     # --
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
             two_lines_of_ascii_art_via_position_and_line__)
     _2 = tuple(two_lines_of_ascii_art_via_position_and_line__(position, line))
-    num_as_s = str(lineno)
-    _spacer = ' ' * len(num_as_s)
-    yield f"in {path}"
-    yield f'  {num_as_s}:{_2[0]}'
-    yield f'  {_spacer} {_2[1]}'
+
+    if lineno is None:
+        num_as_s = ' '
+        spacer = ''
+    else:
+        num_as_s = f'{lineno}:'
+        spacer = ' ' * len(num_as_s)
+
+    if path is not None:
+        yield f"in {path}"
+
+    yield f'  {num_as_s}{_2[0]}'
+    yield f'  {spacer} {_2[1]}'
 
 
 # mishmash
