@@ -288,6 +288,8 @@ class _AppendableHeadBlock:
     def to_line_stream(self):
         return self._head_block_lines  # while it works
 
+    hello_head_block__ = True  # [#008.D]
+
 
 _empty_head_block = _AppendableHeadBlock(())
 
@@ -327,6 +329,11 @@ class _AppendableTableBlock:
     @property
     def identifier(self):
         return self._table_start_line_object.identifier_for_storage_adapter()
+
+    @property
+    def core_attributes_dictionary_as_storage_adapter_entity(self):
+        _ = self.to_dictionary_two_deep_as_storage_adapter_entity()
+        return _['core_attributes']
 
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
         from .entity_via_identifier_and_file_lines import (

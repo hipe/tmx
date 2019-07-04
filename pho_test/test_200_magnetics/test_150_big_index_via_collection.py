@@ -211,7 +211,7 @@ def _big_index_one():
 @memoize
 def _collection_one():
     _dir = fixture_directory('collection-00500-intro')
-    return kiss_rdber().COLLECTION_VIA_DIRECTORY(_dir)
+    return kiss_rdber().COLLECTION_VIA_COLLECTION_PATH(_dir)
 
 
 if __name__ == '__main__':

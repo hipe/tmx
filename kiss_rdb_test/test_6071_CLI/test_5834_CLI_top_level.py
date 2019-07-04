@@ -19,7 +19,7 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
         # #here1
         import re
         _line = self.command_help_screen().usage_line
-        md = re.match(r'^Usage: ohai-mami ([a-z]+) \[OPTIONS\] (.+)$', _line)
+        md = re.match(r'^Usage: ohai-mami ([-a-z]+) \[OPTIONS\] (.+)$', _line)
         first, *actual_these = md[2].split(' ')
 
         # every one of these commands requires the collection (name)
@@ -561,18 +561,17 @@ class Case6226_update(_CommonCase):
 class Case6242_search_help(_CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
-        self.expect_requires_these_particular_arguments()
+        self.expect_requires_these_particular_arguments('[QUERY]...')
 
     def test_200_expect_this_string_in_first_line_of_description(self):
-        self.expect_this_string_in_first_line_of_description(
-                'WARNING may merge with select')
+        self.expect_this_string_in_first_line_of_description('EXPERIMENTAL')
 
     @shared_subject
     def command_help_screen(self):
         return self.build_command_help_screen_subtree()
 
     def given_args(self):
-        return ('search', '--help')
+        return ('filter-by-tags', '--help')
 
 
 @memoize

@@ -116,6 +116,11 @@ class _MutableDocumentEntity:
     def identifier(self):
         return self._table_start_line_object.identifier_for_storage_adapter()
 
+    @property
+    def core_attributes_dictionary_as_storage_adapter_entity(self):
+        _ = self.to_dictionary_two_deep_as_storage_adapter_entity()
+        return _['core_attributes']
+
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
         from .entity_via_identifier_and_file_lines import (
                 dictionary_two_deep_via_entity_line_stream_)
@@ -138,6 +143,7 @@ class _MutableDocumentEntity:
         if gist in self._IID_via_gist:
             return self._LL.item_via_IID(self._IID_via_gist[gist])
 
+    @property
     def identifier_string(self):
         # (note this does not derive from identifier. the other way around)
         return self._table_start_line_object.identifier_string

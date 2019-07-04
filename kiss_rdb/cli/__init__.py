@@ -224,14 +224,14 @@ def create(ctx, collection, value):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if col is None:
+    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    if coll is None:
         return mon.some_error_code()
     # end
 
     _cuds = {name_s: val_s for name_s, val_s in value}  # ..
 
-    doc_ent = col.create_entity(_cuds, listener)
+    doc_ent = coll.create_entity(_cuds, listener)
 
     # exact same thing as 2 others #here3
 
@@ -245,7 +245,7 @@ def create(ctx, collection, value):
     for line in doc_ent.to_line_stream():
         sout.write(line)
 
-    return _success_exit_code
+    return success_exit_code_
 
 
 @cli.command()
@@ -275,8 +275,8 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if col is None:
+    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    if coll is None:
         return mon.some_error_code()
     # end
 
@@ -288,7 +288,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     for n in delete:
         cuds.append(('delete_attribute', n))
 
-    before_after = col.update_entity(internal_identifier, cuds, listener)
+    before_after = coll.update_entity(internal_identifier, cuds, listener)
 
     # exact same thing as 2 others #here3:
 
@@ -304,7 +304,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     for line in after_ent.to_line_stream():
         sout.write(line)
 
-    return _success_exit_code
+    return success_exit_code_
 
 
 @cli.command()
@@ -328,25 +328,21 @@ def get(ctx, collection, internal_identifier):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if col is None:
+    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    if coll is None:
         return mon.some_error_code()
     # end
 
-    dct = col.retrieve_entity(internal_identifier, listener)
+    dct = coll.retrieve_entity(internal_identifier, listener)
     if dct is None:
         return mon.max_errno or 404  # (Case6064)  ##here1
 
-    # (Case6080):
-    # don't get overly attached to the use of JSON here.
-    # it's done out of the convenience of implementation here..
+    fp = click.utils._default_text_stdout()
+    _dump = dict_dumper_via_output_stream_(fp)
+    _dump(dct)
+    fp.write('\n')
 
-    import json
-    fp = click.utils._default_text_stdout()  # oh my
-    json.dump(dct, fp=fp, indent=2)
-    fp.write('\n')  # (the above doesn't)
-
-    return _success_exit_code
+    return success_exit_code_
 
 
 @cli.command()
@@ -364,12 +360,12 @@ def delete(ctx, collection, internal_identifier):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if col is None:
+    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    if coll is None:
         return mon.some_error_code()
     # end
 
-    doc_ent = col.delete_entity(internal_identifier, listener)
+    doc_ent = coll.delete_entity(internal_identifier, listener)
 
     # exact same thing as 2 others #here3:
 
@@ -384,7 +380,7 @@ def delete(ctx, collection, internal_identifier):
     for line in doc_ent.to_line_stream():
         sout.write(line)
 
-    return _success_exit_code
+    return success_exit_code_
 
 
 @cli.command()
@@ -405,12 +401,12 @@ def traverse(ctx, collection):
     mon = cf.build_monitor()
     listener = mon.listener
     _inj = cf.release_these_injections('filesystem')
-    col = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if col is None:
+    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    if coll is None:
         return mon.some_error_code()
     # end
 
-    _iids = col.to_identifier_stream(listener)
+    _iids = coll.to_identifier_stream(listener)
 
     echo = click.echo
     for iid in _iids:
@@ -420,7 +416,7 @@ def traverse(ctx, collection):
     if len(mon.error_categories_box.set):
         return mon.some_error_code()
     else:
-        return _success_exit_code
+        return success_exit_code_
 
 
 @cli.command()
@@ -432,13 +428,38 @@ def select():
     click.echo('#open [#867.M] select')
 
 
-@cli.command()
+def _filter_by_tags():
+    from . import filter_by_tags_
+    return filter_by_tags_
+
+
+@cli.command(short_help='reduce entity collection by tags')
 @click.argument('collection')
-def search():
-    """WARNING may merge with select
+@click.argument('query', nargs=-1)
+@click.pass_context
+@require_hub
+def filter_by_tags(ctx, collection, query):
+    """EXPERIMENTAL. example: \\( "#open" and not "#cosmetic" \\) or "#critical"
+    unfortunately you will have to follow the code to find the documentaton
+    because there's no easy way for us to blit all of it here and there's a lot
     """
 
-    click.echo('#open [#867.M] search')
+    return _filter_by_tags().filter_by_tags(ctx, collection, query)
+
+
+def dict_dumper_via_output_stream_(fp):  # (Case6080)
+    """JSON is chosen as a convenience for us not you. Don't get too attached
+
+    because we might switch this default dumping format to something else.
+    NOTE ths does *not* output a trailing newline.
+
+    Everywhere this is used is near our "oneline" #wish [#873.C].
+    """
+
+    def dump(dct):
+        json.dump(dct, fp=fp, indent=2)
+    import json
+    return dump
 
 
 # ==
@@ -543,7 +564,7 @@ def cover_me(msg=None):
 
 
 _failure_exit_code_bad_request = 400  # Bad Request lol ##here1
-_success_exit_code = 0
+success_exit_code_ = 0
 
 
 # #history-A.2 as referenced

@@ -62,7 +62,7 @@ class SYNC_RESPONSE_VIA_TWO_FUNCTIONS:
         if dct is None:
             # for example when you need tag lyfe field names
             # (same *type* of thing as #here4 above)
-            return None  # #coverpointTL.1.5.1.1
+            return None  # (may have lost coverage at [#707.J])
         else:
             return _TraversalParameters(**dct)
 

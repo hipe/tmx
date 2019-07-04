@@ -48,7 +48,7 @@ def complicated_join(left, sep, right, itr, max_width, string_via_item):
         traversal comes out to a width that is at or less than maxwidth
         minus ~2, ok.
 
-    (#coverpointTL.1.5.1.1)
+    (may have lost coverage at [#707.J])
     (#[#007.2] wish for doctest)
     """
 

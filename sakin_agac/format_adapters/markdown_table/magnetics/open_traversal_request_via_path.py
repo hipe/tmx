@@ -210,7 +210,9 @@ def __tag_lyfe_field_names_hack(dct, intention, listener):
         sanity()
 
 
-def __whine_about_no_whatever(dct, listener):  # #coverpointTL.1.5.1.1
+def __whine_about_no_whatever(dct, listener):
+
+    # (may have lost coverage at [#707.J])
 
     import script_lib.magnetics.ellipsified_string_via as _
     ellipsis_join = _.complicated_join
@@ -239,7 +241,7 @@ def __main_stepper(next_doc_line_item, field_names, eto):
         result = None
         pair = next_doc_line_item()
         if pair is None:
-            # #coverpointTL.1.5.1.2:
+            # (may have lost coverage at [#707.J])
             # table was last thing in file and that's OK
             close_mutex()
         else:

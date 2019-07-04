@@ -1,3 +1,4 @@
-"storage schema" = "32x32x32"
+storage_adapter: toml
+storage_schema: 32x32x32
 
 # #born.

@@ -1,18 +1,24 @@
 # just messing around
 
 
-def build_parser():
+def build_parser(but_wrong):
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
             pattern_via_description_and_regex_string as o)
 
-    these_two = o('square bracket and octothorpe', r'\[#')
-    body = o('identifier body', r'[^\]]+')
-    square_close = o('closing square bracket', r'\]')
+    if but_wrong:
+        # this is a super big hack to accomodate the wrong format in "tag-lyfe"
+        head = o('hashtag', r'(?:\[\\\[)?#')
+        body = o('identifier body', r'[^ |\\\]]+')  # pessimistic-is
+        tail = o('maybe this one thing', r'(?:\\\]\])?')
+    else:
+        head = o('square bracket and octothorpe', r'\[#')
+        body = o('identifier body', r'[^\]]+')  # optimistic
+        tail = o('closing square bracket', r'\]')
 
     def parse(scn):
-        scn.skip_required(these_two)
+        scn.skip_required(head)
         content = scn.scan_required(body)
-        scn.skip_required(square_close)
+        scn.skip_required(tail)
         one_or_two = content.split('-', 1)
         ids = tuple(parse_identifier(s) for s in one_or_two)
         if 2 == len(ids):

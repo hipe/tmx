@@ -711,9 +711,58 @@ def _IDs_via_lines(lines, g, listener):
 
 
 def _entities_via_lines_and_schema(lines, schema, g, listener):
-    asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
+
+    class _ListenForErrors:
+
+        def __init__(self):
+            self.is_first = True
+
+        def __call__(self, *a):
+
+            # pass thru all non-errors as-is
+            if 'error' != a[0]:
+                return listener(*a)
+
+            # pass thru all errors as-is that did not happen on the first row
+            if not self.is_first:
+                self.do_ignore = False
+                return listener(*a)
+
+            # experimentally we're gonna alow one error on the first row
+            self.do_ignore = True
+            _this_crazy(a)
+
+    def _this_crazy(a):
+        severity, *middle, payloader = a
+        sct = payloader()
+        if 'reason' in sct:
+            pop_me = 'reason'
+            reason = sct[pop_me]
+        else:
+            pop_me = 'expecting'
+            reason = f'expecting {sct[pop_me]}'
+
+        def payloader():
+            dct = {k: v for k, v in sct.items()}
+            dct.pop(pop_me)
+            dct['message'] = ("ignoring issues like this on the first row "
+                              f"for now: {reason}")
+            return dct
+        listener('info', *middle, payloader)
+
+    my_listener = _ListenForErrors()
+
+    asts_via_line = g.ASTs_via_line_via_listener(my_listener, schema)
+
     for line in lines:
-        identi_cel, *attr_cels, has_t = asts_via_line(line)  # ..
+        tup = tuple(asts_via_line(line))
+        my_listener.is_first = False
+        if len(tup) < 2:
+            if my_listener.do_ignore:
+                continue
+            else:
+                return
+        identi_cel, *attr_cels, has_t = tup
         yield _RowAsEntity(identi_cel, tuple(attr_cels), has_t)
 
 
@@ -748,6 +797,8 @@ def _stateful_grammar_via(schema):
     eos = o('end of line', r'\n')  # ..
 
     peek_open_bracket = o('open square bracket', r'(?=\[)')
+
+    peek_octothorpe = o('octothorpe', '(?=#)')
 
     def asts_via_scanner(scn):
         # implement exactly this [#873] state machine illustration (see)
@@ -820,7 +871,7 @@ def _stateful_grammar_via(schema):
     class Grammar:
 
         def __init__(self):
-            self._parse_identifier = parse_identifier_the_first_time
+            self._parse_identifier = self._parse_identifier_initially
 
         def ASTs_via_line_via_listener(self, listener, schema=None):
             def asts_via_line(line):
@@ -838,19 +889,42 @@ def _stateful_grammar_via(schema):
         def parse_identifier(self, scn):
             return self._parse_identifier(scn)
 
-    def parse_identifier_the_first_time(scn):
-        _d = scn.skip(peek_open_bracket)
-        if _d is None:
-            use = parse_identifier_normally
-        else:
-            from .issue_identifier_ import build_parser
-            use = build_parser()
-        grammar._parse_identifier = use  # STATE CHANGE
-        return grammar._parse_identifier(scn)
+        def _parse_identifier_initially(self, scn):
+            # experimental hack to support alternative format of identifier:
+            # on the first line, peek the first character and use that to
+            # determine which parser to use.
 
-    def parse_identifier_normally(scn):
-        s = scn.scan_required(some_non_empty_cel_content)
-        return identi_via_s(s, scn.listener)
+            use = self.__which_parser_for(scn)
+
+            o = use(scn)
+            assert(o)  # otherwise, would have raised a _Stop, right?
+
+            # (chagne state only if we found the right parser)
+            self._parse_identifier = use  # STATE CHANGE
+            return o
+
+        def __which_parser_for(self, scn):
+
+            _d = scn.skip(peek_open_bracket)
+            if _d is not None:
+                return self._parser_for_issue_identifiers(but_wrong=False)
+
+            _d = scn.skip(peek_octothorpe)
+            if _d is not None:
+                return self._parser_for_issue_identifiers(but_wrong=True)
+
+            return self._parse_identifier_conventionally
+
+        def _parse_identifier_conventionally(self, scn):
+            s = scn.scan_required(some_non_empty_cel_content)
+            return identi_via_s(s, scn.listener)
+
+        def _parser_for_issue_identifiers(self, but_wrong):
+            attr = '_this_one_parser' if but_wrong else '_this_other_parser'
+            if not hasattr(self, attr):
+                from .issue_identifier_ import build_parser
+                setattr(self, attr, build_parser(but_wrong))
+            return getattr(self, attr)
 
     identi_via_s = _memoized.identifier_codec.identifier_via_string
 
@@ -980,9 +1054,13 @@ class _RowAsEntity:
         yield '\n'  # ..
 
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
-        return {'core_attributes': self._to_yes_value_dict()}
+        _ = self.core_attributes_dictionary_as_storage_adapter_entity
+        return {
+                'identifier': self.identifier_string,
+                'core_attributes': _}
 
-    def _to_yes_value_dict(self):
+    @property
+    def core_attributes_dictionary_as_storage_adapter_entity(self):
         return {k: v for k, v in self.__to_key_and_non_empty_value_pairs()}
 
     def __to_key_and_non_empty_value_pairs(self):
@@ -991,6 +1069,10 @@ class _RowAsEntity:
             if '' == s:
                 continue
             yield cel.field_name, cel.DECODE_HACKISHLY()
+
+    @property
+    def identifier_string(self):
+        return self.identifier.to_string()
 
     @property
     def identifier(self):

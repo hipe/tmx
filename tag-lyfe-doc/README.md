@@ -2,25 +2,54 @@
 
 ## objective & scope
 
-  - à la twitter, imagine a collection that is marked up with "ordinary" tags:
+"Tag-lyfe" is a small specification and implementation of a tagging language
+and query language. Collections that participate in the tagging language can
+be seached using the query language (and associated functions provided here).
 
-    1. `tweet one - #metoo #basta`
-    1. `what a great game #fifa2018`
-    1. `rose mcgowan #metoo autobiagraphy 😭✊ #fierce`
+The tag-lyfe tag specification is designed to look familiar to people familiar
+with the "hashtag" convention of social media platforms like Twitter and
+Instagram (where tags start with an "octothorpe" `#`), but we extend this
+convention a bit:
 
-  - we can search for all items that have one particular tag, but also
-    we can make more complicated boolean queries based on the taggings.
-    a minimal example is in the [next section](#status).
-
-(oblique snippet that will be moved to somewhere like `filter_by_tags.py`:
-this is for making informed decisions, and then later being able to
-justifying how you made those deicisions in a straightforward, reproducible,
-machine-readble way.)
+* Our tag names can be any combination of upper or lowercase letters, numbers
+  and underscores; but can also use a dash `#like-this`. (If the desire were
+  there, we would formally add support for multi-byte (unicode) tag names but
+  at present this is undefined.)
+* Search for entities that are tagged with the tag by using a query composed
+  of just the tag as-is. For example, the query `#tbt` would find entities
+  tagged with that exact tag (but not `#tbt2019`, for example). (Case-
+  sensitivity is discussed below.)
+* One way we extend the familiar convention significantly is that our
+  "taggings" can represent some name value pairs like this: `#priority:urgent`.
+  (We call these "deep taggings".)
+* Such name-value-looking "taggings" can be nested arbitrarily deeply:
+  `#priority:urgent:right-now`.
+* In your query you can express a boolean "AND-group" or "OR-group" from a list
+  of taggings with `and` or `or`: `#tbt and #2019`, `#cats or #dogs or #reptiles`.
+* You can (and sometimes must) use parenthesis to make groupings clear:
+  `#red or #blue or ( #pink and #brown )`. (Unlike most programming languages,
+  we do *not* assign different precedence to those two operators, because we
+  find that arbitrary, non-obvious and hard to remember.)
+* Negate with `not`: `#red and not #blue`.
+* Combine "deep taggings" with boolean conjuction: `#code:red or #code:pink`
+* The `in` operator provides a shorthand for the above:
+  `#code in ( red pink )`.
+* You can search your deep tagging "value" with a regular expression:
+  `#full-name in /^Kim Jong-/`.
+* Search for integer values in a range: `#age in 33..44`. (Experimental,
+  not very useful because no `∞` yet.)
+* Find tags with a certain name that do *not* have a value:
+ `#age without value` and tags that *do*: `#urgent with value`.
 
 
 
 
 ## <a name=status></a>status
+
+This currently works and is useful. At #history-A.1 we moved its integration
+from [\[#400\]] "sakin-agac" to [\[#851\]] "kiss-rdb".
+
+
 
 this subproject currently works and is useful. combined with the power of
 [\[#400\]] sakin-agac, this thing can take collections of items we're
@@ -63,6 +92,7 @@ consumed by arbitrary other processes.
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.J  |       | maybe lost coverage/created appendates at #history-A.1
 |                   #707.I  | #open | #refactor: queries and tagging should use same grammar (for tagging)
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics
@@ -72,7 +102,6 @@ consumed by arbitrary other processes.
 |                   #707.C  | #trak | when we formalize allowable tag names
 |                   #707.B  |       | for now no 'tag subtree' class
 |                   #707    |       | (internal tracking)
-|                   #706    | #trak | #central-conceit: queries then other arguments in ARGV ([#706.B] is note)
 |                   #705    |       | the tagging model (graph viz file)
 |                   #704    |       | experimental conventions
 |                   #703    |       | soft notes
@@ -91,4 +120,5 @@ consumed by arbitrary other processes.
 
 ## (document-meta)
 
+  - #history-A.1
   - #born.

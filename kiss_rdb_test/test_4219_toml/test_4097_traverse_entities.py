@@ -46,9 +46,9 @@ class _CommonCase(unittest.TestCase):
         _listener = _debugging_listener() if False else _no_listener
         return self._iterator_via_run(_listener)
 
-    def _iterator_via_run(self, lstn):
-        _given_linz = self.given_lines()
-        return _subject_module().block_stream_via_file_lines(_given_linz, lstn)
+    def _iterator_via_run(self, listener):
+        _given_lines = self.given_lines()
+        return block_stream_via_file_lines(_given_lines, listener)
 
 
 class Case4094_simplified_typical(_CommonCase):
@@ -215,6 +215,45 @@ class Case4101_two_yes_head(_CommonCase):
         [item.BB.attributes]
         no = "see"
         """)
+
+
+class Case4111_integrate_filter_by_tags(_CommonCase):
+
+    def test_100_result(self):
+        self.my_case.expect_these_two_entities(self)
+
+    def test_200_statistics(self):
+        self.my_case.expect_the_appropriate_statistics(self)
+
+    def given_collection(self):
+        _lines = _unindent("""
+        [item.ENA.attributes]
+        hi_one = "this is #red"
+
+        [item.ENB.attributes]
+        hi_two = "this is #green"
+
+        [item.ENC.attributes]
+        hi_three = "this is #blue"
+        """)
+        itr = block_stream_via_file_lines(_lines)
+        _head_block = next(itr)
+        _head_block.hello_head_block__
+        return tuple(itr)
+
+    @shared_subject
+    def end_state(self):
+        return self.my_case.build_end_state(self)
+
+    @property
+    def my_case(self):
+        from kiss_rdb_test.filter_canon import (
+            case_of_one_column_match_two_out_of_three)
+        return case_of_one_column_match_two_out_of_three
+
+
+def block_stream_via_file_lines(given_lines, listener=None):
+    return _subject_module().block_stream_via_file_lines(given_lines, listener)
 
 
 def _subject_module():

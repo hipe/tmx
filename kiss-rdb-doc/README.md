@@ -29,6 +29,7 @@ woah boy.
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |[#880-899]                 |       | narrow allocation for "pho" for now
+|[#873.C]                   | #wish | a `--oneline` option for CLI
 |[#873.B]                   | #wish | this one smell in emissions
 |[#873.A]                   | #wish | make CLI error case expression more abstracted
 |[#873]                     |       | internal tracking (extended)

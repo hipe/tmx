@@ -99,13 +99,6 @@ class ModalityAdaptationInjections_:  # see [#867.U] "why we inject"
         return {k: once[k]() for k in names}
 
 
-# == internal
-
-def yes_value_dictionary_via_remote_entity(remote_entity):
-    _dct = remote_entity.to_dictionary_two_deep_as_storage_adapter_entity()
-    return _dct['core_attributes']
-
-
 # == listener science
 
 class ErrorMonitor_:

@@ -1,124 +1,87 @@
-"""
-.:#coverpoint1.5.3 (not used but nonetheless reserved)
-
-(see discussion at [#706.B] about what belongs here and what belongs elsewhere)
-"""
-
-
-import _init  # noqa: F401
-from tag_lyfe_test.API_integration import (
-        MemoizyCommonCase as _ThisCase,
-        query_which_is_no_see,
+from kiss_rdb_test.filter_canon import (
+        case_of_one_column_match_two_out_of_three,
+        case_of_empty_collection,
         )
 from modality_agnostic.memoization import (
-        memoize,
-        )
+        dangerous_memoize_in_child_classes)
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class _CommonCase(unittest.TestCase):
+
+    @dangerous_memoize_in_child_classes('_end_state', 'build_end_state')
+    def end_state():
+        pass
+
+    def build_end_state(self):
+        return self.my_case.build_end_state(self)
 
 
-class Case050_schema_row_missing_this_one_thing(_CommonCase, _ThisCase):
+class Case1872_one_column_match_two_out_of_three(_CommonCase):
 
-    def test_100_fails(self):
-        self.fails()
+    def test_100_result(self):
+        self.my_case.expect_these_two_entities(self)
 
-    def test_200_says_only_this(self):
-        self.says_only_this_regex(r'\bmust have `tag_lyfe_field_names`')
+    def test_200_statistics(self):
+        self.my_case.expect_the_appropriate_statistics(self)
 
-    def given_query(self):
-        return query_which_is_no_see()
+    def given_collection(self):
+        return tuple(_EZ_Entity(dct) for dct in _lets_go())
 
-    def given_collection_identifier(self):
-        return (
-                {
-                    '_is_sync_meta_data': True,
-                    'natural_key_field_name': 'xx_no_see',
-                    },
-                )
+    @property
+    def my_case(self):
+        return case_of_one_column_match_two_out_of_three
 
 
-class Case075_no_rows_at_all(_CommonCase, _ThisCase):
+class Case1875_empty_collection(_CommonCase):
 
-    def test_100_succeeds(self):
-        self.succeeds()
+    def test_100_result(self):
+        self.my_case.expect_no_entities(self)
 
-    def test_200_says_only_this(self):
-        _exp = '(nothing matched because collection was empty.)'
-        self.says_only_this(_exp)
+    def test_200_statistics(self):
+        self.my_case.expect_the_appropriate_statistics(self)
 
-    def given_query(self):
-        return query_which_is_no_see()
+    def given_collection(self):
+        return ()
 
-    def given_collection_identifier(self):
-        return (
-                {
-                    '_is_sync_meta_data': True,
-                    'natural_key_field_name': 'xx_no_see',
-                    'tag_lyfe_field_names': ('no_see_1', 'no_see_2'),
-                    },
-                )
+    @property
+    def my_case(self):
+        return case_of_empty_collection
 
 
-class Case100_one_participating_column_match_one(_CommonCase, _ThisCase):
-
-    def test_100_succeeds(self):
-        self.succeeds()
-
-    def test_200_expect_match(self):
-        self.expect_matches_items('item 1')
-
-    def test_300_says_this(self):
-        _exp = '(1 match(es) of 2 item(s) seen.)'
-        self.says_this_one_line(_exp)
-
-    def given_query_tokens(self):
-        return ('#red',)
-
-    def given_collection_identifier(self):
-        return _collection_with_one_participating_column()
-
-
-class Case150_one_participating_column_match_all(_CommonCase, _ThisCase):
-
-    def test_100_succeeds(self):
-        self.succeeds()
-
-    def test_200_expect_match(self):
-        self.expect_matches_items('item 1', 'item 2')
-
-    def test_300_says_this(self):
-        _exp = '(all 2 item(s) matched.)'
-        self.says_this_one_line(_exp)
-
-    def given_query_tokens(self):
-        return ('#red', 'or', '#blue')
-
-    def given_collection_identifier(self):
-        return _collection_with_one_participating_column()
-
-
-@memoize
-def _collection_with_one_participating_column():
+def _lets_go():
     return (
             {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': 'xx_no_see',
-                'tag_lyfe_field_names': ('bb',),
-                },
-            {
-                'aa': 'item 1',
+                'aa': 'ENA',
                 'bb': 'this is #red.',
                 },
             {
-                'aa': 'item 2',
+                'aa': 'ENB',
+                'bb': 'this is #green.',
+                },
+            {
+                'aa': 'ENC',
                 'bb': 'this is #blue.',
                 },
     )
 
 
+class _EZ_Entity:
+
+    def __init__(self, dct):
+        self._dct = dct
+
+    @property
+    def identifier_string(self):
+        return self._dct['aa']
+
+    @property
+    def core_attributes_dictionary_as_storage_adapter_entity(self):
+        return self._dct
+
+
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: rewrite
 # #extracted from a cousin test file

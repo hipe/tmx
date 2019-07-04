@@ -68,8 +68,8 @@ class Case4361_retrieve_OK(_CommonCase):
 
         _col = wrap_collection(_col)
 
-        # _listener = _no_listener
-        _listener = debugging_listener
+        _listener = _no_listener
+        # _listener = debugging_listener
         return _col.retrieve_entity('68', _listener)
 
 

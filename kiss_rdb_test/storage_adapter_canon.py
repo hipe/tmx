@@ -558,8 +558,7 @@ def _confirm_collection_empty(tc, coll):
 
 
 def _yes_value_dict(ent):
-    from kiss_rdb import yes_value_dictionary_via_remote_entity
-    return yes_value_dictionary_via_remote_entity(ent)
+    return ent.core_attributes_dictionary_as_storage_adapter_entity
 
 
 yes_value_dictionary_of = _yes_value_dict
