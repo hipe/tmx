@@ -11,8 +11,8 @@ filesystem tree or whatever but we see the way we do it here
 as better because it uses the presentation structure which is
 presumably the most representative of yadda..
 """
+# [#874.4] tracks multi-tablism, which this script engages in
 # #[#410.1.2] this is a producer script.
-# #[#432] tracks multi-tablism
 
 
 import soupsieve as sv
@@ -34,10 +34,11 @@ def _required(self, attr, x):
 class open_dictionary_stream:
 
     def __init__(self, cached_document_path, listener):
-        import script.json_stream_via_url_and_selector as _
+        from data_pipes.format_adapters.html.script_common import (
+                soup_via_locators_ as _)
+        self._soup_via_locators = _
         self._cached_document_path = cached_document_path
         self._listener = listener
-        self._lib = _
         self._OK = True
 
     def __enter__(self, *_3):
@@ -97,7 +98,7 @@ class open_dictionary_stream:
         self._the_root_UL = ul
 
     def __resolve_soup(self):
-        _soup = self._lib.soup_via_locators_(
+        _soup = self._soup_via_locators(
                 url=_url,
                 html_document_path=self._cached_document_path,
                 listener=self._listener)
@@ -124,8 +125,9 @@ def cover_me():
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+    from data_pipes.format_adapters.html.script_common import (
+            common_CLI_for_json_stream_)
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'hugo_docs_url': _url},

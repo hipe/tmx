@@ -1,4 +1,4 @@
-from common_initial_state import unindent_with_dot_hack
+from kiss_rdb_test.common_initial_state import unindent_with_dot_hack
 import unittest
 
 

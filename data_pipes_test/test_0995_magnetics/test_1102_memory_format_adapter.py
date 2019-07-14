@@ -1,16 +1,12 @@
-from sakin_agac_test.format_adapter import (
-        battery,
-        )
-from modality_agnostic.memoization import (
-        memoize,
-        )
+import data_pipes_test.LEGACY_format_adapter_canon as canon
+from modality_agnostic.memoization import lazy
 import unittest
 
 
 _CommonCase = unittest.TestCase
 
 
-class Case010_hello(_CommonCase):
+class Case1102_hello(_CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -33,11 +29,11 @@ def _snapshot_one():
     # == == ==
 
     _format_adapter = _subject_module().FORMAT_ADAPTER
-    return battery.SOME_SNAPSHOT(iter(_this), _format_adapter)
+    return canon.SOME_SNAPSHOT(iter(_this), _format_adapter)
 
 
 def _subject_module():
-    import sakin_agac_test.format_adapters.in_memory_dictionaries as x
+    import data_pipes_test.format_adapters.in_memory_dictionaries as x
     return x
 
 

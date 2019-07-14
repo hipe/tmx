@@ -10,13 +10,8 @@ along the way this evolved to cover also our alignment and other formatting
 behavior (#history-A.1).
 """
 
-from _init import (
-        sanity,
-        )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -223,8 +218,8 @@ _CommonCase._build_state_commonly = _build_state_commonly
 class _schema_plus_via_two_lines:
 
     def __init__(self, line1, line2, nkfn):
-
-        _ = co.sub_magnetic('schema_index_via_schema_row')
+        from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+            schema_index_via_schema_row as _)
         _tup = _.row_two_function_and_liner_via_row_one_line(
                 line1, 'listener01')
         f1, row1 = _tup
@@ -238,13 +233,16 @@ class _schema_plus_via_two_lines:
 
 
 def _row_via_line(line):
-    _ = co.sub_magnetic('row_as_editable_line_via_line')
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        row_as_editable_line_via_line as _)
     _row = _(line, listener=None)
     return _row
 
 
 def _subject_module():
-    return co.sub_magnetic('prototype_row_via_example_row_and_schema_index')
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        prototype_row_via_example_row_and_schema_index as mod)
+    return mod
 
 
 if __name__ == '__main__':

@@ -373,18 +373,18 @@ def cover_me(msg=None):
 
 
 def _md_lib():
-    import script.markdown_document_via_json_stream as _
-    return _
+    from data_pipes import common_producer_script as mod
+    return mod.LEGACY_markdown_lib()
 
 
 def _ad_hoc_lib():
-    import script.json_stream_via_url_and_selector as x
+    import data_pipes.format_adapters.html.script_common as x
     return x
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+    common_CLI_for_json_stream_ = _ad_hoc_lib().common_CLI_for_json_stream_
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'domain': _domain},

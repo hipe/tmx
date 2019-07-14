@@ -1,10 +1,13 @@
-from _init import (
-        fixture_file_path,
-        minimal_listener_spy,
-        )
+from kiss_rdb_test.common_initial_state import (
+        functions_for)
+from modality_agnostic.test_support.structured_emission import (
+        minimal_listener_spy)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
+
+
+fixture_path = functions_for('markdown').fixture_path
 
 
 class _CommonCase(unittest.TestCase):
@@ -19,7 +22,7 @@ class _CommonCase(unittest.TestCase):
         return _State(business_objects, first)
 
     def _run(self, path, listener):
-        _cm = _subject_module().open_traversal_stream(
+        _cm = _subject_module().open_traversal_stream_TEMPORARY_LOCATION(
                 intention=None,
                 cached_document_path=None,
                 collection_identifier=path,
@@ -45,7 +48,7 @@ class Case2449_fail(_CommonCase):
 
     @shared_subject
     def _state(self):
-        _md = fixture_file_path('file-with-no-extension')
+        _md = fixture_path('file-with-no-extension')
         return self._build_state_expecting_some_emssions(_md)
 
 
@@ -68,7 +71,7 @@ class Case2451_work(_CommonCase):
 
     @shared_subject
     def _state(self):
-        _md = fixture_file_path('0115-stream-me.md')
+        _md = fixture_path('0115-stream-me.md')
         return self._build_state_expecting_no_emissions(_md)
 
 
@@ -84,7 +87,7 @@ def _failey_listener(*a):
 
 
 def _subject_module():
-    import script.stream as mod
+    import kiss_rdb.cli.LEGACY_stream as mod
     return mod
 
 

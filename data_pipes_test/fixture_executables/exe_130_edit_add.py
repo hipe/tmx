@@ -16,7 +16,7 @@ class open_dictionary_stream:
     def __enter__(self):
         yield {
                 '_is_sync_meta_data': True,
-                'custom_pass_filter_for_syncing': 'sakin_agac.YIKES_SKIP_HEADERS',  # noqa: E501
+                'custom_pass_filter_for_syncing': 'data_pipes.YIKES_SKIP_HEADERS',  # noqa: E501
                 'natural_key_field_name': 'field_name_one',
                 }
         yield {'header_level': 99, 'no_see': 'no_see'}

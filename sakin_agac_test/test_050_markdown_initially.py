@@ -4,9 +4,8 @@
 """
 
 
-from _init import (
-        fixture_executable_path,
-        )
+from sakin_agac_test.common_initial_state import (
+        executable_fixture)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -59,7 +58,8 @@ class _CommonCase(unittest.TestCase):  # #[#410.K]
         _tail = self.argv_tail()
         _use_argv = ('ohai-mami', *_tail)
 
-        import script.khong.markdown_via_json_stream as subject_script
+        from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+                markdown_via_json_stream as subject_script)
 
         _es = subject_script._CLI(_stdin, sout, serr, _use_argv)
 
@@ -191,7 +191,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):
         _first_line = json.dumps({
             '_is_sync_meta_data': True,
             'natural_key_field_name': 'lesson',
-            'custom_pass_filter_for_syncing': 'sakin_agac.YIKES_SKIP_HEADERS',
+            'custom_pass_filter_for_syncing': 'data_pipes.YIKES_SKIP_HEADERS',
             })
         return _this_one_lib().STDERR_CRAZYTOWN(
                 _first_line,
@@ -224,7 +224,7 @@ class Case060SA_one_arg_which_is_token(_CommonCase):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
-        return (fixture_executable_path('exe_140_khong_micro.py'),)
+        return (executable_fixture('exe_140_khong_micro.py'),)
 
 
 def _this_one_lib():

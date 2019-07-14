@@ -18,15 +18,18 @@ def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
-
-
 def fixture_directory(stem):
-    return os_path.join(fixture_directories_path(), stem)
+    return os_path.join(fixture_directories_directory(), stem)
 
 
 @lazy
-def fixture_directories_path():
-    return os_path.join(_top_test_dir, 'fixture-directories')
+def fixture_directories_directory():
+    return os_path.join(_top_test_dir(), 'fixture-directories')
+
+
+@lazy
+def _top_test_dir():
+    return os_path.dirname(os_path.abspath(__file__))
 
 
 def throwing_listenerer():

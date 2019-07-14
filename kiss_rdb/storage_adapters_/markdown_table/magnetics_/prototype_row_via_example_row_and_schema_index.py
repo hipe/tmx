@@ -75,7 +75,7 @@ import sys
 
 _do_shrink_to_fit_hack = False
 """
-these are temporary notes towars a possible solution to #open [#418.S]:
+these are temporary notes towars a possible solution to #open [#458.S]:
   - the above turns on an experimental behavior that seems likely to become
     default. it's towards a possible answer to [#410.S].
   - at #history-A.3 we turned this on and used it to commit the generated
@@ -209,7 +209,7 @@ class _SELF:
 
         new_cels.append(self.__reuse_newline)  # always add a newline
 
-        return self._RowDOM().init_via_all_memberdata__(
+        return self._RowDOM().init_via_all_memberdata_(
             cels_count=self._cels_count,
             children=tuple(new_cels),
             has_endcap=has,

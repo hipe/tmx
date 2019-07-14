@@ -1,9 +1,9 @@
 # #covers: script.sync
 
-from _init import (
-        fixture_executable_path,
-        fixture_file_path,
-        )
+from kiss_rdb_test.common_initial_state import (
+        publicly_shared_fixture_file)
+from data_pipes_test.common_initial_state import (
+        executable_fixture)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -314,11 +314,11 @@ class Case3070_money_and_diff(_CommonCase):
 
 
 def _far_130():
-    return fixture_executable_path('exe_130_edit_add.py')
+    return executable_fixture('exe_130_edit_add.py')
 
 
 def _markdown_0100():
-    return fixture_file_path('0100-hello.md')
+    return publicly_shared_fixture_file('0100-hello.md')
 
 
 class _CrazyDiffParse:
@@ -450,8 +450,8 @@ def _expect_STDs():
 
 
 def _subject_script():
-    import script.sync as x
-    return x
+    import data_pipes.cli.sync as mod
+    return mod
 
 
 if __name__ == '__main__':

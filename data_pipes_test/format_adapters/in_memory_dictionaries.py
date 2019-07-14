@@ -11,9 +11,8 @@ be useful in production.
     its test node into the asset tree
 """
 
-from sakin_agac.magnetics import (
-        format_adapter_via_definition,
-        )
+from kiss_rdb import (
+        LEGACY_format_adapter_via_definition as format_adapter_via_definition)
 
 
 class _open_traversal_request:
@@ -77,7 +76,7 @@ class _open_traversal_request:
 
 
 def _native_item_normalizer(dct):
-    return dct  # [#418.E.2] for now dictionary is the standard
+    return dct  # [#458.E.2] for now dictionary is the standard
 
 
 def _value_readers_via_field_names(*names):
@@ -89,7 +88,7 @@ def _value_readers_via_field_names(*names):
 
 
 def _pop_property(x, name):
-    from sakin_agac import pop_property
+    from data_pipes import pop_property
     return pop_property(x, name)
 
 
@@ -111,7 +110,7 @@ FORMAT_ADAPTER = format_adapter_via_definition(
 
 
 def _sync_lib():
-    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
     return _
 
 # #born.

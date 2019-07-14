@@ -1,9 +1,10 @@
 """
-(this is a rough seed for [#505] "feature branch" (collection) functions..)
+(this is a rough seed for [#874.2] collection API)
 
 this will *very* likely move to the [#500] subproject but we want to avoid
 early abstraction at first.
 """
+# #[#874.9] file is LEGACY
 
 
 def _subfeatures_via_item_default_function(human_key, _item):
@@ -29,7 +30,7 @@ def procure(
     when one item can be resolved, it is returned as a tuple alongside its
     human key (as `(human_key, item)`).
 
-    an essential function of [#505]. currently an ad-hoc spike.
+    essential function of [#874.2] collection API. currently an ad-hoc spike.
     """
 
     _ui_tuple = (

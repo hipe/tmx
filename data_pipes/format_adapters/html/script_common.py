@@ -59,20 +59,14 @@ def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
 def flush_JSON_stream_into(sout, serr, itr):
     """convenience guy for this pattern ETC"""
 
-    visit = JSON_object_writer_via_IO_downstream(sout)
+    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
+    visit = dictionary_dumper_as_JSON_via_output_stream(sout)
     count = 0
     for obj in itr:
         count += 1
         visit(obj)
 
     serr.write('({} items(s))\n'.format(count))
-
-
-def JSON_object_writer_via_IO_downstream(io):
-    def f(obj):
-        io.write(f'{json.dumps(obj)}\n')
-    import json
-    return f
 
 
 # -- EXPERIMENT..

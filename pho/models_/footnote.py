@@ -21,7 +21,7 @@ def dereference_footnotes__(mixed_children, lineno, ifr, idoc, listener):
     dct = ifr.footnote_url_via_local_identifier
 
     def add_string(s):
-        assert(isinstance(s, str))  # #[#008.D]
+        assert(isinstance(s, str))  # #[#022]
         a.append(s)
 
     add_string(next(mixed_itr))

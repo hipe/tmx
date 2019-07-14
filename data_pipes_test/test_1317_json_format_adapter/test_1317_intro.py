@@ -1,12 +1,14 @@
 # #covers: [isomorphic asset file]
-
+from data_pipes_test.common_initial_state import (
+        build_end_state_commonly,
+        markdown_fixture,
+        executable_fixture)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
+from modality_agnostic.test_support.structured_emission import (
+        minimal_listener_spy)
 import unittest
-
-fixture_executable_path = ts.fixture_executable_path
-fixture_file_path = ts.fixture_file_path
 
 
 class _CommonCase(unittest.TestCase):
@@ -22,7 +24,7 @@ class _CommonCase(unittest.TestCase):
 
     def _fail_against(self, s):
 
-        msgs, listener = ts.minimal_listener_spy()
+        msgs, listener = minimal_listener_spy()
 
         _cr = _build_collection_reference(s)
 
@@ -34,8 +36,8 @@ class _CommonCase(unittest.TestCase):
         msg, = msgs  # assertion
         return msg
 
+    _build_end_state = build_end_state_commonly
 
-    _build_end_state = ts.build_end_state_commonly
 
 class Case1312(_CommonCase):
 
@@ -51,7 +53,7 @@ class Case1312(_CommonCase):
         self.assertRegex(_msg, r'\babsolute path outside of ecosystem\b')
 
     def test_220_this_one_file_fails_because_invalid_chars_in_name(self):
-        _path = ts.fixture_file_path('no-ent.py')
+        _path = executable_fixture('no-ent.py')
         _msg = self._fail_against(_path)
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
@@ -90,9 +92,10 @@ class Case1314DP_filenames_must_look_a_way(_CommonCase):
         yield 'error', 'expression', 'as', 'first_error'
 
     def given(self):
+        # NOTE the dash in the below filename
         return {
                 'near_collection': _same_near_collection(),
-                'far_collection': fixture_file_path('chimi-churry.py'),  # NOTE - dash  # noqa: E501
+                'far_collection': executable_fixture('chimi-churry.py'),
                 }
 
 
@@ -128,7 +131,7 @@ class Case1317_no_metadata_row(_CommonCase):
     def given(self):
         return {
                 'near_collection': _same_near_collection(),
-                'far_collection': fixture_executable_path('exe_080_no_metadata.py'),  # noqa: E501
+                'far_collection': executable_fixture('exe_080_no_metadata.py'),
                 }
 
 
@@ -165,7 +168,7 @@ class Case1320DP_extra_cel(_CommonCase):
         return iter(())
 
     def given(self):
-        _ = fixture_executable_path('exe_110_extra_cel.py')
+        _ = executable_fixture('exe_110_extra_cel.py')
         return {
                 'near_collection': _same_near_collection(),
                 'far_collection': _,
@@ -185,13 +188,13 @@ class Case1322DP_RUM(_CommonCase):
 
     def given(self):
         return {
-                'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
-                'far_collection': fixture_executable_path('exe_120_endcap_yes_no.py'),  # noqa: E501
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
+                'far_collection': executable_fixture('exe_120_endcap_yes_no.py'),  # noqa: E501
                 }
 
 
 def _chimi_churri_far_path():
-    return fixture_executable_path('exe_100_bad_natural_key.py')
+    return executable_fixture('exe_100_bad_natural_key.py')
 
 
 def _same_near_collection():
@@ -200,7 +203,7 @@ def _same_near_collection():
     to test our own. but meh.
     """
 
-    return fixture_file_path('0080-cel-underflow.md')
+    return markdown_fixture('0080-cel-underflow.md')
 
 
 def _build_collection_reference(string):
@@ -209,7 +212,7 @@ def _build_collection_reference(string):
 
 @lazy
 def _subject_format_adapter():
-    import sakin_agac.format_adapters.json_script as x
+    import data_pipes.format_adapters.json_script as x
     return x
 
 

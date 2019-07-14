@@ -16,7 +16,7 @@ generically this whole mess of fields and their directives is specified
 under the "special field instructions".)
 """
 
-from sakin_agac import (
+from data_pipes import (
         cover_me,
         pop_property)
 import sys
@@ -31,7 +31,9 @@ def dictionary_via_cels_via_definition(
     near_field_names = []  # note them along the way yikes
     specials = (special_field_instructions or ())
     default_tup = ('string_via_cel', string_via_cel)
-    from sakin_agac.magnetics import normal_field_name_via_string
+
+    from kiss_rdb.LEGACY_normal_field_name_via_string import (
+            normal_field_name_via_string)
 
     def formal_via(unsanitized_far_field_name):
         far_k = normal_field_name_via_string(unsanitized_far_field_name)

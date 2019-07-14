@@ -16,7 +16,7 @@ def THROWING_LISTENER(channel_head, *rest):
 
 # == decorators
 
-def lazy_experiment(attr_name, build):
+def lazy_experiment(attr_name, build):  # [#510.6]
     def decorator(f):
         return _do_lazy_experiment(f, attr_name, build)
     return decorator
@@ -215,7 +215,7 @@ class _Emission:
     def _flush_payloader_(self):
         payloader = self._payloader_HOT
         del self._payloader_HOT
-        return payloader()
+        return payloader()  # [#511.3]
 
 
 class _ErrorEmission(_Emission):

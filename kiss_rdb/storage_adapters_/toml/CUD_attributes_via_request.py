@@ -230,7 +230,7 @@ def __determine_insertion_groupings(qits, creates):
 
     you are solving for not only the insertion points but groupings.
 
-    we attempt something similar "interleaving" algorithm described in [#407].
+    we attempt something similar "interleaving" algorithm described in [#447].
     """
 
     # qits = qualified items
@@ -693,8 +693,7 @@ def __PLAN_VIA(updates, groups, appends, eenc):
 
         tup = eenc.semi_encode(mixed, attr_name_s)
         if tup is None:
-            # (Case4258)
-            return
+            return  # (Case4258KR)
 
         name_value_plan, o = tup
 
@@ -706,7 +705,7 @@ def __PLAN_VIA(updates, groups, appends, eenc):
             semi_encoded_lines = o.semi_encoded_lines
             num_lines = len(semi_encoded_lines)
 
-            assert(num_lines)  # (Case4258) empty string
+            assert(num_lines)  # (Case4258KR) empty string
 
             if 1 == num_lines:
                 if o.has_special_characters:

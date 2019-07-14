@@ -135,14 +135,13 @@ to run the whole test suite:
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
-|                [#204]     | #open | tracks our local instances of [\[#019\]]
+|                [#204]     |       | (not sure what was intended with this)
 |                [#203]     |       | [code node]
 |<a name=202></a>[#202]     | #open | enzyme/mocha tests for web front like [bedjango1]
 
 
 
 
-[\[#019\]]: ../README.md#019
 [018_pyver]: ../doc/118-installing-and-deploying-python.md#python-version
 [\[#018\]]: ../README.md#018
 [\[#002\]]: ../README.md#002

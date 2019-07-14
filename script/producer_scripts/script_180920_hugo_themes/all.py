@@ -246,7 +246,8 @@ def _big_index_via_walk(rd, themes_dir, listener):
 
     big_index = _BigIndex()
 
-    import script.SSGs.hugo_themes_deep.theme_toml_stream_via_themes_dir as _
+    from script.producer_scripts import (
+        script_180920_hugo_theme_toml_stream_via_themes_dir as _)
 
     _surface_phenomena_index = big_index._surface_phenomena_index
 
@@ -458,7 +459,7 @@ def _report_paths():
 def _module_via_path(report_path):
     import importlib
     _stem = __stem_via_path(report_path)
-    _use = f'script.SSGs.hugo_themes_deep.tags_and_features_reports.{_stem}'
+    _use = f'script.producer_scripts.script_180920_hugo_themes.{_stem}'
     return importlib.import_module(_use)
 
 

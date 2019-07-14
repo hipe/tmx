@@ -150,7 +150,7 @@ def _lines_via_strings_with_optimistic_peek(lines):
     and it is used to determine whether or not this behavior is desired.
     """
 
-    assert(hasattr(lines, '__next__'))  # if not, nasty bugs below #[#008.D]
+    assert(hasattr(lines, '__next__'))  # if not, nasty bugs below #[#022]
 
     empty = True
     for line in lines:  # #once

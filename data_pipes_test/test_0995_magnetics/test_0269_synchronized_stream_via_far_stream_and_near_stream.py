@@ -1,15 +1,12 @@
 """
 the birth of this test file coincided with the introduction of the new
 test synchronization algorithm (interleaving) which became the default.
-(all in [#407]).
+(all in [#447]).
 
 some of the numbers of test cases line up with test cases in a sibling.
 """
 
-import _init  # noqa: F401
-from sakin_agac_test.sync_support import (
-        SyncCase_,
-        )
+from data_pipes_test.sync_support import SyncCase_
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -264,7 +261,7 @@ class Case0275_bigger_example_of_disorder(_CommonCase):
 
 
 def _subject_module():
-    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
     return _
 
 

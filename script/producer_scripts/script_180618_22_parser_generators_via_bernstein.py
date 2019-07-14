@@ -62,7 +62,7 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         we emit a meta record based off that one BUT with the field names
         changed to reflect etc.
 
-          - assume #provision [#418.I.2] that the natural key field name
+          - assume #provision [#458.I.2] that the natural key field name
             is leftmost (here in the near field names (which are derived))
 
         #abstraction-candidate: the format adaptation of [#410.J] the record
@@ -73,14 +73,14 @@ class open_traversal_stream:  # #[#410.F] class as context manager
         o = {k: v for k, v in schema_record.items()}
         o['natural_key_field_name'] = near_field_names[0]  # (per above provis)
         o['field_names'] = near_field_names
-        o['custom_keyer_for_syncing'] = 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+        o['custom_keyer_for_syncing'] = 'data_pipes.format_adapters.html.script_common.simplify_keys_',  # noqa: E501
         # above is broken for syncing,
         # #not-covered since #history-A.3 or before
         o['traversal_will_be_alphabetized_by_human_key'] = False
         return o
 
     def __build_dict_via_cels(self, far_field_names):
-        import sakin_agac.magnetics.dictionary_via_cels_via_definition as _
+        import data_pipes.magnetics.dictionary_via_cels_via_definition as _
         return _(
                 unsanitized_far_field_names=far_field_names,
                 special_field_instructions={
@@ -92,7 +92,8 @@ class open_traversal_stream:  # #[#410.F] class as context manager
                 )
 
     def __open_traversal_stream(self):
-        from script.stream import open_traversal_stream as _
+        from data_pipes import common_producer_script as mod
+        _ = mod.common_CLI_library().open_traversal_stream_TEMPORARY_LOCATION
         return _(
                 cached_document_path=None,
                 collection_identifier=self._cached_doc.cache_path,
@@ -180,8 +181,11 @@ def _string_via_cel_one(human_key):
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+
+    from data_pipes.format_adapters.html.script_common import (
+            common_CLI_for_json_stream_)
+
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_traversal_stream,
             doc_string=_my_doc_string,
             help_values={'raw_url': _raw_url},

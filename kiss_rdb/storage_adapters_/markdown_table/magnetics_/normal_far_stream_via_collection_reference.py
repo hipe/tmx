@@ -11,10 +11,10 @@ in fact this module does not accomplish this feat on its own in one
 unified magnetic, but rather it has *all* (?) the constituent magnetics
 that do this (with a bit of coordination required).
 
-[#417.C.2] discusses this challenge in more depth.
+[#457.C.2] discusses this challenge in more depth.
 """
 
-from sakin_agac import (
+from data_pipes import (
         cover_me,
         pop_property)
 
@@ -143,7 +143,7 @@ def OPEN_FAR_SESSION(
         far_collection_reference,
         datastore_resources,
         listener,
-        custom_mapper_OLDSCHOOL=None,  # see [#418.I.4]
+        custom_mapper_OLDSCHOOL=None,  # see [#458.I.4]
         ):
 
     sr_cm = far_collection_reference.open_sync_request(
@@ -198,7 +198,7 @@ def OPEN_FAR_SESSION(
 def _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener):
     """
     so:
-        - here we implement exactly [#423.B] (a graph-viz graph)
+        - here we implement exactly [#463.B] (a graph-viz graph)
 
         - here is where we first thought of #wish [#410.Y] customizable
           functional pipelines (so you could map before or after filter
@@ -216,7 +216,7 @@ def _far_session_work(sync_request, custom_mapper_OLDSCHOOL, listener):
     # --
 
     if 4 != tp.traversal_parameters_version:
-        raise Exception('woot - #provision [#418.J] - parameters added')
+        raise Exception('woot - #provision [#458.J] - parameters added')
 
     is_ordered = tp.traversal_will_be_alphabetized_by_human_key
 
@@ -357,7 +357,7 @@ def __procure_any_map(tp, custom_mapper_OLDSCHOOL, listener):
 
 
 def _CRAZY_TIME(map_id, listener):
-    """(static arguments in function identifiers #stub [#418.I.5]"""
+    """(static arguments in function identifiers #stub [#458.I.5]"""
 
     import re
     md = re.match(r'^(.+)\(([^)]+)\)$', map_id)
@@ -382,12 +382,12 @@ def _CRAZY_TIME(map_id, listener):
 
 
 def _not_OK_when_CM_expected():
-    from sakin_agac import my_contextlib
+    from data_pipes import my_contextlib
     return my_contextlib.not_OK_context_manager()
 
 
 def _procure_func_via_func_identifier(identifier, listener):
-    from sakin_agac.magnetics import function_via_function_identifier as _
+    from data_pipes.magnetics import function_via_function_identifier as _
     return _(identifier, listener)
 
 

@@ -272,7 +272,7 @@ class _AppendableHeadBlock:
     def to_line_stream(self):
         return self._head_block_lines  # while it works
 
-    hello_head_block__ = True  # [#008.D]
+    hello_head_block__ = True  # #[#022] wish for strong types
 
 
 _empty_head_block = _AppendableHeadBlock(())
@@ -308,7 +308,7 @@ class _AppendableTableBlock:
     def table_type(self):  # #NO
         return self._table_start_line_object.table_type
 
-    # == "THE STORAGE ADAPTER ENTITY INTERFACE" (experimental)
+    # == towards experimental [#874.3] storage adapter entity interface
 
     @property
     def identifier(self):

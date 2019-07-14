@@ -1,13 +1,14 @@
 # #covers: sakin_agac.format_adapters.markdown_table.magnetics.tagged_native_item_stream_via_line_stream  # noqa: E501
-
-from _init import (
-        fixture_file_path,
-        minimal_listener_spy,
-        )
+from kiss_rdb_test.common_initial_state import (
+        functions_for)
+from modality_agnostic.test_support.structured_emission import (
+        minimal_listener_spy)
 from modality_agnostic.memoization import (
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
         lazy)
 import unittest
+
+
+fixture_path = functions_for('markdown').fixture_path
 
 
 class _CommonCase(unittest.TestCase):
@@ -206,7 +207,9 @@ _all_possible_transitions = (
 
 
 def _subject_module():
-    return co.sub_magnetic('tagged_native_item_stream_via_line_stream')
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        tagged_native_item_stream_via_line_stream as mod)
+    return mod
 
 
 if __name__ == '__main__':

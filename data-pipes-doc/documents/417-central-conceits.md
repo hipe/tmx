@@ -6,7 +6,7 @@ date: "2018-09-02T19:10:48-04:00"
 
 ## <a name=A></a> central conceit: the JSON wall (lingua franca)
 
-  - be sure to see the excellent ASCII diagram and description at `:[#417.A]`
+  - be sure to see the excellent ASCII diagram and description at `:[#457.A]`
   - in summary, one pipey interface to rule them all (sort of)
 
 
@@ -24,7 +24,7 @@ date: "2018-09-02T19:10:48-04:00"
 conveniently, this item combines the two before it.
 
 the "central conceit" of the sync script (in its adaptation provided by
-the markdown tables format adapter) is that it takes a stream of [#417.A]
+the markdown tables format adapter) is that it takes a stream of [#457.A]
 normal records (dictionaries) and in effect turns them into markdown table
 rows, sort of.
 
@@ -50,7 +50,7 @@ towards this, generally our design guidelines are:
 
   - it's better to [same] rather than adding configuration options for it.
 
-we now call this idea :[#418.3] heuristic templating.
+we now call this idea :[#458.3] heuristic templating.
 
 in order to meet the above design guidelines we pull of a dastardly bit of
 hackery that we call the :[#481.D] the "prototype row" and it works like so:
@@ -61,7 +61,7 @@ table is used *only* as an example, to show how to format other rows.
 this "prototype row" can then take the knowledge it has about target widths
 for each field (while this misfeature persists) and with that, produce new
 rows for the markdown table. we have now generalized this into the idea of
-a "nativizer" because it takes the pure, [#417.A] normal records from the
+a "nativizer" because it takes the pure, [#457.A] normal records from the
 far collection and turns them into crunchy, surface-tailored native records.
 
 (so when we say that a record is "nativized", we mean that it appears as a
@@ -79,7 +79,7 @@ item by item in their order with no large-scale caching, so that
 synchronization can scale linearly to very large datasets (both near and far).
 
 but note you can't output a "nativized" far item until you've seen the
-[#418.D] example row, which is why the example row must be a non-
+[#458.D] example row, which is why the example row must be a non-
 participating row that always appears first.
 
 so this magnetic tries to thread the needle: it uses a "random access"

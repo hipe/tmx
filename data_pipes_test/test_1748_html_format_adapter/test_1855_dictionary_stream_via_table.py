@@ -35,9 +35,7 @@ at #history-A.1 minus three weeee).)
 """
 
 
-from _init import (
-        fixture_file_path,
-        )
+from data_pipes_test.common_initial_state import html_fixture
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -99,7 +97,7 @@ class Case1855DP_hello(_CommonCase):
         use_listener = lib.listener_via_emission_receiver(emissions.append)
 
         _ = _subject_module().open_dictionary_stream(
-                html_document_path=fixture_file_path('0130-tag-subtree.html'),
+                html_document_path=html_fixture('0130-tag-subtree.html'),
                 listener=use_listener)
 
         with _ as dcts:
@@ -116,8 +114,9 @@ class Case1855DP_hello(_CommonCase):
 
 
 def _subject_module():
-        import script.tag_lyfe.json_stream_via_python_wiki as x
-        return x
+    from script.producer_scripts import (
+            script_180618_03_parser_generators_via_python_wiki as mod)
+    return mod
 
 
 if __name__ == '__main__':

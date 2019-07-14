@@ -14,7 +14,7 @@ class open_dictionary_stream:
         self._listener = listener
 
     def __enter__(self):
-        from script.SSGs.hugo_themes_deep.tags_and_features_reports.all import API_for_Report__ as _  # noqa: E501
+        from .all import API_for_Report__ as _
         return _(self._themes_dir, _me_as_module(), self._listener)
 
     def __exit__(self, *_4):

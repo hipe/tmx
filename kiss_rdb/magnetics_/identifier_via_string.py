@@ -241,7 +241,7 @@ def identifier_via_integer__(i):  # arbitrary depth, on the fly
 class Identifier_:
 
     def __init__(self, native_digits):
-        self.native_digits = native_digits  # assume tuple #wish #[#008.D]
+        self.native_digits = native_digits  # assume tuple #wish #[#022]
 
     def __lt__(self, other):  # :#here5
         return self.native_digits < other.native_digits  # (Case4302) and ..

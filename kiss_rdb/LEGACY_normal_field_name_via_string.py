@@ -3,6 +3,7 @@
 only lowercase alpha and the underscore (and maybe some integers somewhere).
 this fellow attempts to make one from any string. ("attempts").
 """
+# #[#874.9] file is LEGACY
 
 import re
 import sys
@@ -37,7 +38,7 @@ def _split_on_whitespace(s):
 _whitespace_rx = re.compile(r'[- \t]+')
 
 
-def _split_on_camel_case(s):
+def _split_on_camel_case(s):  # #testpoint
     """ruby has to be better at something"""
 
     offset = 0
@@ -46,9 +47,6 @@ def _split_on_camel_case(s):
         yield s[offset:offset_]
         offset = offset_
     yield s[offset:]
-
-
-normal_field_name_via_string._split_on_camel_case = _split_on_camel_case  # #testpoint  # noqa: E501
 
 
 _camelcase_rx = re.compile('(?<=[a-z])(?=[A-Z])')

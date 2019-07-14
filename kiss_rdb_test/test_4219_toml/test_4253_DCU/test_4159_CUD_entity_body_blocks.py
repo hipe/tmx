@@ -77,7 +77,7 @@ class _CommonCase(unittest.TestCase):
         mde = self._build_doc_ent(listener)
         _iid = _internal_identifier_via_component_offset(offset, mde)
         x = mde._delete_block_via_iid(_iid)
-        # -- begin make contact as assert. maybe types would help #[#008.D]
+        # -- begin make contact as assert. maybe types would help #[#022]
         x.is_attribute_block
         x.is_discretionary_block
         # --

@@ -1,16 +1,16 @@
-"""several [#417] central conceits of this whole project happen here:
+"""several [#457] central conceits of this whole project happen here:
 
 this is where we read the lines of a markdown document, and pass a certain
 subslice of those lines over to our synchronization algorithm. the output
 of the main function in this module is the new lines of the markdown document
 (sort of) after the synchronization has been applied.
 
-(that's central conceit [#417.B] "markdown as datastore". also it's
-[#417.C] synchronization.)
+(that's central conceit [#457.B] "markdown as datastore". also it's
+[#457.C] synchronization.)
 
 by "sort of" we mean this: the result of the function is actually a stream
 of tuples, where each first element of each tuple is a "category" (type) of
-element (roughly corresponding to the names of the states in our [#409]
+element (roughly corresponding to the names of the states in our [#875.2]
 parser state machine), and each second element is mixed (but either a line
 or a `to_string()`-able).
 
@@ -21,10 +21,9 @@ we thought that you would want a [#411] tagged stream processor to produce
 your result; but in fact we do something simpler.
 """
 
-from sakin_agac.magnetics import (
-        synchronized_stream_via_far_stream_and_near_stream as _top_sync,
-        )
-from sakin_agac import (
+from data_pipes.magnetics import (
+        synchronized_stream_via_far_stream_and_near_stream as _top_sync)
+from data_pipes import (
         cover_me,
         pop_property)
 from modality_agnostic import streamlib
@@ -37,7 +36,7 @@ next_or_none = streamlib.next_or_none
 def _could_end_at_any_time(f):
     """custom decorator. this file only.
 
-    the markdown document can end at any time (see [#409])
+    the markdown document can end at any time (see [#875.2] markdown state m.
     """
 
     def g(self):
@@ -63,7 +62,7 @@ def OPEN_NEWSTREAM_VIA(**kwargs):
 
 
 class _Newstream_via:
-    """be LIKE #[#418.Z.3] a context manager class in the typical pattern,
+    """be LIKE #[#458.Z.3] a context manager class in the typical pattern,
 
     whose element are..
     our (tagged maybe) output lines (in some whatever parse tree format)
@@ -71,7 +70,7 @@ class _Newstream_via:
     whereby:
 
       - like any processor, we expect to traverse through a particular state
-        graph; in this case [#409] our conception of the markdown document.
+        graph; in this case [#875.2] our model of the markdown document.
         (the method has a name in all caps IFF it corresponds to a state.)
 
       - when we get to the target markdown table, we do a crazy thing to pass
@@ -90,7 +89,7 @@ class _Newstream_via:
             normal_far_stream,
             near_tagged_items,
             near_keyerer,
-            far_deny_list,  # may be temporary. see [#418.I.3.2]
+            far_deny_list,  # may be temporary. see [#458.I.3.2]
             listener,
             ):
 
@@ -194,11 +193,11 @@ class _Newstream_via:
         """
         we get here when the near and far item have the "same" human key.
 
-        .#provision [#418.G] is that we short-circuit out of calling the
+        .#provision [#458.G] is that we short-circuit out of calling the
         merge callback if the far "record" has no components other than
         the natural key (because why bother, right?)
 
-        but then #provision [#418.H] is that you can provide a function that
+        but then #provision [#458.H] is that you can provide a function that
         derives arbitrary human keys.
 
         for now, we skip this heuristic of skipping the merge in those
@@ -213,7 +212,7 @@ class _Newstream_via:
         can_short_circuit = self._near_keyerer is None
 
         def f(far_key, far_dct, near_key, near_row_DOM):
-            # realize #provision #[#418.F] four args
+            # realize #provision #[#458.F] four args
 
             length = len(far_dct)
 
@@ -257,7 +256,7 @@ class _Newstream_via:
     def __procure_pair_via_near(self):
 
         def key_via_row_DOM_normally(row_DOM):
-            # for now KISS and #provision [#418.I.2] (leftmost is guy)
+            # for now KISS and #provision [#458.I.2] (leftmost is guy)
             return row_DOM.cel_at_offset(0).content_string()
 
         f_f = pop_property(self, '_near_keyerer')

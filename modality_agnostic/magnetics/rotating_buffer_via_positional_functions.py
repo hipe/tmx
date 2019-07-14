@@ -103,7 +103,7 @@ def oxford_join(
     in the collection)), use the less significant separator.
     """
 
-    if hasattr(string_iterator, '__len__'):  # #[#008.D]
+    if hasattr(string_iterator, '__len__'):  # #[#022] wish for strong types
         # this is nasty if you don't catch this
         _ = f'need iterator of strings had {type(string_iterator)}'
         raise TypeError(_)

@@ -1,9 +1,8 @@
-from _init import (
-        minimal_listener_spy,
-        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
+from modality_agnostic.test_support.structured_emission import (
+        minimal_listener_spy)
 import doctest
 import unittest
 
@@ -154,6 +153,20 @@ class Case1432_succeed(_CommonCase):
         return _collection_C()
 
 
+class Case1434_ASSORTED_STOWAWAYS(_CommonCase):  # [#874.6] stowaway about refl
+
+    def test_100_SNEAK_IN_TEST_ABOUT_REFLECTION(self):
+        count = 0
+        import kiss_rdb.LEGACY_format_adapter_collection as lib
+        for mod in lib.EVERY_MODULE():
+            fa = mod.FORMAT_ADAPTER
+            if fa is not None:
+                # make some contact with the format adapter. OK if None.
+                mod.FORMAT_ADAPTER.associated_filename_globs
+                count += 1
+        self.assertNotEqual(0, count)
+
+
 @lazy
 def _collection_C():
     x = 'no see'
@@ -190,7 +203,7 @@ def _HKC_via_pairs(pairs):
 
 @lazy
 def _subject_module():
-    import sakin_agac.magnetics.via_human_keyed_collection as x
+    import kiss_rdb.LEGACY_collection_lib as x
     return x
 
 

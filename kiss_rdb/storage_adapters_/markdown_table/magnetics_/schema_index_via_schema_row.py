@@ -52,9 +52,7 @@ def row_two_function_and_liner_via_row_one_line(line, listener):
     def row_via_line(line_):
         return f(line_, listener)
 
-    from sakin_agac.format_adapters.markdown_table.magnetics import (
-            row_as_editable_line_via_line as f,
-            )
+    from . import row_as_editable_line_via_line as f
 
     def _stop():
         self._ok = False
@@ -143,7 +141,7 @@ class _SchemaIndex:
         return self.__field_readerer(field_name)
 
     def natural_key_field_name__(self):
-        return self.field_names__[0]  # assume [#418.I.2] first is it
+        return self.field_names__[0]  # assume [#458.I.2] first is it
 
 
 def _the_index_components_via(cels_count, header_row1_DOM):
@@ -159,7 +157,8 @@ def _the_index_components_via(cels_count, header_row1_DOM):
     """
 
     def normal_field_name_via_offset(offset):
-        import sakin_agac.magnetics.normal_field_name_via_string as name_via
+        from kiss_rdb.LEGACY_normal_field_name_via_string import (
+                normal_field_name_via_string as name_via)
         _cel_DOM = header_row1_DOM.cel_at_offset(offset)
         _s = _cel_DOM.content_string()
         return name_via(_s)

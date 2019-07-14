@@ -1,4 +1,4 @@
-# #[#874.5] file used to be executable script and may need further changes
+# #[#874.8] file generates mardown the old way and may need to be the new way
 # #[#874.4] module is concerned with multi-tablism. (maybe frontiered it)
 
 

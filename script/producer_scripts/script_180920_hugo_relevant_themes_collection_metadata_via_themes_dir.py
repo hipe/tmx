@@ -45,7 +45,8 @@ class _CLI:
         self._OK = True
 
     def execute(self):
-        import script.stream as cl  # cl = "CLI lib"
+        from data_pipes import common_producer_script as mod
+        cl = mod.common_CLI_library()  # cl = CLI library
         cl.must_be_interactive_(self)
         cl.parse_args_(self, '_namespace', _my_params, _my_desc)
         self.OK and setattr(self, '_listener', cl.listener_for_(self))
@@ -87,7 +88,7 @@ def relevant_themes_collection_metadata_via_themes_dir(themes_dir, listener):
     return parse.finish(themes_dir)
 
 
-class _MadParseBashScript:  # #pattern #[#418.Z.4] "mad parse"
+class _MadParseBashScript:  # #pattern #[#458.Z.4] "mad parse"
     """like grep but ..
     """
 

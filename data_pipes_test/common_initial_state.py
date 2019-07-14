@@ -1,3 +1,4 @@
+from modality_agnostic.memoization import lazy
 import os.path as os_path
 
 
@@ -42,8 +43,8 @@ class ProducerCaseMethods:
         _cdp = self.cached_document_path()
         _ci = _norm_path(self.far_collection_identifier())
         _listener = self.use_listener()
+        _f = _this_stream_lib()._traversal_stream_for_sync
 
-        from script.stream import _traversal_stream_for_sync as _f
         pairs = _f(
                 cached_document_path=_cdp,
                 collection_identifier=_ci,
@@ -61,7 +62,8 @@ class ProducerCaseMethods:
         _ci = _norm_path(self.far_collection_identifier())
         _listener = self.use_listener()
 
-        from script.stream import open_traversal_stream
+        open_traversal_stream = _this_stream_lib().open_traversal_stream_TEMPORARY_LOCATION  # noqa: E501
+
         _ = open_traversal_stream(
                 cached_document_path=_cdp,
                 collection_identifier=_ci,
@@ -103,8 +105,7 @@ def _the_no_op_listener(*_):
 
 
 def _sync_context_manager_via(**kwargs):
-
-    import script.sync as _
+    import data_pipes.cli.sync as _
     return _.OpenNewLines_via_Sync_(**kwargs)
 
 
@@ -114,34 +115,31 @@ class _EndState:
         self.actual_emission_index = aei
 
 
-def minimal_listener_spy():
-    """similar elsewhere. this one is minimal. DEPRECATED. use [#509.2]
-
-    #open [#410.I] the soul of this has been stolen and moved to [#509]
-    """
-
-    def listener(*a):
-        None if 'error' == a[0] else sanity(a[0])
-        None if 'expression' == a[1] else sanity(a[1])
-        a[-1](o)
-
-    def o(s):
-        mutable_message_array.append(s)
-
-    mutable_message_array = []
-    return (mutable_message_array, listener)
+def executable_fixture(stem):
+    return os_path.join(_top_test_dir(), 'fixture_executables', stem)
 
 
-def fixture_executable_path(stem):
-    return os_path.join(_top_test_dir, 'fixture_executables', stem)
+def html_fixture(tail):
+    return os_path.join(_fixture_files(), '500-html', tail)
 
 
-def fixture_directory_path(stem):
-    return os_path.join(_top_test_dir, 'fixture-directories', stem)
+def markdown_fixture(tail):
+    return os_path.join(_fixture_files(), '300-markdown', tail)
 
 
-def fixture_file_path(stem):
-    return os_path.join(_top_test_dir, 'fixture-files', stem)
+@lazy
+def _fixture_files():
+    return os_path.join(_top_test_dir(), 'fixture-files')
+
+
+@lazy
+def _top_test_dir():
+    return os_path.dirname(__file__)
+
+
+def _this_stream_lib():
+    from data_pipes import common_producer_script
+    return common_producer_script.common_CLI_library()
 
 
 def pop_property(self, prop):

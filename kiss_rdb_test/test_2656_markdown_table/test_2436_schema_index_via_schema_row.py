@@ -1,9 +1,6 @@
 # #covers: sakin_agac.format_adapters.markdown_table.magnetics.schema_index_via_schema_row  # noqa: E501
-
-from _init import (
-        minimal_listener_spy,
-        )
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
+from modality_agnostic.test_support.structured_emission import (
+        minimal_listener_spy)
 import unittest
 
 
@@ -56,7 +53,7 @@ class Case2436_normalize_freeform_strings(_CommonCase):  # #midpoint
     _this = _be_like_so
 
     def _go_subject(self, big_s):
-        return _stowaway_subject_module()(big_s)
+        return _stowaway_subject_function()(big_s)
 
 
 class Case2437_encap_is_required(_CommonCase):
@@ -72,13 +69,19 @@ class Case2437_encap_is_required(_CommonCase):
         self.assertEqual(msgs, [_])
 
 
+def _stowaway_subject_function():
+    return _stowaway_subject_module().normal_field_name_via_string
+
+
 def _stowaway_subject_module():
-    import sakin_agac.magnetics.normal_field_name_via_string as x
-    return x
+    import kiss_rdb.LEGACY_normal_field_name_via_string as mod
+    return mod
 
 
 def _subject_module():
-    return co.sub_magnetic('schema_index_via_schema_row')
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        schema_index_via_schema_row as mod)
+    return mod
 
 
 if __name__ == '__main__':

@@ -3,18 +3,17 @@
 
 objectives are severalfold:
     - cover scraping of this one page format
-    - cover the beginnings of #[#432] multi-tablism
+    - cover the beginnings of [#874.4] multi-tablism
 
 we first assert several structural details of the scraping, including whether
 the branch boundaries are being detected and emitted.
 """
 
 
-from _init import (
-        fixture_file_path,
-        ProducerCaseMethods,
-        )
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table.parsers as parsers  # noqa: E501
+from data_pipes_test.common_initial_state import (
+        html_fixture,
+        ProducerCaseMethods)
+from kiss_rdb_test import markdown_table_parsers as parsers
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
@@ -75,10 +74,10 @@ class Case1747_does_scrape_work(_CommonCase):
         return self.build_raw_list_()
 
     def far_collection_identifier(self):
-        return 'script/SSGs/hugo_docs_multi_table_json_stream.py'
+        return 'script/producer_scripts/script_180815_hugo_docs.py'
 
     def cached_document_path(self):
-        return fixture_file_path('0170-hugo-docs.html')
+        return html_fixture('0170-hugo-docs.html')
 
 
 class Case1749_gen(_CommonCase):
@@ -135,7 +134,8 @@ class Case1749_gen(_CommonCase):
     @shared_subject
     def _lines(self):
         _d_a = _these_dictionaries()
-        import script.markdown_document_via_json_stream as _
+        from data_pipes import common_producer_script as mod
+        _ = mod.LEGACY_markdown_lib()
         _lines = _._raw_lines_via_collection_identifier(_d_a, __file__)
         return tuple(x for x in _lines)
 

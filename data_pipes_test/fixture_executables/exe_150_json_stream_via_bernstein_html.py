@@ -45,7 +45,7 @@ def open_traversal_stream(html_document_path, listener):
 
         table, = el.select('table')
 
-        from sakin_agac.format_adapters.html.magnetics import (
+        from data_pipes.format_adapters.html.magnetics import (
                 dictionary_stream_via_table)
 
         table_o = dictionary_stream_via_table(
@@ -116,14 +116,9 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-def _top_html_lib():
-    import script.json_stream_via_url_and_selector as lib
-    return lib
-
-
 def _md_lib():
-    import script.markdown_document_via_json_stream as _
-    return _
+    from data_pipes import common_producer_script as mod
+    return mod.LEGACY_markdown_lib()
 
 
 def execute_as_CLI_(open_dictionary_stream):
@@ -131,15 +126,16 @@ def execute_as_CLI_(open_dictionary_stream):
     this is the implementation of :[#410.H]
     """
 
-    from script.json_stream_via_url_and_selector import (
-            flush_JSON_stream_into as flush_into,
-            )
+    flush_into = _top_html_lib().flush_JSON_stream_into
     import sys as o
     with open_dictionary_stream(None, None) as dcts:
         flush_into(o.stdout, o.stderr, dcts)
     return 0
 
 
+def _top_html_lib():
+    import data_pipes.format_adapters.html.script_common as lib
+    return lib
 
 
 if __name__ == '__main__':

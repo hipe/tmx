@@ -2,13 +2,14 @@ from kiss_rdb_test.common_initial_state import (
         pretend_file_via_path_and_big_string,
         PretendFile,
         unindent_with_dot_hack,
-        functions_for,
-        fixture_directories_path,
-        )
+        functions_for)
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
-import os.path as os_path
+
+
+toml_fixture_directory_for = functions_for('toml').fixture_directory_for
+md_fixture_path = functions_for('markdown').fixture_path
 
 
 # [2500 (2517) 2535)
@@ -63,7 +64,7 @@ class Case2510_collection_not_found(_CommonCase):
         return self.build_end_state_expecting_failure()
 
     def given_path(self):
-        return functions_for('toml').fixture_directory_path('000-no-ent')
+        return toml_fixture_directory_for('000-no-ent')
 
     @property
     def _canon_case(self):
@@ -88,7 +89,7 @@ class Case2513_file_has_no_table(_CommonCase):
         return self.build_end_state_expecting_failure()
 
     def given_path(self):
-        return my_fixture_directory_path('2515-has-no-table.md')
+        return md_fixture_path('2515-has-no-table.md')
 
     @property
     def _canon_case(self):
@@ -183,12 +184,6 @@ class Case2522_non_empty_collection_found(_CommonCase):
 
 
 reason_via_end_state = canon.reason_via_end_state
-
-
-def my_fixture_directory_path(tail):  # ..
-    return os_path.join(
-            fixture_directories_path(),
-            '2656-markdown-table', tail)
 
 
 if __name__ == '__main__':

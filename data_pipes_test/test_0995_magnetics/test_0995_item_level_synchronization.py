@@ -1,4 +1,4 @@
-# covers: sakin_agac/magnetics/synchronized_stream_via_far_stream_and_near_stream  # noqa: E501
+# covers: data_pipes/magnetics/synchronized_stream_via_far_stream_and_near_stream  # noqa: E501
 
 """discussion
 
@@ -8,7 +8,7 @@ synchronization can be used at the sub-item level. that is, if collections
 are an ordered list of items (each one of which has a natural key), can
 we see an item as a collection (that is, an ordered list) of name-value
 pairs, where each name-value pair acts as "the item", and the name is
-itself the natural key? (more at [#407].)
+itself the natural key? (more at [#447].)
 
 sometime before #history-A.2 we established that yes, our synchronization
 facility can be applied usefully to this use case. the cost:
@@ -32,7 +32,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case010_hello(_CommonCase):
+class Case0995_hello(_CommonCase):
 
     def test_yes_we_can(self):
         _orig = _MyBusinessObject(
@@ -57,7 +57,7 @@ def _my_sync(orig, new):  # #here1
     _normal_far_st = new._to_normal_stream()
     _normal_near_st = orig._to_normal_stream()
 
-    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
     sync_st = _.stream_of_mixed_via_sync(
         normal_far_stream=_normal_far_st,
         normal_near_stream=_normal_near_st,
@@ -68,7 +68,7 @@ def _my_sync(orig, new):  # #here1
 
 
 def _item_via_collision(far_key, far_value, near_key, near_value):
-    # (#provision [#418.F] four args)
+    # (#provision [#458.F] four args)
 
     assert(far_key == near_key)
 
@@ -104,7 +104,7 @@ class _MyBusinessObject:
 
     def _to_normal_stream(bo):
         """so:
-        - this feels similar to [#418.E.2] a "native item normalizer"
+        - this feels similar to [#458.E.2] a "native item normalizer"
         - new at #history-A.2, :#here4 you must present the below in
           alphabetical order (or an error is emitted)
         """

@@ -2,6 +2,7 @@
 
 we want it be that there are no format-adapter-specific doo-hahs
 """
+# #[#874.9] file is LEGACY
 
 
 class SOME_SNAPSHOT:

@@ -36,12 +36,9 @@ script-test and its underlying support infrastructure in place:
 (this whole big change discussed above happened at #history-A.1.)
 """
 
-from _init import (
-        fixture_file_path,
-        )
-from sakin_agac_test.format_adapter.disjoint_smalls import (
-        build_state_the_bernstein_way,
-        )
+from data_pipes_test.common_initial_state import html_fixture
+from data_pipes_test.disjoint_small_support import (
+        build_state_the_bernstein_way)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
@@ -104,14 +101,14 @@ class Case1640DP_hello(_CommonCase):
     @shared_subject
     def _end_state(self):
         return build_state_the_bernstein_way(
-                fixture_document_path=fixture_file_path('0140-bernstein-subtree.html'),  # noqa: E501
+                fixture_document_path=html_fixture('0140-bernstein-subtree.html'),  # noqa: E501
                 producer_module=_subject_module(),
                 )
 
 
 @lazy
 def _subject_module():
-    from sakin_agac_test.fixture_executables import (
+    from data_pipes_test.fixture_executables import (
             exe_150_json_stream_via_bernstein_html as x)
     return x
 

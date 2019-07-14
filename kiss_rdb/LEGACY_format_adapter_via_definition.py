@@ -5,6 +5,7 @@ reminder:
 
   - the 'natural key' is not an immutable property of the format adapter
 """
+# #[#874.9] file is LEGACY
 
 
 class _FormatAdapter:
@@ -13,13 +14,13 @@ class _FormatAdapter:
             self,
 
             format_adapter_module_name,
-            # a human key is derived from this for the [#505] collection API
+            # a human key is derived from this for the [#874.3] collection API
 
             functions_via_modality=None,
             # if this format can be used as a "near" collection for syncing
 
             native_item_normalizer=None,
-            # for far collection, it must provide this per provision [#418.E.2]
+            # for far collection, it must provide this per provision [#458.E.2]
 
             value_readers_via_field_names=None,
             # for target near collection, calculate field readers dynamically
@@ -104,7 +105,7 @@ class _FormatAdapter:
         """NOTE - no caching - we should be caching maybe
         """
 
-        import sakin_agac.magnetics.via_human_keyed_collection as lib
+        import kiss_rdb.LEGACY_collection_lib as lib
 
         def say_collection():
             return 'the %s format adapter' % repr(self.format_name)

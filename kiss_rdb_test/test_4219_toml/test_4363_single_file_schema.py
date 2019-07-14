@@ -202,7 +202,7 @@ def _build_collection(dir_path, **injections):
 
 @lazy
 def _dir_path_most_common():
-    return functions_for('toml').fixture_directory_path('056-single-file')
+    return functions_for('toml').fixture_directory_for('056-single-file')
 
 
 @lazy

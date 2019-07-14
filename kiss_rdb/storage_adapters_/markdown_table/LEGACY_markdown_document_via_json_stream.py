@@ -1,6 +1,7 @@
 """experiment.."""
 # #[#874.8] file generates mardown the old way and may need to be the new way
 # #[#874.5] file used to be executable script and may need further changes
+# #[#874.9] file is LEGACY
 
 
 def _run_CLI(sin, sout, serr, argv):
@@ -39,7 +40,7 @@ _CLI_body.__doc__ = __doc__
 
 def _raw_lines_via_collection_identifier(coll_id, listener):  # #testpoint
 
-    from script.stream import collection_reference_via_ as _
+    from kiss_rdb.cli.LEGACY_stream import collection_reference_via_ as _
     coll_ref = _(coll_id, listener)
 
     if coll_ref is None:
@@ -124,7 +125,8 @@ def COMMON_FAR_KEY_SIMPLIFIER_(trav_params, listener):
     def f(dct):
         _norm_key = normal_via_str(dct['label'])
         return _simple_key_via_normal_key(_norm_key)
-    import sakin_agac.magnetics.normal_field_name_via_string as normal_via_str
+    from kiss_rdb.LEGACY_normal_field_name_via_string import (
+            normal_field_name_via_string as normal_via_str)
     return f
 
 
@@ -145,7 +147,7 @@ def COMMON_NEAR_KEY_SIMPLIFIER_(key_via_DOM_row, schema, listener):
     return f
 
 
-def simplified_key_via_markdown_link_er():  # #coverpoint13 (?) #html2markdown
+def simplified_key_via_markdown_link_er():  # (Case1640DP) (?) #html2markdown
 
     def simplified_key_via_markdown_link(markdown_link_string):
         md = markdown_link_rx.search(markdown_link_string)
@@ -156,7 +158,10 @@ def simplified_key_via_markdown_link_er():  # #coverpoint13 (?) #html2markdown
 
     import re
     markdown_link_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
-    import sakin_agac.magnetics.normal_field_name_via_string as normal_via_str
+
+    from kiss_rdb.LEGACY_normal_field_name_via_string import (
+            normal_field_name_via_string as normal_via_str)
+
     return simplified_key_via_markdown_link
 
 
@@ -181,7 +186,7 @@ def this_one_mapper_(key, listener):
     return mapper
 
 
-def label_via_string_via_max_width(max_width):  # #coverpoint8.1
+def label_via_string_via_max_width(max_width):  # (Case0810DP)
     def f(s):
         use_s = s[:(max_width-1)] + '…' if max_width < len(s) else s
         # (could also be accomplished by that one regex thing maybe)
@@ -191,7 +196,7 @@ def label_via_string_via_max_width(max_width):  # #coverpoint8.1
     return f
 
 
-def url_via_href_via_domain(domain):  # #coverpoint8.1
+def url_via_href_via_domain(domain):  # (Case0810DP)
     def f(href):
         _escaped_href = href.replace(' ', '%20')
         return url_head_format.format(_escaped_href)
@@ -220,7 +225,7 @@ def collection_identifier_via_parsed_arg_(arg):
 def __collection_identifier_via_stdin(stdin):
     import json
     _itr = (json.loads(s) for s in stdin)
-    from sakin_agac import my_contextlib as _
+    from data_pipes import my_contextlib as _
     return _.context_manager_via_iterator__(_itr)
 
 

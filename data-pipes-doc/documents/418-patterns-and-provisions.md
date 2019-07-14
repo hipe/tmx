@@ -43,7 +43,7 @@ particular application of this theory that has yielded mis-behaviors.
 but the "theory" of heruistic templating is that we look at the existing
 formatting of the document to determine how we format new expression.
 
-more at [#417.C], which segues into this (among other corollaries).
+more at [#457.C], which segues into this (among other corollaries).
 
 
 
@@ -84,7 +84,7 @@ but this is seen as overwrought for now.
 
 ## <a name='E.2'></a> provision: dictionary is the standard item
 
-(explained in a context at [#408.E].)
+(explained in a context at [#448.E].)
 
 
 
@@ -115,7 +115,7 @@ One case that covers this provision is (Case0150DP).
 ## <a name=H></a> provision: custom keyers
 
 this provision holds that you can provide a function that "derives" a human
-key per each item through arbitrary means. [#423.B] shows how a keyer can
+key per each item through arbitrary means. [#463.B] shows how a keyer can
 work in conjunction with a mapper, in our "pipeline workflow".
 
 One case that that covers this provision is (Case0160DP).
@@ -135,7 +135,7 @@ married to this but it's a cost-saving shortcut.
 ## <a name="I.3.1"></a> feature-ish: map for sync
 
 (first read the description in the UI referenced with this tag then return
-to here.) having not yet fully realized [#423.C] full, arbitray functional
+to here.) having not yet fully realized [#463.C] full, arbitray functional
 pipelines to the extent that we would like, we for now have this more
 hard-coded action for inspecting a producer stream after its various mappings,
 filters etc are applied.
@@ -146,17 +146,17 @@ filters etc are applied.
 
 ## <a name="I.3.2"></a> feature: far deny list
 
-this "feature" is an outcropping of feature [#418.I.3.1] "map for sync"
+this "feature" is an outcropping of feature [#458.I.3.1] "map for sync"
 (immediately above); that is it is a necessary byproduct of the wish to
 inspect data in our pipeline and still meet the various requirements of
-the consuming script. longer explanation at [#423.D].
+the consuming script. longer explanation at [#463.D].
 
 
 
 
 ## <a name="I.4"></a> feature: custom mapper oldschool
 
-away at [#423.C] custom pipes, probably.
+away at [#463.C] custom pipes, probably.
 
 
 
@@ -188,7 +188,7 @@ for a synchronization:
   - you can't have traversal parameters without a far stream. (EDIT: explain
     the thinking by importing a comment to here.)
   - you can't do the central syncing algorithm without the two streams.
-  - finally, per the next point [#418.L], these streams gonna be in context
+  - finally, per the next point [#458.L], these streams gonna be in context
     managers..
 
 so, in pseudocode:
@@ -206,7 +206,7 @@ so the order must be:
   1. near
   1. sync
 
-in turn, the above is now considered #pattern [#418.Z.1].
+in turn, the above is now considered #pattern [#458.Z.1].
 
 
 
@@ -214,7 +214,7 @@ in turn, the above is now considered #pattern [#418.Z.1].
 ## <a name=L></a> provision: the two streams should be in context managers
 you can
 
-.:[#418.L.2]: on failure you must sill result in an iterator
+.:[#458.L.2]: on failure you must sill result in an iterator
 
 
 

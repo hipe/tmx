@@ -51,13 +51,13 @@ def filter_by_tags(ctx, collection, query):
     itr = stats_future_and_results_via_entity_stream_and_query(_ents, q)
     future = next(itr)
 
-    from kiss_rdb.cli import (
-            click, dict_dumper_via_output_stream_, success_exit_code_)
+    from kiss_rdb.cli import (click, success_exit_code_)
+    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
 
     sout = click.utils._default_text_stdout()
     serr = click.utils._default_text_stderr()
 
-    dump = dict_dumper_via_output_stream_(sout)
+    dump = dictionary_dumper_as_JSON_via_output_stream(sout)
     first = True
     for entity in itr:
         if first:

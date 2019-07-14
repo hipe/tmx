@@ -1,12 +1,10 @@
 # #covers: sakin_agac.format_adapters.markdown_table.magnetics.prototype_row_via_example_row_and_schema_index  # noqa: E501
-
-from _init import (
-        fixture_file_path,
-        pop_property,
-        )
+from kiss_rdb_test.common_initial_state import (
+        publicly_shared_fixture_file)
+from data_pipes_test.common_initial_state import (
+        pop_property)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as mag_lib  # noqa: E501
         lazy)
 import unittest
 
@@ -321,9 +319,9 @@ def _sections_index_via(section_list):
 
 def _section_list_via(far_dicts, mixed_near):
 
-    # #pattern [#418.Z.1] - nested context managers
+    # #pattern [#458.Z.1] - nested context managers
 
-    import sakin_agac_test.sync_support as sync_lib
+    import data_pipes_test.sync_support as sync_lib
 
     near_keyer, normal_far_dicts = sync_lib.NORMALIZE_NEAR_ETC_AND_FAR(far_dicts)  # noqa: E501
 
@@ -338,13 +336,13 @@ def _section_list_via(far_dicts, mixed_near):
 
     def open_near():
         if isinstance(mixed_near, str):
-            use_near = fixture_file_path(mixed_near)
+            use_near = publicly_shared_fixture_file(mixed_near)
         else:
             use_near = mixed_near
 
         return sync_lib.open_tagged_doc_line_items__(use_near)
 
-    import sakin_agac.magnetics.result_via_tagged_stream_and_processor as _
+    import data_pipes.magnetics.result_via_tagged_stream_and_processor as _
     with open_near() as near, open_out(near) as sess:
         result = _(sess, _MyCustomProcessor())
     return result
@@ -420,23 +418,23 @@ class _MyCustomProcessor:
 
 @lazy
 def _same_far_keyer():
-    return _here() + 'Chimmy_Chamosa_001_far'  # (in this file)
+    return f'{_here()}.Chimmy_Chamosa_001_far'  # (in this file)
     # return Chimmy_Chamosa_001_far
 
 
 @lazy
 def _same_near_keyer():
-    # return _here() + 'Chimmy_Chamosa_001_near'  # (in this file)
+    # return f'{_here()}.Chimmy_Chamosa_001_near'  # (in this file)
     return Chimmy_Chamosa_001_near
 
 
 @lazy
 def _here():
-    return (
-        'sakin_agac_test.test_450_format_adapters.'
-        'test_100_markdown_table.'
-        'test_300_synchronized_stream_via_far_stream_and_near_stream.'
-        )
+    # this is awful but, while it works: load *this* file as a module
+    from os import path as os_path
+    o = __file__.split(os_path.sep)
+    _these = (o[-3], o[-2], os_path.splitext(o[-1])[0])
+    return '.'.join(_these)
 
 
 # == BEGIN [#410.W] explains our excitement and misgivings about these
@@ -476,7 +474,9 @@ class _Section:
 
 
 def _subject_module():
-    return mag_lib.sub_magnetic('synchronized_stream_via_far_stream_and_near_stream')  # noqa: E501
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        synchronized_stream_via_far_stream_and_near_stream as mod)
+    return mod
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-from _common_state import cover_me  # noqa: F401
+from pho_test.common_initial_state import cover_me
 from pho_test import document_state as doc_state_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest

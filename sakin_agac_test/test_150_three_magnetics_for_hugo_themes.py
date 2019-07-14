@@ -4,9 +4,8 @@
 .#covers script.SSGs.hugo_themes_deep.theme_toml_stream_via_themes_dir #[#410.A.1]  # noqa: E501
 """
 
-from _init import (
-        fixture_directory_path,
-        )
+from sakin_agac_test.common_initial_state import (
+        fixture_directory_for)
 from modality_agnostic.memoization import lazy
 import unittest
 
@@ -144,21 +143,24 @@ def _product_of_magnet_one():
 
 @lazy
 def _themes_dir_A():
-    return fixture_directory_path('0190-a-few-hugo-themes')
+    return fixture_directory_for('0190-a-few-hugo-themes')
 
 
 def _subject_module_three():
-    import script.SSGs.hugo_themes_deep.theme_toml_stream_via_themes_dir as _  # noqa: E501
+    from script.producer_scripts import (
+            script_180920_hugo_theme_toml_stream_via_themes_dir as _)
     return _
 
 
 def _subject_module_two():
-    import script.SSGs.hugo_themes_deep.theme_directory_stream_via_themes_dir as _  # noqa: E501
+    from script.producer_scripts import (
+            script_180920_hugo_theme_directory_stream_via_themes_dir as _)
     return _
 
 
 def _subject_module_one():
-    import script.SSGs.hugo_themes_deep.relevant_themes_collection_metadata_via_themes_dir as _  # noqa: E501
+    from script.producer_scripts import (
+            script_180920_hugo_relevant_themes_collection_metadata_via_themes_dir as _)  # noqa: E501
     return _
 
 

@@ -7,8 +7,8 @@ objectives are severalfold:
     - cover that syncing still works here with our crazy new deny list
 """
 
-from _init import (
-        fixture_file_path,
+from data_pipes_test.common_initial_state import (
+        html_fixture,
         ProducerCaseMethods)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -56,10 +56,10 @@ class Case2014_does_scrape_work(ProducerCaseMethods, _CommonCase):
         return self.build_raw_list_()
 
     def far_collection_identifier(self):
-        return 'script/heroku_add_ons/json_stream_via_website.py'
+        return 'script/producer_scripts/script_180421_heroku_add_ons.py'
 
     def cached_document_path(self):
-        return fixture_file_path('0160-heroku-add-ons.html')
+        return html_fixture('0160-heroku-add-ons.html')
 
 
 class Case2016_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
@@ -123,10 +123,10 @@ class Case2018_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
         return self.build_pair_list_for_inspect_()
 
     def far_collection_identifier(self):
-        return 'script/SSGs/hugo_themes.py'
+        return 'script/producer_scripts/script_180905_hugo_themes.py'
 
     def cached_document_path(self):
-        return fixture_file_path('0180-hugo-themes.html')
+        return html_fixture('0180-hugo-themes.html')
 
 
 class Case2019_omg_syncing(ProducerCaseMethods, _CommonCase):

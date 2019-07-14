@@ -19,7 +19,7 @@ further processing.)
 at the end of all this, each far item that had no corresponding near item
 (i.e. that did not "pair up") is simply appended to the near collection.
 
-(this is a synopsis of an algorithm that is described [#407] more formally.)
+(this is a synopsis of an algorithm that is described [#447] more formally.)
 """
 
 _desc = __doc__
@@ -63,7 +63,7 @@ def _my_parameters(o, param):
 
 
 def _pop_property(self, prop):
-    from sakin_agac import pop_property
+    from data_pipes import pop_property
     return pop_property(self, prop)
 
 
@@ -290,7 +290,7 @@ class _LineConsumer_via_STDOUT:
         return False
 
 
-if is_entrypoint_file:
+def cli_for_production():
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

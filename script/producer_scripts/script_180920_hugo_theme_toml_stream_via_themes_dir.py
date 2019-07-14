@@ -33,7 +33,8 @@ class _CLI:
         self.OK = True
 
     def execute(self):
-        import script.stream as cl  # cl = "CLI lib"
+        from data_pipes import common_producer_script as mod
+        cl = mod.common_CLI_library()  # cl = CLI library
         cl.must_be_interactive_(self)
         cl.parse_args_(self, '_namespace', _my_parameters, _my_desc)
         self.OK and setattr(self, '_listener', cl.listener_for_(self))
@@ -64,7 +65,8 @@ def theme_toml_stream_via_themes_dir(themes_dir, listener):  # glue
 
     dictionary_via_toml_via_path = _make_toml_parser(listener)
 
-    import script.SSGs.hugo_themes_deep.theme_directory_stream_via_themes_dir as _  # noqa: E501
+    from script.producer_scripts import (
+        script_180920_hugo_theme_directory_stream_via_themes_dir as _)
 
     _ = _.open_theme_directory_stream_via_themes_dir(themes_dir, listener)
     with _ as paths:

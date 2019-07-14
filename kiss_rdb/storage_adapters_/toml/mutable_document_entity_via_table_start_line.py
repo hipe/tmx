@@ -110,7 +110,7 @@ class _MutableDocumentEntity:
 
         return gist
 
-    # == THE STORAGE ADAPTER ENTITY INTERFACE (experimental)
+    # == towards experimental [#874.3] storage adapter entity interface
 
     @property
     def identifier(self):

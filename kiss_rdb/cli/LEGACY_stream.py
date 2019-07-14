@@ -7,8 +7,9 @@ or for debugging collections for example in syncing.
 """
 # NOTE above is expressed in helpscreen :[#415]
 # #[#874.5] file used to be executable script and may need further changes
+# #[#874.9] file is "LEGACY"
 
-
+from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
 
 _is_entrypoint_file = __name__ == '__main__'
 
@@ -83,9 +84,9 @@ class _CLI:
 
     def __work_simple(self):
 
-        visit = siblib.JSON_object_writer_via_IO_downstream(self._sout)
+        visit = dictionary_dumper_as_JSON_via_output_stream(self._sout)
 
-        _ = open_traversal_stream(
+        _ = open_traversal_stream_TEMPORARY_LOCATION(
                 cached_document_path=None,  # (we don't test CLI)
                 collection_identifier=self._coll_id,
                 intention=None,
@@ -115,7 +116,8 @@ def _traversal_stream_for_sync(  # #testpoint
         return
 
     _fsf = _filesystem_functions()
-    import sakin_agac.format_adapters.markdown_table.magnetics.normal_far_stream_via_collection_reference as _  # noqa: E501
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        normal_far_stream_via_collection_reference as _)
 
     far_sess_cm = _.OPEN_FAR_SESSION(
         far_collection_reference=coll_ref,
@@ -131,8 +133,10 @@ def _traversal_stream_for_sync(  # #testpoint
             yield pair
 
 
-class open_traversal_stream:
+class open_traversal_stream_TEMPORARY_LOCATION:
     """ #[#020.3]. just glue.
+
+    [#874.7] non-CLI should not load CLI to use this
     """
 
     def __init__(
@@ -339,7 +343,7 @@ def _format_adapters_module():
     per typical invocation.)
     """
 
-    import sakin_agac.format_adapters as mod
+    import kiss_rdb.LEGACY_format_adapter_collection as mod
     return mod
 
 

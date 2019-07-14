@@ -11,16 +11,16 @@ firstly:
   - (we were #[#020.3] at one point distrungtled that simple function-
     based context manager wouldn't suffice here.)
 
-this ended up blowing up into [#418] thoughts on collection metadata..
+this ended up blowing up into [#458] thoughts on collection metadata..
 """
 
-from sakin_agac import (
+from data_pipes import (
         cover_me,
         pop_property)
 
 
-class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # #coverpoint13.2
-    """exercise #pattern [#418.Z.2]: separate context manager from work"""
+class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # (Case2451)
+    """exercise #pattern [#458.Z.2]: separate context manager from work"""
 
     def __init__(
             self,
@@ -39,7 +39,7 @@ class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # #coverpoint13.2
             tup = _main_work(_doc_items, intention, listener)
             arg1, arg2 = _normalize_final_args(tup)
 
-            import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+            import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
             return _.SYNC_RESPONSE_VIA_TWO_FUNCTIONS(
                 release_sync_parameters_dictionary=arg1,
                 release_dictionary_stream=arg2,
@@ -94,7 +94,8 @@ def _main_work(doc_line_items, intention, listener):
     from modality_agnostic import streamlib as _
     next_doc_line_item = _.next_or_noner(doc_line_items)
 
-    import sakin_agac.format_adapters.markdown_table as _
+    from kiss_rdb.storage_adapters_.markdown_table import (
+            LEGACY_format_adapter as _)
     eto = _.ExpectedTagOrder_()
 
     _ok = __advance_over_head_lines(doc_line_items, eto)
@@ -135,7 +136,7 @@ def _main_work(doc_line_items, intention, listener):
 
 def __build_schema_dictionary(tlfn, field_names):
 
-    _nkfn = field_names[0]  # for now, hardcoded as this [#418.I.2]
+    _nkfn = field_names[0]  # for now, hardcoded as this [#458.I.2]
     return {
             '_is_sync_meta_data': True,
             'natural_key_field_name': _nkfn,
@@ -181,7 +182,7 @@ def __advance_over_head_lines(doc_line_items, eto):
 # ==
 
 def __tag_lyfe_field_names_hack(dct, intention, listener):
-    """as an answer to the problem introduced in [#418.2] ("whether to be a
+    """as an answer to the problem introduced in [#458.2] ("whether to be a
 
     jack of all trades"), we introduced the idea of "intention" as a soft
     hint for what this traversal is for.
@@ -260,7 +261,7 @@ def __dict_via_row_dom(field_names):
     def f(dom):
         _r = range(0, dom.cels_count)
         _pairs = ((i, dom.cel_at_offset(i).content_string()) for i in _r)
-        # #[#410.13] where sparseness is implemented #coverpoint13.2:
+        # #[#410.13] where sparseness is implemented (Case2451)
         return {field_names[t[0]]: t[1] for t in _pairs if len(t[1])}
     return f
 

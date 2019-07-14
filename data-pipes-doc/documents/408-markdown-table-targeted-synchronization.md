@@ -8,7 +8,7 @@ date: "2018-04-24T16:01:17-04:00"
 
 this document serves dual purposes, one more general and one more specific:
 
-generally, we decompose our [#407] high-level synchronization algorithm
+generally, we decompose our [#447] high-level synchronization algorithm
 into code-level modules ("magnetics", usually) that we write one by one.
 
 more specifically, begin to tilt the work towards our target use case:
@@ -146,7 +146,7 @@ item to use, IFF the first element of the tuple to use is `OK`.
 
 ## <a name=E></a> provision: the item normalizer
 
-(when referencing this point as a provision (or otherwise), use [#418.E.2])
+(when referencing this point as a provision (or otherwise), use [#458.E.2])
 
 in order for a practical synchronization to make a remote object fit in with
 our local presentation (document), we have to be able to read the remote
@@ -171,7 +171,7 @@ less efficient for some contrived scenarios);
     but this lacks reflection ability on its own; and these idioms are
     in-built when we use something as familiar as dictionaries)
 
-  - in practice in our imagined ideal scenario we are getting [#417.A]
+  - in practice in our imagined ideal scenario we are getting [#457.A]
     streams of JSON objects anyway. to first run each item thru a normalizer
     that presented it as an iterator of name-value pairs, and then go and
     derive again a dictionary from such a function, was far too triggering

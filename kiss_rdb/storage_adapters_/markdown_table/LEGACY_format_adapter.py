@@ -1,9 +1,8 @@
-from sakin_agac.magnetics import (
-        format_adapter_via_definition as _format_adapter,
-        )
-from sakin_agac import (
-        cover_me,
-        )
+# #[#874.9] file is LEGACY
+
+from kiss_rdb import (
+        LEGACY_format_adapter_via_definition as _format_adapter)
+from data_pipes import cover_me
 
 
 def _required(self, prop, x):  # ..
@@ -184,11 +183,19 @@ _functions = {
             },
         }
 
+
+# == in oldentimes, this file was __init__.py probably. then, #history-A.2
+s = __name__
+_use_name = s[0:s.rindex('.')]  # like "dirname"
+# ==
+
+
 FORMAT_ADAPTER = _format_adapter(
         functions_via_modality=_functions,
         associated_filename_globs=('*.md',),
-        format_adapter_module_name=__name__,
+        format_adapter_module_name=_use_name,
         )
 
+# #history-A.2
 # #history-A.1: markdown table as producer
 # #born.

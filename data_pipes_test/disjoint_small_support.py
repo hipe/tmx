@@ -40,9 +40,9 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
 
     def fuzzy_key(dct):
         return simplified_key_via_markdown_link(dct['name'])
-    from script.markdown_document_via_json_stream import (
-            simplified_key_via_markdown_link_er as _,
-            )
+
+    from data_pipes import common_producer_script as mod
+    _ = mod.LEGACY_markdown_lib().simplified_key_via_markdown_link_er
     simplified_key_via_markdown_link = _()
 
     with _open_traversal_stream as dcts:

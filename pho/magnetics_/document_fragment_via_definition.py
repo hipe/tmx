@@ -41,7 +41,7 @@ def document_fragment_via_definition(
             **dct)
 
 
-def _normalize_core_attribute_names(  # #[#008.D]
+def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
         parent=None,
         natural_key=None,
         heading=None,

@@ -1,10 +1,8 @@
 # #covers: script.sync
-
-from _init import (
+from data_pipes_test.common_initial_state import (
         build_end_state_commonly,
-        fixture_executable_path,
-        fixture_file_path,
-        )
+        markdown_fixture,
+        executable_fixture)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
@@ -165,8 +163,8 @@ class Case2662DP_near_file_not_found(_CommonCase):
 
     def given(self):
         return {
-                'near_collection': fixture_file_path('0075-no-such-file.md'),
-                'far_collection': fixture_executable_path('exe_110_extra_cel.py'),  # noqa: E501
+                'near_collection': markdown_fixture('0075-no-such-file.md'),
+                'far_collection': executable_fixture('exe_110_extra_cel.py'),
                 }
 
 
@@ -203,7 +201,7 @@ class Case2664DP_duplicate_key(_CommonCase):
             {'col_a': 'qux'},
         )
         return {
-            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
             'far_collection': _these,
         }
 
@@ -219,7 +217,7 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
 
     NOTE the original has stochastic whitespace. the updated cel loses
     this whitespace. we presume it is that the new is using the whitespacing
-    of the [#418.D] example row. but at this point, we don't know nore care.
+    of the [#458.D] example row. but at this point, we don't know nore care.
     that is a bridge to cross when we get to it.
     """
 
@@ -243,7 +241,7 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
                 {'col_a': 'thing B', 'col_b': 'thing two'},
                 )
         return {
-            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
             'far_collection': _far,
         }
 
@@ -277,7 +275,7 @@ class Case2667DP_ADD_end_cappiness_here(_CommonCase):
                 {'col_a': 'thing C', 'col_b': 'yerp'},
                 )
         return {
-            'near_collection': fixture_file_path('0110-endcap-yes-no.md'),
+            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
             'far_collection': _far,
         }
 
@@ -291,11 +289,11 @@ def _same_this():
 
 
 def _far_script_exists():
-    return fixture_executable_path('exe_100_bad_natural_key.py')
+    return executable_fixture('exe_100_bad_natural_key.py')
 
 
 def _same_existent_markdown_file():
-    return fixture_file_path('0080-cel-underflow.md')
+    return markdown_fixture('0080-cel-underflow.md')
 
 
 if __name__ == '__main__':

@@ -33,10 +33,10 @@ class open_dictionary_stream:
         return False  # no, we don't trap exceptions
 
 
-# == BEGIN (see same in sakin_agac: [#410.H])
+# == BEGIN (see same in data_pipes: [#410.H])
 
 def execute_as_CLI_(open_dictionary_stream):
-    from script.json_stream_via_url_and_selector import (
+    from data_pipes.format_adapters.html.script_common import (
             flush_JSON_stream_into as flush_into)
     import sys as o
     with open_dictionary_stream(None, None) as dcts:

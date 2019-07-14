@@ -1,6 +1,6 @@
-"""(algorithm documented (first) exhaustively at [#407])"""
+"""(algorithm documented (first) exhaustively at [#447])"""
 
-from sakin_agac import (
+from data_pipes import (
         cover_me,
         pop_property)
 from modality_agnostic import (
@@ -82,7 +82,7 @@ class _TraversalParameters:
     either collection, but rather we are conceiving of it as a property
     (a parameter) of the synchronization itself...
 
-    [#418.E] is dedicated to thoughts on this class and its future
+    [#458.E] is dedicated to thoughts on this class and its future
     """
 
     def __init__(
@@ -115,7 +115,7 @@ class _TraversalParameters:
 
     traversal_parameters_version = 4
 
-    # bump this WHEN you add to constituency (#provision [#418.J])
+    # bump this WHEN you add to constituency (#provision [#458.J])
     # bumped from 3 to 4 at #history-A.6
     # bumped from 2 to 3 at #history-A.5
 
@@ -172,7 +172,7 @@ class _Worker:
 
 class _WorkerWhenInterleaving(_Worker):
     """
-    the [#407] interleaving algorithm. spiked at #history-A.4
+    the [#447] interleaving algorithm. spiked at #history-A.4
     """
 
     def __init__(
@@ -433,7 +433,7 @@ class _WorkerWhenDiminishingPool(_Worker):
         self._OK = False
 
 
-# :#here1: realize #provision [#418.F] four args for collision callback
+# :#here1: realize #provision [#458.F] four args for collision callback
 
 
 # --

@@ -85,13 +85,12 @@ as either "python" or "other" (based on the extension, maybe) and we use
 either figure 1 or figure 2 based on that. but suffice it to say, there is
 some figure 1 work we would have to do that is not yet implemented.)
 
-.:[#417.A]
+.:[#457.A]
 """
 
-from sakin_agac.magnetics import (
-        format_adapter_via_definition,
-        )
-from sakin_agac import (
+from kiss_rdb import (
+        LEGACY_format_adapter_via_definition as format_adapter_via_definition)
+from data_pipes import (
         cover_me,
         pop_property)
 import re
@@ -178,8 +177,8 @@ class _OpenTravRequest:
         """
 
         dn = os_path.dirname
-        import sakin_agac as x
-        root = dn(dn(x.__file__))  # not __init__.py, not sakin_agac
+        import data_pipes as x
+        root = dn(dn(x.__file__))  # not __init__.py, not data_pipes
         path_len = len(path_stem)
         head_len = len(root) + 1  # include a trailing '/' sep yuck
 
@@ -231,7 +230,7 @@ class _MyContextManager:
 
         _dictionary_stream = self._the_worst.__enter__()
 
-        import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+        import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
         return _.SYNC_RESPONSE_VIA_DICTIONARY_STREAM(
                 _dictionary_stream,
                 self._format_adapter,

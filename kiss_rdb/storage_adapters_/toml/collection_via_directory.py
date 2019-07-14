@@ -86,7 +86,7 @@ class collection_via_directory_and_schema:
         # the KISS-iest interface here is that CREATE should take an isomorphic
         # dictionary as an argument in the expected way..
 
-        assert(isinstance(dct, dict))  # [#008.D]
+        assert(isinstance(dct, dict))  # #[#022] wish for strong types
 
         # internally we want to use our "prepare & flush edit" pattern which
         # is fine, but we have to upgrade the dict into:

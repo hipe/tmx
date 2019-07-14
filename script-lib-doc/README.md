@@ -54,18 +54,17 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 
 (this is a [\[#002\]] node table.)
 
-|Id                         | Main Tag | Content
-|---------------------------|:-----:|-
+|Id                         | Main Tag | Content |
+|---------------------------|:-----:|---|
 |[#610]                     |       | line stream via big string
 |[#608.7]                   | #trak | track fellows whose CLI exitstatus is "guilty til proven innocent"
 |[#608.6]                   | #trak | this other approach to a library interface (see)
 |[#608.5]                   | #trak | this one approach to a library interface (see)
 |[#608.4]                   | #trak | all the places you write this same `--help` regex |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
-|[#608.2]                   |       | external tracking |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
-|[#604]                     | #wish | for strong type |
+|[#604]                     | #hole |
 |[#603]                     |       | [the help screen parser] |
 |:[#602]                    | #open | track that one issue with argparse (should patch) |
 

@@ -87,22 +87,6 @@ def given_input_string(f):  # local decorator
     return g
 
 
-class Case005_ASSORTED_STOWAWAYS(_CommonCase):
-
-    def test_format_adapter_loads(self):
-        self.assertIsNotNone(co.subject_format_adapter())
-
-    def test_SNEAK_IN_TEST_ABOUT_REFLECTION(self):
-        count = 0
-        import sakin_agac.format_adapters as x
-        for mod in x.EVERY_MODULE():
-            fa = mod.FORMAT_ADAPTER
-            if fa is not None:
-                mod.FORMAT_ADAPTER.associated_filename_globs  # it's OK if None
-                count += 1
-        self.assertNotEqual(0, count)
-
-
 class Case010_some_failures(_CommonCase):
 
     def test_010_loads(self):
@@ -214,7 +198,9 @@ class _CaseState:
 
 
 def _subject_module():
-    return co.sub_magnetic('row_as_editable_line_via_line')
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
+        row_as_editable_line_via_line as mod)
+    return mod
 
 
 if __name__ == '__main__':

@@ -1,9 +1,8 @@
 # #covers script.SSGs.hugo_themes_deep.tags_and_features_reports.report_200_alternatives_and_their_useful_phenomena #[#410.A.1]  # noqa: E501
 
 
-from _init import (
-        fixture_directory_path,
-        )
+from sakin_agac_test.common_initial_state import (
+        fixture_directory_for)
 import unittest
 
 
@@ -46,12 +45,13 @@ class Case250_HI(_CommonCase):
 
 
 def _subject_module():
-    import script.SSGs.hugo_themes_deep.tags_and_features_reports.report_200_alternatives_and_their_useful_phenomena as _  # noqa: E501
+    from script.producer_scripts.script_180920_hugo_themes import (
+            report_200_alternatives_and_their_useful_phenomena as _)
     return _
 
 
 def _themes_dir_A():
-    return fixture_directory_path('0190-a-few-hugo-themes')
+    return fixture_directory_for('0190-a-few-hugo-themes')
 
 
 if __name__ == '__main__':

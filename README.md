@@ -185,7 +185,7 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
-|[#851]-[#899]              |       | (for kiss-rdb/casle of dust, for now)
+|[#851]-[#899]              |       | (for kiss-rdb/castle of dust, for now)
 |[#802]-[#850]              |       | (reserved for [#406] CMS app for now)
 |[#701]-[#799]              |       | (for tag lyfe)
 |[#601]-[#699]              |       | (for script lib)
@@ -194,14 +194,15 @@ then in your 'main' terminal:
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+|[#022]                     | #trak | places where we wish we had strongly typed
 |[#021]                     | #wish | the desire for coverage testing (for particular reasons)
 |[#020.4]                   | #trak | track attempts at importing sibling modules
 |[#020.3]                   | #trak | track this one gripe about contextlib
 |[#020.2]                   | #hm   | track this one gripe about argparse
 |[#020]                     | #trak | track all issues with python itself
-|[#019]                     | #open | normalizing sys path ..
+|[#019]                     |       | package filesystem conventions ..
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
-|[#017]                     |       | [placeholder to explain our listener pattern]
+|[#017]                     |       | placeholder to explain our listener pattern - use [#511] now instead
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [tickler numberspace]
 |[#014]                     |       | [expect tree-like screen]
@@ -216,9 +217,9 @@ then in your 'main' terminal:
 |[#008.G]                   |       | track callable modules
 |[#008.F]                   | #vape | machine-generated tests
 |[#008.E]                   | #wish | gettext uber alles
-|[#008.D]                   | #wish | strongly typed python yikes
+|[#008.D]                   | #hole |
 |[#008.C]                   | #wish | function-based commands
-|[#008.B]                   | #open | remove array abuse
+|[#008.B]                   | #hole |
 |[#008]                     |       | (placeheld for small internal tracking)
 |[#007.E]                   | #open | probably refactor all `format` and (probably) `%` to use f-strings
 |[#007.D]                   | #open | PEP8 (now that we know how to activate it)
@@ -235,7 +236,7 @@ then in your 'main' terminal:
 
 
 
-[\[#019\]]: doc/019-normalizing-sys-path.md
+[\[#019\]]: doc/019-package-filesystem-conventions.md
 [\[#018\]]: doc/018-installing-and-deploying-python.md
 [\[#016\]]: game-server-doc/016-K-hong-reading-notes.md
 [\[#015\]]: game-server-doc/015-tickler-file.md

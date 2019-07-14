@@ -22,12 +22,21 @@ only in modeling interfaces for this purpose.
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#511.4]                   |       | the previous but plus styler
+|[#511.3]                   |       | provision: expression with yield
+|[#510.8]                   |       | track copy-pasted implementations of lazy
+|[#510.7]                   |       | namespace for specfic instances
+|[#510.6]                   |       | track custom memoizy decorators
+|[#510.5]                   |       | track custom dereferencers
+|[#510.4]                   |       | track custom memoizers
+|[#510.3]                   |       | track custom states
+|[#510.2]                   |       | track blank states
 |[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
-|[#508]                     | #open | worldwide, change this to be this (see)
+|[#508]                     | #hole |
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
-|[#505]                     |       | [feature branch]
+|[#505]                     | #hole |
 |[#504]                     | #open | magnetics/command-via-command-stream
 |[#503]                     | #open | magnetics/command-via-parameter-stream
 |[#502]                     | #open | magnetics/parameter-via-definition

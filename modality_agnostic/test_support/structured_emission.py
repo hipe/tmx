@@ -33,6 +33,23 @@ def one_and_done(tc, recv):  # 1x
     return ee.listener, ee.ran
 
 
+def minimal_listener_spy():
+    """similar elsewhere. this one is minimal. DEPRECATED:
+
+    .#history-A.2: even the below may be deprecated. moved here from elsewhere
+    .#open [#410.I] the soul of this has been stolen and moved to [#509.2]
+    """
+
+    def listener(*a):
+        severity, shape, *ignore, payloader = a
+        assert('error' == severity)
+        assert('expression' == shape)
+        for line in payloader():
+            mutable_message_array.append(line)
+    mutable_message_array = []
+    return (mutable_message_array, listener)
+
+
 class ExpectEmission:
 
     def __init__(
@@ -100,5 +117,6 @@ def debugging_listener():
     return _.for_DEBUGGING
 
 
+# #history-A.2
 # #history-A.1: move state stuff into a class
 # #abstracted.

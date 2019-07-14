@@ -45,13 +45,13 @@ def open_dictionary_stream(html_document_path, listener):
 
 
 def _lib():
-    import script.json_stream_via_url_and_selector as lib
+    import data_pipes.format_adapters.html.script_common as lib
     return lib
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+    common_CLI_for_json_stream_ = _lib().common_CLI_for_json_stream_
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'url': _url},

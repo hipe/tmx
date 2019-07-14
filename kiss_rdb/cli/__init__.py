@@ -311,8 +311,9 @@ def get(ctx, collection, internal_identifier):
     if dct is None:
         return mon.max_errno or 404  # (Case6064)  ##here1
 
+    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
     fp = click.utils._default_text_stdout()
-    _dump = dict_dumper_via_output_stream_(fp)
+    _dump = dictionary_dumper_as_JSON_via_output_stream(fp)
     _dump(dct)
     fp.write('\n')
 
@@ -419,21 +420,6 @@ def filter_by_tags(ctx, collection, query):
     """
 
     return _filter_by_tags().filter_by_tags(ctx, collection, query)
-
-
-def dict_dumper_via_output_stream_(fp):  # (Case6080)
-    """JSON is chosen as a convenience for us not you. Don't get too attached
-
-    because we might switch this default dumping format to something else.
-    NOTE ths does *not* output a trailing newline.
-
-    Everywhere this is used is near our "oneline" #wish [#873.C].
-    """
-
-    def dump(dct):
-        json.dump(dct, fp=fp, indent=2)
-    import json
-    return dump
 
 
 # ==

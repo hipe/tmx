@@ -296,7 +296,7 @@ class _IndexedFragment:
         return _okay
 
     def _add_AST(self, ast):
-        assert(hasattr(ast, 'symbol_name'))  # #[#008.D]
+        assert(hasattr(ast, 'symbol_name'))  # #[#022] wish for strong types
         self.line_ASTs.append(ast)
         return _okay
 

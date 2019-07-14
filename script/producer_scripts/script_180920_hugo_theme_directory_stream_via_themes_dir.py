@@ -27,7 +27,8 @@ class _CLI:
         self.OK = True
 
     def execute(self):
-        import script.stream as cl  # cl = "CLI lib"
+        from data_pipes import common_producer_script as mod
+        cl = mod.common_CLI_library()  # cl = "CLI lib"
         cl.must_be_interactive_(self)
         self.OK and cl.parse_args_(self, '_namespace', _my_params, _my_desc)
         self.OK and setattr(self, '_listener', cl.listener_for_(self))
@@ -55,7 +56,8 @@ class open_theme_directory_stream_via_themes_dir:  # just glue
 
     def __enter__(self):
         self._exit_me = None
-        import script.SSGs.hugo_themes_deep.relevant_themes_collection_metadata_via_themes_dir as _  # noqa: E501
+        from script.producer_scripts import (
+                script_180920_hugo_relevant_themes_collection_metadata_via_themes_dir as _)  # noqa: E501
         md = _.relevant_themes_collection_metadata_via_themes_dir(self._themes_dir, self._listener)  # noqa: E501
         if md is None:
             return

@@ -26,7 +26,7 @@ def _required(self, attr, x):
 class open_dictionary_stream:
 
     def __init__(self, cached_document_path, listener):
-        import script.json_stream_via_url_and_selector as _
+        import data_pipes.format_adapters.html.script_common as _
         self._cached_document_path = cached_document_path
         self._listener = listener
         self._lib = _
@@ -102,8 +102,9 @@ def cover_me():
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+    from data_pipes.format_adapters.html.script_common import (
+            common_CLI_for_json_stream_)
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'_this_one_url': _url},

@@ -1,6 +1,4 @@
-from _common_state import (
-        fixture_directory,
-        )
+from pho_test.common_initial_state import fixture_directory
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest

@@ -1,6 +1,8 @@
 from sakin_agac import (
         cover_me,
         )
+# #[#874.9] file is LEGACY
+
 from modality_agnostic.memoization import lazy
 
 
@@ -9,7 +11,7 @@ def procure_format_adapter(**kwargs):
 
 
 class _ProcureFormatAdapter:
-    """"procure" is an essential part of [#505] our collections API.
+    """"procure" is an essential part of [#874.2] our collections API.
 
     this is a specialization of it: given a filesystem path (a filename)
     and possibly a format name, we result in a name-value pair for a format
@@ -44,8 +46,8 @@ class _ProcureFormatAdapter:
             return self.__when_in_memory()
 
     def __when_in_memory(self):
-        import sakin_agac_test.format_adapters.in_memory_dictionaries as lib
         # arrived in #history-A.2. begin #track [#410.L] (Case2664DP)
+        import data_pipes_test.format_adapters.in_memory_dictionaries as lib
         return ('in_memory_dictionaries', lib)
 
     def __when_via_collection_identifier_as_string(self):
@@ -196,7 +198,7 @@ def EVERY_MODULE():
 
 
 def _collection_lib():
-    import sakin_agac.magnetics.via_human_keyed_collection as x
+    import kiss_rdb.LEGACY_collection_lib as x
     return x
 
 

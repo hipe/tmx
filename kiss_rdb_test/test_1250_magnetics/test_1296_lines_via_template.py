@@ -54,7 +54,7 @@ class Case1299_fails(_CommonCase):
 
 
 def _subject_function():
-    import script.lines_via_template as _
+    from kiss_rdb.magnetics_ import lines_via_template as _
     return _._lines_via
 
 

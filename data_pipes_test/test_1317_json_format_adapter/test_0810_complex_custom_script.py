@@ -3,9 +3,7 @@
 """
 
 
-from _init import (
-        fixture_file_path,
-        )
+from data_pipes_test.common_initial_state import html_fixture
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -88,8 +86,8 @@ class _BlankState:  # #[#510.2]
 
 
 def _subject_module():
-        import script.khong.json_stream_via_website as x
-        return x
+    import script.producer_scripts.script_180421_khong_lessons as x
+    return x
 
 
 if __name__ == '__main__':

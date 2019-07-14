@@ -69,14 +69,14 @@ class _build_snapshot:
 
 
 def _item_via_collision(far_key, far_s, near_key, near_s):
-    # (#provision #[#418.F] four args)
-    None if far_s == near_s else sanity()
+    # (#provision #[#458.F] four args)
+    assert(far_s == near_s)
     return near_s.upper()
 
 
 def NORMALIZE_NEAR_ETC_AND_FAR(far_dicts):
 
-    import sakin_agac_test.format_adapters.in_memory_dictionaries as _
+    import data_pipes_test.format_adapters.in_memory_dictionaries as _
     _far_FA = _.FORMAT_ADAPTER
 
     _far_col_ref = _far_FA.collection_reference_via_string(far_dicts)
@@ -132,7 +132,8 @@ def open_tagged_doc_line_items__(mixed_near):
 
 
 def collection_reference_via_(collection_identifier, listener):
-    import script.stream as _  # #[#410.Q] this script as lib only
+    from data_pipes import common_producer_script
+    _ = common_producer_script.common_CLI_library()
     return _.collection_reference_via_(collection_identifier, listener)
 
 
@@ -148,8 +149,9 @@ def _mag_sync():
 
 def _sub_mag(which):
     import importlib
-    import sakin_agac.format_adapters.markdown_table.magnetics as _
-    return importlib.import_module(which, _.__name__)
+    return importlib.import_module(
+            which,
+            'kiss_rdb.storage_adapters_.markdown_table.magnetics_')  # #todo
 
 
 def _identity(x):
@@ -157,7 +159,7 @@ def _identity(x):
 
 
 def _subject_module():
-    import sakin_agac.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
+    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as x  # noqa: E501
     return x
 
 # #abstracted.

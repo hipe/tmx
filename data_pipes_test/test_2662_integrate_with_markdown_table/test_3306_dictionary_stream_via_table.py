@@ -18,12 +18,9 @@ currently there is no such magnetic in the subject format adapter
 """
 
 
-from _init import (
-        fixture_file_path,
-        )
-from sakin_agac_test.format_adapter.disjoint_smalls import (
-        build_state_the_bernstein_way,
-        )
+from data_pipes_test.common_initial_state import markdown_fixture
+from data_pipes_test.disjoint_small_support import (
+        build_state_the_bernstein_way)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -74,7 +71,7 @@ class Case3306DP_hello(_CommonCase):
     @shared_subject
     def _end_state(self):
         return build_state_the_bernstein_way(
-            fixture_document_path=fixture_file_path('0150-bernstein-subtree.md'),  # noqa: E501
+            fixture_document_path=markdown_fixture('0150-bernstein-subtree.md'),  # noqa: E501
             producer_module=_subject_module(),
         )
 
@@ -90,8 +87,9 @@ class Case3306DP_hello(_CommonCase):
 
 
 def _subject_module():
-    import script.tag_lyfe.json_stream_via_bernstein as x
-    return x
+    from script.producer_scripts import (
+            script_180618_22_parser_generators_via_bernstein as mod)
+    return mod
 
 
 if __name__ == '__main__':

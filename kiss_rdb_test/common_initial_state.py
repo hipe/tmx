@@ -1,3 +1,4 @@
+from modality_agnostic.memoization import memoize_into
 import os.path as os_path
 
 
@@ -92,49 +93,75 @@ def debugging_listener():
     return se_lib.debugging_listener()
 
 
-def _make_functions_for():
-    def functions_for(who):
-        if who in cache:
-            return cache[who]
-        if 'toml' == who:
-            res = _functions_for_toml()
-        else:
-            raise Exception(f"add functions for '{who}'")
-        cache[who] = res
-        return res
+def publicly_shared_fixture_file(which):
+    assert(_this == which)
+    return functions_for('markdown').fixture_path(_this)
+
+
+_this = '0100-hello.md'
+
+
+def __make_functions_for():
+    def functions_for(key):
+        if key not in cache:
+            cache[key] = _these_classes[key]()
+        return cache[key]
     cache = {}
     return functions_for
 
 
-functions_for = _make_functions_for()
+functions_for = __make_functions_for()
 
 
-class _functions_for_toml:
+def _path_for(self, tail):
+    _ = self.fixture_directories_directory()
+    return os_path.join(_, tail)
 
-    def __init__(self):
-        self.fixture_dir_name = '4219-toml'
-        self._ca_head = None
-        self._fd_path = None
 
+class _FunctionsFor:
+
+    @memoize_into('_ca_head')
     def common_args_head(self):
-        if self._ca_head is None:
-            _ = self.fixture_directories_path()
-            self._ca_head = ('--collections-hub', _)
-        return self._ca_head
+        _ = self.fixture_directories_directory()
+        return ('--collections-hub', _)
 
-    def fixture_directory_path(self, tail):
-        return os_path.join(self.fixture_directories_path(), tail)
+    @memoize_into('_fdd')
+    def fixture_directories_directory(self):
+        _ = top_fixture_directories_directory()
+        return os_path.join(_, self.fixture_dir_name)
 
-    def fixture_directories_path(self):
-        if self._fd_path is None:
-            self._fd_path = os_path.join(
-                    fixture_directories_path(), self.fixture_dir_name)
-        return self._fd_path
+
+_these_classes = {}
+
+
+def _woah(k):
+    def decorator(cls):
+        _these_classes[k] = cls
+        return cls
+    return decorator
+
+
+@_woah('markdown')
+class ___funcs_for_MD(_FunctionsFor):
+    fixture_path = _path_for
+    fixture_dir_name = '2656-markdown-table'
+
+
+@_woah('toml')
+class ___funcs_for_TOML(_FunctionsFor):
+    fixture_directory_for = _path_for
+    fixture_dir_name = '4219-toml'
 
 
 @lazy
-def fixture_directories_path():
-    return os_path.join(_top_test_dir, 'fixture-directories')
+def top_fixture_directories_directory():
+    return os_path.join(_top_test_dir(), 'fixture-directories')
+
+
+@lazy
+def _top_test_dir():
+    return os_path.dirname(os_path.abspath(__file__))
+
 
 # #history-A.1
 # #born.

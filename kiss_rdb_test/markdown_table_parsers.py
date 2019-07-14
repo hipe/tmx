@@ -60,7 +60,7 @@ def _mad_parse(lines, parse):
     return parse.finish()
 
 
-class _MadParseTable:  # #pattern #[#418.Z.4] "mad parse"
+class _MadParseTable:  # #pattern #[#458.Z.4] "mad parse"
 
     def __init__(self):
         self._state = 'receive_header_line'
@@ -159,7 +159,7 @@ def _yield_markdown_table_cel_strings(line):
         cursor = next_pipe + 1
 
 
-class _MadParseLineSections:  # #wish, #pattern #[#418.Z.4] "mad parse"
+class _MadParseLineSections:  # #wish, #pattern #[#458.Z.4] "mad parse"
 
     def __init__(self):
         self._state = 'receive_initial_line'

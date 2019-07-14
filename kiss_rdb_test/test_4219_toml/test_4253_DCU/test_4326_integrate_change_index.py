@@ -354,7 +354,8 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
         return filesystem_recordings_of(self, 'delete', 'B8H')
 
     def subject_collection(self):
-        return wrap_collection(_build_collection_expecting_common_number_of_rewrites())
+        _ = _build_collection_expecting_common_number_of_rewrites()
+        return wrap_collection(_)
 
 
 # Case4331: delete when index file is left empty! (delete the last entity)

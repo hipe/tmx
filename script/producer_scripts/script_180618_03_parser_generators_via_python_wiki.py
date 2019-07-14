@@ -23,7 +23,7 @@ def open_dictionary_stream(html_document_path, listener):
 
         table, = el.select('table')
 
-        from sakin_agac.format_adapters.html.magnetics import (
+        from data_pipes.format_adapters.html.magnetics import (
                 dictionary_stream_via_table
                 )
 
@@ -43,7 +43,7 @@ def open_dictionary_stream(html_document_path, listener):
                 'natural_key_field_name': field_names[0],
                 'field_names': field_names,  # coverpoint [#708.2.2]
                 'traversal_will_be_alphabetized_by_human_key': False,
-                'custom_keyer_for_syncing': 'script.json_stream_via_url_and_selector.simplify_keys_',  # noqa: E501
+                'custom_keyer_for_syncing': 'data_pipes.format_adapters.html.script_common.simplify_keys_',  # noqa: E501
                 # above is broken for syncing,
                 # #not-covered since #history-A.2 or before
                 }
@@ -101,18 +101,18 @@ def _filter(sel, el):
 
 
 def _md_lib():
-    import script.markdown_document_via_json_stream as _
-    return _
+    from data_pipes import common_producer_script as mod
+    return mod.LEGACY_markdown_lib()
 
 
 def _top_html_lib():
-    import script.json_stream_via_url_and_selector as lib
+    import data_pipes.format_adapters.html.script_common as lib
     return lib
 
 
 if __name__ == '__main__':
-    import script.json_stream_via_url_and_selector as _
-    _exitstatus = _.common_CLI_for_json_stream_(
+    common_CLI_for_json_stream_ = _top_html_lib().common_CLI_for_json_stream_
+    _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
             help_values={'url': _url},

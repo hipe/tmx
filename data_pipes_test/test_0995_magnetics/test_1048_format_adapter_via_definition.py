@@ -5,7 +5,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case010_hello(_CommonCase):
+class Case1048_hello(_CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -31,7 +31,7 @@ def subject_one():
 
 
 def _subject_module():
-    import sakin_agac.magnetics.format_adapter_via_definition as x
+    import kiss_rdb.LEGACY_format_adapter_via_definition as x
     return x
 
 

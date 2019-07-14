@@ -1032,7 +1032,7 @@ class _RowAsEntity:
     # introduced at (Case2587)
 
     def __init__(self, identifier_cel, attribute_cels, has_trailing_pipe):
-        assert(isinstance(attribute_cels, tuple))  # #[#008.D]
+        assert(isinstance(attribute_cels, tuple))  # #[#022] strong type
         self._identifier_cel_ = identifier_cel
         self._attribute_cels_ = attribute_cels
         self._has_trailing_pipe_ = has_trailing_pipe

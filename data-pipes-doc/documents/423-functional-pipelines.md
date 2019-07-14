@@ -11,17 +11,17 @@ this is scratching a surface. this article is stub. i can help expand it.
     birth); but it can also refer to several specific ideas that can be at
     odds with each other; the subject of the next two bullets.
 
-  - NOTE :[#423.B] refers to the pipeline workflow we use at document birth,
+  - NOTE :[#443.B] refers to the pipeline workflow we use at document birth,
     which is what is depicted in our sibling digraph document.
 
-  - in contrast, we will use :[#423.C] to be a hazy placeholder for this
     future vaporwae idea of configurable, functional pipelines.
+  - in contrast, we will use :[#463.C] to be a hazy placeholder for this
 
   - often the distinction isn't important except for complicated
     synchronizations; but since there is nonetheless potential for ambiguity,
     we must always distinguish which we mean when we use this node tag.
 
-  - we are familiar with the idea of [#417.A] JSON being the lingua franca.
+  - we are familiar with the idea of [#457.A] JSON being the lingua franca.
 
   - we can extend this idea further when we are syncing. the schema of the
     near collection sort of serves as a lingua franca of its own for the
@@ -110,7 +110,7 @@ so:
                 +--------------------+              +--------------------+
 
 
-ideally, with [#423.C] custom functional pipelines, we could accomplish
+ideally, with [#463.C] custom functional pipelines, we could accomplish
 the above with a series of maps only; with no need for special implementation
 of a deny list.
 

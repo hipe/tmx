@@ -29,11 +29,20 @@ woah boy.
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |[#880-899]                 |       | narrow allocation for "pho" for now
+|[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
+|[#874.9]                   |       | files marked with "LEGACY"
+|[#874.8]                   |       | multiple scripts that generated markown. change them to be the new way
+|[#874.7]                   |       | non-CLI should not load CLI to use this
+|[#874.6]                   |       | away this test, arch for data pipes
+|[#874.5]                   |       | scripts that USED TO be executable
+|[#874.4]                   |       | multi-tablism
+|[#874.3]                   |       | the API (interface) for entity
+|[#874.2]                   |       | the API (interface) for collection
+|[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
 |[#873.C]                   | #wish | a `--oneline` option for CLI
 |[#873.B]                   | #wish | this one smell in emissions
 |[#873.A]                   | #wish | make CLI error case expression more abstracted
 |[#873]                     |       | internal tracking (extended)
-|[#872.02]                  |       | external tracking: new lazy implementation
 |[#872]                     |       | multi-line strings: the document
 |[#871]                     |       | this one thing (see inline)
 |[#870]                     |       | "backend roadmap again"

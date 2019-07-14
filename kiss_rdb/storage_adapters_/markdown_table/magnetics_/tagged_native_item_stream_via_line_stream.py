@@ -1,4 +1,4 @@
-"""this is for exactly [#407.G].
+"""this is for exactly [#447.G].
 
 provisions (requirements):
 
@@ -27,7 +27,7 @@ contiguous lines that start with a pipe.)
 (also there is a cost to making the name-to-offset mapping.)
 
 would that we had a single document with several markdown tables and we are
-in fact riding on our [#417.B] central conceit of using MDT's as datastores;
+in fact riding on our [#457.B] central conceit of using MDT's as datastores;
 we might want to parse the document *without* the assumption built-in to it
 that we are parsing every markdown table we encounter robustly.
 
@@ -86,7 +86,7 @@ def __open_upstream_path_challenge_mode(x):
         else:
             yes = False
     if yes:
-        from sakin_agac import my_contextlib as my_clib
+        from data_pipes import my_contextlib as my_clib
         return my_clib.context_manager_via_iterator__(x)
     else:
         raise Exception(f'can we keep this simple? had {type(x)}')
@@ -95,7 +95,7 @@ def __open_upstream_path_challenge_mode(x):
 class _Parse:
     """stay light on your feet. this is not the right way
 
-    (after the fact, we documented this in [#407])
+    (after the fact, we documented this in [#447])
     """
 
     def __init__(self, listener):

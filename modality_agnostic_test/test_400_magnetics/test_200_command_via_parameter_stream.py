@@ -1,6 +1,5 @@
-from modality_agnostic_test.test_400_magnetics._init import (
-        empty_command_module,
-        )
+from modality_agnostic_test.public_support import (
+        empty_command_module)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
