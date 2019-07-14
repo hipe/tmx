@@ -11,27 +11,32 @@ import sys
 
 def _SELF(tagged_stream, processor):
 
-    current_typ = 'BEGIN'
+    self = _ThisState()
+
+    self._current_type = 'BEGIN'
     current_bound_method = None
 
     def transition_to(typ):
-        nonlocal current_typ
-        transition_method_name = 'move_from__%s__to__%s' % (current_typ, typ)
-        current_typ = typ
+        m = 'move_from__%s__to__%s' % (self._current_type, typ)
+        self._current_type = typ
 
-        transition = getattr(processor, transition_method_name)
+        transition = getattr(processor, m)
         if transition is not None:
             return transition()
 
     for (typ, x) in tagged_stream:
 
-        if current_typ != typ:
+        if self._current_type != typ:
             transition_to(typ)
             current_bound_method = getattr(processor, typ)  # subject to change
 
         current_bound_method(x)
 
     return transition_to('END')
+
+
+class _ThisState:  # #[#510.2]
+    pass
 
 
 sys.modules[__name__] = _SELF

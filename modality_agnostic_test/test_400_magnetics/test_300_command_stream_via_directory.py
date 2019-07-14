@@ -1,8 +1,5 @@
 """cover the magnetic of the same name (stem)."""
 
-from _init import (
-        fixture_directory,
-        )
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
@@ -33,7 +30,7 @@ class Case8313_the_only_case(_CommonCase):
 
 
 def _this_one_module():
-    fixture_directory.hello()
+    # 'fixture-directories'
     import modality_agnostic_test.fixture_directories._010_cha_cha as x
     return x
 

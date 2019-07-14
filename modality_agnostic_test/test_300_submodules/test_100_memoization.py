@@ -2,26 +2,22 @@ import modality_agnostic.memoization as helper
 import unittest
 
 
-def _shared_subject(f):
-    # (redundant with the other one, but the point is that we keep one of
+class _shared_subject:  # :[#510.4]
+    # functionally similar to the main one, but the point is to keep one of
     # these in a known stable state so that we can refactor the other one,
     # and when we run tests, breakages to the other one will be detected)
 
-    def g(some_self):
-        return mutable_function(some_self)
+    def __init__(self, f):
+        self._method = f
+        self._is_first_call = True
 
-    def initially(orig_self):
-        def subsequently(_):
-            return x
-
-        nonlocal mutable_function
-        mutable_function = None
-        x = f(orig_self)
-        mutable_function = subsequently
-        return g(None)
-
-    mutable_function = initially
-    return g
+    def __call__(self, tc):
+        if self._is_first_call:
+            self._is_first_call = False
+            f = self._method
+            del self._method
+            self._value = f(tc)
+        return self._value
 
 
 class _CommonYikes(unittest.TestCase):
@@ -46,27 +42,25 @@ class Case0105_memoize(_CommonYikes):
     @property
     @_shared_subject
     def end_state(self):
-        memoize = helper.memoize
+        lazy = helper.lazy
 
-        @memoize
+        @lazy
         def f():
-            nonlocal count
-            d = count + 1
-            count = d
-            return d
+            counter.increment()
+            return counter.value
 
-        count = 0
+        counter = helper.Counter()
         _d_a = [f(), f(), f()]
 
         return self.namedtuple('_CustTpl01', ['num_times', 'number_array'])(
-                num_times=count,
-                number_array=_d_a,
-        )
+                num_times=counter.value,
+                number_array=_d_a)
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.2: sunset lazy function definition
 # #history-A.1: re-housed
 # (the below should read #open [#007.2] but is kept intact for trackability)
 # #open [#007.B] - when we use docutest, um..

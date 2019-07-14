@@ -54,18 +54,19 @@ def complicated_join(left, sep, right, itr, max_width, string_via_item):
     current_width = len(left) + len(right) + len(tail_ellipsis)
     pieces = [left]
 
-    def sep_stuff_at_this_step():  # don't use separator on the first step
-        nonlocal sep_stuff_at_this_step
-        real_tuple = (len(sep), sep)
+    self = _ComplicatedJoinState()
 
-        def sep_stuff_at_this_step():
-            return real_tuple
+    def separator_stuff_at_this_step_initially():
+        real_tuple = (len(sep), sep)
+        self.separator_stuff_at_this_step = lambda: real_tuple
         return (0, '')
+
+    self.separator_stuff_at_this_step = separator_stuff_at_this_step_initially
 
     broke = False
     for x in itr:
         as_string = string_via_item(x)
-        w, use_sep = sep_stuff_at_this_step()
+        w, use_sep = self.separator_stuff_at_this_step()
 
         would_be_width = current_width + w + len(as_string)
 
@@ -86,6 +87,12 @@ def complicated_join(left, sep, right, itr, max_width, string_via_item):
 
     pieces.append(right)
     return ''.join(pieces)
+
+
+class _ComplicatedJoinState:  # #[#510.3]
+
+    def __init__(self):
+        self.separator_stuff_at_this_step = None
 
 
 class _FixedShapeWordWrap:
@@ -190,54 +197,51 @@ class _FixedShapeWordWrap:
         if word is _WAS_EMPTY:
             return  # (Case3760)
 
-        # -- should be member variables
+        # --
 
-        would_be_width = None
-        current_width = 0
-        cache = []
-        max_width = None
-        offset_of_the_row_we_are_on = -1
-        shape_is_filled = False
+        state = _FixedShapeWordWrapState()
+        state.current_width = 0
+        state.offset_of_the_row_we_are_on = -1
+        state.shape_is_filled = False
+        state.max_width = None
 
         # --
 
+        cache = []
+        would_be_width = None
+
         def do_accept_word(word):
-            nonlocal current_width
-            current_width = would_be_width
+            state.current_width = would_be_width
             cache.append(_SpacePlusWord(word) if len(cache) else word)
 
         def do_flush_row():
-            nonlocal current_width
-            res = _StructuredLine(current_width, tuple(cache))
+            res = _StructuredLine(state.current_width, tuple(cache))
             cache.clear()
-            current_width = 0
+            state.current_width = 0
             return res
 
         def begin_next_row():
-            nonlocal offset_of_the_row_we_are_on
-            i = offset_of_the_row_we_are_on + 1
+            i = state.offset_of_the_row_we_are_on + 1
             if i == len(self.row_max_widths):
-                nonlocal shape_is_filled
-                shape_is_filled = True
+                state.shape_is_filled = True
                 return
-            offset_of_the_row_we_are_on = i
-            nonlocal max_width
-            max_width = self.row_max_widths[i]
+            state.offset_of_the_row_we_are_on = i
+            self.max_width = self.row_max_widths[i]
 
         begin_next_row()
-        assert(not shape_is_filled)  # iff the empty shape
+        assert(not state.shape_is_filled)  # iff the empty shape
 
         while True:  # there are multiple exit conditions
-            if current_width:
-                would_be_width = current_width + 1 + word.width
+            if state.current_width:
+                would_be_width = state.current_width + 1 + word.width
             else:
                 would_be_width = word.width
 
-            if would_be_width < max_width:
+            if would_be_width < self.max_width:
                 # the new word doesn't put us over or on, just add it
                 accept_word = True
                 flush_row = False
-            elif would_be_width == max_width:
+            elif would_be_width == self.max_width:
                 # the new word would land us right on the money
                 accept_word = True
                 flush_row = True
@@ -262,9 +266,13 @@ class _FixedShapeWordWrap:
             if flush_row:
                 yield do_flush_row()
                 begin_next_row()
-                if shape_is_filled:
+                if state.shape_is_filled:
                     self._do_ellipsify = True  # (Case3745)
                     break
+
+
+class _FixedShapeWordWrapState:  # [#510.2]
+    pass
 
 
 class _StructuredLine:

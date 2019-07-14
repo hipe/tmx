@@ -1,20 +1,17 @@
 import os.path as os_path
 
 
-def lazy(f):  # #meh
-    is_first_call = True
-    x = None
+def lazy(f):  # #[#510.8]
+    class EvaluateLazily:
+        def __init__(self):
+            self._has_been_evaluated = False
 
-    def use_f():
-        nonlocal is_first_call
-        nonlocal x
-        if is_first_call:
-            is_first_call = False
-            x = f()
-        return x
-    return use_f
-
-
+        def __call__(self):
+            if not self._has_been_evaluated:
+                self._has_been_evaluated = True
+                self._value = f()
+            return self._value
+    return EvaluateLazily()
 
 
 def cover_me(msg=None):

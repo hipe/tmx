@@ -343,19 +343,23 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-def _this_lazy(f):  # experiment
+class _this_lazy:  # [#510.6]
 
-    def g(*a):
-        return f_pointer(*a)
+    def __init__(self, f):
+        self._is_first_call = True
+        self._function = f
 
-    def f_pointer(*a):
-        import importlib
-        lib = importlib.import_module('sakin_agac')
-        nonlocal f_pointer
-        f_pointer = getattr(lib, f.__name__)
-        return f_pointer(*a)
+    def __call__(self, *a):
+        if self._is_first_call:
+            self._is_first_call = False
+            self._use_function = self.__lookup_use_function()
+        return self._use_function(*a)
 
-    return g
+    def __lookup_use_function(self):
+        f = self._function
+        del self._function
+        import data_pipes as lib
+        return getattr(lib, f.__name__)
 
 
 @_this_lazy

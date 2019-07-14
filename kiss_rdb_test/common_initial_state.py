@@ -1,21 +1,27 @@
 import os.path as os_path
 
 
+class OneWriteReference:  # :[#510.5] (again)
+    def __init__(self):
+        self._is_first_call = True
+
+    def receive_value(self, x):
+        assert(self._is_first_call)
+        self._is_first_call = False
+        self.value = x
 
 
-def lazy(f):  # #meh
-    def redefined_f():
-        return use_f()
+def lazy(f):  # #[#510.8]
+    class EvaluateLazily:
+        def __init__(self):
+            self._has_been_evaluated = False
 
-    def use_f():
-        x = f()
-        nonlocal use_f
-
-        def use_f():
-            return x
-        return x
-
-    return redefined_f
+        def __call__(self):
+            if not self._has_been_evaluated:
+                self._has_been_evaluated = True
+                self._value = f()
+            return self._value
+    return EvaluateLazily()
 
 
 # ==

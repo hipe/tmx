@@ -5,8 +5,11 @@ As such, the asset code is contemporaneous with #birth but the "spirit" of
 both the cases and the SUT may be up to 1.5 years older.
 """
 
+from modality_agnostic_test.common_initial_state import (
+        BooleanReference)
 from modality_agnostic.memoization import (
-         dangerous_memoize as shared_subject)
+        Counter,
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -33,23 +36,21 @@ class Case1020_flush(_CommonCase):
 
     def test_200_but_you_do_have_one_if_you_pass_one(self):
         def f():
-            nonlocal seen
-            seen = True
-        seen = False
+            seen.see()
+        seen = BooleanReference()
         o = _write_only_IO_proxy(None, flush=f)
         self.assertTrue(hasattr(o, 'flush'))
         o.flush()
-        self.assertTrue(seen)
+        self.assertTrue(seen.value)
 
     def test_300_unlike_write_you_yes_get_the_result_back(self):
         def f():
-            nonlocal count
-            count += 5
-            return count
-        count = 0
+            counter.increment()
+            return counter.value
+        counter = Counter()
         o = _write_only_IO_proxy(None, flush=f)
-        self.assertEqual(o.flush(), 5)
-        self.assertEqual(count, 5)
+        self.assertEqual(o.flush(), 1)
+        self.assertEqual(counter.value, 1)
 
 
 class Case1030_context_manager(_CommonCase):
@@ -68,23 +69,24 @@ class Case1030_context_manager(_CommonCase):
 
     @shared_subject
     def o(self):
-        def f():
-            nonlocal count
-            count += 1
-            return 'NO_SEE'
-        count = 0
+
         writes = []
+        counter = Counter()
+
+        def on_OK_exit():
+            counter.increment()
+            return 'NO_SEE'
         o = _write_only_IO_proxy(
                 writes.append,
-                on_OK_exit=f,
+                on_OK_exit=on_OK_exit,
                 )
         with o as fh:
             is_same = o is fh
             fh.write('ohai')
 
         return {
-                'count': count,
-                'writes': writes,
+                'count': counter.value,
+                'writes': tuple(writes),
                 'is_same': is_same,
                 }
 

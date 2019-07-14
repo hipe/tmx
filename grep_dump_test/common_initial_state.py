@@ -1,8 +1,14 @@
-def sanity():
-    raise Exception('assumption failed')
+def lazy(f):  # #[#510.8]
+    class EvaluateLazily:
+        def __init__(self):
+            self._has_been_evaluated = False
 
-
-lazy = 'soon'
+        def __call__(self):
+            if not self._has_been_evaluated:
+                self._has_been_evaluated = True
+                self._value = f()
+            return self._value
+    return EvaluateLazily()
 
 
 @lazy

@@ -328,10 +328,7 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
 
     stack = [_scanner_via_branch(tree)]
 
-    def f():
-        return g()
-
-    def g():
+    def initial_step_fuction():
         frm = stack[-1]
         use_stack_depth = len(stack) - 1
         while not frm.current_token.is_terminal:
@@ -347,18 +344,16 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
                 break
             stack.pop()
             if len(stack) is 0:
-                def new_g():
-                    None
-                nonlocal g
-                g = new_g
+                self._function = lambda: None
                 break
             frm = stack[-1]
 
         return ('> ' * use_stack_depth) + term.styled_content_string
 
-    class _Wtf:
+    class _StateAndAlsoIterator:  # #[#510.3]
+
         def __init__(self):
-            self._function = f
+            self._function = initial_step_fuction
 
         def __iter__(self):
             return self
@@ -371,7 +366,8 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
             else:
                 return x
 
-    return iter(_Wtf())
+    self = _StateAndAlsoIterator()
+    return iter(self)
 
 
 def _tree_via_docstring(doc_s):

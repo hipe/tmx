@@ -43,8 +43,9 @@ def __option_line_challenge_mode(line_s):
     """EXPERIMENT...
 
     ... if this proves at all useful it should certainly be abstracted.
-    note there is only a single would-be member variable (nonlocal).
     """
+
+    out = {}
 
     def __main():
         out['main_short_switch'] = __parse_any_short()
@@ -54,8 +55,11 @@ def __option_line_challenge_mode(line_s):
         _my_tuple = __my_named_tuple_for_above()
         return _my_tuple(**out)
 
+    self = _ThisState()
+    self.cursor = 0
+
     def __parse_any_args():
-        if cursor is not len(haystack_s):
+        if self.cursor is not len(haystack_s):
             return _assert_scan('[ ]([^ ].+)$')  # soften if necessary
 
     def __parse_long():
@@ -107,13 +111,13 @@ def __option_line_challenge_mode(line_s):
         match = _match(rx_s)
         if match is not None:
             cursor_ = match.end()
-            width = cursor_ - cursor
+            width = cursor_ - self.cursor
             _advance_cursor_to(cursor_)
             return width
 
     def _match(rx_s):
         _regex = re.compile(rx_s)
-        return _regex.match(haystack_s, cursor)
+        return _regex.match(haystack_s, self.cursor)
 
     def __build_assertion_failure_message(f, rx_s):
         _fmt = 'failed to {verb} /{rx_s}/: {excerpt}'
@@ -123,23 +127,23 @@ def __option_line_challenge_mode(line_s):
             verb = fname
         else:
             verb = match[1]
-        if cursor >= len(haystack_s):
+        if self.cursor >= len(haystack_s):
             excerpt = '[empty string]'
         else:
-            excerpt = '«%s»' % haystack_s[cursor:]
+            excerpt = '«%s»' % haystack_s[self.cursor:]
         return _fmt.format(verb=verb, rx_s=rx_s, excerpt=excerpt)
 
     def _advance_cursor_to(num):
-        nonlocal cursor
-        cursor = num
+        self.cursor = num
 
     _match_obj = re.search('^((?:[^ ]|[ ](?![ ]))+)(?:[ ]{2,}(.+))?$', line_s)
     haystack_s, desc_first_line = _match_obj.groups()
 
-    out = {}
-    cursor = 0
-
     return __main()
+
+
+class _ThisState:  # #[#510.2]
+    pass
 
 
 @lazy

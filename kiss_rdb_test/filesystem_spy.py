@@ -15,33 +15,37 @@ def filesystem_expecting_no_rewrites():
 
 def build_filesystem_expecting_num_file_rewrites(expected_num):
 
-    recs = []
+    self = _ThisState()
+    self._records = []
 
     def INJECTED_FELLOW(from_fh, to_fh):
 
-        if len(recs) == expected_num:
+        if len(self._records) == expected_num:
             raise Exception('too many doo-hahs')
 
         from_fh.seek(0)  # necessary
         _new_lines = tuple(iter(from_fh))
 
-        recs.append(_RecordOfFileRewrite(
+        self._records.append(_RecordOfFileRewrite(
             path=to_fh.name,
             lines=_new_lines,))
 
     def finish():
 
-        nonlocal recs
-        if len(recs) != expected_num:
+        if len(self._records) != expected_num:
             _msg = ('expected there to be more file rewrites '
-                    f'(needed {expected_num}, had {len(recs)})')
+                    f'(needed {expected_num}, had {len(self._records)})')
             raise Exception(_msg)
 
-        res = tuple(recs)
-        del(recs)  # works! (as a safety measure)
+        res = tuple(self._records)
+        del(self._records)
         return res
 
     return _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish)
+
+
+class _ThisState:  # #[#510.2]
+    pass
 
 
 def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):

@@ -79,11 +79,21 @@ def open_traversal_stream(html_document_path, listener):
     return _cm
 
 
-def _via_upda(s):
-    global _via_upda  # ick/meh
-    import script.tag_lyfe.json_stream_via_bernstein as _
-    _via_upda = _.updated_and_version_via_string
-    return _via_upda(s)
+class _Memoized:
+
+    def __init__(self):
+        self._is_first_call = True
+
+    def via_update(self, s):
+        if self._is_first_call:
+            self._is_first_call = False
+            from script.producer_scripts import (
+                script_180618_22_parser_generators_via_bernstein as mod)
+            self._function = mod.updated_and_version_via_string
+        return self._function(s)
+
+
+_via_upda = _Memoized().via_update
 
 
 def _this_typical_humkey_via_td():

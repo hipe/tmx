@@ -21,29 +21,32 @@ def row_two_function_and_liner_via_row_one_line(line, listener):
     the line. the first component is a function that produces the schema.
     """
 
+    self = _ThisState1()
+    self._row = None
+    self._ok = True
+
     def __main():
-        ok and __parse_second_row()
-        ok and __ensure_row_has_endcap()
-        if ok:
+        __parse_second_row()
+        self._ok and __ensure_row_has_endcap()
+        if self._ok:
             return __finish()
 
     def __finish():
         _f = __build_schemaer_and_liner_via_alignments_line(
-                row, row_via_line, listener)
-        return (_f, row)
+                self._row, row_via_line, listener)
+        return (_f, self._row)
 
     def __ensure_row_has_endcap():
-        if not row.has_endcap:
-            from modality_agnostic import listening as li
-            error = li.leveler_via_listener('error', listener)
-            error('header row 1 must have "encap" (trailing pipe)')
+        if not self._row.has_endcap:
             # (Case2420)
+            def lineser():  # #[#511.3]
+                yield 'header row 1 must have "encap" (trailing pipe)'
+            listener('error', 'expression', lineser)
             _stop()
 
     def __parse_second_row():
-        nonlocal row
-        row = row_via_line(line)
-        if row is None:
+        self._row = row_via_line(line)
+        if self._row is None:
             cover_me("we don't know if this is possible")
 
     def row_via_line(line_):
@@ -54,12 +57,13 @@ def row_two_function_and_liner_via_row_one_line(line, listener):
             )
 
     def _stop():
-        nonlocal ok
-        ok = False
+        self._ok = False
 
-    row = None
-    ok = True
     return __main()
+
+
+class _ThisState1:  # #[#510.2]
+    pass
 
 
 def __build_schemaer_and_liner_via_alignments_line(row1, row_via_line, listnr):
@@ -71,39 +75,37 @@ def __build_schemaer_and_liner_via_alignments_line(row1, row_via_line, listnr):
     policy part of it not very hard-coded..
     """
 
-    def f(line):
-        mutex()
-        ok and __parse_row(line)
-        ok and __validate_arity()
-        if ok:
+    self = _ThisState2()
+    self._mutex = None
+    self._ok = True
+
+    def main(line):
+        del self._mutex
+        self._ok and __parse_row(line)
+        self._ok and __validate_arity()
+        if self._ok:
             return __finish()
 
     def __finish():
         def build_schema():
-            return _SchemaIndex(row_via_line, row1, row2, listnr)
-        return (build_schema, row2)
-
-    def mutex():
-        """(we save on complexity in one dimension if we can assume this)"""
-        nonlocal mutex
-        del(mutex)
+            return _SchemaIndex(row_via_line, row1, self._row2, listnr)
+        return (build_schema, self._row2)
 
     def __validate_arity():
         _validate = _make_row_num_validator(row1, listnr, False, True, False)
-        if not _validate(row2):
-            nonlocal ok
-            ok = False
+        if not _validate(self._row2):
+            self._ok = False
 
     def __parse_row(line):
-        nonlocal row2
-        row2 = row_via_line(line)
-        if row2 is None:
+        self._row2 = row_via_line(line)
+        if self._row2 is None:
             cover_me('hi')
 
-    row2 = None
-    ok = True
+    return main
 
-    return f
+
+class _ThisState2:  # #[#510.2]
+    pass
 
 
 class _SchemaIndex:

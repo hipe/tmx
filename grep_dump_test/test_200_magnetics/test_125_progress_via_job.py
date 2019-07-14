@@ -193,21 +193,12 @@ class Case505_Overreach(_TestCase):
                 'expected 4 existing line items in logfile, had 3')
 
 
-def file_lines(f):
-    def g():
-        return function_pointer()
-
-    def function_pointer():
+def file_lines(f):  # #decorator
+    def first_time():
         mutable_lines = []
         f(_Lines(mutable_lines))
-        tup = tuple(mutable_lines)
-        nonlocal function_pointer
-
-        def function_pointer():
-            return tup
-        return function_pointer()
-
-    return g
+        return tuple(mutable_lines)
+    return lazy(first_time)
 
 
 @file_lines

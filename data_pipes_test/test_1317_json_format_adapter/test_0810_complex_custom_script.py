@@ -46,12 +46,14 @@ class Case0810DP(_CommonCase):
         use_listener = lib.listener_via_emission_receiver(emissions.append)
 
         _cm = _subject_module().open_dictionary_stream(
-                html_document_path=fixture_file_path('0120-real-subtree.html'),
+                html_document_path=html_fixture('0120-real-subtree.html'),
                 listener=use_listener)
 
-        def store_previous():
-            nonlocal store_previous
-            store_previous = store_previous_normally
+        def store_previous_initially():
+            state.store_previous = store_previous_normally
+
+        state = _BlankState()
+        state.store_previous = store_previous_initially
 
         def store_previous_normally():
             sections.append(section)
@@ -81,7 +83,7 @@ class Case0810DP(_CommonCase):
         return _State(tuple(emissions), tuple(sections))
 
 
-class _ThisState:  # #[#510.2]
+class _BlankState:  # #[#510.2]
     pass
 
 

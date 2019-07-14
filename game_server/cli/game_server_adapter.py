@@ -12,9 +12,12 @@ def cli_for_production():
 
 def __run_adapter_forever():
 
+    self = _State()
+    self._timeout_float = 0.5
+
     def __main():
         while True:
-            _print('(timeout is currently {})'.format(timeout_float))
+            _print('(timeout is currently {})'.format(self._timeout_float))
             inp = __parse_input()
             if inp.is_redo:
                 continue
@@ -23,7 +26,6 @@ def __run_adapter_forever():
             __money(inp.send_this_string)
 
         _print('done.')
-
 
     def __money(s):
 
@@ -40,12 +42,11 @@ def __run_adapter_forever():
                 _print('received zero length')
                 break
             _print('received: ', repr(recvd_bytes))
-            avail, _, _ = select.select(rlist, (), (), timeout_float)
+            avail, _, _ = select.select(rlist, (), (), self._timeout_float)
             if len(avail) is 0:
                 _print('nothing was ready')
                 break
             _print('something should be ready now')
-
 
     def __parse_input():
         s = input('any string (float to change timeout, "done" for done): ')
@@ -64,22 +65,16 @@ def __run_adapter_forever():
             else:
                 return __when_change_timeout(md[0])
 
-
     def __when_change_timeout(float_s):
-        nonlocal timeout_float
-        was_float = timeout_float
-        timeout_float = float(float_s)
+        was_float = self._timeout_float
+        self._timeout_float = float(float_s)
         _fmt = 'changed sleep time from {} to {}'
-        _print(_fmt.format(was_float, timeout_float))
+        _print(_fmt.format(was_float, self._timeout_float))
         return _REDO
 
-
-    timeout_float = 0.5
     sock = None
-
     _print = print
     port = 50007
-
 
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
@@ -88,16 +83,22 @@ def __run_adapter_forever():
         __main()
 
 
+class _State:  # #[#510.2]
+    pass
+
+
 class _NormalInput:
     def __init__(self, s):
         self.send_this_string = s
         self.is_quit = False
         self.is_redo = False
 
+
 class _Redo:
     def __init__(self):
         self.is_quit = False
         self.is_redo = True
+
 
 class _Quit:
     def __init__(self):

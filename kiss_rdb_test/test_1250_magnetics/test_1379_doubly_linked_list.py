@@ -26,19 +26,28 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(a, _expected)
 
 
-def _common_shared_state(orig_f):
-    first = True
-    dll = None
-
-    def new_f(self):
-        nonlocal first
-        nonlocal dll
-        if first:
-            first = False
+def _common_shared_state(m):  # #decorator
+    def build_value():
             dll = _subject_module().build_new_doubly_linked_list()
-            orig_f(None, dll)  # don't pass self unless we really need to
-        return dll
-    return new_f
+            m(None, dll)  # don't pass self since we don't have to
+            return dll
+    return lazify_method_non_dangerously(build_value, m)
+
+
+def lazify_method_non_dangerously(build_value, m):  # [#510.6]
+    self = _State()
+    self._is_first_call = True
+
+    def use_method(ignore_test_context):
+        if self._is_first_call:
+            self._is_first_call = False
+            self._value = build_value()
+        return self._value
+    return use_method
+
+
+class _State:  # #[#510.2]
+    pass
 
 
 class Case1367_empty(_CommonCase):

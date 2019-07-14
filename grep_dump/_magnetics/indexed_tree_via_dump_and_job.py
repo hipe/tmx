@@ -4,16 +4,18 @@ def JOB_VIA_WEB_FIELD(field, jobser):
     .. a stowaway here
     """
 
+    self = _JobViaWebField()
+    self._ok = True
+
     def __main():
-        ok and __check_content_type()
-        ok and __save_file()
-        if ok:
-            return job
+        __check_content_type()
+        self._ok and __save_file()
+        if self._ok:
+            return self._job
 
     def __save_file():
-        nonlocal job
-        job = jobser.begin_job()
-        file_storage.save(job.big_json_dump_path)
+        self._job = jobser.begin_job()
+        file_storage.save(self._job.big_json_dump_path)
 
     def __check_content_type():
         cs = file_storage.content_type
@@ -26,14 +28,16 @@ def JOB_VIA_WEB_FIELD(field, jobser):
         _tmpl = field.gettext(msg)
         _msg = _tmpl.format(*a)
         field.errors.append(_msg)
-        nonlocal ok
-        ok = False
+        self._ok = False
 
     file_storage = field.data
-    job = None
-    ok = True
-
     return __main()
+
+
+class _JobViaWebField:
+    def __init__(self):
+        self._job = None
+        self._ok = None
 
 
 class IndexingJob:

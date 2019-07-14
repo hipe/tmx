@@ -1,4 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
+        OneWriteReference,
         unindent)
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
@@ -44,12 +45,10 @@ class _CommonCase(unittest.TestCase):
 
     def run_expecting_structured_input_error(self):
         def recv_payloader(payloader):
-            nonlocal freeform_metadata
-            freeform_metadata = payloader()
-        freeform_metadata = None
-
+            ref.receive_value(payloader())
+        ref = OneWriteReference()
         self._run_expecting_input_error('structure', recv_payloader)
-        return freeform_metadata
+        return ref.value  # freeform metadata
 
     def _run_expecting_input_error(self, shape, receive_payloader):
 

@@ -45,43 +45,35 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(_act, n)
 
 
-def failure_snapshot(f):  # local decorator
+def lazyer(snapshotter):  # [#510.6] experiment
+    def decorator(test_context_method):
 
-    def g(ignore_self):
-        return mutable_f()
+        # when the test context requests the snapshot..
+        def memoized_snapshot(ignore_test_context):  # (ignore else dangerous)
+            return lazy_valuer()  # ..dereference this memoized value
 
-    def mutable_f():
+        # build the memoized value (once) by passing 1 function into another
+        def build_snapshot():
+            return snapshotter(test_context_method)
+        lazy_valuer = lazy(build_snapshot)
+
+        return memoized_snapshot
+    return decorator
+
+
+@lazyer
+def failure_snapshot(f):
         fixture_file = f(None)
         a, listener = minimal_listener_spy()
         tuples = _common_execute(fixture_file, listener)
-
-        def final_f():
-            return x
-        x = _Snapshot(tuples, a)
-        nonlocal mutable_f
-        mutable_f = final_f
-        return mutable_f()
-
-    return g
+        return _Snapshot(tuples, a)
 
 
+@lazyer
 def success_snapshot(f):  # local decorator
-
-    def g(ignore_self):
-        return mutable_f()
-
-    def mutable_f():
         fixture_file = f(None)
         tuples = _common_execute(fixture_file, 'listener03')
-
-        def final_f():
-            return x
-        x = _Snapshot(tuples)
-        nonlocal mutable_f
-        mutable_f = final_f
-        return mutable_f()
-
-    return g
+        return _Snapshot(tuples)
 
 
 class Case2420_fail_too_many_rows(_CommonCase):
@@ -127,7 +119,7 @@ class Case2422_minimal_working(_CommonCase):
 def _common_execute(fixture_file, listener):
 
     _magnetic = _subject_module().OPEN_TAGGED_DOC_LINE_ITEM_STREAM
-    _path = fixture_file_path(fixture_file)
+    _path = fixture_path(fixture_file)
     _cm = _magnetic(upstream_path=_path, listener=listener)
     tuples = []
     with _cm as itr:
@@ -158,46 +150,50 @@ def _calculate_state_statistics(wat, tuples):
     infallible.
     """
 
-    def increment_count():
-        raise Exception('no see')
-
-    def change_state(state):
-
-        nonlocal increment_count
-
-        def increment_count():
-            nonlocal curr_count
-            curr_count += 1
-
-        _do_change_state(state)
-        nonlocal change_state
-        change_state = _change_state_normally
-
-    def _change_state_normally(state):
-        result_tuples.append((curr_state, curr_count))
-        _do_change_state(state)
-
-    def _do_change_state(state):
-        nonlocal curr_count
-        curr_count = 1
-        nonlocal curr_state
-        curr_state = state
-
-    curr_count = None
-    curr_state = None
+    self = _BlankState()
+    self._change_state = None
+    self._current_count = None
+    self._current_state = None
     result_tuples = []
 
-    for tup in tuples:
-        very_curr_state = tup[0]
-        if curr_state == very_curr_state:
-            increment_count()
-        else:
-            change_state(very_curr_state)
+    def increment_count_initially():
+        raise Exception('no see')
 
-    change_state(None)
+    self._increment_count = increment_count_initially
+
+    def change_state_initially(state):
+        self._increment_count = increment_count_normally
+        do_change_state(state)
+        self._change_state = change_state_normally
+
+    self._change_state = change_state_initially
+
+    def increment_count_normally():
+        self._current_count += 1
+
+    def change_state_normally(state):
+        result_tuples.append((self._current_state, self._current_count))
+        do_change_state(state)
+
+    def do_change_state(state):
+        self._current_count = 1
+        self._current_state = state
+
+    for tup in tuples:
+        state = tup[0]
+        if self._current_state == state:
+            self._increment_count()
+        else:
+            self._change_state(state)
+
+    self._change_state(None)
 
     wat.STATE_AND_COUNTS = tuple(result_tuples)
     wat.COUNT_VIA_STATE = {k: v for (k, v) in result_tuples}
+
+
+class _BlankState:  # #[#510.2]
+    pass
 
 
 _all_possible_transitions = (

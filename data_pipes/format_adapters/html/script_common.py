@@ -184,21 +184,20 @@ def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
     return _(filesystem_path, url, 'HTML', listener)
 
 
-def _this_lazy(f):  # experiment (copy-paste)
+class _this_lazy:  # [#510.4] experiment (copy-paste)
 
-    def g(*a):
-        return f_pointer(*a)
+    def __init__(self, f):
+        self._is_first_call = True
+        self._function = f
 
-    def f_pointer(*a):
-        import importlib
-        lib = importlib.import_module('sakin_agac')
-        nonlocal f_pointer
-        f_pointer = getattr(lib, f.__name__)
-        return f_pointer(*a)
-
-    return g
-
-
+    def __call__(self, *a):
+        if self._is_first_call:
+            self._is_first_call = False
+            f = self._function
+            del self._function
+            import data_pipes as top_mod
+            self._use_function = getattr(top_mod, f.__name__)
+        return self._use_function(*a)
 
 
 @_this_lazy

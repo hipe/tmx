@@ -28,25 +28,33 @@ def ARGV(f):
     return g
 
 
-def stream_via_memoized_array(f):
-    """EXPERIMENTAL decorator"""
+def decoratorize_dangerously(define_two):  # [#510.6]
+    def use_decorator(m):
+        def use_method(tc):
+            if state._is_first_call:
+                state._is_first_call = False
+                state._value = build_once(tc)
+            return retrieve_subsequently(state._value)
+        state = _BlankState()
+        state._is_first_call = True
+        build_once, retrieve_subsequently = tuple(define_two(m))
+        return use_method
+    return use_decorator
 
-    def permanent_f(some_self):
-        return mutable_function(some_self)
 
-    def at_first_call_only(self_FROM_FIRST_CALL):
+class _BlankState:  # #[#510.5]
+    pass
 
-        a = f(self_FROM_FIRST_CALL)  # imagine frozen. a long-running
 
-        def at_subsequent_calls(_):
-            return iter(a)
+@decoratorize_dangerously
+def stream_via_memoized_array(m):
+    def build_once(tc):
+        return m(tc)
+    yield build_once
 
-        nonlocal mutable_function
-        mutable_function = at_subsequent_calls
-        return at_subsequent_calls(None)
-
-    mutable_function = at_first_call_only
-    return permanent_f
+    def retrieve_subsequently(tup):
+        return iter(tup)
+    yield retrieve_subsequently
 
 
 class CLI_CaseMethods:

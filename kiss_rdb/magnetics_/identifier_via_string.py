@@ -1,3 +1,12 @@
+def _fun_experiment_for_memoizer(self, m, attr, builder):  # [#510.6]
+    def f():
+        if not hasattr(self, attr):
+            setattr(self, attr, None)  # don't infinite loop in the builder
+            setattr(self, attr, builder())
+        return getattr(self, attr)
+    setattr(self, m, f)
+
+
 def _CLI(sin, sout, serr, argv):  # :[#867.S]
     """a quick and dirty CLI for visual testing ID encoding/decoding."""
 
@@ -7,29 +16,26 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
 
     long_program_name = stack.pop()
 
-    def pn():
+    def build_program_name():
         from os import path as os_path
-        res = os_path.basename(long_program_name)
-        nonlocal pn
+        return os_path.basename(long_program_name)
 
-        def pn():
-            return res
-        return res
+    self = _State_For_CLI()
+    _fun_experiment_for_memoizer(self, 'pn', '_pn', build_program_name)
+    pn = self.pn
 
     # parse options at head of argv
 
-    did_ask_help = False
-    exit_code = 0
+    self._did_ask_help = False
+    self.exit_code = 0
 
     def see_option(token):
-        nonlocal did_ask_help
-        nonlocal exit_code
         import re
         if re.match('^--?h(?:e(?:lp?)?)?$', token):
-            did_ask_help = True
+            self._did_ask_help = True
         else:
             serr.write(f"unrecogized option(s): {token}\n")
-            exit_code = 1
+            self.exit_code = 1
 
     def looks_like_option(tok):
         return '-' == tok[0]
@@ -42,9 +48,9 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         serr.write(tail if sp is None else f'{sp} {tail}')
         return 2
 
-    if exit_code:
+    if self.exit_code:
         invite()
-        return exit_code
+        return self.exit_code
 
     # process actionable options that were at head (just one)
 
@@ -61,7 +67,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         serr.write(f'    {pn()} {int_via_id} IDENTIFIER\n')
         return exit_ok
 
-    if did_ask_help:
+    if self._did_ask_help:
         return express_help()
 
     # descend into sub-action
@@ -119,6 +125,10 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         return 0
 
     assert(False)  # placehold future sub-actions
+
+
+class _State_For_CLI:  # #[#510.2]
+    pass
 
 
 def three_via_depth_(depth):
@@ -247,18 +257,18 @@ def integer_via_identifier_er__():
     # because we supposedly have arbitrary depth...
 
     from functools import reduce
+    self = _StateForIntegerVia()
+    self._num_powers = 1
     powers = [1]
-    num_powers = 1
 
     def CALCULATE_MORE_POWERS(depth):
-        nonlocal num_powers  # #meh
-        for i in range(num_powers, depth):
+        for i in range(self._num_powers, depth):
             powers.append(_num_digits ** i)
-        num_powers = depth
+        self._num_powers = depth
 
     def int_via_iden(iden):
         depth = len(iden.native_digits)
-        if num_powers < depth:
+        if self._num_powers < depth:
             CALCULATE_MORE_POWERS(depth)
         depth_minus_one = depth - 1
         nd_tup = iden.native_digits
@@ -268,6 +278,10 @@ def integer_via_identifier_er__():
         return reduce(lambda m, x: m + x, (add_me(i) for i in range(0, depth)))
 
     return int_via_iden
+
+
+class _StateForIntegerVia:  # #[#510.2]
+    pass
 
 
 def native_digit_via_character_(s, listener):

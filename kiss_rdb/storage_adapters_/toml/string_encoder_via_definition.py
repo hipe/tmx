@@ -139,8 +139,9 @@ def lines_via_big_string_(big_s):  # (ANOTHER copy-paste of [#610].)
 
 def _escape_line(md, itr, line_no, listener):
 
+    self = _ThisState()
+    self.cursor = 0
     pieces = []
-    cursor = 0
     line = md.string
 
     def step():
@@ -154,11 +155,9 @@ def _escape_line(md, itr, line_no, listener):
             return
         escape_expession_right_hand_side, = rest
 
-        nonlocal cursor  # ick/meh
-
         # add any non-special span yet to be transferred
-        if cursor < span_begin:
-            pieces.append(line[cursor:span_begin])
+        if self.cursor < span_begin:
+            pieces.append(line[self.cursor:span_begin])
 
         # escape expressions always start with one of these
         pieces.append('\\')
@@ -166,7 +165,7 @@ def _escape_line(md, itr, line_no, listener):
         # then
         pieces.append(escape_expession_right_hand_side)
 
-        cursor = span_end
+        self.cursor = span_end
         return _okay
 
     # do one "step" for this known existing matchdata
@@ -180,10 +179,14 @@ def _escape_line(md, itr, line_no, listener):
 
     # if the last match didn't end on the string, flush the rest
     length = len(line)
-    if cursor != length:
-        pieces.append(line[cursor:length])  # #here1
+    if self.cursor != length:
+        pieces.append(line[self.cursor:length])  # #here1
 
     return ''.join(pieces)
+
+
+class _ThisState:  # #[#510.2]
+    pass
 
 
 # == whiners

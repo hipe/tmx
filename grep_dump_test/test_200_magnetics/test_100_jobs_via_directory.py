@@ -44,47 +44,41 @@ class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
     def test_010_function_based_context_manager_does_not_run_cleanup(self):
         """(see comment at the end)"""
 
-        did_before = False
-        did_after = False
+        o = DidBeforeDidAfter()
 
         from contextlib import contextmanager
 
         @contextmanager
         def get_busy():
-            nonlocal did_before
-            did_before = True
+            o.did_before = True
             yield
-            nonlocal did_after
-            did_after = True
+            o.did_after = True
 
         did_during, caught_this_exception = self._same(get_busy())
 
-        self.assertTrue(did_before and did_during and caught_this_exception)
+        self.assertTrue(o.did_before and did_during and caught_this_exception)
 
-        self.assertFalse(did_after)  # 👈👈👈 NOTE!!!
+        self.assertFalse(o.did_after)  # 👈👈👈 NOTE!!!
         # if an exception is thrown within the `yield` above, the
         # cleanup section is not run. this is contrary to what is expected
         # (subjectively)
 
     def test_020_class_based_context_manager_DOES_ensure_cleanup(self):
 
-        did_before = False
-        did_after = False
+        o = DidBeforeDidAfter()
 
         class MyDoohah:
             def __enter__(self):
-                nonlocal did_before
-                did_before = True
+                o.did_before = True
 
             def __exit__(self, *_):
-                nonlocal did_after
-                did_after = True
+                o.did_after = True
 
         did_during, caught_this_exception = self._same(MyDoohah())
 
-        self.assertTrue(did_before and did_during and caught_this_exception)
+        self.assertTrue(o.did_before and did_during and caught_this_exception)
 
-        self.assertTrue(did_after)  # 👈 LOOK! it's opposite of the above
+        self.assertTrue(o.did_after)  # 👈 LOOK! it's opposite of the above
 
     def _same(self, context_manager):
 
@@ -189,16 +183,17 @@ class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
 
                 a.append((job.job_number, did_exist_before, did_exist_after))
 
-        def listener(top_channel, *_):
-            # (we have tested that these emissions look right in a lowel-
-            #  leveled test module. here we just assert that there is no etc)
+        tc = self
 
-            if 'info' != top_channel:
-                self.fail("expecting 'info' had '{}'".format(top_channel))
-            nonlocal number_of_infos
-            number_of_infos += 1
+        class Listener:
+            def __init__(self):
+                self.number_of_infos = 0
 
-        number_of_infos = 0
+            def __call__(self, top_channel, *rest):
+                tc.assertEqual(top_channel, 'info')
+                self.number_of_infos += 1
+
+        listener = Listener()
 
         with _clean_jobs_dir() as jobs_path:
             with _jobs_session(jobs_path, listener) as jobs:
@@ -206,7 +201,7 @@ class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
 
         return {
                 'directory_tuples': a,
-                'number_of_infos': number_of_infos,
+                'number_of_infos': listener.number_of_infos,
                 }
 
 
@@ -214,12 +209,13 @@ class Case020_Locking(unittest.TestCase):
 
     def test_010_locking_ensures_multiple_servers_dont_use_same_jobs_dir(self):
 
-        def listener(top_channel, *_):
-            nonlocal count
-            count += 1
-            self.assertEqual('info', top_channel)
+        from modality_agnostic.test_support.structured_emission import (
+                one_and_done)
 
-        count = 0
+        def recv(chan, payloader):
+            self.assertEqual('info', chan[0])
+
+        listener, ran = one_and_done(self, recv)
         e = None
 
         with _clean_jobs_dir() as jobs_path:
@@ -241,7 +237,7 @@ class Case020_Locking(unittest.TestCase):
                 outer.exit()
 
         self.assertEqual('[Errno 35] Resource temporarily unavailable', str(e))
-        self.assertEqual(1, count)
+        ran()
 
 
 class _clean_jobs_dir():
@@ -274,6 +270,12 @@ class _jobs_session:
         x = self._jobser
         del self._jobser
         x.exit()
+
+
+class DidBeforeDidAfter:
+    def __init__(self):
+        self.did_before = False
+        self.did_after = False
 
 
 def _touch(path):  # #todo how (2/2)

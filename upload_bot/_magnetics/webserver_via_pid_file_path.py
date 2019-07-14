@@ -23,18 +23,20 @@ def _SELF(
 
     # -- actions
 
+    self = _State()
+
     def _start_the_server_etc():
 
         def recv_pid(new_pid):
-            nonlocal pid
-            pid = new_pid
+            self.pid = new_pid
             __when_did_start_server()
 
         start_server(recv_pid, listener)
 
     def __when_did_start_server():
-        _content = 'Process ID of running server: {}\n'.format(pid)
-        with filesystem.open(pid_file_path, 'w' if do_clobber else 'x') as fh:
+        _content = 'Process ID of running server: {}\n'.format(self.pid)
+        _which = 'w' if self.do_clobber else 'x'
+        with filesystem.open(pid_file_path, _which) as fh:
             fh.write(_content)
         _emit_a_courtesy_message_that_the_server_is_running()
 
@@ -42,7 +44,7 @@ def _SELF(
         _info('(PID file was stale)')
 
     def _emit_a_courtesy_message_that_the_server_is_running():
-        _info('(server PID: {})', pid)
+        _info('(server PID: {})', self.pid)
 
     def _info(tmpl, *rest):
         def f(o):
@@ -53,7 +55,7 @@ def _SELF(
 
     def __the_process_is_running():
         try:
-            psutil.Process(pid)
+            psutil.Process(self.pid)
             yes = True
         except psutil._exceptions.NoSuchProcess:
             yes = False
@@ -65,18 +67,18 @@ def _SELF(
             import re
             _content = fh.read()
             _md = re.search(r'^Process ID of running server: (\d+)$', _content)
-            nonlocal do_clobber, pid
-            pid = int(_md[1])
-            do_clobber = True
+            self.pid = int(_md[1])
+            self.do_clobber = True
             return True
         return filesystem.open_if_exists(pid_file_path, f)
 
-    # -- nonlocals:
-    do_clobber = False
-    pid = None
-    # --
-
     return __main()
+
+
+class _State:  # #[#510.3]
+    def __init__(self):
+        self.pid = None
+        self. do_clobber = False
 
 
 # == EXPERIMENT

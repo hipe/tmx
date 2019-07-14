@@ -142,7 +142,8 @@ def custom_index_via_big_index(big_index):
         doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
         is_first = True
 
-        total_line_count = 0
+        from modality_agnostic.memoization import Counter
+        total_line_counter = Counter()
         lines_that_express_the_fragment_heading = []
         lines_that_define_bookmarks = []
 
@@ -151,8 +152,7 @@ def custom_index_via_big_index(big_index):
             # FOR DEBUGGING:
             # print(line)
 
-            nonlocal total_line_count
-            total_line_count += 1
+            total_line_counter.increment()
 
             if not len(line):
                 return
@@ -184,7 +184,7 @@ def custom_index_via_big_index(big_index):
                 echo(line)
 
         return _CustomIndex(
-                total_line_count,
+                total_line_counter.value,
                 lines_that_express_the_fragment_heading,
                 lines_that_define_bookmarks,
                 )

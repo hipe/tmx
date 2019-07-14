@@ -10,6 +10,7 @@ from kiss_rdb_test.CUD import (
         build_filesystem_expecting_num_file_rewrites)
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import (
+        Counter,
         dangerous_memoize as shared_subject,
         lazy)
 import unittest
@@ -689,14 +690,12 @@ def _last_three_path_parts(path):
 
 
 def _random_number_generator_for(random_number):
-    count = 0
-
     def random_number_generator(pool_size):
         assert(32760 == pool_size)
-        nonlocal count
-        count += 1
-        assert(1 == count)
+        counter.increment()
+        assert(1 == counter.value)
         return random_number
+    counter = Counter()
     return random_number_generator
 
 

@@ -4,6 +4,8 @@
 """
 
 from modality_agnostic import cover_me
+from modality_agnostic_test.common_initial_state import (
+        MutexingReference)
 import re
 from collections import deque as deque
 
@@ -191,15 +193,16 @@ class _EmissionModel:
 def _crazy_parse(s_a):
 
     channel_model = []
-    name = None
 
-    def f(s):
+    self = _ParseState()
+
+    def receive_token_initially(s):
         if 'as' == s:
             move(parse_as)
-            f(s)
+            self.receive_token(s)
         elif _name_rx.search(s) is None:
             move(parse_wildcard_globs_or_as)
-            f(s)
+            self.receive_token(s)
         else:
             channel_model.append(_Literal(s))
 
@@ -209,7 +212,7 @@ def _crazy_parse(s_a):
             move(parse_as)
         elif 'as' == s:
             move(parse_as)
-            f(s)
+            self.receive_token(s)
         else:
             cover_me("parse error - expecting 'as' or wildcard")
 
@@ -222,34 +225,40 @@ def _crazy_parse(s_a):
 
     def receive_name(s):
         expecting_more(None)
-        nonlocal name
-        name = s
+        name_reference.receive_value(s)
 
-    def expecting_more(s):
-        nonlocal is_expecting_more, expecting_more_after
-        if s is None:
-            is_expecting_more = False
-            expecting_more_after = None
-        else:
-            is_expecting_more = True
-            expecting_more_after = s
+    name_reference = MutexingReference()
 
-    is_expecting_more = False
-    expecting_more_after = None
+    class ExpectingMore:
+        def __call__(self, s):
+            if s is None:
+                self.is_expecting_more = False
+                self.expecting_more_after = None
+            else:
+                self.is_expecting_more = True
+                self.expecting_more_after = s
+
+    expecting_more = ExpectingMore()
 
     def move(new_f):
-        nonlocal f
-        f = new_f
+        self.receive_token = new_f
+
+    self.receive_token = receive_token_initially
 
     for s in s_a:
-        f(s)
+        self.receive_token(s)
 
-    if is_expecting_more:
+    if expecting_more.is_expecting_more:
         _ = expecting_more.expecting_more_after
         _ = f"unexpected end of tokens after '{_}'"
         cover_me(_)
 
-    return channel_model, name
+    return channel_model, name_reference.value
+
+
+class _ParseState:  # #[#510.3]
+    def __init__(self):
+        self.receive_token = None
 
 
 class _WildcardGlob:

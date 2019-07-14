@@ -109,14 +109,15 @@ def RESOLVE_UPSTREAM_EXPERIMENT(cli):
 
 def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
 
+    self = _State()
+
     def __main():
         if __help_was_requested_in_ANY_argument():
             __express_help()
         elif __parse_arguments_positionally():
             _args = __prepare_args_to_send()
-            nonlocal exitstatus
-            exitstatus = cli_function(*_args)
-        return exitstatus
+            self.exitstatus = cli_function(*_args)
+        return self.exitstatus
 
     def __prepare_args_to_send():
         listener = __build_common_listener(serr)  # ..
@@ -176,17 +177,21 @@ def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
             return serr.write(_line_head + '\n')
 
     def _succeeded():
-        nonlocal exitstatus
-        exitstatus = 0
+        self.exitstatus = 0
 
     sin, sout, serr, argv = std_tuple
 
     exp_num_args = len(arg_names)
     act_num_args = len(argv)
     use_num_args = act_num_args - 1
-    exitstatus = 678
+    self.exitstatus = 678
 
     return __main()
+
+
+class _State:  # #[#510.3]
+    def __init__(self):
+        self.exitstatus = None
 
 
 # -- abstracted at #history-A.1 - scream case because kludge, reach-down

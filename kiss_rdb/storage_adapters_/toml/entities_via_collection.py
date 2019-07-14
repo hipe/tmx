@@ -27,12 +27,12 @@ def table_block_via_lines_and_table_start_line_object_(
 
     # == BEGIN massive a hacks to alter parse state to be as if mid-parse
 
-    actions = None
+    self = _ThisState()
+    self._actions = None
 
     def actionser(ps):  # the actions object isn't normally accessible
-        nonlocal actions
-        actions = blk_lib.ActionsForCoarseBlockParse_(ps)
-        return actions
+        self._actions = blk_lib.ActionsForCoarseBlockParse_(ps)
+        return self._actions
 
     ps = sm_lib.state_machine_.build_parse_state(
             listener=listener,
@@ -41,7 +41,7 @@ def table_block_via_lines_and_table_start_line_object_(
 
     ps.be_in_state_('table begun')  # the state after "table start line"
 
-    actions.begin_table_with_(table_start_line_object)
+    self._actions.begin_table_with_(table_start_line_object)
     # begin the appendable table block
 
     # == END
@@ -54,6 +54,10 @@ def table_block_via_lines_and_table_start_line_object_(
         assert(False)  # assert that that's the end of the stream
 
     return table_block
+
+
+class _ThisState:  # [#510.2]
+    pass
 
 
 def identifiers_via__(paths_function, id_via_string, listener):

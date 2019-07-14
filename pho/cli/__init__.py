@@ -7,18 +7,17 @@ _env_var_prefix = 'PHO'
 _CONTEXT_SETTINGS = {'auto_envvar_prefix': _env_var_prefix}
 
 
-def lazy(f):
-    is_first_call = True
-    x = None
+def lazy(f):  # #[#510.8]
+    class EvaluateLazily:
+        def __init__(self):
+            self._has_been_evaluated = False
 
-    def use_f():
-        nonlocal is_first_call
-        nonlocal x
-        if is_first_call:
-            is_first_call = False
-            x = f()
-        return x
-    return use_f
+        def __call__(self):
+            if not self._has_been_evaluated:
+                self._has_been_evaluated = True
+                self._value = f()
+            return self._value
+    return EvaluateLazily()
 
 
 class _ComplexCLI(click.MultiCommand):
@@ -140,13 +139,16 @@ class _Command:
 
 
 def _commands_directory():
-    return os.path.join(_mono_repo_dir, 'pho', 'cli', 'commands')
+    return os.path.join(_mono_repo_dir(), 'pho', 'cli', 'commands')
 
 
 def _commands_module_name_for(name):
     return f'pho.cli.commands.{name}'
 
 
+@lazy
+def _mono_repo_dir():
     o = os.path
+    return o.abspath(o.join(__file__, '..', '..', '..'))
 
 # #born.

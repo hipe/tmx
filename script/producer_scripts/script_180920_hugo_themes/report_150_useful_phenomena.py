@@ -27,12 +27,16 @@ class Report:
         singletons = o.singletons
         surface_via_normal = o.surface_via_normal
 
-        def once():
-            nonlocal once
+        class Once:  # #[#510.5] a "oncer"
+            def __init__(self):
+                self._is_first_call = True
 
-            def once():
-                return None
-            return ' surface variations'
+            def __call__(self):
+                if self._is_first_call:
+                    self._is_first_call = False
+                    return ' surface variations'
+
+        once = Once()
 
         for count in sorted(buckets.keys(), reverse=True):
             phenomena = buckets[count]

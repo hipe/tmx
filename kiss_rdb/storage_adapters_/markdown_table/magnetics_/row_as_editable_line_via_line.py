@@ -24,7 +24,7 @@ import re
 
 
 def _SELF(upstream_line, listener):
-    return _RowDOM()._init_via_line(upstream_line, listener)
+    return _row_DOM_via_line(upstream_line, listener).execute()
 
 
 class _BranchDOM:
@@ -47,72 +47,66 @@ class _BranchDOM:
     is_branch = True
 
 
-class _RowDOM(_BranchDOM):
+class _row_DOM_via_line:
 
-    def __init__(self):
-        pass  # hi.
+    def __init__(self, line, listener):
+        self._line = line
+        self._listener = listener
 
-    def _init_via_line(self, line, listener):
-
+    def execute(self):
         a = []
-        has_endcap = False
-        last_end = 0
-        ok = True
+        self._has_endcap = False
+        self._last_end = 0
+        self._ok = True
 
         class symbols:  # #class-as-namespace
 
             def cel(begin, end):
-                _cel = _CelDOM()._init_via_begin_and_end(begin, end, line)
-                a.append(_cel)
-                nonlocal last_end
-                last_end = end
+                _ = _CelDOM()._init_via_begin_and_end(begin, end, self._line)
+                a.append(_)
+                self._last_end = end
 
             def endcap():
-                nonlocal has_endcap
-                has_endcap = True
+                self._has_endcap = True
 
             def failed():
-                nonlocal ok
-                ok = False
+                self._ok = False
 
-        for (symbol, beg_end) in self.__tokens_via(line, listener):
+        for (symbol, beg_end) in self.__flush_to_tokens():
             getattr(symbols, symbol)(*beg_end)
 
-        if ok:
-            return self.__finish(a, has_endcap, last_end, line)
+        if self._ok:
+            return self.__finish(a)
 
-    def __finish(self, a, has_endcap, last_end, line):
+    def __finish(self, a):
 
-        cels_count = len(a)
+        cels_count = len(a)  # before the rest
 
-        if has_endcap:
+        if self._has_endcap:
             a.append(_PIPE_LEAF)
-            end = last_end + 1
+            end = self._last_end + 1
         else:
-            end = last_end
+            end = self._last_end
 
         assert('\n' == self._line[end])
         a.append(_NEWLINE_LEAF)
 
-        # --
+        return _RowDOM().init_via_all_memberdata_(
+            cels_count=cels_count,
+            children=tuple(a),
+            has_endcap=self._has_endcap)
 
-        self.children = tuple(a)
-        self.cels_count = cels_count
-        self.has_endcap = has_endcap
-        return self
-
-    def __tokens_via(self, line, listener):
+    def __flush_to_tokens(self):
 
         # (only the first pipe is required. this makes the loop less pretty)
 
         def early_end_of_string():
             if scn.is_end_of_string():
-                nonlocal ok
-                ok = False
+                self._ok = False
                 scn.expecting('\n')
                 return True
 
-        scn = _CustomScanner(line, listener)
+        scn = _CustomScanner(self._line, self._listener)
         ok = True
 
         scn.mark_the_spot()
@@ -160,7 +154,10 @@ class _RowDOM(_BranchDOM):
         else:
             yield 'failed', ()
 
-    def init_via_all_memberdata__(
+
+class _RowDOM(_BranchDOM):
+
+    def init_via_all_memberdata_(
             self,
             cels_count,
             children,

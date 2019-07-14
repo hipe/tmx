@@ -745,20 +745,19 @@ class _Scanner():
     """
 
     def __init__(self, a):
-        position = -1
+        self._position = -1
         final_position = len(a) - 1
         self.eos = False
         self.value = None
 
         def advance():
-            nonlocal position
-            if final_position == position:
+            if final_position == self._position:
                 del(self.advance)
                 del(self.value)
                 self.eos = True
             else:
-                position += 1
-                self.value = a[position]
+                self._position += 1
+                self.value = a[self._position]
         self.advance = advance
         advance()
 

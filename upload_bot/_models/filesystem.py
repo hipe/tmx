@@ -23,6 +23,7 @@ friendly ("fake") counterpart of Filesystem
 """
 
 from modality_agnostic.memoization import (
+        OneShotMutex,
         lazy)
 
 
@@ -76,11 +77,10 @@ class FakeFilesystem:
         from modality_agnostic import io as io_lib
 
         buff = []
-        mutex = None
+        mutex = OneShotMutex()
 
         def on_OK_exit():
-            nonlocal mutex
-            del mutex
+            mutex.shoot()
             self._receive_writes(buff, path)
 
         return io_lib.write_only_IO_proxy(

@@ -70,11 +70,11 @@ class Case150_magenetic_two(_CommonCase):
         # be determinate to test it (or use sets or something crazy).)
 
         def o(target_basename):
-            nonlocal idx
-            _actual_basename = sorted_basenames[idx]
+            _actual_basename = sorted_basenames[indexer.value]
             self.assertEqual(_actual_basename, target_basename)
-            idx += 1
-        idx = 0
+            indexer.increment()
+
+        indexer = Counter()
 
         # (you should not see a '.github' directory here, per [#410.Z.2])
         o('acka-dormic')
@@ -100,10 +100,10 @@ class Case160_magnetic_three(_CommonCase):
         names.sort()
 
         def o(expected_name):
-            nonlocal idx
-            self.assertEqual(names[idx], expected_name)
-            idx += 1
-        idx = 0
+            self.assertEqual(names[indexer.value], expected_name)
+            indexer.increment()
+
+        indexer = Counter()
         dct = dcts[0]  # pick any one MAYBE ..
         isinstance(dct['features'], list)
         isinstance(dct['tags'], list)
@@ -160,6 +160,11 @@ def _subject_module_two():
 def _subject_module_one():
     import script.SSGs.hugo_themes_deep.relevant_themes_collection_metadata_via_themes_dir as _  # noqa: E501
     return _
+
+
+def Counter():
+    from modality_agnostic.memoization import Counter
+    return Counter()
 
 
 if __name__ == '__main__':

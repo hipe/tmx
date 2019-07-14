@@ -306,35 +306,37 @@ class _WorkerWhenInterleaving(_Worker):
             else:
                 recv_item(*pair)
 
+        class ThisState:  # #[#510.2]
+            pass
+
+        state = ThisState()
+        state.prev_key = None
+
         def recv_item(key, item):
             setattr(self, item_attr, item)
             if key is None:
                 cover_me('when key is none')
             else:
-                recv_key(key)
+                state.recv_key(key)
 
-        def recv_key(first_key):
+        def recv_key_initially(first_key):
             store_key(first_key)
-            nonlocal prev_key
-            prev_key = first_key
-            nonlocal recv_key
-            recv_key = recv_key_subsequently
+            state.prev_key = first_key
+            state.recv_key = recv_key_subsequently
+
+        state.recv_key = recv_key_initially
 
         def recv_key_subsequently(key):
-            nonlocal prev_key
-            if prev_key < key:
+            if state.prev_key < key:
                 store_key(key)
-                prev_key = key
-            elif prev_key == key:
+                state.prev_key = key
+            elif state.prev_key == key:
                 self._unable_because_duplicate_key(key, which)
             else:
                 self._emit(
                         ('error', 'expression', 'disorder'),
                         '{} traversal is not in order ({!r} then {!r})',
-                        (_adj_for[which], prev_key, key),
-                        )
-
-        prev_key = None
+                        (_adj_for[which], state.prev_key, key))
 
         def store_key(key):
             setattr(self, key_attr, key)
