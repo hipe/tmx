@@ -5,8 +5,7 @@ import unittest
 
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 
 
 class _CommonCase(unittest.TestCase):
@@ -146,7 +145,7 @@ def _lines_of_description(param):
     return arr
 
 
-@memoize
+@lazy
 def _styler():
     class _STYLER:
         def em(s):
@@ -156,17 +155,17 @@ def _styler():
 
 # -- some memoized parameters
 
-@memoize
+@lazy
 def _parameter_with_list_argument_arity():
     return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
 
 
-@memoize
+@lazy
 def _parameter_with_flag_argument_arity():
     return _build_parameter_via_argument_arity_string('FLAG')
 
 
-@memoize
+@lazy
 def _the_totally_empty_parameter():
     return _subject_magnetic()()
 
@@ -192,7 +191,7 @@ def _subject_magnetic():
     return _subject_magnetic_file()
 
 
-@memoize
+@lazy
 def _subject_magnetic_file():
     import modality_agnostic.magnetics.parameter_via_definition as x
     return x

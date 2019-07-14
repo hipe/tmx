@@ -6,8 +6,7 @@ from kiss_rdb_test.CLI import (
         build_filesystem_expecting_num_file_rewrites)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -573,7 +572,7 @@ class Case6242_search_help(_CommonCase):
         return ('filter-by-tags', '--help')
 
 
-@memoize
+@lazy
 def _CASE_A():  # usually it's one invocation
 
     def debug_IO_f():
@@ -605,7 +604,7 @@ class _StructTreeAndExitCode:
         self.tree, self.exit_code = two
 
 
-@memoize
+@lazy
 def real_filesystem_read_only():
     # push this up whenever - use the real filesystem but the same testy hook
     from kiss_rdb import memoized_

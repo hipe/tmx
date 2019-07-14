@@ -2,7 +2,7 @@ import _init  # noqa: F401
 from contextlib import contextmanager
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
-        memoize)
+        lazy)
 import unittest
 
 
@@ -269,7 +269,6 @@ def _call_subject_commonly(num, lines):
         )
 
 
-@memoize
 def _subject_module():
     import grep_dump._magnetics.progress_via_job as x  # #[#204]
     return x

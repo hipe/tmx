@@ -269,12 +269,6 @@ def pop_property(o, s):
 def cover_me(s):
     pass
 
-
-@_this_lazy
-def sanity(s=None):
-    pass
-
-
 # --
 
 if __name__ == '__main__':

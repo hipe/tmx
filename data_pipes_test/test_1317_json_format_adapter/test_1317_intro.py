@@ -6,8 +6,7 @@ from sakin_agac import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 fixture_executable_path = ts.fixture_executable_path
@@ -215,7 +214,7 @@ def _build_collection_reference(string):
     return _subject_format_adapter().FORMAT_ADAPTER.collection_reference_via_string(string)  # noqa: E501
 
 
-@memoize
+@lazy
 def _subject_format_adapter():
     import sakin_agac.format_adapters.json_script as x
     return x

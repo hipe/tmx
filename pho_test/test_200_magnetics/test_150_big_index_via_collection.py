@@ -4,8 +4,7 @@ from _common_state import (
         throwing_listenerer)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -198,7 +197,7 @@ class _CustomIndex:
         self.lines_that_define_bookmarks = _3
 
 
-@memoize
+@lazy
 def _big_index_one():
     listener = throwing_listenerer()
     from pho.magnetics_ import big_index_via_collection as lib
@@ -206,7 +205,7 @@ def _big_index_one():
     return lib.big_index_via_collection(_coll, listener)
 
 
-@memoize
+@lazy
 def _collection_one():
     _dir = fixture_directory('collection-00500-intro')
     return kiss_rdber().COLLECTION_VIA_COLLECTION_PATH(_dir)

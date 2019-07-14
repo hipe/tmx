@@ -7,8 +7,7 @@ from _init import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -286,7 +285,7 @@ class Case070_ADD_end_cappiness_here(_CommonCase):  # #coverpoint5.5
 _same_row_1 = '|thing A|x|\n'
 
 
-@memoize
+@lazy
 def _same_this():
     return {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'}
 

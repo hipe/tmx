@@ -42,7 +42,7 @@ from modality_agnostic.test_support.structured_emission import (
         channel_and_payloader_and_result_via_run)
 from modality_agnostic.memoization import (
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes,
-        memoize)
+        lazy)
 import unittest
 
 
@@ -373,7 +373,7 @@ class Case1423_single_file_based_money(_CommonCase):
         return build_fake_filesystem(('file', 'abc/xyz.xtc'))
 
 
-@memoize
+@lazy
 def _collectioner():
     from kiss_rdb.magnetics_.collection_via_path import (
             collectioner_via_storage_adapters_module)

@@ -1,7 +1,5 @@
 import _init  # noqa: F401
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 import doctest
 import unittest
 
@@ -155,7 +153,7 @@ class Case5177_oxford_join_hand_written_unit_test(unittest.TestCase):
         self.assertEqual(_actual, expected_string)
 
 
-@memoize
+@lazy
 def wrapper_two():
     return _subject_module().rotating_bufferer(
             lambda c: f'u:{c}',  # u = uninteresting
@@ -165,7 +163,7 @@ def wrapper_two():
             )
 
 
-@memoize
+@lazy
 def wrapper_one():
     return _subject_module().rotating_bufferer(
             lambda c: f'nf:{c}',  # nf = non-final

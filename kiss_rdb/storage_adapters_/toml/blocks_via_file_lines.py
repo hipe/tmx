@@ -11,21 +11,7 @@ from .identifiers_via_file_lines import (
         BaseActions_,
         table_start_line_via_line_,
         nothing, stop, okay)
-
-
-# == BEGIN EXPERIMENT [#872.02]
-def lazy(f):
-    class _Lazy:
-        def __init__(self):
-            self._is_first_call = True
-
-        def __call__(self):
-            if self._is_first_call:
-                self._is_first_call = False
-                self._value = f()
-            return self._value
-    return _Lazy()
-# == END
+from modality_agnostic.memoization import lazy
 
 
 @lazy

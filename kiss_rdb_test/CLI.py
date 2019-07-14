@@ -12,7 +12,6 @@
 """
 
 from script_lib.test_support import expect_STDs as es
-from modality_agnostic.memoization import memoize
 
 
 class CLI_Test_Case_Methods:

@@ -40,10 +40,7 @@ but we are letting this issue incubate for now.
 :[#014]
 """
 
-
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
 def tree_via_line_stream(line_st):
@@ -135,7 +132,7 @@ def __tree_when_one_or_more_lines(scn):
     return _tree
 
 
-@memoize
+@lazy
 def _this_one_state_machine_definition():
     """the definitional structure of our state machine
 

@@ -238,13 +238,17 @@ def _hack_argument_parser(ap, stderr):
     ap_lib.fix_argument_parser__(ap, stderr)
 
 
-@lazy
-def _infer_metavar_via_name():
+def _infer_metavar_via_name(name):
     """given an optional field named eg. "--important-file", name its
 
     argument moniker 'FILE' rather than'IMPORTANT_FILE'
     """
 
+    return __the_infer_metavar_via_name_function()(name)
+
+
+@lazy
+def __the_infer_metavar_via_name_function():
     import re
     regex = re.compile('[^_]+$')
 
@@ -274,10 +278,6 @@ def _():
 
 def implement_me():
     raise _exe('implement me')
-
-
-def sanity():
-    raise _exe('sanity')
 
 
 _exe = Exception

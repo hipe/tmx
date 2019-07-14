@@ -9,8 +9,7 @@ this takes as input a "one big string" and puts as output something like
 our custom, native AST.
 """
 
-from modality_agnostic import memoization as _
-memoize = _.memoize
+from modality_agnostic.memoization import lazy
 
 
 def doc_pairs_via_string_LIGHTWEIGHT(input_string):
@@ -31,7 +30,7 @@ def _doc_pairs_via_walker(walker, input_string):
     return walker.walk(_model)
 
 
-@memoize
+@lazy
 def _walkers():
     """as explained in the counterpart file (referenced in a tag at top of
     file), things regress more nicely when we load this lazily
@@ -167,7 +166,7 @@ exactly what kind of (grammatical) node this is #open [#709.C])
 """
 
 
-@memoize
+@lazy
 def _query_parser():
     from tag_lyfe import grammar_path_
     _grammar_path = grammar_path_('the-tagging-grammar.ebnf')

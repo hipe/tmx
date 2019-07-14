@@ -26,7 +26,7 @@ from modality_agnostic.memoization import (
         lazy)
 
 
-@memoize
+@lazy
 def real_filesystem():
     return _RealFilesystem()
 
@@ -96,7 +96,7 @@ class FakeFilesystem:
     def file_exists(self, path):
         return (path in self._string_via_path)
 
-    @memoize
+    @lazy
     def the_empty_filesystem():
         return FakeFilesystem()
 

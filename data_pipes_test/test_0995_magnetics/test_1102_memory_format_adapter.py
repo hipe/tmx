@@ -25,7 +25,7 @@ class Case010_hello(_CommonCase):
         self.assertEqual(_act, ['xx', 'yy'])
 
 
-@memoize
+@lazy
 def _snapshot_one():
     _this = [
             {'first name': 'jack', 'last name': 'johnson', 'field_one': 'xx'},

@@ -15,7 +15,7 @@
 👉 So this is :[#867.K] the main internal API for doing vendor stuff, but
    we use this same tag to mark the (at writing) one other place we have too.
 """
-from modality_agnostic.memoization import memoize
+from modality_agnostic.memoization import lazy
 
 
 # == injection for locking and mutating index
@@ -158,7 +158,7 @@ class Schema_:
 o = {}
 
 
-@memoize
+@lazy
 def _32_32_32():
     return _StorageSchema(
             identifier_depth=3,
@@ -170,7 +170,7 @@ def _32_32_32():
 o['32x32x32'] = _32_32_32
 
 
-@memoize
+@lazy
 def _32_32():
     return _StorageSchema(
             identifier_depth=2,
@@ -182,7 +182,7 @@ def _32_32():
 o['32x32'] = _32_32
 
 
-@memoize
+@lazy
 def _32up2():
     return _StorageSchema(
             identifier_depth=2,
@@ -225,7 +225,7 @@ class _StorageSchema:
 
 # ==
 
-@memoize
+@lazy
 def _paths_functions():
     """DISCUSSION:
 

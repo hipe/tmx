@@ -3,15 +3,12 @@
 representing the most common use-cases, useful in testing.
 """
 
-
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
 class command_modules:  # used as namespace yikes
 
-    @memoize
+    @lazy
     def category_5_required_list_minimal():
 
         class MyModule:
@@ -31,7 +28,7 @@ class command_modules:  # used as namespace yikes
             }
         return _command_via_fake_module(MyModule)
 
-    @memoize
+    @lazy
     def category_3_optional_list_minimal():
         class MyModule:
             def Command(listo_boyo, wingo_wanno):
@@ -55,7 +52,7 @@ class command_modules:  # used as namespace yikes
             }
         return _command_via_fake_module(MyModule)
 
-    @memoize
+    @lazy
     def category_2_optional_field_minimal():
 
         class MyModule:
@@ -76,7 +73,7 @@ class command_modules:  # used as namespace yikes
             }
         return _command_via_fake_module(MyModule)
 
-    @memoize
+    @lazy
     def category_1_flag_minimal():
 
         class MyModule:
@@ -121,7 +118,7 @@ class command_modules:  # used as namespace yikes
             }
         return _command_via_fake_module(MyModule)
 
-    @memoize
+    @lazy
     def two_crude_function_parameters_by_function():
         class MyModule:
             def Command(foo_bar, biff_baz):
@@ -129,7 +126,7 @@ class command_modules:  # used as namespace yikes
             PARAMETERS = None
         return _command_via_fake_module(MyModule)
 
-    @memoize
+    @lazy
     def two_crude_function_parameters_by_class():  # category 5
         class MyModule:
             class Command:

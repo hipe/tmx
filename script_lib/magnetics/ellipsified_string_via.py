@@ -1,6 +1,4 @@
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
 def fixed_shape_word_wrapperer(row_max_widths, ellipsis_string=None):
@@ -299,7 +297,7 @@ def __token_stream_via_big_string(big_string):
     return _tokens_via_token_strings()(itr)
 
 
-@memoize
+@lazy
 def _tokens_via_token_strings():
     return _rotbuf_lib().rotating_bufferer(
             _NotFinalWord, _FinalWord, lambda: _WAS_EMPTY)

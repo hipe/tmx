@@ -1,8 +1,6 @@
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
-        memoize,
-        )
-
+        lazy)
 import modality_agnostic.test_support.listener_via_expectations as l_via_e  # noqa: E402 E501
 
 
@@ -141,7 +139,7 @@ class _EndState:
             self.result = x
 
 
-@memoize
+@lazy
 def _word_regex():
     import re
     return re.compile(r'[^ ]+')

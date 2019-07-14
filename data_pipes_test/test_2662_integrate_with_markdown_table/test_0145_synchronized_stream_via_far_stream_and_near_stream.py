@@ -6,9 +6,8 @@ from _init import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as mag_lib  # noqa: E501
+        lazy)
 import unittest
 
 
@@ -276,7 +275,7 @@ def _case_010_section_list():
         return _section_list_via(_dicts, _same_markdown_file)
 
 
-@memoize
+@lazy
 def _case_100_section_list():
         _dicts = (
                 _same_schema_row,
@@ -288,7 +287,7 @@ def _case_100_section_list():
         return _section_list_via(_dicts, _same_markdown_file)
 
 
-@memoize
+@lazy
 def _case_200_section_list():
         _dicts = (
                 _same_schema_row,
@@ -419,19 +418,19 @@ class _MyCustomProcessor:
         self._current_section_items.append(x)
 
 
-@memoize
+@lazy
 def _same_far_keyer():
     return _here() + 'Chimmy_Chamosa_001_far'  # (in this file)
     # return Chimmy_Chamosa_001_far
 
 
-@memoize
+@lazy
 def _same_near_keyer():
     # return _here() + 'Chimmy_Chamosa_001_near'  # (in this file)
     return Chimmy_Chamosa_001_near
 
 
-@memoize
+@lazy
 def _here():
     return (
         'sakin_agac_test.test_450_format_adapters.'
@@ -476,7 +475,6 @@ class _Section:
         self.items = items
 
 
-@memoize
 def _subject_module():
     return mag_lib.sub_magnetic('synchronized_stream_via_far_stream_and_near_stream')  # noqa: E501
 

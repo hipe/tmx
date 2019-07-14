@@ -1,10 +1,10 @@
 """helper for testing CLI in a generic, magnetic-agnostic way
 """
 
+
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 
 
 def ARGV(f):
@@ -245,7 +245,7 @@ class _Invocation:
         return self._interpretation_result.OK
 
 
-@memoize
+@lazy
 def _OK_interpretation_result():
     class _OK_Result:
         def __init__(self):
@@ -259,7 +259,7 @@ def _iterator_via_times(num):
         yield i
 
 
-@memoize
+@lazy
 @ARGV
 def the_empty_ARGV():
     return []  # EMPTY_A

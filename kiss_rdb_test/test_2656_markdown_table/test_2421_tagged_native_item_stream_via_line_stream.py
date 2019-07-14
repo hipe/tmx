@@ -5,9 +5,8 @@ from _init import (
         minimal_listener_spy,
         )
 from modality_agnostic.memoization import (
-        memoize,
-        )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
+        lazy)
 import unittest
 
 
@@ -207,7 +206,6 @@ _all_possible_transitions = (
         )
 
 
-@memoize
 def _subject_module():
     return co.sub_magnetic('tagged_native_item_stream_via_line_stream')
 

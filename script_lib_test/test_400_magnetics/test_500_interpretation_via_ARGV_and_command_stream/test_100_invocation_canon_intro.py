@@ -40,8 +40,7 @@ from script_lib.test_support.generic_CLI_helper import (
         NEWLINE)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -171,7 +170,7 @@ class Case1_3_good_sub_command(_CommonCase):
         return ['foo-bar']
 
 
-@memoize
+@lazy
 def _foo_bar_usage_line():
     return 'usage: %s [-h] {foo-bar,biff-baz} ...%s' % (PROGRAM_NAME, NEWLINE)
 

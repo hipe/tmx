@@ -41,14 +41,17 @@ possible issues:
 from modality_agnostic.memoization import lazy
 
 
-
-@lazy
-def expect_lines():
+def expect_lines(_1, _2):
     """a higher-level interface for reaching the other two methods
 
     reach either `expect_stdout_lines` or `expect_stderr_lines`
     """
 
+    return __the_expect_lines_function()(_1, _2)
+
+
+@lazy
+def __the_expect_lines_function():
     dict = {
         STDOUT: expect_stdout_lines,
         STDERR: expect_stderr_lines,
@@ -393,23 +396,16 @@ _string_via_which_hash = {
         }
 
 
-@lazy
-def _which_via_string():
-    # #todo - there has to be a better way
-    these = {
-      'STDOUT': STDOUT,
-      'STDERR': STDERR,
-      'STDIN': STDIN,
-    }
-
-    def f(s):
-        return these[s]
-    return f
-
-
 _NEWLINE = "\n"
 STDIN = 1
 STDOUT = 2
 STDERR = 3
+
+
+_which_via_string = {
+      'STDOUT': STDOUT,
+      'STDERR': STDERR,
+      'STDIN': STDIN,
+    }.__getitem__
 
 # #born.

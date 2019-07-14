@@ -1,7 +1,5 @@
 import _init  # noqa: F401
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 import unittest
 
 
@@ -26,7 +24,7 @@ class Case010_hello(_CommonCase):
         self.assertIsNotNone(subject_one())
 
 
-@memoize
+@lazy
 def subject_one():
     return _subject_module()(
             format_adapter_module_name=None,

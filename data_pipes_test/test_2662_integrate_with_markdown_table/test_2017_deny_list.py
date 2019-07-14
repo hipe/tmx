@@ -13,9 +13,8 @@ from _init import (
         fixture_file_path,
         ProducerCaseMethods)
 from modality_agnostic.memoization import (
-       dangerous_memoize as shared_subject,
-       memoize,
-       )
+        dangerous_memoize as shared_subject,
+        lazy)
 import unittest
 
 
@@ -179,7 +178,7 @@ _same_ablzton_live = '|[Ablzton Live](xx) | keep B2 ||\n'
 _same_ack_foundry = f'|[ACK Foundry]({_url}/articles/ackfoundry)|||\n'  # noqa: #501
 
 
-@memoize
+@lazy
 def _these_dictionaries():
     return tuple(x for x in _yield_these_dictionaries())
 

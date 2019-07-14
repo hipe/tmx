@@ -7,10 +7,7 @@
 from _init import (
         fixture_directory_path,
         )
-from modality_agnostic.memoization import (
-    # dangerous_memoize as shared_subject,
-    memoize,
-)
+from modality_agnostic.memoization import lazy
 import unittest
 
 
@@ -112,14 +109,14 @@ class Case300_magnetic_three(_CommonCase):
         return _product_of_magnet_three()
 
 
-@memoize
+@lazy
 def _product_of_magnet_three():
     prev = _product_of_magnet_two()  # or not
     dictionary_via_toml_via_path = _subject_module_three()._make_toml_parser(None)  # noqa: E501
     return tuple(dictionary_via_toml_via_path(x) for x in prev)
 
 
-@memoize
+@lazy
 def _product_of_magnet_two():
     o = _product_of_magnet_one()  # or not
     __ = _themes_dir_A()
@@ -135,14 +132,14 @@ def _product_of_magnet_two():
     return result
 
 
-@memoize
+@lazy
 def _product_of_magnet_one():
     _ = _subject_module_one().relevant_themes_collection_metadata_via_themes_dir  # noqa: E501
     __ = _themes_dir_A()
     return _(themes_dir=__, listener=__file__)
 
 
-@memoize
+@lazy
 def _themes_dir_A():
     return fixture_directory_path('0190-a-few-hugo-themes')
 

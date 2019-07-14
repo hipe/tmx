@@ -5,8 +5,7 @@ from kiss_rdb_test.common_initial_state import (
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -471,7 +470,7 @@ def _block_via_line(line, mde, listener):
         cover_me()
 
 
-@memoize
+@lazy
 def _table_start_line_object():
     return TSLO_via('A', 'meta')
 

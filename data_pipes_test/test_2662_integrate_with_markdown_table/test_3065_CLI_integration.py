@@ -5,9 +5,7 @@ from _init import (
         fixture_file_path,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        memoize,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -451,7 +449,6 @@ def _expect_STDs():
     return lib
 
 
-@memoize
 def _subject_script():
     import script.sync as x
     return x

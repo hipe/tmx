@@ -1,7 +1,7 @@
-from modality_agnostic.memoization import memoize
+from modality_agnostic.memoization import lazy
 
 
-@memoize
+@lazy
 def filesystem_expecting_no_rewrites():
 
     def inj(*_):

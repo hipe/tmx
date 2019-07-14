@@ -1,8 +1,7 @@
 import _init  # noqa: F401
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -219,13 +218,13 @@ class Case050_category_5_required_list(_CommonCase):
         return _command_modules().category_5_required_list_minimal()
 
 
-@memoize
+@lazy
 def _lib():
     import script_lib.test_support.expect_help_screen as x
     return x
 
 
-@memoize
+@lazy
 def _command_modules():
     from modality_agnostic.test_support.parameters_canon import (
             command_modules as x,

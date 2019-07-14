@@ -10,9 +10,7 @@ from upload_bot_test.common_initial_state import (
 from upload_bot._models import filesystem
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
-
+        lazy)
 import unittest
 import os
 
@@ -166,7 +164,7 @@ def _same_details(path, fs):
     return _DetailsTwo(did_exist, content)
 
 
-@memoize
+@lazy
 def _this_same_fake_filesystem():
     fs = filesystem.FakeFilesystem()
     with fs.open('/aa/bb', 'x') as fh:
@@ -267,7 +265,7 @@ def _real_filesystem():
     return filesystem.real_filesystem()
 
 
-@memoize
+@lazy
 def _subject_model():
     import upload_bot._models.filesystem as mod
     return mod

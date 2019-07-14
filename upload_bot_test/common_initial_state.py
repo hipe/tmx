@@ -41,22 +41,22 @@ from modality_agnostic.memoization import (  # noqa: E402
         )
 
 
-@memoize
+@lazy
 def writable_tmpdir():
     return path.join(top_test_dir, 'writable-tmpdir')
 
 
-@memoize
+@lazy
 def file_with_content_path():
     return path.join(_fixture_files_directory(), '001-file-with-content.txt')
 
 
-@memoize
+@lazy
 def no_ent_path():
     return path.join(_fixture_files_directory(), 'the-no-ent-path.file')
 
 
-@memoize
+@lazy
 def _fixture_files_directory():
     return path.join(top_test_dir, 'fixture-files')
 

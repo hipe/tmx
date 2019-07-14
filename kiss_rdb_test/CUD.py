@@ -6,7 +6,7 @@
 """
 
 from kiss_rdb import THROWING_LISTENER as _throwing_listener
-from modality_agnostic.memoization import memoize
+from modality_agnostic.memoization import lazy
 
 
 # == functions (public & private because the boundary is plastic)
@@ -113,12 +113,12 @@ def request_via_tuples(tuples, listener):
 
 # == memoized
 
-@memoize
+@lazy
 def _same_TSLO_doesnt_matter():  # tslo = table start line object
     return _models_lib().TSLO_via('A', 'meta')
 
 
-@memoize
+@lazy
 def _default_business_schema():
     from kiss_rdb.storage_adapters_.toml import (
             business_schema_via_definition as lib)

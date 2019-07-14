@@ -1,6 +1,4 @@
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
 def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
@@ -372,7 +370,7 @@ class _QualifiedItem:
 
 def __U_and_D_comment_proximity_checkerer(problems, mde, listener):
 
-    @memoize
+    @lazy
     def checker():
 
         from . import entity_via_identifier_and_file_lines as ent_lib
@@ -621,7 +619,7 @@ def __apply_C_and_U(
     return _okay
 
 
-@memoize
+@lazy
 def _blank_line():
     return _blocks_lib().AppendableDiscretionaryBlock_('\n')
 

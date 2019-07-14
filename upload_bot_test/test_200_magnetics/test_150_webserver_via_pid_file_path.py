@@ -10,9 +10,7 @@ from upload_bot._models import (
         filesystem)
 from modality_agnostic.memoization import (
         dangerous_memoize,
-        memoize,
-        )
-
+        lazy)
 import unittest
 
 shared_subject = dangerous_memoize
@@ -130,7 +128,7 @@ class _Tuple:
         self.messages = msgs
 
 
-@memoize
+@lazy
 def _memoized_fake_filesystem():
     fs = filesystem.FakeFilesystem()
     with fs.open('/choopa/dalupa.pid', 'x') as fh:
@@ -138,7 +136,7 @@ def _memoized_fake_filesystem():
     return fs
 
 
-@memoize
+@lazy
 def _subject_magnetic():
     import upload_bot._magnetics.webserver_via_pid_file_path as mag
     return mag

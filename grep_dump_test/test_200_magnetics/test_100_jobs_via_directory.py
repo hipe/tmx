@@ -284,7 +284,6 @@ def _identity(x):  # IDENTITY_
     return x
 
 
-@memoize
 def _subject_module():
     import grep_dump._magnetics.jobs_via_directory as x  # #[#204]
     return x

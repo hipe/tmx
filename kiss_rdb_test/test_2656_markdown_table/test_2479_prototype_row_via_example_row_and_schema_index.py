@@ -15,7 +15,6 @@ from _init import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
         )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
 import unittest
@@ -244,7 +243,6 @@ def _row_via_line(line):
     return _row
 
 
-@memoize
 def _subject_module():
     return co.sub_magnetic('prototype_row_via_example_row_and_schema_index')
 

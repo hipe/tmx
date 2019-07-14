@@ -7,8 +7,7 @@ import _init  # noqa: F401
 import script_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -400,7 +399,7 @@ def _line_stream_via_docstring(big_s):
     return (match[1] for match in iter)
 
 
-@memoize
+@lazy
 def _empty_iterator():
     return iter(())
 

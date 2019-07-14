@@ -8,9 +8,6 @@
 """
 
 import _init  # noqa: F401
-from modality_agnostic.memoization import (
-        memoize,
-        )
 import unittest
 
 
@@ -75,7 +72,6 @@ class Case8189_build_and_see_component_names(_CommonCase):
         self._raises(_exp, _act)
 
 
-@memoize
 def _command_modules():
     from modality_agnostic.test_support.parameters_canon import (
             command_modules as x)

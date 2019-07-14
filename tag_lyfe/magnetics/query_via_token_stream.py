@@ -8,9 +8,7 @@ this one grammar - there can be other such modules for other grammars).
 also, see #here2 which explains how we isolate w/ re: to AST.
 """
 
-
-from modality_agnostic import memoization as _
-memoize = _.memoize
+from modality_agnostic.memoization import lazy
 
 
 def RUMSKALLA(serr, query_s):
@@ -51,7 +49,7 @@ def MAKE_CRAZY_ITERATOR_THING(query_s):
     yield unsani
 
 
-@memoize
+@lazy
 def _memoized_walker():
     """isolate parser-generator specifics w/ re: to AST :#here2:
 
@@ -213,7 +211,7 @@ def query_model_via_big_string(big_string):
     return model
 
 
-@memoize
+@lazy
 def query_parser():
     from tag_lyfe import grammar_path_
     _grammar_path = grammar_path_('the-query-grammar.ebnf')

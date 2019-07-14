@@ -44,8 +44,7 @@ from sakin_agac_test.format_adapter.disjoint_smalls import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -110,7 +109,7 @@ class Case100_hello(_CommonCase):
                 )
 
 
-@memoize
+@lazy
 def _subject_module():
     from sakin_agac_test.fixture_executables import (
             exe_150_json_stream_via_bernstein_html as x)

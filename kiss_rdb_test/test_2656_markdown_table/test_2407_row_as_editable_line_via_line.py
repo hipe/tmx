@@ -48,9 +48,6 @@ can dynamically decompose..
 from _init import (
         sanity,
         )
-from modality_agnostic.memoization import (
-        memoize,
-        )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
 import unittest
 
@@ -216,7 +213,6 @@ class _CaseState:
         self.original_string = s
 
 
-@memoize
 def _subject_module():
     return co.sub_magnetic('row_as_editable_line_via_line')
 

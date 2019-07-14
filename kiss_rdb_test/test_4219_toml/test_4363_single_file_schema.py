@@ -8,8 +8,7 @@ from kiss_rdb_test.CUD import (
         build_filesystem_expecting_num_file_rewrites)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -201,12 +200,12 @@ def _build_collection(dir_path, **injections):
             **injections)
 
 
-@memoize
+@lazy
 def _dir_path_most_common():
     return functions_for('toml').fixture_directory_path('056-single-file')
 
 
-@memoize
+@lazy
 def _always_same_schema():
     from kiss_rdb.storage_adapters_.toml.schema_via_file_lines import Schema_
     return Schema_(storage_schema='32^2')

@@ -2,7 +2,7 @@ from kiss_rdb_test.common_initial_state import unindent
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize)
+        lazy)
 import unittest
 
 
@@ -270,7 +270,7 @@ class Case4193_no_trailing_newline(_CommonCase):
         return "line 1\nline 2\nline 3"
 
 
-@memoize
+@lazy
 def _common_subject():
     return _subject_module().string_encoder_via_definition(
             smaller_string_max_length=_small_limit,

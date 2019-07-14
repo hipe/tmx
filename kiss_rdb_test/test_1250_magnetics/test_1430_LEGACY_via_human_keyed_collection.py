@@ -3,8 +3,7 @@ from _init import (
         )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import doctest
 import unittest
 
@@ -161,7 +160,7 @@ class Case400_win(_CommonCase):
         return _collection_C()
 
 
-@memoize
+@lazy
 def _collection_C():
     x = 'no see'
     pairs = (
@@ -174,7 +173,7 @@ def _collection_C():
     return _HKC_via_pairs(iter(pairs))  # risky, experimental
 
 
-@memoize
+@lazy
 def _collection_B():
     pairs = (
             ('ha_hu', 'no see'),
@@ -186,7 +185,7 @@ def _collection_B():
     return _HKC_via_pairs(iter(pairs))  # risky, experimental
 
 
-@memoize
+@lazy
 def _the_empty_collection():
     return _HKC_via_pairs(iter(()))  # risky, experimental
 
@@ -195,7 +194,7 @@ def _HKC_via_pairs(pairs):
     return _subject_module().human_keyed_collection_via_pairs_cached(pairs)
 
 
-@memoize
+@lazy
 def _subject_module():
     import sakin_agac.magnetics.via_human_keyed_collection as x
     return x

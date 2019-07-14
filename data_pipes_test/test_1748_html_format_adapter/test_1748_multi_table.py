@@ -18,9 +18,8 @@ from _init import (
         )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table.parsers as parsers  # noqa: E501
 from modality_agnostic.memoization import (
-       dangerous_memoize as shared_subject,
-       memoize,
-       )
+        dangerous_memoize as shared_subject,
+        lazy)
 import unittest
 
 
@@ -143,7 +142,7 @@ class Case200_gen(ProducerCaseMethods, _CommonCase):
         return tuple(x for x in _lines)
 
 
-@memoize
+@lazy
 def _these_dictionaries():
     return tuple(x for x in _yield_these_dictionaries())
 

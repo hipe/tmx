@@ -1,9 +1,7 @@
-from modality_agnostic.memoization import (  # noqa: F401
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
-@memoize
+@lazy
 def empty_command_module():
     import types
     ns = types.SimpleNamespace()

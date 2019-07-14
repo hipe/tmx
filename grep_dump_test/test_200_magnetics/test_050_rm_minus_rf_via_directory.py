@@ -2,9 +2,7 @@ from grep_dump_test.common_initial_state import (
         writable_tmpdir)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
-
+        lazy)
 import unittest
 import os
 p = os.path
@@ -101,7 +99,7 @@ def _touch(path):  # #todo how
     open(path, 'w').close()
 
 
-@memoize
+@lazy
 def _subject_function():
     from grep_dump._magnetics.rm_minus_rf_via_directory import (  # #[#204]
        rm_minus_rf_via_directory as x)

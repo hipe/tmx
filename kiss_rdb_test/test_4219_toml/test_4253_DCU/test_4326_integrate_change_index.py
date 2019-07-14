@@ -11,8 +11,7 @@ from kiss_rdb_test.CUD import (
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -639,49 +638,49 @@ def _last_3_of_path(path):
     return re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
 
 
-@memoize
+@lazy
 def _collection_with_expecting_no_rewrites():
     return _build_collection(
             dir_path=_dir_path_most_common(),
             filesystem=filesystem_expecting_no_rewrites())
 
 
-@memoize
+@lazy
 def _collection_with_noent_dir():
     return _build_collection(
             dir_path=_dir_path_of_no_ent(),
             filesystem='no filesystem xyz121')
 
 
-@memoize
+@lazy
 def _wrapped_collection_with_NO_filesystem():
     return wrap_collection(_collection_with_NO_filesystem())
 
 
-@memoize
+@lazy
 def _collection_with_NO_filesystem():
     return _build_collection(
             dir_path=_dir_path_most_common(),
             filesystem='no filesystem xyz122')
 
 
-@memoize
+@lazy
 def _entities_file_path_for_2J():
     import os.path as os_path
     return os_path.join(_dir_path_most_common(), 'entities', '2', 'J.toml')
 
 
-@memoize
+@lazy
 def _dir_path_most_common():
-    return fixture_directory_path('050-rumspringa')
+    return fixture_directory_for('050-rumspringa')
 
 
-@memoize
+@lazy
 def _dir_path_of_no_ent():
-    return fixture_directory_path('000-no-ent')
+    return fixture_directory_for('000-no-ent')
 
 
-fixture_directory_path = functions_for('toml').fixture_directory_path
+fixture_directory_for = functions_for('toml').fixture_directory_for
 
 
 def _last_three_path_parts(path):
@@ -714,7 +713,7 @@ def _build_collection(dir_path, **injections):
             **injections)
 
 
-@memoize
+@lazy
 def _always_same_schema():
     from kiss_rdb.storage_adapters_.toml.schema_via_file_lines import Schema_
     return Schema_(storage_schema='32x32x32')

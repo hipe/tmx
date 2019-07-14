@@ -6,9 +6,8 @@ from kiss_rdb.storage_adapters_.toml.entities_via_collection import (
         table_block_via_lines_and_table_start_line_object_)
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
-    dangerous_memoize as shared_subject,
-    memoize,
-    )
+        dangerous_memoize as shared_subject,
+        lazy)
 import unittest
 
 
@@ -260,7 +259,7 @@ class Case4121_at_tail(_CommonCase):
         return _given_ABC_lines()
 
 
-@memoize
+@lazy
 def _given_ABC_lines():
     return tuple(_unindent("""
     [item.AA.attributes]
@@ -515,7 +514,7 @@ class Case4134_the_hard_but_money_cases(_CommonCase):
         self.expect_yes_comment('basic-string-100-escape')
 
 
-@memoize
+@lazy
 def _comment_tester_one():
     """things to note about this fellow:
         - written so every line passes crude parse (should that be
@@ -572,7 +571,7 @@ def _table_block_via_body_lines(lines):
     return table_block_via_lines_and_table_start_line_object_(lines, _)
 
 
-@memoize
+@lazy
 def _table_start_line_object():
     return TSLO_via('ABCDE', 'attributes')
 

@@ -40,9 +40,7 @@ from _init import (
         fixture_file_path,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        memoize,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -118,7 +116,6 @@ class Case100_hello(_CommonCase):
         return _State(head_dct, tuple(objs), tuple(emissions))
 
 
-@memoize
 def _subject_module():
         import script.tag_lyfe.json_stream_via_python_wiki as x
         return x

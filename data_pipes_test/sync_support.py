@@ -1,5 +1,5 @@
 from sakin_agac import sanity
-from modality_agnostic.memoization import memoize
+from modality_agnostic.memoization import lazy
 import unittest
 
 
@@ -137,12 +137,12 @@ def collection_reference_via_(collection_identifier, listener):
     return _.collection_reference_via_(collection_identifier, listener)
 
 
-@memoize
+@lazy
 def _mag_wee():
     return _sub_mag('.normal_far_stream_via_collection_reference')
 
 
-@memoize
+@lazy
 def _mag_sync():
     return _sub_mag('.synchronized_stream_via_far_stream_and_near_stream')
 

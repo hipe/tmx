@@ -7,8 +7,7 @@ import _init  # noqa: F401  (just normalize `sys.path` so we can import things)
 
 from modality_agnostic.memoization import (
         dangerous_memoize,
-        memoize,
-        )
+        lazy)
 
 import unittest
 
@@ -115,7 +114,7 @@ class Case400_win(_TestCase):
         return _subject_magnetic()(_d)
 
 
-@memoize
+@lazy
 def _subject_magnetic():
     import upload_bot._magnetics.secrets_via_environment_variables as mod
     _requisite_things = {

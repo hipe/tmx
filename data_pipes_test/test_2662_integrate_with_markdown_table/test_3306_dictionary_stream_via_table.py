@@ -25,9 +25,7 @@ from sakin_agac_test.format_adapter.disjoint_smalls import (
         build_state_the_bernstein_way,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        memoize,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -91,7 +89,6 @@ class Case100_hello(_CommonCase):
         self.assertIn('version', act)
 
 
-@memoize
 def _subject_module():
     import script.tag_lyfe.json_stream_via_bernstein as x
     return x

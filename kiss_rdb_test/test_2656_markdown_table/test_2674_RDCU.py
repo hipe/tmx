@@ -3,8 +3,7 @@ from kiss_rdb_test.common_initial_state import (
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        lazy)
 import unittest
 
 
@@ -425,7 +424,7 @@ def _flush_reason_early(es):
     return es
 
 
-@memoize
+@lazy
 def _collection_ordinary_wont_mutate():
     return _collection_ordinary_will_mutate().FREEZE_HACK()
 

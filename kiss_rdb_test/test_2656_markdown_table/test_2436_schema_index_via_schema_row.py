@@ -3,9 +3,6 @@
 from _init import (
         minimal_listener_spy,
         )
-from modality_agnostic.memoization import (
-        memoize,
-        )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
 import unittest
 
@@ -75,13 +72,11 @@ class Case200_encap_is_required(_CommonCase):
         self.assertEqual(msgs, [_])
 
 
-@memoize
 def _stowaway_subject_module():
     import sakin_agac.magnetics.normal_field_name_via_string as x
     return x
 
 
-@memoize
 def _subject_module():
     return co.sub_magnetic('schema_index_via_schema_row')
 

@@ -3,10 +3,7 @@
 :[603]
 """
 
-from modality_agnostic.memoization import (
-        memoize,
-        )
-
+from modality_agnostic.memoization import lazy
 import re
 
 
@@ -145,7 +142,7 @@ def __option_line_challenge_mode(line_s):
     return __main()
 
 
-@memoize
+@lazy
 def __my_named_tuple_for_above():
     import collections
     return collections.namedtuple('OptionDescLineTree', [

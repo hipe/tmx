@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import memoize
+from modality_agnostic.memoization import lazy
 
 
 class _BusinessSchema:
@@ -109,7 +109,7 @@ def _build_semi_encoder(listener, o):
     return semi_encode
 
 
-@memoize
+@lazy
 def _default_string_encoder():
     from kiss_rdb.storage_adapters_.toml import (
         string_encoder_via_definition as se_lib)

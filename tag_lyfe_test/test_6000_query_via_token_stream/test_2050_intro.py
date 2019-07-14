@@ -20,11 +20,7 @@ experimental new provisions:
   - stack countdown number as testpoint identifier (see [#704.B])
 """
 
-
 import _init  # noqa: F401
-from modality_agnostic.memoization import (
-        memoize,
-        )
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
@@ -128,7 +124,6 @@ class Case500_lone_tag(_CommonCase, ScaryCommonCase):
         self.matches_against(('#tres', '#one'))
 
 
-@memoize
 def _subject_magnetic():
     import tag_lyfe as x  # NOTE
     return x

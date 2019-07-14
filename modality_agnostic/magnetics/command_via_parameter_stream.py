@@ -2,9 +2,7 @@
 :[#503]
 """
 
-from modality_agnostic.memoization import (
-        memoize,
-        )
+from modality_agnostic.memoization import lazy
 
 
 class SELF:  # :[#011]
@@ -185,7 +183,7 @@ def _index_parameters(
     )
 
 
-@memoize
+@lazy
 def _default_formal_parameter():  # #testpoint
     import modality_agnostic.magnetics.parameter_via_definition as mag
     return mag(
@@ -221,7 +219,7 @@ class _DefinedParametersDiminishingPool:
         return len(self._my_params_d)
 
 
-@memoize
+@lazy
 def _the_empty_diminishing_pool():
 
     # (we could do class-as-singleton but python reflection doesn't
