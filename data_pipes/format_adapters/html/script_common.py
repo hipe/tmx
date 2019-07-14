@@ -1,5 +1,3 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
 """ASPIRATIONAL: break common scraping tasks up into reusable parts..
 
 so:
@@ -10,6 +8,7 @@ so:
 
 NOTE - this is NOT yet useful as a standalone CLI script..
 """
+# #[#874.5] file used to be executable script and may need further changes
 
 
 """
@@ -25,51 +24,8 @@ def _required(self, s, x):
         setattr(self, s, x)
 
 
-def _my_CLI(url, selector_string, listener, sin, sout, serr):
-
-    cover_me('not used')
-
-    def __main():
-        ok and __resolve_selector()
-        ok and __get_busy()
-        return exitstatus
-
-    def __get_busy():
-        _rc = OPEN_DICTIONARY_STREAM_VIA(
-                url=url,
-                selector=selector,
-                listener=listener,
-                )
-
-        nonlocal exitstatus
-        with _rc as lines:
-            exitstatus = flush_JSON_stream_into(sout, serr, lines)
-
-    def __resolve_selector():
-        my_selector = selector_via_string(selector_string, listener)
-        if my_selector is None:
-            _stop_early()
-        else:
-            nonlocal selector
-            selector = my_selector
-
-    def _stop_early():
-        nonlocal ok
-        ok = False
-
-    selector_string = None
-    selector = None
-    exitstatus = 5
-    ok = True
-
-    return __main()
-
-
 def selector_via_string(*_):
     cover_me('gone a long time ago')
-
-
-_my_CLI.__doc__ = __doc__
 
 
 def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
@@ -243,21 +199,6 @@ def _this_lazy(f):  # experiment (copy-paste)
     return g
 
 
-def normalize_sys_path_():
-    """we want the `sys.path` to start with the universal monoproject
-
-    directory, not the dirname of the entrypoint file (which we assert).
-    this is the first formal implementation of what is now recognized
-    as the pattern :[#019.E].
-    """
-
-    import os.path as os_path
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    sys_path[0] = dn(here)
 
 
 @_this_lazy

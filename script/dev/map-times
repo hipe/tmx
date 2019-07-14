@@ -132,22 +132,6 @@ class _record_via_matchdata:
 
 # --
 
-def _normalize_sys_path():  # #cp
-    """we want the `sys.path` to start with the universal monoproject
-
-    directory, not the dirname of the entrypoint file (which we assert).
-    this is one of quite many implementations of #[#019.E].
-    """
-
-    import os.path as os_path
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    sys_path[0] = dn(dn(here))
-
-
 def cover_me(msg=None):
     raise Exception(_msg(msg, 'cover me'))
 
@@ -161,9 +145,6 @@ def _msg(body, header):
 
 
 if '__main__' == __name__:
-
-    _normalize_sys_path()
-
     import sys as o
     _es = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_es)

@@ -121,7 +121,6 @@ def execute_as_CLI_(open_dictionary_stream):
     this is the implementation of :[#410.H]
     """
 
-    _normalize_sys_path()
     from script.json_stream_via_url_and_selector import (
             flush_JSON_stream_into as flush_into,
             )
@@ -131,26 +130,9 @@ def execute_as_CLI_(open_dictionary_stream):
     return 0
 
 
-def _normalize_sys_path():
-    """
-    assert that the sys.path starts with this fixture_executables directory.
-    instead we want it to have the universal monoproject path.
-    this gave rise to the pattern of #[#019.file-type-E].
-    """
-
-    from sys import path as sys_path
-    from os import path as os_path
-    dn = os_path.dirname
-
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        raise Exception('sanity - in the future, default sys.path may change')
-
-    sys_path[0] = dn(dn(here))
 
 
 if __name__ == '__main__':
-    _normalize_sys_path()
     import sys as o
     import script_lib as _
     _exitstatus = _.CHEAP_ARG_PARSE(

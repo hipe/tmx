@@ -38,8 +38,6 @@ system-under-test is itself a testing library. (but see more N-meta antics
 #here2.)
 """
 
-import _init  # noqa: F401
-
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest

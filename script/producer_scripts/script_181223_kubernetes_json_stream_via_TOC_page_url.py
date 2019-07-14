@@ -21,10 +21,8 @@ class _CLI:
             return 5
         _, url = a
 
-        from script.json_stream_via_url_and_selector import (
-                JSON_object_writer_via_IO_downstream as _,
-                )
-        write = _(self.stdout)
+        from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
+        write = dictionary_dumper_as_JSON_via_output_stream(self.stdout)
 
         for obj in object_stream_via_url_(None, url, self._listener):
             write(obj)
@@ -163,14 +161,6 @@ _label = 'label'
 _url = 'url'
 
 
-def normalize_sys_path_():  # #cp of normalize_sys_path_
-    import os.path as os_path
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    sys_path[0] = dn(dn(here))  # 2x: script/foo/bar.py
 
 
 def sanity(s):
@@ -178,7 +168,6 @@ def sanity(s):
 
 
 if __name__ == '__main__':
-    normalize_sys_path_()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

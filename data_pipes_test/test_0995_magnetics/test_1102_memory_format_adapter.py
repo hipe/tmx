@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 from sakin_agac_test.format_adapter import (
         battery,
         )

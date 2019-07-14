@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 from contextlib import contextmanager
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,

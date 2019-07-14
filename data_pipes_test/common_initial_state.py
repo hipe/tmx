@@ -1,35 +1,4 @@
-"""this is *the* [#019.file-type-D]. see."""
-
 import os.path as os_path
-
-
-def _():
-    dn = os_path.dirname
-    import sys
-
-    a = sys.path
-    head = a[0]
-
-    sub_project_test_dir = dn(__file__)
-    mono_repo_dir = dn(sub_project_test_dir)
-
-    # when we are running all the tests for the whole sub-project,
-    # it looks like this: `<sub_proj_TD>, <mono_repo_dir>, stdlib1, ..`
-
-    if sub_project_test_dir == head:
-        None if mono_repo_dir == a[1] else sanity()
-
-    # when we are running a single test file, that file's init thing
-    # put the mono repo dir at the head, and we'll ignore whatever else
-    # is there:
-
-    elif mono_repo_dir == head:
-        pass  # as above. the 2nd path component might be a deep test dir
-
-    else:
-        sanity()
-
-    return (sub_project_test_dir,)
 
 
 def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
@@ -191,10 +160,6 @@ def cover_me(s=None):
 def sanity(s='assumption failed'):
     raise Exception(s)
 
-
-(
-    _top_test_dir,
-) = _()
 
 # #history-A.1: upgraded to python 3.7, things changed
 # #born.

@@ -8,9 +8,6 @@ import os
 
 
 def run_forever_newschool_(environ, **kwargs):
-
-    _normalize_sys_path()
-
     from upload_bot._magnetics import (
             secrets_via_environment_variables,
             behavior_via_secrets,
@@ -102,26 +99,6 @@ def _run_forever_oldschool():
             time.sleep(RTM_READ_DELAY)
     else:
         print("Connection failed. Exception traceback printed above.")
-
-
-def _normalize_sys_path():
-
-    path = os.path
-    dirname = path.dirname
-    sub_project_dir = dirname(path.abspath(__file__))
-    project_dir = dirname(sub_project_dir)
-
-    from sys import path as a
-    current_head_path = a[0]
-
-    if sub_project_dir == current_head_path:
-        # we are entrypoint file. do exactly as [#029.file-type-A] (see).
-        a[0] = project_dir
-    elif project_dir == current_head_path:
-        # assume this is not the entrypoint file, server being run for tests.
-        pass
-    else:
-        raise Exception('strange - what is up with sys.path')
 
 
 class Exception(Exception):

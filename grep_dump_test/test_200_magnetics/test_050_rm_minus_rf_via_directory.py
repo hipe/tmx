@@ -84,7 +84,7 @@ def _build_this_one_tree():
             file-3.txt
           dir-two/
     """
-    work_dir = p.join(writable_tmpdir, 'wazoo')
+    work_dir = p.join(writable_tmpdir(), 'wazoo')
     os.mkdir(work_dir)
     _touch(p.join(work_dir, 'file-1.txt'))
     dir_one = p.join(work_dir, 'dir-one')

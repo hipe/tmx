@@ -22,23 +22,6 @@ import sys
 path = os.path
 
 
-def _():
-
-    dn = path.dirname
-
-    a = sys.path
-    head = a[0]
-
-    script_dir = dn(path.abspath(__file__))
-    project_dir = dn(dn(script_dir))
-
-    if script_dir == head:
-        a[0] = project_dir  # clobber. see [#019]
-    else:
-        raise Exception('assumption failed')
-
-
-_()
 def _main():
 
     _listener = _build_listener()

@@ -230,8 +230,6 @@ def sanity():
 
 
 if __name__ == '__main__':
-    from relevant_themes_collection_metadata_via_themes_dir import normalize_sys_path_ as _  # noqa: E501
-    _()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

@@ -71,8 +71,6 @@ class _CLI_for_all:
 
 
 def CLI_for_Report(report_module):
-    _normalize_sys_path()  # for now, assume sibling entrypoint
-
     def f(*_four):
         return _CLI_for_Report(report_module, *_four)
     return f
@@ -473,20 +471,6 @@ def __stem_via_path(report_path):
 
 # -- lowest level/common
 
-def _normalize_sys_path():
-    # was custom, now is not
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    monorepo_dir = dn(dn(dn(dn(here))))
-
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    if monorepo_dir == sys_path[1]:
-        sanity()
-    # sys_path.insert(1, monorepo_dir)  old way was to keep local dir at head
-    sys_path[0] = monorepo_dir
-
 
 def cover_me(msg):
     raise Exception(f'cover me: {msg}')
@@ -508,7 +492,6 @@ _this_one_env_var = 'SAKIN_AGAC_HUGO_THEMES_DIR'
 
 
 if __name__ == '__main__':
-    _normalize_sys_path()
     import sys as o
     _exitstatus = _CLI_for_all(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

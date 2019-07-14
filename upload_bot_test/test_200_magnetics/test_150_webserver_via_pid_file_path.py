@@ -3,9 +3,6 @@
 the structure of this test file is almost *entirely* derived from the
 [#304.figure-1]. (in fact, that's interesting food for thougt :[#008.F])
 """
-
-import _init  # noqa: F401
-
 from upload_bot._models import (
         filesystem)
 from modality_agnostic.memoization import (

@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 from modality_agnostic_test.test_400_magnetics._init import (
         empty_command_module,
         )

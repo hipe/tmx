@@ -168,19 +168,7 @@ sys.modules[__name__] = _SelfAsCallableModule()
 
 
 if '__main__' == __name__:
-
-    # == BEGIN #[#024] (they don't make it easy)
     import os
-    path = os.path
-    import sys
-    sub_sub_project_dir = path.dirname(path.abspath(__file__))
-    project_dir = path.dirname(path.dirname(sub_sub_project_dir))
-    a = sys.path
-    if sub_sub_project_dir != a[0]:
-        raise Exception('sanity')
-    a[0] = project_dir
-    # == END
-
     col = _SELF(os.environ)
     o = print
     o('# (DO NOT PUT THIS INFORMATION INTO VERSION CONTROL)')

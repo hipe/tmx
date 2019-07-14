@@ -129,8 +129,6 @@ def sanity():
 
 
 if __name__ == '__main__':
-    import sys as _
-    _.path.insert(0, '')
     import script.json_stream_via_url_and_selector as _
     _exitstatus = _.common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,

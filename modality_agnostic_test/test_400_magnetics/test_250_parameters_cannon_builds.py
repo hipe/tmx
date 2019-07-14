@@ -7,7 +7,6 @@
   - in fact it should be under the test_support counterpart node, but etc
 """
 
-import _init  # noqa: F401
 import unittest
 
 

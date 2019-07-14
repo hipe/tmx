@@ -11,59 +11,14 @@ import sys
 _ws_log = ws._log  # fail early if this non-API function disappears
 
 
-# -- BEGIN (very closely related to [#024]) get `sys.path` right
-def _():
-    """normalize `sys.path`
-
-    python makes the assumption that you want the parent directory of your
-    entrypoint file prepended to your `sys.path`. in our case that is not
-    what we want. in our case:
-
-      - do *not* prepend the dirname of our entrypoint file to `sys.path`.
-        (to do so would encourage a smell - module names should be fully
-        qualified from the top of our project, not the top of our sub-project.)
-
-      - we are in the entrypoint file (for now) for running the server.
-
-      - we want `sys.path` to be not our own entrypoint directory, but dirname
-
-      - (in a function so lvars don't get confused with "local" exports)
-    """
-
+if True:  # because #history-A.4 if you must know
     from os import path
     dirname = path.dirname
 
     sub_project_dir = dirname(path.abspath(__file__))
     project_dir = dirname(sub_project_dir)
+    writable_tmpdir = path.join(project_dir, 'writable-tmpdir')
 
-    a = sys.path
-    current_head_path = a[0]
-
-    if sub_project_dir == current_head_path:
-        """the parent directory of *this file* is at the head of `sys.path`.
-        assume this file is the entrypoint file, ergo we are not in some
-        kind of test suite. normalize the `sys.path` to follow the guidelines
-        set out at [#204].
-        """
-        a[0] = project_dir
-    else:
-        raise Exception("we've never loaded this file under tests before")
-
-    _writable_tmpdir = path.join(project_dir, 'writable-tmpdir')
-
-    return (
-            _writable_tmpdir,
-            sub_project_dir,
-            project_dir,
-            )
-
-
-(
-        writable_tmpdir,
-        sub_project_dir,
-        project_dir,
-) = _()
-# -- END
 
 import grep_dump.forms as forms  # noqa: E402
 
@@ -385,6 +340,7 @@ if __name__ == '__main__':
     _run_server_forever_custom(app)
 
 
+# #history-A.4
 # #history-A.3 learned we can't use jobser with reloader
 # #history-A.1 (can be temporary) when we injected "jobser"
 # #history-A.1 (as referenced)

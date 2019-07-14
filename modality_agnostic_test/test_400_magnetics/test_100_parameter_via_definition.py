@@ -1,6 +1,5 @@
 """this tests only the raw meta-parameters, no integration"""
 
-import _init  # noqa: F401
 import unittest
 
 from modality_agnostic.memoization import (

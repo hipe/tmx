@@ -3,7 +3,6 @@
 this is #meta-testing
 """
 
-import _init  # noqa: F401
 import script_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,

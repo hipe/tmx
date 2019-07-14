@@ -1,45 +1,6 @@
 import os.path as os_path
 
 
-def _normalize_sys_path():  # may or may not be necessary. tracked with [#019]
-    from sys import path as a
-
-    dn = os_path.dirname
-    test_dir = dn(os_path.abspath(__file__))
-    mono_repo_dir = dn(test_dir)
-
-    if test_dir == a[0]:
-        # the topmost test directory was the argument path (type C)
-
-        assert(mono_repo_dir == a[1])  # `py -m unittest discover` probably
-
-        # swap them so sys.path advertises that it is normalized
-        a[0] = mono_repo_dir
-        a[1] = test_dir
-
-    elif mono_repo_dir == a[0]:
-        # file was loaded by a lower same-named file that wants its resources
-        pass
-    else:
-        # either sub-unit is being run or a test file is loading us the new way
-        assert(0 == a[0].index(test_dir))
-
-        if mono_repo_dir == a[1]:  # sub-unit
-            # swap them so sys.path advertises that it is normalized
-            a[1] = a[0]  # keep the deep test module so other tests can load
-            a[0] = mono_repo_dir
-        else:
-            # single file is being run, loaded this the the new way. clobber
-            a[0] = mono_repo_dir
-
-        # (this branch added at #history-A.1)
-
-    assert(mono_repo_dir == a[0])
-
-    return test_dir
-
-
-_top_test_dir = _normalize_sys_path()
 
 
 def lazy(f):  # #meh

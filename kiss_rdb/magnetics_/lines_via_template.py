@@ -192,8 +192,6 @@ _success_exitstatus = 0
 
 
 if __name__ == '__main__':
-    import json_stream_via_url_and_selector as siblib
-    siblib.normalize_sys_path_()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

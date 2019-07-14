@@ -36,8 +36,6 @@ class open_dictionary_stream:
 # == BEGIN (see same in sakin_agac: [#410.H])
 
 def execute_as_CLI_(open_dictionary_stream):
-
-    _normalize_sys_path()
     from script.json_stream_via_url_and_selector import (
             flush_JSON_stream_into as flush_into)
     import sys as o
@@ -45,17 +43,6 @@ def execute_as_CLI_(open_dictionary_stream):
         flush_into(o.stdout, o.stderr, dcts)
     return 0
 
-
-def _normalize_sys_path():  # #[#019.file-type-E]
-    from sys import path as sys_path
-    from os import path as os_path
-    dn = os_path.dirname
-
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        raise Exception('sanity - in the future, default sys.path may change')
-
-    sys_path[0] = dn(dn(here))
 
 # == END
 

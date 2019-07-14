@@ -20,7 +20,6 @@ experimental new provisions:
   - stack countdown number as testpoint identifier (see [#704.B])
 """
 
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

@@ -101,22 +101,11 @@ def cover_me():
     raise Exception('cover me')
 
 
-def normalize_sys_path_():  # #cp from one level up
-    import os.path as os_path
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    sys_path[0] = dn(dn(here))
-
-
 def sanity(s):
     raise Exception(f'sanity - {s}')
 
 
 if __name__ == '__main__':
-    normalize_sys_path_()
     import script.json_stream_via_url_and_selector as _
     _exitstatus = _.common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,

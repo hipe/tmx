@@ -4,8 +4,6 @@ introduce with or without value
 .:#coverpoint1.14
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

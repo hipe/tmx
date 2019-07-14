@@ -31,7 +31,6 @@ tokens start with dashes.)
 we follow [#006.regression-order] in naming the test cases and test methods
 """
 
-import _init  # noqa: F401
 from script_lib.test_support.generic_CLI_helper import (
         CLI_CaseMethods,
         the_empty_ARGV,

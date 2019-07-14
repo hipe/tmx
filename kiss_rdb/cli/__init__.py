@@ -1,29 +1,3 @@
-def _normalize_sys_path():
-    """make the system path what we know we want it to be, not what python
-
-    thinks it should be. at present this is necessary in every entrypoint
-    file and is justified in [#019].
-    """
-
-    from sys import path as a
-    from os import path
-
-    dn = path.dirname
-
-    cli_dir = dn(path.abspath(__file__))
-    _suproj_dir = dn(cli_dir)
-    mono_repo_dir = dn(_suproj_dir)
-    _yikes = path.join(mono_repo_dir, 'my-venv', 'bin')
-
-    if _yikes == a[0]:
-        a[0] = mono_repo_dir
-    elif mono_repo_dir == a[0]:
-        pass  # when run under unit test, OK
-    else:
-        raise Exception('something strange about path')
-
-
-_normalize_sys_path()
 import click  # noqa: E402
 
 # == HERE WE DEFINE OUR OWN DECORATORS (mostly)

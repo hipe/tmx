@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 from modality_agnostic.memoization import (
     dangerous_memoize as shared_subject)
 import unittest

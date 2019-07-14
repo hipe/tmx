@@ -1,6 +1,5 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-
 from os import path as os_path
 
 
@@ -16,7 +15,6 @@ NULL_BYTE_ = '\0'  # (used in next block)
 if __name__ == '__main__':
 
     import sys
-    sys.path.insert(0, '')
 
     these = ('query', 'tags')
     serr = sys.stderr

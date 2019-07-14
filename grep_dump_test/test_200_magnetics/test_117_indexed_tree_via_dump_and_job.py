@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 import unittest
 
 

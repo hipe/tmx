@@ -1,6 +1,5 @@
 # #covers: [isomorphic asset file]
 
-import _init as ts  # "test support"
 from sakin_agac import (
         sanity,
         )

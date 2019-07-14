@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 import modality_agnostic.memoization as helper
 import unittest
 

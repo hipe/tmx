@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 from modality_agnostic.memoization import lazy
 import unittest
 

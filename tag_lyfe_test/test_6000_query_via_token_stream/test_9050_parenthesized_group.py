@@ -4,8 +4,6 @@ introduce parenthesized group
 .:#coverpoint1.10
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

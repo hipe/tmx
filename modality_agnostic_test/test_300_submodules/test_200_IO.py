@@ -5,7 +5,6 @@ As such, the asset code is contemporaneous with #birth but the "spirit" of
 both the cases and the SUT may be up to 1.5 years older.
 """
 
-import _init  # noqa: F401
 from modality_agnostic.memoization import (
          dangerous_memoize as shared_subject)
 import unittest

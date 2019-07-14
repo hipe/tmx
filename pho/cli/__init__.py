@@ -147,17 +147,6 @@ def _commands_module_name_for(name):
     return f'pho.cli.commands.{name}'
 
 
-def _normalize_sys_path_ONCE():
-
-    a = sys.path
-    assert('/my-venv/bin' == a[0][-12:])
-
     o = os.path
-    _mono_repo_dir = o.abspath(o.join(__file__, '..', '..', '..'))
-    a[0] = _mono_repo_dir
-    return _mono_repo_dir
-
-
-_mono_repo_dir = _normalize_sys_path_ONCE()
 
 # #born.

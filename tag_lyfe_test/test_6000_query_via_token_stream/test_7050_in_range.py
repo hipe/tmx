@@ -10,8 +10,6 @@ we might never use this feature, but it's an OCD contact exercise
 :#coverpoint1.12
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

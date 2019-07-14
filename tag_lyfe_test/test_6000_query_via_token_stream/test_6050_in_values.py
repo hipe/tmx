@@ -14,8 +14,6 @@ consistency and regression aesthetics.
 .:#coverpoint1.13
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

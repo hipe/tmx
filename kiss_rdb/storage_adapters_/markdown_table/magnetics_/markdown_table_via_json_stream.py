@@ -133,8 +133,6 @@ def sanity(s):
 
 
 if __name__ == '__main__':
-    from json_stream_via_TOC_page_url import normalize_sys_path_ as _
-    _()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

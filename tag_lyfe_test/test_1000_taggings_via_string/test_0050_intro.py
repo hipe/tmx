@@ -4,8 +4,6 @@ the salient features of the grammar demonstrated here:
   - "hopscotch" between "taggings" and "garbage"
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.tagging import TaggingCommonCase as _ThisCaseHere
 import unittest
 

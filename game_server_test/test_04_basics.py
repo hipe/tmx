@@ -1,4 +1,3 @@
-import _init  # noqa: F401
 import game_server
 import unittest
 

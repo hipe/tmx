@@ -27,7 +27,6 @@ class _CLI:
         if errno is not None:
             return errno
 
-        self.normalize_sys_path()
         # listener = self.build_listener()
 
         idx_path = self._argument
@@ -98,18 +97,6 @@ class _CLI:
             s = self._long_program_name
             self._pn = self.os_path.basename(s)
         return self._pn
-
-    def normalize_sys_path(self):
-
-        from sys import path as a
-
-        os_path = self.os_path
-        dn = os_path.dirname
-        mag_dir = dn(os_path.abspath(__file__))
-        mono_repo_dir = dn(dn(mag_dir))
-
-        assert(a[0] == mag_dir)
-        a[0] = mono_repo_dir
 
 
 def identifiers_via_lines_of_index(file_lines):

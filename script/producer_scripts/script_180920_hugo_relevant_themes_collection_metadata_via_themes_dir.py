@@ -30,16 +30,6 @@ import re
 _my_desc = __doc__
 
 
-def normalize_sys_path_():  # #cp from one level up
-    import os.path as os_path
-    from sys import path as sys_path
-    dn = os_path.dirname
-    here = os_path.abspath(dn(__file__))
-    if here != sys_path[0]:
-        sanity('sanity - in the future, default sys.path may change')
-    sys_path[0] = dn(dn(dn(here)))
-
-
 def sanity(s):
     raise Exception(f'sanity - {s}')
 
@@ -197,7 +187,6 @@ def cover_me(s):
 _bash_interpolation_expression = '${themesDir}'
 
 if __name__ == '__main__':
-    normalize_sys_path_()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

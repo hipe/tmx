@@ -36,8 +36,6 @@ querying for "values":
     related. or maybe it won't)
 """
 
-
-import _init  # noqa: F401
 from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 

@@ -249,7 +249,7 @@ class _clean_jobs_dir():
 
     def __enter__(self):
         p = os.path
-        self._jobs_dir = p.join(writable_tmpdir, 'jobs')
+        self._jobs_dir = p.join(writable_tmpdir(), 'jobs')
         os.mkdir(self._jobs_dir)
         self._lock_me = p.join(self._jobs_dir, 'lock-me')
         _touch(self._lock_me)

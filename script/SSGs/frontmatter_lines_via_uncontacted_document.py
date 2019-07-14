@@ -210,8 +210,6 @@ def _date_string_via_conventional_markdown_file(path, listener):
 
 
 if __name__ == '__main__':
-    import hugo_themes as _
-    _.normalize_sys_path_()
     import sys as o
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)

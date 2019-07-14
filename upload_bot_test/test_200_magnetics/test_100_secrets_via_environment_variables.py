@@ -3,8 +3,6 @@
 ..that explains everything.
 """
 
-import _init  # noqa: F401  (just normalize `sys.path` so we can import things)
-
 from modality_agnostic.memoization import (
         dangerous_memoize,
         lazy)
