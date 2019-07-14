@@ -49,9 +49,6 @@ anticipated issues:
     is needed.
 """
 
-from sakin_agac import (
-        cover_me,
-        )
 import sys
 
 
@@ -66,7 +63,7 @@ def cached_doc_via_url_via_temporary_directory(tmpdir):
         from os import path as p
 
         if '?' in url:
-            cover_me('meh use some url parsing lib')
+            raise Exception("cover me: meh use some url parsing lib")
 
         stem, ext = p.splitext(url)
         if 0 == len(ext):

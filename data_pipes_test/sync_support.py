@@ -1,4 +1,3 @@
-from sakin_agac import sanity
 from modality_agnostic.memoization import lazy
 import unittest
 
@@ -89,7 +88,7 @@ def NORMALIZE_NEAR_ETC_AND_FAR(far_dicts):
             listener=__file__)
 
     with _ as far_session:
-        None if far_session.OK else sanity()
+        assert(far_session.OK)
         _normal_far_st = far_session.release_normal_far_stream()
         dct = far_session.TO_NRTP__()
         ary = [x for x in _normal_far_st]
@@ -110,7 +109,7 @@ def NORMALIZE_FAR(callback, far_path):
             listener=__file__)
 
     with _ as far_session:
-        None if far_session.OK else sanity()
+        assert(far_session.OK)
         _normal_far_st = far_session.release_normal_far_stream()
         result = callback(_normal_far_st)
     return result

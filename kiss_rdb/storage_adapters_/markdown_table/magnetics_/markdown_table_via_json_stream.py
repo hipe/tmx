@@ -103,12 +103,10 @@ def _lines_via_dicts(dicts, listener):
                 yield f'## {label}'
                 last_header_two_label = label
 
-            elif 3 == num:
+            else:
+                assert(3 == num)
                 yield ''  # aesthetics
                 yield f'## {last_header_two_label} - {label}'
-
-            else:
-                sanity(f'unexpected header depth: {num}')
 
         if do_render_table:
             if not in_table:
@@ -126,10 +124,6 @@ def _lines_via_dicts(dicts, listener):
     yield '## (document-meta)'
     yield ''
     yield '  - #born.'
-
-
-def sanity(s):
-    raise Exception(f'sanity - {s}')
 
 
 if __name__ == '__main__':

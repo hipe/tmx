@@ -89,7 +89,7 @@ from fractions import Fraction as _Fraction
 class Report:
 
     def __init__(self, dispatcher, modality, listener):
-        None if 'CLI' == modality else self.sanity()
+        assert('CLI' == modality)
         dispatcher.receive_subscription_to_tap_each_alternative(
                 self.__put_this_alternative_in_a_bucket,
                 self.__when_that_stuff_is_finished,

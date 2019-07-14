@@ -30,10 +30,6 @@ import re
 _my_desc = __doc__
 
 
-def sanity(s):
-    raise Exception(f'sanity - {s}')
-
-
 def _my_params(o, param):
 
     o['themes_dir'] = param(  # ..

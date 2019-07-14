@@ -322,7 +322,7 @@ class _StateMachine:
         stack = self._stack
         del self._stack
 
-        None if len(self.__dict__) == 0 else sanity('OCD')
+        assert(len(self.__dict__) == 0)
         return stack[0].close_stack()
 
     # --
@@ -391,7 +391,7 @@ class _StackFrame:
         self.children.append(x)
 
     def append_terminal_item(self, x):
-        None if x.is_terminal else sanity()
+        assert(x.is_terminal)
         self.children.append(x)
 
     def close_stack(self):
@@ -585,11 +585,6 @@ def _my_exception(msg):  # #copy-pasted
 
 def cover_me(s):
     raise _exe('cover me: {}'.format(s))
-
-
-def sanity(s=None):
-    _use_s = 'sanity' if s is None else 'sanity: {}'.format(s)
-    raise _exe(_use_s)
 
 
 def _exe(s):

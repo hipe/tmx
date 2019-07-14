@@ -32,10 +32,9 @@ class Report:
 
         if 'CLI' == modality:
             use = self._yield_lines
-        elif 'API' == modality:
-            use = self._yield_dictionaries
         else:
-            self.sanity()
+            assert('API' == modality)
+            use = self._yield_dictionaries
 
         dispatcher.receive_subscription_to_big_index(use)
         dispatcher.receive_subscription_to_tap_each_alternative(tap)
@@ -114,7 +113,7 @@ def _build_yes_or_no_via(singeltons, buckets):
     dct = {}
     for _count, phenomena in buckets.items():
         for phenomenon in phenomena:
-            sanity() if phenomenon in dct else None
+            assert(phenomenon not in dct)
             dct[phenomenon] = True
 
     for phenomena in singeltons:
@@ -126,10 +125,6 @@ def _build_yes_or_no_via(singeltons, buckets):
 def _me_as_module():
     import sys
     return sys.modules[__name__]
-
-
-def sanity():
-    raise Exception('sanity')
 
 
 if __name__ == '__main__':

@@ -136,10 +136,6 @@ def cover_me(msg=None):
     raise Exception(_msg(msg, 'cover me'))
 
 
-def sanity(msg=None):
-    raise Exception(_msg(msg, 'sanity'))
-
-
 def _msg(body, header):
     return header if body is None else f'{header}: {body}'
 

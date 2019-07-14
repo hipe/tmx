@@ -116,15 +116,14 @@ class _populate_via_parameter_dictionary:
             elif max is 1:
                 self.__add_optional_field(param, name)
             else:
-                None if max is None else sanity()
+                assert(max is None)
                 self.__add_optional_list(param, name)
         else:
-            None if min is 1 else sanity()
-            sanity() if min is not 1 else None
+            assert(1 == min)
             if max is 1:
                 self.__add_required_field(param, name)
             else:
-                None if max is None else sanity()
+                assert(max is None)
                 self.__add_required_list(param, name)
 
     def __add_required_field(self, param, name):

@@ -101,10 +101,6 @@ def cover_me():
     raise Exception('cover me')
 
 
-def sanity(s):
-    raise Exception(f'sanity - {s}')
-
-
 if __name__ == '__main__':
     import script.json_stream_via_url_and_selector as _
     _exitstatus = _.common_CLI_for_json_stream_(

@@ -123,15 +123,14 @@ def _listener_for_CLI(cli):  # meh
 
     def f(*args):
         flavor, shape, *_, express = args
-        None if 'expression' == shape else sanity()
+        assert('expression' == shape)
         if 'info' == flavor:
             io = serr
-        elif 'error' == flavor:
+        else:
+            assert('error' == flavor)
             io = serr
             if not cli.exitstatus:
                 cli.exitstatus = 333
-        else:
-            sanity()
         for line in express():
             io.write(f'{line}\n')
             io.flush()
@@ -329,7 +328,7 @@ def __build_phenomena_keyser(surface_phenomena_index, listener):
             if isinstance(mixed, str):
                 None if 'nothing yet' == mixed else cover_me('cry')
             else:
-                None if isinstance(mixed, list) else sanity()
+                assert(isinstance(mixed, list))
                 for phenomenon_surface_s in mixed:
                     if _blank_rx.match(phenomenon_surface_s):
                         def f():
@@ -374,8 +373,8 @@ class _BigIndex:
                     assoc_type_via_alternative = {}
                     dct[phenom_k] = assoc_type_via_alternative
 
-                if alternative_k in assoc_type_via_alternative:
-                    sanity('why is there already an association?')
+                assert(alternative_k not in assoc_type_via_alternative)
+                # why is there already an association?
 
                 assoc_type_via_alternative[alternative_k] = assoc_type
         return associate
@@ -474,11 +473,6 @@ def __stem_via_path(report_path):
 
 def cover_me(msg):
     raise Exception(f'cover me: {msg}')
-
-
-def sanity(msg):
-    _use_msg = 'sanity' if msg is None else f'sanity: {msg}'
-    raise Exception(_use_msg)
 
 
 _blank_rx = re.compile('^[ ]*$')

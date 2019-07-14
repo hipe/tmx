@@ -2,9 +2,7 @@
 
 from sakin_agac import (
         cover_me,
-        pop_property,
-        sanity,
-        )
+        pop_property)
 from modality_agnostic import (
         streamlib as _)
 
@@ -260,11 +258,10 @@ class _WorkerWhenInterleaving(_Worker):
         # == do we run down far stream, near stream or no stream?
 
         if self._far_is_open:
-            if self._near_is_open:
-                sanity('how is it that both sides are still active?')
-            else:
-                which = _FAR
-                yes = True
+            assert(not self._near_is_open)
+            # how is it that both sides are still active?
+            which = _FAR
+            yes = True
         elif self._near_is_open:
             which = _NEAR
             yes = True

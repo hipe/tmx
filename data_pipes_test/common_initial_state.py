@@ -157,9 +157,5 @@ def cover_me(s=None):
     raise Exception(msg)
 
 
-def sanity(s='assumption failed'):
-    raise Exception(s)
-
-
 # #history-A.1: upgraded to python 3.7, things changed
 # #born.

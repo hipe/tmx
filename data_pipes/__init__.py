@@ -1,7 +1,7 @@
 def YIKES_SKIP_HEADERS(far_dct):
     """
     so:
-      - #coverpoint13.3
+      - (Case1510DP)
       - TEMPORARY LOCATION POSSIBLY, came as a byproduct of #history-A.1
       - probabably a `_is_section_separator` would be in order, but for
         now we are making this work with legacy fellows
@@ -69,11 +69,6 @@ def pop_property(self, var):
 def cover_me(msg=None):
     _use_msg = 'cover me' if msg is None else ('cover me - %s' % msg)
     raise _exe(_use_msg)
-
-
-def sanity(s=None):
-    _msg = 'sanity' if s is None else 'sanity: %s' % s
-    raise _exe(_msg)
 
 
 _exe = Exception

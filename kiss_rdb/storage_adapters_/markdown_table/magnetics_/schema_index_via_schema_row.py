@@ -1,7 +1,3 @@
-from sakin_agac import (
-        cover_me,
-        sanity,
-        )
 
 
 def row_two_function_and_liner_via_row_one_line(line, listener):
@@ -114,7 +110,7 @@ class _SchemaIndex:
 
     def __init__(self, row_via_line, row1, row2, listener):
 
-        None if row1.has_endcap else sanity()
+        assert(row1.has_endcap)
         cels_count = len(row1.children) - 2  # yuck. one for endcap one for \n
 
         (
@@ -239,7 +235,11 @@ def _make_my_compare(model_count):
         elif model_count > candidate_count:
             return 0
         else:
-            sanity()
+            assert(False)
     return f
+
+
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #born.

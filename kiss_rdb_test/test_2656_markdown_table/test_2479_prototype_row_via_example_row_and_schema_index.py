@@ -228,10 +228,10 @@ class _schema_plus_via_two_lines:
         _tup = _.row_two_function_and_liner_via_row_one_line(
                 line1, 'listener01')
         f1, row1 = _tup
-        None if row1.to_line() == line1 else sanity()  # not SUT. just checking
+        assert(row1.to_line() == line1)  # not SUT. just checking
 
         f2, row2 = f1(line2)
-        None if row2.to_line() == line2 else sanity()  # not SUT. just checking
+        assert(row2.to_line() == line2)  # not SUT. just checking
 
         self.complete_schema = f2()
         self.nkfn = nkfn

@@ -42,9 +42,7 @@ featureset to such a full realization..
 
 
 from sakin_agac import (
-        cover_me,
         pop_property,
-        sanity,
         )
 import contextlib
 import re
@@ -56,8 +54,7 @@ def OPEN_TAGGED_DOC_LINE_ITEM_STREAM(upstream_path, listener):
 
     on the side of over-doing it for now."""
 
-    if listener is None:
-        sanity("you're gonna want a listener")  # #[#412]
+    assert(listener)  # you're gonna want a listener  #[#412]
 
     parse = _Parse(listener)
 
@@ -177,6 +174,10 @@ class _CustomHybrid:
 
 
 _looks_like_table_line = re.compile(r'^\|').search
+
+
+def cover_me(s):
+    raise Exception(f'cover me: {s}')
 
 # #history-A.1: gung-ho on context managers
 # #born.

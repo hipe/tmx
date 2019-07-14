@@ -29,7 +29,7 @@ also:
 class Report:
 
     def __init__(self, dispatcher, modality, listener):
-        None if 'CLI' == modality else self.sanity()
+        assert('CLI' == modality)
         dispatcher.receive_subscription_to_phenomenon_variation(self)
 
     def receive_phenomenon_variation(self, surface_phenomena_index):

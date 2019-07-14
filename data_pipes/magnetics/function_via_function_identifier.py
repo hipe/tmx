@@ -82,9 +82,6 @@ pseudo-formally here's the grammar for these identifiers:
 """
 
 
-from sakin_agac import (
-        cover_me,
-        )
 from importlib import import_module
 import re
 import sys
@@ -92,9 +89,7 @@ import sys
 
 def function_via_function_identifier(identifier, listener):
 
-    md = _rx.search(identifier)
-    if md is None:
-        cover_me('no: %s' % identifier)
+    md = _rx.search(identifier)  # ..
 
     path_esque, function_name = md.groups()
 

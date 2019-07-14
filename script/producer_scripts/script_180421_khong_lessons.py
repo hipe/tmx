@@ -368,11 +368,6 @@ def cover_me(msg=None):
     pass
 
 
-@_this_lazy
-def sanity(msg=None):
-    pass
-
-
 def _md_lib():
     import script.markdown_document_via_json_stream as _
     return _

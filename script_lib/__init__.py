@@ -301,18 +301,13 @@ def putser_via_IO(io):
     def o(s):
         _line = '%s\n' % s
         _len = io.write(_line)  # :[#607.B]
-        None if int == type(_len) else sanity('type assertion failed')  # #track [#604]  # noqa: E501
+        assert(isinstance(_len, int))  # sort of like ~[#022]
         return _len
     return o
 
 
 def cover_me(s):
     raise _exe('cover me: {}'.format(s))
-
-
-def sanity(s=None):
-    _msg = 'sanity' if s is None else 'sanity: %s' % s
-    raise _exe(_msg)
 
 
 _exe = Exception

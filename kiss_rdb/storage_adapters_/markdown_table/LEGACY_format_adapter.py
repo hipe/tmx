@@ -3,7 +3,6 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
-        sanity,
         )
 
 
@@ -23,21 +22,22 @@ def _new_doc_lines_via_sync(
         ):
     """here is where we bring it all together, the grand synthesis outlined
 
-    in [#418.K].
+    in [#458.K].
     """
 
-    from .magnetics import normal_far_stream_via_collection_reference as lib
-    from sakin_agac import my_contextlib
+    from .magnetics_ import (
+            normal_far_stream_via_collection_reference as lib)
+    from data_pipes import my_contextlib
 
     def open_out(far, near):
         if not near.OK:
             return my_contextlib.empty_iterator_context_manager()
-            # #provision [#418.L.2] iterate empty on failure
+            # #provision [#458.L.2] iterate empty on failure
 
         _normal_far_st = far.release_normal_far_stream()
         _tagged_line_items = near.release_tagged_doc_line_item_stream()
         _far_deny_list = far.far_deny_list
-        from .magnetics import synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+        from .magnetics_ import synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
         return _.OPEN_NEWSTREAM_VIA(
                 normal_far_stream=_normal_far_st,
                 near_tagged_items=_tagged_line_items,
@@ -124,10 +124,12 @@ def _open_trav_request(
         datastore_resources,
         listener):
 
-    if cached_document_path is not None:
-        sanity("markdown tables are always how you say 'cached'")
+    assert(not cached_document_path)
+    # markdown tables always live in the filesystem (at writing #history-A.1),
+    # never from (internet) urls so, in this sense they are already "cached"
+    # so they should never be literally cached. All of this is away soon.
 
-    from .magnetics import open_traversal_request_via_path as _
+    from .magnetics_ import open_traversal_request_via_path as _
     return _.OPEN_TRAVERSAL_REQUEST_VIA_PATH(
             mixed_collection_identifier=collection_identifier,
             format_adapter=format_adapter,

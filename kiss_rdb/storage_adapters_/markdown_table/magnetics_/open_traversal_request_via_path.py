@@ -16,8 +16,6 @@ this ended up blowing up into [#418] thoughts on collection metadata..
 
 from sakin_agac import (
         cover_me,
-        sanity,
-        )
         pop_property)
 
 
@@ -204,10 +202,9 @@ def __tag_lyfe_field_names_hack(dct, intention, listener):
             return False, None
         else:
             return True, result
-    elif 'sync' == intention:
-        return True, result
     else:
-        sanity()
+        assert('sync' == intention)
+        return True, result
 
 
 def __whine_about_no_whatever(dct, listener):
@@ -283,7 +280,6 @@ class _ExperimentalMutexer:
         self._is_closed = True
 
     def check_mutex(self):
-        if self._is_closed:
-            sanity()
+        assert(not self._is_closed)
 
 # #abstracted.

@@ -1,8 +1,5 @@
 # #covers: [isomorphic asset file]
 
-from sakin_agac import (
-        sanity,
-        )
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
@@ -33,10 +30,10 @@ class _CommonCase(unittest.TestCase):
                 cached_document_path=None,
                 datastore_resources=None,
                 listener=listener)
-        None if cm is None else sanity()
+        assert(not cm)
+        msg, = msgs  # assertion
+        return msg
 
-        None if 1 == len(msgs) else sanity()
-        return msgs[0]
 
     _build_end_state = ts.build_end_state_commonly
 

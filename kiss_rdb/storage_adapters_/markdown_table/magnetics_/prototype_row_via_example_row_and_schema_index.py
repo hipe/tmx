@@ -67,7 +67,6 @@ have it not change how subsequent machine-generated rows are aligned. meh
 
 from sakin_agac import (
         cover_me,
-        sanity,
         )
 import sys
 
@@ -358,8 +357,6 @@ def _cel_schema_via(cel_DOM):
 
     s = cel_DOM.content_string()
     md = re.search(r'^(?:(:)|(-))(?:-*(?:(:)|(-)))?$', s)
-    if md is None:
-        sanity('interesting')
 
     if md[1] is None:
         if md[3] is None:
@@ -372,9 +369,9 @@ def _cel_schema_via(cel_DOM):
         # #coverpoint4.2 - yes colon - no colon
         return _cel_schemas.left_aligned
     else:
-        None if md[2] is None else sanity()
-        None if md[4] is None else sanity()
-        # #coverpoint4.3: yes colon/yes colon: center aligned
+        assert(not md[2])
+        assert(not md[4])
+        # yes colon/yes colon: center aligned (Case2480)
         return _cel_schemas.center_aligned
 
 

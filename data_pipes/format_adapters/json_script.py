@@ -93,9 +93,7 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
-        pop_property,
-        sanity,
-        )
+        pop_property)
 import re
 from os import path as os_path
 
@@ -212,10 +210,9 @@ class _OpenTravRequest:
 
         stem, ext = os_path.splitext(path)
 
-        if '.py' == ext:
-            self._path_stem = stem
-        else:
-            sanity('the #here1 provision has possibly changed..')
+        assert('.py' == ext)  # else the #here1 provision may have changed..
+
+        self._path_stem = stem
 
     def _err(self, tmpl, *args):
         from modality_agnostic import listening as li

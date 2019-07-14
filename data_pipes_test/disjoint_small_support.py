@@ -1,9 +1,5 @@
 """(abstracted.)"""
 
-from sakin_agac import (
-        sanity,
-        )
-
 
 def build_state_the_bernstein_way(fixture_document_path, producer_module):
     """
@@ -53,9 +49,8 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
         head_dct = next(dcts)
         objs = {fuzzy_key(dct): dct for dct in dcts}
 
-    if 1 != len(emissions):
-        sanity("(this wasn't the point of the test (but if it becomes one..)")
-        # .. if it becomes something that is covered in a test, etc
+    assert(1 == len(emissions))
+    # this wasn't the point of the test but if we trip this, make a case for it
 
     class _State:
         def __init__(self, _1, _2):

@@ -53,11 +53,10 @@ def object_stream_via_url_(cached_path, url, listener):
         if 'a' == name:
             for obj in _objects_via_anchor_tag_up_top(item):
                 yield obj
-        elif 'div' == name:
+        else:
+            assert('div' == name)
             for obj in _objects_via_div_tag(item):
                 yield obj
-        else:
-            sanity(f'eek: {name}')
         item
 
 
@@ -90,11 +89,10 @@ def _objects_via_div_tag(div):
         name = a.name
         if 'a' == name:
             yield _object_via_anchor_tag_not_top(a)
-        elif 'div' == name:
+        else:
+            assert('div' == name)
             for dct in _recurse(a):
                 yield dct
-        else:
-            sanity(f'wat do: {name}')
 
 
 def _recurse(div):  # note ugly redundancy with above
@@ -108,10 +106,8 @@ def _recurse(div):  # note ugly redundancy with above
     container, = div.select('> *')
     for a in container.select('> *'):
         name = a.name
-        if 'a' == name:
-            yield _object_via_anchor_tag_not_top(a)
-        else:
-            sanity(f'wat do: {name}')
+        assert('a' == name)
+        yield _object_via_anchor_tag_not_top(a)
 
 
 def _objects_via_anchor_tag_up_top(a):
@@ -163,8 +159,6 @@ _url = 'url'
 
 
 
-def sanity(s):
-    raise Exception(f'sanity - {s}')
 
 
 if __name__ == '__main__':

@@ -94,7 +94,8 @@ class _open_theme_directory_stream_via_these:  # #testpoint
     def __enter__(self):
 
         cmd = self.__build_find_command()
-        None if isinstance(cmd, tuple) else sanity()  # change #here1
+        assert(isinstance(cmd, tuple))  # something re #here1. ~#[#022]
+
         # == BEGIN hotfix for issue :[#410.Z.2]:
         """
         the .github entry is a doozer:
@@ -209,12 +210,9 @@ def __do_the_crazy_thing(command_part):
     while cursor != length:
 
         md = rx.match(command_part, cursor)
-        if md is None:
-            sanity()
-
         s = md[1]
         if '"' == s[0]:
-            None if '"' == s[-1] else sanity()
+            assert('"' == s[-1])
             yield s[1:-1]
         else:
             yield s
@@ -223,10 +221,6 @@ def __do_the_crazy_thing(command_part):
 
 def cover_me(s):
     raise Exception(f'cover me - {s}')
-
-
-def sanity():
-    raise Exception('sanity')
 
 
 if __name__ == '__main__':

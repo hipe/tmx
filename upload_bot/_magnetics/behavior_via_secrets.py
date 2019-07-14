@@ -39,15 +39,15 @@ def _build_all_responder_functions(secrets):
             return _verify_application_token(response, slack_event, f, app_tok)
 
         responder_via_name[f.__name__] = g
-        return sanity
+        return assert_not_called
 
     def responder(f):
         responder_via_name[f.__name__] = f
-        return sanity
+        return assert_not_called
 
     responder_via_name = {}
 
-    def sanity(*args, **kwargs):
+    def assert_not_called(*args, **kwargs):
         raise Exception('never actually called')
 
     # ==

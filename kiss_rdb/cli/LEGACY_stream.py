@@ -313,10 +313,9 @@ def try_help_(s):
 def _method_name_via_intention(intention):
     if 'sakin_agac_synchronization' == intention:
         return 'open_sync_request'
-    elif 'tag_lyfe_filter' == intention:
-        return 'open_filter_request'
     else:
-        raise Exception('sanity')
+        assert('tag_lyfe_filter' == intention)
+        return 'open_filter_request'
 
 
 def collection_reference_via_(

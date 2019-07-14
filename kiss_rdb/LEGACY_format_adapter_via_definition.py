@@ -6,10 +6,6 @@ reminder:
   - the 'natural key' is not an immutable property of the format adapter
 """
 
-from sakin_agac import (
-        sanity,
-        )
-
 
 class _FormatAdapter:
 
@@ -35,8 +31,8 @@ class _FormatAdapter:
 
         # # this is a common error that *really* trips us up) #open [#412]
 
-        if str is type(associated_filename_globs):
-            sanity('you meant to put a tuple not a string here')
+        assert(not isinstance(associated_filename_globs, str))
+        # the above is supposed to be a tuple not a string #[#022]
 
         # # this should be abstracted if pattern
 

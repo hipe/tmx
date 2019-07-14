@@ -45,9 +45,6 @@ however as is hinted at in one place below, there may be a way that we
 can dynamically decompose..
 """
 
-from _init import (
-        sanity,
-        )
 import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
 import unittest
 
@@ -203,8 +200,8 @@ def _failure_message_via_line(upstream_s):
             upstream_line=upstream_s,
             listener=listener,
             )
-    None if x is None else sanity('should be none')
     return 'EEK'.join(a)
+    assert(x is None)
 
 
 class _CaseState:

@@ -17,10 +17,6 @@ having said that,
 
 """
 
-from sakin_agac import (
-        cover_me,
-        sanity,
-        )
 from modality_agnostic import listening
 import sys
 import re
@@ -94,8 +90,7 @@ class _RowDOM(_BranchDOM):
         else:
             end = last_end
 
-        None if '\n' == line[end] else sanity()
-
+        assert('\n' == self._line[end])
         a.append(_NEWLINE_LEAF)
 
         # --
@@ -160,8 +155,7 @@ class _RowDOM(_BranchDOM):
             scn.match_assertively(_pipe)
 
         if ok:
-            if not scn.is_end_of_string():
-                sanity('super weird - stuff after newline')
+            assert(scn.is_end_of_string())  # stuff after newline?
         else:
             yield 'failed', ()
 
@@ -295,7 +289,7 @@ class _CustomScanner:  # #abstraction candidate
 
     def match_assertively(self, rx):
         _yes = self.match(rx)
-        None if _yes else sanity()
+        assert(_yes)
 
     def match(self, rx):
         md = rx.match(self._line, self._offset)
@@ -320,6 +314,10 @@ class _CustomScanner:  # #abstraction candidate
 
     def is_end_of_string(self):
         return self._len == self._offset
+
+
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
 sys.modules[__name__] = _SELF  # #[#008.G] so module is callable

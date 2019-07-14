@@ -60,15 +60,14 @@ class open_dictionary_stream:
                     dct = {'_is_branch_node': True}
                     _write_anchor_tag(dct, level_two_node)
                     yield dct
-                elif 'ul' == name:
+                else:
+                    assert('ul' == name)
                     for item_li in _direct_children(level_two_node):
                         a, = tuple(_direct_children(item_li))
-                        None if 'a' == a.name else sanity()
+                        assert('a' == a.name)
                         dct = {}
                         _write_anchor_tag(dct, a)
                         yield dct
-                else:
-                    sanity()
 
     def __exit__(self, *_3):
         return False  # do not swallow exceptions
@@ -94,7 +93,7 @@ class open_dictionary_stream:
         _, nav = _neet  # assert 2 navs, we want only 2nd (compare nth-of-type)
 
         ul, = tuple(_direct_children(nav))  # assert
-        None if 'ul' == ul.name else sanity()
+        assert('ul' == ul.name)
         self._the_root_UL = ul
 
     def __resolve_soup(self):
@@ -122,10 +121,6 @@ def _direct_children(node):
 
 def cover_me():
     raise Exception('cover me')
-
-
-def sanity():
-    raise Exception('sanity')
 
 
 if __name__ == '__main__':

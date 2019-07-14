@@ -15,7 +15,7 @@ import re
 class Report:
 
     def __init__(self, dispatcher, modality, listener):
-        None if 'CLI' == modality else self.sanity()
+        assert('CLI' == modality)
         dispatcher.receive_subscription_to_big_index(self._big_money)
 
     def _big_money(self, big_index):

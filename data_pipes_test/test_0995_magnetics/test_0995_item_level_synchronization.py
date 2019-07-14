@@ -26,9 +26,6 @@ facility can be applied usefully to this use case. the cost:
     confusingly so at times
 """
 
-from _init import (
-        sanity
-        )
 import unittest
 
 
@@ -73,7 +70,7 @@ def _my_sync(orig, new):  # #here1
 def _item_via_collision(far_key, far_value, near_key, near_value):
     # (#provision [#418.F] four args)
 
-    None if far_key == near_key else sanity()
+    assert(far_key == near_key)
 
     f = getattr(_resolve_collision, near_key)
 
@@ -91,8 +88,7 @@ class _resolve_collision:  # :#here3
         return new_x  # allow name change
 
     def user_ID(new_x, orig_x):
-        if new_x is not orig_x:
-            sanity()
+        assert(new_x is orig_x)
         return orig_x
 
     def tags(new_x, orig_x):
