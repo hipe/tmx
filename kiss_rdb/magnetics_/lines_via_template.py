@@ -1,5 +1,3 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
 import re
 
 _this_var_name = '<template-file>'
@@ -10,6 +8,7 @@ the file pointed to by {_this_var_name} should have variables
 in it $like_this. set environment variables with names TMPL_LIKE_THIS.
 etc.
 """
+# #[#874.5] file used to be executable script and may need further changes
 
 
 class _CLI:

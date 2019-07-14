@@ -1,5 +1,3 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
 def _do_work_for_client_socket(client_sock):
 
             while True:
@@ -22,7 +20,7 @@ def _do_work_for_client_socket(client_sock):
 
 def _run_my_server_forever(
     bind_port,
-    max_backlog_of_connections = 5,
+    max_backlog_of_connections=5,
 ):
     def __main():
         with __create_socket() as s:
@@ -48,16 +46,14 @@ def _run_my_server_forever(
 
     _print = print
 
-
     bind_ip = '0.0.0.0'
     __main()
 
 
-
-if __name__ == '__main__':
+def cli_for_production():
     _run_my_server_forever(
-        bind_port = 50007,
+        bind_port=50007,
     )
 
-
+# #history-A.1: lost self-executability
 # #born

@@ -212,18 +212,7 @@ def cover_me(s):
 
 # --
 
-if __name__ == '__main__':
-    cover_me('if this ever worked as an endpoint it was a long time ago')
-
-    import sys as o
-    o.path.insert(0, '')
-    import script_lib
-    _exitstatus = script_lib.CHEAP_ARG_PARSE(
-        cli_function=_my_CLI,
-        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        )
-    exit(_exitstatus)
-
+# #history-A.5: sunset this as an entrypoint script
 # #history-A-4: key simplifier (reads markdown links) left to be with friends
 # #history-A.3: abstracted common CLI for producers
 # #history-A.2: function transplanted to here

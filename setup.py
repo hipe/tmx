@@ -9,6 +9,7 @@ at #birth this file was created only to facilitate the creation of the
 CLI entrypoint file for "kiss rdb".
 
 (then at #history-A.2 we added an entry for the CLI for `pho`)
+(Then at #history-A.3 we added a couple more.)
 
 ideally we will eventually know how we can have this file live in the
 sub-project directory if possible.
@@ -44,5 +45,26 @@ setup(
             kss=kiss_rdb.cli:cli_for_production
         ''')
 
+
+setup(
+        name='z_data_pipes',  # see #here1 above
+        version='0.0',
+        entry_points='''
+            [console_scripts]
+            dp-sync=data_pipes.cli.sync:cli_for_production
+        ''')
+
+
+setup(
+        name='z_game_server',  # see #here1 above
+        version='0.0',
+        entry_points='''
+            [console_scripts]
+            DTF_game_server=game_server:cli_for_production
+            DTF_game_server_adapter=game_server.cli.game_server_adapter:cli_for_production
+            DTF_game_server_server=game_server.cli.game_server_server:cli_for_production
+        ''')
+
+# #history-A.3
 # #history-A.2
 # #birth

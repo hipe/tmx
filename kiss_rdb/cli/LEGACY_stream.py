@@ -1,6 +1,3 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
-
 """simply traverse ("dump") the whole collection by expressing each item in
 
 the lingua franca format: the simple JSON object.
@@ -9,26 +6,22 @@ possibly useful for piping the collection stream to another process,
 or for debugging collections for example in syncing.
 """
 # NOTE above is expressed in helpscreen :[#415]
+# #[#874.5] file used to be executable script and may need further changes
+
 
 
 _is_entrypoint_file = __name__ == '__main__'
-
-if _is_entrypoint_file:
-    import json_stream_via_url_and_selector as siblib
-    siblib.normalize_sys_path_()
-else:
-    import script.json_stream_via_url_and_selector as siblib
 
 
 def _my_parameters(o, param):
 
     common_parameters_from_the_script_called_stream_(o, param)
 
-    def dsc_for_etc(o, _):  # #open [#410.X] yield msg not o(msg)
-        o('apply any custom mappers, keyers, etc for syncing.')
-        o('with this, you see exactly what the syncing operation sees.')
-        o('without this, you see the "raw" output of the producer script.')
-        # this feature is :[#418.I.3.1] (cross-referenced to here)
+    def dsc_for_etc():  # be like [#511.3]
+        yield 'apply any custom mappers, keyers, etc for syncing.'
+        yield 'with this, you see exactly what the syncing operation sees.'
+        yield 'without this, you see the "raw" output of the producer script.'
+        # this feature is :[#458.I.3.1] (cross-referenced to here)
 
     o['apply_sync_related_functions'] = param(
             description=dsc_for_etc,
@@ -38,10 +31,10 @@ def _my_parameters(o, param):
 
 def common_parameters_from_the_script_called_stream_(o, param):
 
-    def _far_coll_desc(o, style):
+    def _far_coll_desc(style):  # [#511.4] linser with styler
         _ = style.em('far_collection')
-        o(f'«help for {_}')
-        o('2nd line')
+        yield f'«help for {_}'
+        yield '2nd line'
 
     o['far_collection'] = param(
              description=_far_coll_desc,
@@ -305,9 +298,10 @@ def listener_for_(cli):
 
 
 def try_help_(s):
-    def f(o, style):
-        o(f"{s} (try 'help')")
-    return f
+    def lineser(style):  # [#511.3] lineser and [#511.4] styler
+        style.hello_styler()
+        yield f"{ s } (try 'help')"
+    return lineser
 
 
 def _method_name_via_intention(intention):

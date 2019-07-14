@@ -1,5 +1,3 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
 """
 description: for a given particular natural key field name, for each item
 
@@ -25,18 +23,14 @@ at the end of all this, each far item that had no corresponding near item
 """
 
 _desc = __doc__
+# #[#874.5] file used to be executable script and may need further changes
 
 
-if __name__ == '__main__':
-    from json_stream_via_url_and_selector import normalize_sys_path_
-    normalize_sys_path_()
-    is_entrypoint_file = True
-else:
-    is_entrypoint_file = False
+from data_pipes import common_producer_script
+cli_lib = common_producer_script.common_CLI_library()
+biz_lib = cli_lib
 
 
-import script.stream as biz_lib  # noqa: E402 #[#410.Q] this script as lib only
-cli_lib = biz_lib
 
 
 def _my_parameters(o, param):

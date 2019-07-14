@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 
-def __invoke_CLI():
+def cli_for_production():
     import sys
     argv = sys.argv
     if len(argv) > 1:
@@ -108,8 +108,5 @@ class _Quit:
 _REDO = _Redo()
 _QUIT = _Quit()
 
-
-if __name__ == '__main__':
-    __invoke_CLI()
-
+# #history-A.1: lost self-executability
 # #born

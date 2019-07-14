@@ -1,6 +1,5 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
-# this is stepping-stone one-off, frontiering #[#432] multi-tablism.
+# #[#874.5] file used to be executable script and may need further changes
+# #[#874.4] module is concerned with multi-tablism. (maybe frontiered it)
 
 
 class _CLI:

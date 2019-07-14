@@ -1,8 +1,6 @@
-#!/usr/bin/env python3 -W error::Warning::0
-
 """experiment.."""
-
-# #[#410.N] a thing that generates markdown, in spite of `sync` existing
+# #[#874.8] file generates mardown the old way and may need to be the new way
+# #[#874.5] file used to be executable script and may need further changes
 
 
 def _run_CLI(sin, sout, serr, argv):
