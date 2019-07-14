@@ -3,16 +3,11 @@
 ..that explains its own objective & scope.
 """
 
-from _init import (
+from upload_bot_test.common_initial_state import (
         file_with_content_path,
         no_ent_path,
-        writable_tmpdir,
-        )
-
-from upload_bot._models import (
-        filesystem,
-        )
-
+        writable_tmpdir)
+from upload_bot._models import filesystem
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

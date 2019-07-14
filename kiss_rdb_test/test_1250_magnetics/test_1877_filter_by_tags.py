@@ -1,7 +1,6 @@
 from kiss_rdb_test.filter_canon import (
         case_of_one_column_match_two_out_of_three,
-        case_of_empty_collection,
-        )
+        case_of_empty_collection)
 from modality_agnostic.memoization import (
         dangerous_memoize_in_child_classes)
 import unittest

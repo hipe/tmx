@@ -115,9 +115,7 @@ class _EndState:
         listener = l_via_e.listener_via_emission_receiver(em_a.append)
         # listener = l_via_e.for_DEBUGGING
 
-        from tag_lyfe.magnetics import (
-                query_via_token_stream as mag,
-                )
+        from tag_lyfe.magnetics import query_via_token_stream as mag
 
         from tag_lyfe import NULL_BYTE_
 

@@ -108,9 +108,7 @@ parameter); but don't do that.
 :[#502]
 """
 
-from modality_agnostic.memoization import (
-        dangerous_memoize,
-        )
+from modality_agnostic.memoization import dangerous_memoize
 
 
 class _SELF:

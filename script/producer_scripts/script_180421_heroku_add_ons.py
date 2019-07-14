@@ -40,8 +40,7 @@ def open_dictionary_stream(html_document_path, listener):
         first_selector=_first_selector,
         second_selector=my_generator,
         html_document_path=html_document_path,
-        listener=listener,
-        )
+        listener=listener)
     return _cm
 
 

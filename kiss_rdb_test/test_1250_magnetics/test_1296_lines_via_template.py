@@ -3,8 +3,7 @@ import unittest
 
 
 from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 
 
 _CommonCase = unittest.TestCase

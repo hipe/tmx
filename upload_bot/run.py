@@ -14,8 +14,7 @@ def run_forever_newschool_(environ, **kwargs):
     from upload_bot._magnetics import (
             secrets_via_environment_variables,
             behavior_via_secrets,
-            webserver_via_behavior,
-            )
+            webserver_via_behavior)
 
     _secrets = secrets_via_environment_variables(environ)
     _behavior = behavior_via_secrets(_secrets)

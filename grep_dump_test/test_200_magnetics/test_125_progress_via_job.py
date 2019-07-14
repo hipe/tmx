@@ -1,11 +1,9 @@
 import _init  # noqa: F401
 from contextlib import contextmanager
-import unittest
-
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
-        memoize,
-        )
+        memoize)
+import unittest
 
 
 class _TestCase(unittest.TestCase):

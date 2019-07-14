@@ -2,12 +2,10 @@ from kiss_rdb_test.common_initial_state import (
         functions_for)
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
-    build_filesystem_expecting_num_file_rewrites,
-    )
+        build_filesystem_expecting_num_file_rewrites)
 import unittest
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 
 
 # 830-840

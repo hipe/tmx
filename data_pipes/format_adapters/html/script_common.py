@@ -177,8 +177,7 @@ class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
         _soup = soup_via_locators_(
                 url=self.url,
                 html_document_path=self.html_document_path,
-                listener=self._listener,
-                )
+                listener=self._listener)
         self._required('_soup', _soup)
 
     _required = _required

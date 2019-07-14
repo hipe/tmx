@@ -43,8 +43,7 @@ def _new_doc_lines_via_sync(
                 near_tagged_items=_tagged_line_items,
                 near_keyerer=near.keyerer,
                 far_deny_list=_far_deny_list,
-                listener=listener,
-                )
+                listener=listener)
 
     def open_near(far):
         if not far.OK:
@@ -53,8 +52,7 @@ def _new_doc_lines_via_sync(
         return lib.OPEN_NEAR_SESSION(
                 near_relevant_traversal_parameters=_nrtp,
                 near_collection_path=near_collection_reference.collection_identifier_string,  # noqa: E501
-                listener=listener,
-                )
+                listener=listener)
 
     def open_far():
         return lib.OPEN_FAR_SESSION(
@@ -62,8 +60,7 @@ def _new_doc_lines_via_sync(
                 far_collection_reference=far_collection_reference,
                 custom_mapper_OLDSCHOOL=custom_mapper_OLDSCHOOL,
                 datastore_resources=filesystem_functions,
-                listener=listener,
-                )
+                listener=listener)
 
     line_via = _liner()
 

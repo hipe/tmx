@@ -13,8 +13,7 @@ from _init import (
         fixture_executable_path,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 

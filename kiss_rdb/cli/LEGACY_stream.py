@@ -260,8 +260,8 @@ def parse_args_(cli, write_attr, params, desc):
 def _parse_args(cli, argv, define_params, desc):
 
         from script_lib.magnetics import (
-                parse_stepper_via_argument_parser_index as stepperer,
-                )
+                parse_stepper_via_argument_parser_index as stepperer)
+
         reso = stepperer.SIMPLE_STEP(
                 cli.stdin, cli.stderr, argv, define_params,
                 stdin_OK=False,  # ..
@@ -327,8 +327,7 @@ def collection_reference_via_(
     pair = _format_adapters_module().procure_format_adapter(
             collection_identifier=collection_identifier,
             format_identifier=format_identifier,
-            listener=listener,
-            )
+            listener=listener)
     if not pair:
         return
     FA_NAME, format_adapter_module = pair

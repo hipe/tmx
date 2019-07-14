@@ -45,8 +45,7 @@ class _build_snapshot:
 
         if do_listen:
             from modality_agnostic.test_support.listener_via_expectations import (  # noqa: E501
-                listener_via_emission_receiver
-                )
+                listener_via_emission_receiver)
             emissions = []
             listener = listener_via_emission_receiver(emissions.append)
             add_these = {'listener': listener}
@@ -63,8 +62,7 @@ class _build_snapshot:
             normal_far_stream=_normal_far_st,
             normal_near_stream=_normal_near_st,
             item_via_collision=_item_via_collision,
-            **add_these
-            )
+            **add_these)
 
         self.result = tuple(x for x in _st)
         if do_listen:

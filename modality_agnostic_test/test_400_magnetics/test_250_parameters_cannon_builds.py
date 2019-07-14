@@ -78,8 +78,7 @@ class Case8189_build_and_see_component_names(_CommonCase):
 @memoize
 def _command_modules():
     from modality_agnostic.test_support.parameters_canon import (
-            command_modules as x,
-            )
+            command_modules as x)
     return x
 
 

@@ -1,8 +1,7 @@
 from kiss_rdb_test.common_initial_state import (
         MDE_via_lines_and_table_start_line_object,
         TSLO_via,
-        unindent,
-        )
+        unindent)
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,

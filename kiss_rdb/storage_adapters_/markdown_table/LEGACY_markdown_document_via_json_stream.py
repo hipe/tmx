@@ -8,8 +8,7 @@
 def _run_CLI(sin, sout, serr, argv):
 
     from script_lib.magnetics import (
-            common_upstream_argument_parser_via_everything,
-            )
+            common_upstream_argument_parser_via_everything)
 
     _exitstatus = common_upstream_argument_parser_via_everything(
             cli_function=_CLI_body,

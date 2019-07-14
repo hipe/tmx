@@ -179,8 +179,7 @@ class collection_via_directory_and_schema:
                         yes_do_cleanup=yes_do_cleanup,
                         files_rewrite_transaction=tr,
 
-                        listener=listener,
-                        )
+                        listener=listener)
 
             if res is not None:
                 assert(res is True)

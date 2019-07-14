@@ -18,8 +18,7 @@ under the "special field instructions".)
 
 from sakin_agac import (
         cover_me,
-        pop_property,
-        )
+        pop_property)
 import sys
 
 
@@ -40,12 +39,10 @@ def dictionary_via_cels_via_definition(
                 near_field_names,
                 specials[far_k] if far_k in specials else default_tup,
                 far_k,
-                string_via_cel,
-                )
+                string_via_cel)
 
     manifolder = _RowManifolder(
-            tuple(formal_via(k) for k in unsanitized_far_field_names),
-            )
+            tuple(formal_via(k) for k in unsanitized_far_field_names))
 
     def dictionary_via_cels(cels):
         i = -1

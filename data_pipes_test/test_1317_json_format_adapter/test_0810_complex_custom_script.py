@@ -7,9 +7,7 @@ from _init import (
         fixture_file_path,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        memoize,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -49,8 +47,7 @@ class Case200(_CommonCase):
 
         _cm = _subject_module().open_dictionary_stream(
                 html_document_path=fixture_file_path('0120-real-subtree.html'),
-                listener=use_listener,
-                )
+                listener=use_listener)
 
         def store_previous():
             nonlocal store_previous
@@ -69,7 +66,7 @@ class Case200(_CommonCase):
             json_obj['_is_sync_meta_data']  # assert
             for json_obj in json_objs:
                 if 'header_level' in json_obj:
-                    store_previous()
+                    state.store_previous()
                     section = _Section(json_obj['header_content'])
                 else:
                     section.item_strings.append(json_obj['lesson'])
@@ -84,7 +81,10 @@ class Case200(_CommonCase):
         return _State(tuple(emissions), tuple(sections))
 
 
-@memoize
+class _ThisState:  # #[#510.2]
+    pass
+
+
 def _subject_module():
         import script.khong.json_stream_via_website as x
         return x

@@ -103,8 +103,7 @@ class Case100_hello(_CommonCase):
 
         _ = _subject_module().open_dictionary_stream(
                 html_document_path=fixture_file_path('0130-tag-subtree.html'),
-                listener=use_listener,
-                )
+                listener=use_listener)
 
         with _ as dcts:
             head_dct = next(dcts)

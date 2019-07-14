@@ -7,9 +7,7 @@ the structure of this test file is almost *entirely* derived from the
 import _init  # noqa: F401
 
 from upload_bot._models import (
-        filesystem,
-        )
-
+        filesystem)
 from modality_agnostic.memoization import (
         dangerous_memoize,
         memoize,

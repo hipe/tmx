@@ -5,10 +5,7 @@ one "step", that is, it is not a deeply recursive tree of branch nodes
 but rather only a flat list of parameters.
 """
 
-
-from script_lib import (
-        cover_me,
-        )
+from script_lib import cover_me
 
 
 class _SELF:
@@ -89,13 +86,9 @@ def _SIMPLE_STEP(
     from script_lib.magnetics import (
             argument_parser_index_via_stderr_and_command_stream as mag,
             deque_via_ARGV as argv_stream_f,
-            resources_via_ARGV_stream_and_stderr_and_stdout as rsx_f,
-            )
-
+            resources_via_ARGV_stream_and_stderr_and_stdout as rsx_f)
     from modality_agnostic.magnetics import (
-            parameter_via_definition as param_f,
-            )
-
+            parameter_via_definition as param_f)
     argv_stream = argv_stream_f(argv)
     prog = argv_stream.popleft()
 

@@ -1,8 +1,7 @@
 from _common_state import (
         fixture_directory,
         kiss_rdber,
-        throwing_listenerer,
-        )
+        throwing_listenerer)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -121,8 +120,7 @@ class Case158_generate_one_document(_CommonCase):
                     be_recursive=False,
                     force_is_present=False,
                     is_dry_run=False,
-                    listener=listener,
-                    )
+                    listener=listener)
 
         from modality_agnostic.test_support import (
                 structured_emission as se_lib)

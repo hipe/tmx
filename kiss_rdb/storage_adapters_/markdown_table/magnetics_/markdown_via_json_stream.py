@@ -74,8 +74,7 @@ def _my_CLI(parsed_arg, program_name, sout, serr):
             far_format=None,
             near_format='markdown_table',
             custom_mapper_OLDSCHOOL=map_far_objects,
-            listener=listener,
-            )
+            listener=listener)
     f = sout.write
     with _rc as lines:
         for line in lines:
@@ -89,8 +88,7 @@ _my_CLI.__doc__ = __doc__
 def _CLI(sin, sout, serr, argv):  # #testpoint
 
     from script_lib.magnetics import (
-            common_upstream_argument_parser_via_everything,
-            )
+            common_upstream_argument_parser_via_everything)
 
     _exitstatus = common_upstream_argument_parser_via_everything(
             cli_function=_my_CLI,

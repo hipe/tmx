@@ -117,8 +117,7 @@ class _Parse:
     def TABLE_SCHEMA_LINE_ONE(self, line):
 
         from .schema_index_via_schema_row import (
-                row_two_function_and_liner_via_row_one_line as f,
-                )
+                row_two_function_and_liner_via_row_one_line as f)
 
         two = f(line, self._listener)
         if two is None:

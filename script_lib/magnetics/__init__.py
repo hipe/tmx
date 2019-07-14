@@ -1,6 +1,4 @@
-from script_lib import (
-        cover_me,
-        )
+from script_lib import cover_me
 
 
 #

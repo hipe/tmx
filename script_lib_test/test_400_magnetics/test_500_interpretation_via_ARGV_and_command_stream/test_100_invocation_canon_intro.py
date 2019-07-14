@@ -37,8 +37,7 @@ from script_lib.test_support.generic_CLI_helper import (
         the_empty_ARGV,
         ARGV,
         PROGRAM_NAME,
-        NEWLINE,
-        )
+        NEWLINE)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

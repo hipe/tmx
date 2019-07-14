@@ -70,8 +70,7 @@ class _CommonCase(unittest.TestCase):
         return _subj_mod().new_lines_via_update_and_existing_lines(
                 new_lines_via_entity=new_lines_via_entity,
                 identifier_string=id_s,
-                **kwargs,
-                )
+                **kwargs)
 
     @expect_everything
     def _expect_everything_for_create(self, kwargs):
@@ -86,8 +85,7 @@ class _CommonCase(unittest.TestCase):
     def _expect_everything_for_delete(self, kwargs):
         two = _subj_mod().new_lines_and_future_deleted_via_existing_lines(
                 identifier_string=self.given_identifer_for_entity_to_delete(),
-                **kwargs
-                )
+                **kwargs)
         lines, future = two
         return lines  # ignore the future
 

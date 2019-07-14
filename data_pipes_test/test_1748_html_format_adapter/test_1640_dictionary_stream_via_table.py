@@ -113,8 +113,7 @@ class Case100_hello(_CommonCase):
 @memoize
 def _subject_module():
     from sakin_agac_test.fixture_executables import (
-            exe_150_json_stream_via_bernstein_html as x,
-            )
+            exe_150_json_stream_via_bernstein_html as x)
     return x
 
 

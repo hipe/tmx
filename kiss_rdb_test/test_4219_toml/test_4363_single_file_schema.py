@@ -1,13 +1,11 @@
 from kiss_rdb_test.common_initial_state import (
         debugging_listener,
         functions_for,
-        unindent,
-        )
+        unindent)
 from kiss_rdb_test.CUD import (
         wrap_collection,
         filesystem_recordings_of,
-        build_filesystem_expecting_num_file_rewrites,
-        )
+        build_filesystem_expecting_num_file_rewrites)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

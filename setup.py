@@ -30,8 +30,7 @@ setup(
         entry_points='''
             [console_scripts]
             pho=pho.cli:cli_for_production
-        ''',
-)
+        ''')
 
 
 setup(
@@ -43,8 +42,7 @@ setup(
         entry_points='''
             [console_scripts]
             kss=kiss_rdb.cli:cli_for_production
-        ''',
-)
+        ''')
 
 # #history-A.2
 # #birth

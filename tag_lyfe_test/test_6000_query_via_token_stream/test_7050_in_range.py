@@ -12,9 +12,7 @@ we might never use this feature, but it's an OCD contact exercise
 
 
 import _init  # noqa: F401
-from tag_lyfe_test.query import (
-        ScaryCommonCase,
-        )
+from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 

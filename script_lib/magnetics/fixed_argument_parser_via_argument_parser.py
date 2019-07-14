@@ -18,8 +18,7 @@ def begin_native_argument_parser_to_fix__(prog, **platform_kwargs):
     return argparse.ArgumentParser(
             prog=prog,
             add_help=False,
-            **platform_kwargs
-            )
+            **platform_kwargs)
 
 
 def fix_argument_parser__(ap, stderr):

@@ -8,7 +8,12 @@ to get the server running to run tests. think of this as a fixture that
 has hard-coded, dummy versions of the environment variables we need..
 """
 
-
+from upload_bot._magnetics import webserver_via_pid_file_path
+from upload_bot._models import filesystem
+from upload_bot_test.common_initial_state import (
+        BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_,
+        VERIFICATION_TOKEN_EXAMPLE_,
+        writable_tmpdir)
 import psutil
 import os
 import sys
@@ -34,36 +39,20 @@ def _():
 
 
 _()
-
-
-from upload_bot._magnetics import (  # noqa: E402
-        webserver_via_pid_file_path,
-        )
-
-from upload_bot._models import (  # noqa: E402
-        filesystem,
-        )
-
-from upload_bot_test import (  # noqa: E402
-        _init as test_support,
-        )
-
-
 def _main():
 
     _listener = _build_listener()
 
     _filesystem = filesystem.real_filesystem()
 
-    _pid_path = path.join(test_support.writable_tmpdir(), 'test-server.pid')
+    _pid_path = path.join(writable_tmpdir(), 'test-server.pid')
 
     webserver_via_pid_file_path(
         start_server=start_server,
         pid_file_path=_pid_path,
         psutil=psutil,
         filesystem=_filesystem,
-        listener=_listener
-        )
+        listener=_listener)
 
 
 def start_server(pid_func, listener):
@@ -86,11 +75,9 @@ def start_server(pid_func, listener):
 
 
 def _build_environment():
-
-    x = test_support
     o = {}
-    o['BOT_USER_OATH_ACCESS_TOKEN'] = x.BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_
-    o['VERIFICATION_TOKEN'] = x.VERIFICATION_TOKEN_EXAMPLE_
+    o['BOT_USER_OATH_ACCESS_TOKEN'] = BOT_USER_OATH_ACCESS_TOKEN_EXAMPLE_
+    o['VERIFICATION_TOKEN'] = VERIFICATION_TOKEN_EXAMPLE_
     return o
 
 

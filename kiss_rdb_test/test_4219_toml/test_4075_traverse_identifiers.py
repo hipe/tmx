@@ -1,6 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
-        unindent,
-        )
+        unindent)
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
@@ -44,7 +43,6 @@ class _CommonCase(unittest.TestCase):
         return self.emitted_elements()['did_reach_end_of_stream']
 
     def run_expecting_structured_input_error(self):
-
         def recv_payloader(payloader):
             nonlocal freeform_metadata
             freeform_metadata = payloader()

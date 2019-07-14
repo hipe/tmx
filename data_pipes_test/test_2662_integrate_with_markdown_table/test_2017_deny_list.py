@@ -11,8 +11,7 @@ objectives are severalfold:
 
 from _init import (
         fixture_file_path,
-        ProducerCaseMethods,
-        )
+        ProducerCaseMethods)
 from modality_agnostic.memoization import (
        dangerous_memoize as shared_subject,
        memoize,

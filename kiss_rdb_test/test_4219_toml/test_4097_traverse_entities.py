@@ -1,7 +1,6 @@
 from kiss_rdb_test.common_initial_state import (
         debugging_listener as _debugging_listener,
-        unindent as _unindent,
-        )
+        unindent as _unindent)
 from modality_agnostic.test_support import structured_emission as se_lib
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest

@@ -1,14 +1,11 @@
-from _init import (
-        writable_tmpdir
-        )
+from grep_dump_test.common_initial_state import (
+        writable_tmpdir)
 import unittest
 import os
 p = os.path
 
 from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject,
-        memoize,
-        )
+        dangerous_memoize as shared_subject)
 
 
 class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(

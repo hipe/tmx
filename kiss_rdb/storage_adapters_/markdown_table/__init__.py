@@ -776,8 +776,7 @@ def _stateful_grammar_via(schema):
 
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
             Scanner,
-            pattern_via_description_and_regex_string as o,
-            )
+            pattern_via_description_and_regex_string as o)
 
     pipe = o('pipe', r'\|')
 

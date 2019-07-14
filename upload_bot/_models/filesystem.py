@@ -23,8 +23,7 @@ friendly ("fake") counterpart of Filesystem
 """
 
 from modality_agnostic.memoization import (
-        memoize,
-        )
+        lazy)
 
 
 @memoize

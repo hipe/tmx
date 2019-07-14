@@ -18,10 +18,8 @@ wishlist:
     this could be "fixed" by creating a new actions that sends a stop instead.
 """
 
-
 from .identifiers_via_file_lines import (  # also as grammar_lib belo
-        not_ok, okay, stop,
-        )
+        not_ok, okay, stop)
 import re
 
 

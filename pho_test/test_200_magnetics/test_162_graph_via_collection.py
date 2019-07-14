@@ -2,8 +2,7 @@ from _common_state import (
         fixture_directory,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 

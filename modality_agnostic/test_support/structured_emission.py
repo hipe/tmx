@@ -96,8 +96,7 @@ class ExpectEmission:
 
 def debugging_listener():
     from modality_agnostic.test_support import (
-            listener_via_expectations as _,
-            )
+            listener_via_expectations as _)
     return _.for_DEBUGGING
 
 

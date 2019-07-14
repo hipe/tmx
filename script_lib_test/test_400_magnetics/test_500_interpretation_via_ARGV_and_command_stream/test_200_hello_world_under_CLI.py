@@ -1,11 +1,8 @@
 import _init  # noqa: F401
 from script_lib.test_support.generic_CLI_helper import (
         CLI_CaseMethods,
-        ARGV,
-)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        ARGV)
+from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 

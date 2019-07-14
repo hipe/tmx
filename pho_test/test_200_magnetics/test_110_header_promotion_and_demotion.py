@@ -1,8 +1,7 @@
 import _common_state  # noqa: F401
 from pho_test import document_state as doc_state_lib
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 

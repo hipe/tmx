@@ -40,8 +40,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
 
     _open_traversal_stream = producer_module.open_traversal_stream(
             fixture_document_path,  # {html_document_path|markdown_path}, e.g
-            listener=use_listener,
-            )
+            listener=use_listener)
 
     def fuzzy_key(dct):
         return simplified_key_via_markdown_link(dct['name'])

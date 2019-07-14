@@ -335,8 +335,7 @@ def _section_list_via(far_dicts, mixed_near):
                 near_tagged_items=near_tagged_items,
                 near_keyerer=near_keyer,
                 far_deny_list=None,
-                listener=__file__,
-                )
+                listener=__file__)
 
     def open_near():
         if isinstance(mixed_near, str):

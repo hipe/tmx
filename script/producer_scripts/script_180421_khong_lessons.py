@@ -99,8 +99,7 @@ class open_dictionary_stream:
             first_selector=None,
             second_selector=_second_selector,
             html_document_path=self._html_document_path,
-            listener=self._listener,
-            )
+            listener=self._listener)
         return _rc
 
     def __exit__(self, *_):

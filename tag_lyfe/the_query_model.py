@@ -44,10 +44,7 @@ why lossless?
     node for API stuff has no crossover with this concern.)
 """
 
-
-from tag_lyfe import (
-        pop_property,
-        )
+from tag_lyfe import pop_property
 
 
 # == support (early because etc)

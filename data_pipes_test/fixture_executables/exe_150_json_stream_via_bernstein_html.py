@@ -23,7 +23,6 @@ of the [#410.J] record mapper; a something that seems useful to have in the
 toolkit..
 """
 
-
 _url = 'https://github.com/webmaven/python-parsing-tools'
 
 _first_selector = ('div', {'id': 'readme'})
@@ -47,8 +46,7 @@ def open_traversal_stream(html_document_path, listener):
         table, = el.select('table')
 
         from sakin_agac.format_adapters.html.magnetics import (
-                dictionary_stream_via_table
-                )
+                dictionary_stream_via_table)
 
         table_o = dictionary_stream_via_table(
                 special_field_instructions={
@@ -76,8 +74,7 @@ def open_traversal_stream(html_document_path, listener):
         first_selector=_first_selector,
         second_selector=my_generator,
         html_document_path=html_document_path,
-        listener=listener,
-        )
+        listener=listener)
 
     return _cm
 

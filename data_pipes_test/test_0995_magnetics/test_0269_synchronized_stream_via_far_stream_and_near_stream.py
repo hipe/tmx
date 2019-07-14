@@ -13,8 +13,7 @@ from sakin_agac_test.sync_support import (
         SyncCase_,
         )
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 import unittest
 
 

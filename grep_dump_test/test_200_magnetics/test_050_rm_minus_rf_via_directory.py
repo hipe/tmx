@@ -1,7 +1,5 @@
-from _init import (
-        writable_tmpdir,
-        )
-
+from grep_dump_test.common_initial_state import (
+        writable_tmpdir)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,
@@ -106,8 +104,7 @@ def _touch(path):  # #todo how
 @memoize
 def _subject_function():
     from grep_dump._magnetics.rm_minus_rf_via_directory import (  # #[#204]
-       rm_minus_rf_via_directory as x,
-       )
+       rm_minus_rf_via_directory as x)
     return x
 
 

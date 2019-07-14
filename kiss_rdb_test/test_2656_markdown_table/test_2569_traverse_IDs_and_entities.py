@@ -1,6 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
-        pretend_file_via_path_and_big_string,
-        )
+        pretend_file_via_path_and_big_string)
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest

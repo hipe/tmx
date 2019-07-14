@@ -1,7 +1,6 @@
 from kiss_rdb_test.common_initial_state import (
         functions_for,
-        unindent,
-        )
+        unindent)
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import (
         build_filesystem_expecting_num_file_rewrites)

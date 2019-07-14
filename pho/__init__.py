@@ -19,8 +19,7 @@ def big_index_and_collection_via_path(collection_path, listener):
         return
 
     from pho.magnetics_.big_index_via_collection import (
-            big_index_via_collection,
-            )
+            big_index_via_collection)
 
     big_index = big_index_via_collection(coll, listener)
     if big_index is None:

@@ -202,9 +202,7 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
         chunks.append(s)
 
     from modality_agnostic import io as io_lib
-    mock_IO = io_lib.write_only_IO_proxy(
-            write=write,
-            )
+    mock_IO = io_lib.write_only_IO_proxy(write=write)
 
     import script_lib.magnetics.interpretation_via_parse_stepper as _mag
     _oo = _mag.interpretationer_via_individual_resources(

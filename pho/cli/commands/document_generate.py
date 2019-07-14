@@ -145,8 +145,7 @@ def cli(
             be_recursive=recursive,
             force_is_present=force,
             is_dry_run=dry_run,
-            listener=listener,
-            )
+            listener=listener)
 
     if ok is None:
         if ctx.DID_ERROR:

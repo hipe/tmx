@@ -1,7 +1,6 @@
 """helper for testing CLI in a generic, magnetic-agnostic way
 """
 
-
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         memoize,

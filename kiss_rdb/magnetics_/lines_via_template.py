@@ -41,8 +41,7 @@ class _CLI:
             data_source=environ,
             template_big_string=self._big_string,
             data_source_key_via_template_variable_name=my_key_via,
-            listener=_listener,
-            )
+            listener=_listener)
 
         if lines is None:
             return

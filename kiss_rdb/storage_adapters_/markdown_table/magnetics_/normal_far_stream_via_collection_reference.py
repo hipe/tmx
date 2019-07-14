@@ -16,8 +16,7 @@ that do this (with a bit of coordination required).
 
 from sakin_agac import (
         cover_me,
-        pop_property,
-        )
+        pop_property)
 
 
 def NATIVIZER_ETC_VIA(**kwargs):

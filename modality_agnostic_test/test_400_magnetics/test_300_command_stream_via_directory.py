@@ -3,9 +3,7 @@
 from _init import (
         fixture_directory,
         )
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        )
+from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 

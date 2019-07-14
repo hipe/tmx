@@ -94,8 +94,8 @@ class _CLI:
     def _parse_arguments(cli):
 
         from script_lib.magnetics import (
-                parse_stepper_via_argument_parser_index as _,
-                )
+                parse_stepper_via_argument_parser_index as _)
+
         reso = _.SIMPLE_STEP(
                 cli.stdin, cli.stderr, cli.ARGV, _my_parameters,
                 stdin_OK=True,

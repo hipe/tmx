@@ -10,8 +10,7 @@ the salient features of the grammar demonstrated here:
 
 import _init  # noqa: F401
 from tag_lyfe_test.tagging import (
-        TaggingCommonCasePlusMemoization as _ThisCase,
-        )
+        TaggingCommonCasePlusMemoization as _ThisCase)
 import unittest
 
 

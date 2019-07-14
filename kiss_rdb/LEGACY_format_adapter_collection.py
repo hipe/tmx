@@ -1,9 +1,7 @@
-from modality_agnostic.memoization import (
-        lazy,
-        )
 from sakin_agac import (
         cover_me,
         )
+from modality_agnostic.memoization import lazy
 
 
 def procure_format_adapter(**kwargs):
@@ -111,8 +109,7 @@ class _ProcureFormatAdapter:
             item_noun_phrase=item_noun_phrase,
             channel_tail_component_on_not_found=channel_tail_component_on_not_found,  # noqa: E501
             listener=self._listener,
-            **kwargs,
-            )
+            **kwargs)
 
     def _these(self):
         if self.__these is None:
@@ -143,7 +140,6 @@ def EVERY_MODULE():
     would get picked up.)
     """
 
-    def f():
         return modules_via_directory_and_mod_name(*main_module_tuple)
 
     def _ALTERNATE_FOR_REFERENCE():
@@ -152,6 +148,7 @@ def EVERY_MODULE():
         for x in modules_via_directory_and_mod_name(*main_module_tuple):
             yield x
         for x in modules_via_directory_and_mod_name(*other_module_tuple):
+    def main():
             yield x
 
     def modules_via_directory_and_mod_name(direc, mod_name):
@@ -195,7 +192,7 @@ def EVERY_MODULE():
 
     import importlib
     from glob import glob as glob_glob
-    return f
+    return main
 
 
 def _collection_lib():

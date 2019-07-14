@@ -7,12 +7,10 @@ these actions implement "block stream"
 new a #birth is blocks
 """
 
-
 from .identifiers_via_file_lines import (
         BaseActions_,
         table_start_line_via_line_,
-        nothing, stop, okay,
-        )
+        nothing, stop, okay)
 
 
 # == BEGIN EXPERIMENT [#872.02]

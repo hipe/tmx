@@ -6,12 +6,9 @@ parsing.
 """
 
 from modality_agnostic.memoization import (
-        lazy,
-        )
-
+        lazy)
 from script_lib import (
-        cover_me,
-        )
+        cover_me)
 
 
 _THIS_NAME = 'chosen_sub_command'
@@ -156,8 +153,7 @@ class _populate_via_parameter_dictionary:
     def __do_add_required_field(self, param, name):  # category 4
         self._parser.add_argument(
             _slug_via_name(name),
-            ** self._common_kwargs(param, name),
-        )
+            ** self._common_kwargs(param, name))
 
     def __add_optional_list(self, param, name):  # category 3
         self._parser.add_argument(

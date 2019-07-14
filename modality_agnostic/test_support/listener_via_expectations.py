@@ -3,9 +3,7 @@
 :[#509]
 """
 
-from modality_agnostic import (
-        cover_me,
-        )
+from modality_agnostic import cover_me
 import re
 from collections import deque as deque
 
@@ -247,9 +245,8 @@ def _crazy_parse(s_a):
         f(s)
 
     if is_expecting_more:
-        _ = "unexpected end of tokens after '{}'".format(
-                expecting_more_after,
-                )
+        _ = expecting_more.expecting_more_after
+        _ = f"unexpected end of tokens after '{_}'"
         cover_me(_)
 
     return channel_model, name

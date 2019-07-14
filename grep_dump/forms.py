@@ -1,39 +1,35 @@
 from flask_wtf import FlaskForm
-
 from wtforms import (
         BooleanField,
         FileField,
-        PasswordField,
-        SelectField,
+        # PasswordField,
+        # SelectField,
         SelectMultipleField,
         StringField,
         SubmitField,
         )
-
 import wtforms.validators as validators  # ..
+from wtforms.validators import DataRequired
 
-from wtforms.validators import (
-        DataRequired,
-        )
 
 class SearchForm(FlaskForm):
     search_string = StringField('Search String', validators=[DataRequired()])
     is_egrep = BooleanField('Search string is egrep regex')
     add_in = SelectMultipleField('In', choices=[
-        ['xx','#kikker'],
-        ['yy','#blubba'],
-        ['zz','#zimoji'],
+        ['xx', '#kikker'],
+        ['yy', '#blubba'],
+        ['zz', '#zimoji'],
     ])
     add_from = SelectMultipleField('From', choices=[
-        ['mm','@mejor_mejores'],
-        ['ll','@fingle_fangel'],
-        ['qq','@gneeseesee'],
-        ['mm','@major_majors'],
-        ['ll','@fingle_fangel'],
-        ['qq2','@gneeseesee'],
-        ['mm2','@mejor_mejores'],
-        ['ll2','@fingle_fangel'],
-        ['qq3','@gneeseesee'],
+        ['mm', '@mejor_mejores'],
+        ['ll', '@fingle_fangel'],
+        ['qq', '@gneeseesee'],
+        ['mm', '@major_majors'],
+        ['ll', '@fingle_fangel'],
+        ['qq2', '@gneeseesee'],
+        ['mm2', '@mejor_mejores'],
+        ['ll2', '@fingle_fangel'],
+        ['qq3', '@gneeseesee'],
     ])
     since = StringField('Since')
     thru = StringField('Thru')

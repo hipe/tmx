@@ -26,11 +26,8 @@ from sakin_agac.magnetics import (
         )
 from sakin_agac import (
         cover_me,
-        pop_property,
-        )
-from modality_agnostic import (
-        streamlib,
-        )
+        pop_property)
+from modality_agnostic import streamlib
 import contextlib
 
 

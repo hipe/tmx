@@ -101,8 +101,7 @@ class open_dictionary_stream:
         _soup = self._lib.soup_via_locators_(
                 url=_url,
                 html_document_path=self._cached_document_path,
-                listener=self._listener,
-                )
+                listener=self._listener)
         self._required('_soup', _soup)
 
     _required = _required

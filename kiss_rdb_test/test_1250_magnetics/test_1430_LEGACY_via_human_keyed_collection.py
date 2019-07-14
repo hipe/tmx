@@ -50,9 +50,7 @@ class _CommonCase(unittest.TestCase):
                 human_keyed_collection=_hkc,
                 needle_function=_needle,
                 listener=None,
-                **kwargs,
-                )
-
+                **kwargs)
         return _x
 
 

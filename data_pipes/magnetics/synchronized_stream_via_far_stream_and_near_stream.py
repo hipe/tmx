@@ -6,8 +6,7 @@ from sakin_agac import (
         sanity,
         )
 from modality_agnostic import (
-        streamlib as _,
-        )
+        streamlib as _)
 
 
 next_or_none = _.next_or_none

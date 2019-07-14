@@ -5,11 +5,9 @@ we use for coarse, line-based parsing of toml files.
 it is a near-exact adaptation of [#863]
 """
 
-
 from kiss_rdb.magnetics_ import (
         string_scanner_via_definition as scn_lib,
-        state_machine_via_definition as sm_lib,
-        )
+        state_machine_via_definition as sm_lib)
 
 
 def table_start_line_stream_via_file_lines_(file_lines, listener):

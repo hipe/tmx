@@ -39,8 +39,7 @@ def execute_as_CLI_(open_dictionary_stream):
 
     _normalize_sys_path()
     from script.json_stream_via_url_and_selector import (
-            flush_JSON_stream_into as flush_into,
-            )
+            flush_JSON_stream_into as flush_into)
     import sys as o
     with open_dictionary_stream(None, None) as dcts:
         flush_into(o.stdout, o.stderr, dcts)

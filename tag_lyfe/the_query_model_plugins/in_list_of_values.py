@@ -1,10 +1,8 @@
 from tag_lyfe.the_query_model import (
         in_subtree_match_any_one_,
-        wordable_via_string_,
-        )
+        wordable_via_string_)
 from tag_lyfe import (
-        pop_property,
-        )
+        pop_property)
 
 
 class UnsanitizedInValuesFunction:

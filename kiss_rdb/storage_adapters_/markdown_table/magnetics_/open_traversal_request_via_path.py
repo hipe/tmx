@@ -16,9 +16,9 @@ this ended up blowing up into [#418] thoughts on collection metadata..
 
 from sakin_agac import (
         cover_me,
-        pop_property,
         sanity,
         )
+        pop_property)
 
 
 class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # #coverpoint13.2

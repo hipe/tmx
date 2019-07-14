@@ -2,8 +2,7 @@ from kiss_rdb_test.CUD import (
         expect_big_success,
         emission_payload_expecting_error_given_run,
         run_given_edit_tuples,
-        request_via_tuples as _request_via_tuples,
-        )
+        request_via_tuples as _request_via_tuples)
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 

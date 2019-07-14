@@ -1,6 +1,5 @@
 from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject,
-        )
+        dangerous_memoize as shared_subject)
 
 
 class TaggingCommonCase:

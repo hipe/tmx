@@ -10,8 +10,7 @@ COMING SOON:
 """
 
 from grep_dump._magnetics.rm_minus_rf_via_directory import (  # [#204]
-        rm_minus_rf_via_directory
-        )
+        rm_minus_rf_via_directory)
 import fcntl
 import os
 p = os.path
@@ -67,7 +66,7 @@ class Jobser:
         """
 
         self._lockfile_filehandle = open(p.join(self._dir_path, 'lock-me'))
-        fcntl.flock(self._lockfile_filehandle, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        fcntl.flock(self._lockfile_filehandle, fcntl.LOCK_EX | fcntl.LOCK_NB)
 
     def begin_job(self):
         # NOTE - gonna change this to a pool
@@ -94,7 +93,6 @@ class Jobser:
 
         self._lockfile_filehandle.close()
         del self._lockfile_filehandle
-
 
 
 class _Job:

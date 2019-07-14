@@ -37,8 +37,7 @@ from flask import (
         make_response,
         render_template,
         request,
-        url_for,
-        )
+        url_for)
 import json
 import time
 import random

@@ -38,8 +38,7 @@ def document_fragment_via_definition(
             heading=use_heading,
             heading_is_natural_key=heading_is_natural_key,
             body=body,
-            **dct
-            )
+            **dct)
 
 
 def _normalize_core_attribute_names(  # #[#008.D]

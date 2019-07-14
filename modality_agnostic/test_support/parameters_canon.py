@@ -13,7 +13,9 @@ class command_modules:  # used as namespace yikes
 
     @memoize
     def category_5_required_list_minimal():
+
         class MyModule:
+
             def Command(reqo_listo):
                 pass
 
@@ -55,7 +57,9 @@ class command_modules:  # used as namespace yikes
 
     @memoize
     def category_2_optional_field_minimal():
+
         class MyModule:
+
             def Command(opto_fieldo):
                 pass
 
@@ -74,7 +78,9 @@ class command_modules:  # used as namespace yikes
 
     @memoize
     def category_1_flag_minimal():
+
         class MyModule:
+
             def Command(this_flag):
                 pass
 
