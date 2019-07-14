@@ -56,7 +56,7 @@ class Case4257_simplifed_typical(_CommonCase):
         """
 
 
-class Case4258_empty_string(_CommonCase):
+class Case4258KR_empty_string(_CommonCase):
 
     def test_100_reason(self):
         self.assertIn('not allowed generally', self.error_structure['reason'])

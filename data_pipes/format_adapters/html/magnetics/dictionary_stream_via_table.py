@@ -3,9 +3,7 @@
 there is an asymmetry: if markdown tables are so special and get their
 own format adapter, why not HTML tables too? maybe one day..
 
-it gets coverage by way of #coverpoint12 for now.
-
-also #coverpoint13
+For now it's covered by (Case1855DP) and (Case1640DP).
 
 at #history-A.1 a big chunk of it is abstracted out to be not format-specific.
 

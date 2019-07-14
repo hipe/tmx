@@ -275,6 +275,13 @@ will do is refer to articles in #[#008.10] that-other-project. (EDIT)
 
 
 
+## <a name="7"></a>case numbers
+
+(in its own file adjacent to this one.)
+
+
+
+
 [semver]: http://semver.org
 
 ## (document-meta)

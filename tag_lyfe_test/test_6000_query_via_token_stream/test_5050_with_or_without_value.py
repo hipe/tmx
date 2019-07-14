@@ -1,7 +1,5 @@
 """
 introduce with or without value
-
-.:#coverpoint1.14
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -11,7 +9,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_without(_CommonCase, ScaryCommonCase):
+class Case5049_without(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'without', 'value', 'xx')
@@ -29,7 +27,10 @@ class Case100_without(_CommonCase, ScaryCommonCase):
         self.matches_against(('#foo',))
 
 
-class Case200_with(_CommonCase, ScaryCommonCase):
+# Case5050  # #midpoint
+
+
+class Case5051_with(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'with', 'value', 'xx')

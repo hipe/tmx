@@ -79,7 +79,7 @@ class _FormatAdapter:
 
         f = self.DIG_HOI_POLLOI(dig_f(), trav_req.listener)
         if f is None:
-            return  # #coverpoint5.1 GONE at #history-A.1 (see c.p tombstone)
+            return  # (Case2664DP) GONE at #history-A.1 (see c.p tombstone)
         return f(trav_req)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):

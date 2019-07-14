@@ -15,6 +15,7 @@ having said that,
 
   - also (new at #history-A.1) a trailing pipe at the end of the line
 
+(Case2407)
 """
 
 from modality_agnostic import listening

@@ -54,7 +54,7 @@ def _build_all_responder_functions(secrets):
 
     @responder_that_verifies_application_token
     def respond_to_url_verification(response, slack_event):
-        # #coverpoint1.2
+        # (Case501)
         return response.respond_in_JSON_via_simple_dictionary(
                 challenge=slack_event['challenge'],
                 )
@@ -79,8 +79,7 @@ def _verify_application_token(response, slack_event, f, expected):
     else:
 
         # NOTE - security bad - don't send our verification token to
-        # arbitrary clients
-        # #coverpoint1.1
+        # arbitrary clients (Case499)
 
         _msg = (
           'I AM NOT FOR PRODUCTION\n' +

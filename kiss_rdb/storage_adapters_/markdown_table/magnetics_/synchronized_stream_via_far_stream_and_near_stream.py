@@ -165,8 +165,7 @@ class _Newstream_via:
         del(o)
 
         def native_via_key_and_item(far_key, far_item):
-            # #coverpoint7.4
-            return native_via_item(far_item)
+            return native_via_item(far_item)  # (Case1320DP)
 
         item_via_collision = self.__procure_item_via_collision()
         if item_via_collision is None:
@@ -222,10 +221,10 @@ class _Newstream_via:
                 cover_me('completely empty far record?')
             elif 1 == length:
                 if can_short_circuit:
-                    # #coverpoint1.5: short circuit the work
+                    # short circuit the work (Case0150DP)
                     result = near_row_DOM
                 else:
-                    # #coverpoint1.7: let some single-field records thru
+                    # let some single-field records thru (Case0170DP)
                     result = do_merge(far_dct, near_row_DOM)
             else:
                 result = do_merge(far_dct, near_row_DOM)
@@ -250,7 +249,7 @@ class _Newstream_via:
 
         """(we don't know why but you don't need to and must not close
         yourself even when you hit the end of the whole document here.
-        #coverpoint9.1.1)
+        (Case050SA)
         """
 
         self._did_hit_the_end_here = hit_the_end
@@ -265,7 +264,7 @@ class _Newstream_via:
         if f_f is None:
             use_key_via_row_DOM = key_via_row_DOM_normally
         else:
-            # #coverpoint1.6
+            # (Case0160DP)
             use_key_via_row_DOM = f_f(
                     key_via_row_DOM_normally,
                     self._complete_schema,
@@ -287,7 +286,7 @@ class _Newstream_via:
         if x is None:
             if self._OK:
                 if self._did_hit_the_end_here:
-                    pass  # #coverpoint7.5
+                    pass  # (Case1322DP)
                 else:
                     self._move_to('TAIL_LINES')
                     return pop_property(self, '_TUP_ON_DECK')

@@ -4,6 +4,6 @@
 """
 
 
-FORMAT_ADAPTER = None  # by way of #coverpoint7.1
+FORMAT_ADAPTER = None  # by way of (Case1314DP)
 
 # born.

@@ -75,7 +75,7 @@ def _build_semi_encoder(listener, o):
             length = len(lines)
 
             if 0 == length:
-                # (Case4258_empty_string)
+                # (Case4258KR)
                 assert(not allow_empty_strings)  # ..
                 _whine_about_empty_string(listener, name)
                 return

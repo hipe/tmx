@@ -1,3 +1,4 @@
+# covered by (Case2436)
 
 
 def row_two_function_and_liner_via_row_one_line(line, listener):
@@ -33,10 +34,10 @@ def row_two_function_and_liner_via_row_one_line(line, listener):
 
     def __ensure_row_has_endcap():
         if not row.has_endcap:
-            # #coverpoint3.1
             from modality_agnostic import listening as li
             error = li.leveler_via_listener('error', listener)
             error('header row 1 must have "encap" (trailing pipe)')
+            # (Case2420)
             _stop()
 
     def __parse_second_row():
@@ -191,7 +192,7 @@ def _make_row_num_validator(model_row, listener, *ok_via_which):
         which = my_compare(actual_cel_count)
         if ok_via_which[which]:
             return True
-        else:  # #coverpoint3.1
+        else:  # (Case2420)
             __when_cel_count_mismatch(which, actual_cel_count)
 
     def __when_cel_count_mismatch(which, actual_count):

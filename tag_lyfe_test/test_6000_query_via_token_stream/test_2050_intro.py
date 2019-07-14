@@ -13,11 +13,6 @@ broadly, our high-level objectives are to suss-out our main big unknowns:
     exceptions thrown from the generated parser etc?
 
   - is this null byte hack really going to work? (more below at #here1)
-
-
-experimental new provisions:
-
-  - stack countdown number as testpoint identifier (see [#704.B])
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -30,7 +25,7 @@ class _CommonCase(unittest.TestCase):
         return f"can't change from '{left}' to '{right}' at the same level (use parens)"  # noqa: E501
 
 
-class Case100_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
+class Case2047_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
 
     def test_050_hi(self):
         self.assertIsNotNone(_subject_magnetic())
@@ -48,7 +43,7 @@ class Case100_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
         return self.point_at_word('or')
 
 
-class Case200_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
+class Case2048_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#one', 'or', '#two', 'and', '#three', 'xx')
@@ -63,7 +58,7 @@ class Case200_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
         return self.point_at_word('and')
 
 
-class Case300_minimal_OR(_CommonCase, ScaryCommonCase):
+class Case2050_minimal_OR(_CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#one', 'or', '#two')
@@ -81,7 +76,7 @@ class Case300_minimal_OR(_CommonCase, ScaryCommonCase):
         self.matches_against(('#two',))
 
 
-class Case400_minimal_AND(_CommonCase, ScaryCommonCase):
+class Case2052_minimal_AND(_CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#one', 'and', '#two')
@@ -102,7 +97,7 @@ class Case400_minimal_AND(_CommonCase, ScaryCommonCase):
         self.matches_against(('#one', '#tres', '#two'))
 
 
-class Case500_lone_tag(_CommonCase, ScaryCommonCase):
+class Case2053_lone_tag(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#one',)

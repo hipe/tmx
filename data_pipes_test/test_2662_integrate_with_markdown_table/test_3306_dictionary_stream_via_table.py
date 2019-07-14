@@ -38,10 +38,10 @@ class _CommonCase(unittest.TestCase):
         return self._end_state().business_object_dictionary[k]
 
 
-class Case100_hello(_CommonCase):
+class Case3306DP_hello(_CommonCase):
     """the interesting tests here (towards the end) are (at writing)..
 
-    ..a sub-slice of tests in our #coverpoint13 "mentor" test file. we have
+    ..a sub-slice of tests in our "mentor" test file (Case1640DP). we have
     carried over only a sub-slice of those tests, having the sole intention
     of covering only our format adapter's implementation of [#410.J] record
     mapping in most of its directives:

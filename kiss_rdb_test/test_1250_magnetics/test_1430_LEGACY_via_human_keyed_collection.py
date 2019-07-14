@@ -53,9 +53,7 @@ class _CommonCase(unittest.TestCase):
         return _x
 
 
-class Case100_anything_against_none(_CommonCase):
-
-    # #coverpoint2.1
+class Case1428_anything_against_none(_CommonCase):
 
     def test_050_subject_module_loads(self):
         # (currently redudant and pointless because of doctest integ but meh.)
@@ -78,7 +76,7 @@ class Case100_anything_against_none(_CommonCase):
         return _the_empty_collection()
 
 
-class Case200_splay(_CommonCase):
+class Case1429_splay(_CommonCase):
 
     def test_100_result_is_none(self):
         self._result_is_none()
@@ -100,9 +98,7 @@ class Case200_splay(_CommonCase):
         return _collection_B()
 
 
-class Case300_ambiguous(_CommonCase):
-
-    # #coverpoint2.2
+class Case1431_ambiguous(_CommonCase):
 
     def test_100_result_is_none(self):
         self._result_is_none()
@@ -131,9 +127,7 @@ class Case300_ambiguous(_CommonCase):
         return _collection_C()
 
 
-class Case400_win(_CommonCase):
-
-    # #coverpoint2.3
+class Case1432_succeed(_CommonCase):
 
     def test_100_result_is_not_none(self):
         self.assertIsNotNone(self._result())

@@ -144,7 +144,7 @@ def __needle_sayer_via(needle_x):
 @_ui_thing
 def _when_ambiguous(say_needle, item_noun_phrase, say_coll, err, posi_mem):
 
-    # #coverpoint2.2
+    # (Case1431)
 
     f = placeholder_for_say_subfeature
 
@@ -157,7 +157,7 @@ def _when_ambiguous(say_needle, item_noun_phrase, say_coll, err, posi_mem):
 @_ui_thing
 def _when_not_found(say_needle, item_noun_phrase, say_coll, err, neg_mem=None):
 
-    # #coverpoint2.1
+    # (Case1428)
 
     def yes(k, x):
         tmpl_args[k] = x

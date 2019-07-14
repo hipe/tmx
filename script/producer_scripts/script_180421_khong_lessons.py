@@ -61,7 +61,7 @@ class open_dictionary_stream:
 
     ## about tests:
 
-    the #coverpoint8 series covers this document.
+    Test cases near (Case0810DP) cover this document.
     it behooves us to derive things from real world use cases;
     early abstraction
     """

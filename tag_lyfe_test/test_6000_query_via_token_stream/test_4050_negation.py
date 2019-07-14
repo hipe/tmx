@@ -1,7 +1,5 @@
 """
 introduce negation.
-
-.:#coverpoint1.15
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -11,7 +9,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_simple(_CommonCase, ScaryCommonCase):
+class Case4050_simple(_CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('not', '#foo', 'xx')
@@ -29,7 +27,7 @@ class Case100_simple(_CommonCase, ScaryCommonCase):
         self.matches_against(('#bar', '#baz'))
 
 
-class Case300_rumskalla_integration(_CommonCase, ScaryCommonCase):
+class Case4060_rumskalla_integration(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'and', 'not', '#bar:baz', 'xx')

@@ -146,12 +146,10 @@ class DoubleQuotedStringNameComponent:
             for typ, s in sexps:
                 if 'raw_string' == typ:
                     pieces.append(s)
-                elif 'escaped_character' == typ:
-                    # ##coverpoint1.8.4
-                    pieces.append('\\')
-                    pieces.append(s)
                 else:
-                    self.sanity()
+                    assert('escaped_character' == typ)
+                    pieces.append('\\')  # #(Case1040) 1/2
+                    pieces.append(s)
             pieces.append('"')
             return ''.join(pieces)
 
@@ -165,11 +163,9 @@ class DoubleQuotedStringNameComponent:
             for typ, s in sexps:
                 if 'raw_string' == typ:
                     pieces.append(s)
-                elif 'escaped_character' == typ:
-                    # ##coverpoint1.8.4
-                    pieces.append(s)
                 else:
-                    self.sanity()
+                    assert('escaped_character' == typ)
+                    pieces.append(s)  # (Case1040) 2/2
 
             return ''.join(pieces)
 

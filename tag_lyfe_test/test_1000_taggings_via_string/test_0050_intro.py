@@ -18,7 +18,7 @@ class _ThisCase(_ThisCaseHere):
 _CommonCase = unittest.TestCase
 
 
-class Case042_empty_string(_CommonCase, _ThisCase):
+class Case0042_empty_string(_CommonCase, _ThisCase):
 
     def given_string(self):
         return ''
@@ -27,7 +27,7 @@ class Case042_empty_string(_CommonCase, _ThisCase):
         return ''
 
 
-class Case125_string_with_no_octothorpe(_CommonCase, _ThisCase):
+class Case0043_string_with_no_octothorpe(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'foo'
@@ -36,7 +36,7 @@ class Case125_string_with_no_octothorpe(_CommonCase, _ThisCase):
         return 'sss'
 
 
-class Case208_octothorpe_at_end(_CommonCase, _ThisCase):
+class Case0045_octothorpe_at_end(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#'
@@ -45,7 +45,7 @@ class Case208_octothorpe_at_end(_CommonCase, _ThisCase):
         return 's'
 
 
-class Case292_quite_simple(_CommonCase, _ThisCase):
+class Case0046_quite_simple(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo'
@@ -54,7 +54,7 @@ class Case292_quite_simple(_CommonCase, _ThisCase):
         return 'TTTT'
 
 
-class Case375_begin_with_number(_CommonCase, _ThisCase):
+class Case0048_begin_with_number(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#8ee4ff'
@@ -63,7 +63,7 @@ class Case375_begin_with_number(_CommonCase, _ThisCase):
         return 'TTTTTTT'
 
 
-class Case458_not_this__need_space(_CommonCase, _ThisCase):
+class Case0049_not_this__need_space(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'welf#foo'
@@ -72,7 +72,7 @@ class Case458_not_this__need_space(_CommonCase, _ThisCase):
         return 'ssssssss'
 
 
-class Case542_yes_this__has_space(_CommonCase, _ThisCase):
+class Case0051_yes_this__has_space(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'welf #foo'
@@ -81,7 +81,7 @@ class Case542_yes_this__has_space(_CommonCase, _ThisCase):
         return 'sssssTTTT'
 
 
-class Case625_false_alarm_separator_run(_CommonCase, _ThisCase):
+class Case0052_false_alarm_separator_run(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'welf hi #foo'
@@ -90,7 +90,7 @@ class Case625_false_alarm_separator_run(_CommonCase, _ThisCase):
         return 'ssssssssTTTT'
 
 
-class Case708_strange_hashtag_wont_mess(_CommonCase, _ThisCase):
+class Case0054_strange_hashtag_wont_mess(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'welf h#i #foo'
@@ -99,7 +99,7 @@ class Case708_strange_hashtag_wont_mess(_CommonCase, _ThisCase):
         return 'sssssssssTTTT'
 
 
-class Case792_multiple_tags_no_head_no_tail(_CommonCase, _ThisCase):
+class Case0055_multiple_tags_no_head_no_tail(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo #bar'
@@ -108,7 +108,7 @@ class Case792_multiple_tags_no_head_no_tail(_CommonCase, _ThisCase):
         return 'TTTTsTTTT'
 
 
-class Case875_multiple_tags_no_head_yes_tail(_CommonCase, _ThisCase):
+class Case0057_multiple_tags_no_head_yes_tail(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo  #bar '
@@ -117,7 +117,7 @@ class Case875_multiple_tags_no_head_yes_tail(_CommonCase, _ThisCase):
         return 'TTTTssTTTTs'
 
 
-class Case958_three_not_two(_CommonCase, _ThisCase):
+class Case0058_three_not_two(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo  #bar #baz '

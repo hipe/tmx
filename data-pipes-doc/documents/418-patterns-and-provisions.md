@@ -107,7 +107,7 @@ bother, right?).
 
 there are, however, some caveates discussed in code.
 
-.#coverpoint1.5
+One case that covers this provision is (Case0150DP).
 
 
 
@@ -117,7 +117,8 @@ there are, however, some caveates discussed in code.
 this provision holds that you can provide a function that "derives" a human
 key per each item through arbitrary means. [#423.B] shows how a keyer can
 work in conjunction with a mapper, in our "pipeline workflow".
-(#coverpoint1.6)
+
+One case that that covers this provision is (Case0160DP).
 
 
 

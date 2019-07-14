@@ -12,6 +12,9 @@ from modality_agnostic.memoization import (
 import unittest
 
 
+# Case001SA is used to reference this whole file
+
+
 class _CommonCase(unittest.TestCase):  # #[#410.K]
 
     # -- assertions & assistance
@@ -70,7 +73,7 @@ class _CommonCase(unittest.TestCase):  # #[#410.K]
         return _this_one_lib().MINIMAL_INTERACTIVE_IO
 
 
-class Case110_help(_CommonCase):  # #coverpoint9.1.4 - one arg, help
+class Case010SA_help(_CommonCase):
 
     def test_100_succeeds(self):
         self.succeeds()
@@ -93,7 +96,7 @@ class Case110_help(_CommonCase):  # #coverpoint9.1.4 - one arg, help
         return ('--hel',)
 
 
-class Case120_no_args(_CommonCase):  # #coverpoint9.0  - no args
+class Case020SA_no_args(_CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -116,7 +119,7 @@ class Case120_no_args(_CommonCase):  # #coverpoint9.0  - no args
         return ()
 
 
-class Case130_both(_CommonCase):  # #coverpoint9.2 - two args
+class Case030SA_args_and_stdin(_CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -139,7 +142,7 @@ class Case130_both(_CommonCase):  # #coverpoint9.2 - two args
         return ('no-see',)
 
 
-class Case170_too_many_args(_CommonCase):  # #coverpoint9.3 - two args
+class Case040SA_too_many_args(_CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -162,7 +165,7 @@ class Case170_too_many_args(_CommonCase):  # #coverpoint9.3 - two args
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case200_stdin(_CommonCase):  # :#coverpoint9.1.1  - one arg: stdin
+class Case050SA_one_arg_which_is_stdin(_CommonCase):
 
     def test_100_succeeds(self):
         self.succeeds()
@@ -201,7 +204,7 @@ class Case200_stdin(_CommonCase):  # :#coverpoint9.1.1  - one arg: stdin
         return ()
 
 
-class Case220_arg(_CommonCase):  # #coverpoint9.1.2  - one arg: arg
+class Case060SA_one_arg_which_is_token(_CommonCase):
 
     def test_100_succeeds(self):
         self.succeeds()

@@ -88,18 +88,14 @@ def SELF(
             raise _MyException(_fmt.format(repr(line)))
 
         if job_is_finished:
-            # #coverpoint1.2
-            share_complete_float = 1.0
+            share_complete_float = 1.0  # (Case499)
         elif item_count > last_known_number_of_line_items:
-            # #coverpoint1.3
-            share_complete_float = float(md['share'])
+            share_complete_float = float(md['share'])  # (Case500)
         elif item_count == 0:
-            # #coverpoint1.1
-            share_complete_float = 0.0
+            share_complete_float = 0.0  # (Case497)
         else:
             # your item count is nonzero, but your item count does not
-            # exceed that of the client's last known item count
-            # #coverpoint1.4
+            # exceed that of the client's last known item count (Case503)
             md = _matchdata_via_line(line)
             share_complete_float = float(md['share'])  # ..
 
@@ -191,14 +187,14 @@ def SELF(
 
         if found_expected_number_of_items:
             return (real_item_count, last_line)
-        else:  # #coverpoint1.5
+        else:
             _fmt = 'expected {exp} existing line items in logfile, '\
                     'had {act}'
             _msg = _fmt.format(
                     act=real_item_count,
                     exp=last_known_number_of_line_items,
                     )
-            raise _MyException(_msg)
+            raise _MyException(_msg)  # (Case505)
 
     def __advance_over_the_first_line():
 

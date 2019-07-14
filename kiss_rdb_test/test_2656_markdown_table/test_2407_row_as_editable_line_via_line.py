@@ -136,6 +136,9 @@ class Case020_one_cel_with_nothing_YES_ENDCAP(_CommonCase):
         return '||\n'
 
 
+# Case2407  # #midpoint
+
+
 class Case022_only_one_pipe(_CommonCase):
 
     def test_010_number_of_cels_IS_ZERO(self):

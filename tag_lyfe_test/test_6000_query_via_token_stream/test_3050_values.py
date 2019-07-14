@@ -15,13 +15,11 @@ querying for "values":
 
         #food:fruit:tomato ∈ #food:fruit
 
-    (:#coverpoint1.16.3)
-
   - but the reverse is not true. a more specific query will not match a
     more generally tagged item. a query for `#car:ford:f-series` will not
     match an item simply tagged with `#car`. (yes you could take a fuzzy
     guess that the item might match but we aren't doing fuzzy matching yet :P)
-    (:#coverpoint1.16.2)
+    (Case3020)
 
   - note we have gotten this far without having the queries and taggings
     (variously) model "name-value pairs". one perspective is that it's sort
@@ -43,7 +41,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_two_deep(_CommonCase, ScaryCommonCase):
+class Case3030_two_deep(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo:bar', 'xx')
@@ -66,11 +64,11 @@ class Case100_two_deep(_CommonCase, ScaryCommonCase):
     def test_250_against_same_matches(self):
         self.matches_against(('#foo:bar',))
 
-    def test_275_against_more_specific_matches(self):  # #coverpoint1.16.3
+    def test_275_against_more_specific_matches(self):
         self.matches_against(('#foo:bar:baz',))
 
 
-class Case200_three_deep(_CommonCase, ScaryCommonCase):
+class Case3032_three_deep(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo:bar:baz', 'xx')

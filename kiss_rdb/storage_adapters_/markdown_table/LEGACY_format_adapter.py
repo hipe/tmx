@@ -47,7 +47,8 @@ def _new_doc_lines_via_sync(
 
     def open_near(far):
         if not far.OK:
-            return my_contextlib.not_OK_context_manager()  # #coverpoint7.1
+            return my_contextlib.not_OK_context_manager()  # (Case1314DP)
+
         _nrtp = far.TO_NRTP__()
         return lib.OPEN_NEAR_SESSION(
                 near_relevant_traversal_parameters=_nrtp,
@@ -68,7 +69,7 @@ def _new_doc_lines_via_sync(
         for k, v in out:
             line = line_via(k, v)
             if line is None:
-                break  # #coverpoint5.3
+                break  # (Case2664DP)
             yield line
 
 
@@ -91,7 +92,7 @@ def _liner():
                 ok = True
             else:
                 if 'markdown_table_unable_to_be_synced_against_' == tag:
-                    ok = False  # #coverpoint5.3
+                    ok = False  # (Case2664DP)
                 else:
                     o.pop_and_assert_matches_top(tag)
                     self._item_is_string = o.per_current_top_item_is_string()

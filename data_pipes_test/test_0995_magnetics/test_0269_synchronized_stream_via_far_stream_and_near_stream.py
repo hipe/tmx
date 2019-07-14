@@ -1,6 +1,4 @@
 """
-:#coverpoint14
-
 the birth of this test file coincided with the introduction of the new
 test synchronization algorithm (interleaving) which became the default.
 (all in [#407]).
@@ -22,9 +20,8 @@ class _CommonCase(SyncCase_):
         return False
 
 
-class Case020_none_down_on_to_none_produces_none(_CommonCase):
-    """:#coverpoint14.1
-    """
+class Case0262_none_down_on_to_none_produces_none(_CommonCase):
+    # NOTE at writing, this is the only case with external references
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -39,11 +36,8 @@ class Case020_none_down_on_to_none_produces_none(_CommonCase):
         return ()
 
 
-class Case025_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
-    """
-    .##coverpoint14.2: disorder in the near traversal is a problem even
-    when it's in the run-down
-    """
+class Case0264_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
+    # disorder in the near traversal is a problem even
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')
@@ -66,7 +60,7 @@ class Case025_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
         return ('z', 'q', 'y')
 
 
-class Case030_none_down_on_to_some_is_unsurprising(_CommonCase):
+class Case0265_none_down_on_to_some_is_unsurprising(_CommonCase):
 
     def test(self):
         self.expect_these_('a', 'b', 'c')
@@ -78,11 +72,8 @@ class Case030_none_down_on_to_some_is_unsurprising(_CommonCase):
         return ('a', 'b', 'c')
 
 
-class Case035_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
-    """
-    .##coverpoint14.2: disorder in the far traversal is not OK even
-    if it's just in the rundown.
-    """
+class Case0267_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
+    # disorder in the far traversal is not OK even if it's just in the rundown.
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')
@@ -105,7 +96,7 @@ class Case035_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
         return ()
 
 
-class Case040_some_down_on_to_none_is_unsurprising(_CommonCase):
+class Case0268_some_down_on_to_none_is_unsurprising(_CommonCase):
 
     def test(self):
         self.expect_these_('d', 'e', 'f')
@@ -117,7 +108,7 @@ class Case040_some_down_on_to_none_is_unsurprising(_CommonCase):
         return ()
 
 
-class Case053_duplicate_key_near(_CommonCase):
+class Case0270_duplicate_key_near(_CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'duplicate_key')
@@ -144,7 +135,7 @@ class Case053_duplicate_key_near(_CommonCase):
                 )
 
 
-class Case055_weird_order_is_bad_in_far_here(_CommonCase):
+class Case0271_weird_order_is_bad_in_far_here(_CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')
@@ -169,7 +160,7 @@ class Case055_weird_order_is_bad_in_far_here(_CommonCase):
                 )
 
 
-class Case058_interleave_no_collision_both_sides_already_sorted(_CommonCase):
+class Case0273_interleave_no_collision_both_sides_already_sorted(_CommonCase):
 
     def test(self):
         self.expect_these_(
@@ -196,9 +187,8 @@ class Case058_interleave_no_collision_both_sides_already_sorted(_CommonCase):
                 )
 
 
-class Case060_some_down_on_to_some_yes_collisions(_CommonCase):
-    """:#coverpoint14.3: item-level merge
-    """
+class Case0274_some_down_on_to_some_yes_collisions(_CommonCase):
+    # item-level merge
 
     def test(self):
         self.expect_these_(
@@ -227,9 +217,7 @@ class Case060_some_down_on_to_some_yes_collisions(_CommonCase):
                 )
 
 
-class Case055_bigger_example_of_disorder(_CommonCase):
-    """.##coverpoint14.2
-    """
+class Case0275_bigger_example_of_disorder(_CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')

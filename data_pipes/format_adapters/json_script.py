@@ -243,11 +243,11 @@ class _MyContextManager:
 
 
 def _native_item_normalizer(dct):
-    # #coverpoint7.4
-    return dct  # provision [#418.E.2] dictionary is the standard item
+    # (Case1320DP)
+    return dct  # provision [#458.E.2] dictionary is the standard item
 
 
-def _value_readers_via_field_names(*names):  # #coverpoint5.2
+def _value_readers_via_field_names(*names):  # (Case2662DP)
     def reader_for(name):
         def read(normal_dict):
             return normal_dict[name]

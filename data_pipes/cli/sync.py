@@ -73,9 +73,10 @@ def _pop_property(self, prop):
     return pop_property(self, prop)
 
 
-class _CLI:  # #coverpoint
+class _CLI:
 
     def __init__(self, *_four):
+        # (Case3061)
         self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]
         self.exitstatus = 5  # starts as guilty til proven innocent
         self.OK = True
@@ -233,7 +234,7 @@ class _FancyDiffLineConsumer:
     def __enter__(self):
         return self._receive_line
 
-    def _receive_line(self, line):  # #coverpoint6.2
+    def _receive_line(self, line):  # (Case3070)
         self._tmp_file.write(line)
 
     def __exit__(self, ex, *_):

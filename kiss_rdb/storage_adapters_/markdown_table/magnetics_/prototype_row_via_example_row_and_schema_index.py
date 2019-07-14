@@ -3,7 +3,7 @@
 really it's just a function that produces new rows, but we have so-named
 it because:
 
-  - it does the [#418.3] "heuristic templating", so the
+  - it does the [#458.3] "heuristic templating", so the
     name is a better semantic fit, because it "feels" like it's coming
     from a true prototype object (if you're into that sort of thing).
 
@@ -15,7 +15,7 @@ it because:
 
 ## about alignment
 
-(the below is covered near #coverpoint4.1 and #coverpoint4.2)
+(the below is covered near (Case2478KR) and (Case2479KR)
 
 our policy on alignment is guided by one central design objective: when
 bringing in new data (through a sync), format things the way the user wants.
@@ -52,7 +52,7 @@ but we accidentally mostly implemented it before realizing this (A) and B)
 it actually does probably make sense to right-align your ASCII "art" for
 right-aligned tables (think numbers).
 
-however, this does not do the [#418.3] "heuristic templating" that it could
+however, this does not do the [#458.3] "heuristic templating" that it could
 do here.
 (that is, it could try to detect whether the human does in fact (e.g)
 right-align the ASCII art for right-aligned columns, and follow suit
@@ -63,6 +63,8 @@ and come to think of it, center-aligning ASCII art seems like a misfeature.
 indeed it's a poor separation of content from presentation. the human should
 be able to change the alignment of a column (e.g from `:---` to `---:`) and
 have it not change how subsequent machine-generated rows are aligned. meh
+
+((Case4075) is used formally to connect this magnet with its test file)
 """
 
 from sakin_agac import (
@@ -142,13 +144,13 @@ class _SELF:
         of updating this value, so delete that item from the dictionary.
         """
 
-        # (before #history-A.2 we use to do #coverpoint1.5 here)
+        # (before #history-A.2 we use to do (Case0150DP) here)
 
         # instead of value via key, we want value via offset.
 
         offset_via_name = self._offset_via_field_name
         new_value_via_offset = {offset_via_name[k]: v for k, v in far_pairs}
-        # KeyError #coverpoint1.1 (1/2)
+        # KeyError (Case0110DP) (1/2)
 
         # make a reader function for producing near cels from offsets
 
@@ -171,9 +173,9 @@ class _SELF:
         near_row_any_endcap = near_row_DOM.any_endcap_()
 
         if near_max_offset < far_max_offset:
-            use_endcap = self._eg_endcap  # #coverpoint5.5
+            use_endcap = self._eg_endcap  # (Case2667DP)
         else:
-            use_endcap = near_row_any_endcap  # #coverpoint5.4
+            use_endcap = near_row_any_endcap  # (Case2665DP)
 
         return self._build_new_row(near_f, new_value_via_offset, use_endcap)
 
@@ -183,7 +185,7 @@ class _SELF:
         for all the rest, make them blank cels.
         """
 
-        def spaces_cel(i):  # #coverpoint1.3
+        def spaces_cel(i):  # (Case0130DP)
             d = _spaces_cel_cache
             if i not in d:
                 d[i] = _celers[i]('')
@@ -195,7 +197,7 @@ class _SELF:
 
         offset = self._offset_via_field_name
         _nvvo = {offset[k]: v for k, v in far_dict.items()}
-        # KeyError #coverpoint1.1 (2/2)
+        # KeyError (Case0110DP) (2/2)
 
         return self._build_new_row(spaces_cel, _nvvo, self._eg_endcap)
 
@@ -258,7 +260,7 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
             new_content_w = len(new_content_string)
             total_margin_w = max_content_w - new_content_w
             if total_margin_w < 0:
-                # #coverpoint1.4 - content overflow
+                # content overflow (Case0140DP)
                 _gen = aligned_children(0, new_content_string)
             else:
                 _gen = aligned_children(total_margin_w, new_content_string)
@@ -275,7 +277,7 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
         def w(offset):
             return len(tainted_cx[offset].string_)
 
-        max_content_w = w(1) + w(2) + w(3)  # for #coverpoint.2
+        max_content_w = w(1) + w(2) + w(3)  # for (Case1320DP)
 
         if _do_shrink_to_fit_hack:
             use_alignment = 'align_always_shrink_to_fit'
@@ -309,23 +311,23 @@ def _childreners_via(tainted_example_cel_DOM):
             yield _fellow(new_content_s)
             yield _spaces(0)
 
-        def align_left(total_margin_w, new_content_s):  # #coverpoint4.1
+        def align_left(total_margin_w, new_content_s):  # (Case2478KR)
             yield _spaces(0)
             yield _fellow(new_content_s)
             yield _spaces(total_margin_w)
 
-        def align_center(total_margin_w, new_content_s):  # #coverpoint4.3
+        def align_center(total_margin_w, new_content_s):  # (Case2480KR)
             each_side, was_odd = divmod(total_margin_w, 2)
             yield _spaces(each_side)
             yield _fellow(new_content_s)
             yield _spaces(each_side + was_odd)  # hard coded: prefer left by 1
 
-        def align_right(total_margin_w, new_content_s):  # #coverpoint4.2
+        def align_right(total_margin_w, new_content_s):  # (Case2479KR)
             yield _spaces(total_margin_w)
             yield _fellow(new_content_s)
             yield _spaces(0)
 
-        no_alignment_specified = align_left  # #coverpoint4.4
+        no_alignment_specified = align_left  # (Case2481KR)
 
     def _fellow(new_content_s):
         return _LeafDOM(new_content_s)
@@ -360,13 +362,13 @@ def _cel_schema_via(cel_DOM):
 
     if md[1] is None:
         if md[3] is None:
-            # #coverpoint4.4 - no alignment specified
+            # no alignment specified (Case2481KR)
             return _cel_schemas.no_alignment_specified
         else:
-            # #coverpoint4.1 - no colon - yes colon
+            # no colon yes colon (Case2478KR)
             return _cel_schemas.right_aligned
     elif md[3] is None:
-        # #coverpoint4.2 - yes colon - no colon
+        # yes colon no colon (Case2479KR)
         return _cel_schemas.left_aligned
     else:
         assert(not md[2])

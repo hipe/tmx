@@ -133,7 +133,7 @@
 						"slack-action-endpoint"
 					]
 				},
-				"description": "\\#coverpoint1.1: fail because application token is strange"
+				"description": "fail because application token is strange (Case499)"
 			},
 			"response": []
 		},
@@ -180,7 +180,7 @@
 						"slack-action-endpoint"
 					]
 				},
-				"description": "\\#coverpoint1.2: succeed because app token OK"
+				"description": "succeed because app token OK (Case501)"
 			},
 			"response": []
 		}

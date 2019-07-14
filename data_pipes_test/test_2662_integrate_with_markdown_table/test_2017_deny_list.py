@@ -5,8 +5,6 @@
 objectives are severalfold:
     - cover scraping of this one page format
     - cover that syncing still works here with our crazy new deny list
-
-.:#coverpoint16
 """
 
 from _init import (
@@ -34,7 +32,10 @@ class _CommonCase(unittest.TestCase):
         self.assertSequenceEqual(of(act_dct), of(exp_dct))
 
 
-class Case100_does_scrape_work(ProducerCaseMethods, _CommonCase):
+# Case2013DP  # is used to refer to the whole test file
+
+
+class Case2014_does_scrape_work(ProducerCaseMethods, _CommonCase):
 
     def test_010_scrape_works(self):
         self.assertEqual(_reduced_number + 1, len(self._dictionaries()))
@@ -61,7 +62,7 @@ class Case100_does_scrape_work(ProducerCaseMethods, _CommonCase):
         return fixture_file_path('0160-heroku-add-ons.html')
 
 
-class Case250_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
+class Case2016_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
 
     def test_010_runs__does_not_have_schema_row(self):
         _act = self._pairs()
@@ -91,7 +92,7 @@ class Case250_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
         return _these_dictionaries()
 
 
-class Case270_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
+class Case2018_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
 
     def test_100_produces_something(self):
         self.assertEqual(len(self._pairs()), 2)
@@ -128,7 +129,7 @@ class Case270_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
         return fixture_file_path('0180-hugo-themes.html')
 
 
-class Case300_omg_syncing(ProducerCaseMethods, _CommonCase):
+class Case2019_omg_syncing(ProducerCaseMethods, _CommonCase):
 
     def test_100_did_something(self):
         a = self._output_lines()

@@ -1,22 +1,18 @@
 ## the numbering scheme
 
-of the test folders siblng to this file that have numbers (all should have
-numbers) the numbers are intended to express a [#010.6] regression-friendly
-order. they are inspired by a numbering scheme that is something like this:
+We do this because [#010.6] regression-friendliness.
 
-  - 100: private models
-  - 200: public models
-  - 300: private magnetics
-  - 400: public magnetics
-  - 500: public API endpoints (or similiar)
-  - (600-999: modality integrations)
+At writing (#history-A.1) we "feel" that we are *at most* a third of the
+way "filled up" with test cases and asset. We will use four-digit case
+numbers. At writing we have 62 test cases.
 
-while the particular numbers used may vary; please recognize and
-promulgate the spirit of [#010.6] regression-friendliness.
-
+```bash
+py -c 'min=1;max=3334;ni=62;w=max-min;hwpi=w/ni/2;tuple(print(round(hwpi + w*i/ni)) for i in range(0, ni))'
+```
 
 
 
 ## (document-meta)
 
+  - #history-A.1: massive re-arch during module split
   - #born.

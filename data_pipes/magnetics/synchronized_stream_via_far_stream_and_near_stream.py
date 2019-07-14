@@ -25,7 +25,7 @@ class SYNC_RESPONSE_VIA_DICTIONARY_STREAM:
     """
 
     def __init__(self, dict_stream, format_adapter):
-        # #coverpoint7.6
+        # (Case1312)
         self._dict_stream = dict_stream
         self._format_adapter = format_adapter
 
@@ -89,7 +89,7 @@ class _TraversalParameters:
             self,
             _is_sync_meta_data,
             natural_key_field_name,
-            # (#coverpoint7.2 is simply the names of the above arguments)
+            # (Case1317) is simply the names of the above arguments)
             field_names=None,
             tag_lyfe_field_names=None,  # yuck, experiement
             traversal_will_be_alphabetized_by_human_key=None,
@@ -189,7 +189,7 @@ class _WorkerWhenInterleaving(_Worker):
                 return self._far_item
         else:
             def f():
-                # #coverpoint7.4 (obliquely)
+                # (Case1320DP) (obliquely)
                 return nativizer(self._far_key, self._far_item)
         self._nativized_far_item = f
 
@@ -266,7 +266,7 @@ class _WorkerWhenInterleaving(_Worker):
             which = _NEAR
             yes = True
         else:
-            # #coverpoint14.1: both hit the end at the same step
+            # both hit the end at the same step (Case0262)
             yes = False
 
         if not yes:

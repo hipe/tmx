@@ -1,7 +1,6 @@
 """
 .#covers script.tag_lyfe.json_stream_via_python_wiki #[#410.A.1]
 
-.:#coverpoint12: multi-axis coverage from this script-test:
 
   - cover the particular producer script (used for business) and
   - provide limited coverage to the HTML format adapter's particular
@@ -47,7 +46,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_hello(_CommonCase):
+class Case1855DP_hello(_CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())

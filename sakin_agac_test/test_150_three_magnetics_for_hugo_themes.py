@@ -14,7 +14,10 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_magenetic_one(_CommonCase):
+# Case100SA is used to reference this whole file
+
+
+class Case140_magenetic_one(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_one())
@@ -48,7 +51,7 @@ class Case100_magenetic_one(_CommonCase):
         return _product_of_magnet_one()
 
 
-class Case200_magenetic_two(_CommonCase):
+class Case150_magenetic_two(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_two())
@@ -82,7 +85,7 @@ class Case200_magenetic_two(_CommonCase):
         return _product_of_magnet_two()
 
 
-class Case300_magnetic_three(_CommonCase):
+class Case160_magnetic_three(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_three())

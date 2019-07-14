@@ -1,11 +1,9 @@
 """
 introduce `in <regex>`
 
-see the note at #coverpoint1.13 about how we want this to be more plug-inable.
+see the note at (Case6050) about how we want this to be more plug-inable.
 
 significant here will be how we hackishly avoid x
-
-:#coverpoint1.11
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -15,7 +13,10 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case050_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):
+# Case8020 is #here1
+
+
+class Case8048_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/bar')
@@ -32,7 +33,7 @@ class Case050_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):
         return self.point_at_offset(len(s) - 1)
 
 
-class Case062_empty_regexp(_CommonCase, ScaryCommonCase):
+class Case8049_empty_regexp(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '//')
@@ -49,7 +50,10 @@ class Case062_empty_regexp(_CommonCase, ScaryCommonCase):
         return self.point_at_offset(len(s) - 1)
 
 
-class Case075_bad_regex(_CommonCase, ScaryCommonCase):
+# Case8050  # #midpoint
+
+
+class Case8051_bad_regex(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/bar[/')
@@ -67,7 +71,7 @@ class Case075_bad_regex(_CommonCase, ScaryCommonCase):
         # '------------^'
 
 
-class Case100_good_regex(_CommonCase, ScaryCommonCase):
+class Case8052_good_regex(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/^b(ar|az)$/', 'xx')
@@ -78,7 +82,7 @@ class Case100_good_regex(_CommonCase, ScaryCommonCase):
     def test_150_unparses(self):
         self.unparses_to('#foo in /^b(ar|az)$/')
 
-    def test_200_not_match(self):  # :#coverpoint1.11.2
+    def test_200_not_match(self):  # :#here1
         self.does_not_match_against(('#foo:barr',))
 
     def test_250_yes_match(self):

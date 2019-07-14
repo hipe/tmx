@@ -21,19 +21,19 @@ class _InValuesFunction:
         def f(tagging):
             sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
             if sub_tagging is None:
-                return  # #coverpoint1.13.2
+                return  # (Case6020)
             elif sub_tagging.is_deep:  # then it has a value (child)
                 sub_sub_tagging = sub_tagging.child
                 needle = sub_sub_tagging.tag_stem
                 if needle in strings:  # (easy for now)
                     if sub_sub_tagging.is_deep:
-                        return True  # #coverpoint1.13.6 hi.
+                        return True  # (Case6060) hi.
                     else:
-                        return True  # #coverpoint1.13.5 hi.
+                        return True  # (Case6050) hi.
                 else:
-                    return False  # #coverpoint1.13.4
+                    return False  # (Case6040)
             else:
-                return  # #coverpoint1.13.3
+                return  # (Case6030)
 
         self._test = f
         self._tagging_query = tagging_query

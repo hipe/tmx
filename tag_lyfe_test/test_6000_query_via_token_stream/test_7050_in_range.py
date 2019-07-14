@@ -1,13 +1,11 @@
 """
 introduce `in <range>`
 
-see the note at #coverpoint1.13 about how we want this to be more plug-inable.
+see the note at (Case6050) about how we want this to be more plug-inable.
 
 see towards the end of the file of smatterings of not implemeted things
 
 we might never use this feature, but it's an OCD contact exercise
-
-:#coverpoint1.12
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -17,7 +15,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case050_bad_range(_CommonCase, ScaryCommonCase):
+class Case7010_bad_range(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '13..12')
@@ -32,7 +30,10 @@ class Case050_bad_range(_CommonCase, ScaryCommonCase):
         return self.point_at_word('13..12')
 
 
-class Case100_good_range(_CommonCase, ScaryCommonCase):
+# Case7020 is below
+
+
+class Case7030_good_range(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '12..14', 'xx')
@@ -43,13 +44,13 @@ class Case100_good_range(_CommonCase, ScaryCommonCase):
     def test_150_unparses(self):
         self.unparses_to('#foo in 12..14')
 
-    def test_200_not_a_number(self):  # :#coverpoint1.12.2
+    def test_200_not_a_number(self):  # :(Case7020)
         self.does_not_match_against(('#foo:bar',))
 
     def test_210_a_number_plus_alpha(self):
         self.does_not_match_against(('#foo:13gen',))
 
-    def test_220_under(self):  # :#coverpoint1.12.3
+    def test_220_under(self):  # :(Case7030)
         self.does_not_match_against(('#foo:11',))
 
     def test_230_at_lower_boundary(self):
@@ -61,11 +62,14 @@ class Case100_good_range(_CommonCase, ScaryCommonCase):
     def test_250_at_upper_boundary(self):
         self.matches_against(('#foo:14',))
 
-    def test_260_above(self):  # :#coverpoint1.12.4
+    def test_260_above(self):  # :(Case7040)
         self.does_not_match_against(('#foo:15',))
 
 
-class Case200_float(_CommonCase, ScaryCommonCase):  # :#coverpoint1.12.5
+# Case7040 is above
+
+
+class Case7050_float(_CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '12.5..13.7')

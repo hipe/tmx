@@ -7,8 +7,6 @@ objectives are severalfold:
 
 we first assert several structural details of the scraping, including whether
 the branch boundaries are being detected and emitted.
-
-.:#coverpoint17 (NOT_REFERENCED)
 """
 
 
@@ -26,7 +24,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_does_scrape_work(ProducerCaseMethods, _CommonCase):
+class Case1747_does_scrape_work(_CommonCase):
 
     def test_010_scrape_works(self):
         self.assertGreaterEqual(len(self._dicts()), 2)  # meh whatever
@@ -83,7 +81,7 @@ class Case100_does_scrape_work(ProducerCaseMethods, _CommonCase):
         return fixture_file_path('0170-hugo-docs.html')
 
 
-class Case200_gen(ProducerCaseMethods, _CommonCase):
+class Case1749_gen(_CommonCase):
 
     def test_100_does_something(self):
         self.assertLessEqual(1, len(self._lines()))

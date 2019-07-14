@@ -44,18 +44,18 @@ class _ProcureFormatAdapter:
             return self.__when_in_memory()
 
     def __when_in_memory(self):
-        # arrived in #history-A.2. begin #track [#410.L]. #coverpoint5.3
         import sakin_agac_test.format_adapters.in_memory_dictionaries as lib
+        # arrived in #history-A.2. begin #track [#410.L] (Case2664DP)
         return ('in_memory_dictionaries', lib)
 
     def __when_via_collection_identifier_as_string(self):
         import os
         _stem, ext = os.path.splitext(self._collection_identifier)
         if ext == '':
-            # #coverpoint13.1
             def f(o, _=None):  # #open #[#508]
                 o("can't infer filename type from a file with no extension - %s" % self._collection_identifier)  # noqa: E501
             self._listener('error', 'expression', 'file_extension_required', f)
+            # (Case2449)
         else:
             return self.__do_when_via_collection_identifier(ext)
 

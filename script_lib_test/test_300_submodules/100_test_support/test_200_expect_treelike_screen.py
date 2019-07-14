@@ -23,7 +23,7 @@ class _NormalLinerCase(unittest.TestCase):
         return [x for x in _iter]
 
 
-class Case010_empty_string(_NormalLinerCase):
+class CaseFA0_empty_string(_NormalLinerCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -36,7 +36,7 @@ class Case010_empty_string(_NormalLinerCase):
         return self._lines_via_big_string('')  # EMPTY_S
 
 
-class Case020_one_string_no_newline(_NormalLinerCase):
+class CaseFA1_one_string_no_newline(_NormalLinerCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -50,7 +50,7 @@ class Case020_one_string_no_newline(_NormalLinerCase):
         return self._lines_via_big_string('foo')
 
 
-class Case030_one_string_yes_newline(_NormalLinerCase):
+class CaseFA2_one_string_yes_newline(_NormalLinerCase):
 
     def test_010_one_line__content_OK(self):
         _s_a = self._lines()
@@ -61,7 +61,7 @@ class Case030_one_string_yes_newline(_NormalLinerCase):
         return self._lines_via_big_string("foo\n")
 
 
-class Case040_blank_lines_inside(_NormalLinerCase):
+class CaseFA3_blank_lines_inside(_NormalLinerCase):
 
     def test_010_three_lines__content_OK(self):
         _s_a = self._lines()
@@ -94,7 +94,7 @@ class _CommonCase(unittest.TestCase):
         return t.children
 
 
-class Case110_scanner_via_iterator(_CommonCase):
+class CaseFA4_scanner_via_iterator(_CommonCase):
 
     def test_020_empty_knows_it_is_empty(self):
         _scn = self._build_empty()
@@ -132,7 +132,7 @@ class Case110_scanner_via_iterator(_CommonCase):
         return _subject_module()._scanner_via_iterator
 
 
-class Case210_nonplural_inputs(_CommonCase):
+class CaseFA5_nonplural_inputs(_CommonCase):
 
     def test_010_zero_lines(self):
         _x = _tree_via_line_stream(_empty_iterator())
@@ -156,7 +156,7 @@ class Case210_nonplural_inputs(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case220_these_errors(_CommonCase):
+class CaseFA6_these_errors(_CommonCase):
 
     def test_010_a_blank_line_with_extra_whitespace(self):
         self._expect_this_one_error_from_this_one_line(
@@ -179,7 +179,7 @@ class Case220_these_errors(_CommonCase):
         self.assertEqual(exp_s, str(e))
 
 
-class Case230_cover_edge__end_of_input_during_branch(_CommonCase):
+class CaseFA7_cover_edge__end_of_input_during_branch(_CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
@@ -202,7 +202,7 @@ class Case230_cover_edge__end_of_input_during_branch(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case240_cover_edge__indet_to_indet(_CommonCase):
+class CaseFA8_cover_edge__indet_to_indet(_CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
@@ -233,7 +233,7 @@ class Case240_cover_edge__indet_to_indet(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case250_first_target_case(_CommonCase):  # #coverpoint1.1
+class CaseFA9_first_target_case(_CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)

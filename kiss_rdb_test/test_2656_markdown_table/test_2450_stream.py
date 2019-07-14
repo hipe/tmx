@@ -34,7 +34,7 @@ class _CommonCase(unittest.TestCase):
         return business_objects, first
 
 
-class Case100_fail(_CommonCase):  # #coverpoin13.1
+class Case2449_fail(_CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -49,7 +49,10 @@ class Case100_fail(_CommonCase):  # #coverpoin13.1
         return self._build_state_expecting_some_emssions(_md)
 
 
-class Case150_work(_CommonCase):  # :#coverpoint13.2
+# Case2450  #midpoint
+
+
+class Case2451_work(_CommonCase):
 
     def test_200_runs(self):
         self.assertIsNotNone(self._state())

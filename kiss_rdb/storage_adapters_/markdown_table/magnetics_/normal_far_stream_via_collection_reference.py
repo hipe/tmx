@@ -152,7 +152,7 @@ def OPEN_FAR_SESSION(
             listener=listener)
 
     if sr_cm is None:
-        return _not_OK_when_CM_expected()  # #coverpoint5.10
+        return _not_OK_when_CM_expected()  # (Case1314DP)
 
     class _OpenFarSessionContextManager:
 
@@ -304,9 +304,9 @@ def __procure_some_far_keyer(o, listener):
     if cust_far_keyer_id is None:
 
         def result(far_dct):
-            return far_dct[nkfn]  # #coverpoint7.3
+            return far_dct[nkfn]  # (Case0730DP)
     else:
-        # #coverpoint1.6
+        # (Case0160DP)
         f_f = _procure_func_via_func_identifier(cust_far_keyer_id, listener)
         if f_f is None:
             cover_me('failed to load function from function identifier')
@@ -324,7 +324,7 @@ def __procure_any_pass_filter(tp, listener):
     if f_id is None:
         result = (True, None)
     else:
-        # #coverpoint13.3
+        # (Case2451)
         pass_filter = _procure_func_via_func_identifier(f_id, listener)
         if pass_filter is None:
             result = (False, None)  # meh, not covered
@@ -348,7 +348,7 @@ def __procure_any_map(tp, custom_mapper_OLDSCHOOL, listener):
             ok = False if use_map is None else True
     elif has_map_passed_directly:
         ok = True
-        use_map = custom_mapper_OLDSCHOOL  # #coverpoint9.1.1
+        use_map = custom_mapper_OLDSCHOOL  # (Case050SA)
     else:
         ok = True
         use_map = None
@@ -378,7 +378,7 @@ def _CRAZY_TIME(map_id, listener):
     if f is None:
         cover_me('client function function did not return function')
 
-    return f  # #coverpoint15.1
+    return f  # (Case1510DP)
 
 
 def _not_OK_when_CM_expected():

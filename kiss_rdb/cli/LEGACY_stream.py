@@ -59,7 +59,7 @@ class _CLI:
         self.exitstatus = 0
 
     def execute(self):
-        # (stopping early is #coverpoint6.1)
+        # stopping early is (Case3063DP)
         must_be_interactive_(self)
         self.OK and parse_args_(self, '_namespace', _my_parameters, _desc)
         self.OK and self.__init_attributes_via_namespace()
@@ -207,7 +207,7 @@ def _do_express_help_for_formats(cli):
     o('(or you can specify an adapter explicitly by name.)\n')
     o('known format adapters (and associated extensions):\n')
 
-    out = cli.stdout.write  # #coverpoint6.3: imagine piping output (! errput)
+    out = cli.stdout.write  # imagine piping output (! errput) (Case3067DP)
 
     count = 0
     for (k, mod) in _format_adapters_module().to_name_value_pairs():

@@ -62,7 +62,7 @@ class _TestCase(unittest.TestCase):
         self.line_string_array = line_s_a
 
 
-class Case010_Malformations(_TestCase):
+class Case496_Malformations(_TestCase):
 
     def test_010_magnet_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -94,9 +94,9 @@ class Case010_Malformations(_TestCase):
                 )
 
 
-class Case020_AgainstJustBegunFile_AfterNoItems(_TestCase):
+class Case497_AgainstJustBegunFile_AfterNoItems(_TestCase):  # :[#510.7.2]
 
-    def test_010_response_says_not_complete(self):  # #coverpoint1.1
+    def test_010_response_says_not_complete(self):
         self.response_says_not_complete()
 
     def test_020_response_says_zero_percent_complete(self):
@@ -110,9 +110,9 @@ class Case020_AgainstJustBegunFile_AfterNoItems(_TestCase):
         return _call_subject_commonly(0, _file_just_begun())
 
 
-class Case030_AgainstFileBegunAndFinishedWithNoItems_AfterNoItems(_TestCase):
+class Case499_AgainstFileBegunAndFinishedWithNoItems_AfterNoItems(_TestCase):
 
-    def test_010_response_says_complete(self):  # #coverpoint1.2
+    def test_010_response_says_complete(self):
         self.response_says_complete()
 
     def test_020_response_says_one_hundred_percent_complete(self):
@@ -128,9 +128,9 @@ class Case030_AgainstFileBegunAndFinishedWithNoItems_AfterNoItems(_TestCase):
                 _file_begun_and_finished_with_no_items())
 
 
-class Case040_AgainstUnfinishedFileWithThreeItems_AfterNoItems(_TestCase):
+class Case500_AgainstUnfinishedFileWithThreeItems_AfterNoItems(_TestCase):
 
-    def test_010_response_says_not_complete(self):  # #coverpoint1.3
+    def test_010_response_says_not_complete(self):
         self.response_says_not_complete()
 
     def test_020_response_says_some_X_percent_complete(self):
@@ -144,7 +144,7 @@ class Case040_AgainstUnfinishedFileWithThreeItems_AfterNoItems(_TestCase):
         return _call_subject_commonly(0, _file_unfinished_with_three_items())
 
 
-class Case050_AgainstFinishedFileWithThreeItems_AfterNoItems(_TestCase):
+class Case502_AgainstFinishedFileWithThreeItems_AfterNoItems(_TestCase):
 
     def test_010_response_says_complete(self):
         self.response_says_complete()
@@ -160,9 +160,9 @@ class Case050_AgainstFinishedFileWithThreeItems_AfterNoItems(_TestCase):
         return _call_subject_commonly(0, _file_finished_with_three_items())
 
 
-class Case060_AgainstUnfinishedFileWithThreeItems_AfterThreeItems(_TestCase):
+class Case503_AgainstUnfinishedFileWithThreeItems_AfterThreeItems(_TestCase):
 
-    def test_010_response_says_not_complete(self):  # #coverpoint1.4
+    def test_010_response_says_not_complete(self):
         self.response_says_not_complete()
 
     def test_020_response_says_some_X_percent_complete(self):
@@ -179,11 +179,11 @@ class Case060_AgainstUnfinishedFileWithThreeItems_AfterThreeItems(_TestCase):
         return _call_subject_commonly(3, _file_unfinished_with_three_items())
 
 
-class Case070_Overreach(_TestCase):
+class Case505_Overreach(_TestCase):
 
     # (a long comment in the source explains this)
 
-    def test_010_OHAI(self):  # #coverpoint1.5
+    def test_010_OHAI(self):
 
         with self.assert_raises_common() as cm:
             _call_subject_commonly(4, _file_unfinished_with_three_items())

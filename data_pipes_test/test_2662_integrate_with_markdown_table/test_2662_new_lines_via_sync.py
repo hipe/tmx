@@ -38,7 +38,7 @@ class _CommonCase(unittest.TestCase):
         return iter(())
 
 
-class Case010_strange_format_adapter_name(_CommonCase):
+class Case2557_strange_format_adapter_name(_CommonCase):
     """(this is the other end of getting us "over the wall" - this has
 
     two copy-pasted tests that appear the same in the modality-specific
@@ -78,7 +78,7 @@ class Case010_strange_format_adapter_name(_CommonCase):
                 }
 
 
-class Case020_strange_file_extension(_CommonCase):
+class Case2559_strange_file_extension(_CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
@@ -112,7 +112,7 @@ class Case020_strange_file_extension(_CommonCase):
                 }
 
 
-class Case030_no_functions(_CommonCase):  # #coverpoint5.1
+class Case2660DP_no_functions(_CommonCase):
     """discussion - the point here (new in #history-A.1) is that whether
 
     you're posing it as a far collection or near for the synchronization,
@@ -153,9 +153,9 @@ class Case030_no_functions(_CommonCase):  # #coverpoint5.1
                 }
 
 
-class Case040_near_file_not_found(_CommonCase):
+class Case2662DP_near_file_not_found(_CommonCase):
 
-    # #coverpoint5.2 - this is the first code to rustle up a lot of stuff
+    # this is the first code to rustle up a lot of stuff
 
     def test_100_raises_this_one_exception(self):
         def f():
@@ -170,7 +170,7 @@ class Case040_near_file_not_found(_CommonCase):
                 }
 
 
-class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
+class Case2664DP_duplicate_key(_CommonCase):
 
     def test_100_gets_as_far_as_the_schema_lines_and_a_couple_recs_WHY(self):
         _act = self._end_state().outputted_lines
@@ -208,7 +208,7 @@ class Case050_duplicate_key(_CommonCase):  # #coverpoint5.3
         }
 
 
-class Case060_preserve_endcappiness_here(_CommonCase):  # #coverpoint5.4
+class Case2665DP_preserve_endcappiness_here(_CommonCase):
     """this is the proof of bugfix - we want that a row that didn't
     have an endcap before, DOESN'T have an endcap after (even though
     the last cel's value changed.
@@ -248,7 +248,7 @@ class Case060_preserve_endcappiness_here(_CommonCase):  # #coverpoint5.4
         }
 
 
-class Case070_ADD_end_cappiness_here(_CommonCase):  # #coverpoint5.5
+class Case2667DP_ADD_end_cappiness_here(_CommonCase):
     """this is kind of an edge case as a corollary of the above thing,
     and it reveals something about the idea of "endcap" - here, the
     endcap gets added because we are lengthening the number of cels.

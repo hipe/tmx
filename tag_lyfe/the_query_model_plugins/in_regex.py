@@ -94,7 +94,7 @@ class _InRegexFunction:
                 needle = sub_sub_tagging.tag_stem
                 md = rx.search(needle)
                 if md is None:
-                    pass  # #coverpoint1.11.2
+                    pass  # (Case8020)
                 else:
                     return True
             else:

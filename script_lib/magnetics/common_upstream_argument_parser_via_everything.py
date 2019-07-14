@@ -4,7 +4,7 @@ broadly the idea is to satisfy the common pattern of this CLI interface.
 at first swing it's coarse and not configurable. later we can break it
 out into a tower of abstracted segments as needed.
 
-three-laws compliant, but all coverage is from [#414.2] (:[#608.2]).
+three-laws compliant, but all coverage is from (Case001SA).
 """
 
 
@@ -64,14 +64,13 @@ class common_upstream_argument_parser_via_everything:
         else:
             self.__when_too_many()
 
-    def __when_stdin(self):  # #coverpoint9.1.1
+    def __when_stdin(self):  # (Case050SA)
         self._NORMALIZED_ARGUMENT = _STDIN_As_Argument(self._stdin)
 
-    def __when_argv_argument(self):  # #coverpoint9.1.2
+    def __when_argv_argument(self):  # (Case060SA)
         self._NORMALIZED_ARGUMENT = _FilesystemPathAsArgument(self._ARGV[-1])
 
-    def __when_help(self):
-        # #coverpoint9.1.4 - one arg, help
+    def __when_help(self):  # (Case010SA)
 
         from script_lib import line_stream_via_doc_string_ as line_stream_via
 
@@ -97,19 +96,19 @@ class common_upstream_argument_parser_via_everything:
         self._emit_these(f, self._stderr)  # (or stdout)
         self._will_exit_with(0)
 
-    def __when_too_many(self):  # #coverpoint9.3 - too many
+    def __when_too_many(self):  # (Case040SA) - too many
         def f():
             yield 'too many args (had {} need 1)'.format(self._num_args())
             yield self._invite_line()
         self._unable_because(f)
 
-    def __when_both(self):  # #coverpoint9.2 - both
+    def __when_both(self):  # (Case030SA) - both
         def f():
             yield "can't have both STDIN and argument(s)"
             yield self._invite_line()
         self._unable_because(f)
 
-    def __when_neither(self):  # #coverpoint9.0 - neither
+    def __when_neither(self):  # (Case020SA) - neither
         def f():
             yield 'provide STDIN or {}'.format(self._arg_moniker)
             yield self._invite_line()

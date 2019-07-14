@@ -1,7 +1,5 @@
 """
 introduce parenthesized group
-
-.:#coverpoint1.10
 """
 
 from tag_lyfe_test.query import ScaryCommonCase
@@ -11,7 +9,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100(_CommonCase, ScaryCommonCase):
+class Case9050(_CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#foo', 'and', '(', '#bar', 'or', '#baz', ')', 'xx')

@@ -1,5 +1,5 @@
 """
-.:[#410.W]: custom keyers for syncing (#coverpoint1.6)
+.:[#410.W]: custom keyers for syncing (Case0160DP)
 
 in pure theory, the human keys of the near and far collections are "normal"
 (meaning two keys represent the same thing IFF they have the same value)

@@ -53,7 +53,7 @@ class _CommonCase(unittest.TestCase):
         return 1
 
 
-class Case010_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
+class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -98,12 +98,12 @@ class Case010_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
     def schema_plus(self):
         return _schema_plus_via_two_lines(
             "|Ohai I'm Natty Key|Celo|\n",
-            '|--:|--:|\n',  # #coverpoint4.1: no colon, yes colon means right
+            '|--:|--:|\n',  # no colon, yes colon means right  ##here2
             nkfn='ohai_im_natty_key',
             )
 
 
-class Case040_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCase):  # noqa: E501
+class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCase):  # noqa: E501 #midpoint
 
     def test_020_the_content_string_gets_updated(self):
         self.assertEqual(self._content_string_after(), 'Y3')
@@ -136,12 +136,12 @@ class Case040_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCase)
     def schema_plus(self):
         return _schema_plus_via_two_lines(
             "|Hallo I'm Natty Key|Zig|\n",
-            '|:--|:--|\n',  # #coverpoint4.2: yes colon, no colon means left
+            '|:--|:--|\n',  # yes colon, no colon means left  ##here2
             nkfn='hallo_im_natty_key',
             )
 
 
-class Case060_change_human_key_only_OK(_CommonCase):
+class Case2480KR_change_human_key_only_OK(_CommonCase):
     """
     it used to be a thing to short-circuit the record-merge (and leave the
     "before" record alone) if there was nothing but the human key in the
@@ -181,7 +181,7 @@ class Case060_change_human_key_only_OK(_CommonCase):
     def schema_plus(self):
         return _schema_plus_via_two_lines(
             "|Oi I'm Natty|\n",
-            '|:--:|\n',  # #coverpoint4.3: yes colon, yes colon = center
+            '|:--:|\n',  # yes colon yes colon means center  ##here2
             nkfn='oi_im_natty',
             )
 
@@ -189,7 +189,7 @@ class Case060_change_human_key_only_OK(_CommonCase):
         return 0
 
 
-# (#coverpoint4.4 (no alignment specified) is ricocheted off of elsewhere.)
+# (Case2481KR) (no alignment specified) is ricocheted off of elsewhere.)
 
 
 def _build_state_commonly(tc):

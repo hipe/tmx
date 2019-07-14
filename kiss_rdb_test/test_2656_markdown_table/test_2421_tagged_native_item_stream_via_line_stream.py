@@ -84,7 +84,7 @@ def success_snapshot(f):  # local decorator
     return g
 
 
-class Case020_fail_too_many_rows(_CommonCase):  # #coverpoint3.1
+class Case2420_fail_too_many_rows(_CommonCase):
 
     def test_005_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -102,7 +102,10 @@ class Case020_fail_too_many_rows(_CommonCase):  # #coverpoint3.1
         return '0090-cel-overflow.md'
 
 
-class Case030_minimal_working(_CommonCase):
+# Case2421  #midpoint
+
+
+class Case2422_minimal_working(_CommonCase):
 
     def test_010_succeeds(self):
         self._succeeds()

@@ -81,13 +81,13 @@ class _CommonCase(unittest.TestCase):
         return _these().MINIMAL_INTERACTIVE_IO
 
 
-class Case010_basics(_CommonCase):
+class Case3060_basics(_CommonCase):
 
     def test_100_subject_script_loads(self):
         self.assertIsNotNone(_subject_script())
 
 
-class Case020_must_be_interactive(_CommonCase):
+class Case3061_must_be_interactive(_CommonCase):
 
     def test_100_CLI_client_results_in_failure_exitstatus(self):
         self._CLI_client_results_in_failure_exitstatus()
@@ -109,7 +109,7 @@ class Case020_must_be_interactive(_CommonCase):
         return self._expect_this_many_on_stderr(2)
 
 
-class Case030_strange_option(_CommonCase):  # #coverpoint6.1
+class Case3063DP_strange_option(_CommonCase):
 
     def test_100_fails(self):
         self._CLI_client_results_in_failure_exitstatus()
@@ -132,7 +132,7 @@ class Case030_strange_option(_CommonCase):  # #coverpoint6.1
         return self._expect_this_many_on_stderr(2)
 
 
-class Case035_missing_requireds(_CommonCase):
+class Case3064_missing_requireds(_CommonCase):
 
     def test_100_fails(self):
         self._CLI_client_results_in_failure_exitstatus()
@@ -154,7 +154,7 @@ class Case035_missing_requireds(_CommonCase):
         return self._expect_this_many_on_stderr(2)
 
 
-class Case040_top_help_screen(_CommonCase):
+class Case3066_top_help_screen(_CommonCase):
 
     def test_100_succeeds(self):
         self._CLI_client_results_in_success_exitstatus()
@@ -198,7 +198,7 @@ class Case040_top_help_screen(_CommonCase):
         return ('me', '-h')
 
 
-class Case050_FA_help_screen(_CommonCase):  # #coverpoint6.3
+class Case3067DP_FA_help_screen(_CommonCase):
 
     def test_100_succeeds(self):
         self._CLI_client_results_in_success_exitstatus()
@@ -233,7 +233,7 @@ class Case050_FA_help_screen(_CommonCase):  # #coverpoint6.3
         return ('me', '--near-format', 'help', 'xx', 'yy')
 
 
-class Case060_strange_format_adapter_name(_CommonCase):
+class Case3069_strange_format_adapter_name(_CommonCase):
     """(this is to get us "over the wall - there is another test just like
 
     it that is modality-agnostic. (but this one came first! yikes)
@@ -265,7 +265,7 @@ class Case060_strange_format_adapter_name(_CommonCase):
         return ('me', '--far-format', 'zig-zag', 'xx', 'yy')
 
 
-class Case070_money_and_diff(_CommonCase):  # #coverpoint6.2
+class Case3070_money_and_diff(_CommonCase):
 
     def test_100_succeeds(self):
         self._CLI_client_results_in_success_exitstatus()

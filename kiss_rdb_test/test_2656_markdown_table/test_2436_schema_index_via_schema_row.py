@@ -21,7 +21,7 @@ def _split_like_so(self, orig_s, * expect_these_s_a):
     self.assertEqual(_actual_these, expect_these_s_a)
 
 
-class Case010_camel_case(_CommonCase):  # #coverpoint11.1
+class Case2435_camel_case(_CommonCase):
 
     def test_005_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -45,7 +45,7 @@ class Case010_camel_case(_CommonCase):  # #coverpoint11.1
         return tuple(s for s in _f(big_s))
 
 
-class Case100_normalize_freeform_strings(_CommonCase):  # #coverpoint11.2
+class Case2436_normalize_freeform_strings(_CommonCase):  # #midpoint
 
     def test_010(self):
         self._this('FooBar  biffo-bazzo', 'foo_bar_biffo_bazzo')
@@ -59,7 +59,7 @@ class Case100_normalize_freeform_strings(_CommonCase):  # #coverpoint11.2
         return _stowaway_subject_module()(big_s)
 
 
-class Case200_encap_is_required(_CommonCase):
+class Case2437_encap_is_required(_CommonCase):
 
     def test_rumskalla(self):
 

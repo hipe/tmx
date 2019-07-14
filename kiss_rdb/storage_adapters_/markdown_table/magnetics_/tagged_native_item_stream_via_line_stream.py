@@ -38,8 +38,9 @@ furthermore such an arrangement would break consuemrs that expect documents
 to have only these discrete N sectiosn (header, table, and so on.) so this
 marker tracks relevant code spots that would be effected by expanding our
 featureset to such a full realization..
-"""
 
+(Case2421)
+"""
 
 from sakin_agac import (
         pop_property,
@@ -81,7 +82,7 @@ def __open_upstream_path_challenge_mode(x):
     else:
         import collections.abc
         if isinstance(x, collections.abc.Iterable):
-            yes = True  # like a generator, #coverpoint16
+            yes = True  # like a generator (Case2013DP)
         else:
             yes = False
     if yes:

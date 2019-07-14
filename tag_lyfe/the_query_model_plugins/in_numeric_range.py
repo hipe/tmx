@@ -49,7 +49,7 @@ class _InRangeFunction:
                 needle = sub_sub_tagging.tag_stem
                 md = _number_rx.search(needle)
                 if md is None:
-                    # #coverpoint1.12.2: tagging value does not look like num
+                    # tagging value does not look like num (Case7020)
                     pass
                 else:
                     int_part, float_part = md.groups()
@@ -58,11 +58,11 @@ class _InRangeFunction:
                     else:
                         use_number = float(md[0])
                     if use_number < beg_num:
-                        pass  # #coverpoint1.12.3: too low
+                        pass  # too low (Case7030)
                     elif use_number <= end_num:
                         return True
                     else:
-                        pass  # #coverpoint1.12.4: too high
+                        pass  # too high (Case7040)
             else:
                 cover_me('tagging has no value')
 

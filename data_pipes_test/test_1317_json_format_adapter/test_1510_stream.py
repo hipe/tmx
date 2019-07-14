@@ -20,7 +20,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case100_OHAI(_CommonCase):  # :#coverpoint15.1
+class Case1510DP_OHAI(_CommonCase):
 
     def test_100_runs(self):
         self.assertIsNotNone(self._state())

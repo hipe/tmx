@@ -154,8 +154,8 @@ def _memoized_walker():
             if float_strings is None:
                 use_number = int(use_string)
             else:
-                # #coverpoint1.12.5
-                use_string = f"{use_string}{float_strings[0]}{float_strings[1]}"  # noqa: E501
+                decimal, digits, _ignore = float_strings  # (Case7050)
+                use_string = f'{ use_string }{ decimal }{ digits }'
                 use_number = float(use_string)
             from tag_lyfe.the_query_model_plugins import in_numeric_range as o
             return o.EasyNumber(use_number, use_string)

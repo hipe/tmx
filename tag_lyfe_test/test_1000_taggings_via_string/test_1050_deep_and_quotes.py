@@ -3,8 +3,6 @@ the salient features of the grammar demonstrated here:
 
   - double-quoted strings as name components (with one escape sequence)
   - same as non-tail nodes
-
-.:#coverpoint1.8
 """
 
 from tag_lyfe_test.tagging import (
@@ -21,7 +19,7 @@ class _CommonCase(unittest.TestCase):
         return self.end_state()[0].tagging
 
 
-class Case100_minimal_name_value(_CommonCase, _ThisCase):  # :#coverpoint1.8.2
+class Case1020_minimal_name_value(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo:bar'
@@ -30,7 +28,7 @@ class Case100_minimal_name_value(_CommonCase, _ThisCase):  # :#coverpoint1.8.2
         self.expect_shadow('TTTTTTTT')
 
 
-class Case200_oh_boy_quotes(_CommonCase, _ThisCase):  # :#coverpoint1.8.3
+class Case1030_oh_boy_quotes(_CommonCase, _ThisCase):
 
     def given_string(self):
         return 'foo:(#bar:"wow" neat)'
@@ -47,8 +45,7 @@ class Case200_oh_boy_quotes(_CommonCase, _ThisCase):  # :#coverpoint1.8.3
         self.expect_shadow('sssssTTTTTTTTTTssssss')
 
 
-class Case300_double_quotes_can_escape_and_be_parent(_CommonCase, _ThisCase):
-    # :#coverpoint1.8.4
+class Case1040_double_quotes_can_escape_and_be_parent(_CommonCase, _ThisCase):
 
     def given_string(self):
         return '#foo:"mom\'s spaghetti: i \\"love\\" it":77'

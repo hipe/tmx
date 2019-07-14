@@ -1,5 +1,5 @@
 """
-.#coverpoint13: this script-test has a particularly nifty origin story:
+this script-test has a particularly nifty origin story:
 
 we felt reasonably certain when reaching the end of developing the
 counterpart asset of this of what we had suspected by around the middle:
@@ -57,7 +57,7 @@ class _CommonCase(unittest.TestCase):
         return self._end_state().business_object_dictionary[k]
 
 
-class Case100_hello(_CommonCase):
+class Case1640DP_hello(_CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())

@@ -37,8 +37,7 @@ class _CommonCase(unittest.TestCase):
 
     _build_end_state = ts.build_end_state_commonly
 
-
-class Case100(_CommonCase):
+class Case1312(_CommonCase):
 
     def test_010_format_adapter_loads(self):
         self.assertIsNotNone(_subject_format_adapter())
@@ -56,8 +55,7 @@ class Case100(_CommonCase):
         _msg = self._fail_against(_path)
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
-    def test_500_RUMSKALLA(self):  # :#coverpoint7.6
-
+    def test_500_RUMSKALLA(self):
         _path = _chimi_churri_far_path()
         _cref = _build_collection_reference(_path)
         # from script_lib import filesystem_functions as rsx
@@ -75,7 +73,7 @@ class Case100(_CommonCase):
         self.assertEqual(these[0], {'choo cha': 'foo fa'})
 
 
-class Case250_filenames_must_look_a_way(_CommonCase):  # #coverpoint7.1
+class Case1314DP_filenames_must_look_a_way(_CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
@@ -98,7 +96,7 @@ class Case250_filenames_must_look_a_way(_CommonCase):  # #coverpoint7.1
                 }
 
 
-class Case260_file_not_found(_CommonCase):
+class Case1315_file_not_found(_CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
@@ -116,7 +114,7 @@ class Case260_file_not_found(_CommonCase):
                 }
 
 
-class Case270_no_metadata_row(_CommonCase):  # #coverpoint7.2
+class Case1317_no_metadata_row(_CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
@@ -134,7 +132,7 @@ class Case270_no_metadata_row(_CommonCase):  # #coverpoint7.2
                 }
 
 
-class Case280_bad_human_key(_CommonCase):  # :#coverpoint7.3
+class Case1319_bad_human_key(_CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
@@ -152,8 +150,8 @@ class Case280_bad_human_key(_CommonCase):  # :#coverpoint7.3
                 }
 
 
-class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
-    """(may be partially or wholly redundant with #coverpoint1.1)
+class Case1320DP_extra_cel(_CommonCase):
+    """(may be partially or wholly redundant with (Case0110DP))
     (may be #overloaded. is first coverage of an oblique thing.)
     """
 
@@ -174,8 +172,7 @@ class Case290_extra_cel(_CommonCase):  # #coverpoint7.4
                 }
 
 
-class Case300_RUM(_CommonCase):  # #coverpoint7.5
-    """(RUM)"""
+class Case1322DP_RUM(_CommonCase):
 
     def test_100_RUM(self):
         _ = self._build_end_state()

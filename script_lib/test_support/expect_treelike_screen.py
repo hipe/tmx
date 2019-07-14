@@ -253,7 +253,7 @@ class _StateMachine:
             this_num = frame.the_effective_margin_length
             if this_num > target_num:
                 # it is normal to see a depth deeper than your taregt depth
-                pass  # #coverpoint1.1
+                pass  # (CaseFA9)
             elif this_num == target_num:
                 # if the depth of this item we just popped off the stack
                 # IS EQUAL to the depth of the current line, that means they
@@ -410,7 +410,7 @@ class _StackFrame:
         return self.children[0].effective_margin_length
 
     def hello_stack_frame(self):
-        pass  # #wish [#008.D]
+        pass  # #[#022] a substitute for strong typing
 
     is_terminal = False
 

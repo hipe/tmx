@@ -41,12 +41,12 @@ class _CommonCase(unittest.TestCase):
         return self._sections_index()['business_object_row']
 
 
-class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase):  # noqa: E501
+class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase):  # noqa: E501
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
 
-    def test_020_it_just_throws_a_key_error(self):  # #coverpoint1.1
+    def test_020_it_just_throws_a_key_error(self):
         e = None
         try:
             _case_010_section_list()
@@ -55,7 +55,7 @@ class Case010_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase)
         self.assertEqual(str(e), "'chalupa fupa'")
 
 
-class Case100_adds_only(_CommonCase):
+class Case0130DP_adds_only(_CommonCase):
 
     def test_002_does_not_fail(self):
         self.assertIsNotNone(self._section_list())
@@ -85,9 +85,9 @@ class Case100_adds_only(_CommonCase):
         this test (although small in codesize) is overloaded. if you
         refactor this test, consider breaking it up to test these separately:
 
-          - that original widths are respected when possible #coverpoint1.2
-          - that blank cels also get padded appropriately #coverpoint1.3
-          - what happens with content overflow #coverpoint1.4
+          - that original widths are respected when possible (Case0120DP)
+          - that blank cels also get padded appropriately (Case0130DP)
+          - what happens with content overflow (Case0140DP)
         """
 
         items = self._items()
@@ -104,7 +104,7 @@ class Case100_adds_only(_CommonCase):
 
         # we are avoiding testing the details of alignment
         # self.assertEqual(_actual_line, "|3A |   |choo choo|\n")
-        # because those are #coverpoint4.1 #coverpoint4.2
+        # because those are (Case2478KR) (Case2479KR)
 
     def test_070_tail_lines_count(self):
         self._tail_lines_this_many(4)
@@ -117,7 +117,7 @@ class Case100_adds_only(_CommonCase):
         return _case_100_section_list()
 
 
-class Case200_MERGE(_CommonCase):
+class Case0140_MERGE(_CommonCase):
 
     def test_010_does_not_fail(self):
         self.assertIsNotNone(self._section_list())
@@ -134,7 +134,7 @@ class Case200_MERGE(_CommonCase):
         self.assertEqual(row.has_endcap, False)
         # avoid testing alignments here, but:
         # self.assertEqual(_after_line, '| four |  5| six\n')
-        # but this bumps into #coverpoint4.4 which is at writing not covered
+        # this touches on alignment not specified (Case2481KR)
 
     @shared_subject
     def _sections_index(self):
@@ -144,9 +144,9 @@ class Case200_MERGE(_CommonCase):
         return _case_200_section_list()
 
 
-class Case317_in_this_case_mono_value_does_NOT_update(_CommonCase):
+class Case0150DP_in_this_case_mono_value_does_NOT_update(_CommonCase):
     """
-    .#coverpoint1.5: IF all of:
+    IF all of:
       - the far record only has one field (name-value pair)
         (which is to say it only has the human-key field) :#here1
       - other things are "normal"
@@ -181,13 +181,13 @@ class Case317_in_this_case_mono_value_does_NOT_update(_CommonCase):
         return _sections_index_via(_section_list_via(_far, _near))
 
 
-class Case350_custom_keyer_for_syncing(_CommonCase):  # #coverpoint1.6
+class Case0160DP_custom_keyer_for_syncing(_CommonCase):
 
     def test_100_the_NOT_updated_business_cel_stays_as_is(self):
         self.assertEqual(self._cel_strings()[2], '| six')
 
     def test_200_the_YES_updated_business_cel_has_the_example_width(self):
-        """(#coverpoint4.2 (align left) is also exhibited)"""
+        # (Case2479KR) (align left) is also exhibited
         self.assertEqual(self._cel_strings()[1], '|  5')
 
     def test_300_crucially_the_human_key_IS_updated(self):
@@ -218,9 +218,9 @@ class Case350_custom_keyer_for_syncing(_CommonCase):  # #coverpoint1.6
                 _section_list_via(_far, _same_markdown_file))
 
 
-class Case383_in_this_case_mono_value_does_YES_update(_CommonCase):
+class Case0170DP_in_this_case_mono_value_does_YES_update(_CommonCase):
     """
-    .#coverpoint1.7: (integration of the last 2 coverpoints) IF all of:
+    (integration of the last 2 coverpoints) IF all of:
       - the far record only has one field (name-value pair)
         (assume it's a human-key field)
       - there's a custom keyer for syncing
@@ -235,7 +235,7 @@ class Case383_in_this_case_mono_value_does_YES_update(_CommonCase):
         did not get updated with the example record formatting for that cel.
 
         for the second result cel:
-        you see #coverpoint4.4 no alignment specified gets align left.
+        you see no alignment specified gets align left (Case2481KR).
         """
 
         _row = self._this_one_business_object_row()

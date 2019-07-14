@@ -15,12 +15,12 @@ class _CommonCase(unittest.TestCase):
     pass
 
 
-class Case200(_CommonCase):
+class Case0810DP(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
 
-    def test_020_three_sections(self):  # #coverpoint8.1
+    def test_020_three_sections(self):
         _act = len(self._shared_state().sections)
         self.assertEqual(_act, 3)
 

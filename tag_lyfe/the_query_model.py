@@ -465,7 +465,7 @@ class _NameChainNode:
 
             def f(tagging_node):
                 if not tagging_node.is_deep:
-                    # #coverpoint1.16.2 deeper query won't match shallower tag
+                    # deeper query won't match shallower tag (Case3020)
                     return
                 if name_matches(tagging_node):
                     return child.dig_recursive_(tagging_node.child)
@@ -473,7 +473,7 @@ class _NameChainNode:
             def f(tagging_node):
                 if name_matches(tagging_node):
                     if tagging_node.is_deep:
-                        # #coverpoint1.16.3: deeper tag matches shallower query
+                        # deeper tag matches shallower query (Case3030)
                         return tagging_node
                     else:
                         return tagging_node

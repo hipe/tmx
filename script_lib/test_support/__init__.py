@@ -5,8 +5,9 @@ class _UNINDENT_SINGLETON:
         self._is_first_call = True
 
     def __call__(self, s):  # s = big string
+
         if '' == s:
-            return  # (Case407_120 in kiss_rdb_test (at writing))
+            return  # (Case4258KR)
 
         import re
 
