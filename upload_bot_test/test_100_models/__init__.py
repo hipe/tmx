@@ -1,3 +1,2 @@
-# this is a #[#019.file-type-B], which explains why this must contain nothing.
-
+# [#019.file-type-B] empty but necessary file
 # #born.

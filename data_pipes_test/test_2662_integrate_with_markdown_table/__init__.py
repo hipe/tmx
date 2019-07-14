@@ -1,2 +1,2 @@
-# empty but necessary file.
+# [#019.file-type-B] empty but necessary file
 # born.
