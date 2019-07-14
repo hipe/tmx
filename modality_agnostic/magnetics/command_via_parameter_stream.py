@@ -32,10 +32,10 @@ class SELF:  # :[#011]
 
     @property
     def description(self):
-        # #todo
-        def f(o, style):
-            o("«hello i am desc for '%s'»" % self.name)
-        return f
+        def lineser(styler):  # [#511.4] lineser with styler
+            styler.hello_styler()
+            yield f"«hello i am desc for '{self.name}'»"
+        return lineser
 
     def EXECUTABLE_VIA_RESOURCER(self, resourcer):  # mutates resourcer
         idx = self._parameters_index

@@ -250,23 +250,13 @@ def listener_via_error_listener_and_IO(when_error, serr):
 
 
 def __build_common_listener(serr):
-    """(approaching #open [#508])
-    """
 
     def listener(*these):
-        (*chan), emitter = these
-        if 'expression' != chan[1]:
-            raise('cover me')
-        import inspect
-        length = len(inspect.signature(emitter).parameters)
-        if 0 == length:
-            for line in emitter():
-                serr_puts(line)
-        elif 1 == length:
-            # (deprecated but still widespread at writing)
-            emitter(serr_puts)
-        else:
-            cover_me('two args? very oldschool - probably refactor')
+        (*chan), lineser = these
+        assert('expression' == chan[1])  # else cover me
+        # (at #history-A.2 got rid of remnants of the old way)
+        for line in lineser():  # #[#511.3]
+            serr_puts(line)
     serr_puts = putser_via_IO(serr)
     return listener
 
@@ -327,5 +317,6 @@ SUCCESS = 0
 TEMPORARY_DIR = 'z'  # ick/meh
 
 
+# #history-A.2; as referenced
 # #history-A.1: as referenced
 # #born: abstracted

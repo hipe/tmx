@@ -14,21 +14,19 @@ from collections import deque as deque
 
 def for_DEBUGGING(*a):
 
-    *chan, emit = a
+    *chan, payloader = a
     shape = chan[1]
 
     from sys import stderr as io
 
     io.write(f'channel: {repr(chan)}\n')
     io.flush()
-
-    if 'message' == shape:
-        if 0 != _num_params(emit):
-            raise Exception('«no expression agent yet»')  # near #open [#508]
-        _s_a = tuple(emit())
-        io.write(f'messages: {repr(_s_a)}')
-    elif 'structure' == shape:
-        io.write(f'meta-doh-dah: {repr(emit())}')
+    if 'structure' == shape:
+        io.write(f'meta-doh-dah: {repr(payloader())}')
+    elif 'expression' == shape:
+        # (at #history-A.1 got rid of old way)
+        _lines = tuple(payloader())
+        io.write(f'messages: {repr(_lines)}')
     else:
         raise Exception(f'strange shape: {repr(shape)}')
 
@@ -123,9 +121,10 @@ class _ActualEmission:
         self.emission_payload_function = emission_payload_function
         self.channel = chan
 
-    def to_first_string(self):  # #[#508] assumes simple new way strictly
+    def to_first_string(self):
         result = None
-        for line in self.emission_payload_function():
+        # (removed complicated way at #history-A.1)
+        for line in self.emission_payload_function():  # #[#511.3]
             result = line
             break
         return result
@@ -139,28 +138,10 @@ class _ActualEmission:
         for one thing, this has been done elsewhere
         for another thing, this totally ignores expression agents
         for a third thing, this work isn't memoized here.
-
-        finally, #open #[#508]: transitional solution (redundant)
         """
 
-        msgs = []
-        user_f = self.emission_payload_function
-        length = _num_params(user_f)
-        if 0 == length:
-            for line in user_f():
-                msgs.append(line)
-        else:
-            # (deprecated but still widespread emission signature at writing)
-            def receive_nonterminated_message_string(message):
-                msgs.append(message)
-            if 1 == length:
-                user_f(receive_nonterminated_message_string)
-            elif 2 == length:
-                user_f(receive_nonterminated_message_string, 'no expag [ma]')
-            else:
-                raise TypeError('no')
-
-        return msgs
+        # (removed complicated way at #history-A.1)
+        return tuple(self.emission_payload_function())  # #[#511.3]
 
 
 class _EmissionModel:
@@ -303,15 +284,11 @@ class _Literal:
     does_get_consumed = True
 
 
-def _num_params(f):
-    import inspect
-    return len(inspect.signature(f).parameters)
-
-
 _name_rx = re.compile('^[a-z_]+$')
 
 
 import sys  # noqa: E402
 sys.modules[__name__] = _EmissionsModel
 
+# #history-A.1
 # #born.

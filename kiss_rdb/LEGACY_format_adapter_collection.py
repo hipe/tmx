@@ -54,10 +54,14 @@ class _ProcureFormatAdapter:
         import os
         _stem, ext = os.path.splitext(self._collection_identifier)
         if ext == '':
-            def f(o, _=None):  # #open #[#508]
-                o("can't infer filename type from a file with no extension - %s" % self._collection_identifier)  # noqa: E501
-            self._listener('error', 'expression', 'file_extension_required', f)
             # (Case2449)
+            s = self._collection_identifier
+
+            def lineser():  # #[#511.3]
+                yield ("can't infer filename type from a file "
+                       f"with no extension - {s}")
+            self._listener('error', 'expression',
+                           'file_extension_required', lineser)
         else:
             return self.__do_when_via_collection_identifier(ext)
 

@@ -27,12 +27,11 @@ def _listener_via_stderr(stderr):
             # longer channels used in e.g tag_lyfe [#708.3]. now preferred.
             pass
 
-        # #open #[#508] (partially redundant)
         import inspect
         length = len(inspect.signature(emission_payload_f).parameters)
         if 0 == length:
             # #cover-me
-            for msg in emission_payload_f():
+            for msg in emission_payload_f():  # [#511.3] message lines iterator
                 receive_nonterminated_message_string(msg)
         else:
             emission_payload_f(receive_nonterminated_message_string, STYLER_)
@@ -55,6 +54,9 @@ class STYLER_:
 
     def em(s):
         return "\u001B[1;32m%s\u001B[0m" % s
+
+    def hello_styler():  # #[#022]
+        pass
 
 
 _approved_toplevel_channels = {

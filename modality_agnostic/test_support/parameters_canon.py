@@ -16,8 +16,9 @@ class command_modules:  # used as namespace yikes
             def Command(reqo_listo):
                 pass
 
-            def desc_f(o, style):
-                o('howdy ho')
+            def desc_f(style):  # [#511.4] lineser with styler
+                style.hello_styler()
+                yield 'howdy ho'
 
             param = _parameter()
             PARAMETERS = {
@@ -35,9 +36,10 @@ class command_modules:  # used as namespace yikes
                 pass
 
             def fake_desc(name):
-                def f(o, style):
-                    o("«desc for parm '%s'»" % name)
-                return f
+                def lineser(style):  # [#511.4] lineser with styler
+                    style.hello_styler()
+                    yield "«desc for parm '{ name }'»"
+                return lineser
 
             param = _parameter()
             PARAMETERS = {
@@ -60,9 +62,10 @@ class command_modules:  # used as namespace yikes
             def Command(opto_fieldo):
                 pass
 
-            def desc_f(o, style):
-                o('i am opto fieldo')
-                o('line 2 '+style.em('hello'))
+            def desc_f(style):  # [#511.4] lineser with styler
+                yield 'i am opto fieldo'
+                _ = style.em('hello')
+                yield f'line 2 {_}'
 
             mag = _parameter()
             PARAMETERS = {
@@ -81,8 +84,9 @@ class command_modules:  # used as namespace yikes
             def Command(this_flag):
                 pass
 
-            def desc_f(o, style):
-                o('ohai mami')
+            def desc_f(style):  # [#511.4] lineser with styler
+                style.hello_styler()
+                yield 'ohai mami'
 
             mag = _parameter()
             PARAMETERS = {

@@ -214,9 +214,9 @@ class _OpenTravRequest:
         self._path_stem = stem
 
     def _err(self, tmpl, *args):
-        from modality_agnostic import listening as li
-        _err = li.leveler_via_listener('error', self._listener)
-        _err(tmpl, *args)
+        def lineser():  # #[#511.3]
+            yield tmpl.format(*args)
+        self._listener('error', 'expression', lineser)
         self._OK = False
 
 

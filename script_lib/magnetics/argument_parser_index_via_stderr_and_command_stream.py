@@ -220,15 +220,18 @@ def _element_description_string_via_mixed(x):
     return desc_s
 
 
-def _string_via_description_function(f):
+def _string_via_description_function(lineser):
 
-    from script_lib.magnetics import STYLER_
-    s_a = []
+    # FRONTIER of how to support passing a [#511.4] styler to a linser
 
-    def write_f(s):
-        s_a.append(s + _NEWLINE)
-    f(write_f, STYLER_)
-    return _EMPTY_STRING.join(s_a)
+    import inspect
+    if len(inspect.signature(lineser).parameters):
+        def use_lineser():
+            return lineser(STYLER_)
+        from script_lib.magnetics import STYLER_
+    else:
+        use_lineser = lineser
+    return ''.join(use_lineser())
 
 
 def _hack_argument_parser(ap, stderr):
@@ -282,7 +285,6 @@ def implement_me():
 _exe = Exception
 
 _DASH_DASH = '--'
-_EMPTY_STRING = ''
 _NEWLINE = '\n'
 
 

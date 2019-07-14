@@ -53,8 +53,8 @@ def _my_parameters(o, param):
             argument_arity='OPTIONAL_FIELD',
             )
 
-    def diff_desc(o, _):  # #open [#410.X] yield(msg) not o(msg)
-        o("show only the changed lines as a diff")
+    def diff_desc():  # be like [#511.3]
+        yield "show only the changed lines as a diff"
 
     o['diff'] = param(
             description=diff_desc,

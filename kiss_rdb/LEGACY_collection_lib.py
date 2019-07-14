@@ -116,13 +116,13 @@ def _ui_thing(f):
             say_needle = __needle_sayer_via(needle_x)
 
         def err(msg, *params):
-            def DEPRECATED_emission_receiver(o, styler=None):  # #open [#508]
+            def lineser():  # #[#511.3]
                 if 0 == len(params):
                     use_msg = msg
                 else:
                     use_msg = msg.format(*params)
-                o(use_msg)
-            listener(*these, DEPRECATED_emission_receiver)
+                yield use_msg
+            listener(*these, lineser)
 
         these = ['error', 'expression']
         if channel_tail_component_on_not_found is not None:
