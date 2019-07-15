@@ -98,10 +98,11 @@ def function_via_function_identifier(identifier, listener):
     return getattr(mod, function_name)  # #cover-me - when no such attr
 
 
-_word = '[a-z][a-z0-9_]*'
+_word = '[a-zA-Z][a-zA-Z0-9_]*'  # was all lowercase until #history-A.1
 _rx = re.compile(r'^(%s(?:\.%s)*)\.([a-zA-Z][a-zA-Z0-9_]*)$' % (_word, _word))
 
 
 sys.modules[__name__] = function_via_function_identifier
 
+# #history-A.1
 # #born.

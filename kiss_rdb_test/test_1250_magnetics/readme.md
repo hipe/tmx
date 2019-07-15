@@ -30,7 +30,7 @@ py -c 'beg=1255;jump=(2499-beg)/15;first=beg+jump/2;print(tuple(round(first+jump
 2209
 2292
 2375
-2458
+2399 (last)
 
 
 (the expansion:)

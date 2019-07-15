@@ -213,9 +213,7 @@ def _make_row_num_validator(model_row, listener, *ok_via_which):
 
         _msg = '. '.join((_msg1, _msg2))
 
-        from modality_agnostic import listening as li
-        error = li.leveler_via_listener('error', listener)  # ..
-        error(_msg)
+        listener('error', 'expression', lambda: (_msg,))  # #[#511.3]
 
     model_cel_count = model_row.cels_count
     my_compare = _make_my_compare(model_cel_count)

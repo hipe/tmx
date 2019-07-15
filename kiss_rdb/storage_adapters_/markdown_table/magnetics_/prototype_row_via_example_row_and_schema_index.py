@@ -67,9 +67,6 @@ have it not change how subsequent machine-generated rows are aligned. meh
 ((Case4075) is used formally to connect this magnet with its test file)
 """
 
-from sakin_agac import (
-        cover_me,
-        )
 import sys
 
 
@@ -388,6 +385,10 @@ class _cel_schemas:  # #class-as-namespace
     center_aligned = _CelSchema('align_center')
     right_aligned = _CelSchema('align_right')
     no_alignment_specified = _CelSchema('no_alignment_specified')
+
+
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 
 sys.modules[__name__] = _SELF

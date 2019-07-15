@@ -21,8 +21,6 @@ at the end of all this, each far item that had no corresponding near item
 
 (this is a synopsis of an algorithm that is described [#447] more formally.)
 """
-
-_desc = __doc__
 # #[#874.5] file used to be executable script and may need further changes
 
 
@@ -31,6 +29,7 @@ cli_lib = common_producer_script.common_CLI_library()
 biz_lib = cli_lib
 
 
+_desc = __doc__
 
 
 def _my_parameters(o, param):

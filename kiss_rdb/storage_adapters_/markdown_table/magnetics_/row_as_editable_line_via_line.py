@@ -18,7 +18,6 @@ having said that,
 (Case2407)
 """
 
-from modality_agnostic import listening
 import sys
 import re
 
@@ -306,9 +305,14 @@ class _CustomScanner:  # #abstraction candidate
             where = ' at offset %d' % self._offset
             yes = True
 
-        had = ' had %s' % repr(self._line[self._offset]) if yes else ''
-        error = listening.leveler_via_listener('error', self._listener)  # ..
-        error("expecting {}{}{}".format(repr(s), had, where))
+        def lines():
+            if yes:
+                _ = repr(self._line[self._offset])
+                had = f' had {_}'
+            else:
+                had = ''
+            yield f'expecting {repr(s)}{had}{where}'
+        self._listener('error', 'expression', lines)
 
     def is_end_of_string(self):
         return self._len == self._offset

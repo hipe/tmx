@@ -182,12 +182,13 @@ def _these_dictionaries():
 
 
 def _yield_these_dictionaries():
+    from data_pipes import common_producer_script as lib
     yield {
             '_is_sync_meta_data': True,
             'natural_key_field_name': 'add_on',
-            'custom_far_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_FAR_KEY_SIMPLIFIER_',  # noqa: E501
-            'custom_near_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_NEAR_KEY_SIMPLIFIER_',  # noqa: E501
-            'custom_mapper_for_syncing': 'script.markdown_document_via_json_stream.this_one_mapper_("add_on")',  # noqa: E501
+            'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
+            'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
+            'custom_mapper_for_syncing': lib.mapper_for('add_on'),
             'far_deny_list': ('url', 'label')
     }
 

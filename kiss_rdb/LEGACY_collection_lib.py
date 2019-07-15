@@ -300,7 +300,7 @@ class human_keyed_collection_via_pairs_cached:
 
     as we enounter each new association during our traversal, we put this
     association *into* a dictionary that serves as a cache. (note the
-    association is cached whether or not has the target key (if relevant).)
+    association is cached whether or not it has the target key (if relevant).)
 
     if it's a traversal (not retrieval) that's being performed externally,
     we likewise place each encountered association in the cache. note too if

@@ -1,4 +1,4 @@
-import click  # noqa: E402
+import click
 
 # == HERE WE DEFINE OUR OWN DECORATORS (mostly)
 

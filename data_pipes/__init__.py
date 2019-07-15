@@ -1,3 +1,37 @@
+class common_producer_script:  # #as-namespace-only
+
+    def common_CLI_library():
+        import kiss_rdb.cli.LEGACY_stream as mod
+        return mod
+
+    # we want these to go away soon
+
+    def far_key_simplifier():
+        return common_producer_script._key_simp('COMMON_FAR_KEY_SIMPLIFIER_')
+
+    def near_key_simplifier():
+        return common_producer_script._key_simp('COMMON_NEAR_KEY_SIMPLIFIER_')
+
+    def mapper_for(s):
+        _ = common_producer_script._this_module
+        return f'{_}.this_one_mapper_("{s}")'
+
+    def _key_simp(tail):
+        return '.'.join((common_producer_script._this_module, tail))
+
+    def LEGACY_markdown_lib():
+        from kiss_rdb.storage_adapters_.markdown_table import (  # same as belo
+                LEGACY_markdown_document_via_json_stream as mod)
+        return mod
+
+    def TEMPORARY_LEGACY_USE_OF_SYNC_LIB():
+        from data_pipes.cli import sync as mod
+        return mod
+
+    _this_module = 'kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream'  # noqa: E501
+    # same as above
+
+
 def YIKES_SKIP_HEADERS(far_dct):
     """
     so:

@@ -89,7 +89,7 @@ class _CommonCase(unittest.TestCase):
                     collection_path=path, filesystem=fs, listener=listener)
         fs = self.given_fake_filesystem()
 
-        # rather that memoize the filesystem for every case just for the
+        # rather than memoize the filesystem for every case just for the
         # one case that does this one thing, we do this
 
         if hasattr(self, 'given_path'):

@@ -6,7 +6,6 @@ this fellow attempts to make one from any string. ("attempts").
 # #[#874.9] file is LEGACY
 
 import re
-import sys
 
 
 def normal_field_name_via_string(big_s):
@@ -50,8 +49,5 @@ def _split_on_camel_case(s):  # #testpoint
 
 
 _camelcase_rx = re.compile('(?<=[a-z])(?=[A-Z])')
-
-
-sys.modules[__name__] = normal_field_name_via_string
 
 # #abstracted.

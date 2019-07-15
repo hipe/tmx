@@ -1,6 +1,3 @@
-from sakin_agac import (
-        cover_me,
-        )
 # #[#874.9] file is LEGACY
 
 from modality_agnostic.memoization import lazy
@@ -135,9 +132,20 @@ def to_name_value_pairs():
             yield fa.format_name, mod
 
 
-@lazy
 def EVERY_MODULE():
-    """result is an iterator over every such module.
+    return __function_for_EVERY_MODULE()()
+
+
+@lazy
+def __function_for_EVERY_MODULE():
+    """produce a function that produces an iterator that iterates over modules.
+
+    In oldentimes this was how we effected the collection of format adapters.
+    Now at #history-A.4 during this great big merge, our only goal is to keep
+    this working for the legacy tests, before we finish the merge.
+
+    We are moving the markdown format adapter code to the other library so
+    now we need to accomodate that explicitly.
 
     don't let the `lazy` fool you: this function is re-entrant:
 
@@ -146,16 +154,18 @@ def EVERY_MODULE():
     would get picked up.)
     """
 
-        return modules_via_directory_and_mod_name(*main_module_tuple)
-
-    def _ALTERNATE_FOR_REFERENCE():
-        # (this worked when it was written.)
-        # (it's "proof" that we can support multiple adapter dirs)
-        for x in modules_via_directory_and_mod_name(*main_module_tuple):
-            yield x
-        for x in modules_via_directory_and_mod_name(*other_module_tuple):
     def main():
+        these = ('data_pipes', 'format_adapters')
+        _package_dir = dn(__file__)
+        _monorepo_dir = dn(_package_dir)
+        _dir = os_path.join(_monorepo_dir, *these)
+        _mod_name = '.'.join(these)
+        for x in modules_via_directory_and_mod_name(_dir, _mod_name):
             yield x
+        # #history-A.4
+        from kiss_rdb.storage_adapters_.markdown_table import (
+                LEGACY_format_adapter as mod)
+        yield mod
 
     def modules_via_directory_and_mod_name(direc, mod_name):
 
@@ -177,17 +187,6 @@ def EVERY_MODULE():
     dn = os_path.dirname
     import re
 
-    main_dir = dn(__file__)
-
-    main_module_tuple = (main_dir, __name__)
-
-    if False:  # (see related test above)
-        these = ('sakin_agac_test', 'format_adapters')
-        other_module_tuple = (
-                os_path.join(dn(dn(main_dir)), * these),
-                '.'.join(these),
-                )
-
     rx = re.compile(r'(^(?!_)[^\.]+)(?:\.py)?$')
     """
     such that:
@@ -206,6 +205,7 @@ def _collection_lib():
     return x
 
 
+# #history-A.4: as referenced
 # #history-A.3: as referenced
 # #history-A.2: as referenced
 # #history-A.1: as referenced

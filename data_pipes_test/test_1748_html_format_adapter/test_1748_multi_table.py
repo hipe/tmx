@@ -18,7 +18,8 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class _CommonCase(ProducerCaseMethods, unittest.TestCase):
+    pass
 
 
 class Case1747_does_scrape_work(_CommonCase):

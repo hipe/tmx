@@ -7,10 +7,11 @@ def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
     import modality_agnostic.test_support.listener_via_expectations as lib
 
     exp = lib(self.expect_emissions())
+    listener = exp.listener
 
     _d = self.given()
 
-    _cm = _sync_context_manager_via(**_d, listener=exp.listener)
+    _cm = _sync_context_manager_via(**_d, listener=listener)
 
     with _cm as lines:
         lines = tuple(x for x in lines)

@@ -42,9 +42,6 @@ featureset to such a full realization..
 (Case2421)
 """
 
-from sakin_agac import (
-        pop_property,
-        )
 import contextlib
 import re
 
@@ -126,8 +123,8 @@ class _Parse:
             return ('table_schema_line_one_of_two', liner)
 
     def TABLE_SCHEMA_LINE_TWO(self, line):
-
-        f = pop_property(self, '_row_two_function')
+        f = self._row_two_function
+        del self._row_two_function
 
         schema_f, liner = f(line)  # ..
         schema = schema_f()  # #[#410.D] just build the index now, always

@@ -28,12 +28,11 @@ class _CommonCase(unittest.TestCase):
                 collection_identifier=path,
                 listener=listener)
         with _cm as dcts:
+            itr = iter(dcts)
             first = None
-            try:
-                first = next(dcts)
-            except StopIteration:
-                pass
-            business_objects = tuple(dct for dct in dcts)
+            for first in itr:
+                break
+            business_objects = tuple(itr)
         return business_objects, first
 
 

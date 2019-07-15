@@ -44,7 +44,6 @@ however as is hinted at in one place below, there may be a way that we
 can dynamically decompose..
 """
 
-import sakin_agac_test.test_450_format_adapters.test_100_markdown_table._common as co  # noqa: E501
 import unittest
 
 
@@ -70,20 +69,11 @@ class _CommonCase(unittest.TestCase):
         return case.row.cel_at_offset(offset)
 
 
-def given_input_string(f):  # local decorator
-
-    def g(_ignore_self):
-        return mutable_f()
-
-    def mutable_f():
-        def f3():
-            return x
-        x = _CaseState(f(None))
-        nonlocal mutable_f
-        mutable_f = f3
-        return f3()
-
-    return g
+def given_input_string(f):  # #decorator #[#510.6]
+    def build_value():
+        return _CaseState(f(None))
+    from modality_agnostic.memoization import lazify_method_safely
+    return lazify_method_safely(build_value)
 
 
 class Case010_some_failures(_CommonCase):
@@ -92,11 +82,11 @@ class Case010_some_failures(_CommonCase):
         self.assertIsNotNone(_subject_module())
 
     def test_020_pipe_at_beginning_is_required(self):
-        _msg = _failure_message_via_line('😂')
+        _msg = _failure_message_via_line(self, '😂')
         self.assertEqual("expecting '|' had '😂' at beginning of line", _msg)
 
     def test_030_newline_at_ending_is_required(self):
-        _msg = _failure_message_via_line('|')
+        _msg = _failure_message_via_line(self, '|')
         self.assertEqual(r"expecting '\n' at end of line", _msg)
 
 
@@ -176,18 +166,18 @@ class Case030_typical_guy(_CommonCase):
         return (r'|<a name=123></a>[\[#123\]] |       | using the TO_DO stack' + '\n')  # noqa: E501
 
 
-def _failure_message_via_line(upstream_s):
-    def listener(*chan_msg):
-        def o(s):
-            a.append(s)
-        chan_msg[-1](o)
-    a = []
+def _failure_message_via_line(tc, upstream_s):
+    from modality_agnostic.test_support.structured_emission import (
+            listener_and_emissioner_for)
+    listener, emissioner = listener_and_emissioner_for(tc)
     x = _subject_module()(
             upstream_line=upstream_s,
-            listener=listener,
-            )
-    return 'EEK'.join(a)
+            listener=listener)
     assert(x is None)
+    chan, payloader = emissioner()
+    assert(chan == ('error', 'expression'))
+    line1, = payloader()
+    return line1
 
 
 class _CaseState:

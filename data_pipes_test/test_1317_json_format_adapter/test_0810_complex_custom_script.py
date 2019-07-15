@@ -4,8 +4,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+_CommonCase = unittest.TestCase
 
 
 class Case0810DP(_CommonCase):

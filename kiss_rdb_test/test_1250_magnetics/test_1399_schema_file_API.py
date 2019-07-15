@@ -8,7 +8,7 @@ dedicated node and not up here in with the mainline magnets. However, the
 "recfiles" format is special because we use it to parse schema files and
 those must come first before we can do anything interesting with collections.
 As such, that part of the whole would-be recfiles storage adapter that serves
-this effort is seen as having a higher [#010.G] regression precedence than
+this effort is seen as having a higher [#010.6] regression precedence than
 the suites for all other storage adapters.
 
 👉 We want a minimally simple, pure-python solution for now, one that's

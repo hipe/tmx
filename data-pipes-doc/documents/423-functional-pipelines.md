@@ -14,8 +14,8 @@ this is scratching a surface. this article is stub. i can help expand it.
   - NOTE :[#443.B] refers to the pipeline workflow we use at document birth,
     which is what is depicted in our sibling digraph document.
 
-    future vaporwae idea of configurable, functional pipelines.
   - in contrast, we will use :[#463.C] to be a hazy placeholder for this
+    future vaporware idea of configurable, functional pipelines.
 
   - often the distinction isn't important except for complicated
     synchronizations; but since there is nonetheless potential for ambiguity,
