@@ -1,4 +1,3 @@
-# #covers: sakin_agac.format_adapters.markdown_table.magnetics.prototype_row_via_example_row_and_schema_index  # noqa: E501
 from kiss_rdb_test.common_initial_state import (
         publicly_shared_fixture_file)
 from data_pipes_test.common_initial_state import (

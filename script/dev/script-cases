@@ -1,32 +1,219 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3 -W error::Warning::0
 
-if [ ! -e mono-repo.test-these.list ] ; then
-  echo "run this from root of mono-repo"
-  exit 3
-fi
+"""
+looks for any line in {file_moniker} matching {pattern_moniker} and parses it.
+"""
 
-if [ "$#" -ne 0 ] ; then
-  echo "usage: $0"
-  echo ""
-  echo "description: shows which producer scripts still need coverage."
-  exit 3
-fi
+from sys import (
+        argv,
+        stderr)
+import re
 
-dot () {
-  >&2 echo -n '.'
-}
 
-tmp1="z/tmp.covered.list"
-tmp2="z/tmp.scripts.list"
+# -- stuff of note
 
-dot
-ack -h '\[\#410\.A\.1' sakin_agac_test | awk '{print $2}' | sort | uniq > "$tmp1"
-dot
-ack -l '\[\#410\.1\.2' script | ruby -lne 'puts $_.gsub("/", ".")[0..-4]' | sort | uniq > "$tmp2"
-dot
->&2 echo ''
-diff "$tmp1" "$tmp2"
+def _egads():
+    return ("find script/producer_scripts -type f -name '[^_]*.py' | "
+            'while read line ; do echo -n "$line" ; '
+            './script/dev/script-cases "producer script" "$line" 2>/dev/null |'
+            " wc -l ; done  | awk '{ if (0 == $2) print $1 }'")
 
-rm "$tmp1" "$tmp2"
 
+# -- constants
+
+formal_arguments = ('STRING_THING', 'FILE')
+pattern_moniker, file_moniker = formal_arguments
+required_num_args = len(formal_arguments)
+
+program_name, *args = argv
+num_args = len(args)
+
+description = __doc__
+
+
+# -- everything lol
+
+def _main():
+    state = _State()
+    _work(state)
+    return state.exitstatus
+
+
+def _work(state):
+
+    if not _parse_args(state):
+        return
+
+    with open(state.path) as lines:
+        count = 0
+        _itr = _relevant_lines_via_lines(lines)
+        for s in _target_features_via_relevant_lines(_itr, state.main_regex):
+            count += 1
+            print(s)
+        if 0 == count:
+            serr(f'(0 cases found against /{state.main_regex.pattern}/)')
+
+
+def _parse_args(state):
+    if _help_was_requested():
+        for line in _lines_for_help():
+            serr(line)
+        state.stop()
+        return
+    if num_args != required_num_args:
+        if num_args < required_num_args:
+            serr(f'expecting {formal_arguments[0]}')
+        else:
+            serr(f'unexected argument: "{args[required_num_args]}"')
+        state.be_errored_generically()
+        serr(f'see "{program_name} -h"')
+        return
+
+    string_thing, path = args
+    assert(re.match(r'^[a-z]+(?: [a-z]+)*$', string_thing))  # start meh-ly
+
+    state.receive_args(string_thing, path)
+    return True
+
+
+def _help_was_requested():
+    if 0 == num_args:
+        return False
+    if 1 == num_args:
+        return args[0] in helps
+    return args[0] in helps or args[-1] in helps
+
+
+helps = ('-h', '--help')
+
+
+def _lines_for_help():
+    these = {'file_moniker': file_moniker, 'pattern_moniker': pattern_moniker}
+    _desc = re.sub(r'{([a-z_]+)}', lambda md: these[md[1]], description[1:-1])
+
+    yield f'usage: {program_name} {" ".join(formal_arguments)}'
+    yield ''
+    yield f'description: {_desc}'
+    yield ''
+    yield "it was made to do this:"
+    yield f"   {_egads()}"
+
+
+def _target_features_via_relevant_lines(relelvant_lines, main_rx):
+    itr = iter(relelvant_lines)
+    for line in itr:
+        md = main_rx.match(line)
+        if md is None:
+            continue
+
+        s = _post_match(md)
+        md = re.match(r'^(one of several )?'
+                      r'covered by '
+                      r'(multiple test files:)?', s)
+
+        # is_one_of_several = (-1, -1) == md.span(1)
+        has_multiple_test_files = (-1, -1) != md.span(2)
+
+        if not has_multiple_test_files:
+            yield _remove_parens(_remove_any_period(_post_match(md)))
+            continue
+
+        line = next(itr)
+        for parened in _remove_parens(line).split(', '):
+            yield _remove_parens(parened)
+
+
+def _remove_parens(s):
+    md = re.match(r'^\((.+)\)$', s)
+    return md[1]
+
+
+def _remove_any_period(s):
+    return s[:-1] if '.' == s[-1] else s
+
+
+def _relevant_lines_via_lines(lines):
+    """of the input lines presumably of a file, output the content of each
+
+    line that is part of that run of zero or more comment lines or blank
+    lines anchored to the beginning of the file; not yielding anything for
+    the blank lines or the any first she-bang line.
+    """
+
+    itr = iter(lines)
+    line = next(itr)
+
+    def post_match():
+        return line[md.span()[1]:-1]
+
+    if '#!' == line[0:2]:
+        # don't treat the she-bang line like an ordinary comment line
+        line = next(itr)
+
+    while True:
+        if '\n' == line:
+            # skip blank lines
+            line = next(itr)
+            continue
+
+        md = re.match(r'^("""|# )?', line)
+        substring = md[0]
+
+        # if it's a comment, yield the rest
+        if '# ' == substring:
+            yield post_match()
+            line = next(itr)
+            continue
+
+        # if it's the beginning of a multi-line comment,
+        if '"""' == substring:
+            after = post_match()
+            if '' != after:
+                yield after
+            while True:
+                line_ = next(itr)  # balls are necessary
+                if '"""\n' == line_:
+                    break
+                content = line_[0:-1]
+                if '' == content:
+                    continue
+                yield content
+            line = next(itr)
+            continue
+
+        # the line we are on doesn't fit into any of the above categories.
+        # we must have found the first line that is a "code line"
+        break
+
+
+def _post_match(md):
+    return md.string[md.span()[1]:]
+
+
+class _State:
+
+    def __init__(self):
+        self.exitstatus = 0
+        self.ok = True
+
+    def receive_args(self, string_thing, path):
+        self.main_regex = re.compile(f'^This {string_thing} is ')
+        self.string_thing = string_thing
+        self.path = path
+
+    def be_errored_generically(self):
+        self.exitstatus = 567
+        self.stop()
+
+    def stop(self):
+        self.ok = False
+
+
+def serr(s):
+    stderr.write(f'{s}\n')
+
+
+exit(_main())
+
+# #history-A.1: full rewrite off bash
 # #born.

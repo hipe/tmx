@@ -1,4 +1,3 @@
-# #covers: sakin_agac.format_adapters.markdown_table.magnetics.row_as_editable_line_via_line  # noqa: E501
 """
 keep in mind the caveats: don't get attached because:
   - we are doing it wrong: we should use existing markdown parsers

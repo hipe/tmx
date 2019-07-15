@@ -1,6 +1,3 @@
-# #covers script.SSGs.hugo_themes_deep.tags_and_features_reports.report_200_alternatives_and_their_useful_phenomena #[#410.A.1]  # noqa: E501
-
-
 from sakin_agac_test.common_initial_state import (
         fixture_directory_for)
 import unittest

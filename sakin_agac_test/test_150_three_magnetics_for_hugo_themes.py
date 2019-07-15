@@ -1,9 +1,3 @@
-"""
-.#covers script.SSGs.hugo_themes_deep.relevant_themes_collection_metadata_via_themes_dir #[#410.A.1]  # noqa: E501
-.#covers script.SSGs.hugo_themes_deep.theme_directory_stream_via_themes_dir #[#410.A.1]  # noqa: E501
-.#covers script.SSGs.hugo_themes_deep.theme_toml_stream_via_themes_dir #[#410.A.1]  # noqa: E501
-"""
-
 from sakin_agac_test.common_initial_state import (
         fixture_directory_for)
 from modality_agnostic.memoization import lazy

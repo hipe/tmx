@@ -1,4 +1,3 @@
-# #covers: script.sync
 from data_pipes_test.common_initial_state import (
         build_end_state_commonly,
         markdown_fixture,

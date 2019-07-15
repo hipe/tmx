@@ -4,7 +4,7 @@
 
 theme in the collection, taking into account the deny list (OR NOT)..
 """
-# #[#410.1.2] this is a producer script (sort of)
+# This producer script is one of several covered by (Case100SA).
 
 import re
 

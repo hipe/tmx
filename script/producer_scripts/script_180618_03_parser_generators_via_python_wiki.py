@@ -5,7 +5,7 @@ generate a stream of JSON from {url}
 
 (this is the content-producer of the producer/consumer pair)
 """
-# #[#410.1.2] this is a producer script.
+# This producer script is covered by (Case1855DP).
 
 
 _domain = 'https://wiki.python.org'

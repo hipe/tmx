@@ -1,6 +1,4 @@
 """
-#covers: sakin_agac.format_adapters.markdown_table.magnetics.prototype_row_via_example_row_and_schema_index  # noqa: E501
-
 this file's founding objective was for a regression to cover the unforseen
 edge case of having irregular use of endcaps. what we set out to test
 initially was that a record merge does not add an endcap under some certain

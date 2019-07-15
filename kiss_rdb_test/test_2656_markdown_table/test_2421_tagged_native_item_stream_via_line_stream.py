@@ -1,4 +1,3 @@
-# #covers: sakin_agac.format_adapters.markdown_table.magnetics.tagged_native_item_stream_via_line_stream  # noqa: E501
 from kiss_rdb_test.common_initial_state import (
         functions_for)
 from modality_agnostic.test_support.structured_emission import (

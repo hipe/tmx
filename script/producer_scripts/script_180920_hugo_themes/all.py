@@ -42,10 +42,13 @@ measured by a report, synonymity is a more subjective determination:
 we have to look at the set of all deep phenomena and ask who among them are
 "like" the others..
 """
+# This producer script is one of several covered by (Case200SA).
 
 
 import re
 from os import path as os_path
+
+
 _os_path_basename = os_path.basename
 
 
@@ -432,6 +435,9 @@ class _Alternative:
 # --
 
 def _report_paths():
+    raise Exception('This was not covered. Almost certainly broke just now.')
+    # broke (probably) at #history-A.1. #cover-me. probably trivial to fix
+
     _dir = os_path.dirname(__file__)
     # at writing, above should be same as `sys.path[0]` but like, yikes
     _cmd = ['find', _dir, '-name', 'report_*.py', '-type', 'f', '-maxdepth', '1']  # noqa: E501
@@ -491,4 +497,5 @@ if __name__ == '__main__':
     _exitstatus = _CLI_for_all(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 
+# #history-A.1
 # #born.

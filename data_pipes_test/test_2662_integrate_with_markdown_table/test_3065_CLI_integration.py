@@ -1,5 +1,3 @@
-# #covers: script.sync
-
 from kiss_rdb_test.common_initial_state import (
         publicly_shared_fixture_file)
 from data_pipes_test.common_initial_state import (

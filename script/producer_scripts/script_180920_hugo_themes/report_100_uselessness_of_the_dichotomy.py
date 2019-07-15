@@ -86,6 +86,10 @@ we can perhaps devise:
 from fractions import Fraction as _Fraction
 
 
+raise Exception("#not-covered and untestable at writing")
+# we deleted the huge hugo-themes directory..
+
+
 class Report:
 
     def __init__(self, dispatcher, modality, listener):

@@ -4,7 +4,7 @@
 
 (this is the content-producer of the producer/consumer pair)
 """
-# #[#410.1.2] this is a producer script.
+# This producer script is covered by (Case2013DP).
 
 
 _domain = 'https://devcenter.heroku.com'
@@ -19,14 +19,14 @@ _my_doc_string = __doc__
 def open_dictionary_stream(html_document_path, listener):
 
     def my_generator(el, _listener):
-
+        from data_pipes import common_producer_script as lib
         yield {
                 '_is_sync_meta_data': True,
                 'natural_key_field_name': 'add_on',
-                'custom_far_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_FAR_KEY_SIMPLIFIER_',  # noqa: E501
-                'custom_near_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_NEAR_KEY_SIMPLIFIER_',  # noqa: E501
-                'custom_mapper_for_syncing': 'script.markdown_document_via_json_stream.this_one_mapper_("add_on")',   # noqa: E501
-                'far_deny_list': ('url', 'label'),  # documented @ [#418.I.3.2]
+                'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
+                'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
+                'custom_mapper_for_syncing': lib.mapper_for('add_on'),
+                'far_deny_list': ('url', 'label'),  # documented @ [#458.I.3.2]
                 }
 
         for el in el.find_all('li', recursive=False):

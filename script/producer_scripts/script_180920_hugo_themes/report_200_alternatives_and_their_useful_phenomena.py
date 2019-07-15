@@ -4,7 +4,7 @@
 for each alternative, show a list of its phenomena, having subtracted out
 those phenomena we aren't interested in because they're singletons. YAY!
 """
-# #[#410.1.2] this is a producer script.
+# This producer script is one of several covered by (Case200SA).
 
 
 class open_dictionary_stream:
@@ -50,14 +50,14 @@ class Report:
             yield f'  {_use_label} ({_tags})'
 
     def _yield_dictionaries(self, big_index):
-
+        from data_pipes import common_producer_script as lib
         yield {
                 '_is_sync_meta_data': True,
                 'natural_key_field_name': 'CHOO_CHA',
-                'custom_far_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_FAR_KEY_SIMPLIFIER_',  # noqa: E501
-                'custom_near_keyer_for_syncing': 'script.markdown_document_via_json_stream.COMMON_NEAR_KEY_SIMPLIFIER_',  # noqa: E501
-                'custom_mapper_for_syncing': 'script.markdown_document_via_json_stream.this_one_mapper_("hugo_theme")',   # noqa: E501
-                'far_deny_list': ('url', 'label'),  # documented @ [#418.I.3.2]  # noqa: E501
+                'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
+                'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
+                'custom_mapper_for_syncing': lib.mapper_for('hugo_themes'),
+                'far_deny_list': ('url', 'label'),  # documented @ [#458.I.3.2]  # noqa: E501
                 }
 
         for dct in self._dictionario_dawson(big_index):

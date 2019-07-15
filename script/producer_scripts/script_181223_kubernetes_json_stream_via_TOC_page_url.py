@@ -1,6 +1,8 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-# #[#410.1.2] this is a producer script.
+
+raise Exception("#not-covered - comment out if you're feelng lucky")
+# (restored to work "visually" at #history-A.1, but not covered hence broken)
 
 
 class _CLI:
@@ -27,6 +29,8 @@ class _CLI:
         for obj in object_stream_via_url_(None, url, self._listener):
             write(obj)
 
+        self.stdout.write('\n')
+
 
 def object_stream_via_url_(cached_path, url, listener):
 
@@ -43,12 +47,16 @@ def object_stream_via_url_(cached_path, url, listener):
         soup = BeautifulSoup(fh, 'html.parser')
 
     toc, = soup.select('#docsToc')
-    div, = toc.select('> div')
-    items = iter(div.select('> *'))
 
-    yield _object_via_first_anchor_tag_ONCE_ONLY(next(items), url)
+    div, = _filter('div', toc)
 
-    for item in items:
+    items = _direct_children(div)
+
+    itr = iter(items)  # be explicit
+
+    yield _object_via_first_anchor_tag_ONCE_ONLY(next(itr), url)
+
+    for item in itr:
         name = item.name
         if 'a' == name:
             for obj in _objects_via_anchor_tag_up_top(item):
@@ -84,8 +92,8 @@ def _objects_via_div_tag(div):
             _label: div['data-title'],
             }
 
-    container, = div.select('> *')
-    for a in container.select('> *'):
+    container, = _direct_children(div)
+    for a in _direct_children(container):
         name = a.name
         if 'a' == name:
             yield _object_via_anchor_tag_not_top(a)
@@ -103,8 +111,8 @@ def _recurse(div):  # note ugly redundancy with above
             _label: div['data-title'],
             }
 
-    container, = div.select('> *')
-    for a in container.select('> *'):
+    container, = _direct_children(div)
+    for a in _direct_children(container):
         name = a.name
         assert('a' == name)
         yield _object_via_anchor_tag_not_top(a)
@@ -151,14 +159,19 @@ def _object_via_anchor_tag_not_top(a):
             }
 
 
+def _direct_children(node):  # #cp
+    return _filter('*', node)  # omit strings
+
+
+def _filter(sel, el):
+    import soupsieve as sv
+    return sv.filter(sel, el)
+
+
 _header_level = 'header_level'
 _is_header_node = '_is_branch_node'
 _label = 'label'
 _url = 'url'
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -166,4 +179,5 @@ if __name__ == '__main__':
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
     exit(_exitstatus)
 
+# #history-A.1
 # #born.

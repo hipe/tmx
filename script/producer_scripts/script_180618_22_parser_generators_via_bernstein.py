@@ -12,7 +12,8 @@ available to us, exposed by github over plain old HTTP. so at #history-A.1
 this refactored quite smoothly into pioneering the idea of scraping
 markdown instead (sidestepping the #html2markdown problem).
 
-.#[#410.1.2] this is a producer script.
+This producer script is covered by multiple test files:
+((Case1640DP), (Case3306DP))
 """
 
 

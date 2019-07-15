@@ -1,6 +1,5 @@
 """
-.#covers script.tag_lyfe.json_stream_via_python_wiki #[#410.A.1]
-
+multi-axis coverage from this script-test:
 
   - cover the particular producer script (used for business) and
   - provide limited coverage to the HTML format adapter's particular

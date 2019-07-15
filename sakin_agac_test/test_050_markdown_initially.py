@@ -1,9 +1,3 @@
-"""
-.#covers: script.khong.markdown_via_json_stream
-(also provides coverage for [#608.2] :[#414.2])
-"""
-
-
 from sakin_agac_test.common_initial_state import (
         executable_fixture)
 from modality_agnostic.memoization import (

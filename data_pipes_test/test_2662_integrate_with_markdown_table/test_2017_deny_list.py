@@ -1,7 +1,4 @@
 """
-.#covers script.heroku_add_ons.json_stream_via_website #[#410.A.1]
-.#covers script.SSGs.hugo_themes #[#410.A.1]
-
 objectives are severalfold:
     - cover scraping of this one page format
     - cover that syncing still works here with our crazy new deny list

@@ -21,7 +21,7 @@ bork () {
 }
 
 show_primary_usage_line () {
-  echo "usage: $prog_name [-e] [-f] $file_arg_name" >&2
+  echo "usage: $prog_name [-e] [-s] $file_arg_name" >&2
 }
 
 # Our command-line options/syntax are currently minimal so we are keeping it
@@ -87,6 +87,6 @@ else
   print_what='$_'
 fi
 
-perl -ne "/^${match_what} Case(\d{4}(?!\.))/ && print $print_what" "$file"
+perl -ne "/^${match_what} Case([A-Z0-9][A-Za-z0-9]*)/ && print $print_what" "$file"
 
 # #born.

@@ -13,6 +13,13 @@ broadly there are 3 steps to this:
       (a "one dimensional scatterplot")
 """
 
+
+raise Exception('#todo - is this really not covered?')
+
+
+_doc = __doc__  # grab the above as our UI docstring before below
+
+
 # TODO (we don't yet want these in a versionsed Pipfile because it would
 # be a very weak development dependency, and we want to hold off on any
 # dependencies for now..)
@@ -25,6 +32,7 @@ dependencies (TODO):
     - requests         2.18.4
 """
 
+
 url = 'https://en.wikipedia.org/wiki/Woody_Allen_filmography'
 
 tmp_numbers_file = 'tmp.woody-allen.numbers.list'
@@ -34,7 +42,7 @@ tmp_html_file = 'tmp.woody-allen.page.html'
 def _execute_into(client, argv):
 
     def __main():
-        ok = __parse_argv()
+        ok, do_thing = __parse_argv()
         if not ok:
             return exitstatus
 
@@ -46,7 +54,7 @@ def _execute_into(client, argv):
         if not ok:
             return exitstatus
 
-        return _display_thing(client)
+        return _display_thing(client, do_thing)
 
     def __resolve_numbers():
         if client.path_exists(tmp_numbers_file):
@@ -63,29 +71,56 @@ def _execute_into(client, argv):
             return _write_html_file(client)
 
     def __parse_argv():
-        if 1 is not len(argv):
-            raise Exception('cover me')
-        return True
+        program_name, *rest = argv
+        leng = len(rest)
+        if 0 == leng:
+            return True, False
+        this_one_option = '--use-numpy'
+        do_explain = False
+        if 1 == leng:
+            tok, = rest
+            if tok == this_one_option:
+                return True, True
+            if tok in ('-h', '--help'):
+                do_explain = True
+            else:
+                client.error(f"unrecognized option/argument '{tok}'")
+        else:
+            client.error('too many arguments')
+
+        client.info(f'usage: {program_name} [--help|--use-numpy]')
+        if do_explain:
+            for line in __do_explain():
+                client.stderr.write(f'{line}\n')
+        return False, None
+
+    def __do_explain():
+        itr = (line for line in _doc.split('\n') if len(line))
+        yield f'description: {next(itr)}'
+        for line in itr:
+            yield line
+        yield 'options:'
+        yield '    --use-numpy  do the full monty. requires things'
 
     exitstatus = 5
 
     return __main()
 
 
-def _display_thing(client):
+def _display_thing(client, do_thing):
+
+    float_a = tuple(__floats_via_file())
+    if do_thing:
+        __display_thing_using_numpy(client, float_a)
+    else:
+        __display_thing_simply(client, float_a)
+
+
+def __display_thing_using_numpy(client, float_a):
     """(adapted from K.-Michael Aye's work stack overflow)"""
 
     import numpy as np
     import matplotlib.pyplot as pp
-
-    import json
-
-    float_a = []
-
-    with open(tmp_numbers_file) as fp:
-        for line in fp:
-            _row = json.loads(line)
-            float_a.append(float(_row['year']))
 
     val = 0.  # this is the value where you want
     # the data to appear on the y-axis.
@@ -94,6 +129,24 @@ def _display_thing(client):
     pp.plot(ar, np.zeros_like(ar) + val, 'x')
     client.info('(showing. close window there to return.)')
     pp.show()
+
+
+def __display_thing_simply(client, float_a):
+    io = client.stdout
+    count = 0
+    for f in float_a:
+        count += 1
+        io.write('%0.2f\n' % f)
+    client.info('({} items total)', count)
+
+
+def __floats_via_file():
+
+    import json
+    with open(tmp_numbers_file) as fp:
+        for line in fp:
+            _row = json.loads(line)
+            yield float(_row['year'])
 
 
 def _write_numbers_file(client):

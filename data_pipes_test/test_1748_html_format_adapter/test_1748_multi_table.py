@@ -1,6 +1,4 @@
 """
-.#covers script.SSGs.hugo_docs_multi_table_json_stream #[#410.A.1]
-
 objectives are severalfold:
     - cover scraping of this one page format
     - cover the beginnings of [#874.4] multi-tablism

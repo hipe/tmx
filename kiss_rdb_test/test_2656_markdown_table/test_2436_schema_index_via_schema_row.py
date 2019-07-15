@@ -1,4 +1,3 @@
-# #covers: sakin_agac.format_adapters.markdown_table.magnetics.schema_index_via_schema_row  # noqa: E501
 from modality_agnostic.test_support.structured_emission import (
         minimal_listener_spy)
 import unittest

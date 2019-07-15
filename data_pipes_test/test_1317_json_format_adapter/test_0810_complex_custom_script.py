@@ -1,8 +1,3 @@
-"""
-.#covers script.khong.json_stream_via_website #[#410.A.1]
-"""
-
-
 from data_pipes_test.common_initial_state import html_fixture
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)

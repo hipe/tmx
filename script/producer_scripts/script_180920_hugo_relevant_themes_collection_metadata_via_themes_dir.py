@@ -21,8 +21,9 @@ distribution (like the script itself), but also it contains a couple of
 hard-coded lists at least one of which we need to know.
 
 there are alternatives to what we do here..
+
 """
-# #[#410.1.2] this is a producer script (sort of)
+# This producer script is one of several covered by (Case100SA).
 
 
 import re
