@@ -33,7 +33,8 @@ def _top_test_dir():
 
 
 def throwing_listenerer():
-    return kiss_rdber().THROWING_LISTENER
+    from modality_agnostic import listening
+    return listening.throwing_listener
 
 
 def kiss_rdber():

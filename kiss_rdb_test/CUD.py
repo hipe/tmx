@@ -5,8 +5,11 @@
 - #open [#867.Z] not yet fully divorced from toml
 """
 
-from kiss_rdb import THROWING_LISTENER as _throwing_listener
+from modality_agnostic import listening
 from modality_agnostic.memoization import lazy
+
+
+_throwing_listener = listening.throwing_listener
 
 
 # == functions (public & private because the boundary is plastic)

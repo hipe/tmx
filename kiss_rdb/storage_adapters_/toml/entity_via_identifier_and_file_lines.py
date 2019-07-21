@@ -444,7 +444,9 @@ def dictionary_two_deep_via_entity_line_stream_(de):
     # knowing just what kind of code we are passing this off to 😬
 
     big_string = ''.join(de.to_line_stream())
-    from kiss_rdb import THROWING_LISTENER as listener
+
+    from modality_agnostic import listening
+    listener = listening.throwing_listener
 
     # --
 

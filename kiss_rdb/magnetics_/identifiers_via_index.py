@@ -103,7 +103,7 @@ def identifiers_via_lines_of_index(file_lines):
     return _StateMachineIsh(file_lines).execute()
 
 
-class _StateMachineIsh():
+class _StateMachineIsh():  # #[#008.2] a state machine
 
     def __init__(self, x):
 

@@ -1,7 +1,7 @@
 from os import path as os_path
 
 
-def _thing(f):
+def _encode_identifier(f):
     def use_f(self, identifier_string, *rest):
         from kiss_rdb.magnetics_.identifier_via_string import (
             identifier_via_string_)
@@ -22,25 +22,24 @@ class _Collection:  # #tespoint
     def __init__(self, impl):
         self._impl = impl  # #testpoint
 
-    @_thing
+    @_encode_identifier
     def update_entity(self, *a):
         return self._impl.update_entity_as_storage_adapter_collection(*a)
 
     def create_entity(self, *a):
         return self._impl.create_entity_as_storage_adapter_collection(*a)
 
-    @_thing
+    @_encode_identifier
     def delete_entity(self, *a):
         return self._impl.delete_entity_as_storage_adapter_collection(*a)
 
-    @_thing
+    @_encode_identifier
     def retrieve_entity(self, iden, listener):
         de = self._impl.retrieve_entity_as_storage_adapter_collection(
                 iden, listener)
         if de is None:
             return  # (Case4130)
         # (Case4292):
-        assert(de.table_type == 'attributes')
         return de.to_dictionary_two_deep_as_storage_adapter_entity()
 
     def to_identifier_stream(self, listener):

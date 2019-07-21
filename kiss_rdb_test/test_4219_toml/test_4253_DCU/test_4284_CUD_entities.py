@@ -41,8 +41,8 @@ def expect_everything(orig_f):
         _existing_lines = unindent(self.given_big_string())
 
         # resolve listener
-
-        from kiss_rdb import THROWING_LISTENER as listener
+        from modality_agnostic import listening
+        listener = listening.throwing_listener
 
         # work
 

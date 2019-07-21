@@ -1,7 +1,7 @@
 import re
 
 
-class Scanner:
+class Scanner:  # #[#008.4] a scanner
     """many others like it, but this one is ours
 
     attempts to wrap up higher-level behavior we always end up wanting

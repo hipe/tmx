@@ -438,7 +438,8 @@ class _TableStartLine:
     def identifier_for_storage_adapter(self):
         # it looks like we accomplish RETRIEVE without creating identifiers..
 
-        from kiss_rdb import THROWING_LISTENER as listener
+        from modality_agnostic import listening
+        listener = listening.throwing_listener
 
         if self._identifier is None:
             from kiss_rdb.magnetics_.identifier_via_string import (

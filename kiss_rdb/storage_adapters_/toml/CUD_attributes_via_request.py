@@ -732,7 +732,7 @@ def __flush_deletes(mde, deletes):
 
 # == SUPPORT
 
-class _Scanner():
+class _Scanner():  # [#008.4] a scanner
     """
     a … scanner. like an iterator but more low-level & empty-friendly
 

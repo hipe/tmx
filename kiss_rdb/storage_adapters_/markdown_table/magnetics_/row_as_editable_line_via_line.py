@@ -256,7 +256,7 @@ _zero_or_more_not_newline_not_pipes = o(r'[^|\n]*')
 del o
 
 
-class _CustomScanner:  # #abstraction candidate
+class _CustomScanner:  # #abstraction candidate #[#008.4] a scanner
 
     def __init__(self, upstream_line, listener):
 

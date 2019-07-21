@@ -874,10 +874,10 @@ def _stateful_grammar_via(schema):
 
         def ASTs_via_line_via_listener(self, listener, schema=None):
             def asts_via_line(line):
-                def throwing_listener(*args):
+                def raising_listener(*args):
                     listener(*args)
                     raise _Stop
-                scn = Scanner(line, throwing_listener)
+                scn = Scanner(line, raising_listener)
                 try:
                     for tup in asts_via_scanner(scn):
                         yield tup

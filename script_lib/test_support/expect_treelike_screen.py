@@ -170,7 +170,7 @@ def _this_one_state_machine_definition():
     }
 
 
-class _StateMachine:
+class _StateMachine:  # #[#008.2] a state machine
     """(the more abstract parts of this could certainly be abstracted out..)
 
     (..the bulk of this is business-specific but etc.)

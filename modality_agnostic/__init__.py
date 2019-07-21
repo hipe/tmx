@@ -16,6 +16,116 @@ class listening:  # (as namespace only)
 
     # at #history-B.3 got rid of 2 methods that make emitters
 
+    def throwing_listener(channel_head, *rest):
+        """Experimental. Raise an exception derived from the emission IFF it's
+
+        an `error`, otherwise ignore. Use this only as a sort of `assert`.
+        """
+
+        if 'info' == channel_head:
+            return
+        raise Exception(listening.reason_via_error_emission(*rest))
+
+    def emission_via_args(args):
+        error_or_info, *rest = args
+        _i = ('error', 'info').index(error_or_info)
+        return (_InfoEmission if _i else _ErrorEmission)(*rest)
+
+    def reason_via_error_emission(shape, error_category, union, *rest):
+        _ee = _ErrorEmission(shape, error_category, union, *rest)
+        return _ee._flush_to_reason_()
+
+    def message_via_info_emission(shape, info_category, payloader):
+        _ = _InfoEmission(shape, info_category, payloader)
+        return _._flush_some_message_()
+
+
+class _Emission:
+    # experiment: a short-lived & highly stateful auxiliary for assisting in
+    # emission reflection. do not pass around as an emission. (call that Event)
+    # moved here at #history-B.4
+
+    def __init__(self, *a):
+        shape, *chan_tail, payloader = a
+        assert(shape in ('structure', 'expression'))
+        self.shape = shape
+        self.channel_tail = chan_tail
+        self._payloader_HOT = payloader
+
+    def _has_channel_tail_(self):
+        return len(self.channel_tail)
+
+    def _prefix_via_channel_tail_(self):
+        _what_kind = self.channel_tail[0].replace('_', ' ')  # "input error"
+        return f'{_what_kind}:'
+
+    def flush_to_trace_line(self):
+        _tup = tuple(self.__flush_to_trace_line_pieces())
+        return f'{_tup}\n'
+
+    def _flush_some_message_(self):
+        _i = ('structure', 'expression').index(self.shape)
+        _m = ('_message_when_structure', '_message_when_expression')[_i]
+        return getattr(self, _m)()
+
+    def _message_when_structure(self):
+        sct = self._flush_payloader_()
+        key = self._message_key_
+        if key in sct:
+            return sct[key]
+        _these = ', '.join(sct.keys())
+        return f"(unknown {key}, keys: ({_these}))"  # key as natural key
+
+    def __flush_to_trace_line_pieces(self):
+        yield (self._severity_, self.shape, * self.channel_tail)  # _to_cha.._
+        _i = ('structure', 'expression').index(self.shape)
+        _m = ('_trace_when_structure', '_trace_when_expression')[_i]
+        for tup in getattr(self, _m)():
+            yield tup
+
+    def _trace_when_expression(self):
+        yield ('paragraph_string', self._message_when_expression())
+
+    def _message_when_expression(self):
+        pcs = []
+        for line in self._flush_payloader_():
+            pcs.append(line)
+            pcs.append('\n')
+        return ''.join(pcs)
+
+    def _trace_when_structure(self):
+        sct = self._flush_payloader_()
+        key = self._message_key_
+        if key in sct:
+            yield (key, sct[key])
+        else:
+            yield ('keys', tuple(sct.keys()))
+
+    def _flush_payloader_(self):
+        payloader = self._payloader_HOT
+        del self._payloader_HOT
+        return payloader()  # [#511.3]
+
+
+class _ErrorEmission(_Emission):
+
+    def _flush_to_reason_(self):
+        return ' '.join(self.__to_pieces())
+
+    def __to_pieces(self):
+        if self._has_channel_tail_:
+            yield self._prefix_via_channel_tail_()
+        yield self._flush_some_message_()
+
+    _message_key_ = 'reason'
+    _severity_ = 'error'
+
+
+class _InfoEmission(_Emission):
+
+    _message_key_ = 'message'
+    _severity_ = 'info'
+
 
 class _write_only_IO_proxy:
     """A sort-of proxy (façade?) of a filehandle open for writing defined..
@@ -95,6 +205,7 @@ class Exception(Exception):
     pass
 
 
+# #history-B.4: as referenced
 # #history-B.3: get rid of emitting assistants
 # #history-B.2: unify IO proxies
 # #history-B.1: as referenced, can be temporary

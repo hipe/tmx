@@ -328,8 +328,8 @@ class Case1407_flush_as_config_money(_CommonCase):
 
 
 def _throwing_listener():
-    from kiss_rdb import THROWING_LISTENER
-    return THROWING_LISTENER
+    from modality_agnostic import listening
+    return listening.throwing_listener
 
 
 same_path = 'xx/yy.file'

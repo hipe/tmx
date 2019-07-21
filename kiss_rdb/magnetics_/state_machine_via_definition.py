@@ -140,7 +140,7 @@ def _build_enhanced_listener(listener, ps):
     return enhanced_listener
 
 
-class StateMachine:
+class StateMachine:  # #[#008.2] a state machine
     """DISCUSSION
 
     the state machine is an immutable.

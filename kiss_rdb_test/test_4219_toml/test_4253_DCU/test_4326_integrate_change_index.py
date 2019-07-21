@@ -751,8 +751,8 @@ def _subject_module():
 # ==
 
 def _throwing_listener():
-    from kiss_rdb import THROWING_LISTENER
-    return THROWING_LISTENER
+    from modality_agnostic import listening
+    return listening.throwing_listener
 
 
 def _no_listener(*chan, payloader):

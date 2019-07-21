@@ -542,13 +542,13 @@ def _message_from(es):
 
 
 def _message_or_reason_from(which, es):
-    import kiss_rdb as lib
+    from modality_agnostic import listening as lib
     severity, *rest = *es['channel'], es['payloader_CAUTION_HOT']
     if 'error' == which:
         assert('error' == severity)
-        return lib.reason_via_error_emission_(*rest)
+        return lib.reason_via_error_emission(*rest)
     assert('info' == severity)
-    return lib.message_via_info_emission_(*rest)
+    return lib.message_via_info_emission(*rest)
 
 
 def _confirm_collection_empty(tc, coll):
@@ -565,7 +565,8 @@ yes_value_dictionary_of = _yes_value_dict
 
 
 def _identifier_via_string(s):
-    from kiss_rdb import THROWING_LISTENER as listener
+    from modality_agnostic import listening
+    listener = listening.throwing_listener
     from kiss_rdb.magnetics_ import identifier_via_string as lib
     return lib.identifier_via_string_(s, listener)
 

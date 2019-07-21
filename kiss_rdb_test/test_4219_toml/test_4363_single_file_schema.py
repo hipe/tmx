@@ -1,5 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
-        debugging_listener,
+        # debugging_listener,
         functions_for,
         unindent)
 from kiss_rdb_test.CUD import (
@@ -217,8 +217,8 @@ def _main_module():
 
 
 def _throwing_listener():
-    from kiss_rdb import THROWING_LISTENER
-    return THROWING_LISTENER
+    from modality_agnostic import listening
+    return listening.throwing_listener
 
 
 _no_listener = None
