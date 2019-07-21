@@ -5,7 +5,7 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class Case010_ohai(CLI_CaseMethods, unittest.TestCase):
+class Case6150_ohai(CLI_CaseMethods, unittest.TestCase):
 
     def test_010_the_invocation_succeeds(self):
         self.assertTrue(self.magnetic_call_.OK)

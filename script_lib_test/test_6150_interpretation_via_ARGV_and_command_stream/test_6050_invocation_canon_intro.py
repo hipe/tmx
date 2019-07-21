@@ -69,7 +69,7 @@ class _CommonCase(CLI_CaseMethods, unittest.TestCase):
         return self.interpretation_when_expected_(2, STDERR)
 
 
-class Case0_no_args(_CommonCase):
+class Case6146_no_args(_CommonCase):  # classically case 0
 
     def test_010_subject_module_loads(self):
         self.assertIsNotNone(self.main_magnetic_())
@@ -93,7 +93,7 @@ class Case0_no_args(_CommonCase):
         return the_empty_ARGV()
 
 
-class Case1_1_strange_subparser_name(_CommonCase):
+class Case6149_strange_subparser_name(_CommonCase):  # classically case 1.1
 
     def test_020_magnetic_call_happens(self):
         self.magnetic_call_happens_()
@@ -121,7 +121,10 @@ class Case1_1_strange_subparser_name(_CommonCase):
         return ['fhqwhgads']
 
 
-class Case1_2_strange_option(_CommonCase):
+# Case6150  # #midpoint
+
+
+class Case6152_strange_option(_CommonCase):  # classically case 1.2
 
     def test_020_magnetic_call_happens(self):
         self.magnetic_call_happens_()
@@ -148,7 +151,7 @@ class Case1_2_strange_option(_CommonCase):
         return ['-x', '--another', '--etc']
 
 
-class Case1_3_good_sub_command(_CommonCase):
+class Case6155_good_sub_command(_CommonCase):  # classically case 1.3
 
     def test_020_magnetic_call_happens(self):
         self.magnetic_call_happens_()

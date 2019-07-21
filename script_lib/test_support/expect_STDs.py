@@ -35,7 +35,9 @@ possible issues:
     we model neither; that in fact we model the expectation of one *or more*
     lines per write..
 
+
 :[#009]
+(Case0250)
 """
 
 from modality_agnostic.memoization import lazy

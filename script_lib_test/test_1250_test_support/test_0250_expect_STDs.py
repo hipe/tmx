@@ -1,28 +1,26 @@
 """cover the "expect STD's" library
 
-the module this test file covers (the "subject") is mirrored in the
-file's name. see that corresponding asset file for a statement of the
-subject's objective and scope.
+The covered asset file has a statement of the subject's objective and scope.
 
 for these tests in this file, our general goals are:
 
-  - cover at least one success path (case 01)
+  - cover at least one success path (Case0243)
 
   - cover that failure is expressed appropriately for all of these:
 
-    - when the actual number of lines exceeds the expected number. (case 02)
+    - when the actual number of lines exceeds the expected number. (Case0246)
 
-    - when the actual number of lines comes up short. (case 03)
+    - when the actual number of lines comes up short. (Case0249)
 
     - when an actual line is written to the "wrong" stream
-      (viz STDOUT not STDERR, or the other one) (case 04)
+      (viz STDOUT not STDERR, or the other one) (Case0252)
 
     - (the kinds of content failure discussed next.)
 
   - allow modeling of content expectation (and cover failure thereof) via:
 
-    - fixed string (case 05)
-    - regexp (case 06)
+    - fixed string (Case0255)
+    - regexp (Case0258)
     - the absence of content expectation (various cases)
 
 the test cases (and the test methods within them) are written in an
@@ -76,7 +74,7 @@ class _CaseMethods:
         return x
 
 
-class Case01_success_path(_CaseMethods, unittest.TestCase):
+class Case0243_success_path(_CaseMethods, unittest.TestCase):
 
     def test_050_subject_module_loads(self):
         self.assertIsNotNone(self._subject_module())
@@ -99,7 +97,7 @@ class Case01_success_path(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case02_one_too_many(_CaseMethods, unittest.TestCase):
+class Case0246_one_too_many(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -126,7 +124,7 @@ class Case02_one_too_many(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case03_one_too_few(_CaseMethods, unittest.TestCase):
+class Case0249_one_too_few(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -151,7 +149,10 @@ class Case03_one_too_few(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
+# Case0250  # #midpoint
+
+
+class Case0252_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()
@@ -175,7 +176,7 @@ class Case04_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_any_string_expectation()
 
 
-class Case05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
+class Case0255_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self.assertIsNotNone(self._performance())
@@ -200,7 +201,7 @@ class Case05_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
         return self._two_stderr_line_certain_string_expectation()
 
 
-class Case06_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
+class Case0258_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
         self._performance_performs()

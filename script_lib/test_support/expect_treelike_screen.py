@@ -253,7 +253,7 @@ class _StateMachine:  # #[#008.2] a state machine
             this_num = frame.the_effective_margin_length
             if this_num > target_num:
                 # it is normal to see a depth deeper than your taregt depth
-                pass  # (CaseFA9)
+                pass  # (Case0464)
             elif this_num == target_num:
                 # if the depth of this item we just popped off the stack
                 # IS EQUAL to the depth of the current line, that means they

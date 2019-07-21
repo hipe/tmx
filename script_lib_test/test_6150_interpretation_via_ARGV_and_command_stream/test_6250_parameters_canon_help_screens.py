@@ -68,7 +68,7 @@ class _CommonCase(unittest.TestCase):
 
 # (each "category N" below is from the list at [#502])
 
-class Case010_category_4_required_field(_CommonCase):
+class Case6244_category_4_required_field(_CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -91,7 +91,7 @@ class Case010_category_4_required_field(_CommonCase):
         return _command_modules().two_crude_function_parameters_by_function()
 
 
-class Case020_category_1_flag(_CommonCase):
+class Case6247_category_1_flag(_CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -118,7 +118,7 @@ class Case020_category_1_flag(_CommonCase):
         return _command_modules().category_1_flag_minimal()
 
 
-class Case030_category_2_optional_field_NOTE(_CommonCase):
+class Case6250_category_2_optional_field_NOTE(_CommonCase):
     """NOTE - there is a #aesthetic-hueristic vaporware here that has
 
     yet to be specified (in this project). it's something like this: an
@@ -170,7 +170,7 @@ class Case030_category_2_optional_field_NOTE(_CommonCase):
         return _command_modules().category_2_optional_field_minimal()
 
 
-class Case040_category_3_optional_list(_CommonCase):
+class Case6253_category_3_optional_list(_CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -194,7 +194,7 @@ class Case040_category_3_optional_list(_CommonCase):
         return _command_modules().category_3_optional_list_minimal()
 
 
-class Case050_category_5_required_list(_CommonCase):
+class Case6256_category_5_required_list(_CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
