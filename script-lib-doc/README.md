@@ -64,7 +64,7 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
-|[#604]                     | #hole |
+|[#604.2]                   | #open | known limitation of our arg parsing
 |[#603]                     |       | [the help screen parser] |
 |:[#602]                    | #open | track that one issue with argparse (should patch) |
 

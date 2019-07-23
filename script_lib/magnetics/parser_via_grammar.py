@@ -29,26 +29,40 @@ def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
     last_used_offset_in_grammar = -1  # BE CAREFUL
     did_plurals_at = []
 
+    def offset_of_any_next_missing_required():
+        for i in range(last_used_offset_in_grammar + 1, len(sequence_grammar)):
+            if sequence_grammar[i].is_required:  # #term
+                return i
+
     while not token_scanner.is_empty:
         # the essence of all (packrat?) parsing: first match wins
-        found_first_match = False
-        for transition in transitions:
-            # #transition:
-            symbol_name, offset_in_grammar, move_to_offset = transition
-            SOMETHING = symbol_table(symbol_name)
-            found_first_match = SOMETHING.YES_I_AM_INTERESTED(token_scanner)
-            if found_first_match:
-                break
-        if not found_first_match:
-            return _when_transition_not_found(
-                    listener, token_scanner, transitions)
-        tup = SOMETHING.DO_THE_PARSE(token_scanner, listener)
-        if tup is None:
-            xx()
-        decoded, = tup
 
-        _, is_plural, _ = sequence_grammar[offset_in_grammar]  # #term
-        if is_plural:
+        # step one: find the first match based on peeking
+
+        use_transition = None
+        did_match = False
+
+        for trans in transitions:
+            subparser = symbol_table(trans.symbol_name)
+            did_match = subparser.match_by_peek_as_subparser(token_scanner)
+            if did_match:
+                use_transition = trans  # first match wins
+                break
+
+        if not did_match:
+            _i = offset_of_any_next_missing_required()
+            return _when_transition_not_found(
+                    listener, _i, token_scanner, transitions)
+
+        # step two: does the ONE matching symbol succeed in parsing?
+
+        wv = subparser.parse_as_subparser(token_scanner, listener)
+        if wv is None:  # wv = wrapped value
+            return  # (Case5442)
+        decoded, = wv
+
+        offset_in_grammar = use_transition.offset_in_grammar
+        if sequence_grammar[offset_in_grammar].is_plural:
             if ast[offset_in_grammar] is None:  # (Case2626)
                 ast[offset_in_grammar] = []
                 did_plurals_at.append(offset_in_grammar)
@@ -56,16 +70,15 @@ def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
         else:
             ast[offset_in_grammar] = decoded  # (Case2595)
 
-        transitions = digraph[move_to_offset]
+        transitions = digraph[use_transition.move_to_offset]
         last_used_offset_in_grammar = offset_in_grammar
 
     # We have succeeded it getting the grammar to satisfy the input tokens,
     # but did the input tokens satisfy all of the grammar? We must check:
 
-    for i in range(last_used_offset_in_grammar + 1, len(sequence_grammar)):
-        is_required, is_plural, symbol_name = sequence_grammar[i]  # #term
-        if is_required:
-            return _when_missing_required(listener, symbol_name, symbol_table)
+    i = offset_of_any_next_missing_required()
+    if i is not None:
+        return _when_missing_required(listener, i)
 
     for i in did_plurals_at:
         ast[i] = tuple(ast[i])
@@ -129,7 +142,7 @@ def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)
     create_state(0)  # the start state is at offset zero
     left_boundary = 0
 
-    tox = _TokenScanner(tokens)
+    tox = TokenScanner(tokens)
     while not tox.is_empty:
 
         arity = tox.shift()
@@ -146,7 +159,9 @@ def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)
             includes_zero = False
             goes_to_infinity = True
         else:
-            xx()
+            assert('zero or more' == arity)
+            includes_zero = True
+            goes_to_infinity = True
 
         """.#here1 is the key thing: this pair in concert with the
         "participating states" expresses a set of transitions to add to our
@@ -155,16 +170,20 @@ def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)
 
         future_new_state_offset = len(states)
         offset_in_grammar = len(sequence_grammar)
-        _term = (not includes_zero, goes_to_infinity, symbol_name)  # #term
-        sequence_grammar.append(_term)
+        term = _Term()  # #term
+        term.symbol_name = symbol_name
+        term.is_required = not includes_zero
+        term.is_plural = goes_to_infinity
+        sequence_grammar.append(term)
 
-        transition = (  # #transition
-                symbol_name,
-                offset_in_grammar,
-                future_new_state_offset)
+        trans = _Transition()
+        trans.symbol_name = symbol_name
+        trans.offset_in_grammar = offset_in_grammar
+        trans.move_to_offset = future_new_state_offset
+
         for offset in range(left_boundary, future_new_state_offset):
             _state_trasitions = states[offset]  # #transitions
-            _state_trasitions.append(transition)
+            _state_trasitions.append(trans)
 
         # as soon as you encounter any pair whose arity does not include zero,
         # it closes off a run of "maybes". It is a spot you have to hit. It
@@ -179,20 +198,34 @@ def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)
         # if a pair's arity is unbounded, express that it transitions to self
         if goes_to_infinity:
             _state_trasitions = states[future_new_state_offset]  # #transitions
-            _state_trasitions.append(transition)  # (Case2626)
+            _state_trasitions.append(trans)  # (Case2626)
 
     return states, sequence_grammar
 
 
-class _TokenScanner:  # #testpoint  # [#008.4] a scanner
+class _Term:  # #[#510.2]  blank state
+    pass
+
+
+class _Transition:  # #[#510.2]  blank state
+    pass
+
+
+class TokenScanner:  # #[#008.4] a scanner
+    # NOTE this is now used experimentally also as a character scanner!
 
     def __init__(self, tokens):
         self._length = len(tokens)
-        self._tokens = tokens
-        self._pos = -1  # BE CAREFUL
+        self.tokens = tokens
+        self.pos = -1  # re value: BE CAREFUL! re name: be like ruby meh
         self.peek = None  # BE CAREFUL
         self.is_empty = False
         self.advance()
+
+    def flush_the_rest(self):
+        x = self.tokens[self.pos:]
+        self.advance_to_position(self._length)
+        return x
 
     def shift(self):
         x = self.peek
@@ -200,33 +233,36 @@ class _TokenScanner:  # #testpoint  # [#008.4] a scanner
         return x
 
     def advance(self):
-        self._pos += 1
-        if self._pos == self._length:
+        self.advance_to_position(self.pos + 1)
+
+    def advance_to_position(self, pos):
+        self.pos = pos
+        if self.pos == self._length:
             self.is_empty = True
             del self._length
-            del self._tokens
-            del self._pos
+            del self.pos
             del self.peek
             return
-        self.peek = self._tokens[self._pos]
+        self.peek = self.tokens[self.pos]
 
 
 # -- whiners
 
-def _when_missing_required(listener, symbol_name, symbol_table):
+def _when_missing_required(listener, offset_in_grammar):
     def structer():
-        SOMETHING = symbol_table(symbol_name)
-        xx()
-        return SOMETHING  # no
+        return {'offset_in_grammar': offset_in_grammar}
     listener('error', 'structure', 'parse_error', 'missing_required', structer)
 
 
-def _when_transition_not_found(listener, token_scanner, transitions):
+def _when_transition_not_found(listener, i, token_scanner, transitions):
 
-    if len(transitions):  # (Case2611)
-        return _when_unrecognized_input(listener, token_scanner, transitions)
-    else:
-        return _when_extra_input(listener, token_scanner)  # (Case2611)
+    if i is None:
+        # when no missing required, say it is unexpected (i.e extra) input
+        # rather than splaying available transitions EXPERIMENTAL
+        return _when_extra_input(listener, token_scanner)   # (Case2611)
+
+    # (Case2598)
+    return _when_unrecognized_input(listener, token_scanner, transitions)
 
 
 def _when_extra_input(listener, token_scanner):

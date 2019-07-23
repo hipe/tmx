@@ -21,7 +21,7 @@ class _CommonCase(unittest.TestCase):
 
     def my_run(self, listener):  # NOTE you can't call it `run` because unittst
         _tokens = self.given_tokens()
-        _scn = subject_module()._TokenScanner(_tokens)
+        _scn = subject_module().TokenScanner(_tokens)
         _grammar = self.given_grammar()
         return _grammar.parse(_scn, listener)
 
@@ -157,10 +157,10 @@ class build_minimal_parser:
     def __init__(self, string):
         self._string = string
 
-    def YES_I_AM_INTERESTED(self, tox):
+    def match_by_peek_as_subparser(self, tox):
         return self._string == tox.peek
 
-    def DO_THE_PARSE(self, tox, listener):
+    def parse_as_subparser(self, tox, listener):
         tox.advance()
         return (self._string,)
 
