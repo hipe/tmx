@@ -30,6 +30,7 @@ History:
 👉 At #history-A.2 changed from being case-oriented to pattern-oriented.
 A simple case as a regression-point: (Case5918)
 """
+# this is the most apotheotic extant implementation (at writing) of #[#008.11]
 
 
 def WHINE_ABOUT(echo, channel_tail, dim_pool):
@@ -245,8 +246,8 @@ def __lines_for_context_for_parse_error(dim_pool):
     position = o('position')
     # --
     from kiss_rdb.magnetics_.string_scanner_via_definition import (
-            two_lines_of_ascii_art_via_position_and_line__)
-    _2 = tuple(two_lines_of_ascii_art_via_position_and_line__(position, line))
+            two_lines_of_ascii_art_via_position_and_line)
+    _2 = tuple(two_lines_of_ascii_art_via_position_and_line(position, line))
 
     if lineno is None:
         num_as_s = ' '

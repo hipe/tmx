@@ -107,93 +107,6 @@ def RESOLVE_UPSTREAM_EXPERIMENT(cli):
     # == END
 
 
-def CHEAP_ARG_PARSE(cli_function, std_tuple, arg_names=(), help_values={}):
-
-    self = _State()
-
-    def __main():
-        if __help_was_requested_in_ANY_argument():
-            __express_help()
-        elif __parse_arguments_positionally():
-            _args = __prepare_args_to_send()
-            self.exitstatus = cli_function(*_args)
-        return self.exitstatus
-
-    def __prepare_args_to_send():
-        listener = __build_common_listener(serr)  # ..
-        return (* argv[1:], listener, * std_tuple[0:3])
-
-    def __parse_arguments_positionally():
-
-        if use_num_args == exp_num_args:
-            return True
-        else:
-            ui_puts('had {} needed {} arguments', use_num_args, exp_num_args)
-            _express_usage()
-            return False
-
-    def __help_was_requested_in_ANY_argument():
-        rx = re.compile('^--?h(?:e(:?lp?)?)?$')  # #[#608.4] DRY one day
-        _gen = (None for i in range(1, act_num_args) if rx.search(argv[i]))
-        help_was_requested = None
-        for _ in _gen:
-            help_was_requested = True
-            break
-        return help_was_requested
-
-    def __express_help():  # ..
-        io = serr
-        _express_usage()
-        ui_puts()
-        doc_s = cli_function.__doc__
-        if doc_s is not None:
-            io.write('description: ')  # ..
-            if '\n' in doc_s:
-                use_doc_s = doc_s
-            else:
-                use_doc_s = f'{doc_s}\n'
-            _ = line_stream_via_doc_string_(
-                    doc_string=use_doc_s,
-                    help_values=help_values)
-            for line in _:
-                io.write(line)
-        _succeeded()
-
-    def _express_usage():
-
-        if len(arg_names) is 0:
-            _args = ''
-        else:
-            _args = ' ' + ' '.join(arg_names)
-
-        _program_name = argv[0]  # ..
-        ui_puts('usage: {}{}', _program_name, _args)
-
-    def ui_puts(*a):
-        if len(a) is 0:
-            return serr.write('\n')
-        else:
-            _line_head = a[0].format(*a[1:])
-            return serr.write(_line_head + '\n')
-
-    def _succeeded():
-        self.exitstatus = 0
-
-    sin, sout, serr, argv = std_tuple
-
-    exp_num_args = len(arg_names)
-    act_num_args = len(argv)
-    use_num_args = act_num_args - 1
-    self.exitstatus = 678
-
-    return __main()
-
-
-class _State:  # #[#510.3]
-    def __init__(self):
-        self.exitstatus = None
-
-
 # -- abstracted at #history-A.1 - scream case because kludge, reach-down
 
 def CACHED_DOCUMENT_VIA_TWO(cached_path, url, noun_phrase, listener):
@@ -221,26 +134,31 @@ def _cached_doc_via_url(url, listener):
 # --
 
 
-def line_stream_via_doc_string_(doc_string, help_values):
-    if help_values is None:
-        big_string = doc_string
+def deindent_doc_string_(big_string, do_append_newlines):
+    # convert a PEP-257-like string into an iterator of lines
+
+    if do_append_newlines:
+        iter_rxs = '^.*\n'
+        # two_tabs_rxs = '^[ ]{8}(.*\n)'
     else:
-        big_string = doc_string.format(**help_values)
-    _reg = re.compile('^(.*\n)', re.MULTILINE)
-    _itr = _reg.finditer(big_string)
-    return (__deinident(md) for md in _itr)
+        iter_rxs = '^.*(?=\n)'
+        # two_tabs_rxs = '^[ ]{8}(.*)\n'
+
+    # two_tabs_rx = re.compile(two_tabs_rxs)
+    indented_line_md = None
+    for line_md in re.compile(iter_rxs, re.MULTILINE).finditer(big_string):
+        line = line_md[0]
+        # indented_line_md = two_tabs_rx.match(line)
+        if True or indented_line_md is None:
+            yield line
+        else:
+            yield indented_line_md[0]
 
 
-def __deinident(md):
-    line = md[1]
-    md2 = re.search('^[ ]{8}(.*\n)', line)
-    return line if md2 is None else md2[1]
+def listener_via_error_listener_and_IO(when_error, serr):  # 1x: KR
 
-
-def listener_via_error_listener_and_IO(when_error, serr):
-
-    from script_lib.magnetics import listener_via_resources as _
-    downstream_listener = _.listener_via_stderr(serr)
+    from script_lib.magnetics import listener_via_stderr
+    downstream_listener = listener_via_stderr(serr)
 
     def listener(head_channel, *a):
         if 'error' == head_channel:
@@ -249,15 +167,14 @@ def listener_via_error_listener_and_IO(when_error, serr):
     return listener
 
 
-def __build_common_listener(serr):
-
-    def listener(*these):
-        (*chan), lineser = these
-        assert('expression' == chan[1])  # else cover me
+def build_simple_business_listener_for_case_expression__(serr):  # #[#607.C]
+    def listener(sev, shape, emission_category, payloader):
+        assert('expression' == shape)  # else cover me
         # (at #history-A.2 got rid of remnants of the old way)
+        lineser = payloader
         for line in lineser():  # #[#511.3]
-            serr_puts(line)
-    serr_puts = putser_via_IO(serr)
+            write_line(line)
+    write_line = ___line_writer_via_putsernvia_IO(serr)
     return listener
 
 
@@ -290,13 +207,12 @@ class filesystem_functions:  # as namespace
         cover_me('not used')  # #todo
 
 
-def putser_via_IO(io):
-    def o(s):
-        _line = '%s\n' % s
-        _len = io.write(_line)  # :[#607.B]
+def ___line_writer_via_putsernvia_IO(io):
+    def write_line(s):
+        _len = io.write(f'{s}\n')  # :[#607.B]
         assert(isinstance(_len, int))  # sort of like ~[#022]
         return _len
-    return o
+    return write_line
 
 
 def cover_me(s):
@@ -317,6 +233,7 @@ SUCCESS = 0
 TEMPORARY_DIR = 'z'  # ick/meh
 
 
+# #history-A.3: "cheap arg parse" moves to dedicated file
 # #history-A.2; as referenced
 # #history-A.1: as referenced
 # #born: abstracted

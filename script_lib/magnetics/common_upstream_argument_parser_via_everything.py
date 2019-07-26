@@ -72,7 +72,7 @@ class common_upstream_argument_parser_via_everything:
 
     def __when_help(self):  # (Case010SA)
 
-        from script_lib import line_stream_via_doc_string_ as line_stream_via
+        from script_lib import deindent_doc_string_
 
         def f():
             pn = self._program_name()
@@ -84,8 +84,7 @@ class common_upstream_argument_parser_via_everything:
 
             if True:
                 if '\n' in big_s:
-                    itr = line_stream_via(big_s, {})
-                    itr = (s[:-1] for s in itr)  # meh
+                    itr = deindent_doc_string_(big_s, do_append_newlines=False)
                 else:
                     itr = iter([big_s])
                 yield ''

@@ -91,47 +91,6 @@ class ModalityAdaptationInjections_:  # see [#867.U] "why we inject"
         return {k: once[k]() for k in names}
 
 
-# == listener science
-
-class ErrorMonitor_:
-    """Construct the error monitor with one listener. It has two attributes:
-
-    `listener` and `ok`. Pass *this* listener to a client, and if it fails
-    (by emitting an `error`), the `ok` attribute (which started out as True)
-    will be set to False. The emission is passed thru to the argument listener
-    unchanged.
-
-    (moved files at #history-A.1)
-    """
-
-    def __init__(self, listener):
-        self.ok = True
-        self._debug = None
-        self.experimental_mutex = None  # go this away if it's annoying
-
-        def my_listener(*a):
-            if self._debug is not None:
-                self._debug(a)
-            if 'error' == a[0]:
-                del self.experimental_mutex
-                self.ok = False
-            listener(*a)
-
-        self.listener = my_listener
-
-    def DEBUGGING_TURN_ON(self):  # this will bork IFF destructive payloads
-        assert(not self._debug)
-        from sys import stderr
-
-        from modality_agnostic.listening import emission_via_args
-
-        def f(a):
-            stderr.write(emission_via_args(a).flush_to_trace_line())
-        self._debug = f
-
-
-# ==
-
 def dictionary_dumper_as_JSON_via_output_stream(fp):  # (Case6080)
     """JSON is chosen as a convenience for us not you. Don't get too attached
 
@@ -149,6 +108,7 @@ def dictionary_dumper_as_JSON_via_output_stream(fp):  # (Case6080)
 
 # ==
 
+# #history-A.4 lose error monitor
 # #history-A.3 lose throwing listener
 # #history-A.2 modality adaptation injections moved to here
 # #history-A.1 become home to "listener science"

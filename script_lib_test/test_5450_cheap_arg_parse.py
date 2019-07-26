@@ -374,7 +374,7 @@ class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
 
     def test_100_channel(self):
         self.expect_channel_tail(
-                'cannot_mix_flags_and_optional_parameters_in_one_token')
+                'cannot_mix_flags_and_optional_arguments_in_one_token')
 
     def test_200_payload(self):
         self.expect_token_and_position('-abdx1', 3)
@@ -394,7 +394,7 @@ class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
 
 @lazy
 def CLI_two():
-    return CLI_via(AST_via((
+    return CLI_parse_function_via(AST_via((
         ('-a', '--alfalfa', 'd1'),
         ('-b', '--bubu', 'd2'),
         ('-c', '--chou-chou', 'd3'),
@@ -403,7 +403,7 @@ def CLI_two():
 
 @lazy
 def CLI_one():
-    return CLI_via(grammar_one())
+    return CLI_parse_function_via(grammar_one())
 
 
 @lazy
@@ -415,8 +415,12 @@ def grammar_one():
         ('arg2', 'desc 4')))
 
 
-def CLI_via(syntax_AST):
-    return subject_module()._CLI_parser_function_via_syntax_AST(syntax_AST)
+def CLI_parse_function_via(syntax_AST):
+    def parse(token_scanner, listener):
+        return sm._do_parse(token_scanner, CLI, listener)
+    sm = subject_module()
+    CLI = sm._CLI_via_syntax_AST(syntax_AST)
+    return parse
 
 
 def AST_via(tups):

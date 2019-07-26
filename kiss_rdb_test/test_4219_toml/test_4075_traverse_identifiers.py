@@ -147,10 +147,10 @@ class Case4073_not_quite_section_line(_CommonCase):
         # but at #tombstone-A.3 it was restored
 
         from kiss_rdb.magnetics_.string_scanner_via_definition import (
-                two_lines_of_ascii_art_via_position_and_line__)
+                two_lines_of_ascii_art_via_position_and_line)
         _all_these = self.emitted_elements()
         _two = _two_via_these(**_all_these)
-        _itr = two_lines_of_ascii_art_via_position_and_line__(**_two)
+        _itr = two_lines_of_ascii_art_via_position_and_line(**_two)
         last_lines = list(_itr)
         _1 = "    [fun time]"
         _2 = "    ----^"

@@ -211,6 +211,7 @@ then in your 'main' terminal:
 |[#011]                     |       | commands/parameters API (placeheld)
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
+|[#008.11]                  | #trak | CLI error case expression
 |[#008.10]                  | #trak | places where you refer to that-other-project
 |[#008.I]                   | #trak | wish we could hook into importing
 |[#008.H]                   | #wish | come back when you understand data science better

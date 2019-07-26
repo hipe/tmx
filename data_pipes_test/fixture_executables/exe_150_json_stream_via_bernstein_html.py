@@ -28,12 +28,11 @@ _url = 'https://github.com/webmaven/python-parsing-tools'
 _first_selector = ('div', {'id': 'readme'})
 
 
-def _my_CLI(listener, sin, sout, serr):
-
-    _cm = open_traversal_stream(None, listener)
+def _my_CLI(error_monitor, sin, sout, serr, _SOON):
+    _cm = open_traversal_stream(None, error_monitor.listener)
     with _cm as lines:
-        exitstatus = _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
-    return exitstatus
+        _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
+    return 0 if error_monitor.ok else 456
 
 
 _my_CLI.__doc__ = __doc__
@@ -139,12 +138,16 @@ def _top_html_lib():
 
 
 if __name__ == '__main__':
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            CHEAP_ARG_PARSE)
     import sys as o
-    import script_lib as _
-    _exitstatus = _.CHEAP_ARG_PARSE(
+    _exitstatus = CHEAP_ARG_PARSE(
         cli_function=_my_CLI,
-        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        help_values={'url': _url},
+        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+        formal_parameters=(
+            ('-s', '--for-sync', 'COMING SOON'),
+            ),
+        description_template_valueser=lambda: {'url': _url},
         )
     exit(_exitstatus)
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 """
-generate a stream of JSON from {raw_url}
+generate a stream of JSON from
+{raw_url}
 
 (this is the content-producer of the producer/consumer pair)
 """
@@ -189,7 +190,7 @@ if __name__ == '__main__':
     _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_traversal_stream,
             doc_string=_my_doc_string,
-            help_values={'raw_url': _raw_url},
+            description_template_valueser=lambda: {'raw_url': _raw_url},
             )
     exit(_exitstatus)
 

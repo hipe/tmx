@@ -105,7 +105,7 @@ class Scanner:  # #[#008.4] a scanner
         return pattern.regex.match(self._line, self._position)
 
 
-def two_lines_of_ascii_art_via_position_and_line__(position, line):
+def two_lines_of_ascii_art_via_position_and_line(position, line):
     """given a possibly long line and a position, render it in 2 lines.
 
     something like this:
@@ -179,5 +179,6 @@ class pattern_via_description_and_regex_string:
         self.description = desc
         self.regex = re.compile(rx_string, *flags)
 
+# #pending-rename: move this to that one place
 # #history-A.1
 # #born.

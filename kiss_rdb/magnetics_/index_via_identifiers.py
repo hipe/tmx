@@ -223,7 +223,7 @@ class _CLI:
         # build a "error case expressor" (listener) that is similar in spirit
         # to our real CLI but worse in several observed ways. We don't want to
         # depend on the CLI because that defeats the purpose of a quarantined
-        # one-off, but #wish [#873.A] is to abstract it to be more accessible
+        # one-off, but #trak #[#008.11] is to abstract it to be more accessible
 
         def listener(*args):
             mood, shape, typ, *rest, payloader = args

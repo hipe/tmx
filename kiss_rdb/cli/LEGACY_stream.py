@@ -42,7 +42,7 @@ def common_parameters_from_the_script_called_stream_(o, param):
              )
 
 
-class _CLI:
+class _CLI:  # #open [#607.4] de-customize this custom CLI
 
     def __init__(self, sin, sout, serr, argv):
         self.stdin = sin
@@ -288,8 +288,8 @@ def listener_for_(cli):
     set an errorstatus and return early.
     """
 
-    from script_lib.magnetics import listener_via_resources as lib
-    express = lib.listener_via_stderr(cli.stderr)
+    from script_lib.magnetics import listener_via_stderr
+    express = listener_via_stderr(cli.stderr)
 
     def f(head_channel, *a):
         if 'error' == head_channel:

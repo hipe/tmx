@@ -15,6 +15,160 @@ import re
 _THIS_NAME = 'chosen_sub_command'
 
 
+def CHEAP_ARG_PARSE(cli_function, stdin, stdout, stderr, argv,
+                    formal_parameters, description_template_valueser=None):
+    """
+    NOTE This is still highly experimental: it is almost guaranteed that the
+    API will change (in terms of both function signatures and the exposed
+    function constituency). #history-A.4 was an overhaul of this method to add
+    support for parsing arbitrary options and (non-globbing) positional
+    arguments. Its exit criteria was only that the many involved producer
+    scripts continued to work as they did. #here marks new API experiments or
+    places where we carry over some weaknesses from the previous code.
+    """
+
+    _syntax_AST = _syntax_AST_via_parameters_definition(formal_parameters)
+    CLI = _CLI_via_syntax_AST(_syntax_AST)
+
+    tox = _parse_lib().TokenScanner(argv)
+    long_program_name = tox.shift()
+
+    state = _InvocationState()
+
+    @state.lazy_reader
+    def program_name():
+        from os import path as os_path
+        return os_path.basename(long_program_name)
+
+    @state.lazy_method_receiver
+    def business_listener():  # ##here only 'expression' not 'structure'
+        from script_lib import (
+                build_simple_business_listener_for_case_expression__)
+        return build_simple_business_listener_for_case_expression__(stderr)
+
+    def listener_for_parse_errors(*a):
+        sev, shape, cat, error_case, structurer = a
+        assert((sev, shape, cat) == ('error', 'structure', 'parameter_error'))
+
+        # catching help this way has some benefits but is mostly a hack
+        if ('unrecognized_option' == error_case and
+                structurer()['token'] in ('-h', '--help')):
+            __write_help_lines(stderr, description_template_valueser,
+                               cli_function, state.program_name(), CLI)
+            state.exitstatus = 0
+            return
+
+        for line in _express_parameter_error(state, error_case, structurer):
+            stderr.write(line)
+            stderr.write('\n')
+        stderr.write(f"see '{state.program_name()} --help'\n")
+
+    two = _do_parse(tox, CLI, listener_for_parse_errors)
+    if two is None:
+        return state.exitstatus
+    opt_vals, arg_vals = two
+
+    from modality_agnostic import listening
+    ErrorMonitor = listening.ErrorMonitor
+
+    es = cli_function(ErrorMonitor(state.business_listener),  # #here
+                      stdin, stdout, stderr, *opt_vals, *arg_vals)
+    assert(isinstance(es, int))  # #[#022]
+    return es
+
+
+class _InvocationState:  # [#503.11] blank slate, plus one thing
+
+    def lazy_method_receiver(self, f):  # #[#510.6] experimental
+        def use_f(*a):
+            return getattr(self, method_reader_method_name)()(*a)
+        method_reader_method_name = f'{f.__name__}_method'
+        self._add_lazy_reader(method_reader_method_name, f)
+        setattr(self, f.__name__, use_f)
+
+    def lazy_reader(self, f):  # #[#510.6] experimental
+        self._add_lazy_reader(f.__name__, f)
+
+    def _add_lazy_reader(self, method_name, f):
+        def use_f():
+            if not hasattr(self, attr):
+                setattr(self, attr, f())
+            return getattr(self, attr)
+        attr = f'_{method_name}'
+        setattr(self, method_name, use_f)
+
+
+def __write_help_lines(stderr, description_template_valueser,
+                       cli_function, program_name, CLI):
+
+    from script_lib.magnetics.listener_via_resources import (
+            desc_lineser_via, help_lines)
+
+    _descser = desc_lineser_via(description_template_valueser, cli_function)
+
+    for line in help_lines(program_name, _descser, CLI.opts, CLI.args):
+        stderr.write('\n' if line is None else f'{line}\n')
+
+
+def _express_parameter_error(state, error_case, structurer):
+    # cases covered visually: (Case5470) (Case5470) (Case5424) (Case5438)
+    # (Case5459) (Case5463) (Case5480) (Case5484) (Case5442) (Case5445)
+    # (Case5449) (Case5452) (Case5456)
+
+    opt, arg, token_pos, tok = (None, None, None, None)
+    dct = structurer()
+    dct = {k: v for k, v in dct.items()}
+    if 'option' in dct:
+        opt = dct.pop('option')
+        opt_moniker = f"'--{opt.long_name}'"
+    if 'argument' in dct:
+        arg = dct.pop('argument')
+        arg_moniker = f"<{arg.name}>"  # ..
+    if 'token_position' in dct:
+        token_pos = dct.pop('token_position')
+    if 'token' in dct:
+        tok = dct.pop('token')
+        tok_moniker = repr(tok)
+    assert(not len(dct))  # get earliest possible warning that stuff is wrong
+    mutable_words = error_case.split('_')
+
+    if opt is not None:
+        assert('option' == mutable_words[0])
+        mutable_words[0] = opt_moniker
+    else:
+        assert('option' != mutable_words[0])
+
+    if arg is not None:
+        assert(tok is None)
+        mutable_words.append(arg_moniker)
+
+    if token_pos is None and tok is not None:
+        mutable_words[-1] = f"{mutable_words[-1]}:"  # ick/meh
+        mutable_words.append(tok_moniker)
+
+    yield f"parameter error: {' '.join(mutable_words)}"
+
+    if token_pos is not None:
+        from kiss_rdb.magnetics_.string_scanner_via_definition import (
+                two_lines_of_ascii_art_via_position_and_line)
+        for s in two_lines_of_ascii_art_via_position_and_line(token_pos, tok):
+            yield s
+
+    state.exitstatus = 456
+
+
+def _init_CLI(o, syntax_AST):
+    # pre-compute things that can be pre-computed
+    o.opts, o.args = syntax_AST
+    _ = __build_option_index(o.opts)
+    o.opt_offset_via_short_name, o.opt_offset_via_long_name = _
+    o.sequence_grammar = tuple(__sequence_grammar_via_syntax_args(o.args))
+
+
+class _CLI_via_syntax_AST:  # #testpoint
+    __init__ = _init_CLI
+
+
 # #todo - you could eliminate (at writing) all `lazy` here (look)
 
 class argument_parser_index_via:
@@ -205,7 +359,7 @@ def _CLI_parser_function_via_syntax_AST(syntax_AST):  # #testpoint
     o.sequence_grammar = tuple(__sequence_grammar_via_syntax_args(o.args))
 
     def parse(token_scanner, listener):
-        return __do_parse(token_scanner, o, listener)
+        return _do_parse(token_scanner, o, listener)
 
     return parse
 
@@ -214,7 +368,7 @@ class _CLI:  # #[#510.2] blank state
     pass
 
 
-def __do_parse(tox, CLI, listener):
+def _do_parse(tox, CLI, listener):  # #testpoint
 
     inner_parser = _parse_lib().parser_via_grammar_and_symbol_table(
         CLI.sequence_grammar, {
@@ -304,7 +458,7 @@ def __do_parse(tox, CLI, listener):
                 return when('unrecognized_option', chars)  # (Case5480)
             if CLI.opts[opt_offset].takes_argument:
                 return when(
-                  'cannot_mix_flags_and_optional_parameters_in_one_token',
+                  'cannot_mix_flags_and_optional_arguments_in_one_token',
                   chars)  # (Case5477)
             chars.advance()
         tox.advance()
@@ -432,7 +586,6 @@ def __build_option_index(opts):
 
 
 # == the trick with winding and unwinding the thing
-
 
 def __two_tuples_via_big_flat(big_flat, opts, args):
 
@@ -568,7 +721,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
     class desc_parser:  # #class-as-namespace
 
         def match_by_peek_as_subparser(tox):
-            return multi_purpose_rx.match(tox.peek)
+            return looks_like_desc_rx.match(tox.peek)
 
         def parse_as_subparser(tox, _listener):
             return (tox.shift(),)  # #wrapped-AST-value
@@ -577,6 +730,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
     formal_short_rx = re.compile('-([a-z])$')
     looks_like_long_rx = re.compile('--[a-z][-a-z]')  # ..
     formal_long_rx = re.compile(f'--({_long_name_rxs})(?:=([_A-Z]+))?$')
+    looks_like_desc_rx = re.compile('[a-zA-Z]')
     multi_purpose_rx = re.compile('[a-z]')
     formal_arg_name_rx = re.compile('[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
 
@@ -587,7 +741,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
     if opts is None:
         opts = ()
     else:
-        opts = tuple(_FormalOption(*opt_parts) for opt_parts in opts)
+        opts = tuple(FormalOption_(*opt_parts) for opt_parts in opts)
 
     if args is None:
         args = ()
@@ -595,6 +749,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
         args = tuple(_FormalArgument(*arg_parts) for arg_parts in args)
 
     return opts, args
+
 
 def _argument_parser_via(stderr, prog, **platform_kwargs):
 
@@ -607,7 +762,7 @@ def _argument_parser_via(stderr, prog, **platform_kwargs):
     return ap
 
 
-class _FormalOption:
+class FormalOption_:
 
     def __init__(self, any_short_name, long_two, descs):
         self.short_name = any_short_name
@@ -694,7 +849,7 @@ def _ap_lib():
 
 
 def _parse_lib():
-    from .  import parser_via_grammar as parse_lib
+    from . import parser_via_grammar as parse_lib
     return parse_lib
 
 
@@ -721,6 +876,8 @@ _exe = Exception
 _DASH_DASH = '--'
 _NEWLINE = '\n'
 
+# #pending-rename: to "cheap arg parse" or something
+# #history-A.4: help & initial integration
 # #history-A.3: begin parser-generator-backed rewrite of "cheap arg parse"
 # #history-A.2: MASSIVE exodus
 # #history-A.1: as referenced (can be temporary)

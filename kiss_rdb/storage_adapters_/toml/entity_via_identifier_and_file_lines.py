@@ -61,9 +61,10 @@ class _Main:
         # build our parser "by hand" so we have a handle on the parse state
 
         from . import identifiers_via_file_lines as grammar_lib
-        from kiss_rdb import ErrorMonitor_
+        from modality_agnostic import listening
+        ErrorMonitor = listening.ErrorMonitor
 
-        mon = ErrorMonitor_(listener)
+        mon = ErrorMonitor(listener)
 
         _sm = grammar_lib.state_machine_
 

@@ -275,8 +275,9 @@ def __block_stream_via_file_lines(existing_file_lines, listener):
 
 
 def __monitor_via_listener(listener):
-    from kiss_rdb import ErrorMonitor_
-    return ErrorMonitor_(listener)
+    from modality_agnostic import listening
+    ErrorMonitor = listening.ErrorMonitor
+    return ErrorMonitor(listener)
 
 
 # ==

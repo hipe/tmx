@@ -159,10 +159,10 @@ class _ExecutableTerminalStepResolution:
         rsx = self.__modality_resources
         del self.__modality_resources
 
-        from script_lib.magnetics import listener_via_resources as o
+        from script_lib.magnetics import listener_via_stderr
 
         def extraneous_f():
-            _listener = o.listener_via_stderr(rsx.stderr)  # maybe more later
+            _listener = listener_via_stderr(rsx.stderr)  # maybe more later
             return _listener
         return extraneous_f
 

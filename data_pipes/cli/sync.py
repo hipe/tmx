@@ -66,7 +66,8 @@ def _pop_property(self, prop):
     return pop_property(self, prop)
 
 
-class _CLI:
+class _CLI:  # #open [#607.4] de-customize this custom CLI
+
 
     def __init__(self, *_four):
         # (Case3061)

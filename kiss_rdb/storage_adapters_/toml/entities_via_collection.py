@@ -61,9 +61,9 @@ class _ThisState:  # [#510.2]
 
 
 def identifiers_via__(paths_function, id_via_string, listener):
-
-    from kiss_rdb import ErrorMonitor_
-    monitor = ErrorMonitor_(listener)
+    from modality_agnostic import listening
+    ErrorMonitor = listening.ErrorMonitor
+    monitor = ErrorMonitor(listener)
     my_listener = monitor.listener
 
     _otl_itr = _table_start_line_stream_via_dir_path(paths_function, monitor)

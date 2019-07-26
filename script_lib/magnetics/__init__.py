@@ -1,17 +1,13 @@
 from script_lib import cover_me
 
 
-#
-# listener stowaway
-#
+# == BEGIN listener stowaway
 
-def listener_via_resources(rsx):
-    # (see comments in dedicated file)
-
-    return listener_via_resources.listener_via_stderr(rsx.stderr)
-
-
-def _listener_via_stderr(stderr):
+def listener_via_stderr(stderr):
+    # this is a modality implementation of a [#017] listener
+    # see a simpler #[#607.C] above and a more complex one below
+    # as of #history-A.1 this may be LEGACY and DEPRECATED, awaitng
+    # unification of case expression
 
     def listener(*a):
         d = _deque_via_array(a)
@@ -46,9 +42,6 @@ def _listener_via_stderr(stderr):
     return listener
 
 
-listener_via_resources.listener_via_stderr = _listener_via_stderr
-
-
 class STYLER_:
     """EXPERIMENT (placeholder)"""
 
@@ -64,10 +57,8 @@ _approved_toplevel_channels = {
         'error': None,
         }
 
+# == END listener stowaway
 
-#
-#
-#
 
 class resources_via_ARGV_stream_and_stderr_and_stdout:
 
@@ -88,4 +79,5 @@ _deque_via_array = deque_via_ARGV
 
 _NEWLINE = '\n'
 
+# #history-A.1
 # #abstracted.

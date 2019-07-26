@@ -19,8 +19,8 @@ def _run_CLI(sin, sout, serr, argv):
 
 def _CLI_body(arg, prog, sout, serr):
 
-    from script_lib.magnetics import listener_via_resources as _
-    listener = _.listener_via_stderr(serr)
+    from script_lib.magnetics import listener_via_stderr
+    listener = listener_via_stderr(serr)
 
     _coll_id = collection_identifier_via_parsed_arg_(arg)
 

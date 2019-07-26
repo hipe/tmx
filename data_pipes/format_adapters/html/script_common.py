@@ -31,26 +31,27 @@ def selector_via_string(*_):
 def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
         traversal_function,
         doc_string,
-        help_values=None,
+        description_template_valueser=None,
         ):
 
-    def my_CLI(listener, sin, sout, serr):
-
-        _rc = traversal_function(None, listener=listener)
-
+    def my_CLI(error_monitor, sin, sout, serr, IS_FOR_SYNC):
+        _rc = traversal_function(None, listener=error_monitor.listener)
         with _rc as itr:
-                result = flush_JSON_stream_into(sout, serr, itr)
-        return result
+                flush_JSON_stream_into(sout, serr, itr)
+        return 0 if error_monitor.ok else 456
 
     my_CLI.__doc__ = doc_string
 
-    import script_lib as _
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            CHEAP_ARG_PARSE)
     import sys as o
-
-    _exitstatus = _.CHEAP_ARG_PARSE(
+    _exitstatus = CHEAP_ARG_PARSE(
         cli_function=my_CLI,
-        std_tuple=(o.stdin, o.stdout, o.stderr, o.argv),
-        help_values=help_values,
+        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+        formal_parameters=(
+            ('-s', '--for-sync', 'COMING SOON'),
+            ),
+        description_template_valueser=description_template_valueser,
         )
 
     return _exitstatus
@@ -65,7 +66,7 @@ def flush_JSON_stream_into(sout, serr, itr):
     for obj in itr:
         count += 1
         visit(obj)
-
+        sout.write('\n')
     serr.write('({} items(s))\n'.format(count))
 
 

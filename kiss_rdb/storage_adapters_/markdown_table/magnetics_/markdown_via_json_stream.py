@@ -87,8 +87,8 @@ def _these():
 
 def _my_CLI(parsed_arg, program_name, sout, serr):
 
-    from script_lib.magnetics import listener_via_resources as o
-    listener = o.listener_via_stderr(serr)
+    from script_lib.magnetics import listener_via_stderr
+    listener = listener_via_stderr(serr)
 
     from data_pipes import common_producer_script as mod
     _ = mod.LEGACY_markdown_lib().collection_identifier_via_parsed_arg_

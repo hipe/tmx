@@ -24,7 +24,7 @@ def _my_parameters(o, param):
             )
 
 
-class _CLI:
+class _CLI:  # #open [#607.4] de-customize this custom CLI
 
     def __init__(self, *_four):
         self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]

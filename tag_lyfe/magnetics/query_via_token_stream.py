@@ -24,8 +24,8 @@ def RUMSKALLA(serr, query_s):
     print('the unsani:')
     unsani = next(itr)
 
-    from script_lib.magnetics import listener_via_resources as _
-    listener = _.listener_via_stderr(serr)
+    from script_lib.magnetics import listener_via_stderr
+    listener = listener_via_stderr(serr)
 
     wat = unsani.sanitize(listener)
 

@@ -41,7 +41,7 @@ woah boy.
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
 |[#873.C]                   | #wish | a `--oneline` option for CLI
 |[#873.B]                   | #wish | this one smell in emissions
-|[#873.A]                   | #wish | make CLI error case expression more abstracted
+|[#873.A]                   | #hole |
 |[#873]                     |       | internal tracking (extended)
 |[#872]                     |       | multi-line strings: the document
 |[#871]                     |       | this one thing (see inline)

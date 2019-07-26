@@ -40,6 +40,44 @@ class listening:  # (as namespace only)
         return _._flush_some_message_()
 
 
+class _ErrorMonitor:
+    """Construct the error monitor with one listener. It has two attributes:
+
+    `listener` and `ok`. Pass *this* listener to a client, and if it fails
+    (by emitting an `error`), the `ok` attribute (which started out as True)
+    will be set to False. The emission is passed thru to the argument listener
+    unchanged.
+
+    (moved files (a second time) at #history-B.5)
+    """
+
+    def __init__(self, listener):
+        self.ok = True
+        self._debug = None
+        self._experimental_mutex = None  # go this away if it's annoying
+
+        def my_listener(*a):
+            if self._debug is not None:
+                self._debug(a)
+            if 'error' == a[0]:
+                del self._experimental_mutex
+                self.ok = False
+            listener(*a)
+
+        self.listener = my_listener
+
+    def DEBUGGING_TURN_ON(self):  # this will bork IFF destructive payloads
+        assert(not self._debug)
+        from sys import stderr
+
+        def f(a):
+            stderr.write(listening.emission_via_args(a).flush_to_trace_line())
+        self._debug = f
+
+
+setattr(listening, 'ErrorMonitor', _ErrorMonitor)
+
+
 class _Emission:
     # experiment: a short-lived & highly stateful auxiliary for assisting in
     # emission reflection. do not pass around as an emission. (call that Event)
@@ -205,6 +243,7 @@ class Exception(Exception):
     pass
 
 
+# #history-B.5: as referenced
 # #history-B.4: as referenced
 # #history-B.3: get rid of emitting assistants
 # #history-B.2: unify IO proxies

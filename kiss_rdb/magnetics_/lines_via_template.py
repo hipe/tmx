@@ -33,8 +33,8 @@ class _CLI:
 
         from os import environ
 
-        from script_lib.magnetics import listener_via_resources as _
-        _listener = _.listener_via_stderr(self.stderr)
+        from script_lib.magnetics import listener_via_stderr
+        _listener = listener_via_stderr(self.stderr)
 
         lines = _lines_via(
             data_source=environ,

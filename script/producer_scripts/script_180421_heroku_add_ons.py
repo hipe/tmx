@@ -1,6 +1,7 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
-"""generate a stream of JSON from the heroku page {url}
+"""generate a stream of JSON from the heroku page:
+{url}
 
 (this is the content-producer of the producer/consumer pair)
 """
@@ -54,7 +55,7 @@ if __name__ == '__main__':
     _exitstatus = common_CLI_for_json_stream_(
             traversal_function=open_dictionary_stream,
             doc_string=_my_doc_string,
-            help_values={'url': _url},
+            description_template_valueser=lambda: {'url': _url},
             )
     exit(_exitstatus)
 
