@@ -37,7 +37,7 @@ error reporting geared towards your .. intention.
 
 ## <a name=3></a>heuristic templating
 
-this relates to #open [#410.S]  (see, discussed there at length) which pertains to a
+this relates to #open [#873.G]  (see, discussed there at length) which pertains to a
 particular application of this theory that has yielded mis-behaviors.
 
 but the "theory" of heruistic templating is that we look at the existing
@@ -89,7 +89,7 @@ but this is seen as overwrought for now.
 
 
 
-## <a name=F></a> provision: the collision handler takes four arguments.
+## <a name=6></a> provision: the collision handler takes four arguments.
 
 (this is up from the previous two it used to take before #history-A.1)
 we made this change because we were gung-ho about etc but it seems it might
@@ -99,35 +99,59 @@ natural key?
 
 
 
-## <a name=G></a> provision: short circuit out of a merge operation
+## <a name=7></a> avoiding no-op merges that clobber formatting
 
-this provision holds that we short-circuit out of calling the merge callback
-if the far "record" has no components other than the human key (because why
-bother, right?).
+Some prerequisites:
 
-there are, however, some caveates discussed in code.
+  - know vaguely what is meant by "natural key".
+  - know what sync keys are. (See #provision [#458.H]).
 
-One case that covers this provision is (Case0150DP).
+Imagine a case where a far entity dictionary has been matched up with a near
+entity (because their sync keys are equal). Here we usually do we call an
+"entity-sync" (or (indifferently) an "entity merge").
+
+Imagine the case where a near entity is so matched to a far entity, and
+and every name-value pair in the far entity has values equal to existing
+values in the near entity.
+
+Doing the entity-sync here would have no logical effect because it would
+consist only of over-writing existing values with the same values. Futhermore,
+it can have the undesired *actual* effect of applying formatting from the
+example surface entity (e.g. the "prototype row") and clobbering the desired
+actual formatting present in the particular surface entity.
 
 
 
 
 ## <a name=H></a> provision: custom keyers
 
-this provision holds that you can provide a function that "derives" a human
-key per each item through arbitrary means. [#463.B] shows how a keyer can
-work in conjunction with a mapper, in our "pipeline workflow".
+This provision holds that you can provide a function that derives the
+sync key given an entity.
+
+This is available for the near collection but no longer the far one
+(as of #history-A.2).
+
+[#463.B]  (graph viz file) illustrates how this pipeline has changed over time.
+
+A "keyer" is a function that makes keys.
+
+(A "keyerer" is a function that makes such a function).
 
 One case that that covers this provision is (Case0160DP).
+
+.#open [#459.N] it is a smell to have near sync keyerers associated with
+producer scripts (producer scripts should be target agnostic) but this
+is out of scope to fix at #history-A.2.
 
 
 
 
 ## <a name=I.2></a> provision: the leftmost column in the markdown table is..
 
-..by default the "human key" field.. we don't want to be fully
-married to this but it's a cost-saving shortcut.
-
+a "natural key" that can be used to identify uniquely the entity in the
+context of the collection. Note however that this is not the same as a
+"sync key". How a sync key is derived may employ fuzzification so that
+two entities may still match with different natural keys.
 
 
 
@@ -139,18 +163,6 @@ to here.) having not yet fully realized [#463.C] full, arbitray functional
 pipelines to the extent that we would like, we for now have this more
 hard-coded action for inspecting a producer stream after its various mappings,
 filters etc are applied.
-
-
-
-
-
-## <a name="I.3.2"></a> feature: far deny list
-
-this "feature" is an outcropping of feature [#458.I.3.1] "map for sync"
-(immediately above); that is it is a necessary byproduct of the wish to
-inspect data in our pipeline and still meet the various requirements of
-the consuming script. longer explanation at [#463.D].
-
 
 
 
@@ -168,13 +180,9 @@ away at [#463.C] custom pipes, probably.
 
 
 
-## <a name=J></a> provision: there is a version integer for sync parameters.
+## <a name=J></a> (gone)
 
-this contrivance exists so there is a discrete, hard-coded assertion
-somewhere about what constituency of names we can assume; both from
-the defining side and the consuming side separately.
-
-(probably we will get rid of this)
+(version integer for sync parameters gone at #history-A.2)
 
 
 
@@ -185,7 +193,7 @@ for a synchronization:
 
   - you can't have a normal near stream without the traversal parameters
     (because you may have a custom keyer).
-  - you can't have traversal parameters without a far stream. (EDIT: explain
+  - you can't have traversal parameters without a far stream. (#edit [#458.B]: explain
     the thinking by importing a comment to here.)
   - you can't do the central syncing algorithm without the two streams.
   - finally, per the next point [#458.L], these streams gonna be in context
@@ -205,8 +213,6 @@ so the order must be:
   1. far
   1. near
   1. sync
-
-in turn, the above is now considered #pattern [#458.Z.1].
 
 
 
@@ -273,5 +279,6 @@ there's some better alternative, etc.
 
 ## (document-meta)
 
+  - #history-A.2: as referenced
   - #history-A.1: normal far stream became a thing
   - #born.

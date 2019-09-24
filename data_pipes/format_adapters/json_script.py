@@ -90,84 +90,70 @@ some figure 1 work we would have to do that is not yet implemented.)
 
 from kiss_rdb import (
         LEGACY_format_adapter_via_definition as format_adapter_via_definition)
-from data_pipes import (
-        cover_me,
-        pop_property)
-import re
 from os import path as os_path
+import re
 
 
-def _open_trav_request(trav_req):
-    return _OpenTravRequest(** trav_req.to_dictionary()).execute()
+def _dicty(f):  # #decorator
+    def use_f(request):
+        return f(** request.to_dictionary())
+    return use_f
 
 
-class _OpenTravRequest:
-    """
-    if such a script ends in *.py (which for now, all of them do :+#here1),
-    then don't incur the overhead and annoyance (debugging/development wise)
-    of going thru another processs. rather, load it as a module.
-    """
+@_dicty
+def PRODUCER_SCRIPT_VIA(
+        cached_document_path,
+        collection_identifier,
+        datastore_resources,
+        format_adapter,
+        listener):
+    return _module_via(collection_identifier, listener)
 
-    def __init__(
-            self,
+
+@_dicty
+def _open_filter_or_traversal_stream(
             cached_document_path,
             collection_identifier,
             datastore_resources,
             format_adapter,
-            listener,
-            ):
+            listener):
 
-        self._cached_document_path = cached_document_path
-        self._filesystem_path = collection_identifier
-        self._fiesystem_functions = datastore_resources
-        self._format_adapter = format_adapter
-        self._listener = listener
-        self._OK = True
+    mod = _module_via(collection_identifier, listener)
+    if mod is None:
+        return
+    return mod.open_traversal_stream(listener, cached_document_path)
 
-    def execute(self):
-        self._OK and self.__resolve_path_stem_via_path()
-        self._OK and self.__resolve_normal_stem_via_path_stem()
-        self._OK and self.__resolve_dictionary_stream_session_via_normal_stem()
-        if self._OK:
-            return self.__flush_context_manager()
 
-    def __flush_context_manager(self):
-        """(by 'flush' we mean "build it the one time we build it")"""
+def _module_via(collection_identifier, listener):
 
-        _sess = pop_property(self, '_dictionary_stream_session')
-        _fa = pop_property(self, '_format_adapter')
-        return _MyContextManager(_sess, _fa)
+    def main():
+        path_stem = path_stem_via_path()
+        normal_stem = normal_stem_via_path_stem(path_stem)
+        if normal_stem is None:
+            return
+        return module_via_normal_stem(normal_stem)
 
-    def __resolve_dictionary_stream_session_via_normal_stem(self):
-
+    def module_via_normal_stem(normal_stem):
         import importlib
-        _stem = pop_property(self, '_normal_stem')
-        _name = _stem.replace('/', '.')
-        _mod = importlib.import_module(_name)  # ..
-        _sess = _mod.open_dictionary_stream(
-                self._cached_document_path, self._listener)
-        self._dictionary_stream_session = _sess
+        _name = normal_stem.replace('/', '.')
+        return importlib.import_module(_name)  # ..
 
-    def __resolve_normal_stem_via_path_stem(self):
-
-        if '/' != os_path.sep:
-            cover_me('we need help implementhing this on windows 🙄')
-
-        path_stem = pop_property(self, '_path_stem')
+    def normal_stem_via_path_stem(path_stem):
+        assert('/' == os_path.sep)  # windows is possible but not covered
 
         # if it starts with a dot slash, use the part after it
         md = re.search(r'^\./(?=[^/])', path_stem)
-        if md is None:
-            md = re.search(r'^/(?=[^/])', path_stem)
-            if md is None:
-                # if it doesn't look absolute, it must be OK, right?
-                self._use_as_normal_stem(path_stem)
-            else:
-                self.__normalize_stem_when_absolute(path_stem)
-        else:
-            self.__normalize_stem_when_dot_slash(md, path_stem)
+        if md is not None:
+            return normal_stem_via_dot_slash(md, path_stem)
 
-    def __normalize_stem_when_absolute(self, path_stem):
+        md = re.search(r'^/(?=[^/])', path_stem)
+        if md is not None:
+            return normal_stem_via_absolute(path_stem)
+
+        # if it doesn't look absolute, it must be OK, right?
+        return normal_stem_via_string(path_stem)
+
+    def normal_stem_via_absolute(path_stem):
         """when an absolute filesystem path was used, it's a bit more
 
         tricky: we only want to mess with it if it looks like it's part
@@ -182,63 +168,36 @@ class _OpenTravRequest:
         path_len = len(path_stem)
         head_len = len(root) + 1  # include a trailing '/' sep yuck
 
-        if 0 is path_stem.find(root) and path_len > head_len:  # ##[#410.C]
-            self._use_as_normal_stem(path_stem[head_len:path_len])
+        if 0 is path_stem.find(root) and path_len > head_len:  # ##[#459.L]
+            return normal_stem_via_string(path_stem[head_len:path_len])
         else:
-            self._err('absolute path outside of ecosystem - {}', path_stem)
+            whine(f'absolute path outside of ecosystem - {path_stem}')
 
-    def __normalize_stem_when_dot_slash(self, md, path_stem):
+    def normal_stem_via_dot_slash(md, path_stem):
         # when it's dot-slash, use the part after it (meh)
-        self._use_as_normal_stem(path_stem[md.end():])
+        return normal_stem_via_string(path_stem[md.end():])
 
-    def _use_as_normal_stem(self, s):
+    def normal_stem_via_string(s):
         md = re.search(r'[^a-zA-Z0-9_/]', s)
         if md is None:
-            self._normal_stem = s
+            return s
         else:
-            _msg = f"character we don't like ({md[0]!r}) in path stem: {s}"
-            self._err(_msg)
+            whine(f"character we don't like ({md[0]!r}) in path stem: {s}")
 
-    def __resolve_path_stem_via_path(self):
+    def path_stem_via_path():
         """the path has to end in .py.
 
         (this is a sanity check only while provision #here1 holds)
         """
 
-        path = pop_property(self, '_filesystem_path')
-
-        stem, ext = os_path.splitext(path)
-
+        stem, ext = os_path.splitext(collection_identifier)
         assert('.py' == ext)  # else the #here1 provision may have changed..
+        return stem
 
-        self._path_stem = stem
+    def whine(msg):
+        listener('error', 'expression', lambda: (msg,))  # #[#511.3]
 
-    def _err(self, tmpl, *args):
-        def lineser():  # #[#511.3]
-            yield tmpl.format(*args)
-        self._listener('error', 'expression', lineser)
-        self._OK = False
-
-
-class _MyContextManager:
-
-    def __init__(self, sess, fa):
-        self._the_worst = sess
-        self._format_adapter = fa
-
-    def __enter__(self):
-
-        _dictionary_stream = self._the_worst.__enter__()
-
-        import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
-        return _.SYNC_RESPONSE_VIA_DICTIONARY_STREAM(
-                _dictionary_stream,
-                self._format_adapter,
-                )
-
-    def __exit__(self, *_):
-        _exit_me = pop_property(self, '_the_worst')
-        return _exit_me.__exit__(*_)  # #[#410.G]
+    return main()
 
 
 def _native_item_normalizer(dct):
@@ -258,8 +217,9 @@ def _value_readers_via_field_names(*names):  # (Case2662DP)
 
 _functions = {
         'modality_agnostic': {
-            'open_filter_request': _open_trav_request,
-            'open_sync_request': _open_trav_request,
+            'PRODUCER_SCRIPT_VIA': PRODUCER_SCRIPT_VIA,
+            'open_filter_stream': _open_filter_or_traversal_stream,
+            'open_traversal_stream': _open_filter_or_traversal_stream,
             }
         }
 

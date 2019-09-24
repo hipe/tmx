@@ -27,8 +27,9 @@ class Case1747_does_scrape_work(_CommonCase):
     def test_010_scrape_works(self):
         self.assertGreaterEqual(len(self._dicts()), 2)  # meh whatever
 
-    def test_020_first_fellow_is_metadata(self):
-        self._dicts()[0]['_is_sync_meta_data']
+    def test_020_an_entity_dictionary_looks_like_this(self):
+        dct = self._dicts()[1]
+        self.assertEqual(dct['label'], 'Overview')
 
     def test_030_these_fellows_are_terminal_items(self):
         _exp = (
@@ -57,10 +58,7 @@ class Case1747_does_scrape_work(_CommonCase):
         branch_labels = []
         item_labels = []
 
-        itr = iter(self._dicts())
-        next(itr)  # we don't again test that this is metadata, just assume
-
-        for dct in itr:
+        for dct in self._dicts():
             if '_is_branch_node' in dct:
                 branch_labels.append(dct['label'])
             else:
@@ -70,16 +68,16 @@ class Case1747_does_scrape_work(_CommonCase):
 
     @shared_subject
     def _dicts(self):
-        return self.build_raw_list_()
+        return self.build_dictionaries_tuple_from_traversal_()
 
-    def far_collection_identifier(self):
+    def producer_script(self):
         return 'script/producer_scripts/script_180815_hugo_docs.py'
 
     def cached_document_path(self):
         return html_fixture('0170-hugo-docs.html')
 
 
-class Case1749_gen(_CommonCase):
+class Case1749DP_generate(_CommonCase):
 
     def test_100_does_something(self):
         self.assertLessEqual(1, len(self._lines()))
@@ -132,10 +130,13 @@ class Case1749_gen(_CommonCase):
 
     @shared_subject
     def _lines(self):
+        from modality_agnostic import listening
+        listener = listening.throwing_listener
+
         _d_a = _these_dictionaries()
         from data_pipes import common_producer_script as mod
         _ = mod.LEGACY_markdown_lib()
-        _lines = _._raw_lines_via_collection_identifier(_d_a, __file__)
+        _lines = _._raw_lines_via_collection_identifier(_d_a, listener)
         return tuple(x for x in _lines)
 
 
@@ -145,11 +146,8 @@ def _these_dictionaries():
 
 
 def _yield_these_dictionaries():
-    yield {'_is_sync_meta_data': True, 'natural_key_field_name': 'la_la'}
-
     def o(path):
         return f'{_url}{path}'
-
     yield {'_is_branch_node': True, 'label': 'About Hugo'}
     yield {'label': 'Overview', 'url': o('/about/')}
     yield {'_is_branch_node': True, 'label': 'Getting Started'}

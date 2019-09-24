@@ -6,16 +6,6 @@ class common_producer_script:  # #as-namespace-only
 
     # we want these to go away soon
 
-    def far_key_simplifier():
-        return common_producer_script._key_simp('COMMON_FAR_KEY_SIMPLIFIER_')
-
-    def near_key_simplifier():
-        return common_producer_script._key_simp('COMMON_NEAR_KEY_SIMPLIFIER_')
-
-    def mapper_for(s):
-        _ = common_producer_script._this_module
-        return f'{_}.this_one_mapper_("{s}")'
-
     def _key_simp(tail):
         return '.'.join((common_producer_script._this_module, tail))
 
@@ -29,19 +19,6 @@ class common_producer_script:  # #as-namespace-only
         return mod
 
     _this_module = 'kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream'  # noqa: E501
-    # same as above
-
-
-def YIKES_SKIP_HEADERS(far_dct):
-    """
-    so:
-      - (Case1510DP)
-      - TEMPORARY LOCATION POSSIBLY, came as a byproduct of #history-A.1
-      - probabably a `_is_section_separator` would be in order, but for
-        now we are making this work with legacy fellows
-    """
-
-    return 'header_level' not in far_dct
 
 
 class _MyContextlib:
@@ -99,13 +76,6 @@ def pop_property(self, var):
     delattr(self, var)
     return x
 
-
-def cover_me(msg=None):
-    _use_msg = 'cover me' if msg is None else ('cover me - %s' % msg)
-    raise _exe(_use_msg)
-
-
-_exe = Exception
-
+# #history-A.2: sunset header filter
 # #history-A.1 (as referenced, can be temporary)
 # #abstracted.

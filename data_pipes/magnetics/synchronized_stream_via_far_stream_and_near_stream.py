@@ -1,146 +1,5 @@
 """(algorithm documented (first) exhaustively at [#447])"""
 
-from data_pipes import (
-        cover_me,
-        pop_property)
-from modality_agnostic import (
-        streamlib as _)
-
-
-next_or_none = _.next_or_none
-
-
-class SYNC_RESPONSE_VIA_DICTIONARY_STREAM:
-    """experiment...
-
-    a sync request is:
-      - some properties talking bout natural key
-      - a stream of items
-
-    we make "dictionary stream" be the lingua franca because it's trivial
-    to convert a dictionary to named arguments to build the etc..
-
-    but if this is to be useful for different formats we may want to
-    granulate this out into smaller pieces..
-    """
-
-    def __init__(self, dict_stream, format_adapter):
-        # (Case1312)
-        self._dict_stream = dict_stream
-        self._format_adapter = format_adapter
-
-    def release_traversal_parameters(self):
-        itr = pop_property(self, '_dict_stream')
-        _hi = next(itr)
-        # #cover-me (above) - when user gives empty stream, this is confusing
-        # :#here4
-        self._dict_stream_part_two = itr
-        return _TraversalParameters(**_hi)
-
-    def release_dictionary_stream(self):
-        return pop_property(self, '_dict_stream_part_two')
-
-
-class SYNC_RESPONSE_VIA_TWO_FUNCTIONS:
-
-    def __init__(
-            self,
-            release_sync_parameters_dictionary,
-            release_dictionary_stream,
-            ):
-
-        self._order = [
-                ('two', release_dictionary_stream),
-                ('one', release_sync_parameters_dictionary),
-                ]
-
-    def release_traversal_parameters(self):
-        dct = self._same('one')
-        if dct is None:
-            # for example when you need tag lyfe field names
-            # (same *type* of thing as #here4 above)
-            return None  # (may have lost coverage at [#707.J])
-        else:
-            return _TraversalParameters(**dct)
-
-    def release_dictionary_stream(self):
-        return self._same('two')
-
-    def _same(self, k):
-        have, f = self._order.pop()
-        None if have == k else cover_me('no')
-        return f()
-
-
-class _TraversalParameters:
-    """consider the role of 'natural key' in a sync:
-
-    what is the natural key of the near collection? of the far collection?
-    is _it_ (as a particular field) a property of the collection?
-
-    how we conceive of it in fact is that it is not an intrinsic part of
-    either collection, but rather we are conceiving of it as a property
-    (a parameter) of the synchronization itself...
-
-    [#458.E] is dedicated to thoughts on this class and its future
-    """
-
-    def __init__(
-            self,
-            _is_sync_meta_data,
-            natural_key_field_name,
-            # (Case1317) is simply the names of the above arguments)
-            field_names=None,
-            tag_lyfe_field_names=None,  # yuck, experiement
-            traversal_will_be_alphabetized_by_human_key=None,
-            custom_mapper_for_syncing=None,
-            custom_far_keyer_for_syncing=None,
-            custom_near_keyer_for_syncing=None,
-            custom_pass_filter_for_syncing=None,
-            far_deny_list=None,
-            ):
-
-        if _is_sync_meta_data is not True:
-            cover_me('hi')
-
-        self.natural_key_field_name = natural_key_field_name
-        self.field_names = field_names
-        self.tag_lyfe_field_names = tag_lyfe_field_names
-        self.traversal_will_be_alphabetized_by_human_key = traversal_will_be_alphabetized_by_human_key  # noqa: E501
-        self.custom_mapper_for_syncing = custom_mapper_for_syncing
-        self.custom_far_keyer_for_syncing = custom_far_keyer_for_syncing
-        self.custom_near_keyer_for_syncing = custom_near_keyer_for_syncing
-        self.custom_pass_filter_for_syncing = custom_pass_filter_for_syncing
-        self.far_deny_list = far_deny_list
-
-    traversal_parameters_version = 4
-
-    # bump this WHEN you add to constituency (#provision [#458.J])
-    # bumped from 3 to 4 at #history-A.6
-    # bumped from 2 to 3 at #history-A.5
-
-    def to_dictionary(self):
-        dct = {'_is_sync_meta_data': True}
-        o = _specialty_thing(dct, self)
-        o('natural_key_field_name')
-        o('field_names')
-        o('tag_lyfe_field_names')
-        o('traversal_will_be_alphabetized_by_human_key')
-        o('custom_mapper_for_syncing')
-        o('custom_far_keyer_for_syncing')
-        o('custom_near_keyer_for_syncing')
-        o('custom_pass_filter_for_syncing')
-        o('far_deny_list')
-        return dct
-
-
-def _specialty_thing(dct, self):
-    def f(attr):
-        x = getattr(self, attr)
-        if x is not None:
-            dct[attr] = x
-    return f
-
 
 def stream_of_mixed_via_sync(
         preserve_freeform_order_and_insert_at_end=False,
@@ -291,6 +150,7 @@ class _WorkerWhenInterleaving(_Worker):
             step()
 
     def _init_traversers(self, which, normal_stream):
+        # NOTE: both near and far are served by this same function interleaved
 
         iter_attr = _iter_attribute_for[which]
         setattr(self, iter_attr, normal_stream)
@@ -298,8 +158,11 @@ class _WorkerWhenInterleaving(_Worker):
         key_attr = _key_attribute_for[which]
 
         def step():
-            pair = next_or_none(normal_stream)
-            if pair is None:
+            at_end = True
+            for pair in normal_stream:  # #once
+                at_end = False
+                break
+            if at_end:
                 setattr(self, _is_open_attribute_for[which], False)
                 self._both_open = False  # might be the 2nd time. ##here3
                 clear_props()
@@ -414,7 +277,7 @@ class _WorkerWhenDiminishingPool(_Worker):
 
     def __resolve_diminishing_pool_via_big_flush(self):
         pool = {}
-        sanity = 200  # ##[#410.R]
+        sanity = 200  # ##[#873.6]
         count = 0
 
         _ = pop_property(self, '_normal_far_stream')
@@ -433,7 +296,21 @@ class _WorkerWhenDiminishingPool(_Worker):
         self._OK = False
 
 
-# :#here1: realize #provision [#458.F] four args for collision callback
+# :#here1: realize #provision [#458.6] four args for collision callback
+
+
+def pop_property(self, attr):
+    x = getattr(self, attr)
+    delattr(self, attr)
+    return x
+
+
+def cover_me(s=None):
+    raise Exception('cover me' if s is None else f'cover me: {s}')
+
+
+def xx():
+    raise Exception('write me')
 
 
 # --
@@ -458,6 +335,7 @@ def _empty_iterator():
     return iter(())
 
 
+# #history-A.7: no more traversal_parameters_version
 # #history-A.6: bumped version because added deny list
 # #history-A.5: bumped version because added several components
 # #history-A.4: sunset diminishing pool algorithm while spike interleaving

@@ -1,15 +1,13 @@
-"""birth note:
-
-we are sure (almost) we're gonna want something like this, but we don't
-yet know what its full API should be so no tests yet. abstracted at birth.
-
+"""
+.#coverage-island
+(Case0110DP)
 :[#411]
+This is a processor, adjacent to #[#008.2] state machines.
+.#anemic
 """
 
-import sys
 
-
-def _SELF(tagged_stream, processor):
+def result_via_tagged_stream_and_processor(tagged_stream, processor):
 
     self = _ThisState()
 
@@ -37,8 +35,5 @@ def _SELF(tagged_stream, processor):
 
 class _ThisState:  # #[#510.2]
     pass
-
-
-sys.modules[__name__] = _SELF
 
 # #born.

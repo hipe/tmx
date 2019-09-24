@@ -5,7 +5,7 @@
 this is a "shallow scrape", in contrast to a "deep scrape"
 available in a sibling script.
 """
-# This producer script is covered by (Case2013DP).
+# This producer script is covered by (Case2018DP)
 
 import soupsieve as sv
 
@@ -13,23 +13,38 @@ import soupsieve as sv
 _domain = 'https://themes.gohugo.io'
 _url = _domain + '/'
 
-_my_doc_string = __doc__
+
+def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
+    with open_traversal_stream(error_monitor.listener) as dcts:
+        if is_for_sync:
+            dcts = stream_for_sync_via_stream(dcts)
+        _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
+    return 0 if error_monitor.OK else 456
 
 
-def _required(self, attr, x):
-    if x is None:
-        self._OK = False  # often `_become_not_OK`
-    else:
-        setattr(self, attr, x)
+_my_CLI.__doc__ = __doc__
 
 
-class open_dictionary_stream:
+stream_for_sync_is_alphabetized_by_key_for_sync = True
 
-    def __init__(self, cached_document_path, listener):
-        import data_pipes.format_adapters.html.script_common as _
+
+def stream_for_sync_via_stream(dcts):
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            markdown_link_via)
+    left = len(_url)
+    for dct in dcts:
+        url = dct['url']
+        assert(_url == url[0:left])
+        assert('/' == url[-1])
+        _ = url[left:-1].replace('-', '')
+        yield (_, {'hugo_theme': markdown_link_via(dct['label'], url)})
+
+
+class open_traversal_stream:
+
+    def __init__(self, listener, cached_document_path=None):
         self._cached_document_path = cached_document_path
         self._listener = listener
-        self._lib = _
         self._OK = True
 
     def __enter__(self, *_3):
@@ -37,19 +52,8 @@ class open_dictionary_stream:
         self._OK and self.__find_the_root_section()
         if not self._OK:
             return
-        from data_pipes import common_producer_script as lib
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': 'hugo_theme',
-                'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
-                'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
-                'custom_mapper_for_syncing': lib.mapper_for('hugo_theme'),
-                'far_deny_list': ('url', 'label'),  # documented @ [#458.I.3.2]
-                }
-
         for a in _direct_children(self._the_root_section):
-            if 'a' != a.name:
-                cover_me()
+            assert('a' == a.name)
             dct = {}
             _write_url_and_label(dct, a)
             yield dct
@@ -67,14 +71,15 @@ class open_dictionary_stream:
         self._the_root_section = main_section
 
     def __resolve_soup(self):
-        _soup = self._lib.soup_via_locators_(
+        soup = _ps_lib().soup_via_locators_(
                 url=_url,
                 html_document_path=self._cached_document_path,
                 listener=self._listener,
                 )
-        self._required('_soup', _soup)
-
-    _required = _required
+        if not soup:
+            self._OK = False
+            return
+        self._soup = soup
 
 
 def _write_url_and_label(dct, a):
@@ -97,18 +102,22 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-def cover_me():
-    raise Exception('cover me')
+def _ps_lib():
+    import data_pipes.format_adapters.html.script_common as lib
+    return lib
 
 
 if __name__ == '__main__':
-    from data_pipes.format_adapters.html.script_common import (
-            common_CLI_for_json_stream_)
-    _exitstatus = common_CLI_for_json_stream_(
-            traversal_function=open_dictionary_stream,
-            doc_string=_my_doc_string,
+    import sys as o
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    exit(cheap_arg_parse(
+            CLI_function=_my_CLI,
+            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+            formal_parameters=(
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),),
             description_template_valueser=lambda: {'_this_one_url': _url},
-            )
-    exit(_exitstatus)
+            ))
 
 # #born

@@ -69,66 +69,9 @@ class _build_snapshot:
 
 
 def _item_via_collision(far_key, far_s, near_key, near_s):
-    # (#provision #[#458.F] four args)
+    # (#provision #[#458.6] four args)
     assert(far_s == near_s)
     return near_s.upper()
-
-
-def NORMALIZE_NEAR_ETC_AND_FAR(far_dicts):
-
-    import data_pipes_test.format_adapters.in_memory_dictionaries as _
-    _far_FA = _.FORMAT_ADAPTER
-
-    _far_col_ref = _far_FA.collection_reference_via_string(far_dicts)
-
-    _ = _mag_wee().OPEN_FAR_SESSION(
-            cached_document_path=None,
-            far_collection_reference=_far_col_ref,
-            datastore_resources=None,
-            listener=__file__)
-
-    with _ as far_session:
-        assert(far_session.OK)
-        _normal_far_st = far_session.release_normal_far_stream()
-        dct = far_session.TO_NRTP__()
-        ary = [x for x in _normal_far_st]
-
-    _nkr = __unpack_these(dct)
-
-    return _nkr, ary
-
-
-def NORMALIZE_FAR(callback, far_path):
-
-    _far_col_ref = collection_reference_via_(far_path, __file__)
-
-    _ = _mag_wee().OPEN_FAR_SESSION(
-            cached_document_path=None,
-            far_collection_reference=_far_col_ref,
-            datastore_resources=None,
-            listener=__file__)
-
-    with _ as far_session:
-        assert(far_session.OK)
-        _normal_far_st = far_session.release_normal_far_stream()
-        result = callback(_normal_far_st)
-    return result
-
-
-def __unpack_these(dct):
-    if dct is None:
-        result = None
-    else:
-        def yuck(custom_near_keyer_for_syncing=None):
-            return custom_near_keyer_for_syncing
-        result = yuck(**dct)
-    return result
-
-
-def open_tagged_doc_line_items__(mixed_near):
-    _ = _mag_sync().OPEN_NEWSTREAM_VIA
-    _ = _.sibling_('tagged_native_item_stream_via_line_stream')
-    return _.OPEN_TAGGED_DOC_LINE_ITEM_STREAM(mixed_near, __file__)
 
 
 def collection_reference_via_(collection_identifier, listener):
@@ -137,21 +80,9 @@ def collection_reference_via_(collection_identifier, listener):
     return _.collection_reference_via_(collection_identifier, listener)
 
 
-@lazy
-def _mag_wee():
-    return _sub_mag('.normal_far_stream_via_collection_reference')
-
-
-@lazy
-def _mag_sync():
-    return _sub_mag('.synchronized_stream_via_far_stream_and_near_stream')
-
-
-def _sub_mag(which):
-    import importlib
-    return importlib.import_module(
-            which,
-            'kiss_rdb.storage_adapters_.markdown_table.magnetics_')  # #todo
+def _same_listener():
+    from modality_agnostic import listening
+    return listening.throwing_listener
 
 
 def _identity(x):

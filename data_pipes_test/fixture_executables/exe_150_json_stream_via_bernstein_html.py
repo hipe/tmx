@@ -19,7 +19,7 @@ that "started" as markdown in the first place.
 
 but A) by the time we realized this the script was done and covered and
 B) this script is the only guy that gives coverage to the html adaptation
-of the [#410.J] record mapper; a something that seems useful to have in the
+of the [#459.E] record mapper; a something that seems useful to have in the
 toolkit..
 """
 
@@ -29,16 +29,28 @@ _first_selector = ('div', {'id': 'readme'})
 
 
 def _my_CLI(error_monitor, sin, sout, serr, _SOON):
-    _cm = open_traversal_stream(None, error_monitor.listener)
+    _cm = open_traversal_stream(error_monitor.listener)
     with _cm as lines:
         _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
-    return 0 if error_monitor.ok else 456
+    return 0 if error_monitor.OK else 456
 
 
 _my_CLI.__doc__ = __doc__
 
 
-def open_traversal_stream(html_document_path, listener):
+stream_for_sync_is_alphabetized_by_key_for_sync = False
+
+
+def stream_for_sync_via_stream(dcts):  # #copy-pasted from prod #history-A.1
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            simplified_key_via_markdown_link_er)
+    key_via = simplified_key_via_markdown_link_er()
+
+    for dct in dcts:
+        yield (key_via(dct['name']),  dct)
+
+
+def open_traversal_stream(listener, html_document_path):
 
     def my_generator(el, _emit):
 
@@ -56,19 +68,10 @@ def open_traversal_stream(html_document_path, listener):
                 table=table,
                 )
 
-        field_names = table_o.field_names
-
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': field_names[0],
-                'field_names': field_names,
-                'traversal_will_be_alphabetized_by_human_key': False,
-                }
-
         for dct in table_o:
             yield dct
 
-    _cm = _top_html_lib().OPEN_DICTIONARY_STREAM_VIA(
+    _cm = _top_html_lib().open_dictionary_stream_via(
         url=_url,
         first_selector=_first_selector,
         second_selector=my_generator,
@@ -120,14 +123,15 @@ def _md_lib():
     return mod.LEGACY_markdown_lib()
 
 
-def execute_as_CLI_(open_dictionary_stream):
+def execute_as_CLI_(open_diction_IN_FLUX):
     """
-    this is the implementation of :[#410.H]
+    this is the implementation of :[#459.D]
     """
 
+    raise Exception("change me")  # #open [#476] cover me
     flush_into = _top_html_lib().flush_JSON_stream_into
     import sys as o
-    with open_dictionary_stream(None, None) as dcts:
+    with open_diction_IN_FLUX(None, None) as dcts:
         flush_into(o.stdout, o.stderr, dcts)
     return 0
 
@@ -139,10 +143,10 @@ def _top_html_lib():
 
 if __name__ == '__main__':
     from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            CHEAP_ARG_PARSE)
+            cheap_arg_parse)
     import sys as o
-    _exitstatus = CHEAP_ARG_PARSE(
-        cli_function=_my_CLI,
+    _exitstatus = cheap_arg_parse(
+        CLI_function=_my_CLI,
         stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
         formal_parameters=(
             ('-s', '--for-sync', 'COMING SOON'),
@@ -151,4 +155,5 @@ if __name__ == '__main__':
         )
     exit(_exitstatus)
 
+# #history-A.1
 # #DNA-fissure

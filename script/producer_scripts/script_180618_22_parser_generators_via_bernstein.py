@@ -23,92 +23,126 @@ _raw_url = (
         '/webmaven/python-parsing-tools/master/README.md'
         )
 
-_my_doc_string = __doc__
+
+def _my_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
+    listener = error_monitor.listener
+
+    if do_prepare or is_for_sync:
+        opened = open_traversal_stream(listener)
+    else:
+        opened = _open_raw_traversal_stream(listener, None, False)
+
+    with opened as dcts:
+        if is_for_sync:
+            dcts = stream_for_sync_via_stream(dcts)
+        _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
+
+    return 0 if error_monitor.OK else 456
 
 
-class open_traversal_stream:  # #[#410.F] class as context manager
+_my_CLI.__doc__ = __doc__
 
-    def __init__(self, markdown_path, listener):
-        self.raw_url = _raw_url
+
+stream_for_sync_is_alphabetized_by_key_for_sync = False
+
+
+def stream_for_sync_via_stream(dcts):
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            simplified_key_via_markdown_link_er)
+    key_via = simplified_key_via_markdown_link_er()
+
+    for dct in dcts:
+        # #[#873.5] how sparseness (holes) must be filled lost at #history-A.4
+        # lost at #history-A.3 or before was `simplify_keys_`
+        yield (key_via(dct['name']),  dct)
+
+
+def open_traversal_stream(listener, markdown_path=None):
+    # like the raw stream but..
+
+    class ContextManager:
+        def __enter__(self):
+            _cm = _open_raw_traversal_stream(listener, markdown_path, True)
+            with _cm as itr:
+                _field_names = next(itr)
+
+                dict_via = _dict_via_cels_via(_field_names)
+
+                for dct in itr:
+                    yield dict_via(dct.values())
+
+        def __exit__(self, *_3):
+            pass
+
+    return ContextManager()
+
+
+def _dict_via_cels_via(far_field_names):
+    _split_th_version = updated_and_version_via_string
+    from data_pipes.magnetics import dictionary_via_cels_via_definition
+    return dictionary_via_cels_via_definition(
+        unsanitized_far_field_names=far_field_names,
+        special_field_instructions={
+            'name': ('string_via_cel', lambda s: s),
+            'parses': ('rename_to', 'grammar'),
+            'updated': ('split_to', ('updated', 'version'), _split_th_version),
+            },
+        string_via_cel=lambda s: s,
+        )
+
+
+class _open_raw_traversal_stream:  # #[#459.3] class as context manager
+
+    def __init__(self, listener, markdown_path=None, do_field_names=False):
+        self._raw_url = _raw_url
+        self._do_field_names = do_field_names
         self._markdown_path = markdown_path
         self._listener = listener
 
     def __enter__(self):
-        self._OK = True
-        self._OK and self.__resolve_cached_doc()
-        if not self._OK:
-            return
-        with self.__open_traversal_stream() as dcts:
-            coll_metadata = next(dcts)  # ..
-            far_field_names = coll_metadata.field_names
-            dic_via_cels = self.__build_dict_via_cels(far_field_names)
-            schema = coll_metadata.to_dictionary()
-
-            yield self.__meta_record_via(dic_via_cels, schema)
-
-            for dct in dcts:
-                def _custom_generator():  # risky. no closure scope
-                    for k in far_field_names:
-                        if k in dct:
-                            yield dct[k]
-                        else:
-                            yield ''  # #[#410.M] how sparseness (holes) must
-                yield dic_via_cels(_custom_generator())
+        from script_lib import CACHED_DOCUMENT_VIA_TWO
+        doc = CACHED_DOCUMENT_VIA_TWO(
+                self._markdown_path, self._raw_url, 'markdown', self._listener)
+        # ..
+        lines = open(doc.cache_path)
+        self._close_this = lines
+        return _main(lines, self._do_field_names, self._listener)
 
     def __exit__(self, *_3):
+        ct = self._close_this
+        del self._close_this
+        if True:  # ..
+            ct.close()
         return False  # never swallow an exception
 
-    def __meta_record_via(self, dic_via_cels, schema_record):
-        """whatever "collection meta record" is emitted by our upstream,
 
-        we emit a meta record based off that one BUT with the field names
-        changed to reflect etc.
+def _main(lines, do_field_names, listener):
+    # FOR NOW, VIOLATE THINGS
 
-          - assume #provision [#458.I.2] that the natural key field name
-            is leftmost (here in the near field names (which are derived))
+    from kiss_rdb.storage_adapters_.markdown_table.magnetics_.markdown_table_scanner_via_lines import (  # noqa: E501
+            MarkdownTableScanner)
 
-        #abstraction-candidate: the format adaptation of [#410.J] the record
-        mapper should probably be the one doing this (maybe?)
-        """
+    scn = MarkdownTableScanner(
+            lines, do_parse_example_row=False, listener=listener)
 
-        near_field_names = dic_via_cels.near_field_names
-        o = {k: v for k, v in schema_record.items()}
-        o['natural_key_field_name'] = near_field_names[0]  # (per above provis)
-        o['field_names'] = near_field_names
-        o['custom_keyer_for_syncing'] = 'data_pipes.format_adapters.html.script_common.simplify_keys_',  # noqa: E501
-        # above is broken for syncing,
-        # #not-covered since #history-A.3 or before
-        o['traversal_will_be_alphabetized_by_human_key'] = False
-        return o
+    while not scn.is_empty:
+        if 'head_line' == scn.peeked_AST_symbol:
+            scn.advance()
+            continue
+        break
 
-    def __build_dict_via_cels(self, far_field_names):
-        import data_pipes.magnetics.dictionary_via_cels_via_definition as _
-        return _(
-                unsanitized_far_field_names=far_field_names,
-                special_field_instructions={
-                    'name': ('string_via_cel', _string_via_cel_one),
-                    'parses': ('rename_to', 'grammar'),
-                    'updated': ('split_to', ('updated', 'version'), _via_upda),
-                    },
-                string_via_cel=_string_via_cel_two,
-                )
+    assert('table_schema_from_two_lines' == scn.peeked_AST_symbol)
+    if do_field_names:
+        yield scn.peeked_AST.complete_schema.schema_field_names
 
-    def __open_traversal_stream(self):
-        from data_pipes import common_producer_script as mod
-        _ = mod.common_CLI_library().open_traversal_stream_TEMPORARY_LOCATION
-        return _(
-                cached_document_path=None,
-                collection_identifier=self._cached_doc.cache_path,
-                intention=None,
-                listener=self._listener)
-
-    def __resolve_cached_doc(self):
-        from script_lib import CACHED_DOCUMENT_VIA_TWO as _
-        doc = _(self._markdown_path, self.raw_url, 'markdown', self._listener)
-        if doc is None:
-            self._OK = False
-        else:
-            self._cached_doc = doc
+    while True:
+        scn.advance()
+        if scn.is_empty:
+            break
+        if not 'business_object_row' == scn.peeked_AST_symbol:
+            assert('tail_line' == scn.peeked_AST_symbol)
+            break
+        yield scn.peeked_AST
 
 
 def updated_and_version_via_string(s):  # #testpoint (sort of)
@@ -171,29 +205,28 @@ def updated_and_version_via_string(s):  # #testpoint (sort of)
     return (final_date, final_version)
 
 
-_via_upda = updated_and_version_via_string
-
-
-def _string_via_cel_two(some_value_string):
-    return some_value_string  # #hi.
-
-
-def _string_via_cel_one(human_key):
-    return human_key  # #hi.
+def _ps_lib():
+    import data_pipes.format_adapters.html.script_common as x
+    return x
 
 
 if __name__ == '__main__':
-
-    from data_pipes.format_adapters.html.script_common import (
-            common_CLI_for_json_stream_)
-
-    _exitstatus = common_CLI_for_json_stream_(
-            traversal_function=open_traversal_stream,
-            doc_string=_my_doc_string,
+    import sys as o
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    exit(cheap_arg_parse(
+            CLI_function=_my_CLI,
+            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+            formal_parameters=(
+                ('-p', '--prepared-for-sync',
+                 'map certain fields from far to near (1 rename, 1 split)'),
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),
+            ),
             description_template_valueser=lambda: {'raw_url': _raw_url},
-            )
-    exit(_exitstatus)
+            ))
 
+# #history-A.4: rewrite: no more sync-side stream mapping
 # #history-A.3: key simplifier found to be not covered and left broken
 # #history-A.1: birth of the expression "collection meta-record"
 # #history-A.1: wow rewrite half so it scrapes markdown not HTML

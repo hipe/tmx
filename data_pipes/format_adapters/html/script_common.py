@@ -24,15 +24,13 @@ def _required(self, s, x):
         setattr(self, s, x)
 
 
-def selector_via_string(*_):
-    cover_me('gone a long time ago')
-
-
 def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
         traversal_function,
         doc_string,
         description_template_valueser=None,
         ):
+
+    raise Exception('not used, but..')  # possible future home of [#607.4]
 
     def my_CLI(error_monitor, sin, sout, serr, IS_FOR_SYNC):
         _rc = traversal_function(None, listener=error_monitor.listener)
@@ -43,10 +41,10 @@ def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
     my_CLI.__doc__ = doc_string
 
     from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            CHEAP_ARG_PARSE)
+            cheap_arg_parse)
     import sys as o
-    _exitstatus = CHEAP_ARG_PARSE(
-        cli_function=my_CLI,
+    _exitstatus = cheap_arg_parse(
+        CLI_function=my_CLI,
         stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
         formal_parameters=(
             ('-s', '--for-sync', 'COMING SOON'),
@@ -70,9 +68,29 @@ def flush_JSON_stream_into(sout, serr, itr):
     serr.write('({} items(s))\n'.format(count))
 
 
+def the_function_called_markdown_link_via():
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+        markdown_link_via)
+    return markdown_link_via
+
+
+def the_function_called_normal_field_name_via_string():
+    # #open [#459.Q] assess the placement of the below file
+    from kiss_rdb.LEGACY_normal_field_name_via_string import (
+            normal_field_name_via_string)
+    return normal_field_name_via_string
+
+
+def the_function_called_simple_key_via_normal_key():
+    # #open [#459.Q] assess the placement of the below file (again)
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            simple_key_via_normal_key)
+    return simple_key_via_normal_key
+
+
 # -- EXPERIMENT..
 
-class OPEN_DICTIONARY_STREAM_VIA:  # #[#410.F] class as context manager
+class open_dictionary_stream_via:  # #[#459.3] class as context manager
 
     def __init__(
             self,
@@ -197,11 +215,6 @@ class _this_lazy:  # [#510.4] experiment (copy-paste)
 
 @_this_lazy
 def pop_property(o, s):
-    pass
-
-
-@_this_lazy
-def cover_me(s):
     pass
 
 # --

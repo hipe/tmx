@@ -1,10 +1,10 @@
 from data_pipes_test.common_initial_state import (
         build_end_state_commonly,
+        FakeProducerScript,
         markdown_fixture,
         executable_fixture)
 from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+        dangerous_memoize as shared_subject)
 import unittest
 
 
@@ -69,9 +69,9 @@ class Case2557_strange_format_adapter_name(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': 'no see 324ujerie09heoiw',
                 'near_collection': None,
-                'far_collection': None,
-                'far_format': 'zig-zag',
+                'near_format': 'zig-zag',
                 }
 
 
@@ -104,8 +104,8 @@ class Case2559_strange_file_extension(_CommonCase):
 
     def given(self):
         return {
-                'near_collection': None,
-                'far_collection': 'ziffy-zaffy.zongo',
+                'producer_script_path': 'no see 23os093w3hw33',
+                'near_collection': 'ziffy-zaffy.zongo',
                 }
 
 
@@ -145,8 +145,8 @@ class Case2660DP_no_functions(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': 'no see 32o4iu32boiwr3si',
                 'near_collection': _far_script_exists(),
-                'far_collection': _same_existent_markdown_file(),
                 }
 
 
@@ -162,8 +162,8 @@ class Case2662DP_near_file_not_found(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': executable_fixture('exe_110_extra_cel.py'),  # noqa: E501
                 'near_collection': markdown_fixture('0075-no-such-file.md'),
-                'far_collection': executable_fixture('exe_110_extra_cel.py'),
                 }
 
 
@@ -192,16 +192,19 @@ class Case2664DP_duplicate_key(_CommonCase):
         yield ('error', 'expression', 'duplicate_key', 'as', 'erx')
 
     def given(self):
-
-        _these = (
-            {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'},
+        _dictionaries = (
             {'col_a': 'qux'},
             {'col_a': 'xx'},
             {'col_a': 'qux'},
         )
+        _producer_script = FakeProducerScript(
+                stream_for_sync_is_alphabetized_by_key_for_sync=False,
+                stream_for_sync_via_stream=sync_stream_using_column_A,
+                dictionaries=_dictionaries,
+                near_keyerer=near_keyerer_minimal)
         return {
-            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-            'far_collection': _these,
+                'producer_script_path': _producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
         }
 
 
@@ -216,7 +219,7 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
 
     NOTE the original has stochastic whitespace. the updated cel loses
     this whitespace. we presume it is that the new is using the whitespacing
-    of the [#458.D] example row. but at this point, we don't know nore care.
+    of the [#458.D] example row. but at this point, we neither know or care.
     that is a bridge to cross when we get to it.
     """
 
@@ -234,15 +237,19 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
         return self._build_end_state()
 
     def given(self):
-
-        _far = (
-                _same_this(),
+        _dictionaries = (
                 {'col_a': 'thing B', 'col_b': 'thing two'},
                 )
+        _producer_script = FakeProducerScript(
+                stream_for_sync_is_alphabetized_by_key_for_sync=False,
+                stream_for_sync_via_stream=sync_stream_using_column_A,
+                dictionaries=_dictionaries,
+                near_keyerer=near_keyerer_minimal,
+                )
         return {
-            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-            'far_collection': _far,
-        }
+                'producer_script_path': _producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
+                }
 
 
 class Case2667DP_ADD_end_cappiness_here(_CommonCase):
@@ -268,23 +275,33 @@ class Case2667DP_ADD_end_cappiness_here(_CommonCase):
         return self._build_end_state()
 
     def given(self):
-
-        _far = (
-                _same_this(),
+        _dictionaries = (
                 {'col_a': 'thing C', 'col_b': 'yerp'},
                 )
+        _producer_script = FakeProducerScript(
+                stream_for_sync_via_stream=sync_stream_using_column_A,
+                stream_for_sync_is_alphabetized_by_key_for_sync=False,
+                dictionaries=_dictionaries,
+                near_keyerer=near_keyerer_minimal,
+                )
         return {
-            'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-            'far_collection': _far,
-        }
+                'producer_script_path': _producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
+                }
 
 
 _same_row_1 = '|thing A|x|\n'
 
 
-@lazy
-def _same_this():
-    return {'_is_sync_meta_data': True, 'natural_key_field_name': 'col_a'}
+def sync_stream_using_column_A(dcts):
+    for dct in dcts:
+        yield (dct['col_a'], dct)
+
+
+def near_keyerer_minimal(key_via_native, schema, listener):
+    def near_keyer(native):
+        return native.cel_at_offset(0).content_string()
+    return near_keyer
 
 
 def _far_script_exists():

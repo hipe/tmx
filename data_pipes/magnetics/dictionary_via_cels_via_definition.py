@@ -1,4 +1,4 @@
-""":[#410.J] record mapping
+""":[#458.E] record mapping
 
 convert an upstream dictionary stream (a.k.a "JSON stream") to a downstream
 where certain transformations are performed on possibly each record in the
@@ -16,9 +16,7 @@ generically this whole mess of fields and their directives is specified
 under the "special field instructions".)
 """
 
-from data_pipes import (
-        cover_me,
-        pop_property)
+from data_pipes import pop_property
 import sys
 
 
@@ -88,7 +86,7 @@ class _FormalManifold:
         if isinstance(tup_or_dict, tuple):
             use_dict = {tup_or_dict[0]: tup_or_dict[1:]}  # all have args
         elif isinstance(tup_or_dict, dict):
-            cover_me('just a sketch - probably fine')
+            raise Exception('cover me: just a sketch - probably fine')
             use_dict = tup_or_dict
         else:
             _ = 'type error - need tuple or dict, had %s' % type(tup_or_dict)
@@ -139,7 +137,7 @@ class _FormalManifold:
         # (this would need to change for aggregate fields)
 
         s = self._string_via_cel(cel)
-        if 0 != len(s):  # coverpoint [#708.2.4] #[#410.13] where sparseness
+        if 0 != len(s):  # (Case1855DP) (test 420) #[#873.5] where sparseness
             self._RECEIVE_STRING(dct, s)
 
     def _RECEIVE_STRING(self, dct, s):

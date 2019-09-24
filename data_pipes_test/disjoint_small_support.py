@@ -18,46 +18,34 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
         item name.
     """
 
-    emissions = []
+    from modality_agnostic import listening as _
+    listener = _.throwing_listener
 
-    import modality_agnostic.test_support.listener_via_expectations as lib
-
-    # use_listener = lib.for_DEBUGGING (works)
-    use_listener = lib.listener_via_emission_receiver(emissions.append)
-
-    """NOTE - we don't pass the first argument below as a named parameter
-    because we can't: what that (required) parameter is named is currently
-    indeterminable (that is, not governed by spec) because we want it to
-    accord (make sense) with the particular script's assisting format
-    adapter (e.g it might be called `html_document_path`, it might be called
-    `markdown_path`). at writing (file birth), this file engages with
-    producer scripts that serve both these associated format adapters.
-    """
+    # (normally we would pass the below two arguments as named parameters but
+    # in this case we can't because the parameter name will change based on
+    # the format, so for once we must rely solely on parameter order. listener
+    # is first b.c it makes (sans fixture) prod scripts read more smoothly.)
 
     _open_traversal_stream = producer_module.open_traversal_stream(
+            listener,
             fixture_document_path,  # {html_document_path|markdown_path}, e.g
-            listener=use_listener)
+            )
 
-    def fuzzy_key(dct):
-        return simplified_key_via_markdown_link(dct['name'])
-
-    from data_pipes import common_producer_script as mod
-    _ = mod.LEGACY_markdown_lib().simplified_key_via_markdown_link_er
-    simplified_key_via_markdown_link = _()
+    seen = {}
+    objs = {}
 
     with _open_traversal_stream as dcts:
-        head_dct = next(dcts)
-        objs = {fuzzy_key(dct): dct for dct in dcts}
+        _stream_for_sync = producer_module.stream_for_sync_via_stream(dcts)
+        for key, dct in _stream_for_sync:
+            for sub_key in dct.keys():
+                seen[sub_key] = None
+            objs[key] = dct
 
-    assert(1 == len(emissions))
-    # this wasn't the point of the test but if we trip this, make a case for it
+    class EndState:  # #class-as-namespace
+        sync_keys_seen = seen
+        entity_dictionary_via_sync_key = objs
 
-    class _State:
-        def __init__(self, _1, _2):
-            self.head_dictionary = _1
-            self.business_object_dictionary = _2
-
-    return _State(head_dct, objs)
+    return EndState
 
 
 # #abstracted.

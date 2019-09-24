@@ -3,6 +3,16 @@ digraph g {
 
 /* nodes */
 
+subgraph cluster_2 {
+
+label="the new new way"
+
+nn_far_native_object[label="far native\nobject" shape=rect]
+nn_far_native_object->nn_script
+nn_script[label="far producer\nscript"]
+nn_script->nn_tuple
+nn_tuple[label="normal tuple\nfor syncing" shape=rect style=filled]
+}
 subgraph cluster_1 {
 
 label="the new way"

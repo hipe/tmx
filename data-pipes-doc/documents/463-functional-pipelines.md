@@ -11,7 +11,7 @@ this is scratching a surface. this article is stub. i can help expand it.
     birth); but it can also refer to several specific ideas that can be at
     odds with each other; the subject of the next two bullets.
 
-  - NOTE :[#443.B] refers to the pipeline workflow we use at document birth,
+  - NOTE :[#463.B] refers to the pipeline workflow we use at document birth,
     which is what is depicted in our sibling digraph document.
 
   - in contrast, we will use :[#463.C] to be a hazy placeholder for this

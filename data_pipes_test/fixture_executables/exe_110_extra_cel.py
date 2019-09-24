@@ -1,14 +1,24 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 
-class open_dictionary_stream:
+stream_for_sync_is_alphabetized_by_key_for_sync = True
+
+
+def stream_for_sync_via_stream(dcts):
+    for dct in dcts:
+        yield (dct['field_name_one'], dct)
+
+
+near_keyerer = None  # #open [#458.N] producer script shouldn't have knowledge
+
+
+class open_traversal_stream:
     """(example with extra cel)"""
 
-    def __init__(self, cache_path, listener):
+    def __init__(self, listener, cache_path):
         pass
 
     def __enter__(self):
-        yield {'_is_sync_meta_data': True, 'natural_key_field_name': 'field_name_one'}  # noqa: E501
         yield {'field_name_one': 'one', 'ziff_davis': 'xixjf'}
 
     def __exit__(*_):
@@ -17,7 +27,6 @@ class open_dictionary_stream:
 
 if __name__ == '__main__':
     import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
-    exit(_.execute_as_CLI_(open_dictionary_stream))
-
+    exit(_.execute_as_CLI_(open_traversal_stream))
 
 # #born.

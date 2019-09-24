@@ -14,20 +14,40 @@ _url = _domain + '/moin/LanguageParsing'
 
 _first_selector = ('div', {'id': 'content'})
 
-_my_doc_string = __doc__
+
+def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
+    with open_traversal_stream(error_monitor.listener) as dcts:
+        if is_for_sync:
+            dcts = stream_for_sync_via_stream(dcts)
+        _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
+    return 0 if error_monitor.OK else 456
 
 
-def open_dictionary_stream(html_document_path, listener):
+_my_CLI.__doc__ = __doc__
+
+
+stream_for_sync_is_alphabetized_by_key_for_sync = False
+
+
+def stream_for_sync_via_stream(dcts):
+    # #not-covered since #history-A.2 or before
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            simplified_key_via_markdown_link_er)
+    key_via = simplified_key_via_markdown_link_er()
+    for dct in dcts:
+        yield (key_via(dct['name']),  dct)
+
+
+def open_traversal_stream(listener, html_document_path=None):
 
     def my_generator(el, _listener):
 
         table, = el.select('table')
 
         from data_pipes.format_adapters.html.magnetics import (
-                dictionary_stream_via_table
-                )
+                dictionary_stream_via_table)
 
-        table_o = dictionary_stream_via_table(
+        return dictionary_stream_via_table(
                 string_via_td_for_header_row=_string_via_td_STRICT,
                 string_via_td_for_body_row=_string_via_td_LOOSE,
                 special_field_instructions={
@@ -36,29 +56,12 @@ def open_dictionary_stream(html_document_path, listener):
                 table=table,
                 )
 
-        field_names = table_o.field_names
-
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': field_names[0],
-                'field_names': field_names,  # coverpoint [#708.2.2]
-                'traversal_will_be_alphabetized_by_human_key': False,
-                'custom_keyer_for_syncing': 'data_pipes.format_adapters.html.script_common.simplify_keys_',  # noqa: E501
-                # above is broken for syncing,
-                # #not-covered since #history-A.2 or before
-                }
-
-        for dct in table_o:
-            yield dct
-
-    _cm = _top_html_lib().OPEN_DICTIONARY_STREAM_VIA(
+    return _ps_lib().open_dictionary_stream_via(
         url=_url,
         first_selector=_first_selector,
         second_selector=my_generator,
         html_document_path=html_document_path,
         listener=listener)
-
-    return _cm
 
 
 def _this_more_complicated_string_via_td():
@@ -73,8 +76,8 @@ def _this_more_complicated_string_via_td():
         _p, = _filter('p', td)
         a_tag, = _filter('a', _p)
         url = a_tag['href']
-        if '/' == url[0]:  # ick/meh coverpoint [#708.2.3]
-            url = url_via_href(url)
+        if '/' == url[0]:
+            url = url_via_href(url)  # ick/meh (Case1855DP) (test 400)
         return markdown_link_via(_string_via_el(a_tag), url)
 
     return f
@@ -105,21 +108,24 @@ def _md_lib():
     return mod.LEGACY_markdown_lib()
 
 
-def _top_html_lib():
+def _ps_lib():
     import data_pipes.format_adapters.html.script_common as lib
     return lib
 
 
 if __name__ == '__main__':
-    common_CLI_for_json_stream_ = _top_html_lib().common_CLI_for_json_stream_
-    _exitstatus = common_CLI_for_json_stream_(
-            traversal_function=open_dictionary_stream,
-            doc_string=_my_doc_string,
-            description_template_valueser=lambda: {'url': _url},
-            )
-    exit(_exitstatus)
+    import sys as o
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    exit(cheap_arg_parse(
+            CLI_function=_my_CLI,
+            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+            formal_parameters=(
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),),
+            description_template_valueser=lambda: {'url': _url}))
 
-
+# #history-A.4: no more sync-side entity-mapping
 # #history-A.3: beaut. soup changed
 # #history-A.2: key simplifier found to be not covered and left broken
 # #history-A.1: key simplifier gets extracted

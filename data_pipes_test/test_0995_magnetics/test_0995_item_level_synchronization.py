@@ -68,7 +68,7 @@ def _my_sync(orig, new):  # #here1
 
 
 def _item_via_collision(far_key, far_value, near_key, near_value):
-    # (#provision [#458.F] four args)
+    # (#provision [#458.6] four args)
 
     assert(far_key == near_key)
 

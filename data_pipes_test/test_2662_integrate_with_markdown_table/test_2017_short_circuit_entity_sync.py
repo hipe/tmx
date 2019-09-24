@@ -1,7 +1,7 @@
 """
 objectives are severalfold:
     - cover scraping of this one page format
-    - cover that syncing still works here with our crazy new deny list
+    - cover behavior about avoiding no-op entity sync
 """
 
 from data_pipes_test.common_initial_state import (
@@ -35,7 +35,7 @@ class _CommonCase(unittest.TestCase):
 class Case2014_does_scrape_work(ProducerCaseMethods, _CommonCase):
 
     def test_010_scrape_works(self):
-        self.assertEqual(_reduced_number + 1, len(self._dictionaries()))
+        self.assertEqual(_reduced_number, len(self._dictionaries()))
 
     def test_050_pseudo_real_scrape_looks_like_our_raw_dump(self):
         act = self._dictionaries()
@@ -50,10 +50,10 @@ class Case2014_does_scrape_work(ProducerCaseMethods, _CommonCase):
 
     @shared_subject
     def _dictionaries(self):
-        return self.build_raw_list_()
+        return self.build_dictionaries_tuple_from_traversal_()
 
-    def far_collection_identifier(self):
-        return 'script/producer_scripts/script_180421_heroku_add_ons.py'
+    def producer_script(self):
+        return _production_producer_script()
 
     def cached_document_path(self):
         return html_fixture('0160-heroku-add-ons.html')
@@ -66,16 +66,17 @@ class Case2016_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
         self.assertEqual(_reduced_number, len(_act))
         # (the number being N and not N+1 implies there is no schema item)
 
-    def test_020_see_the_raw_things_and_the_cooked_things(self):
+    def test_020_see_only_the_cooked_not_the_raw_things(self):
+        # before #history-A.1 this would test "raw things and cooked things"
 
-        # for the purposes of inspection, we want you to be able to see
-        # the raw thing and the .. cooked things
-
+        count = 0
+        same = ('add_on',)
         for pair in self._pairs():
             dct = pair[1]
-            dct['add_on']
-            dct['url']
-            dct['label']
+            assert(tuple(dct.keys()) == same)
+            count += 1
+
+        assert(2 < count)
 
     def test_030_look_at_this_fuzzification_from_keyer(self):
         pair = self._pairs()[2]
@@ -85,11 +86,14 @@ class Case2016_does_sync_preview_work(ProducerCaseMethods, _CommonCase):
     def _pairs(self):
         return self.build_pair_list_for_inspect_()
 
-    def far_collection_identifier(self):
-        return _these_dictionaries()
+    def producer_script(self):
+        return _production_producer_script()
+
+    def cached_document_path(self):
+        return _these_dictionaries()  # 👀 LOOK
 
 
-class Case2018_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
+class Case2018DP_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
 
     def test_100_produces_something(self):
         self.assertEqual(len(self._pairs()), 2)
@@ -99,12 +103,10 @@ class Case2018_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
             return pair[0]
         self.assertSequenceEqual(self._map(f), ('minimo', 'navigatorhugo'))
 
-    def test_300_each_business_item_has_the_things(self):
+    def test_300_each_business_item_has_only_the_thing(self):
         def f(pair):
-            dct = pair[1]
-            link = dct['hugo_theme']
-            self.assertIn(dct['label'], link)
-            self.assertIn(dct['url'], link)
+            assert(tuple(pair[1].keys()) == same)
+        same = ('hugo_theme',)
         self._walk(f)
 
     def _walk(self, f):  # experiment
@@ -119,14 +121,14 @@ class Case2018_scrape_AND_sync_preview(ProducerCaseMethods, _CommonCase):
     def _pairs(self):
         return self.build_pair_list_for_inspect_()
 
-    def far_collection_identifier(self):
+    def producer_script(self):
         return 'script/producer_scripts/script_180905_hugo_themes.py'
 
     def cached_document_path(self):
         return html_fixture('0180-hugo-themes.html')
 
 
-class Case2019_omg_syncing(ProducerCaseMethods, _CommonCase):
+class Case2019DP_omg_syncing(ProducerCaseMethods, _CommonCase):
 
     def test_100_did_something(self):
         a = self._output_lines()
@@ -155,8 +157,24 @@ class Case2019_omg_syncing(ProducerCaseMethods, _CommonCase):
     def _output_lines(self):
         return self.build_YIKES_SYNC_()
 
-    def far_collection_identifier(self):
-        return _these_dictionaries()
+    def producer_script(self):
+        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+                markdown_link_via, simple_key_via_normal_key)
+        from kiss_rdb.LEGACY_normal_field_name_via_string import (
+                normal_field_name_via_string)
+
+        def stream_for_sync_via_stream(dcts):
+            for dct in dcts:
+                _md_link = markdown_link_via(dct['label'], dct['url'])
+                _ = normal_field_name_via_string(dct['label'])
+                _ = simple_key_via_normal_key(_)
+                yield (_, {'add_on': _md_link})
+        return {
+                'stream_for_sync_is_alphabetized_by_key_for_sync': False,
+                'stream_for_sync_via_stream': stream_for_sync_via_stream,
+                'dictionaries': _these_dictionaries(),
+                'near_keyerer': near_keyerer_common,
+                }
 
     def near_collection_identifier(self):
         return _this_markdown_fellow()
@@ -178,20 +196,10 @@ _same_ack_foundry = f'|[ACK Foundry]({_url}/articles/ackfoundry)|||\n'  # noqa: 
 
 @lazy
 def _these_dictionaries():
-    return tuple(x for x in _yield_these_dictionaries())
+    return tuple(_yield_these_dictionaries())
 
 
 def _yield_these_dictionaries():
-    from data_pipes import common_producer_script as lib
-    yield {
-            '_is_sync_meta_data': True,
-            'natural_key_field_name': 'add_on',
-            'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
-            'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
-            'custom_mapper_for_syncing': lib.mapper_for('add_on'),
-            'far_deny_list': ('url', 'label')
-    }
-
     def o(tail):
         return f'{_url}{tail}'
     yield {'url': o('/articles/ably'), 'label': 'Ably'}
@@ -200,10 +208,24 @@ def _yield_these_dictionaries():
     yield {'url': o('/articles/adept-scale'), 'label': 'Adept Scale'}
 
 
+def _production_producer_script():
+    return 'script/producer_scripts/script_180421_heroku_add_ons.py'
+
+
+def near_keyerer_common(key_via_native, schema, listener):  # pure pass-thru
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            COMMON_NEAR_KEY_SIMPLIFIER)
+
+    # (reminder: function takes a row_DOM and returns a sync_key)
+
+    return COMMON_NEAR_KEY_SIMPLIFIER(key_via_native, schema, listener)
+
+
 _reduced_number = 4  # how many business items in our reduced collection?
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1: no more sync-side item-mapping
 # #born.

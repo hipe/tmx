@@ -10,7 +10,7 @@ import unittest
 class _CommonCase(unittest.TestCase):
     """NOTE - many of these are abstraction candidates
 
-    #track #[#410.K]
+    #track #[#459.F] CLI integ tests have redundant setup
     """
 
     # -- assertions
@@ -37,8 +37,8 @@ class _CommonCase(unittest.TestCase):
         self.assertRegex(
                 _lines[0],
                 r'^usage: me \[-h\] \[--near-format FORMAT\] '
-                r'\[--far-format FORMAT\] \[--diff\]\n'
-                r' +near-collection far-collection$')
+                r'\[--diff\]'
+                r' +near-collection producer-script$')
 
     def _first_line(self):
         return self._this_line(0)
@@ -163,13 +163,13 @@ class Case3066_top_help_screen(_CommonCase):
     def test_300_something_about_description(self):
         _sect = self._section('description')
         _first_line = _sect.children[0].styled_content_string
-        self.assertIn('description: for a given particular natur', _first_line)
+        self.assertIn('description: for each entity in a far', _first_line)
 
     def test_400_something_about_arguments(self):
         self._num_children(self._section('positional arguments'), 2)
 
     def test_500_something_about_options(self):
-        self._num_children(self._section('optional arguments'), 4)  # -h + 1
+        self._num_children(self._section('optional arguments'), 3)  # -h + 1
 
     def _num_children(self, sect, num):
         cx = sect.children
@@ -260,7 +260,7 @@ class Case3069_strange_format_adapter_name(_CommonCase):
         return self._expect_this_many_on_stderr(1)
 
     def _argv(self):
-        return ('me', '--far-format', 'zig-zag', 'xx', 'yy')
+        return ('me', '--near-format', 'zig-zag', 'xx', 'yy')
 
 
 class Case3070_money_and_diff(_CommonCase):
@@ -308,7 +308,7 @@ class Case3070_money_and_diff(_CommonCase):
         return ('me', '--diff', _markdown_0100(), _far_130())
 
 
-# #open [#410.T] cover case: no diff
+# #open [#459.I] cover case: no diff
 
 
 def _far_130():

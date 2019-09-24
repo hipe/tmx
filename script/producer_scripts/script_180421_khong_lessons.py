@@ -4,7 +4,6 @@
 {domain}
 
 (this is the content-producer of the producer/consumer pair)
-(the first row (line) is metadata about syncing)
 """
 # This producer script is covered by (Case0810DP)
 
@@ -18,106 +17,49 @@ _url = _domain + '/python/pytut.php'  # ..
 _my_doc_string = __doc__
 
 
-class open_dictionary_stream:
-    """ordinarily such a scraping script is only about half a terminal screen
-
-    of code. throughout the document we'll explain why this particular one
-    is more complicated. but as an overview:
-
-      - we are outuputting something like compound keys
-      - aspects of the page structure (and 'soup pragmatics') make it tricky
-      - something about tests
-
-    here's the thing about compound keys:
-
-    at a purely conceptual level, we are producing a collection of "items"
-    where each "item" is a named tuple-ish of name-value pairs derived from
-    particular anchor (`<a>`) tags in the the page. the name value pairs are:
-
-      - a URL
-      - a label
-
-    the URL is derived from the anchor attribute's `href` attribute. the
-    label is simply be the whole body (content string) of the anchor tag.
-
-    (maybe maybe not we will include the section ..)
-
-    now, if we wanted purity we would output dictionaries like this (one per
-    row/line/item) and we would be done. (before #history-A.1 was like this.)
-
-        {"label": "intro to numpy", "url": "http://xx.yy.zz/qq.html"}
-
-    but: the target (near) markdown table we are generating/editing has
-    something lke a compound value for its "human key" cel. you see, we want
-    this cel to be a clickable link. this clickable link will have *both* the
-    above components in it (as one human key):
-
-        {"main_cel": "[intro to numpy](http://xx.yy.zz/qq.html)"}
-
-    although this is something of a superficical design choice, it's a
-    provision that for now is easier for us to implement on the producer end
-    instead of the consumer end. (that is, if our synchronizer algorithm
-    could accomodate the tranformation between the above two structures,
-    that's a whole addition to the API we haven't yet considered or designed.)
+def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
+    with open_traversal_stream(error_monitor.listener) as dcts:
+        if is_for_sync:
+            dcts = stream_for_sync_via_stream(dcts)
+        _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
+    return 0 if error_monitor.OK else 456
 
 
-    ## about tests:
+_use_key = 'href'  # internally (in function) which component to use for ID
 
-    Test cases near (Case0810DP) cover this document.
-    it behooves us to derive things from real world use cases;
-    early abstraction
-    """
 
-    def __init__(
-            self,
-            html_document_path,
-            listener,
-            ):
+def stream_for_sync_via_stream(dcts):
+    o = _md_lib()
+    markdown_link_via = o.markdown_link_via
+    url_via_href = o.url_via_href_via_domain(_domain)
+    label_via_string = o.label_via_string_via_max_width(70)
+    del(o)
+    for dct in dcts:
+        if _use_key not in dct:
+            assert('header_content' in dct)
+            continue
+        href = dct['href']
+        _use_label = label_via_string(dct['text'])
+        _url = url_via_href(href)
+        _lesson = markdown_link_via(_use_label, _url)
+        yield (href, {'lesson': _lesson})
 
-        self._html_document_path = html_document_path
-        self._listener = listener
-        self._enter_mutex = None
-        self._exit_mutex = None
 
-    def __enter__(self):
-        """(produce one metadata row then the object rows)"""
-
-        del(self._enter_mutex)
-        _rc = self.__build_this_one_runtime_context()
-
-        yield {
-            '_is_sync_meta_data': True,
-            'natural_key_field_name': 'lesson',
-            }
-
-        with _rc as json_objects:
-            for json_obj in json_objects:
-                yield json_obj
-
-    def __build_this_one_runtime_context(self):
-
-        _rc = _ad_hoc_lib().OPEN_DICTIONARY_STREAM_VIA(
-            url=_url,
-            first_selector=None,
-            second_selector=_second_selector,
-            html_document_path=self._html_document_path,
-            listener=self._listener)
-        return _rc
-
-    def __exit__(self, *_):
-        # bs4 (beautiful soup) doesn't stream. does One Big Tree. dothing to do
-
-        del(self._exit_mutex)
+def open_traversal_stream(listener, html_document_path=None):
+    return _ps_lib().open_dictionary_stream_via(
+        url=_url,
+        first_selector=None,
+        second_selector=_second_selector,
+        html_document_path=html_document_path,
+        listener=listener)
 
 
 def _second_selector(soup, listener):
     """
-    in the purest form of using this scraper script, one doo-hah serves as
-    a straightforward selector and another doo-hah takes the element from
-    the first and traverses its children yielding the desired of its
-    components (something of a map-reduce).
-
-    but this KHong page throws us several curve balls in terms of its structure
+    The typical script like this consists of two parts: one, a selector that
+    selects a single node of interest in the document, and two, a
+    straightforward mapping of each immediate child element of that node
+    to a label and a url. But this KHong page is not straightforward:
 
       - `<br>` elements are intermixed alongside `<a>` (anchor) elements.
         (ok, no problem. reduce them out.)
@@ -197,17 +139,17 @@ def _second_selector(soup, listener):
         ]
     do_thing = False
 
-    for json_obj in o.special_doo_hah_for_two_div(two_div):
-        if 'header_level' in json_obj:
+    for dct in o.special_doo_hah_for_two_div(two_div):
+        if 'header_level' in dct:
             expected, yes_no = stack.pop()
-            actual = json_obj['header_content']
+            actual = dct['header_content']
             if expected != actual:
                 _tmpl = "new section or order change? expected '%s' (had '%s')"
                 cover_me(_tmpl % (expected, actual))
             do_thing = yes_no
         elif do_thing:  # counter to OCD
-            seen_set.update({json_obj['lesson']})
-        yield json_obj
+            seen_set.update({dct[_use_key]})
+        yield dct
 
     # then, etc while traversing the FIRST
 
@@ -218,8 +160,8 @@ def _second_selector(soup, listener):
         cover_me()
 
     count = 0
-    for json_obj in itr:
-        key = json_obj['lesson']
+    for dct in itr:
+        key = dct[_use_key]
         if key in seen_set:
             count += 1
         else:
@@ -316,22 +258,7 @@ def _all_these_functions(listener):
         return (el for el in bs_el.recursiveChildGenerator() if yes(el))
 
     def dictionary_via_soup_element(el):
-
-        _href = el['href']
-        _label = el.text
-        # the old way:
-        # return {'href': _href, 'text': _label}
-
-        _use_label = label_via_string(_label)
-        _url = url_via_href(_href)
-        _lesson = markdown_link_via(_use_label, _url)
-        return {'lesson': _lesson}
-
-    o = _md_lib()
-    markdown_link_via = o.markdown_link_via
-    url_via_href = o.url_via_href_via_domain(_domain)
-    label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
+        return {'href': el['href'], 'text': el.text}
 
     class o:
         pass
@@ -345,54 +272,34 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-class _this_lazy:  # [#510.6]
-
-    def __init__(self, f):
-        self._is_first_call = True
-        self._function = f
-
-    def __call__(self, *a):
-        if self._is_first_call:
-            self._is_first_call = False
-            self._use_function = self.__lookup_use_function()
-        return self._use_function(*a)
-
-    def __lookup_use_function(self):
-        f = self._function
-        del self._function
-        import data_pipes as lib
-        return getattr(lib, f.__name__)
-
-
-@_this_lazy
-def pop_property(o, s):
-    pass
-
-
-@_this_lazy
-def cover_me(msg=None):
-    pass
-
-
 def _md_lib():
     from data_pipes import common_producer_script as mod
     return mod.LEGACY_markdown_lib()
 
 
-def _ad_hoc_lib():
+def _ps_lib():
     import data_pipes.format_adapters.html.script_common as x
     return x
 
 
-if __name__ == '__main__':
-    common_CLI_for_json_stream_ = _ad_hoc_lib().common_CLI_for_json_stream_
-    _exitstatus = common_CLI_for_json_stream_(
-            traversal_function=open_dictionary_stream,
-            doc_string=_my_doc_string,
-            description_template_valueser=lambda: {'domain': _domain},
-            )
-    exit(_exitstatus)
+def cover_me(s):
+    raise Exception('cover me' if s is None else f'cover me: {s}')
 
+
+if __name__ == '__main__':
+    import sys as o
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    exit(cheap_arg_parse(
+            CLI_function=_my_CLI,
+            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+            formal_parameters=(
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),),
+            description_template_valueser=lambda: {'domain': _domain},
+            ))
+
+# #history-A.4: no more sync-side stream mapping - removed a ton of doc
 # #history-A.3: beaut. soup changed.
 # #history-A.2: sunsetted file of origin
 # #history-A.1

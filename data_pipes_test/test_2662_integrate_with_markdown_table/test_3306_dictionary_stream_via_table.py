@@ -8,7 +8,7 @@ counterpart to the magnetic that *does* actually exist for the html format
 adapter.
 
 currently there is no such magnetic in the subject format adapter
-  - because we have not yet abstracted any [#410.J] adaptation
+  - because we have not yet abstracted any [#459.E] adaptation
     for this format adapter,
   - because we are letting it incubate
       - because of how fresh it is, and
@@ -27,10 +27,10 @@ import unittest
 class _CommonCase(unittest.TestCase):
 
     def _field_names(self):
-        return self._end_state().head_dictionary['field_names']
+        return self._end_state().sync_keys_seen
 
     def _record(self, k):
-        return self._end_state().business_object_dictionary[k]
+        return self._end_state().entity_dictionary_via_sync_key[k]
 
 
 class Case3306DP_hello(_CommonCase):
@@ -38,7 +38,7 @@ class Case3306DP_hello(_CommonCase):
 
     ..a sub-slice of tests in our "mentor" test file (Case1640DP). we have
     carried over only a sub-slice of those tests, having the sole intention
-    of covering only our format adapter's implementation of [#410.J] record
+    of covering only our format adapter's implementation of [#459.E] record
     mapping in most of its directives:
       - `rename_to`
       - `split_to`

@@ -7,7 +7,9 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case0810DP(_CommonCase):
+class Case0810DP_khong(_CommonCase):
+    # this exists only to assert that we don't break this complicated
+    # production producer script
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -28,7 +30,6 @@ class Case0810DP(_CommonCase):
 
     @shared_subject
     def _shared_state(self):
-
         emissions = []
         sections = []
 
@@ -36,10 +37,6 @@ class Case0810DP(_CommonCase):
 
         # use_listener = lib.for_DEBUGGING (works)
         use_listener = lib.listener_via_emission_receiver(emissions.append)
-
-        _cm = _subject_module().open_dictionary_stream(
-                html_document_path=html_fixture('0120-real-subtree.html'),
-                listener=use_listener)
 
         def store_previous_initially():
             state.store_previous = store_previous_normally
@@ -55,15 +52,16 @@ class Case0810DP(_CommonCase):
                 self.item_strings = []
                 self.header_content = s
 
-        with _cm as json_objs:
-            json_obj = next(json_objs)
-            json_obj['_is_sync_meta_data']  # assert
-            for json_obj in json_objs:
-                if 'header_level' in json_obj:
+        _cm = _subject_module().open_traversal_stream(
+                listener=use_listener,
+                html_document_path=html_fixture('0120-real-subtree.html'))
+        with _cm as dcts:
+            for dct in dcts:
+                if 'header_level' in dct:
                     state.store_previous()
-                    section = _Section(json_obj['header_content'])
+                    section = _Section(dct['header_content'])
                 else:
-                    section.item_strings.append(json_obj['lesson'])
+                    section.item_strings.append(dct['text'])
 
         store_previous_normally()
 

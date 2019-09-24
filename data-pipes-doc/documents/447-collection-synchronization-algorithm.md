@@ -127,7 +127,7 @@ we are going to make it original-order-centric by default (specifically
 because the example reasons we just cited are in fact based on real-world
 use cases are are compelling to us).
 
-(EDIT at writing we have not yet exposed an option for "order centricity"
+(#edit [#447.B] at writing we have not yet exposed an option for "order centricity"
 (i.e near-centric vs. far-centric, introduced next), but we state
 this all here now so we can give thought to it as we write the algorithm.)
 
@@ -183,7 +183,7 @@ this imagined option would be for whether or not you would want the
 synchronization to remove from your near collection those items that
 are not also in the far collection (in terms of their natural key).
 
-EDIT at present we are not going to implement this, but we should
+.#edit [#447.B] at present we are not going to implement this, but we should
 consider how such a requirement would manifest in our algorithm nonetheless.
 
 probably what we will do as the default (and at first only) behavior is
@@ -220,7 +220,7 @@ what we mean by "output" is important:
 
   - don't assume you are necessarily writing to a file on the filesystem
     (unless you really have to assume this). there are some coarse
-    advantages to thinking of file IO as line-based instead of byte-based EDIT.
+    advantages to thinking of file IO as line-based instead of byte-based #edit [#447.B]
 
   - there CAN be advantages to modeling your document production as
     stream-like instead of iterative; but MAYBE some implementation
@@ -258,7 +258,7 @@ ouputting a full, new document; it gives you this triad (plus) of benefits:
 
   - _simple:_ this simplifies the interface without sacraficing power,
     and comes at a cost in convenience that we see as negligible.
-    accomplishing this is probably some kind of design principle somewhere EDIT
+    accomplishing this is probably some kind of design principle somewhere #edit [#447.B]
 
   - _upgrade path:_ by targeting this behavior we are not trapped in it.
     accomplishing a `-i`-like option could be possible through etc.
@@ -313,7 +313,7 @@ so, the pieces in more detail:
 ### index the new collection (which traverses it)
 
 you will turn the collection (a stream) into a "diminshing pool".
-(NOTE in-memory vs e.g redis vs e.g a database vs ?? EDIT).
+(NOTE in-memory vs e.g redis vs e.g a database vs ?? #edit [#447.B]).
 
 the "diminishing pool" won't be diminishing yet at this phase, so
 in fact we can think of it as a mutable ordered dictionary. (in our

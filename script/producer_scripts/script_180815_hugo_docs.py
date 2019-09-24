@@ -21,40 +21,50 @@ import soupsieve as sv
 _domain = 'https://gohugo.io'  # no trailing slash because #here1
 _url = _domain + '/documentation/'
 
-_my_doc_string = __doc__
+
+def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
+    with open_traversal_stream(error_monitor.listener) as dcts:
+        if is_for_sync:
+            dcts = stream_for_sync_via_stream(dcts)
+        _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
+    return 0 if error_monitor.OK else 456
 
 
-def _required(self, attr, x):
-    if x is None:
-        self._OK = False  # often `_become_not_OK`
-    else:
-        setattr(self, attr, x)
+_my_CLI.__doc__ = __doc__
 
 
-class open_dictionary_stream:
+stream_for_sync_is_alphabetized_by_key_for_sync = False
 
-    def __init__(self, cached_document_path, listener):
+
+def stream_for_sync_via_stream(dcts):
+
+    expected_head = f'{_domain}/'
+    leng = len(expected_head)
+
+    for dct in dcts:
+        if '_is_branch_node' in dct:
+            continue
+        s = dct['url']
+        assert(expected_head == s[0:leng])
+        yield (s[leng:], dct)
+
+
+class open_traversal_stream:
+
+    def __init__(self, listener, cached_document_path=None):
         from data_pipes.format_adapters.html.script_common import (
                 soup_via_locators_ as _)
         self._soup_via_locators = _
         self._cached_document_path = cached_document_path
         self._listener = listener
-        self._OK = True
 
     def __enter__(self, *_3):
-        self._OK and self.__resolve_soup()
-        self._OK and self.__find_the_root_UL()
-        if not self._OK:
+        if not self.__resolve_soup():
             return
-
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': 'la_la',
-                }
+        self.__find_the_root_UL()
 
         for level_one_node in _direct_children(self._the_root_UL):
-            if 'li' != level_one_node.name:
-                cover_me()
+            assert('li' == level_one_node.name)
             for level_two_node in _direct_children(level_one_node):
                 name = level_two_node.name
                 if 'a' == name:
@@ -96,15 +106,17 @@ class open_dictionary_stream:
         ul, = tuple(_direct_children(nav))  # assert
         assert('ul' == ul.name)
         self._the_root_UL = ul
+        return _okay
 
     def __resolve_soup(self):
-        _soup = self._soup_via_locators(
+        soup = self._soup_via_locators(
                 url=_url,
                 html_document_path=self._cached_document_path,
                 listener=self._listener)
-        self._required('_soup', _soup)
-
-    _required = _required
+        if not soup:
+            return
+        self._soup = soup
+        return _okay
 
 
 def _write_anchor_tag(dct, a):
@@ -120,18 +132,26 @@ def _direct_children(node):
     return sv.filter('*', node)  # omit strings, `_filter`
 
 
-def cover_me():
-    raise Exception('cover me')
+def _ps_lib():
+    import data_pipes.format_adapters.html.script_common as x
+    return x
+
+
+_okay = True
 
 
 if __name__ == '__main__':
-    from data_pipes.format_adapters.html.script_common import (
-            common_CLI_for_json_stream_)
-    _exitstatus = common_CLI_for_json_stream_(
-            traversal_function=open_dictionary_stream,
-            doc_string=_my_doc_string,
+    import sys as o
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    exit(cheap_arg_parse(
+            CLI_function=_my_CLI,
+            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+            formal_parameters=(
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),),
             description_template_valueser=lambda: {'hugo_docs_url': _url},
-            )
-    exit(_exitstatus)
+            ))
 
+# #history-A.1: no more sync-side stream mapping
 # #born.

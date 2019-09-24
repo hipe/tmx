@@ -27,18 +27,15 @@ class _CommonCase(unittest.TestCase):
 
         _cr = _build_collection_reference(s)
 
-        cm = _cr.open_sync_request(
-                cached_document_path=None,
-                datastore_resources=None,
-                listener=listener)
-        assert(not cm)
+        ps = _cr.TO_PRODUCER_SCRIPT(listener)
+        assert(not ps)
         msg, = msgs  # assertion
         return msg
 
     _build_end_state = build_end_state_commonly
 
 
-class Case1312(_CommonCase):
+class Case1312_producer_script_via_path(_CommonCase):
 
     def test_010_format_adapter_loads(self):
         self.assertIsNotNone(_subject_format_adapter())
@@ -60,18 +57,21 @@ class Case1312(_CommonCase):
         _path = _chimi_churri_far_path()
         _cref = _build_collection_reference(_path)
         # from script_lib import filesystem_functions as rsx
-        rsx = "you don't need filesystem resources yet"
-        _cm = _cref.open_sync_request(
-                cached_document_path=None,
-                datastore_resources=rsx,
-                listener=__file__)
-        with _cm as sync_response:
-            sync_params = sync_response.release_traversal_parameters()
-            dict_stream = sync_response.release_dictionary_stream()
-        self.assertEqual(sync_params.natural_key_field_name, 'xyzz 01')
-        these = [x for x in dict_stream]
-        self.assertEqual(len(these), 1)
-        self.assertEqual(these[0], {'choo cha': 'foo fa'})
+
+        listener = None
+        ps = _cref.TO_PRODUCER_SCRIPT(listener)
+
+        self.assertTrue(ps.stream_for_sync_is_alphabetized_by_key_for_sync)
+
+        with ps.open_traversal_stream(listener) as dcts:
+            dcts = tuple(dcts)  # see it all now
+
+        tups = tuple(ps.stream_for_sync_via_stream(dcts))
+        tup, = tups  # assertion
+        key_for_sync, dct = tup
+
+        self.assertEqual(dct, {'choo cha': 'foo fa'})
+        self.assertEqual(key_for_sync, 'foo fa')
 
 
 class Case1314DP_filenames_must_look_a_way(_CommonCase):
@@ -93,8 +93,8 @@ class Case1314DP_filenames_must_look_a_way(_CommonCase):
     def given(self):
         # NOTE the dash in the below filename
         return {
+                'producer_script_path': executable_fixture('chimi-churry.py'),
                 'near_collection': _same_near_collection(),
-                'far_collection': executable_fixture('chimi-churry.py'),
                 }
 
 
@@ -111,35 +111,20 @@ class Case1315_file_not_found(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': 'script/no_such_script_one.py',
                 'near_collection': _same_near_collection(),
-                'far_collection': 'script/no_such_script_one.py',
                 }
 
 
-class Case1317_no_metadata_row(_CommonCase):
+# Case1317 was "no metadata row", archived #history-A.1
+
+
+class Case1319DP_bad_human_key(_CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
             self._build_end_state()
-        _rx = r"\bunexpected keyword argument 'choovo chavo'"
-        self.assertRaisesRegex(TypeError, _rx, f)
-
-    def expect_emissions(self):
-        return iter(())
-
-    def given(self):
-        return {
-                'near_collection': _same_near_collection(),
-                'far_collection': executable_fixture('exe_080_no_metadata.py'),
-                }
-
-
-class Case1319_bad_human_key(_CommonCase):
-
-    def test_100_raises_this_happenstance_exception(self):
-        def f():
-            self._build_end_state()
-        _rx = r"^'xyzz 01'$"
+        _rx = r"^'choo cha'$"  # it asks for a prototype for this field
         self.assertRaisesRegex(KeyError, _rx, f)
 
     def expect_emissions(self):
@@ -147,8 +132,8 @@ class Case1319_bad_human_key(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': _chimi_churri_far_path(),
                 'near_collection': _same_near_collection(),
-                'far_collection': _chimi_churri_far_path()
                 }
 
 
@@ -169,8 +154,8 @@ class Case1320DP_extra_cel(_CommonCase):
     def given(self):
         _ = executable_fixture('exe_110_extra_cel.py')
         return {
+                'producer_script_path': _,
                 'near_collection': _same_near_collection(),
-                'far_collection': _,
                 }
 
 
@@ -187,8 +172,8 @@ class Case1322DP_RUM(_CommonCase):
 
     def given(self):
         return {
+                'producer_script_path': executable_fixture('exe_120_endcap_yes_no.py'),  # noqa: E501
                 'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-                'far_collection': executable_fixture('exe_120_endcap_yes_no.py'),  # noqa: E501
                 }
 
 
@@ -218,4 +203,5 @@ def _subject_format_adapter():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1
 # #born.

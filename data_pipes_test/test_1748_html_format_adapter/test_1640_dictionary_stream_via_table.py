@@ -16,7 +16,7 @@ very straightforward way, it's a potential future problem we want to
 sidestep now if we can.
 
 ok but having said that, the development of this producer script was what
-pioneered the creation of [#410.J] the record mapper thing. we then exercised
+pioneered the creation of [#459.E] the record mapper thing. we then exercised
 all of its available directives in the coverage for this producer script.
 (of course we did, because the abstract thing was abstracted entirely from
 the concrete thing).
@@ -31,7 +31,7 @@ script-test and its underlying support infrastructure in place:
   - because it's the only thing that covers the html adaptaton of same
     (a thing we certainly want to keep around for later, and because it's
     still used in the producer script that came before this (whose source
-    content "lives in" (#wish [#410.P]) moin moin.
+    content "lives in" (#wish [#459.H]) moin moin.
 
 (this whole big change discussed above happened at #history-A.1.)
 """
@@ -48,10 +48,10 @@ import unittest
 class _CommonCase(unittest.TestCase):
 
     def _field_names(self):
-        return self._end_state().head_dictionary['field_names']
+        return self._end_state().sync_keys_seen
 
     def _record(self, k):
-        return self._end_state().business_object_dictionary[k]
+        return self._end_state().entity_dictionary_via_sync_key[k]
 
 
 class Case1640DP_hello(_CommonCase):

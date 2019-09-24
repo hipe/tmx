@@ -14,7 +14,7 @@ def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
     _cm = _sync_context_manager_via(**_d, listener=listener)
 
     with _cm as lines:
-        lines = tuple(x for x in lines)
+        lines = tuple(lines)
 
     _ = exp.actual_emission_index_via_finish()
     return _EndState(lines, _)
@@ -24,12 +24,12 @@ class ProducerCaseMethods:
 
     def build_YIKES_SYNC_(self):
 
-        _far_coll_id = _norm_path(self.far_collection_identifier())
+        _producer_script = PS_via(self.producer_script())
         _near_coll_id = self.near_collection_identifier()
         _listener = self.use_listener()
 
         _cm = _sync_context_manager_via(
-                far_collection=_far_coll_id,
+                producer_script_path=_producer_script,
                 near_collection=_near_coll_id,
                 near_format='markdown_table',
                 listener=_listener)
@@ -42,72 +42,78 @@ class ProducerCaseMethods:
     def build_pair_list_for_inspect_(self):
 
         _cdp = self.cached_document_path()
-        _ci = _norm_path(self.far_collection_identifier())
+        _ps = PS_via(self.producer_script())
         _listener = self.use_listener()
-        _f = _this_stream_lib()._traversal_stream_for_sync
-
-        pairs = _f(
+        _ = _this_stream_lib()._traversal_stream_for_sync(
                 cached_document_path=_cdp,
-                collection_identifier=_ci,
+                collection_identifier=_ps,
                 listener=_listener)
+        return tuple(_)
 
-        slowly = []
-        for (key, dct) in pairs:
-            slowly.append((key, dct))
-
-        return slowly
-
-    def build_raw_list_(self):
+    def build_dictionaries_tuple_from_traversal_(self):
 
         _cdp = self.cached_document_path()
-        _ci = _norm_path(self.far_collection_identifier())
+        _ps = PS_via(self.producer_script())
         _listener = self.use_listener()
-
-        open_traversal_stream = _this_stream_lib().open_traversal_stream_TEMPORARY_LOCATION  # noqa: E501
-
-        _ = open_traversal_stream(
+        _ = _this_stream_lib().open_traversal_stream_TEMPORARY_LOCATION(
                 cached_document_path=_cdp,
-                collection_identifier=_ci,
-                intention=None,
+                collection_identifier=_ps,
                 listener=_listener)
-
-        slowly = []
-
-        def visit(dct):
-            slowly.append(dct)
-
         with _ as dcts:
-            trav_params = next(dcts)  # ..
-            metadata_row_dict = trav_params.to_dictionary()
-            visit(metadata_row_dict)
-            for dct in dcts:
-                visit(dct)
-
-        return slowly
+            return tuple(dcts)  # (much simplified at #history-A.2)
 
     def cached_document_path(self):
         return None
 
     def use_listener(self):
-        # return self.LISTENER_FOR_DEBUGGING()
-        return _the_no_op_listener
+        from modality_agnostic import listening as _
+        return _.throwing_listener
 
     def LISTENER_FOR_DEBUGGING(self):
         import modality_agnostic.test_support.listener_via_expectations as _
         return _.for_DEBUGGING
 
 
-def _norm_path(path):
-    return path  # ..
-
-
-def _the_no_op_listener(*_):
-    pass
+def PS_via(mixed):
+    if isinstance(mixed, str):
+        return mixed
+    return FakeProducerScript(**mixed)
 
 
 def _sync_context_manager_via(**kwargs):
-    import data_pipes.cli.sync as _
-    return _.OpenNewLines_via_Sync_(**kwargs)
+    from data_pipes.cli.sync import open_new_lines_via_sync
+    return open_new_lines_via_sync(**kwargs)
+
+
+class FakeProducerScript:
+    def __init__(
+            self, stream_for_sync_is_alphabetized_by_key_for_sync,
+            stream_for_sync_via_stream, dictionaries, near_keyerer):
+
+        self._dictionaries = dictionaries
+        self.stream_for_sync_is_alphabetized_by_key_for_sync = stream_for_sync_is_alphabetized_by_key_for_sync  # noqa: E501
+        self.stream_for_sync_via_stream = stream_for_sync_via_stream
+        self.near_keyerer = near_keyerer
+
+    def open_traversal_stream(self, listener, cached_document_path):
+        x = self._dictionaries
+        del self._dictionaries
+        return _AbsractMe(x)
+
+    HELLO_I_AM_A_PRODUCER_SCRIPT = None
+
+
+class _AbsractMe:
+    def __init__(self, x):
+        self._value = x
+
+    def __enter__(self):
+        x = self._value
+        del self._value
+        return x
+
+    def __exit__(self, *_3):
+        return False
 
 
 class _EndState:
@@ -143,12 +149,6 @@ def _this_stream_lib():
     return common_producer_script.common_CLI_library()
 
 
-def pop_property(self, prop):
-    x = getattr(self, prop)
-    delattr(self, prop)
-    return x
-
-
 def cover_me(s=None):
     msg = 'cover me'
     if s is not None:
@@ -156,5 +156,6 @@ def cover_me(s=None):
     raise Exception(msg)
 
 
+# #history-A.2: no more sync-side entity mapping
 # #history-A.1: upgraded to python 3.7, things changed
 # #born.
