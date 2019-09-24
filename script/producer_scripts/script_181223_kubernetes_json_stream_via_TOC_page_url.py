@@ -5,7 +5,7 @@ raise Exception("#not-covered - comment out if you're feelng lucky")
 # (restored to work "visually" at #history-A.1, but not covered hence broken)
 
 
-class _CLI:
+class _CLI:  # [#607.4] custom CLI
 
     def __init__(self, *four):
         self.stdin, self.stdout, self.stderr, self.ARGV = four

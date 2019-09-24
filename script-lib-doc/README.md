@@ -56,8 +56,8 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
-|[#610]                     |       | line stream via big string
 |[#676]                     | #open | track `cover_me`
+|[#610]                     |       | line stream via big string
 |[#608.K]                   | #refa | lazy not necessary
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context

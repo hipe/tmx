@@ -235,7 +235,7 @@ def _write_html_file(client):
     return ok
 
 
-class _Client:
+class _Client:  # [#607.4] custom CLI
     """("modality" "injection")"""
 
     def __init__(self, sin, sout, serr):

@@ -15,7 +15,7 @@ near_keyerer = None
 
 
 class open_traversal_stream:
-    def __init__(self, listener, cached_document_path):
+    def __init__(self, listener, cached_document_path=None):
         pass
 
     def __enter__(self):
@@ -28,8 +28,8 @@ class open_traversal_stream:
 
 
 if __name__ == '__main__':
-    import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
-    exit(_.execute_as_CLI_(open_traversal_stream))
+    from data_pipes_test.fixture_executables.exe_150_json_stream_via_bernstein_html import exit_code_via_path  # noqa: E501
+    exit(exit_code_via_path(__file__))
 
 # #history-A.1: no more sync-side entity mapping
 # #born.

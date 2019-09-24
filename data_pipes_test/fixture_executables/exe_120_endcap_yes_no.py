@@ -12,7 +12,7 @@ near_keyerer = None  # #open [#458.N] producer script shouldn't have knowledge
 class open_traversal_stream:
     """(RUM)"""
 
-    def __init__(self, listener, cache_path):
+    def __init__(self, listener, cache_path=None):
         pass
 
     def __enter__(self):
@@ -26,7 +26,7 @@ stream_for_sync_is_alphabetized_by_key_for_sync = True
 
 
 if __name__ == '__main__':
-    import exe_150_json_stream_via_bernstein_html as _  # #[410.H]
-    exit(_.execute_as_CLI_(open_traversal_stream))
+    from exe_150_json_stream_via_bernstein_html import exit_code_via_path
+    exit(exit_code_via_path(__file__))
 
 # #born.

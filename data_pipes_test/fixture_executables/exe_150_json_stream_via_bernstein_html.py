@@ -28,14 +28,63 @@ _url = 'https://github.com/webmaven/python-parsing-tools'
 _first_selector = ('div', {'id': 'readme'})
 
 
-def _my_CLI(error_monitor, sin, sout, serr, _SOON):
-    _cm = open_traversal_stream(error_monitor.listener)
-    with _cm as lines:
-        _top_html_lib().flush_JSON_stream_into(sout, serr, lines)
-    return 0 if error_monitor.OK else 456
+# == BEGIN LIB
+
+def exit_code_via_path(producer_script_path):
+    # (NOTE this is called from sakin_agac_test at writing #history-A.2)
+    _ps = __producer_script_via_producer_script_path(producer_script_path)
+    return _exit_code_via_producer_script(_ps)
 
 
-_my_CLI.__doc__ = __doc__
+def __producer_script_via_producer_script_path(producer_script_path):
+    # hard-coded depth of 3. ick/meh
+    import re
+    md = re.search(r'(?:^|/)([^/]+/[^/]+/[^/.]+)\.py$', producer_script_path)
+    _module_name = '.'.join(md[1].split('/'))
+    from importlib import import_module
+    return import_module(_module_name)
+
+
+def _exit_code_via_producer_script(ps):
+    _my_CLI = __CLI_function_via_producer_script(ps)
+    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
+            cheap_arg_parse)
+    import sys as o
+    return cheap_arg_parse(
+        CLI_function=_my_CLI,
+        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
+        formal_parameters=(
+            ('-s', '--for-sync', 'show the traveral stream mapped thru etc'),
+            ),
+        description_template_valueser=lambda: {'url': _url},
+        )
+
+
+def __CLI_function_via_producer_script(ps):
+    open_trav_stream = ps.open_traversal_stream
+    stream_via_stream = ps.stream_for_sync_via_stream
+    doc = ps.__doc__
+    del ps
+
+    def my_CLI(error_monitor, sin, sout, serr, is_for_sync):
+
+        opened = open_trav_stream(error_monitor.listener)
+
+        with opened as dcts:
+            if is_for_sync:
+                use_this_stream = stream_via_stream(dcts)
+            else:
+                use_this_stream = dcts
+            _top_html_lib().flush_JSON_stream_into(sout, serr, use_this_stream)
+
+        if error_monitor.OK:
+            return 0
+        return 456
+
+    my_CLI.__doc__ = doc
+    return my_CLI
+
+# == END
 
 
 stream_for_sync_is_alphabetized_by_key_for_sync = False
@@ -50,7 +99,7 @@ def stream_for_sync_via_stream(dcts):  # #copy-pasted from prod #history-A.1
         yield (key_via(dct['name']),  dct)
 
 
-def open_traversal_stream(listener, html_document_path):
+def open_traversal_stream(listener, html_document_path=None):
 
     def my_generator(el, _emit):
 
@@ -123,37 +172,16 @@ def _md_lib():
     return mod.LEGACY_markdown_lib()
 
 
-def execute_as_CLI_(open_diction_IN_FLUX):
-    """
-    this is the implementation of :[#459.D]
-    """
-
-    raise Exception("change me")  # #open [#476] cover me
-    flush_into = _top_html_lib().flush_JSON_stream_into
-    import sys as o
-    with open_diction_IN_FLUX(None, None) as dcts:
-        flush_into(o.stdout, o.stderr, dcts)
-    return 0
-
-
 def _top_html_lib():
     import data_pipes.format_adapters.html.script_common as lib
     return lib
 
 
 if __name__ == '__main__':
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
-    import sys as o
-    _exitstatus = cheap_arg_parse(
-        CLI_function=_my_CLI,
-        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-        formal_parameters=(
-            ('-s', '--for-sync', 'COMING SOON'),
-            ),
-        description_template_valueser=lambda: {'url': _url},
-        )
-    exit(_exitstatus)
+    import sys
+    _me_as_module = sys.modules[__name__]
+    exit(_exit_code_via_producer_script(_me_as_module))
 
+# #history-A.2
 # #history-A.1
 # #DNA-fissure

@@ -97,7 +97,7 @@ class _CLI_for_Report:
         return self._report_module.__doc__
 
 
-def _parse_args(cli):
+def _parse_args(cli):  # [#607.4] custom CLI
     argv = cli.ARGV
     length = len(argv)
     if 1 == length:

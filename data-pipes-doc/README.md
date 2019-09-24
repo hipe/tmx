@@ -25,7 +25,7 @@ date: 2019-07-09T10:20:00-04:00
 |                  [#459.G] | #trak | whether in-memory should be official format
 |                  [#459.F] | #trak | CLI integration tests have redundant setup
 |                  [#459.E] | #trak | [record mapper]
-|                  [#459.D] | #trak | fixture executables aren't actuall exe.. (see)
+|                  [#459.D] | #hole |
 |                  [#459.3] | #hole |
 |                  [#459.2] |       | an exemplary implementation of sync
 |                  [#459]   |       | (internal & external tracking of small)
