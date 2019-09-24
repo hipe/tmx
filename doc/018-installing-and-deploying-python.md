@@ -34,7 +34,7 @@ all use the same version of python. that is, when we upgrade one
 sub-project to use a newer version of python, we must upgrade all of the
 sub-projects to use that new version.)
 
-(addendum to above EDIT: we are beginning to think about `pyenv`, but..)
+(addendum to above #edit [#018.B] we are beginning to think about `pyenv`, but..)
 
 in addition to the sub-project requiring a particular version of python,
 the sub-project will frequently require a particular set of python

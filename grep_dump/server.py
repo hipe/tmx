@@ -27,7 +27,7 @@ import grep_dump.forms as forms  # noqa: E402
 
 class _Config:  # :#here1
 
-    SECRET_KEY = 'one_day_make_this_more_secure'  # #todo
+    SECRET_KEY = 'one_day_make_this_more_secure'  # #open [#207.B]
     """the secret key is supposed to be secret, as the strength of the
     tokens and signatures generated with it depends on no person outside
     of the trusted maintainers of the application knowing it

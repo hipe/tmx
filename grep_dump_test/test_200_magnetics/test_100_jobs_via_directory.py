@@ -278,7 +278,7 @@ class DidBeforeDidAfter:
         self.did_after = False
 
 
-def _touch(path):  # #todo how (2/2)
+def _touch(path):  # #open [#207.C] how to do this right
     open(path, 'w').close()
 
 

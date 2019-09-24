@@ -39,7 +39,7 @@ def _do_do_verb(existing_file_lines, listener, client_args, f, do_future):
 
     # cut out early if the file failed to parse the first block
 
-    if not monitor.ok:
+    if not monitor.OK:
         return
 
     # if input entity blocks are out of order, you're gonna have a bad time.
@@ -98,7 +98,7 @@ def new_lines_via_update_and_existing_lines(
 
         yield de
 
-    if not monitor.ok:  # there's a lot that could have been wrong in the file
+    if not monitor.OK:  # there's a lot that could have been wrong in the file
         return
 
     if not did_find:
@@ -146,7 +146,7 @@ def new_lines_and_future_deleted_via_existing_lines(
 
         yield de
 
-    if not monitor.ok:  # there's a lot that could have been wrong in the file
+    if not monitor.OK:  # there's a lot that could have been wrong in the file
         return
 
     if not did_find:
@@ -160,7 +160,7 @@ def new_lines_and_future_deleted_via_existing_lines(
 
     # [#864]: "important: set the future value only once stream is exhausted"
 
-    if monitor.ok:
+    if monitor.OK:
         deleted_document_entity = document_entity_that_will_be_deleted
         _express_joy_at_having_deleted(
                 monitor.listener, deleted_document_entity)
@@ -184,7 +184,7 @@ def new_lines_via_create_and_existing_lines(
             first_greater = de
             break
 
-    if not monitor.ok:
+    if not monitor.OK:
         return
 
     # output the new lines

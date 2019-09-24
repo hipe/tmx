@@ -462,7 +462,7 @@ def _report_paths():
         cover_me(f'exitstatus: {es}')
 
 
-def _module_via_path(report_path):
+def _module_via_path(report_path):  # #[#510.10] module via path
     import importlib
     _stem = __stem_via_path(report_path)
     _use = f'script.producer_scripts.script_180920_hugo_themes.{_stem}'

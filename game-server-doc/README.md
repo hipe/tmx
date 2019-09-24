@@ -84,7 +84,7 @@ it burns up time trying to figure out why a very detailed, high-level
 test is broken if it's something fundamental and lowlevel that's the issue.
 this is why the author feels strongly about "regression order".
 
-(#todo this is documented in [tmx] yikes)
+(#edit [#001.B] this is documented in [tmx] yikes)
 
 
 
@@ -93,6 +93,8 @@ this is why the author feels strongly about "regression order".
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
+|[#015.B]                   | #edit | edit documentation
+|[#001.B]                   | #edit | edit documentation
 [[#000]                     |       | REMINDER - numberspace placeheld with ../README.md
 
 

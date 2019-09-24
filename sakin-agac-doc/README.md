@@ -35,10 +35,13 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #426    |       | publishing roadmap ..
 |                   #425    |       | dev workflow notes like git bisect
 |                   #424    |       | [theme notes]
+|                  [#423]   | #hole |
 |                   #422    |       | [hugo theme dim sum]
 |                   #421    |       | hugo vs jekyll vs whatever
 |                   #420    |       | adventures in CSS ..
 |                   #419    |       | heroku CMS add-on dim sum ..
+|                  [#418]   | #hole |
+|                  [#417]   | #hole |
 |                   #416.D  |       | CMS's
 |                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
 |                   #416.B  |       | (nasim!)
@@ -47,32 +50,18 @@ these were the original stated objectives, here (in part) for posterity:
 |                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
 |                   #412    | #open | "strict" "typing" (track true wishpoints)
 |                   #411    |       | [the function that flushes stream processors]
-|                   #410.Z  | #trak | the order that files are listed from the filesystem (even find) is indeterminate
-|                   #410.Y  | #wish | customizable functional pipelines (map, filter in any order etc)
-|                   #410.W  |       | [the magnetic that loads a function via a string]
+|                   #410.W  | #edit | edit documentation
 |                   #410.V  | #open | (no taggings) sync on a markdown file with no table should complain
-|                   #410.U  | #open | visible seams to clean up when things are stable
-|                   #410.T  | #open | tests we haven't written but still want
-|                   #410.S  | #open | markdown row spacing might be a misfeature
-|                   #410.R  | #trak | would redis etc
-|                   #410.Q  | #hole |
-|                   #410.P  | #wish | would we really want a moin moin adaption?
 |                   #410.N  | #trak | [html via markdown that isn't sync]
-|                   #410.13 | #trak | #provsion: where sparseness is implemented - prune "empty" cels
-|                   #410.L  | #trak | whether in-memory should be official format
-|                   #410.K  | #trak | CLI integration tests have redundant setup
-|                   #410.J  | #trak | [record mapper]
-|                   #410.I  | #open | remove this redundancy
-|                   #410.H  | #trak | fixture executables aren't actuall exe.. (see)
 |                   #410.G  | #trak | nested context managers closing each other
-|                   #410.F  | #hole |
-|                   #410.E  | #open | dashes to underscores is getting annoying
-|                   #410.D  | #trak | spots to change if we add this feature (see)
-|                   #410.C  | #wish | we want regex escape
+|                   #410.5  | #trak | workaround to avoid particular dotfiles as reported by vendor script
+|                   #410.4  | #trak | the order that files are listed from the filesystem (even find) is indeterminate
 |                   #410.B  | #open | absorb small graph into big graph
 |                   #410.A.1| #trak | track where we cover specific producer scripts
 |                   #410    |       | (internal tracking)
 |                   #409    | #hole |
+|                  [#408]   | #hole |
+|                  [#407]   | #hole |
 |<a name=406></a>[\[#406\]] | #open | this document might be obviated by "/TODO.dot" (of the mono-repo)
 |<a name=405></a>[\[#405\]] |       | play
 |<a name=404></a>[\[#404\]] |       | wiki app dim sum

@@ -2,7 +2,7 @@
 .#born to help us universalize non-click CLI..
 
 This was early-abstracted from a rough sketch of an attempt at adding
-options to CHEAP_ARG_PARSE..
+options to cheap_arg_parse..
 """
 
 
@@ -267,17 +267,13 @@ def _when_transition_not_found(listener, i, token_scanner, transitions):
 
 def _when_extra_input(listener, token_scanner):
     def structer():
-        xx()
+        raise Exception('cover me')  # [#676] cover me
     listener('error', 'structure', 'parse_error', 'extra_input', structer)
 
 
 def _when_unrecognized_input(listener, token_scanner, transitions):
     def stcter():
-        xx()
+        raise Exception('cover me')  # [#676] cover me
     listener('error', 'structure', 'parse_error', 'unrecognized_input', stcter)
-
-
-def xx():  # #todo
-    raise Exception('write me')
 
 # #born.

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 
-raise Exception('never loaded but may be useful for visual testing..')
+raise Exception('never loaded but may be useful for viz test')  # [#776] cov
 
 
-class open_dictionary_stream:
+class open_diction_IN_FLUX:
 
     def __init__(self, *_):
         pass
@@ -33,13 +33,13 @@ class open_dictionary_stream:
         return False  # no, we don't trap exceptions
 
 
-# == BEGIN (see same in data_pipes: [#410.H])
+# == BEGIN (see same in data_pipes: [#459.4])
 
-def execute_as_CLI_(open_dictionary_stream):
+def execute_as_CLI_(open_diction_IN_FLUX):
     from data_pipes.format_adapters.html.script_common import (
             flush_JSON_stream_into as flush_into)
     import sys as o
-    with open_dictionary_stream(None, None) as dcts:
+    with open_diction_IN_FLUX(None, None) as dcts:
         flush_into(o.stdout, o.stderr, dcts)
     return 0
 
@@ -48,6 +48,6 @@ def execute_as_CLI_(open_dictionary_stream):
 
 
 if __name__ == '__main__':
-    exit(execute_as_CLI_(open_dictionary_stream))
+    exit(execute_as_CLI_(open_diction_IN_FLUX))
 
 # #born.

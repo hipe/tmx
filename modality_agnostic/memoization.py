@@ -2,7 +2,7 @@ def dangerous_memoize_in_child_classes(attr, builder_method_name):
     """decorator takes two parameters: an attribute to set the value in
 
     IN THE CLASS, and the name of a builder method to call.
-    .#todo we need to integrate this with teardown so the memory is reclaimed
+    .#open [#507.F] integrate this with teardown so the memory is reclaimed
     """
 
     def decorate(f):

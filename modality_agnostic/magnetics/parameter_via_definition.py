@@ -131,7 +131,7 @@ class _SELF:
         self.default_value = default_value
 
     @property
-    def generic_universal_type(self):  # contact-point for the idea #todo
+    def generic_universal_type(self):  # contact-point for the idea [#507.E]
         pass
 
 

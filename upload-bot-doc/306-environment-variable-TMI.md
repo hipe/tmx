@@ -88,7 +88,7 @@ electronically somehow, somewhere.
   - it's unreasonable to expect developers to keep these values not in
     plain text on their disks, but it's incumbent on the trusted developer
     to exercise the overarching precautions discussed here.
-  - (maybe one day we could get fancy with that one thing EDIT)
+  - (maybe one day we could get fancy with that one thing #edit [#306.B])
   - we consider slack private messages to be an adequately secure means
     of sharing tokens from one developer to another.
   - however don't share tokens in ordinary slack channels. having an

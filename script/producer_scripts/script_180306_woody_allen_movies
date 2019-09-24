@@ -14,7 +14,8 @@ broadly there are 3 steps to this:
 """
 
 
-raise Exception('#todo - is this really not covered?')
+raise Exception('not covered')  # [#676] cover me. worked at #history-A.1
+# NOTE - this writes tempfiles so take that into account when you cover
 
 
 _doc = __doc__  # grab the above as our UI docstring before below
@@ -265,4 +266,5 @@ if __name__ == '__main__':
     _client = _Client(sys.stdin, sys.stdout, sys.stderr)
     exit(_execute_into(_client, sys.argv))
 
+# #history-A.1
 # #born.

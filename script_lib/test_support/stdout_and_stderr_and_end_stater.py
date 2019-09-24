@@ -146,7 +146,7 @@ def for_expect_on_which_this_many_under(which, num, test_context):
 
     def finish(actual_exitstatus):
         perfo_finish()
-        two = [None for _ in range(0, 2)]  # how?  #todo
+        two = [None for _ in range(0, 2)]  # must be mutable
         two[offset] = tuple(actual_lines)
         return _EndState(actual_exitstatus, *two)
 

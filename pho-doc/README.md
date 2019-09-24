@@ -5,7 +5,7 @@ excerpt: "introduction, objective & scope."
 ---
 ## introduction, objective & scope
 
-(EDIT get description from groupchat from around the time of #birth lol.)
+(#edit [#880.B] get description from groupchat from around the time of #birth lol.)
 
 
 ## quick sketch
@@ -43,6 +43,8 @@ when you click create
 
 ## (the identifier registry)
 
+(Our range is [#876]-[#899].)
+
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|---
 |[#884]                     |       | facets towards publication (graph)
@@ -50,6 +52,7 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.I]                   | #edit | edits to do in fragments
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
 |[#882.G]                   | #trak | empty but self-documentary files
 |[#882.F]                   | #open | we need proper markdown parsing
@@ -60,6 +63,7 @@ when you click create
 [[#882.A]                   | #open | any unit tests at all ASAP!
 |[#882]                     |       | (internal tracking)
 |[#881]                     |       | roadmap.dot
+|[#880.B]                   | #edit | edit documentation
 |[#880]                     |       | README
 
 

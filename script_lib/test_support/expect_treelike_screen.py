@@ -471,7 +471,7 @@ class _ScannedLine:
 
     is_terminal = True
 
-    # #todo - can you employ decorators without a starting method :#here1
+    # #refa [#608.J] can you employ decorators w/o a starting method :#here1
 
     import re
     _THIS_ONE_RE = re.compile(

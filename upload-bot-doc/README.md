@@ -71,10 +71,13 @@ we use these <a name='aliases'>aliases</a>
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
+|                   [#309.B]| #edit | edit documentation
 |              [\[#309\]]   |       | rabbitmq
 |              [\[#308\]]   |       | redis
 |              [\[#307\]]   |       | celery
+|                   [#306.B]| #edit | edit documentation
 |              [\[#306\]]   |       | environment variables TMI
+|                   [#305.B]| #edit | edit documentation
 |              [\[#305\]]   |       | tunneling thru ngrok
 |                [#304]     |       | "kicker"
 |              [\[#303\]]   |       | testing our webserver

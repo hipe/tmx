@@ -82,9 +82,12 @@ consumed by arbitrary other processes.
 
 ## <a name=nt></a>the node table
 
+(My range is [#701]-[#799].)
+
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
 |                 (example) | #eg   | #example blah blah
+|                  [#776]   | #open | track all `cover_me`
 |                   #709.D  | #open | integrate queries and tagging to use same grammar (#when)
 |                   #709.C  | #open | maybe don't walk (#when)
 |                   #709.B  | #open | generic small seams (#when)
@@ -92,6 +95,7 @@ consumed by arbitrary other processes.
 |                   #708.3  |       | (this one coverpoint, referenced in [ma]
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
+|                   #707.K  | #open | reconcile something with something
 |                   #707.J  |       | maybe lost coverage/created appendates at #history-A.1
 |                   #707.I  | #open | #refactor: queries and tagging should use same grammar (for tagging)
 |                   #707.H  |       | #provision: don't use default whitespace handling
@@ -104,6 +108,7 @@ consumed by arbitrary other processes.
 |                   #707    |       | (internal tracking)
 |                   #705    |       | the tagging model (graph viz file)
 |                   #704    |       | experimental conventions
+|                  [#703.B] | #edit | edit documentation
 |                   #703    |       | soft notes
 |                [\[#702\]] |       | due dilligence on parser generators
 |                   #701    |       | (this readme)

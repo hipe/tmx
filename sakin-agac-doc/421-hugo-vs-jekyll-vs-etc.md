@@ -52,7 +52,7 @@ this document uses the documentation of hugo to form a doo-hah.
 |document node|about|
 |---|---|
 |[Themes Overview](https://gohugo.io/themes/)|#overview-page|
-|[Install and Use Themes](https://gohugo.io/themes/installing-and-using-themes/)|to check out ~275 submodules took just under 10 minutes. #todo:granulate for comparison.|
+|[Install and Use Themes](https://gohugo.io/themes/installing-and-using-themes/)|to check out ~275 submodules took just under 10 minutes. #TODO:granulate for comparison.|
 |[Theme Components](https://gohugo.io/themes/theme-components/)|complicated thing about inheritance. revisit on as-needed basis.|
 |[Create a Theme](https://gohugo.io/themes/creating/)|has some stuff about structure of theme directory.|
 

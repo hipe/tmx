@@ -22,7 +22,7 @@ don't kill the server with `kill`, instead use:
 
 ## objective & scope
 
-we might or might not end up using rabbitmq EDIT but these were our notes
+we might or might not end up using rabbitmq #edit [#309.B] but these were our notes
 from when we thought we were going to.
 
 

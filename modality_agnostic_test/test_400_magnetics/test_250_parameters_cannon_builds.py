@@ -26,7 +26,7 @@ class _CommonCase(unittest.TestCase):
         self.assertIsNotNone(x)
 
     def _raises(self, msg, f):
-        # #todo - idiomize this for the test platform
+        # #open [#507.G] idiomize this for the test platform
         import modality_agnostic
         exe = None
         try:

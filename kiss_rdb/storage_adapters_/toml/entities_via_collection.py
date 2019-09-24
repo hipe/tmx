@@ -87,7 +87,7 @@ def identifiers_via__(paths_function, id_via_string, listener):
         break
 
     # things that could make this fail: wrong ID depth, general parse fail
-    if not monitor.ok:
+    if not monitor.OK:
         return
 
     # every subsequent item
@@ -132,7 +132,7 @@ def _table_start_line_stream_via_dir_path(paths_function, monitor):
                     yield otl
 
             # if something went wrong in one file, don't process subseq. files
-            if not monitor.ok:
+            if not monitor.OK:
                 break
 
 

@@ -14,7 +14,7 @@ for any given language that we employ in this project (the "platform
 language"), we will draw first from that existing ecosystem of conventions
 before we effect our own.
 
-(EDIT #open [#007.D] it is a known issue that our older python violates PEP8.)
+(#open [#007.D] it is a known issue that our older python violates PEP8.)
 
 this document, then, is for those conventions that we employ *beyond*
 what is proscribed by the existing culture(s).
@@ -270,7 +270,7 @@ convention aims to highlight that kinship where it holds.
 ## <a name="6"></a>regression-friendly ordering (testing)
 
 this article is a stub and you can help expand it. probably what we
-will do is refer to articles in #[#008.10] that-other-project. (EDIT)
+will do is refer to articles in #[#008.10] that-other-project. #edit [#010.B]
 
 
 

@@ -31,8 +31,8 @@ class listening:  # (as namespace only)
         _i = ('error', 'info').index(error_or_info)
         return (_InfoEmission if _i else _ErrorEmission)(*rest)
 
-    def reason_via_error_emission(shape, error_category, union, *rest):
-        _ee = _ErrorEmission(shape, error_category, union, *rest)
+    def reason_via_error_emission(shape, error_category, *rest):
+        _ee = _ErrorEmission(shape, error_category, *rest)
         return _ee._flush_to_reason_()
 
     def message_via_info_emission(shape, info_category, payloader):
@@ -52,7 +52,7 @@ class _ErrorMonitor:
     """
 
     def __init__(self, listener):
-        self.ok = True
+        self.OK = True
         self._debug = None
         self._experimental_mutex = None  # go this away if it's annoying
 
@@ -61,7 +61,7 @@ class _ErrorMonitor:
                 self._debug(a)
             if 'error' == a[0]:
                 del self._experimental_mutex
-                self.ok = False
+                self.OK = False
             listener(*a)
 
         self.listener = my_listener
@@ -90,6 +90,7 @@ class _Emission:
         self.channel_tail = chan_tail
         self._payloader_HOT = payloader
 
+    @property
     def _has_channel_tail_(self):
         return len(self.channel_tail)
 

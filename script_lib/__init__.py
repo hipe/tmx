@@ -204,7 +204,7 @@ class filesystem_functions:  # as namespace
     open = open  # simply, *our* open is the *real* open
 
     def open(*x):
-        cover_me('not used')  # #todo
+        cover_me('not used')  # [#676] cover me
 
 
 def ___line_writer_via_putsernvia_IO(io):

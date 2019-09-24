@@ -51,7 +51,7 @@ def _generator_via_dir_path(dir_path):
 
 
 def _dir_path_via_module(collection_module):
-    s_a = collection_module.__path__._path  # #todo
+    s_a = collection_module.__path__._path  # #open [#507.D]
     if 1 != len(s_a):
         assert(2 == len(s_a))
         assert(s_a[0] == s_a[1])

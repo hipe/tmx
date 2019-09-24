@@ -4,7 +4,7 @@
 
 (ideas that belong to the distant future if anywhere at all..)
 
-EDIT: do we really want these in here? i think the idea was to avoid chaotic
+.#edit [#015.B] do we really want these in here? i think the idea was to avoid chaotic
 overflow of small things in the main node collection; but it seems like they
 might grow stale here. could they each just have an entry in sibing README.md
 to _this_ file, where each such node has its own sub-node identifier and a

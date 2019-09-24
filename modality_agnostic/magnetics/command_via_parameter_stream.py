@@ -19,7 +19,7 @@ class SELF:  # :[#011]
           crude_parameters_callable=command_mixed,
         )
 
-        if hasattr(command_mixed.__class__, '__init__'):  # #todo
+        if hasattr(command_mixed.__class__, '__init__'):  # #open [#507.D]
             fellow = _ViaClass
         else:
             fellow = _ViaFunction

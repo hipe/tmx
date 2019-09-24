@@ -95,7 +95,7 @@ def _build_this_one_tree():
     return work_dir
 
 
-def _touch(path):  # #todo how
+def _touch(path):  # #open [#207.C] how to do this right
     open(path, 'w').close()
 
 

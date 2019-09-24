@@ -7,9 +7,24 @@ those phenomena we aren't interested in because they're singletons. YAY!
 # This producer script is one of several covered by (Case200SA).
 
 
-class open_dictionary_stream:
+def stream_for_sync_via_stream(dcts):
+    import re
+    rx = re.compile(r'/([^/]+)/$')
 
-    def __init__(self, themes_dir, listener):
+    for dct in dcts:
+        url = dct['url']
+        _sync_key = rx.search(url)[1]
+        # _f"[{dct['label']}]({dct['url']})",  # meh
+        _dct_ = {
+                'label': dct['label'],
+                'tags_generated': dct['tags_generated']
+                }
+        yield (_sync_key, _dct_)
+
+
+class open_traversal_stream:
+
+    def __init__(self, listener, themes_dir):
         self._themes_dir = themes_dir
         self._listener = listener
 
@@ -50,21 +65,6 @@ class Report:
             yield f'  {_use_label} ({_tags})'
 
     def _yield_dictionaries(self, big_index):
-        from data_pipes import common_producer_script as lib
-        yield {
-                '_is_sync_meta_data': True,
-                'natural_key_field_name': 'CHOO_CHA',
-                'custom_far_keyer_for_syncing': lib.far_key_simplifier(),
-                'custom_near_keyer_for_syncing': lib.near_key_simplifier(),
-                'custom_mapper_for_syncing': lib.mapper_for('hugo_themes'),
-                'far_deny_list': ('url', 'label'),  # documented @ [#458.I.3.2]  # noqa: E501
-                }
-
-        for dct in self._dictionario_dawson(big_index):
-            yield dct
-
-    def _dictionario_dawson(self, big_index):
-
         from . import report_150_useful_phenomena as _
         o = _.MEMOIZED_THING_B_.value(big_index)
         buckets = o.buckets

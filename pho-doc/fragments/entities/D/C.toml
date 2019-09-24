@@ -12,7 +12,7 @@ But we wouldn't have gotten anywhere without finding the
 to use PythonKit. An essential part of this (at 15:16) is about disabling
 the sandboxing security feature so that python can load arbitrary files.
 
-BEGIN EDIT
+BEGIN #edit [#882.I]
 
 read [arsty blog][3]
 
@@ -22,7 +22,7 @@ read [hipster blog][5]
 
 read [stack overflow question][6]
 
-END EDIT
+END
 
 
 [6]: https://stackoverflow.com/questions/44994042/how-to-create-cocoa-gui-application-with-swiftpm

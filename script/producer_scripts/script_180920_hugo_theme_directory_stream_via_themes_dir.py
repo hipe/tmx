@@ -98,7 +98,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
         cmd = self.__build_find_command()
         assert(isinstance(cmd, tuple))  # something re #here1. ~#[#022]
 
-        # == BEGIN hotfix for issue :[#410.Z.2]:
+        # == BEGIN hotfix for issue :[#410.5]:
         """
         the .github entry is a doozer:
           - this entry occurs (last we checked) if you check out the whole
@@ -156,7 +156,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
                 return line[0:-1]  # chop not strip just to be gigo
 
             # at #history-A.1 removed thing that removed '.github' from listing
-            # (at #history-A.3 we re-addressed the above better for [#410.Z.2])
+            # (at #history-A.3 we re-addressed the above better for [#410.5])
 
             for line in sout:
                 yield chop(line)

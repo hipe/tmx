@@ -387,15 +387,14 @@ class ProxyingWriteReceiver:
 # == END NEW
 
 
-def _string_via_which(d):  # #todo
-    return _string_via_which_hash[d]
-
-
 _string_via_which_hash = {
         1: 'STDIN',
         2: 'STDOUT',
         3: 'STDERR',
         }
+
+
+_string_via_which = _string_via_which_hash.__getitem__
 
 
 _NEWLINE = "\n"

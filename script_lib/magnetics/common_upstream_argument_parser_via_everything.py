@@ -12,13 +12,13 @@ class common_upstream_argument_parser_via_everything:
 
     def __init__(
             self,
-            cli_function,
+            CLI_function,
             std_tuple,
             argument_moniker,
     ):
         self._stdin, self._stdout, self._stderr, self._ARGV = std_tuple
         self._arg_moniker = argument_moniker
-        self._CLI_function = cli_function
+        self._CLI_function = CLI_function
 
     def execute(self):
         self._OK = True

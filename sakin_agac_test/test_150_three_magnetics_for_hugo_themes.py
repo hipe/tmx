@@ -58,7 +58,7 @@ class Case150_magenetic_two(_CommonCase):
 
         f = os_path.basename
         sorted_basenames = sorted(f(x) for x in paths)
-        # #[#410.Z] it is not specified that the result list is sorted.
+        # #[#410.4] it is not specified that the result list is sorted.
         # so the order of the list is indeterminate. but we need it to
         # be determinate to test it (or use sets or something crazy).)
 
@@ -69,7 +69,7 @@ class Case150_magenetic_two(_CommonCase):
 
         indexer = Counter()
 
-        # (you should not see a '.github' directory here, per [#410.Z.2])
+        # (you should not see a '.github' directory here, per [#410.5])
         o('acka-dormic')
         o('facka-formic')
         self.assertEqual(len(sorted_basenames), 2)
@@ -88,7 +88,7 @@ class Case160_magnetic_three(_CommonCase):
 
     def test_110_content(self):
         dcts = self._subject()
-        # near [#410.Z] order is indeterminate
+        # near [#410.4] filesystem entry order is indeterminate
         names = [x['name'] for x in dcts]
         names.sort()
 

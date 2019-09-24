@@ -24,6 +24,8 @@ only in modeling interfaces for this purpose.
 |---------------------------|:-----:|-
 |[#511.4]                   |       | the previous but plus styler
 |[#511.3]                   |       | provision: expression with yield
+|[#510.10]                  |       | track "module via path"
+|[#510.9]                   |       | track mutexers (1 at writing)
 |[#510.8]                   |       | track copy-pasted implementations of lazy
 |[#510.7]                   |       | namespace for specfic instances
 |[#510.6]                   |       | track custom memoizy decorators
@@ -34,6 +36,11 @@ only in modeling interfaces for this purpose.
 |[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
 |[#508]                     | #hole |
+|[#507.G]                   | #open | idiomize something for the test platform
+|[#507.F]                   | #open | integrate this with teardown so the memory is reclaimed
+|[#507.E]                   | #open | what is this idea
+|[#507.D]                   | #open | gross violation of python internals
+|[#507.C]                   | #open | remove this redundancy
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |

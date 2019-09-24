@@ -185,22 +185,24 @@ then in your 'main' terminal:
 
 |Id                         | Main Tag | Content
 |---------------------------|:-----:|-
-|[#851]-[#899]              |       | (for kiss-rdb/castle of dust, for now)
+|[#876]-[#899]              |       | (pho)
+|[#851]-[#875]              |       | (kiss-rdb)
 |[#802]-[#850]              |       | (reserved for [#406] CMS app for now)
 |[#701]-[#799]              |       | (for tag lyfe)
 |[#601]-[#699]              |       | (for script lib)
 |[#501]-[#599]              |       | (for modality agnostic)
-|[#401]-[#499]              |       | (for sakin agac)
+|[#432]-[#499]              |       | (data-pipes)
+|[#401]-[#431]              |       | (sakin-agac mostly; some moved to data-pipes)
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
 |[#022]                     | #trak | places where we wish we had strongly typed
 |[#021]                     | #wish | the desire for coverage testing (for particular reasons)
-|[#020.4]                   | #trak | track attempts at importing sibling modules
 |[#020.3]                   | #trak | track this one gripe about contextlib
 |[#020.2]                   | #hm   | track this one gripe about argparse
 |[#020]                     | #trak | track all issues with python itself
 |[#019]                     |       | package filesystem conventions ..
+|[#018.B]                   | #edit | edit documentation
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
 |[#017]                     |       | placeholder to explain our listener pattern - use [#511] now instead
 |[\[#016\]]                 |       | K hong reading notes
@@ -209,6 +211,7 @@ then in your 'main' terminal:
 |[#013]                     |       | modality-agnostic parameter expression
 |[#012]                     |       | generic microservice arch (placeheld)
 |[#011]                     |       | commands/parameters API (placeheld)
+|[#010.B]                   | #edit | edit documentation
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     |       | [ expect STD's ]
 |[#008.11]                  | #trak | CLI error case expression

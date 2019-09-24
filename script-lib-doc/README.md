@@ -57,12 +57,16 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |[#610]                     |       | line stream via big string
+|[#676]                     | #open | track `cover_me`
+|[#608.K]                   | #refa | lazy not necessary
+|[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
 |[#608.7]                   | #trak | track fellows whose CLI exitstatus is "guilty til proven innocent"
 |[#608.6]                   | #trak | this other approach to a library interface (see)
 |[#608.5]                   | #trak | this one approach to a library interface (see)
 |[#608.4]                   | #trak | all the places you write this same `--help` regex |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
+|[#607.E]                   | #refa | there's no way this is right
 |[#607.4]                   | #open | producer scripts w/ small custom CLI's to be de-customized
 |[#607.C]                   | #trak | business listener for case expressions
 |[#607.B]                   |       | as referenced |

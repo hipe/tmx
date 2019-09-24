@@ -12,8 +12,8 @@ See the others for "generic case expression" etc.
 """
 
 
-def desc_lineser_via(description_template_valueser, cli_function):
-    s = cli_function.__doc__
+def desc_lineser_via(description_template_valueser, CLI_function):
+    s = CLI_function.__doc__
     if s is None:
         return
     if description_template_valueser is None:

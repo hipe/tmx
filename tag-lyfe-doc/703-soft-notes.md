@@ -129,7 +129,7 @@ note about this list:
 
 - its web presence is rough
 - there might be some confusion - it has an example grammar for python
-- BERNSTEIN EDIT
+- BERNSTEIN #edit [#703.B]
 
 
 
@@ -440,7 +440,7 @@ note about this list:
 
 (at 31:20 in the video and 5:35AM here, there's SLY)
 
-SLY, (EDIT: we discovered TaTsu shortly after and it won via discretion)
+SLY, (#edit [#703.B]: we discovered TaTsu shortly after and it won via discretion)
 
 
 

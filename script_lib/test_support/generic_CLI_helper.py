@@ -166,7 +166,7 @@ class CLI_CaseMethods:
         def f(line):
             s_a.append(line)
 
-        _f_a = [f for _ in _iterator_via_times(num_lines)]
+        _f_a = tuple(f for _ in range(0, num_lines))
         # the above could just as soon be a generator expression (right?)
 
         return s_a, _f_a
@@ -193,7 +193,7 @@ class CLI_CaseMethods:
 
     @property
     def do_debug(self):
-        """#todo - there's no way this is the right way to do this..
+        """.#open [#607.E] there's no way this is the right way to do this..
 
         all we're trying to do is establish `do_debug` as a plain old
         attribute here that defaults to false-ish.
@@ -259,12 +259,6 @@ def _OK_interpretation_result():
         def __init__(self):
             self.OK = True
     return _OK_Result()
-
-
-def _iterator_via_times(num):
-    # #todo
-    for i in range(0, num):
-        yield i
 
 
 @lazy

@@ -37,7 +37,7 @@ def minimal_listener_spy():
     """similar elsewhere. this one is minimal. DEPRECATED:
 
     .#history-A.2: even the below may be deprecated. moved here from elsewhere
-    .#open [#410.I] the soul of this has been stolen and moved to [#509.2]
+    .#open [#507.C] the soul of this has been stolen and moved to [#509.2]
     """
 
     def listener(*a):

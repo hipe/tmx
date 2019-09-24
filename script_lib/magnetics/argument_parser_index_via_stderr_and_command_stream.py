@@ -15,7 +15,7 @@ import re
 _THIS_NAME = 'chosen_sub_command'
 
 
-def CHEAP_ARG_PARSE(cli_function, stdin, stdout, stderr, argv,
+def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
                     formal_parameters, description_template_valueser=None):
     """
     NOTE This is still highly experimental: it is almost guaranteed that the
@@ -54,7 +54,7 @@ def CHEAP_ARG_PARSE(cli_function, stdin, stdout, stderr, argv,
         if ('unrecognized_option' == error_case and
                 structurer()['token'] in ('-h', '--help')):
             __write_help_lines(stderr, description_template_valueser,
-                               cli_function, state.program_name(), CLI)
+                               CLI_function, state.program_name(), CLI)
             state.exitstatus = 0
             return
 
@@ -71,7 +71,7 @@ def CHEAP_ARG_PARSE(cli_function, stdin, stdout, stderr, argv,
     from modality_agnostic import listening
     ErrorMonitor = listening.ErrorMonitor
 
-    es = cli_function(ErrorMonitor(state.business_listener),  # #here
+    es = CLI_function(ErrorMonitor(state.business_listener),  # #here
                       stdin, stdout, stderr, *opt_vals, *arg_vals)
     assert(isinstance(es, int))  # #[#022]
     return es
@@ -99,12 +99,12 @@ class _InvocationState:  # [#503.11] blank slate, plus one thing
 
 
 def __write_help_lines(stderr, description_template_valueser,
-                       cli_function, program_name, CLI):
+                       CLI_function, program_name, CLI):
 
     from script_lib.magnetics.listener_via_resources import (
             desc_lineser_via, help_lines)
 
-    _descser = desc_lineser_via(description_template_valueser, cli_function)
+    _descser = desc_lineser_via(description_template_valueser, CLI_function)
 
     for line in help_lines(program_name, _descser, CLI.opts, CLI.args):
         stderr.write('\n' if line is None else f'{line}\n')
@@ -169,7 +169,7 @@ class _CLI_via_syntax_AST:  # #testpoint
     __init__ = _init_CLI
 
 
-# #todo - you could eliminate (at writing) all `lazy` here (look)
+# #refo [#608.K] you could eliminate (at writing) all `lazy` here (look)
 
 class argument_parser_index_via:
     """a collection of commands is passed over the transation boundary

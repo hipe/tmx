@@ -90,7 +90,7 @@ design criteria for us:
     harry potter images in frames; or a bit like looking out a window.
 
   - we're not sure but we think we don't want the ziggy layer
-    to be the topmost because we don't want it to EDIT
+    to be the topmost because we don't want it to #edit [#410.W]
 
 so, experimentally:
 

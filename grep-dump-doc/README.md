@@ -135,6 +135,8 @@ to run the whole test suite:
 
 | Id                        | Main Tag | Content
 |---------------------------|:-----:|-
+|                   [#207.C]| #open | hack for file touch
+|                   [#207.B]| #open | secret key is in version control
 |                [#204]     |       | (not sure what was intended with this)
 |                [#203]     |       | [code node]
 |<a name=202></a>[#202]     | #open | enzyme/mocha tests for web front like [bedjango1]

@@ -295,7 +295,7 @@ _NOT_AS_WORDABLE = wordable_via_string_('not')
 
 """the "name chain" model :#here5:
 
-(EDIT reconcile this with the newer [#705] digraph of the latest model)
+.#open #707.K reconcile this with the newer [#705] digraph of the latest model)
 
 categories of surface representation for (what we call) "taggings" include:
     - a simple, one-component tagging like `#foo`. (a "shallow tag".)

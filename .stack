@@ -3,7 +3,6 @@ maybe a CLI (explode me)
 Cover DELETE that would leave entites file empty
 cover yes schema file but no ent entites dir
 a lot of the names in state machine module are still EXPERIMENTAL
-EDIT
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
 codename WASD
@@ -13,10 +12,10 @@ python that you write processing a request & giving a response into a swift app
 learn python extensions: a C extension lib for some minimal python you write
 archive cruft
 cleanup to try and use swift package manager
-do EDIT's in documentation
 graph viz for fragments and generate docs from current frags
 migrate real doc fragments to eno
 have full on eno
+flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
 [#874.6] away this stowaway test and arch for data pipes format collection
 [#874.5] scripts that used to be executable either move under proj/cli or etc
@@ -25,4 +24,3 @@ have full on eno
 the script that was once called "stream" done or absorbed
 destroy existng sync architecture to be some new way
 pass-thru translation integrated into CLI for create collection (CSV to MD)
-let's see if we can have no "schema row" at all. rather the sync-able script should have a --for-sync

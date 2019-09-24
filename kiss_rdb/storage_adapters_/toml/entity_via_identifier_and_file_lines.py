@@ -128,7 +128,7 @@ class _Main:
             here we just assume the file is well-formed & ordered.)
             """
 
-        if not self._monitor.ok:
+        if not self._monitor.OK:
             # e.g an error in parsing the file. something emitted so it's
             # ugly to also emit that the entity was not found.
             return

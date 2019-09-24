@@ -194,7 +194,7 @@ class _State:
 
     def __init__(self):
         self.exitstatus = 0
-        self.ok = True
+        self.OK = True
 
     def receive_args(self, string_thing, path):
         self.main_regex = re.compile(f'^This {string_thing} is ')
@@ -206,7 +206,7 @@ class _State:
         self.stop()
 
     def stop(self):
-        self.ok = False
+        self.OK = False
 
 
 def serr(s):

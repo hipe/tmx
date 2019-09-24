@@ -169,7 +169,7 @@ class _FILE_REWRITE_TRANSACTION:
 
         # if something failed..
 
-        if not self._monitor.ok:
+        if not self._monitor.OK:
             self._OK = False
             return
 

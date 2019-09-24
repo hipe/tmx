@@ -6,31 +6,28 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-# Case200SA is used to reference this whole file
-
-
-class Case250_HI(_CommonCase):
+class Case200SA(_CommonCase):
 
     def test_010_HI(self):
-        these = []
 
-        _report = _subject_module()
+        ps = _subject_module()
         _ = _themes_dir_A()
-        _cm = _report.open_dictionary_stream(_, None)
+        with ps.open_traversal_stream(None, _) as dcts:
+            order_me_pairs = list(ps.stream_for_sync_via_stream(dcts))
 
-        with _cm as dcts:
-            for dct in dcts:
-                these.append(dct)
-
-        these[0]['_is_sync_meta_data']
         tags_k = 'tags_generated'
         label_k = 'label'
 
-        # == BEGIN fix near [#410.Z] order is indeterminate
-        order_me = these[1:]
-        order_me.sort(key=lambda dct: dct[label_k])
-        one, two = order_me
+        # == BEGIN fix near [#410.4] filesystem entry order is indeterminate
+        order_me_pairs.sort(key=lambda pair: pair[0])
+        pair_one, pair_two = order_me_pairs
         # ==
+
+        key_one, one = pair_one
+        key_two, two = pair_two
+
+        assert('acka-dormic' == key_one)
+        assert('facka-formic' == key_two)
 
         tags_one = one[tags_k]
         tags_two = two[tags_k]

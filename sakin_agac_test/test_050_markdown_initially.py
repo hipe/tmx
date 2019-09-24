@@ -8,7 +8,7 @@ import unittest
 # Case001SA is used to reference this whole file
 
 
-class _CommonCase(unittest.TestCase):  # #[#410.K]
+class _CommonCase(unittest.TestCase):  # #[#459.F]
 
     # -- assertions & assistance
 
@@ -181,14 +181,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):
         return self.build_end_state()
 
     def stdin(self):
-        import json
-        _first_line = json.dumps({
-            '_is_sync_meta_data': True,
-            'natural_key_field_name': 'lesson',
-            'custom_pass_filter_for_syncing': 'data_pipes.YIKES_SKIP_HEADERS',
-            })
         return _this_one_lib().STDERR_CRAZYTOWN(
-                _first_line,
                 '{ "header_level": 1 }\n',
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n',

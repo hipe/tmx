@@ -30,7 +30,7 @@ tunneling is the way that you can be developing your work on your
 local machine and still test it against their infrastructure on the
 internet.
 
-there is EDIT some reason why stuff on your laptop can't _just be_
+there is #edit [#305.B] some reason why stuff on your laptop can't _just be_
 on the internet as is. maybe it's because you don't have a stable
 IP address. (or you're behind a NAT or something.) tunneling lets you
 use an outside service to make it look like your thing is on the
