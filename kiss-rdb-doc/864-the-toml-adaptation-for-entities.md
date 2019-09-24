@@ -22,7 +22,7 @@ it is certainly not the case that this is meant to work for all toml documents.
 our variant of toml is stricter than the official spec to scale it down to be
 applicable to exactly our use case and perhaps a few outside of it.
 
-EDIT:
+.#edit [#864.B]
 
 there are things we could store but that we don't want to because
 they wouldn't be "pretty".
@@ -38,7 +38,7 @@ adequately "pretty"..
 
 ## broad provision 2
 
-EDIT: the "surface form" that storage will take will have self-imposed
+.#edit [#864.B]: the "surface form" that storage will take will have self-imposed
 constraints on it so that it is easier to "coarse parse"..
 
 to make "crude" (fast) parsing easier on us, we are going to be very
@@ -197,7 +197,7 @@ those higher level streams are streams of trees!).
 above we introduced our "collection edit theory" of "CUD" and then introduced
 our "file edit theory": that the main _idiom_ we will employ when working
 with files is seeing them as _streams_ of _lines_.
-(EDIT this got more nuanced at #multi-line strings)
+(#edit [#864.B] this got more nuanced at #multi-line strings)
 
 here we synthesize those lexicons towards this document's objective:
 our algorithms for the CUD of entities in files.
@@ -329,7 +329,7 @@ pass with no lookahead, a thing we'll call a "rewrite traversal".
 
 There is a necessary trade-off in realizing the vision of the one-pass
 rewrite traversal, and that is that the client (some client) *must* exhaust
-the whole stream then check `monitor.ok` before the produced lines can be
+the whole stream then check `monitor.OK` before the produced lines can be
 considered comittable; so that for example if there were any issues
 traversing the remainder of the file, we don't commit the rewrite.
 
@@ -349,7 +349,7 @@ rewritten, but also it can have an "auxiliary" result, which is:
   - for UPDATE, formally we want *both* the "before" *and* the "after",
     immutable entities (as snapshots)
 
-Although the client must check `monitor.ok`, we want to wabi-sabi reinforce
+Although the client must check `monitor.OK`, we want to wabi-sabi reinforce
 this provision *by only setting the auxiliary result (future?) once the
 stream is exhausted*. Under no circumstances should the client be able to
 access the auxiliary result before we have determined if there were any of

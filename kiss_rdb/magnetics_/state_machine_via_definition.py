@@ -459,10 +459,6 @@ def _normalize(name):
     return _dash_or_space.sub('_', name)
 
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
-
 _not_ok = False
 _stop = (_not_ok, None)
 _ok = True

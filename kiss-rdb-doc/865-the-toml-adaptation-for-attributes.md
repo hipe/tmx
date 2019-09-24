@@ -210,7 +210,7 @@ your comment still makes sense.
   - for now we will extend the above idea to dashes but may change this
     later. for now, remove the dashes as part of producing a "gist" for
     a key. (more later, near "gist".)
-  - EDIT something about #here4
+  - .#edit [#865.B] something about #here4
 
 
 
@@ -429,7 +429,7 @@ dict (or not)) to simulate something like a linked list..
 
 ## validating/normalizing values
 
-EDIT :#here2. we hate this. separately there's concerns for
+.#edit [#865.B] :#here2. we hate this. separately there's concerns for
 validating/normalizing those values in request vs validating those
 values present in the document. there's type-ism to worry about..
 

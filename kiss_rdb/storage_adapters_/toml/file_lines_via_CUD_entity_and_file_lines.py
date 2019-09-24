@@ -282,7 +282,7 @@ def __monitor_via_listener(listener):
 
 # ==
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #history-A.4: futures, decorator

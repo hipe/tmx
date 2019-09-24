@@ -511,7 +511,7 @@ def _whine_about_no_path(pieces, iden, verb):
     return {'reason': reason}
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

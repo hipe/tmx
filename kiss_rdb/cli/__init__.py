@@ -114,7 +114,7 @@ def cli_for_production():
     where:
       - when a file write/rewrite is committed, actually commit the rewrite.
       - do something real and not contrived for the random number generator
-      - NOTE all the print commands are messy and temporary #todo-soon
+      - NOTE all the print commands are messy and temporary #open [#873.J]
 
     (spiked without coverage at #history-A.1.)
     """

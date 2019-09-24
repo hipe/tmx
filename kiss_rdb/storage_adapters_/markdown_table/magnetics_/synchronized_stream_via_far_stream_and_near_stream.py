@@ -23,9 +23,7 @@ your result; but in fact we do something simpler.
 
 from data_pipes.magnetics import (
         synchronized_stream_via_far_stream_and_near_stream as _top_sync)
-from data_pipes import (
-        cover_me,
-        pop_property)
+from data_pipes import pop_property
 from modality_agnostic import streamlib
 import contextlib
 
@@ -89,17 +87,8 @@ class _Newstream_via:
             normal_far_stream,
             near_tagged_items,
             near_keyerer,
-            far_deny_list,  # may be temporary. see [#458.I.3.2]
             listener,
             ):
-
-        if far_deny_list is not None:
-            def f(pair):
-                dct = pair[1]
-                for key in far_deny_list:
-                    dct.pop(key)  # ..
-                return pair
-            normal_far_stream = (f(x) for x in normal_far_stream)
 
         # --
         self._normal_far_stream = normal_far_stream
@@ -149,8 +138,8 @@ class _Newstream_via:
 
         near_st = self.__build_near_ad_hoc_item_stream()
 
-        from . import normal_far_stream_via_collection_reference as _
-        o = _.NATIVIZER_ETC_VIA(  # see
+        from .stream_for_sync_via import NATIVIZER_ETC_VIA
+        o = NATIVIZER_ETC_VIA(  # see
                 near_stream=near_st,
                 complete_schema=self._complete_schema,
                 listener=self._listener)
@@ -166,10 +155,6 @@ class _Newstream_via:
         def native_via_key_and_item(far_key, far_item):
             return native_via_item(far_item)  # (Case1320DP)
 
-        item_via_collision = self.__procure_item_via_collision()
-        if item_via_collision is None:
-            return
-
         pair_via_near = self.__procure_pair_via_near()
         if pair_via_near is None:
             return
@@ -180,7 +165,7 @@ class _Newstream_via:
         _big_deal_stream = _top_sync.stream_of_mixed_via_sync(
                 normal_far_stream=_far_st,
                 normal_near_stream=_normal_near_st,
-                item_via_collision=item_via_collision,
+                item_via_collision=self._item_via_collision,
                 nativizer=native_via_key_and_item,
                 listener=self._listener)
 
@@ -189,50 +174,34 @@ class _Newstream_via:
         self._move_to('OBJECT_ROWS')
         return ('business_object_row', example_row)
 
-    def __procure_item_via_collision(self):
-        """
-        we get here when the near and far item have the "same" human key.
+    def _item_via_collision(self, far_key, far_dct, near_key, near_row_DOM):
+        # near and far sync keys are equal so entity-sync (probably).
+        # these arguments in this order is #provision [#458.6].
 
-        .#provision [#458.G] is that we short-circuit out of calling the
-        merge callback if the far "record" has no components other than
-        the natural key (because why bother, right?)
+        length = len(far_dct)
+        assert(length)
 
-        but then #provision [#458.H] is that you can provide a function that
-        derives arbitrary human keys.
+        do_short_circuit = False
+        if 1 == length:
+            # short circuit certain cases, implementing [#458.7]
+            far_nat_key = next(iter(far_dct.values()))
+            near_nat_key_s = near_row_DOM.cel_at_offset(0).content_string()
 
-        for now, we skip this heuristic of skipping the merge in those
-        cases where you have defined a keyer.. (experimental still:
-        see its origin story in the asset file added at #history-A.1.)
+            assert(isinstance(far_nat_key, str))  # have fun when not
 
-        this is perhaps a bit of a feature creep; as it serves a behavior
-        that is perhaps more minimally implemented by the data producers,
-        so: experimental for now.
-        """
-
-        can_short_circuit = self._near_keyerer is None
-
-        def f(far_key, far_dct, near_key, near_row_DOM):
-            # realize #provision #[#458.F] four args
-
-            length = len(far_dct)
-
-            if 0 == length:
-                cover_me('completely empty far record?')
-            elif 1 == length:
-                if can_short_circuit:
-                    # short circuit the work (Case0150DP)
-                    result = near_row_DOM
-                else:
-                    # let some single-field records thru (Case0170DP)
-                    result = do_merge(far_dct, near_row_DOM)
+            if near_nat_key_s == far_nat_key:
+                # keep formatting when far dct len 1 and keys same (Case0150DP)
+                do_short_circuit = True
             else:
-                result = do_merge(far_dct, near_row_DOM)
-            return result
+                pass  # sync because different (Case0170DP) (Case2019DP)
+        else:
+            pass  # multiple elements in far dict (Case0140DP)
 
-        def do_merge(far_dct, near_row_DOM):
-            return self.__proto_row.new_row_via_far_pairs_and_near_row_DOM__(
-                    far_dct.items(), near_row_DOM)
-        return f
+        if do_short_circuit:
+            return near_row_DOM
+
+        return self.__proto_row.new_row_via_far_pairs_and_near_row_DOM__(
+                far_dct.items(), near_row_DOM)
 
     def __build_near_ad_hoc_item_stream(self):
 
@@ -317,19 +286,8 @@ class _Newstream_via:
         return f
 
 
-def _import_sibling_module(s):  # #experiment #track [#020.4]
-    """
-    you know how we can do `from . import foo_faa` to reach a module relative
-
-    to the module the code appears in? we want the same kind of thing, but
-    not have to be "inside" the module the code appears in.
-    """
-
-    from importlib import import_module
-    return import_module('..%s' % s, __name__)
-
-
-OPEN_NEWSTREAM_VIA.sibling_ = _import_sibling_module  # #testpoint
+def cover_me(s):  # #open [#876] cover me
+    raise Exception(f'cover me: {s}')
 
 # #history-A.2: big refactor, go gung-ho with context managers. extracted.
 # #history-A.1: add experimental feature "sync keyerser"

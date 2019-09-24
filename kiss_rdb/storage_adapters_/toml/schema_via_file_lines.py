@@ -331,7 +331,7 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
     listener('error', 'structure', 'entity_not_found', structer)
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #history-A.2 toml is no longer used to parse schema files

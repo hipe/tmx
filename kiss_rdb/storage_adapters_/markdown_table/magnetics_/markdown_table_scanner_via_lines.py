@@ -1,211 +1,143 @@
 """
-firstly:
-  - when a markdown table serves as the "far collection" of a synchronization,
-    things "should be" easier than when it's the "near collection" because we
-    don't need to emit the before and after lines of the table, we just emit
-    the lines of the table itself (actually rows (actually items)) sort of..
-
-  - BUT, in order to serve as a producer for a "filter by" operation, we
-    need to know what fields are participating "tag lyfe" fields (#here2)
-
-  - (we were #[#020.3] at one point distrungtled that simple function-
-    based context manager wouldn't suffice here.)
-
 this ended up blowing up into [#458] thoughts on collection metadata..
 """
-
-from data_pipes import (
-        cover_me,
-        pop_property)
+# (removed lots of comments that became outdated at #history-A.1)
 
 
-class OPEN_TRAVERSAL_REQUEST_VIA_PATH:  # (Case2451)
-    """exercise #pattern [#458.Z.2]: separate context manager from work"""
+class MarkdownTableScanner:
 
-    def __init__(
-            self,
-            intention,
-            mixed_collection_identifier,
-            format_adapter,
-            modality_resources,
-            listener
-            ):
+    # eg.
+    #     while not scn.is_empty:
+    #         scn.peeked_AST_symbol  # ..
+    #         scn.peeked_AST  # ..
+    #         scn.advance()  # ..
 
-        import contextlib
-        es = contextlib.ExitStack()
+    def __init__(self, lines, do_parse_example_row, listener):
+        # (Case2451), (Case3306DP)
 
-        def enter():
-            _doc_items = es.enter_context(open_doc_items())
-            tup = _main_work(_doc_items, intention, listener)
-            arg1, arg2 = _normalize_final_args(tup)
+        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_format_adapter import (  # noqa: E501
+                ExpectedTagOrder_)
+        self._ETO = ExpectedTagOrder_()
 
-            import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
-            return _.SYNC_RESPONSE_VIA_TWO_FUNCTIONS(
-                release_sync_parameters_dictionary=arg1,
-                release_dictionary_stream=arg2,
-                )
+        from .tagged_native_item_stream_via_line_stream import (
+                MarkdownTableLineParser_)
+        self._parse = MarkdownTableLineParser_(listener)
 
-        def exit(*_):
-            return es.__exit__(*_)
+        self.is_empty = False  # -- public things
+        self.OK = True
+        self.peeked_AST_symbol, self.peeked_AST = (None, None)
 
-        def open_doc_items():
-            from . import tagged_native_item_stream_via_line_stream as _  # noqa: E501
-            return _.OPEN_TAGGED_DOC_LINE_ITEM_STREAM(mixed_collection_identifier, listener)  # noqa: E501
+        self._lines = lines  # -- the rest
+        self._do_parse_example_row = do_parse_example_row
+        self._listener = listener
 
-        self._enter = enter
-        self._exit = exit
-        self._OK = True
+        self.advance = self._advance_while_in_beginning
+        self.advance()
 
-    def __enter__(self):
-        return pop_property(self, '_enter')()
+    def _advance_while_in_beginning(self):
+        self._step_and_parse_line()
+        if not self.OK:
+            return
+        if self.is_empty:
+            cover_me('beginning of markdown table never found')
+            return
+        if self._ETO.matches_top(self.peeked_AST_symbol):
+            return
+        self._ETO.pop_and_assert_matches_top(self.peeked_AST_symbol)
+        del self.advance
+        self._step_and_parse_line()
+        if not self.OK:
+            return
+        if self.is_empty:
+            cover_me('table with header row but not schema row')
 
-    def __exit__(self, *_):
-        return pop_property(self, '_exit')(*_)
+        self._ETO.pop_and_assert_matches_top(self.peeked_AST_symbol)
+        self.peeked_AST_symbol = 'table_schema_from_two_lines'
 
+        _field_names = self.peeked_AST.complete_schema.schema_field_names
+        self._dictionary_via_row_DOM = _dict_via_row_dom(_field_names)
 
-def _normalize_final_args(tup):  # (just glue)
+        self._ETO.pop_and_assert_matches_top('business_object_row')  # hacky
 
-    mut = _ExperimentalMutexer()
+        if self._do_parse_example_row:
+            self.advance = self._advance_over_example_row
+        else:
+            self.advance = self._advance_to_next_business_line
 
-    if tup is None:
+    def _advance_over_example_row(self):
+        cover_me('whenever we used this, it may be lost. maybe sunset feature')
+        self._step_and_parse_line()
+        if not self.OK:
+            return
+        if self.is_empty:
+            cover_me("no example row (so empty table) - that's OK but etc")
+            return
+        self.peeked_AST = self._dictionary_via_row_DOM(self.peeked_AST)  # ..
+        self.OK, self.TAG_LYFE_FIELD_NAMES = _tag_lyfe_field_names_hack(
+                self.peeked_AST, self._listener)
+        if not self.OK:
+            return self._close()
+        self.peeked_AST_symbol = 'example_row'
+        self.advance = self._advance_to_next_business_line
 
-        def use_release_sync_parameters_dictionary():
-            mut.only_once_ever()
+    def _advance_to_next_business_line(self):
+        self.advance = self._do_advance_to_next_business_line
+        self.advance()
 
-        use_release_dictionary_stream = None
-    else:
-        wow_re_wrap_stream, schema_dct = tup
-        mut2 = _ExperimentalMutexer()
+    def _do_advance_to_next_business_line(self):
+        self._step_and_parse_line()
+        if self.is_empty or not self.OK:
+            return
+        if not self._ETO.matches_top(self.peeked_AST_symbol):
+            self.advance = self._pass_thru
+            return
+        self.peeked_AST = self._dictionary_via_row_DOM(self.peeked_AST)  # ..
 
-        def use_release_sync_parameters_dictionary():
-            mut.only_once_ever()
-            return schema_dct
+    def _step_and_parse_line(self):
+        line = self._next_line()
+        if line is None:
+            return
+        tup = self._parse(line)
+        if tup is None:
+            self.OK = False
+            return self._close()
+        self.peeked_AST_symbol, self.peeked_AST = tup
 
-        def use_release_dictionary_stream():
-            mut2.only_once_ever()  # OCD
-            return wow_re_wrap_stream()
+    def _pass_thru(self):
+        line = self._next_line()
+        if line is None:
+            return
+        self.peeked_AST = line
 
-    return (use_release_sync_parameters_dictionary,
-            use_release_dictionary_stream)
-
-
-def _main_work(doc_line_items, intention, listener):
-
-    from modality_agnostic import streamlib as _
-    next_doc_line_item = _.next_or_noner(doc_line_items)
-
-    from kiss_rdb.storage_adapters_.markdown_table import (
-            LEGACY_format_adapter as _)
-    eto = _.ExpectedTagOrder_()
-
-    _ok = __advance_over_head_lines(doc_line_items, eto)
-    if not _ok:
-        return
-
-    field_names = __advance_over_schema_row_procure_field_names(next_doc_line_item, eto)  # noqa: E501
-    if field_names is None:
-        return
-
-    next_item_dictionary = __main_stepper(next_doc_line_item, field_names, eto)
-
-    eg_dct = next_item_dictionary()
-    if eg_dct is None:
-        cover_me("no example row (so empty table) - that's OK but etc")
-
-    ok, tlfn = __tag_lyfe_field_names_hack(eg_dct, intention, listener)
-    if not ok:
-        return
-
-    schema_dct = __build_schema_dictionary(tlfn, field_names)
-
-    def wow_re_wrap_stream():
-        # neat: python generators gives us a more expressive way to finish
-        # this peek-and-backtrack trick we usually use function pointers for.
-
-        yield eg_dct
-        while True:
-            dct = next_item_dictionary()
-            if dct is None:
-                break
-            yield dct
-
-    return wow_re_wrap_stream, schema_dct
-
-
-# ==
-
-def __build_schema_dictionary(tlfn, field_names):
-
-    _nkfn = field_names[0]  # for now, hardcoded as this [#458.I.2]
-    return {
-            '_is_sync_meta_data': True,
-            'natural_key_field_name': _nkfn,
-            'field_names': field_names,
-            'tag_lyfe_field_names': tlfn,
-            }
-
-
-def __advance_over_schema_row_procure_field_names(next_doc_line_item, eto):
-
-    tup = next_doc_line_item()
-    if tup is None:
-        cover_me('table with header row but not schema row')
-
-    tag, head_line_two_of_two = tup
-    eto.pop_and_assert_matches_top(tag)
-    field_names = head_line_two_of_two.complete_schema.field_names__
-
-    # nasty: if you do this here, it advances the state of the sanity
-    # checker thing now and we don't have to mess with state changes in
-    # our main loop
-    eto.pop_and_assert_matches_top('business_object_row')
-
-    return field_names
-
-
-def __advance_over_head_lines(doc_line_items, eto):
-    """traverse along each line of the md file till you find table line 1"""
-
-    ok = False
-    for tag, item in doc_line_items:
-        if not eto.matches_top(tag):
-            eto.pop_and_assert_matches_top(tag)
-            # tag is 'table_schema_line_one_of_two', can toss
-            ok = True
+    def _next_line(self):
+        eos = True
+        for line in self._lines:  # #once
+            eos = False
             break
-    if ok:
-        return True
-    else:
-        cover_me('beginning of markdown table never found')
+        if eos:
+            return self._close()
+        return line
+
+    def _close(self):
+        del self.peeked_AST_symbol
+        del self.peeked_AST
+        self.is_empty = True
 
 
 # ==
 
-def __tag_lyfe_field_names_hack(dct, intention, listener):
-    """as an answer to the problem introduced in [#458.2] ("whether to be a
+def _tag_lyfe_field_names_hack(dct, listener):  # :#here2
+    """hackishly use the presence of an octothorpe to determine..."""
 
-    jack of all trades"), we introduced the idea of "intention" as a soft
-    hint for what this traversal is for.
-
-    for the sake of consistency and failing early and at a cost of a
-    negligible amount of extra work, we do this hack whether or not we are
-    doing a filter by, a sync or whatever..
-
-    .:#here2:
-    """
+    # (at #history-A.1, got rid of the idea of "intention", near [#458.2]
+    #  (whether to be a "jack of all trades"))
 
     these = tuple(k for k in dct.keys() if '#' in dct[k])
     result = these if len(these) else None
-
-    if 'filter' == intention:
-        if result is None:
-            __whine_about_no_whatever(dct, listener)
-            return False, None
-        else:
-            return True, result
-    else:
-        assert('sync' == intention)
-        return True, result
+    if result is None:
+        __whine_about_no_whatever(dct, listener)
+        return False, None
+    return True, result
 
 
 def __whine_about_no_whatever(dct, listener):
@@ -223,64 +155,17 @@ def __whine_about_no_whatever(dct, listener):
 
 # ==
 
-def __main_stepper(next_doc_line_item, field_names, eto):
-    """step over each item (row (line)) in the markdown table.
-
-    as you encounter each item, convert it to a dictionary.
-    stop when (any of):
-      - you reach the end of the file
-      - you reach the end of the table (but not file)
-    """
-
-    dict_via_row_dom = __dict_via_row_dom(field_names)
-
-    def f():
-        check_mutex()
-        result = None
-        pair = next_doc_line_item()
-        if pair is None:
-            # (may have lost coverage at [#707.J])
-            # table was last thing in file and that's OK
-            close_mutex()
-        else:
-            tag, row_dom = pair
-            if eto.matches_top(tag):
-                result = dict_via_row_dom(row_dom)
-            else:
-                close_mutex()
-        return result
-
-    mut = _ExperimentalMutexer()
-    check_mutex = mut.check_mutex
-    close_mutex = mut.close_mutex
-
-    return f
-
-
-def __dict_via_row_dom(field_names):
+def _dict_via_row_dom(field_names):
     def f(dom):
         _r = range(0, dom.cels_count)
         _pairs = ((i, dom.cel_at_offset(i).content_string()) for i in _r)
-        # #[#410.13] where sparseness is implemented (Case2451)
+        # #[#873.5] where sparseness is implemented (Case2451)
         return {field_names[t[0]]: t[1] for t in _pairs if len(t[1])}
     return f
 
 
-class _ExperimentalMutexer:
+def cover_me(msg):  # #open [#876] cover me
+    raise Exception(f'cover me: {msg}')
 
-    def __init__(self):
-        self._is_closed = False
-        self._meta_mutex = None
-
-    def only_once_ever(self):
-        self.check_mutex()
-        self.close_mutex()
-
-    def close_mutex(self):
-        pop_property(self, '_meta_mutex')
-        self._is_closed = True
-
-    def check_mutex(self):
-        assert(not self._is_closed)
-
+# #history-A.1
 # #abstracted.

@@ -352,7 +352,7 @@ def _emit_input_error_structure(f, listener):
 
 # ==
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

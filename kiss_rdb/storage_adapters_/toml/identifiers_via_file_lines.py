@@ -451,10 +451,6 @@ class _TableStartLine:
 
 # ==
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
-
 not_ok = False
 stop = (not_ok, None)
 okay = True

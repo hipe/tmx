@@ -117,7 +117,7 @@ class _SchemaIndex:
         (
             self.__field_readerer,
             self.offset_via_field_name__,
-            self.field_names__,
+            self.schema_field_names,
         ) = _the_index_components_via(cels_count, row1)
 
         self._validate_row_cel_count = _make_row_num_validator(
@@ -141,7 +141,7 @@ class _SchemaIndex:
         return self.__field_readerer(field_name)
 
     def natural_key_field_name__(self):
-        return self.field_names__[0]  # assume [#458.I.2] first is it
+        return self.schema_field_names[0]  # [#458.I.2] leftmost is natural key
 
 
 def _the_index_components_via(cels_count, header_row1_DOM):
@@ -239,7 +239,7 @@ def _make_my_compare(model_count):
     return f
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #born.

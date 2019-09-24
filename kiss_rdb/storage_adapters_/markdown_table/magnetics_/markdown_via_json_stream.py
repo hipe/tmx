@@ -85,7 +85,7 @@ def _these():
     return tuple(a)
 
 
-def _my_CLI(parsed_arg, program_name, sout, serr):
+def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
 
     from script_lib.magnetics import listener_via_stderr
     listener = listener_via_stderr(serr)
@@ -93,30 +93,68 @@ def _my_CLI(parsed_arg, program_name, sout, serr):
     from data_pipes import common_producer_script as mod
     _ = mod.LEGACY_markdown_lib().collection_identifier_via_parsed_arg_
 
-    _far_collection = _(parsed_arg)
+    far_collection = _(parsed_arg)
 
     _near_collection = _these()
-
-    def map_far_objects(obj):
-        obj['read'] = '◻️'
-        obj['emoji'] = '◻️'
-        return obj
 
     from data_pipes import common_producer_script as mod
     sync = mod.TEMPORARY_LEGACY_USE_OF_SYNC_LIB()
 
-    _rc = sync.OpenNewLines_via_Sync_(
-            far_collection=_far_collection,
+    if isinstance(far_collection, str):  # [#873.I] ick/meh
+        ps = far_collection
+    else:
+        ps = _CustomProducerScript(far_collection)
+
+    _opened = sync.open_new_lines_via_sync(
+            producer_script_path=ps,
             near_collection=_near_collection,
-            far_format=None,
             near_format='markdown_table',
-            custom_mapper_OLDSCHOOL=map_far_objects,
             listener=listener)
     f = sout.write
-    with _rc as lines:
+    with _opened as lines:
         for line in lines:
             f(line)
     return 0  # ..
+
+
+class _CustomProducerScript:
+
+    def __init__(self, far_CM):
+        self._far_CM = far_CM
+
+    stream_for_sync_is_alphabetized_by_key_for_sync = False
+
+    def stream_for_sync_via_stream(self, dcts):
+        return _stream_for_sync_via_stream(dcts)
+
+    near_keyerer = None
+
+    def open_traversal_stream(self, listener, cached_document_path):
+        cm = self._far_CM
+        del self._far_CM
+        return cm
+
+    HELLO_I_AM_A_PRODUCER_SCRIPT = None
+
+
+def _stream_for_sync_via_stream(dcts):
+    these = (dct for dct in dcts if 'header_level' not in dct)
+    empty = True
+    for first_dct in these:  # #once
+        empty = False
+        break
+    if empty:
+        return
+
+    def unwound():
+        yield first_dct
+        for dct in dcts:
+            yield dct
+    key = next(iter(first_dct.keys()))
+    for dct in unwound():
+        dct['read'] = '◻️'
+        dct['emoji'] = '◻️'
+        yield (dct[key], dct)
 
 
 _my_CLI.__doc__ = __doc__
@@ -128,7 +166,7 @@ def _CLI(sin, sout, serr, argv):  # #testpoint
             common_upstream_argument_parser_via_everything)
 
     _exitstatus = common_upstream_argument_parser_via_everything(
-            cli_function=_my_CLI,
+            CLI_function=_my_CLI,
             std_tuple=(sin, sout, serr, argv),
             argument_moniker='<script>',
             ).execute()

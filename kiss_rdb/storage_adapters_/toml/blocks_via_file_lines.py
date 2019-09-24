@@ -441,10 +441,6 @@ class AppendableDiscretionaryBlock_:
     is_discretionary_block = True
 
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
-
 # #history-A.2: mutable document entity breaks out
 # #history-A.1: massive rewrite to accomodate multi-line
 # #born.

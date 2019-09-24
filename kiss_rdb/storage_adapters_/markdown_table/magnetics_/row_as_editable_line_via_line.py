@@ -318,7 +318,7 @@ class _CustomScanner:  # #abstraction candidate #[#008.4] a scanner
         return self._len == self._offset
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

@@ -73,7 +73,7 @@ SO here's our rough draft of what we're going to attempt:
   - (there are certainly edge cases where the above is not true; like where
     our hacky parsing lets through incorrect toml that will not parse (i.e
     _not_ toml). (for example, if the value surface form in our document is
-    EDIT this changed
+    (#edit [#866.B] this changed)
     some arbitrary bareword like "foo"..) also #multi-line strings...)
 
   - indeed if the set of names from our "mutable document entity"
@@ -214,7 +214,7 @@ be *that* bad..
 
 givens:
 
-  - EDIT change all this
+  - #edit [#866.B] change all this
 
   - assume you have some N lines (possibly zero) of the _body_ of your
     document entity (table).

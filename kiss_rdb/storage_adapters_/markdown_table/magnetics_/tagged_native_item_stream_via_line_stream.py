@@ -19,7 +19,7 @@ keep in mind:
 
 this:
 
-:[#410.D]: the idea is there is a cost to parsing a markdown table robustly
+:[#873.D]: the idea is there is a cost to parsing a markdown table robustly
 (you're counting cels, you're parsing escaping to allow for escaped pipes)
 versus parsing markdown tables coarsely (you're just perhaps hopping over all
 contiguous lines that start with a pipe.)
@@ -54,7 +54,7 @@ def OPEN_TAGGED_DOC_LINE_ITEM_STREAM(upstream_path, listener):
 
     assert(listener)  # you're gonna want a listener  #[#412]
 
-    parse = _Parse(listener)
+    parse = MarkdownTableLineParser_(listener)
 
     def f():
         with __open_upstream_path(upstream_path) as lines:
@@ -89,7 +89,7 @@ def __open_upstream_path_challenge_mode(x):
         raise Exception(f'can we keep this simple? had {type(x)}')
 
 
-class _Parse:
+class MarkdownTableLineParser_:
     """stay light on your feet. this is not the right way
 
     (after the fact, we documented this in [#447])
@@ -127,7 +127,7 @@ class _Parse:
         del self._row_two_function
 
         schema_f, liner = f(line)  # ..
-        schema = schema_f()  # #[#410.D] just build the index now, always
+        schema = schema_f()  # #[#873.D] just build the index now, always
 
         if schema is None:
             self._stop_early()
@@ -161,7 +161,7 @@ class _Parse:
 
 
 class _CustomHybrid:
-    """currently clients will have to know that we are *not* doing #[#410.D]"""
+    """currently clients will have to know that we are *not* doing #[#873.D]"""
 
     def __init__(self, schema, liner):
         self.complete_schema = schema
@@ -174,7 +174,7 @@ class _CustomHybrid:
 _looks_like_table_line = re.compile(r'^\|').search
 
 
-def cover_me(s):
+def cover_me(s):  # #open [#876] cover me
     raise Exception(f'cover me: {s}')
 
 # #history-A.1: gung-ho on context managers

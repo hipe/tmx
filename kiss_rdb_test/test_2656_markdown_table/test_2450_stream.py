@@ -22,21 +22,19 @@ class _CommonCase(unittest.TestCase):
         return _State(business_objects, first)
 
     def _run(self, path, listener):
-        _cm = _subject_module().open_traversal_stream_TEMPORARY_LOCATION(
-                intention=None,
+        cm = _subject_module().open_traversal_stream_TEMPORARY_LOCATION(
                 cached_document_path=None,
                 collection_identifier=path,
                 listener=listener)
-        with _cm as dcts:
-            itr = iter(dcts)
-            first = None
-            for first in itr:
-                break
-            business_objects = tuple(itr)
+        first = None
+        if cm is None:
+            return (), first  # (Case2449DP)
+        with cm as dcts:
+            business_objects = tuple(dcts)
         return business_objects, first
 
 
-class Case2449_fail(_CommonCase):
+class Case2449DP_fail(_CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())

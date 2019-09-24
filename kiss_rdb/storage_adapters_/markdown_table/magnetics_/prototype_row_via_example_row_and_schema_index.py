@@ -74,7 +74,7 @@ _do_shrink_to_fit_hack = False
 """
 these are temporary notes towars a possible solution to #open [#458.S]:
   - the above turns on an experimental behavior that seems likely to become
-    default. it's towards a possible answer to [#410.S].
+    default. it's towards a possible answer to [#873.G].
   - at #history-A.3 we turned this on and used it to commit the generated
     document (accompanied in the commit).
   - (if you're going to try to use it again hackily you will have to comment
@@ -387,7 +387,7 @@ class _cel_schemas:  # #class-as-namespace
     no_alignment_specified = _CelSchema('no_alignment_specified')
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

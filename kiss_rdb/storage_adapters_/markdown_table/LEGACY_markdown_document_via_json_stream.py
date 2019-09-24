@@ -10,7 +10,7 @@ def _run_CLI(sin, sout, serr, argv):
             common_upstream_argument_parser_via_everything)
 
     _exitstatus = common_upstream_argument_parser_via_everything(
-            cli_function=_CLI_body,
+            CLI_function=_CLI_body,
             std_tuple=(sin, sout, serr, argv),
             argument_moniker='<script>',
             ).execute()
@@ -46,22 +46,19 @@ def _raw_lines_via_collection_identifier(coll_id, listener):  # #testpoint
     if coll_ref is None:
         return
 
-    _ = coll_ref.open_sync_request(
+    _ = coll_ref.open_traversal_stream(
             cached_document_path=None,  # no
             datastore_resources=None,
             listener=listener)
 
-    return _traverse_raw_lines_via_trav_request(_)
+    return __traverse_raw_lines_via_traversal_stream(_)
 
 
-def _traverse_raw_lines_via_trav_request(_):
+def __traverse_raw_lines_via_traversal_stream(opened):
 
-    with _ as trav_response:
-        trav_response.release_traversal_parameters()  # ignored for now
-        dcts = trav_response.release_dictionary_stream()
-
+    with opened as dcts:
         branch_dct = next(dcts)
-        branch_dct['_is_branch_node'] or cover_me()
+        assert(branch_dct['_is_branch_node'])
 
         stateful = _Stateful()
 
@@ -119,18 +116,10 @@ class _Stateful:
         return x
 
 
-def COMMON_FAR_KEY_SIMPLIFIER_(trav_params, listener):
-    # (transplated from its second home to here at #history-A.1)
-
-    def f(dct):
-        _norm_key = normal_via_str(dct['label'])
-        return _simple_key_via_normal_key(_norm_key)
-    from kiss_rdb.LEGACY_normal_field_name_via_string import (
-            normal_field_name_via_string as normal_via_str)
-    return f
+# (COMMON_FAR_KEY_SIMPLIFIER gone a #history-A.2)
 
 
-def COMMON_NEAR_KEY_SIMPLIFIER_(key_via_DOM_row, schema, listener):
+def COMMON_NEAR_KEY_SIMPLIFIER(key_via_row_DOM, schema, listener):
     """
     my hands look like this:
         [Foo Fa 123](bloo blah)
@@ -141,20 +130,21 @@ def COMMON_NEAR_KEY_SIMPLIFIER_(key_via_DOM_row, schema, listener):
     """
 
     def f(row_DOM):
-        _orig_key = key_via_DOM_row(row_DOM)
+        _orig_key = key_via_row_DOM(row_DOM)
         return simplified_key_via_markdown_link(_orig_key)
     simplified_key_via_markdown_link = simplified_key_via_markdown_link_er()
     return f
 
 
-def simplified_key_via_markdown_link_er():  # (Case1640DP) (?) #html2markdown
+def simplified_key_via_markdown_link_er():  # #html2markdown
+    # ich muss sein notwithstanding #history-A.1. (Case1640DP)
 
     def simplified_key_via_markdown_link(markdown_link_string):
         md = markdown_link_rx.search(markdown_link_string)
         if md is None:
-            cover_me(f'failed to parse markdown link - {markdown_link_string}')
+            assert(False)  # failed to parse markdown link
         _norm_key = normal_via_str(md.group(1))
-        return _simple_key_via_normal_key(_norm_key)
+        return simple_key_via_normal_key(_norm_key)
 
     import re
     markdown_link_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
@@ -165,7 +155,7 @@ def simplified_key_via_markdown_link_er():  # (Case1640DP) (?) #html2markdown
     return simplified_key_via_markdown_link
 
 
-def _simple_key_via_normal_key(normal_key):
+def simple_key_via_normal_key(normal_key):
     return normal_key.replace('_', '')
 
 
@@ -175,13 +165,6 @@ def common_mapper_(key, listener):
         dct.pop('label')  # ..
         dct.pop('url')  # ..
         dct[key] = md_link  # ..
-        return dct
-    return mapper
-
-
-def this_one_mapper_(key, listener):
-    def mapper(dct):
-        dct[key] = _markdown_link_via_dictionary(dct)  # ..
         return dct
     return mapper
 
@@ -205,7 +188,7 @@ def url_via_href_via_domain(domain):  # (Case0810DP)
 
 
 def _markdown_link_via_dictionary(dct):
-    return markdown_link_via(dct['label'], dct['url'])
+    return markdown_link_via(dct['label'], dct['url'])  # (Case1749DP)
 
 
 def markdown_link_via(label, url):
@@ -216,10 +199,9 @@ def collection_identifier_via_parsed_arg_(arg):
     typ = arg.argument_type
     if 'stdin_as_argument' == typ:
         return __collection_identifier_via_stdin(arg.stdin)
-    elif 'path_as_argument' == typ:
-        return arg.path
     else:
-        cover_me(typ)
+        assert('path_as_argument' == typ)
+        return arg.path  # [#873.I] ugly but meh
 
 
 def __collection_identifier_via_stdin(stdin):
@@ -229,15 +211,12 @@ def __collection_identifier_via_stdin(stdin):
     return _.context_manager_via_iterator__(_itr)
 
 
-def cover_me(s=None):
-    raise Exception('cover me' if s is None else f'cover me: {s}')
-
-
 if __name__ == '__main__':
     import sys as o
     o.path[0] = ''
     _exitstatus = _run_CLI(o.stdin, o.stdout, o.stderr, o.argv)
     exit(_exitstatus)
 
+# #history-A.2: no more sync-side entity-mapping
 # #history-A.1: MD table generation overhaul & becomes library when gets covg
 # #born.

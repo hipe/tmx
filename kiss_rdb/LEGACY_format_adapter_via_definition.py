@@ -57,31 +57,29 @@ class _FormatAdapter:
     def collection_reference_via_string(self, coll_id):
         return _CollectionReference(coll_id, self)
 
-    def _open_filter_request(self, trav_req):
+    def _TO_PRODUCER_SCRIPT_(self, stream_request):
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
-            yield ('open_filter_request', 'thing ding NUMERO DOS')
-        return self._open_traversal_request(dig_f, trav_req)
+            yield ('PRODUCER_SCRIPT_VIA', 'sub-component')
+        return self._call_function(dig_f, stream_request)
 
-    def _open_sync_request(self, trav_req):  # #testpoint
-        """
-        note:
-
-          - names may be used as keyword arguments
-          - at #history-A.2 we changed this to be accessed like other
-        hoi-polloi functions that can be associated with the doo-hah adapter
-        """
+    def _open_filter_stream(self, stream_request):
         def dig_f():
             yield ('modality_agnostic', 'sub-section')
-            yield ('open_sync_request', 'thing ding two')
-        return self._open_traversal_request(dig_f, trav_req)
+            yield ('open_filter_stream', 'sub-component')
+        return self._call_function(dig_f, stream_request)
 
-    def _open_traversal_request(self, dig_f, trav_req):
+    def _open_traversal_stream(self, stream_request):
+        def dig_f():
+            yield ('modality_agnostic', 'sub-section')
+            yield ('open_traversal_stream', 'sub-component')
+        return self._call_function(dig_f, stream_request)
 
-        f = self.DIG_HOI_POLLOI(dig_f(), trav_req.listener)
+    def _call_function(self, dig_f, stream_request):
+        f = self.DIG_HOI_POLLOI(dig_f(), stream_request.listener)
         if f is None:
             return  # (Case2664DP) GONE at #history-A.1 (see c.p tombstone)
-        return f(trav_req)
+        return f(stream_request)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
         """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
@@ -156,16 +154,23 @@ class _CollectionReference:
         self.collection_identifier_string = s
         self.format_adapter = fa
 
-    def open_filter_request(self, **kwargs):
-        _ = self._build_traversal_request(**kwargs)
-        return self.format_adapter._open_filter_request(_)
+    def TO_PRODUCER_SCRIPT(self, listener):
+        _ = self._build_stream_request(  # ..
+                cached_document_path=None,
+                datastore_resources=None,
+                listener=listener)
+        return self.format_adapter._TO_PRODUCER_SCRIPT_(_)
 
-    def open_sync_request(self, **kwargs):
-        _ = self._build_traversal_request(**kwargs)
-        return self.format_adapter._open_sync_request(_)
+    def open_filter_stream(self, **kwargs):
+        _ = self._build_stream_request(**kwargs)
+        return self.format_adapter._open_filter_stream(_)
 
-    def _build_traversal_request(self, **kwargs):
-        return _TravRequest(
+    def open_traversal_stream(self, **kwargs):
+        _ = self._build_stream_request(**kwargs)
+        return self.format_adapter._open_traversal_stream(_)
+
+    def _build_stream_request(self, **kwargs):
+        return _StreamRequest(
                 collection_identifier=self.collection_identifier_string,
                 format_adapter=self.format_adapter,
                 **kwargs)
@@ -175,7 +180,7 @@ class _CollectionReference:
         return self.format_adapter.format_name
 
 
-class _TravRequest:
+class _StreamRequest:
     # (sprung of necessity from param list growing too long at #history-A.4)
 
     def __init__(

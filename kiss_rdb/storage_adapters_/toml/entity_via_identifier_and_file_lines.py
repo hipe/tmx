@@ -548,7 +548,7 @@ def _emit_input_error_via_structurer(f, listener):
     listener('error', 'structure', 'input_error', f)
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

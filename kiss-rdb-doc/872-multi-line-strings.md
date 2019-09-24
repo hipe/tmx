@@ -38,7 +38,7 @@ Several facets come to mind, in no particular order:
     strings, for when it is appropriate to use a plain-old literal or basic
     string instead of their multi-line counterparts.
 
-EDIT the unit tests don't yet cover wat do when a string is too large
+.#edit [#872.B] the unit tests don't yet cover wat do when a string is too large
 (too many lines), but it should. then this should be true:
 
 For more detail on this, the associated unit tests for the string encoder

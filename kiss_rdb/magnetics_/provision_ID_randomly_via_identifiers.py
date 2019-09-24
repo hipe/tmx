@@ -214,7 +214,7 @@ def __sanitized_provisioned_integers(provisioned_integers, capacity):
     return a
 
 
-def cover_me(msg=None):
+def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #born.

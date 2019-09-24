@@ -329,10 +329,6 @@ _special_chars = {
 }
 
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
-
 _okay = True
 
 # #born.
