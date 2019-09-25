@@ -39,7 +39,7 @@ class Case6067_modality_specific_whiner(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stderr', 'click exception')
+        return self.build_end_state('stderr',  None)
 
     def given_args(self):
         return (

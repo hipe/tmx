@@ -20,6 +20,10 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
+def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(**kwargs):
+    raise Exception('write me')  # [#876] cover me
+
+
 class ErsatzScanner:
 
     def __init__(self, open_filehandle):

@@ -68,7 +68,7 @@ class CLI_Test_Case_Methods:
         self.assertEqual(self.end_state().exit_code, _success_exit_code)
 
     def expect_exit_code(self, which):
-        self.assertEqual(self.end_state().exception.exit_code, which)
+        self.assertEqual(self.end_state().exit_code, which)
 
     # -- end state builder
 
@@ -79,7 +79,8 @@ class CLI_Test_Case_Methods:
         elif 'stderr' == which_IO:
             yes_stdout = False
             yes_stderr = True
-        elif 'stdout and stderr':
+        else:
+            assert('stdout and stderr' == which_IO)
             yes_stdout = True
             yes_stderr = True
 

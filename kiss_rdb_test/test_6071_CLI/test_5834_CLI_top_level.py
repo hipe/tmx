@@ -211,7 +211,7 @@ class Case5918_traverse_fail(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stderr', 'click exception')
+        return self.build_end_state('stderr', None)
 
     def given_args(self):
         return ('--collections-hub', 'qq', 'traverse', 'pp')
@@ -281,7 +281,7 @@ class Case5999_get_help(_CommonCase):
 class Case6064_get_fail(_CommonCase):
 
     def test_100_exit_code_is_404_lol(self):
-        self.assertEqual(self.end_state().exception.exit_code, 404)
+        self.assertEqual(self.end_state().exit_code, 404)
 
     def test_200_says_only_not_found__with_ID(self):
         line, = self.end_state().lines
@@ -290,7 +290,7 @@ class Case6064_get_fail(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stderr', 'click exception')
+        return self.build_end_state('stderr', None)
 
     def given_args(self):
         return (*common_args_head(), 'get', _common_collection, 'B9F')
@@ -361,7 +361,7 @@ class Case6113_create_fail(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stderr', 'click exception')
+        return self.build_end_state('stderr', None)
 
     def given_args(self):
         return (*common_args_head(), 'create', _common_collection)

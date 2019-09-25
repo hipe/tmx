@@ -1,53 +1,7 @@
 import click
 
-# == HERE WE DEFINE OUR OWN DECORATORS (mostly)
 
-
-def require_hub(orig_f):
-    """decorator for ALL endpoints that need the "collectons hub" (so, most).
-
-    DISCUSSION: although DRY, it feels under-abstracted (i.e. cluttered).
-    """
-
-    def f(ctx, **kwargs):
-
-        cf = ctx.obj  # common functions
-        if cf.unsanitized_collections_hub is not None:
-
-            # (this handling of ec should be in its own decorator..)
-            ec = orig_f(ctx, **kwargs)
-            assert(isinstance(ec, int))
-            if ec is 0:
-                return 0  # (Case6129) (test_100)
-            else:
-                return __crazy_time(ec)  # should throw an exception
-
-        _ = (f"'{ctx.info_name}' requires this option "
-             "(under the top-level command) "
-             f"(or set the {_coll_hub_env_var} environment variable).")
-
-        raise click.MissingParameter(
-                _,
-                param_hint=(_coll_hub_opt,),
-                param_type='option',
-                )
-
-    f.__name__ = orig_f.__name__  # click needs the name to be "right"
-    f.__doc__ = orig_f.__doc__  # same! (covered)
-    return f
-
-
-def __crazy_time(ec):
-    """track complaints about click #[#867.L]:
-
-    - we shouldn't have to raise an exception to control the exit code
-    - we shouldn't have to provide a message alongside an exit code
-    """
-
-    from click.exceptions import ClickException as e_class
-    e = e_class(f'(as explained above) (exit status: {ec})')
-    e.exit_code = ec  # thank goodness this works
-    raise e
+# (got rid of conditional requirement of option (require hub) at #history-A.3)
 
 
 _empty_mapping = {}  # OCD
@@ -72,11 +26,17 @@ class _CommonFunctions:
             listener,
             **injections,
             ):
+
+        # can't assume hub any more (#history-A.3)
+        s = self.unsanitized_collections_hub
+        if s is None:
+            coll_path = collection_argument
+        else:
+            import os.path as os_path
+            coll_path = os_path.join(s, collection_argument)
+
         from kiss_rdb import collection_via_path_
-        import os.path as os_path
-        _coll_path = os_path.join(
-                self.unsanitized_collections_hub, collection_argument)
-        return collection_via_path_(_coll_path, listener, **injections)
+        return collection_via_path_(coll_path, listener, **injections)
 
     def build_monitor(self):
         return _Monitor(
@@ -187,7 +147,7 @@ def cli(ctx, collections_hub):
 @click.option('-val', '--value', nargs=2, multiple=True)
 @click.argument('collection')
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def create(ctx, collection, value):
     """create a new entity in the collection
     given name-value pairs expressed by the --value option.
@@ -236,7 +196,7 @@ def create(ctx, collection, value):
 @click.argument('collection')
 @click.argument('internal-identifier')
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def update(ctx, collection, internal_identifier, add, change, delete):
     """update the entity in the collection
     given the entity's internal identifier
@@ -285,7 +245,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
 @click.argument('collection')
 @click.argument('internal-identifier')
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def get(ctx, collection, internal_identifier):
     """retrieve the entity from the collection
     given the entity's internal identifier.
@@ -324,7 +284,7 @@ def get(ctx, collection, internal_identifier):
 @click.argument('collection')
 @click.argument('internal-identifier')
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def delete(ctx, collection, internal_identifier):
     """delete the entity from the collection
     given the entity's internal identifier
@@ -361,7 +321,7 @@ def delete(ctx, collection, internal_identifier):
 @cli.command()
 @click.argument('collection')
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def traverse(ctx, collection):
     """traverse the collection of entities in "storage order" and for every
     entity output exactly one line to STDOUT consisting of only the entity's
@@ -412,7 +372,7 @@ def _filter_by_tags():
 @click.argument('collection')
 @click.argument('query', nargs=-1)
 @click.pass_context
-@require_hub
+# #history-A.3 (did require hub)
 def filter_by_tags(ctx, collection, query):
     """EXPERIMENTAL. example: \\( "#open" and not "#cosmetic" \\) or "#critical"
     unfortunately you will have to follow the code to find the documentaton
@@ -527,6 +487,7 @@ _failure_exit_code_bad_request = 400  # Bad Request lol ##here1
 success_exit_code_ = 0
 
 
+# #history-A.3: no more "require hub" decorator
 # #history-A.2 as referenced
 # #history-A.1: make first production-only injections for CLI
 # #born.
