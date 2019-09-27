@@ -67,7 +67,7 @@ class _ProcureFormatAdapter:
         import fnmatch
         path = self._collection_identifier
 
-        def _subfeatures_via_item(_human_key, mod):
+        def _subfeatures_via_item(_natural_key, mod):
             return mod.FORMAT_ADAPTER.associated_filename_globs
 
         return self._procure(
@@ -80,8 +80,8 @@ class _ProcureFormatAdapter:
 
     def __when_via_format_identifier(self):
 
-        def _needle_function(human_key):
-            return needle == human_key  # ..  we have to learn about rx esc for
+        def _needle_function(natural_key):
+            return needle == natural_key  # ..  we have to learn about rx esc
 
         needle = self._format_identifier
 
@@ -105,14 +105,14 @@ class _ProcureFormatAdapter:
         if subfeatures_via_item is not None:
             kwargs['subfeatures_via_item'] = subfeatures_via_item
 
-        return _collection_lib().procure(
-            human_keyed_collection=self._these(),
-            needle_function=needle_function,
-            say_needle=say_needle,
-            item_noun_phrase=item_noun_phrase,
-            channel_tail_component_on_not_found=channel_tail_component_on_not_found,  # noqa: E501
-            listener=self._listener,
-            **kwargs)
+        return _collection_lib().key_and_entity_via_collection(
+                collection_implementation=self._these(),
+                needle_function=needle_function,
+                say_needle=say_needle,
+                item_noun_phrase=item_noun_phrase,
+                channel_tail_component_on_not_found=channel_tail_component_on_not_found,  # noqa: E501
+                listener=self._listener,
+                **kwargs)
 
     def _these(self):
         if self.__these is None:
@@ -122,7 +122,7 @@ class _ProcureFormatAdapter:
     def __build_this_thing(self):
         _pairs = to_name_value_pairs()
         _ = _collection_lib()
-        return _.human_keyed_collection_via_pairs_cached(_pairs)
+        return _.collection_implementation_via_pairs_cached(_pairs)
 
 
 def to_name_value_pairs():

@@ -134,15 +134,20 @@ class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCa
             )
 
 
-class Case2480KR_change_human_key_only_OK(_CommonCase):
+class Case2480KR_change_natural_key_only_OK(_CommonCase):
     """
-    it used to be a thing to short-circuit the record-merge (and leave the
-    "before" record alone) if there was nothing but the human key in the
-    far "record". but this was based off the assumption that there would be
-    no reason to update the "before" human key with the "after" one. with
-    the introduction of fuzzy-matching human keys (#history-A.1) this changed.
-    (there might be such short-circuiting still happening, but the decision
-    is pushed up to a higher level.) (at writing, yes there is.)
+    It used to be a thing to short-circuit the record-merge (and leave the
+    "before" record alone) if there was nothing but the natural key in the
+    far "record". But this has changed (at #history-A.1):
+
+    Now, "sync keys" are not necessarily "natural keys". So just because
+    a near and far entity are matched up using a sync key, does not mean that
+    their natural keys are the same.
+
+    Now (still), we short-circuit when the far entity is only length one
+    and the natural keys are the same.
+
+    (all of this is tracked with [#458.7].)
     """
 
     def test_020_the_content_string_gets_updated(self):

@@ -46,6 +46,28 @@ class _Collection:  # #tespoint
         return self._impl.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
 
 
+def DIG_FOR_CAPABILITY(impl, dig_path, listener):  # TEMPORARY wil become meth
+        # (moved here from elsewhere at #history-A.1)
+
+        def use_dig_path():  # add this one step to the front of the path
+            yield ('functions_via_modality', 'property', {'do_splay': False})
+            for dig_step in dig_path:
+                yield dig_step
+
+        def say_collection():
+            return f"the '{impl.format_name}' format adapter"  # TEMPORARY
+            coll_ID = impl.collection_identity
+            _ada = coll_ID.adapter_key.replace('_', '-')
+            s_a = [f"the '{_ada}' format adapter"]
+            adapter_variant = coll_ID.adapter_variant
+            if adapter_variant is not None:
+                s_a.append(f"('{adapter_variant}' variant)")
+            return ' '.join(s_a)
+
+        from kiss_rdb.LEGACY_collection_lib import DIGGY_DIG
+        return DIGGY_DIG(impl, use_dig_path(),  say_collection, listener)
+
+
 def _wrap_in_facade(f):  # decorator
     def use_f(*a):
         injected_coll = f(*a)
@@ -438,4 +460,5 @@ _this_shape = ('error', 'structure')
 _EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
 _EC_for_not_found = (*_this_shape, 'collection_not_found')
 
+# #history-A.1
 # #born.

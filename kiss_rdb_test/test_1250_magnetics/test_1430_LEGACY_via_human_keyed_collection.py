@@ -26,12 +26,12 @@ class _CommonCase(unittest.TestCase):
 
     def _execute_while_listening(self, **kwargs):
 
-        _hkc = self._human_keyed_collection()
+        _coll = self._collection()
         _needle = self._needle_function()
 
         msgs, listener = minimal_listener_spy()
-        _x = _subject_module().procure(
-                human_keyed_collection=_hkc,
+        _x = _subject_module().key_and_entity_via_collection(
+                collection_implementation=_coll,
                 needle_function=_needle,
                 listener=listener,
                 **kwargs,
@@ -41,15 +41,14 @@ class _CommonCase(unittest.TestCase):
 
     def _execute_while_not_listening(self, **kwargs):
 
-        _hkc = self._human_keyed_collection()
+        _coll = self._collection()
         _needle = self._needle_function()
 
-        _x = _subject_module().procure(
-                human_keyed_collection=_hkc,
+        return _subject_module().key_and_entity_via_collection(
+                collection_implementation=_coll,
                 needle_function=_needle,
                 listener=None,
                 **kwargs)
-        return _x
 
 
 class Case1428_anything_against_none(_CommonCase):
@@ -71,7 +70,7 @@ class Case1428_anything_against_none(_CommonCase):
     def _needle_function(self):
         return 'zingo_bango'
 
-    def _human_keyed_collection(self):
+    def _collection(self):
         return _the_empty_collection()
 
 
@@ -93,7 +92,7 @@ class Case1429_splay(_CommonCase):
     def _needle_function(self):
         return 'zanga_tanga'
 
-    def _human_keyed_collection(self):
+    def _collection(self):
         return _collection_B()
 
 
@@ -122,7 +121,7 @@ class Case1431_ambiguous(_CommonCase):
             return rx.search(s)  # hi.
         return f
 
-    def _human_keyed_collection(self):
+    def _collection(self):
         return _collection_C()
 
 
@@ -131,7 +130,7 @@ class Case1432_succeed(_CommonCase):
     def test_100_result_is_not_none(self):
         self.assertIsNotNone(self._result())
 
-    def test_200_first_element_of_tuple_is_item_human_key(self):
+    def test_200_first_element_of_tuple_is_entity_natural_key(self):
         _k = self._result()[0]
         self.assertEqual(_k, 'red_ranger')
 
@@ -149,7 +148,7 @@ class Case1432_succeed(_CommonCase):
     def _needle_function(self):
         return 'foz'
 
-    def _human_keyed_collection(self):
+    def _collection(self):
         return _collection_C()
 
 
@@ -177,7 +176,7 @@ def _collection_C():
             ('yellow_ranger', (x, x, ('fin', 'foo', 'fuu'))),
             ('green_ranger', (x, x, ())),
     )
-    return _HKC_via_pairs(iter(pairs))  # risky, experimental
+    return _collection_via_pairs(iter(pairs))  # risky, experimental
 
 
 @lazy
@@ -189,16 +188,16 @@ def _collection_B():
             ('ho_hu', 'no see'),
             ('hu_hu', 'no see'),
     )
-    return _HKC_via_pairs(iter(pairs))  # risky, experimental
+    return _collection_via_pairs(iter(pairs))  # risky, experimental
 
 
 @lazy
 def _the_empty_collection():
-    return _HKC_via_pairs(iter(()))  # risky, experimental
+    return _collection_via_pairs(iter(()))  # risky, experimental
 
 
-def _HKC_via_pairs(pairs):
-    return _subject_module().human_keyed_collection_via_pairs_cached(pairs)
+def _collection_via_pairs(pairs):
+    return _subject_module().collection_implementation_via_pairs_cached(pairs)
 
 
 @lazy
@@ -210,4 +209,5 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: make this match the asset (`via_collection`) mebbe
 # #born.

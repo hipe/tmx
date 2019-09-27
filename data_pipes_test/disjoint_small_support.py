@@ -8,7 +8,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
     produce an end-state of commonly tested-against summary information.
 
     we assume the provisions:
-      - the human key field name of the formal record is called 'name'
+      - the natural key field name of the formal record is called 'name'
       - the values (names) tha occur in this field look like markdown
         links (e.g "[Foo Bar 12](gopher://foo.edu)")
 

@@ -119,7 +119,7 @@ class Case1315_file_not_found(_CommonCase):
 # Case1317 was "no metadata row", archived #history-A.1
 
 
-class Case1319DP_bad_human_key(_CommonCase):
+class Case1319DP_bad_natural_key(_CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():

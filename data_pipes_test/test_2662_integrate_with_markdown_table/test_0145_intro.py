@@ -170,7 +170,7 @@ class Case0160DP_custom_keyer_for_syncing(_CommonCase):
         # (Case2479KR) (align left) is also exhibited
         self.assertEqual(self._cel_strings()[1], '|  5')
 
-    def test_300_crucially_the_human_key_IS_updated(self):
+    def test_300_crucially_the_natural_key_IS_updated(self):
         self.assertEqual(self._cel_strings()[0], '|  FOUR  ')
 
     @shared_subject

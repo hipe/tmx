@@ -13,7 +13,7 @@ near_keyerer = None  # #open [#458.N] producer script shouldn't have knowledge
 
 
 class open_traversal_stream:
-    """(minimal example exhibiting bad human key)"""
+    """(minimal example exhibiting bad natural key)"""
 
     def __init__(self, listener, cache_path=None):
         pass

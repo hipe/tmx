@@ -82,7 +82,7 @@ our formal definition for "collection" is applied to our practical
 collections but also to the individual item as well, which we can model as
 nothing more than a collection of name-value pairs:
 
-| application of this algorithm | what acts as the collection? | what acts as the item? | the human key? |
+| application of this algorithm | what acts as the collection? | what acts as the item? | the natural key? |
 |---|---|---|---|
 | at the collection level | the collection | each item            | user-defined function against item |
 | at the sub-item level   | the item       | each name-value pair | each name of same |

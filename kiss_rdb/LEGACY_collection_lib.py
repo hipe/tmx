@@ -1,20 +1,66 @@
 """
-(this is a rough seed for [#874.2] collection API)
+This module pre-dates the kiss-rdb sub-project. It was perhaps the first
+home of an implementation of  [#874.2] "collection API". kiss-rdb has since
+grown to supercede this, and now at #history-A.4 the older methods are
+retro-fitted with newer names. (The modernization is not complete.)
 
-this will *very* likely move to the [#500] subproject but we want to avoid
-early abstraction at first.
+Also (now for historical reasons) this module also contains the implementation
+for the function we used to call "procure".
 """
-# #[#874.9] file is LEGACY
 
 
-def _subfeatures_via_item_default_function(human_key, _item):
+def DIGGY_DIG(top_object, dig_path, say_collection, listener):
+    # this is EXPERIMENTAL until we decide if top fellow should be
+    # a collection and not an object..
+
+    current_item = __collection_implementation_via_object(top_object)
+
+    dig_path = tuple(dig_path)  # we need that length
+    final = len(dig_path) - 1
+    offset = 0
+
+    for dig_step_tuple in dig_path:
+
+        if 2 == len(dig_step_tuple):
+            dig_step_key, dig_step_desc = dig_step_tuple
+            kwargs = _empty_hash
+        else:
+            dig_step_key, dig_step_desc, kwargs = dig_step_tuple
+
+        key_and_item = key_and_entity_via_collection(
+            collection_implementation=current_item,
+            needle_function=dig_step_key,
+            item_noun_phrase=dig_step_desc,
+            say_collection=say_collection,  # ..
+            listener=listener,
+            **kwargs)
+
+        if key_and_item is None:
+            return
+
+        _, current_item = key_and_item  # disregard key
+
+        if final == offset:
+            break
+        offset += 1
+
+        assert(isinstance(current_item, dict))  # retrofitting for #history-A.4
+        current_item = __collection_implementation_via_dictionary(current_item)
+
+    return current_item
+
+
+_empty_hash = {}  # #OCD
+
+
+def _subfeatures_via_item_default_function(natural_key, _item):
     """(the default subfeature to search against an item is its key)"""
 
-    return iter((human_key,))
+    return iter((natural_key,))
 
 
-def procure(
-            human_keyed_collection,
+def key_and_entity_via_collection(
+            collection_implementation,
             needle_function,
             listener,
             item_noun_phrase=None,
@@ -28,7 +74,7 @@ def procure(
     given the request, resolve exactly one item from the collection or None.
 
     when one item can be resolved, it is returned as a tuple alongside its
-    human key (as `(human_key, item)`).
+    natural key (as `(natural_key, item)`).
 
     essential function of [#874.2] collection API. currently an ad-hoc spike.
     """
@@ -42,7 +88,7 @@ def procure(
 
     _use_this = _procure_when_splay if do_splay else _procure_when_no_splay
     return _use_this(
-            human_keyed_collection=human_keyed_collection,
+            collection_implementation=collection_implementation,
             needle_function=needle_function,
             subfeatures_via_item=subfeatures_via_item,
             ui_tuple=_ui_tuple,
@@ -50,28 +96,28 @@ def procure(
 
 
 def _procure_when_splay(
-        human_keyed_collection,
+        collection_implementation,
         needle_function,
         subfeatures_via_item,
         ui_tuple,
         ):
 
-    matching_pairs = []  # every human-key/native object pair that you match
+    matching_pairs = []  # every natural-key/native object pair that you match
     negative_memory = []  # every feature value that you don't match
     positive_memory = []  # every feature value that you do match
 
     feature_does_match = _normalize_needle_function(needle_function)
 
-    for human_key in human_keyed_collection:
+    for natural_key in collection_implementation.to_identifier_stream_as_storage_adapter_collection():  # noqa: E501
 
-        native_object = human_keyed_collection[human_key]
+        native_object = collection_implementation.retrieve_entity_as_storage_adapter_collection(natural_key)  # noqa: E501 ..
 
-        _features = subfeatures_via_item(human_key, native_object)
+        _features = subfeatures_via_item(natural_key, native_object)
 
         for feat_x in _features:
             _yes = feature_does_match(feat_x)
             if _yes:
-                matching_pairs.append((human_key, native_object))
+                matching_pairs.append((natural_key, native_object))
                 positive_memory.append(feat_x)
                 break  # once one subfeature matches, don't check the rest
             negative_memory.append(feat_x)
@@ -86,18 +132,20 @@ def _procure_when_splay(
 
 
 def _procure_when_no_splay(
-        human_keyed_collection,
+        collection_implementation,
         needle_function,
         subfeatures_via_item,
         ui_tuple,
         ):
 
-    human_key = needle_function  # ..
-    x = human_keyed_collection[human_key]  # ..
+    # (this is a partial modernization for #history-A.4, but is not complete)
+
+    natural_key = needle_function  # ..
+    x = collection_implementation.retrieve_entity_as_storage_adapter_collection(natural_key)  # noqa: E501 ..
     if x is None:
+        raise Exception('cover me')  # [#876] cover me
         _when_not_found(needle_function, ui_tuple)
-    else:
-        return (human_key, x)
+    return (natural_key, x)
 
 
 def _ui_thing(f):
@@ -247,41 +295,25 @@ def _say(say_x):
         return say_x  # or more "type safety" than this mabye ..
 
 
-"""this is this one interface :#here1
-
-"participants" of this interface will typically implement at least one of:
-
-  - `get` to look and act like the same method from `dict`
-  - `__getitem__` to look and act like the `[]` method from `dict` or list
-  - `__iter__` so that you can `for k in thing` (iterate) like `dict`
-
-we say "participants" and not "adaptations" because it can be useful to
-implement only part of the interface. full participation is not made mandatory.
-"""
-
-
-class human_keyed_collection_via_object:
-    """the #here1 adaptation for arbitarary objects
+class __collection_implementation_via_object:  # 1x
+    """the collection adaptation for arbitarary objects
 
     the idea is that you're using an arbitarary object as the collection,
     and the names of its attributes as keys. (be careful)
+    .#open [#873.L] modernize this API
     """
 
     def __init__(self, obj):
         self._object = obj
 
-    def get(self, human_key, default_x=None):
-        if hasattr(self._object, human_key):
-            return self.__getitem__(human_key)
-        else:
-            return default_x
+    # (got rid of `get` (soft dereference) at #history-A.4)
 
-    def __getitem__(self, human_key):
-        return getattr(self._object, human_key)
+    def retrieve_entity_as_storage_adapter_collection(self, natural_key):  # ..
+        return getattr(self._object, natural_key)  # ..
 
 
-class human_keyed_collection_via_pairs_cached:
-    """the #here1 adaptation for streams of pairs.
+class collection_implementation_via_pairs_cached:
+    """the collection adaptation for streams of pairs.
 
     imagine an iterator (we will say "stream" here) of name-value pairs. the
     target API we are implementing against accomodates both random-access and
@@ -334,18 +366,19 @@ class human_keyed_collection_via_pairs_cached:
 
       - currently the "locking" we do for sanity might be costly at some
         scales.
+
+    .#open [#873.L] modernize this API
     """
 
     def __init__(self, pairs):
         self._state = _OpenState(self._receive_new_state, pairs)
 
-    def get(self, k, default_x=None):
-        return self._state._two_argument_get(k, default_x)
+    # (got rid of `get` at #history-A.4)
 
-    def __getitem__(self, k):
-        return self._state._getitem(k)
+    def retrieve_entity_as_storage_adapter_collection(self, natural_key):
+        return self._state._dereference(natural_key)
 
-    def __iter__(self):
+    def to_identifier_stream_as_storage_adapter_collection(self):  # ..
         return self._state._iter()
 
     def _receive_new_state(self, x):
@@ -359,17 +392,17 @@ class _OpenState:
         self._change_state = change_state
         self._cache = {}
 
-    def _two_argument_get(self, human_key, default_x):
+    def _two_argument_get(self, natural_key, default_x):
 
-        found, x = self._lookup(human_key)
+        found, x = self._lookup(natural_key)
         if found:
             return x
         else:
             return default_x
 
-    def _getitem(self, human_key):
+    def _dereference(self, natural_key):
 
-        found, x = self._lookup(human_key)
+        found, x = self._lookup(natural_key)
         if found:
             return x
         else:
@@ -382,21 +415,21 @@ class _OpenState:
             the above, in turn, means our parent has transitioned off of us
             as a state. which means this should be here GULP:
             """
-            return self.__NEW_STATE._getitem(human_key)
+            return self.__NEW_STATE._dereference(natural_key)
 
-    def _lookup(self, human_key):
+    def _lookup(self, natural_key):
 
         cache = self._cache
         value = None
-        if human_key in cache:
-            value = cache[human_key]
+        if natural_key in cache:
+            value = cache[natural_key]
             found = True
         else:
             found = False
             for k in self._each_next_real_new_key():
-                if human_key == k:
+                if natural_key == k:
                     found = True
-                    value = cache[human_key]
+                    value = cache[natural_key]
                     break
 
         if found:
@@ -495,11 +528,11 @@ class _ClosedState:
     def __init__(self, cache):
         self._cache = cache
 
-    def _two_argument_get(self, human_key, default_x):
-        return self._cache.get(human_key, default_x)
+    def _two_argument_get(self, natural_key, default_x):
+        return self._cache.get(natural_key, default_x)
 
-    def _getitem(self, human_key):
-        return self._cache[human_key]
+    def _dereference(self, natural_key):
+        return self._cache[natural_key]
 
     def _iter(self):
         # NOTE - currently this may not be covered unless you run the whole fil
@@ -507,6 +540,42 @@ class _ClosedState:
 
 
 placeholder_for_say_subfeature = repr
+
+
+class CACHING_COLLECTION_VIA_COLLECTION:  # 1x
+
+    def __init__(self, impl):
+        self._cache = {}
+        self._impl = impl
+
+    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
+        if key in self._cache:
+            return self._cache[key]
+        entity = self._impl.retrieve_entity_as_storage_adapter_collection(key, listener)  # noqa: E501
+        assert(entity)  # cover this - probably you do NOT want to cache fails
+        self._cache[key] = entity
+        return entity
+
+
+class collection_via_DICTIONARY_OF_DEREFERENCERS:  # 1x
+
+    def __init__(self, dct):
+        self._special_dictionary = dct
+
+    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
+        return self._special_dictionary[key]()  # ..
+
+
+class __collection_implementation_via_dictionary:
+
+    def __init__(self, dct):
+        self._dictionary = dct
+
+    def retrieve_entity_as_storage_adapter_collection(self, natural_key):
+        return self._dictionary[natural_key]
+
+    def to_identifier_stream_as_storage_adapter_collection(self):  # ..
+        return self._dictionary.keys()
 
 
 # support for hackish EN expression
@@ -551,7 +620,8 @@ ellipsis_join = _ellipsis_join
 # we want the doctest tests to read as if it's an "ordinary" function.
 
 
-# #pending-rename: wouldn't you rather call this "natural key"?
+# #pending-rename: `collection_via`
+# #history-A.4
 # #history-A.3 (as referenced)
 # #history-A.2
 # #history-A.1

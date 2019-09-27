@@ -147,7 +147,7 @@ def FAR_STREAM_FOR_SYNC_VIA(
 def __yikes_sort(raw_order):
     """simply "flatten" the iterator into one big list and sort it by
 
-    the human key. result in the big list as an iterator.
+    the natural key. result in the big list as an iterator.
       - whine when we reach a sanity limit. we lose linear scaling
     """
 

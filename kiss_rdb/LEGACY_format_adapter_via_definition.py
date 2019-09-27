@@ -14,7 +14,7 @@ class _FormatAdapter:
             self,
 
             format_adapter_module_name,
-            # a human key is derived from this for the [#874.3] collection API
+            # a natural key is derived from this for [#874.3] collection API
 
             functions_via_modality=None,
             # if this format can be used as a "near" collection for syncing
@@ -82,55 +82,8 @@ class _FormatAdapter:
         return f(stream_request)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
-        """EXPERIMENT -- like ruby's new `dig` but with extra natural messages
-
-        see provisos of the callee function too..
-        """
-
-        def use_step_tuples():
-            # cleverly (or not) we DRY into this function this first
-            # step-component that we always use (for now) etc
-
-            # the FA might not have defined any such functions at all
-            yield ('functions_via_modality', 'property', {'do_splay': False})
-
-            for step_tuple in step_tuples:
-                yield step_tuple
-
-        return self._dig_anything(use_step_tuples(), listener)
-
-    def _dig_anything(self, step_tuples, listener):
-        """NOTE - no caching - we should be caching maybe
-        """
-
-        import kiss_rdb.LEGACY_collection_lib as lib
-
-        def say_collection():
-            return 'the %s format adapter' % repr(self.format_name)
-
-        current_node = lib.human_keyed_collection_via_object(self)
-
-        for step_tuple in step_tuples:
-
-            if 2 < len(step_tuple):
-                (kwargs,) = step_tuple[2:]
-            else:
-                kwargs = _empty_hash
-
-            tup = lib.procure(
-                human_keyed_collection=current_node,
-                needle_function=step_tuple[0],
-                listener=listener,
-                item_noun_phrase=step_tuple[1],
-                say_collection=say_collection,  # ..
-                **kwargs,
-                )
-
-            if tup is None:
-                current_node = None
-                break
-            current_node = tup[1]  # diregard particular name
-        return current_node
+        from .magnetics_.collection_via_path import DIG_FOR_CAPABILITY
+        return DIG_FOR_CAPABILITY(self, step_tuples, listener)
 
     @property
     def native_item_normalizer(self):
@@ -203,9 +156,6 @@ class _StreamRequest:
         for attr in f():
             o[attr] = getattr(self, attr)
         return o
-
-
-_empty_hash = {}
 
 
 import sys  # noqa: E402

@@ -10,8 +10,14 @@ class parser_via_grammar_and_symbol_table:
 
     def __init__(self, tokens, symbol_table):
         self._digraph, self._sequence_grammar = _build_digraph(tokens)
-        _inner_coll = collection_via_THIS_ONE_THING(symbol_table)
-        self._symbols = caching_collection_via_collection(_inner_coll)
+
+        from kiss_rdb.LEGACY_collection_lib import (
+                CACHING_COLLECTION_VIA_COLLECTION,
+                collection_via_DICTIONARY_OF_DEREFERENCERS)
+
+        _inner_coll = collection_via_DICTIONARY_OF_DEREFERENCERS(symbol_table)
+
+        self._symbols = CACHING_COLLECTION_VIA_COLLECTION(_inner_coll)
 
     def parse(self, token_scanner, listener):
         def symbol_via(symbol_name):
@@ -84,36 +90,6 @@ def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
         ast[i] = tuple(ast[i])
 
     return tuple(ast)
-
-
-# == BEGIN move these to kiss_rdb.LEGACY_collection_lib
-
-class caching_collection_via_collection:
-
-    def __init__(self, impl):
-        self._cache = {}
-        self._impl = impl
-
-    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
-        if key not in self._cache:
-            x = self._impl.retrieve_entity_as_storage_adapter_collection(
-                    key, listener)
-            assert(x)  # cover this - probably you do NOT want to cache fails
-            self._cache[key] = x
-        return self._cache[key]
-
-
-class collection_via_THIS_ONE_THING:
-
-    def __init__(self, dct):
-        self._special_dictionary = dct
-
-    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
-        _dereference = self._special_dictionary[key]  # ..
-        _x = _dereference()
-        return _x
-
-# == END
 
 
 def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)

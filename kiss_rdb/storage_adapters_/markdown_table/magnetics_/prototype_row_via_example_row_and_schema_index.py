@@ -136,7 +136,7 @@ class _SELF:
         for all the rest, use the doo-hah that was there already!
         """
 
-        """assume the human key in the far pairs has the same effective
+        """assume the natural key in the far pairs has the same effective
         value as that in the near row. no reason to incur the "cost"
         of updating this value, so delete that item from the dictionary.
         """
