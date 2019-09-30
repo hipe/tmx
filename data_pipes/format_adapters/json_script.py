@@ -231,4 +231,5 @@ FORMAT_ADAPTER = format_adapter_via_definition(
         format_adapter_module_name=__name__,
         )
 
+# #pending-rename: producer script (maybe)
 # #born.

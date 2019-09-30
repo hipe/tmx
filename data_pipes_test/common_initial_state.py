@@ -4,10 +4,13 @@ import os.path as os_path
 
 def build_end_state_commonly(self):  # (stowaway - relevant to FA's only)
 
-    import modality_agnostic.test_support.listener_via_expectations as lib
+    from modality_agnostic.test_support.listener_via_expectations import (
+            # for_DEBUGGING,
+            expecter_via_expected_emissions)
 
-    exp = lib(self.expect_emissions())
+    exp = expecter_via_expected_emissions(self.expect_emissions())
     listener = exp.listener
+    # listener = for_DEBUGGING
 
     _d = self.given()
 
@@ -31,7 +34,7 @@ class ProducerCaseMethods:
         _cm = _sync_context_manager_via(
                 producer_script_path=_producer_script,
                 near_collection=_near_coll_id,
-                near_format='markdown_table',
+                near_format='markdown-table',
                 listener=_listener)
 
         with _cm as lines:
@@ -70,8 +73,9 @@ class ProducerCaseMethods:
         return _.throwing_listener
 
     def LISTENER_FOR_DEBUGGING(self):
-        import modality_agnostic.test_support.listener_via_expectations as _
-        return _.for_DEBUGGING
+        from modality_agnostic.test_support.listener_via_expectations import (
+                for_DEBUGGING)
+        return for_DEBUGGING
 
 
 def PS_via(mixed):
@@ -127,15 +131,15 @@ def executable_fixture(stem):
 
 
 def html_fixture(tail):
-    return os_path.join(_fixture_files(), '500-html', tail)
+    return os_path.join(fixture_files_directory(), '500-html', tail)
 
 
 def markdown_fixture(tail):
-    return os_path.join(_fixture_files(), '300-markdown', tail)
+    return os_path.join(fixture_files_directory(), '300-markdown', tail)
 
 
 @lazy
-def _fixture_files():
+def fixture_files_directory():
     return os_path.join(_top_test_dir(), 'fixture-files')
 
 

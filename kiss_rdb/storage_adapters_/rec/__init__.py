@@ -20,8 +20,24 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(**kwargs):
-    raise Exception('write me')  # [#876] cover me
+def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+        collection_identity,
+        random_number_generator,
+        filesystem,
+        listener):
+
+    assert('THE_ADAPTER_VARIANT_FOR_STREAMING' == collection_identity.adapter_variant)  # noqa: E501 but w/e
+    return _FakeCollection(collection_identity)
+
+
+class _FakeCollection:
+
+    COLLECTION_CAPABILITIES = {
+            'choo_cha_foo_fah': None,  # (Case2660DP)
+            }
+
+    def __init__(self, collection_identity):
+        self.collection_identity = collection_identity
 
 
 class ErsatzScanner:

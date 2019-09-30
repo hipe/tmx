@@ -1,4 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
+        StubCollectionIdentity,
         # debugging_listener,
         functions_for,
         unindent)
@@ -195,7 +196,7 @@ def _last_1_of_path(path):
 
 def _build_collection(dir_path, **injections):
     return _main_module().collection_via_directory_and_schema(
-            collection_directory_path=dir_path,
+            collection_identity=StubCollectionIdentity(dir_path),
             collection_schema=_always_same_schema(),
             **injections)
 

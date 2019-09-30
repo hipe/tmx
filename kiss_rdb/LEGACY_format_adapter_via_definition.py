@@ -82,8 +82,19 @@ class _FormatAdapter:
         return f(stream_request)
 
     def DIG_HOI_POLLOI(self, step_tuples, listener):
-        from .magnetics_.collection_via_path import DIG_FOR_CAPABILITY
-        return DIG_FOR_CAPABILITY(self, step_tuples, listener)
+        # the function we once called to dig has gone to live as a method on
+        # the new collection class. so TEMPORARILY we unwind and modify it here
+
+        def use_dig_path():  # add this one step to the front of the path
+            yield ('functions_via_modality', 'property', {'do_splay': False})
+            for dig_step in step_tuples:
+                yield dig_step
+
+        def say_collection():
+            return f"the 'xx' format adapter"
+
+        from kiss_rdb.LEGACY_collection_lib import DIGGY_DIG
+        return DIGGY_DIG(self, use_dig_path(),  say_collection, listener)
 
     @property
     def native_item_normalizer(self):

@@ -1,4 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
+        StubCollectionIdentity,
         pretend_file_via_path_and_big_string)
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.memoization import (
@@ -476,8 +477,9 @@ def _collection_empty_will_mutate():
 
 def _build_collection_via_path_and_big_string(path, big_string):  # #COPY-PASTE
     pfile = pretend_file_via_path_and_big_string(path, big_string)
+    _coll_ID = StubCollectionIdentity(pfile)
     from kiss_rdb.storage_adapters_ import markdown_table as lib
-    return lib._resolve_collection_via_file(pfile, pfile.path, None)
+    return lib._resolve_collection_via_file(pfile, _coll_ID, None)
 
 
 def do_me():

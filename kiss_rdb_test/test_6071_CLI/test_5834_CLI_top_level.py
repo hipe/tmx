@@ -607,8 +607,8 @@ class _StructTreeAndExitCode:
 @lazy
 def real_filesystem_read_only():
     # push this up whenever - use the real filesystem but the same testy hook
-    from kiss_rdb import memoized_
-    fs = memoized_.real_filesystem_read_only  # not really necessary
+    from kiss_rdb import real_filesystem_read_only_
+    fs = real_filesystem_read_only_()  # not really necessary
     otr = fs.__class__(commit_file_rewrite=None)
     otr.FINISH_AS_HACKY_SPY = lambda: None
     return otr

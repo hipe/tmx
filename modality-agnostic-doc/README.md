@@ -36,6 +36,7 @@ only in modeling interfaces for this purpose.
 |[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
 |[#508]                     | #hole |
+|[#507.H]                   |       | [ this lightweight listening library ]
 |[#507.G]                   | #open | idiomize something for the test platform
 |[#507.F]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #open | what is this idea

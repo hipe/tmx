@@ -5,7 +5,9 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
-        collection_path, random_number_generator, filesystem, listener):
+        collection_identity, random_number_generator, filesystem, listener):
+
+    collection_path = collection_identity.collection_path  # hello
 
     listener('info', 'structure', 'hi_from_SA_2', lambda: {'message': 'SA2'})
 

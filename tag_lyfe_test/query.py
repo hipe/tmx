@@ -1,7 +1,9 @@
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject,
         lazy)
-import modality_agnostic.test_support.listener_via_expectations as l_via_e  # noqa: E402 E501
+from modality_agnostic.test_support.listener_via_expectations import (
+        # for_DEBUGGING,
+        listener_via_emission_receiver)
 
 
 class _ScaryCommonCaseWatcher(type):
@@ -110,8 +112,8 @@ class _EndState:
 
         em_a = []
         tox = tc.given_tokens()
-        listener = l_via_e.listener_via_emission_receiver(em_a.append)
-        # listener = l_via_e.for_DEBUGGING
+        # listener = for_DEBUGGING
+        listener = listener_via_emission_receiver(em_a.append)
 
         from tag_lyfe.magnetics import query_via_token_stream as mag
 
@@ -129,7 +131,7 @@ class _EndState:
 
         if len(em_a):
             em, = em_a  # ..
-            self.first_emission_messages = em.to_strings()
+            self.first_emission_messages = tuple(em.to_raw_lines())
         else:
             self.first_emission_messages = None
 

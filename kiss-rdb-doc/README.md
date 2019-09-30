@@ -40,6 +40,8 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.12]                  |       | #experimental. we may remove this API point. capability functions
+|[#873.K]                   | #open | sunset or dissolve LEGACY_stream module
 |[#873.J]                   | #open | debugging `print` statements for kiss-rdb commit
 |[#873.I]                   | #trak | ugly
 |[#873.H]                   | #wish | customizable functional pipelines (map, filter in any order etc)

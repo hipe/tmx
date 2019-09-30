@@ -14,7 +14,7 @@ def emit_error(listener, error_symbol, msg):
 
 def big_index_and_collection_via_path(collection_path, listener):
     import kiss_rdb
-    coll = kiss_rdb.COLLECTION_VIA_COLLECTION_PATH(collection_path, listener)
+    coll = kiss_rdb.collection_via_collection_path(collection_path, listener)
     if coll is None:
         return
 

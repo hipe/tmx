@@ -1,7 +1,5 @@
-from script_lib import cover_me
-
-
 # == BEGIN listener stowaway
+
 
 def listener_via_stderr(stderr):
     # this is a modality implementation of a [#017] listener
@@ -10,19 +8,19 @@ def listener_via_stderr(stderr):
     # unification of case expression
 
     def listener(*a):
-        d = _deque_via_array(a)
-        emission_payload_f = d.pop()
-        s = d.popleft()
-        if s not in _approved_toplevel_channels:
-            cover_me('bad first channel component: {}'.format(s))
-        s = d.popleft()
-        if s != 'expression':
-            cover_me("need 'expression' had {}".format(s))
-        if 1 < len(d):
-            # cover_me(f'do you really want a fourth component?: {d[1]!r}')
-            # longer channels used in e.g tag_lyfe [#708.3]. now preferred.
-            pass
+        from modality_agnostic import listening
+        em = listening.emission_via_args(a)
+        assert(em.severity in ('error', 'info'))
+        if 'expression' == em.shape:
+            return when_expression(em)
+        assert('structure' == em.shape)
+        when_structure(em)
 
+    def when_structure(em):
+        receive_nonterminated_message_string(em.flush_some_message())
+
+    def when_expression(em):
+        emission_payload_f = em.release_payloader()
         import inspect
         length = len(inspect.signature(emission_payload_f).parameters)
         if 0 == length:
@@ -52,11 +50,6 @@ class STYLER_:
         pass
 
 
-_approved_toplevel_channels = {
-        'info': None,
-        'error': None,
-        }
-
 # == END listener stowaway
 
 
@@ -75,7 +68,9 @@ def deque_via_ARGV(ARGV):
     return deque(ARGV)
 
 
-_deque_via_array = deque_via_ARGV
+def cover_me(msg):
+    raise Exception(f'cover me: {msg}')
+
 
 _NEWLINE = '\n'
 

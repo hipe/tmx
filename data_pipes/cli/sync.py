@@ -11,7 +11,6 @@ this will express an error and halt further processing.
 """
 # NOTE some of the content of the above text is covered by (Case3066)
 # [#447] describes the above algorithm more formally
-# #[#874.5] file used to be executable script and may need further changes
 
 
 from data_pipes import common_producer_script
@@ -121,17 +120,22 @@ def open_new_lines_via_sync(  # #testpoint
         cached_document_path=None,  # for tests
         ):
 
-    # resolve the function for syncing from the near collection reference
-    near_coll_ref = biz_lib.collection_reference_via_(
-            near_collection, listener, near_format)
-    if near_coll_ref is None:
+    from kiss_rdb import collection_via_collection_path
+    near_coll = collection_via_collection_path(
+            collection_path=near_collection,
+            adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
+            format_name=near_format,
+            listener=listener)
+    if near_coll is None:
         return _empty_context_manager()
 
-    def ew():
+    # resolve the function for syncing from the near collection reference
+
+    def capability_path():
         yield ('CLI', 'modality functions')
         yield ('new_document_lines_via_sync', 'CLI modality function')
 
-    new_lines_via = near_coll_ref.format_adapter.DIG_HOI_POLLOI(ew(), listener)
+    new_lines_via = near_coll.DIG_FOR_CAPABILITY(capability_path(), listener)
     if new_lines_via is None:
         return _empty_context_manager()
 
@@ -140,6 +144,9 @@ def open_new_lines_via_sync(  # #testpoint
     if hasattr(producer_script_path, 'HELLO_I_AM_A_PRODUCER_SCRIPT'):
         ps = producer_script_path
     else:
+        # #open [#873.K] after you load markdown tables the new way,
+        # load the producer script the new way too, then get rid of this file
+
         from kiss_rdb.cli.LEGACY_stream import module_via_path
         ps = module_via_path(producer_script_path, listener)
 
@@ -160,7 +167,6 @@ def open_new_lines_via_sync(  # #testpoint
                     stream_for_sync_is_alphabetized_by_key_for_sync=ps.stream_for_sync_is_alphabetized_by_key_for_sync,  # noqa: E501
                     stream_for_sync_via_stream=ps.stream_for_sync_via_stream,
                     dictionaries=_dictionaries,
-                    near_collection_reference=near_coll_ref,
                     near_keyerer=ps.near_keyerer,
                     filesystem_functions=None,
                     listener=listener)

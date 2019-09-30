@@ -1,4 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
+        StubCollectionIdentity,
         pretend_file_via_path_and_big_string,
         PretendFile,
         unindent_with_dot_hack,
@@ -42,7 +43,8 @@ class _CommonCase(unittest.TestCase):
         else:
             opened = None
             use_path = path
-        return lib._resolve_collection_via_file(opened, use_path, listener)
+        _coll_ID = StubCollectionIdentity(use_path)
+        return lib._resolve_collection_via_file(opened, _coll_ID, listener)
 
     def given_path(self):
         pass

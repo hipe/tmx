@@ -28,6 +28,14 @@ def lazy(f):  # #[#510.8]
 # ==
 
 
+class StubCollectionIdentity:
+    def __init__(self, collection_path):
+        self.collection_path = collection_path
+
+
+# ==
+
+
 def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
     import kiss_rdb.storage_adapters_.toml.entities_via_collection as ents_lib
     _tb = ents_lib.table_block_via_lines_and_table_start_line_object_(

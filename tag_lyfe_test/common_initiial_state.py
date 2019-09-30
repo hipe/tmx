@@ -11,4 +11,5 @@ def fixture_file_path(stem):
 def _top_test_dir():
     return os_path.dirname(__file__)
 
+# #pending-rename: typo
 # #extracted from sibling

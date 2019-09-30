@@ -5,10 +5,7 @@ parser from modality agnostic commands, but otherwise manage your own
 parsing.
 """
 
-from modality_agnostic.memoization import (
-        lazy)
-from script_lib import (
-        cover_me)
+from modality_agnostic.memoization import lazy
 import re
 
 
@@ -869,6 +866,10 @@ def _wish(s):
 
 def implement_me():
     raise _exe('implement me')
+
+
+def cover_me(msg):
+    raise _exe(f'cover me: {msg}')
 
 
 _exe = Exception

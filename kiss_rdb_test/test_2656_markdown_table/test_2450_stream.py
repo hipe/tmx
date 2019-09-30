@@ -1,7 +1,7 @@
 from kiss_rdb_test.common_initial_state import (
         functions_for)
 from modality_agnostic.test_support.structured_emission import (
-        minimal_listener_spy)
+        listener_and_emissioner_for)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -13,25 +13,29 @@ fixture_path = functions_for('markdown').fixture_path
 class _CommonCase(unittest.TestCase):
 
     def _build_state_expecting_some_emssions(self, path):
-        emissions, listener = minimal_listener_spy()
-        business_objects, first = self._run(path, listener)
-        return _State(business_objects, first, tuple(emissions))
+        listener, emissioner = listener_and_emissioner_for(self)
+        business_objects = self._run(path, listener)
+        chan, payloader = emissioner()
+        return _State(business_objects, ((chan, payloader),))
 
     def _build_state_expecting_no_emissions(self, path):
-        business_objects, first = self._run(path, _failey_listener)
-        return _State(business_objects, first)
+        business_objects = self._run(path, _failey_listener)
+        return _State(business_objects)
 
     def _run(self, path, listener):
-        cm = _subject_module().open_traversal_stream_TEMPORARY_LOCATION(
-                cached_document_path=None,
-                collection_identifier=path,
+
+        from kiss_rdb import collection_via_collection_path
+        coll = collection_via_collection_path(
+                collection_path=path,
+                adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
                 listener=listener)
-        first = None
-        if cm is None:
-            return (), first  # (Case2449DP)
+        if coll is None:
+            return (), None  # (Case2449DP)
+
+        cm = coll.YIKES__.OPEN_TRAVERSAL_STREAM__(listener)
         with cm as dcts:
             business_objects = tuple(dcts)
-        return business_objects, first
+        return business_objects
 
 
 class Case2449DP_fail(_CommonCase):
@@ -40,12 +44,15 @@ class Case2449DP_fail(_CommonCase):
         self.assertIsNotNone(_subject_module())
 
     def test_200_fails(self):
-        _tup = self._state().emissions
-        self.assertRegex(_tup[0], r"^can't infer [a-z]+ type .+ no extensio")
+        (chan, payloader), = self._state().emissions
+        self.assertSequenceEqual(chan,
+                ('error', 'structure', 'cannot_load_collection', 'file_has_no_extname'))  # noqa: E501
+        _reason = payloader()['reason']
+        self.assertRegex(_reason, r'^cannot infer .+om file with no extension')
 
     @shared_subject
     def _state(self):
-        _md = fixture_path('file-with-no-extension')
+        _md = fixture_path('0080-no-extension')
         return self._build_state_expecting_some_emssions(_md)
 
 
@@ -73,10 +80,9 @@ class Case2451_work(_CommonCase):
 
 
 class _State:
-    def __init__(self, _1, _2, _3=None):
-        self.business_objects = _1
-        self.meta_data = _2
-        self.emissions = _3
+    def __init__(self, business_objects, emissions=None):
+        self.business_objects = business_objects
+        self.emissions = emissions
 
 
 def _failey_listener(*a):

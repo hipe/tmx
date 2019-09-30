@@ -21,26 +21,31 @@ def _do_lazy_experiment(f, attr_name, build):
 # ==
 
 
-def _throwing_listenerer():
+def _throwing_listenerer(*args):
     from modality_agnostic import listening
-    return listening.throwing_listener
+    return listening.throwing_listener(*args)
 
 
-def COLLECTION_VIA_COLLECTION_PATH(coll_path, listener=_throwing_listenerer()):
-    """experimental "early access" for other libraries (like pho)
+def collection_via_collection_path(
+        collection_path,
+        listener=_throwing_listenerer,  # (as 2nd arg for tigher 2-arg calls)
+        adapter_variant=None,
+        format_name=None,
+        **injections):
 
-    use the real filesystem. ignoring RNG for now.. Used internally too.
-    """
-
-    _fs = memoized_.real_filesystem_read_only
-    return collection_via_path_(
-            collection_path=coll_path, filesystem=_fs, listener=listener)
+    return _memoized._collectioner.collection_via_path_and_injections_(
+            collection_path=collection_path,
+            adapter_variant=adapter_variant, format_name=format_name,
+            listener=listener, **injections)
 
 
-def collection_via_path_(collection_path, listener, **injections):
-    return memoized_.collectioner.COLLECTION_VIA_PATH_AND_INJECTIONS(
-            collection_path=collection_path, listener=listener, **injections)
+# == access memoized things
 
+def real_filesystem_read_only_():
+    return _memoized._real_filesystem_read_only
+
+
+# == define memoized things
 
 def _build_collectioner():
     # (this is not hard coded just so we can test it)
@@ -63,16 +68,16 @@ class _Memoized:
 
     @property
     @lazy_experiment('_thing', _build_collectioner)
-    def collectioner(self):
+    def _collectioner(self):
         pass
 
     @property
     @lazy_experiment('_real_filesystem', _build_real_filesystem)
-    def real_filesystem_read_only(self):
+    def _real_filesystem_read_only(self):
         pass
 
 
-memoized_ = _Memoized()
+_memoized = _Memoized()
 
 
 # == internal, related to modality adaptation

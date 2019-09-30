@@ -1,7 +1,7 @@
 from os import path as os_path
 
 
-def _encode_identifier(f):
+def _encode_identifier(f):  # #decorator
     def use_f(self, identifier_string, *rest):
         from kiss_rdb.magnetics_.identifier_via_string import (
             identifier_via_string_)
@@ -45,17 +45,17 @@ class _Collection:  # #tespoint
     def to_identifier_stream(self, listener):
         return self._impl.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
 
-
-def DIG_FOR_CAPABILITY(impl, dig_path, listener):  # TEMPORARY wil become meth
+    def DIG_FOR_CAPABILITY(self, dig_path, listener):
         # (moved here from elsewhere at #history-A.1)
 
+        impl = self._impl
+
         def use_dig_path():  # add this one step to the front of the path
-            yield ('functions_via_modality', 'property', {'do_splay': False})
+            yield ('COLLECTION_CAPABILITIES', 'property', {'do_splay': False})
             for dig_step in dig_path:
                 yield dig_step
 
         def say_collection():
-            return f"the '{impl.format_name}' format adapter"  # TEMPORARY
             coll_ID = impl.collection_identity
             _ada = coll_ID.adapter_key.replace('_', '-')
             s_a = [f"the '{_ada}' format adapter"]
@@ -65,7 +65,14 @@ def DIG_FOR_CAPABILITY(impl, dig_path, listener):  # TEMPORARY wil become meth
             return ' '.join(s_a)
 
         from kiss_rdb.LEGACY_collection_lib import DIGGY_DIG
-        return DIGGY_DIG(impl, use_dig_path(),  say_collection, listener)
+        funcer = DIGGY_DIG(impl, use_dig_path(),  say_collection, listener)
+        if funcer is None:
+            return
+        return funcer(impl)
+
+    @property
+    def YIKES__(self):  # track where we do this bad thing
+        return self._impl
 
 
 def _wrap_in_facade(f):  # decorator
@@ -79,15 +86,27 @@ def _wrap_in_facade(f):  # decorator
 
 class _ResolveCollection:
 
-    def __init__(self, collection_path, meta_collection, listener,
-                 random_number_generator=None, filesystem=None):
+    def __init__(
+            self, collection_path, meta_collection, listener,
+            adapter_variant=None,
+            format_name=None,
+            random_number_generator=None,
+            filesystem=None):
+
         self.path = collection_path
-        self.listener = listener
-        self.meta_collection = meta_collection
+        self.adapter_variant = adapter_variant
+        self.format_name = format_name
+
         self.random_number_generator = random_number_generator
         self.FS = filesystem
 
+        self.meta_collection = meta_collection
+        self.listener = listener
+
     def execute(self):
+        # experimentally, format-name skips the stat stuff to let adapter do it
+        if self.format_name is not None:
+            return self.__when_format_name()
         st = self.__stat_via_path()
         if st is None:
             return
@@ -98,6 +117,16 @@ class _ResolveCollection:
             return self.__when_file()
         # #not-covered:
         raise Exception(f'neither file nor directory - {self.path}')
+
+    # -- when format name
+
+    def __when_format_name(self):
+        def SAer():
+            return self.meta_collection._storage_adapter_via_format_name_(
+                self.format_name, self.listener)
+        if not self._resolve_storage_adapteter_by(SAer):
+            return
+        return self._finish_for_single_file_based_collection()
 
     # -- when directory
 
@@ -130,17 +159,20 @@ class _ResolveCollection:
         def contextualize(dct):
             self._scanner.contextualize_about_field_value(dct, field)
 
-        sa = self.meta_collection._storage_adapter_via_key_(
-                field.field_value_string, self.listener, contextualize)
-        if sa is None:
-            return
-        if not sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
+        def SAer():
+            return self.meta_collection._storage_adapter_via_key_(
+                    field.field_value_string, self.listener, contextualize)
+
+        def validate(sa):
+            if sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
+                return True
             return _emit_about_not_directory_based(
                     self.listener, sa, contextualize)
-        if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
-            _emit_about_nonworking_stub(self.listener, sa, contextualize)
+
+        if not self._resolve_storage_adapteter_by(SAer, validate):
             return
-        return self.__finish_for_schema_based_collection(sa)
+
+        return self.__finish_for_schema_based_collection()
 
     def __scan_first_field_line(self):
         scn = self._scanner.recfile_scanner
@@ -170,7 +202,7 @@ class _ResolveCollection:
     def __resolve_open_schema_file(self):
         failed = True
         try:
-            fh = self.FS.open_file_for_reading(self._schema_path)
+            fh = self._some_filesystem().open_file_for_reading(self._schema_path)  # noqa: ErsatzScanner
             failed = False
         except FileNotFoundError as e_:
             e = e_
@@ -188,39 +220,66 @@ class _ResolveCollection:
         return self.__when_extname()
 
     def __when_extname(self):
-        sa = self.meta_collection._storage_adapter_via_extname_(
-                self._extname, self.listener)
-        if sa is None:
+        def SAer():
+            return self.meta_collection._storage_adapter_via_extname_(
+                    self._extname, self.listener)
+
+        def contextualize(dct):
+            dct['path'] = self.path
+
+        if not self._resolve_storage_adapteter_by(SAer, None, contextualize):
             return
-        if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
-            def contextualize(dct):
-                dct['path'] = self.path
-            _emit_about_nonworking_stub(self.listener, sa, contextualize)
-            return
-        return self.__finish_for_single_file_based_collection(sa)
+
+        return self._finish_for_single_file_based_collection()
 
     # -- shared/similar/low-level
 
     @_wrap_in_facade
-    def __finish_for_schema_based_collection(self, sa):
-        return sa.module.RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+    def __finish_for_schema_based_collection(self):
+        return self._storage_adapter.module.RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(  # noqa: E501
                 schema_file_scanner=self._scanner, ** self._these_N())
 
     @_wrap_in_facade
-    def __finish_for_single_file_based_collection(self, sa):
-        return sa.module.RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(  # noqa: E501
+    def _finish_for_single_file_based_collection(self):
+        return self._storage_adapter.module.RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(  # noqa: E501
                 ** self._these_N())
 
     def _these_N(self):
-        return {'collection_path': self.path,
+
+        _collection_identity = _CollectionIdentity(
+                collection_path=self.path,
+                adapter_variant=self.adapter_variant,
+                adapter_key=self._storage_adapter.key,
+                )
+
+        return {'collection_identity': _collection_identity,
                 'random_number_generator': self.random_number_generator,
                 'filesystem': self.FS,
                 'listener': self.listener}
 
+    def _resolve_storage_adapteter_by(
+            self, SAer, validate=None, contextualize=None):
+
+        sa = SAer()
+        if sa is None:
+            return
+
+        # (ad-hoc validation before more general validation = better UI msgs)
+        if validate is not None:
+            if not validate(sa):
+                return
+
+        if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
+            return _emit_about_nonworking_stub(
+                    self.listener, sa, contextualize)
+
+        self._storage_adapter = sa
+        return True
+
     def __stat_via_path(self):
         did_fail = True
         try:
-            stat = self.FS.stat_via_path(self.path)
+            stat = self._some_filesystem().stat_via_path(self.path)
             did_fail = False
         except FileNotFoundError as e_:
             e = e_
@@ -228,6 +287,20 @@ class _ResolveCollection:
             _emit_about_collection_not_found_because_noent(self.listener, e)
             return
         return stat
+
+    def _some_filesystem(self):
+        if self.FS is not None:
+            return self.FS
+        from kiss_rdb import real_filesystem_read_only_
+        return real_filesystem_read_only_()
+
+
+class _CollectionIdentity:  # for error messages from collection
+
+    def __init__(self, collection_path, adapter_variant, adapter_key):
+        self.collection_path = collection_path
+        self.adapter_variant = adapter_variant
+        self.adapter_key = adapter_key
 
 
 class collectioner_via_storage_adapters_module:  # "_MetaCollection"
@@ -254,11 +327,15 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         self._reference_via_key = references
         self._SAs_module_name = module_name
         self._key_via_extname = None
+        self._key_via_format_name = None
 
-    def COLLECTION_VIA_PATH_AND_INJECTIONS(
-            self, collection_path, listener, **injections):
+    def collection_via_path_and_injections_(
+            self, collection_path, listener,
+            adapter_variant=None, format_name=None, **injections):
         return _ResolveCollection(
-                collection_path=collection_path, meta_collection=self,
+                collection_path=collection_path,
+                adapter_variant=adapter_variant, format_name=format_name,
+                meta_collection=self,
                 listener=listener, **injections).execute()
 
     def _storage_adapter_via_extname_(self, extname, listener):
@@ -268,6 +345,17 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
             _emit_about_extname(listener, extname, self._key_via_extname)
             return
         return self._dereference(self._key_via_extname[extname])
+
+    def _storage_adapter_via_format_name_(self, format_name, listener):
+
+        if self._key_via_format_name is None:
+            self._key_via_format_name = {k.replace('_', '-'): k for k in self._order}  # noqa: E501
+
+        if format_name not in self._key_via_format_name:
+            _emit_about_format_name(
+                    listener, format_name, self._key_via_format_name)
+            return
+        return self._dereference(self._key_via_format_name[format_name])
 
     def _storage_adapter_via_key_(self, key, listener, contextualize):
         if key not in self._reference_via_key:
@@ -310,11 +398,6 @@ class _StorageAdapter:  # move this to its own file if it gets big
         self.module = module
         self.key = key
 
-    def RESOLVE_COLLECTION(
-            self, collection_path, listener, schema_file_scanner):
-        # bad to use the existence/absense of scanner
-        raise Exception("HERE IS NOW")
-
     is_loaded = True
 
 
@@ -324,7 +407,7 @@ class _NOT_YET_LOADED:  # #as-namespace-only
 
 # == whiners
 
-def _emit_about_nonworking_stub(listener, sa, contextualize):
+def _emit_about_nonworking_stub(listener, sa, contextualize=None):
     def structurer():  # #not-covered, kind of crazy
         dct = {}
         mod = sa.module
@@ -338,7 +421,8 @@ def _emit_about_nonworking_stub(listener, sa, contextualize):
             dct['reason_tail'] = use_msg
         else:
             dct['reason_tail'] = repr(sa.key)
-        contextualize(dct)
+        if contextualize is not None:
+            contextualize(dct)
         return dct
     listener(*_EC_for_cannot_load,
              'storage_adapter_is_not_available', structurer)
@@ -418,12 +502,23 @@ def _emit_about_no_extname(listener, path):
 
 def _emit_about_extname(listener, extname, key_via_extname):
     def structurer():  # (Case1410)
-        _head = f"unrecognized extension '{extname}'"
-        _these = ', '.join(f"'{s}'" for s in sorted(key_via_extname.keys()))
-        _tail = f"known extension(s): ({_these})"
-        _reason = f'{_head}. {_tail}'
-        return {'reason': _reason}
+        return _same_splay_reason('extension', extname, key_via_extname)
     listener(*_EC_for_cannot_load, 'unrecognized_extname', structurer)
+
+
+def _emit_about_format_name(listener, format_name, key_via_format_name):
+    def structurer():
+        return _same_splay_reason('format name', format_name, key_via_format_name)  # noqa: E501
+    # raise Exception("cover me - worked once at visual test")  # [#876]
+    listener(*_EC_for_cannot_load, 'unrecognized_format_name', structurer)
+
+
+def _same_splay_reason(noun_singular, wrong, key_via_what):
+    _head = f"unrecognized {noun_singular} '{wrong}'"
+    _these = ', '.join(f"'{s}'" for s in sorted(key_via_what.keys()))
+    _tail = f"known {noun_singular}(s): ({_these})"
+    _reason = f'{_head}. {_tail}'
+    return {'reason': _reason}
 
 
 def _emit_about_SA_key(listener, key, order, contextualize):

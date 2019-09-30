@@ -1,13 +1,8 @@
-"""ahem..
-
+"""
+Mocking (expectation) library for [#017] emissions.
+(Compare lighter-weight counterpart: [#507.H].)
 :[#509]
 """
-
-from modality_agnostic import cover_me
-from modality_agnostic_test.common_initial_state import (
-        MutexingReference)
-import re
-from collections import deque as deque
 
 
 # --
@@ -35,32 +30,28 @@ def for_DEBUGGING(*a):
 
 
 def listener_via_emission_receiver(receive_emission):  # :[#509.2]
-    def listener(*a):
-        stack = list(a)
-        receive_emission(_ActualEmission(stack.pop(), tuple(stack)))
+    def listener(*args):
+        receive_emission(_ActualEmission(args))
     return listener
 
-# -- (☝️ don't forget to also put these #here)
 
-
-class _EmissionsModel:
+class expecter_via_expected_emissions:
 
     def __init__(self, itr):
+        from collections import deque
         _a = [_EmissionModel(s_a) for s_a in itr]
         self._emission_models = deque(_a)
         self._actual_emissions = []
         self._offset_via_name = {}
 
-    def listener(self, *chan):
+    def listener(self, *args):
         """NOTE - you won't typically call this directly"""
 
-        chan = list(chan)
-        emission_payload_expresser = chan.pop()
-        ae = _ActualEmission(emission_payload_expresser, tuple(chan))
+        ae = _ActualEmission(args)
         if self._some_emission_models_remain():
             self.__when_expecting_emission(ae)
-        else:
-            cover_me("unexpected emission - {}".format(repr(chan)))
+            return
+        cover_me(f'unexpected emission - {repr(args[:-1])}')
 
     def __when_expecting_emission(self, actual_emission):
 
@@ -99,10 +90,6 @@ class _EmissionsModel:
     def _some_emission_models_remain(self):
         return 0 != len(self._emission_models)
 
-    # :#here:
-    listener_via_emission_receiver = listener_via_emission_receiver
-    for_DEBUGGING = for_DEBUGGING
-
 
 class _ActualEmissionIndex:
 
@@ -117,31 +104,29 @@ class _ActualEmissionIndex:
 
 class _ActualEmission:
 
-    def __init__(self, emission_payload_function, chan):
-        self.emission_payload_function = emission_payload_function
-        self.channel = chan
+    def __init__(self, args):
+        self.channel = args[:-1]
+        self._args = args
 
     def to_first_string(self):
-        result = None
-        # (removed complicated way at #history-A.1)
-        for line in self.emission_payload_function():  # #[#511.3]
-            result = line
-            break
-        return result
+        return next(self.to_raw_lines())
 
     def to_string(self):
-        return '\n'.join(self.to_strings())
+        return ' '.join(self.to_raw_lines())
 
-    def to_strings(self):
-        """NOTE:
+    def flush_payloader(self):
+        return self._flush_to_vendor_emission().flush_payloader()
 
-        for one thing, this has been done elsewhere
-        for another thing, this totally ignores expression agents
-        for a third thing, this work isn't memoized here.
-        """
+    def to_raw_lines(self):
+        return self._flush_to_vendor_emission().flush_to_raw_lines()
 
+    def _flush_to_vendor_emission(self):
+        # (started using other lib at #history-A.2)
         # (removed complicated way at #history-A.1)
-        return tuple(self.emission_payload_function())  # #[#511.3]
+        args = self._args
+        del self._args  # or not
+        from modality_agnostic import listening
+        return listening.emission_via_args(args)
 
 
 class _EmissionModel:
@@ -152,6 +137,7 @@ class _EmissionModel:
         self.name = name
 
     def assert_against(self, actual_emission):
+        from collections import deque
         model_deq = deque(self.channel_model)
         actual_deq = deque(actual_emission.channel)
         while True:
@@ -173,6 +159,8 @@ class _EmissionModel:
 
 def _crazy_parse(s_a):
 
+    import re
+
     channel_model = []
 
     self = _ParseState()
@@ -181,11 +169,11 @@ def _crazy_parse(s_a):
         if 'as' == s:
             move(parse_as)
             self.receive_token(s)
-        elif _name_rx.search(s) is None:
+        elif re.search('^[a-z_]+$', s):
+            channel_model.append(_Literal(s))
+        else:
             move(parse_wildcard_globs_or_as)
             self.receive_token(s)
-        else:
-            channel_model.append(_Literal(s))
 
     def parse_wildcard_globs_or_as(s):
         if '?+' == s:
@@ -208,6 +196,7 @@ def _crazy_parse(s_a):
         expecting_more(None)
         name_reference.receive_value(s)
 
+    from modality_agnostic_test.common_initial_state import MutexingReference
     name_reference = MutexingReference()
 
     class ExpectingMore:
@@ -284,11 +273,9 @@ class _Literal:
     does_get_consumed = True
 
 
-_name_rx = re.compile('^[a-z_]+$')
+def cover_me(msg=None):
+    raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
-
-import sys  # noqa: E402
-sys.modules[__name__] = _EmissionsModel
-
+# #history-A.2
 # #history-A.1
 # #born.

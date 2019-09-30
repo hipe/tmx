@@ -144,8 +144,8 @@ def __function_for_EVERY_MODULE():
     Now at #history-A.4 during this great big merge, our only goal is to keep
     this working for the legacy tests, before we finish the merge.
 
-    We are moving the markdown format adapter code to the other library so
-    now we need to accomodate that explicitly.
+    At #history-A.5 we sunsetted the formal recognition of a markdown format
+    adapter here. Now it is only a "storage adapter" there.
 
     don't let the `lazy` fool you: this function is re-entrant:
 
@@ -162,10 +162,7 @@ def __function_for_EVERY_MODULE():
         _mod_name = '.'.join(these)
         for x in modules_via_directory_and_mod_name(_dir, _mod_name):
             yield x
-        # #history-A.4
-        from kiss_rdb.storage_adapters_.markdown_table import (
-                LEGACY_format_adapter as mod)
-        yield mod
+        # (#history-A.4 then #history-A.5 here)
 
     def modules_via_directory_and_mod_name(direc, mod_name):
 
@@ -205,6 +202,7 @@ def _collection_lib():
     return x
 
 
+# #history-A.5: as referenced
 # #history-A.4: as referenced
 # #history-A.3: as referenced
 # #history-A.2: as referenced

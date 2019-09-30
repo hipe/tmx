@@ -33,10 +33,12 @@ class Case0810DP_khong(_CommonCase):
         emissions = []
         sections = []
 
-        import modality_agnostic.test_support.listener_via_expectations as lib
+        from modality_agnostic.test_support.listener_via_expectations import (
+                # for_DEBUGGING,
+                listener_via_emission_receiver)
 
-        # use_listener = lib.for_DEBUGGING (works)
-        use_listener = lib.listener_via_emission_receiver(emissions.append)
+        # use_listener = for_DEBUGGING (works)
+        use_listener = listener_via_emission_receiver(emissions.append)
 
         def store_previous_initially():
             state.store_previous = store_previous_normally

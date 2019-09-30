@@ -2,10 +2,12 @@ from data_pipes_test.common_initial_state import (
         build_end_state_commonly,
         FakeProducerScript,
         markdown_fixture,
-        executable_fixture)
+        executable_fixture,
+        fixture_files_directory)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
+from os import path as os_path
 
 
 class _CommonCase(unittest.TestCase):
@@ -46,15 +48,15 @@ class Case2557_strange_format_adapter_name(_CommonCase):
         self._outputs_no_lines()
 
     def test_150_this_particular_terminal_channel_name(self):
-        self.assertEqual(self._channel_tail_component(), 'format_adapter_not_found')  # noqa: E501
+        self.assertEqual(self._channel_tail_component(), 'unrecognized_format_name')  # noqa: E501
 
     def test_200_says_not_found(self):  # COPY-PASTED
         _ = self._two_sentences()[0]
-        self.assertEqual(_, "no format adapter for 'zig-zag'")
+        self.assertEqual(_, "unrecognized format name 'zig-zag'")
 
     def test_300_says_did_you_mean(self):  # COPY-PASTED
-        _ = self._two_sentences()[1]
-        self.assertRegex(_, r"\bthere's '[a-z_]+' and '")
+        _ = self._two_sentences()[1]  # #here (next line)
+        self.assertRegex(_, r"\bknown format name\(s\): \('[a-z_]+', '")
 
     @shared_subject
     def _two_sentences(self):
@@ -81,15 +83,15 @@ class Case2559_strange_file_extension(_CommonCase):
         self._outputs_no_lines()
 
     def test_150_this_particular_terminal_channel_name(self):
-        self.assertEqual(self._channel_tail_component(), 'file_extension_not_matched')  # noqa: E501
+        self.assertEqual(self._channel_tail_component(), 'unrecognized_extname')  # noqa: E501
 
     def test_200_says_not_found(self):
         _ = self._two_sentences()[0]
-        self.assertEqual(_, "no format adapter that recognizes filename extension for '.zongo'")  # noqa: E501
+        self.assertEqual(_, "unrecognized extension '.zongo'")  # noqa: E501
 
     def test_300_says_did_you_mean(self):
-        _ = self._two_sentences()[1]
-        self.assertRegex(_, r"\bthere's '\*\.[a-z_]+' and '\*\.")
+        _ = self._two_sentences()[1]  # #here (next line)
+        self.assertRegex(_, r"\bknown extension\(s\): \('\.[a-z]+', '")
 
     @shared_subject
     def _two_sentences(self):
@@ -103,33 +105,30 @@ class Case2559_strange_file_extension(_CommonCase):
         yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
+        _near_path = os_path.join(fixture_files_directory(), '080-strange-extension.zongo')  # noqa: E501
         return {
                 'producer_script_path': 'no see 23os093w3hw33',
-                'near_collection': 'ziffy-zaffy.zongo',
+                'near_collection': _near_path,
                 }
 
 
 class Case2660DP_no_functions(_CommonCase):
-    """discussion - the point here (new in #history-A.1) is that whether
-
-    you're posing it as a far collection or near for the synchronization,
-    it uses the same machinery (and language production) to complain about
-    how it's can't do a thing.
-
-    this test is #fragile - it fails to fail when we add features to the f.a
-    """
+    # The point of this case changed once at #history-A.1 and then once again
+    # at #history-A.2. Currently its only purpose is to cover what happens
+    # when the collection implementation doesn't have the requisite [#873.12]
+    # collection capabilities.
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
 
     def test_200_says_not_found(self):
         _ = self._two_sentences()[0]
-        _exp = "the 'json_script' format adapter has no modality functions for 'CLI'"  # noqa: E501
-        self.assertEqual(_, _exp)
+        _rx = r"^the 'rec' format adapter .+ has no modality functions for 'CLI'"  # noqa: E501
+        self.assertRegex(_, _rx)
 
     def test_300_says_did_you_mean(self):
         _ = self._two_sentences()[1]
-        self.assertIn("there's 'modality_agnostic'", _)
+        self.assertIn("there's 'choo_cha_foo_fah'", _)
 
     @shared_subject
     def _two_sentences(self):
@@ -144,9 +143,13 @@ class Case2660DP_no_functions(_CommonCase):
         yield 'error', 'expression', 'as', 'first_error'
 
     def given(self):
+        from kiss_rdb_test.common_initial_state import top_fixture_directories_directory  # noqa: E501
+        _near_path = os_path.join(
+                top_fixture_directories_directory(),
+                '2969-rec', '0100-example-from-documentation.rec')
         return {
                 'producer_script_path': 'no see 32o4iu32boiwr3si',
-                'near_collection': _far_script_exists(),
+                'near_collection': _near_path,
                 }
 
 
@@ -154,16 +157,29 @@ class Case2662DP_near_file_not_found(_CommonCase):
 
     # this is the first code to rustle up a lot of stuff
 
-    def test_100_raises_this_one_exception(self):
-        def f():
-            self._build_end_state()
-        _rx = r"\bNo such file or directory: '.+\bno-such-file\.md'$"
-        self.assertRaisesRegex(FileNotFoundError, _rx, f)
+    def test_100_channel(self):
+        _em = self._emission('first_error')
+        self.assertSequenceEqual(
+                _em.channel[2:],
+                ('collection_not_found', 'no_such_file_or_directory'))
+
+    def test_200_message(self):
+        sct = self._emission('first_error').flush_payloader()
+        self.assertEqual(sct['errno'], 2)
+        self.assertEqual(sct['reason'], 'No such file or directory')
+        self.assertIn('0000-no-such-file', sct['filename'])
+
+    @shared_subject
+    def _end_state(self):
+        return self._build_end_state()
+
+    def expect_emissions(self):
+        yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
         return {
                 'producer_script_path': executable_fixture('exe_110_extra_cel.py'),  # noqa: E501
-                'near_collection': markdown_fixture('0075-no-such-file.md'),
+                'near_collection': markdown_fixture('0000-no-such-file.md'),
                 }
 
 
@@ -304,10 +320,6 @@ def near_keyerer_minimal(key_via_native, schema, listener):
     return near_keyer
 
 
-def _far_script_exists():
-    return executable_fixture('exe_100_bad_natural_key.py')
-
-
 def _same_existent_markdown_file():
     return markdown_fixture('0080-cel-underflow.md')
 
@@ -315,5 +327,6 @@ def _same_existent_markdown_file():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.2
 # #history-A.1
 # #born.

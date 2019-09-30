@@ -37,7 +37,7 @@ class listening:  # (as namespace only)
 
     def message_via_info_emission(shape, info_category, payloader):
         _ = _InfoEmission(shape, info_category, payloader)
-        return _._flush_some_message_()
+        return _.flush_some_message()
 
 
 class _ErrorMonitor:
@@ -78,6 +78,37 @@ class _ErrorMonitor:
 setattr(listening, 'ErrorMonitor', _ErrorMonitor)
 
 
+# == "views" on the emission
+
+def _flush_to_trace_line(em):  # called below, 1x
+
+    def main():
+        _tup = tuple(flush_to_trace_line_pieces())
+        return f'{_tup}\n'
+
+    def flush_to_trace_line_pieces():
+        yield (em.severity, em.shape, * em.channel_tail)  # _to_channel_ ..
+        if 'structure' == em.shape:
+            tups = tuples_when_structure()
+        else:
+            assert('expression' == em.shape)
+            tups = (('paragraph_string', ' '.join(em.flush_payloader())),)
+        for tup in tups:
+            yield tup
+
+    def tuples_when_structure():
+        sct = em.flush_payloader()
+        key = em._message_key_
+        if key in sct:
+            yield (key, sct[key])
+            return
+        yield ('keys', tuple(sct.keys()))
+
+    return main()
+
+
+# ==
+
 class _Emission:
     # experiment: a short-lived & highly stateful auxiliary for assisting in
     # emission reflection. do not pass around as an emission. (call that Event)
@@ -98,52 +129,36 @@ class _Emission:
         _what_kind = self.channel_tail[0].replace('_', ' ')  # "input error"
         return f'{_what_kind}:'
 
+    def flush_some_message(self):
+        if 'structure' == self.shape:
+            return self._flush_to_some_message_when_structure()
+        assert('expression' == self.shape)
+        return ' '.join(self.flush_payloader())
+
     def flush_to_trace_line(self):
-        _tup = tuple(self.__flush_to_trace_line_pieces())
-        return f'{_tup}\n'
+        return _flush_to_trace_line(self)
 
-    def _flush_some_message_(self):
-        _i = ('structure', 'expression').index(self.shape)
-        _m = ('_message_when_structure', '_message_when_expression')[_i]
-        return getattr(self, _m)()
+    def flush_to_raw_lines(self):
+        if 'structure' == self.shape:
+            return (self._flush_to_some_message_when_structure(),)
+        assert('expression' == self.shape)
+        return self.flush_payloader()
 
-    def _message_when_structure(self):
-        sct = self._flush_payloader_()
+    def _flush_to_some_message_when_structure(self):
+        sct = self.flush_payloader()
         key = self._message_key_
         if key in sct:
             return sct[key]
         _these = ', '.join(sct.keys())
         return f"(unknown {key}, keys: ({_these}))"  # key as natural key
 
-    def __flush_to_trace_line_pieces(self):
-        yield (self._severity_, self.shape, * self.channel_tail)  # _to_cha.._
-        _i = ('structure', 'expression').index(self.shape)
-        _m = ('_trace_when_structure', '_trace_when_expression')[_i]
-        for tup in getattr(self, _m)():
-            yield tup
+    def flush_payloader(self):  # near [#511.3] expression with yield
+        return self.release_payloader()()
 
-    def _trace_when_expression(self):
-        yield ('paragraph_string', self._message_when_expression())
-
-    def _message_when_expression(self):
-        pcs = []
-        for line in self._flush_payloader_():
-            pcs.append(line)
-            pcs.append('\n')
-        return ''.join(pcs)
-
-    def _trace_when_structure(self):
-        sct = self._flush_payloader_()
-        key = self._message_key_
-        if key in sct:
-            yield (key, sct[key])
-        else:
-            yield ('keys', tuple(sct.keys()))
-
-    def _flush_payloader_(self):
-        payloader = self._payloader_HOT
+    def release_payloader(self):
+        f = self._payloader_HOT
         del self._payloader_HOT
-        return payloader()  # [#511.3]
+        return f
 
 
 class _ErrorEmission(_Emission):
@@ -154,16 +169,16 @@ class _ErrorEmission(_Emission):
     def __to_pieces(self):
         if self._has_channel_tail_:
             yield self._prefix_via_channel_tail_()
-        yield self._flush_some_message_()
+        yield self.flush_some_message()
 
     _message_key_ = 'reason'
-    _severity_ = 'error'
+    severity = 'error'
 
 
 class _InfoEmission(_Emission):
 
     _message_key_ = 'message'
-    _severity_ = 'info'
+    severity = 'info'
 
 
 class _write_only_IO_proxy:

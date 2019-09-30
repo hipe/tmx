@@ -208,7 +208,7 @@ def _big_index_one():
 @lazy
 def _collection_one():
     _dir = fixture_directory('collection-00500-intro')
-    return kiss_rdber().COLLECTION_VIA_COLLECTION_PATH(_dir)
+    return kiss_rdber().collection_via_collection_path(_dir)
 
 
 if __name__ == '__main__':

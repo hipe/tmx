@@ -108,7 +108,7 @@ def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
     _opened = sync.open_new_lines_via_sync(
             producer_script_path=ps,
             near_collection=_near_collection,
-            near_format='markdown_table',
+            near_format='markdown-table',
             listener=listener)
     f = sout.write
     with _opened as lines:
@@ -179,6 +179,7 @@ if __name__ == '__main__':
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv)
     exit(_exitstatus)
 
+# #pending-rename
 # #history-A.2: move out of scripts directory. no longer an excutable.
 # #history-A.1: (can be temporary) used to use putser_via_IO
 # #history-A.1: big refactor, sunsetted file of origin

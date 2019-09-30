@@ -1,0 +1,45 @@
+# -*- mode: rec -*-
+
+# This example file is from https://www.gnu.org/software/recutils/manual/A-Little-Example.html#A-Little-Example
+# The lines of this comment-block-run, the two blank lines following it, and
+# our annotation line(s) near the end (e.g #birth and #history annotations)
+# have been inserted into the received content; which otherwise appears
+# exactly as-received.
+#
+# The #birth purpose of this file was merely for (Case2660DP) to produce *any*
+# collection implementation that doesn't have the requisite (or any)
+# .[#873.L] "capability functions", so that the story fails as expected.
+# We will perhaps write the case only with stub classes, so that it doesn't
+# not actually parse any of this content (a thing we shouldn't be doing
+# anyway, but we do do for code that serves (Case1403)).
+
+
+%rec: Book
+%mandatory: Title
+%type: Location enum loaned home unknown
+%doc:
++ A book in my personal collection.
+
+Title: GNU Emacs Manual
+Author: Richard M. Stallman
+Publisher: FSF
+Location: home
+
+Title: The Colour of Magic
+Author: Terry Pratchett
+Location: loaned
+
+Title: Mio Cid
+Author: Anonymous
+Location: home
+
+Title: chapters.gnu.org administration guide
+Author: Nacho Gonzalez
+Author: Jose E. Marchesi
+Location: unknown
+
+Title: Yeelong User Manual
+Location: home
+
+# #birth.
+# End of books.rec

@@ -1,18 +1,14 @@
-# #[#874.9] file is LEGACY
+"""LONGWINDED DISCUSSION
 
-from kiss_rdb import (
-        LEGACY_format_adapter_via_definition as _format_adapter)
-
-
-def _new_doc_lines_via_sync(**kwargs):
-    return __do_new_doc_lines_via_sync(**kwargs)
+this module pre-dates the existence of kiss-rdb.
+"""
 
 
-def __do_new_doc_lines_via_sync(
+def __new_doc_lines_via_sync(
         stream_for_sync_is_alphabetized_by_key_for_sync,
         stream_for_sync_via_stream,
         dictionaries,
-        near_collection_reference,
+        near_collection_implementation,
         near_keyerer,
         filesystem_functions,
         listener
@@ -23,9 +19,11 @@ def __do_new_doc_lines_via_sync(
     from .magnetics_.stream_for_sync_via import (
             OPEN_NEAR_SESSION, FAR_STREAM_FOR_SYNC_VIA)
 
+    _near_path = near_collection_implementation.collection_identity.collection_path  # noqa: E501
+
     ns = OPEN_NEAR_SESSION(
             keyerer=near_keyerer,
-            near_collection_path=near_collection_reference.collection_identifier_string,  # noqa: E501
+            near_collection_path=_near_path,
             listener=listener)
 
     if not ns:
@@ -89,29 +87,78 @@ def _liner():
     return _Liner()
 
 
-def _open_traversal_stream(stream_request):
-    return __open_traversal_stream(**stream_request.to_dictionary())
+def _new_doc_lines_via_sync_er(near_collection_implementation):
+
+    def new_doc_lines_via_sync(
+            stream_for_sync_is_alphabetized_by_key_for_sync,
+            stream_for_sync_via_stream,
+            dictionaries,
+            near_keyerer,
+            filesystem_functions,
+            listener):
+
+        return __new_doc_lines_via_sync(
+                stream_for_sync_is_alphabetized_by_key_for_sync,
+                stream_for_sync_via_stream,
+                dictionaries,
+                near_collection_implementation,
+                near_keyerer,
+                filesystem_functions,
+                listener)
+    return new_doc_lines_via_sync
 
 
-def __open_traversal_stream(
-        collection_identifier, cached_document_path,
-        format_adapter,  # not used
+def THING_2(*_):
+    raise Exception('wahoo: _open_traversal_stream')
+
+
+def __open_traversal_stream_AS_CAPABILIY(stream_request):
+    _use_dict = __map_these_args(**stream_request.to_dictionary())
+    return _open_traversal_stream(**_use_dict)
+
+
+def __map_these_args(
+        collection_identifier,
         datastore_resources,  # not used (for now)
         listener):
 
-    assert(not cached_document_path)
-    # markdown tables always live in the filesystem (at writing #history-A.1),
-    # never from (internet) urls so, in this sense they are already "cached"
-    # so they should never be literally cached. All of this is away soon.
+    # (we might do away we "capabilities" alltogether but not yet..)
+    assert(isinstance(collection_identifier, str))  # ..
+
+    return {
+            'collection_path': collection_identifier,  # note name change
+            'listener': listener,
+            }
+
+
+class LightweightCollectionJustForStreaming_:
+
+    COLLECTION_CAPABILITIES = {
+            'CLI': {
+                'new_document_lines_via_sync': _new_doc_lines_via_sync_er,
+                },
+            'modality_agnostic': {
+                'open_traversal_stream': THING_2,
+                },
+            }
+
+    def __init__(self, coll_ID):
+        self.collection_identity = coll_ID
+
+    def OPEN_TRAVERSAL_STREAM__(self, listener):
+        return _open_traversal_stream(
+                self.collection_identity.collection_path, listener)
+
+
+def _open_traversal_stream(collection_path, listener):
 
     from .magnetics_.markdown_table_scanner_via_lines import MarkdownTableScanner  # noqa: E501
 
     class ContextManager:
 
         def __enter__(self):
-            assert(isinstance(collection_identifier, str))  # ..
             if True:
-                lines = open(collection_identifier)
+                lines = open(collection_path)
                 self._exit_me = lines
 
             scn = MarkdownTableScanner(
@@ -184,33 +231,13 @@ class ExpectedTagOrder_:
         return self._stack[-1][0] == tag
 
 
-_functions = {
-        'CLI': {
-            'new_document_lines_via_sync': _new_doc_lines_via_sync,
-            },
-        'modality_agnostic': {
-            'open_traversal_stream': _open_traversal_stream,
-            },
-        }
-
-
 def _empty_context_manager():
     from data_pipes import my_contextlib
     return my_contextlib.empty_iterator_context_manager()
 
 
-# == in oldentimes, this file was __init__.py probably. then, #history-A.2
-s = __name__
-_use_name = s[0:s.rindex('.')]  # like "dirname"
-# ==
-
-
-FORMAT_ADAPTER = _format_adapter(
-        functions_via_modality=_functions,
-        associated_filename_globs=('*.md',),
-        format_adapter_module_name=_use_name,
-        )
-
+# #pending-rename: magnetics_/entities_via_collection.py
+# #history-A.4: no more format adapter
 # #history-A.3: no more sync-side entity mapping
 # #history-A.2
 # #history-A.1: markdown table as producer

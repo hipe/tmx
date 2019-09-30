@@ -1,3 +1,8 @@
+"""
+Lightweight listening testing library.
+(Compare heavier-weight counterpart: [#509].)
+"""
+# :[#507.H]
 # (keeping track of clients for now: kiss_rdb_test)
 
 
@@ -112,9 +117,8 @@ class ExpectEmission:
 
 
 def debugging_listener():
-    from modality_agnostic.test_support import (
-            listener_via_expectations as _)
-    return _.for_DEBUGGING
+    from .listener_via_expectations import for_DEBUGGING
+    return for_DEBUGGING
 
 
 # #history-A.2

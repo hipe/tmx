@@ -172,8 +172,8 @@ class _CLI:
         # coll_path = self.os_path.abspath(coll_path)
 
         # resolve collection
-        from kiss_rdb import COLLECTION_VIA_COLLECTION_PATH
-        coll = COLLECTION_VIA_COLLECTION_PATH(coll_path, listener)
+        from kiss_rdb import collection_via_collection_path
+        coll = collection_via_collection_path(coll_path, listener)
         if coll is None:
             return
 

@@ -11,15 +11,24 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
 def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
-        collection_path,
+        collection_identity,
         random_number_generator,
         filesystem,
         listener):
-    return _resolve_collection_via_file(None, collection_path, listener)
+
+    adapter_variant = collection_identity.adapter_variant
+    if adapter_variant is not None:
+        assert('THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant)
+        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_format_adapter import (  # noqa: E501
+                LightweightCollectionJustForStreaming_)
+        return LightweightCollectionJustForStreaming_(collection_identity)
+
+    return _resolve_collection_via_file(None, collection_identity, listener)
 
 
-def _resolve_collection_via_file(opened, path, listener):  # #testpoint
+def _resolve_collection_via_file(opened, coll_ID, listener):  # #testpoint
 
+    path = coll_ID.collection_path
     if opened is None:
         try:
             opened = open(path)
@@ -29,6 +38,10 @@ def _resolve_collection_via_file(opened, path, listener):  # #testpoint
     if opened is None:
         assert(e)
         return _whine_about_collection_not_found(listener, lambda: str(e))
+
+    if not isinstance(path, str):
+        # (Case2676) ICK/meh - we did a hack to have fake files. undo it now
+        path = path.path
 
     with opened as fh:
         table_blocks = _table_blocks_via_filehandle(fh, path).execute()
@@ -41,7 +54,7 @@ def _resolve_collection_via_file(opened, path, listener):  # #testpoint
     if 1 < num_tables:
         return __whine_about_too_many_tables(listener, table_blocks, path)
 
-    return table_blocks.children[0].flush_to_table_as_collection()
+    return table_blocks.children[0].flush_to_table_as_collection(coll_ID)
 
 
 # == decorators
@@ -98,17 +111,18 @@ class _FrozenTableBlock:
         self._body_lines = lines
         self._schema = schema
 
-    def flush_to_table_as_collection(self):
+    def flush_to_table_as_collection(self, coll_ID):
         s_tup = self._body_lines
         del self._body_lines
-        return _TableAsCollection(s_tup, self._schema)
+        return _TableAsCollection(s_tup, coll_ID, self._schema)
 
 
 class _TableAsCollection:
 
-    def __init__(self, lines, schema):
+    def __init__(self, lines, coll_ID, schema):
         self._implementation = _MutableFreezableCollection(lines, schema)
         self._is_mutable = True
+        self.collection_identity = coll_ID
 
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
         return self._implementation._update_(iden, tup, listener)
@@ -938,6 +952,7 @@ class _table_blocks_via_filehandle:
     # to preserve history, the comment block for this is up at #here5
 
     def __init__(self, fh, path):
+        assert(isinstance(path, str))  # [#022] wish strong types
         self._filehandle = fh
         self._path = path
 
@@ -1221,6 +1236,7 @@ class _TableBlocks:
 
 class _LocationInFile:
     def __init__(self, lineno, path):
+        assert(isinstance(path, str))  # [#022] strong type
         self.lineno = lineno
         self.path = path
 

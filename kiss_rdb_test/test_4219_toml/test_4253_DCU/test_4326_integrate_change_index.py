@@ -1,4 +1,5 @@
 from kiss_rdb_test.common_initial_state import (
+        StubCollectionIdentity,
         functions_for,
         unindent_with_dot_hack,
         unindent as _unindent)
@@ -707,8 +708,9 @@ def _build_collection_expecting_common_number_of_rewrites():
 
 
 def _build_collection(dir_path, **injections):
+    collection_identity = StubCollectionIdentity(dir_path)
     return _subject_module().collection_via_directory_and_schema(
-            collection_directory_path=dir_path,
+            collection_identity=collection_identity,
             collection_schema=_always_same_schema(),
             **injections)
 

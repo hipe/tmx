@@ -74,12 +74,6 @@ def _item_via_collision(far_key, far_s, near_key, near_s):
     return near_s.upper()
 
 
-def collection_reference_via_(collection_identifier, listener):
-    from data_pipes import common_producer_script
-    _ = common_producer_script.common_CLI_library()
-    return _.collection_reference_via_(collection_identifier, listener)
-
-
 def _same_listener():
     from modality_agnostic import listening
     return listening.throwing_listener

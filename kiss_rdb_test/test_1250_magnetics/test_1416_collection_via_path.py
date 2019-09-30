@@ -85,7 +85,7 @@ class _CommonCase(unittest.TestCase):
 
     def build_end_state(self):
         def run(listener):
-            return _collectioner().COLLECTION_VIA_PATH_AND_INJECTIONS(
+            return _collectioner().collection_via_path_and_injections_(
                     collection_path=path, filesystem=fs, listener=listener)
         fs = self.given_fake_filesystem()
 

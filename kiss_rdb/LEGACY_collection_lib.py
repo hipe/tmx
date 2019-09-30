@@ -143,8 +143,8 @@ def _procure_when_no_splay(
     natural_key = needle_function  # ..
     x = collection_implementation.retrieve_entity_as_storage_adapter_collection(natural_key)  # noqa: E501 ..
     if x is None:
-        raise Exception('cover me')  # [#876] cover me
-        _when_not_found(needle_function, ui_tuple)
+        raise Exception('cover me')  # [#876] (next line worked once0
+        return _when_not_found(needle_function, ui_tuple)
     return (natural_key, x)
 
 
@@ -309,7 +309,10 @@ class __collection_implementation_via_object:  # 1x
     # (got rid of `get` (soft dereference) at #history-A.4)
 
     def retrieve_entity_as_storage_adapter_collection(self, natural_key):  # ..
-        return getattr(self._object, natural_key)  # ..
+        if hasattr(self._object, natural_key):
+            return getattr(self._object, natural_key)
+        else:
+            raise Exception('cover me')  # [#876]
 
 
 class collection_implementation_via_pairs_cached:
@@ -620,7 +623,7 @@ ellipsis_join = _ellipsis_join
 # we want the doctest tests to read as if it's an "ordinary" function.
 
 
-# #pending-rename: `collection_via`
+# #pending-rename: magnetics/via_collection.py
 # #history-A.4
 # #history-A.3 (as referenced)
 # #history-A.2

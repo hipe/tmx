@@ -13,7 +13,7 @@ several different *separate* responsibilities:
 class collection_via_directory_and_schema:
 
     def __init__(
-            self, collection_directory_path, collection_schema,
+            self, collection_identity, collection_schema,
             random_number_generator=None,
             filesystem=None):
 
@@ -24,8 +24,9 @@ class collection_via_directory_and_schema:
             self._filesystem = filesystem
 
         self._schema_pather = collection_schema.build_pather_(
-                collection_directory_path)
+                collection_identity.collection_path)
 
+        self.collection_identity = collection_identity
         self._schema = collection_schema
 
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):

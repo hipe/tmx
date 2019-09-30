@@ -91,10 +91,12 @@ class Case1855DP_hello(_CommonCase):
         entity_dcts = []
         emissions = []
 
-        import modality_agnostic.test_support.listener_via_expectations as lib
+        from modality_agnostic.test_support.listener_via_expectations import (
+                # for_DEBUGGING,
+                listener_via_emission_receiver)
 
-        # listener = lib.for_DEBUGGING (works)
-        listener = lib.listener_via_emission_receiver(emissions.append)
+        # listener = for_DEBUGGING (works)
+        listener = listener_via_emission_receiver(emissions.append)
 
         _ = _subject_module().open_traversal_stream(
                 listener=listener,

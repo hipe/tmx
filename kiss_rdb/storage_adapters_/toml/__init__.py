@@ -5,7 +5,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 def RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(
         schema_file_scanner,
-        collection_path,
+        collection_identity,
         random_number_generator,
         filesystem,
         listener,
@@ -19,7 +19,7 @@ def RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(
             collection_via_directory_and_schema)
 
     return collection_via_directory_and_schema(
-            collection_directory_path=collection_path,
+            collection_identity=collection_identity,
             collection_schema=schema,
             random_number_generator=random_number_generator,
             filesystem=filesystem)

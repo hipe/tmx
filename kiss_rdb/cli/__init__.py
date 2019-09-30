@@ -35,8 +35,9 @@ class _CommonFunctions:
             import os.path as os_path
             coll_path = os_path.join(s, collection_argument)
 
-        from kiss_rdb import collection_via_path_
-        return collection_via_path_(coll_path, listener, **injections)
+        from kiss_rdb import collection_via_collection_path
+        return collection_via_collection_path(
+                coll_path, listener, **injections)
 
     def build_monitor(self):
         return _Monitor(

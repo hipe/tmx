@@ -201,11 +201,11 @@ class Case3067DP_FA_help_screen(_CommonCase):
     def test_100_succeeds(self):
         self._CLI_client_results_in_success_exitstatus()
 
-    def test_200_stdout_lines_look_like_items__at_least_two(self):
+    def test_200_stdout_lines_look_like_items__at_least_one(self):
         import re
         rx = re.compile(r'^ +[_a-z]+ \(\*\.[a-z]{2,3}\)$')  # ..
         s_a = self._end_state().first_section('stdout').lines
-        self.assertGreaterEqual(len(s_a), 2)
+        self.assertGreaterEqual(len(s_a), 1)
         for s in s_a:
             self.assertRegex(s, rx)
 
@@ -242,11 +242,11 @@ class Case3069_strange_format_adapter_name(_CommonCase):
 
     def test_200_says_not_found(self):
         _ = self._two_sentences()[0]
-        self.assertEqual(_, "no format adapter for 'zig-zag'")
+        self.assertEqual(_, "unrecognized format name 'zig-zag'")
 
     def test_300_says_did_you_mean(self):
         _ = self._two_sentences()[1]
-        self.assertRegex(_, r"\bthere's '[a-z_]+' and '")
+        self.assertRegex(_, r"\bknown format name\(s\): \('[a-z]+', '[a-z]+'")
 
     @shared_subject
     def _two_sentences(self):
