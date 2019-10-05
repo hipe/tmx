@@ -130,14 +130,13 @@ class Case1749DP_generate(_CommonCase):
 
     @shared_subject
     def _lines(self):
-        from modality_agnostic import listening
-        listener = listening.throwing_listener
-
         _d_a = _these_dictionaries()
-        from data_pipes import common_producer_script as mod
-        _ = mod.LEGACY_markdown_lib()
-        _lines = _._raw_lines_via_collection_identifier(_d_a, listener)
-        return tuple(x for x in _lines)
+
+        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            _lines_via_traversal_stream)
+
+        _lines = _lines_via_traversal_stream(iter(_d_a))
+        return tuple(_lines)
 
 
 @lazy

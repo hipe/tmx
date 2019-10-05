@@ -19,7 +19,7 @@ def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
     adapter_variant = collection_identity.adapter_variant
     if adapter_variant is not None:
         assert('THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant)
-        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_format_adapter import (  # noqa: E501
+        from kiss_rdb.storage_adapters_.markdown_table.magnetics_.entities_via_collection import (  # noqa: E501
                 LightweightCollectionJustForStreaming_)
         return LightweightCollectionJustForStreaming_(collection_identity)
 
@@ -788,8 +788,8 @@ def _entity_from_these_two(identi_cel, asts):
 
 def _stateful_grammar_via(schema):
 
-    from kiss_rdb.magnetics_.string_scanner_via_definition import (
-            Scanner,
+    from kiss_rdb.magnetics.string_scanner_via_string import (
+            StringScanner,
             pattern_via_description_and_regex_string as o)
 
     pipe = o('pipe', r'\|')
@@ -891,7 +891,7 @@ def _stateful_grammar_via(schema):
                 def raising_listener(*args):
                     listener(*args)
                     raise _Stop
-                scn = Scanner(line, raising_listener)
+                scn = StringScanner(line, raising_listener)
                 try:
                     for tup in asts_via_scanner(scn):
                         yield tup

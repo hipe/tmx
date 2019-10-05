@@ -1,62 +1,10 @@
 """experiment.."""
 # #[#874.8] file generates mardown the old way and may need to be the new way
-# #[#874.5] file used to be executable script and may need further changes
 # #[#874.9] file is LEGACY
 
 
-def _run_CLI(sin, sout, serr, argv):
+def _lines_via_traversal_stream(dcts):
 
-    from script_lib.magnetics import (
-            common_upstream_argument_parser_via_everything)
-
-    _exitstatus = common_upstream_argument_parser_via_everything(
-            CLI_function=_CLI_body,
-            std_tuple=(sin, sout, serr, argv),
-            argument_moniker='<script>',
-            ).execute()
-    return _exitstatus
-
-
-def _CLI_body(arg, prog, sout, serr):
-
-    from script_lib.magnetics import listener_via_stderr
-    listener = listener_via_stderr(serr)
-
-    _coll_id = collection_identifier_via_parsed_arg_(arg)
-
-    line_itr = _raw_lines_via_collection_identifier(_coll_id, listener)
-    if line_itr is None:
-        return 5
-
-    for line_body in line_itr:
-        sout.write(line_body)
-        sout.write('\n')
-
-    return 0
-
-
-_CLI_body.__doc__ = __doc__
-
-
-def _raw_lines_via_collection_identifier(coll_id, listener):  # #testpoint
-
-    from kiss_rdb.cli.LEGACY_stream import collection_reference_via_ as _
-    coll_ref = _(coll_id, listener)
-
-    if coll_ref is None:
-        return
-
-    _ = coll_ref.open_traversal_stream(
-            cached_document_path=None,  # no
-            datastore_resources=None,
-            listener=listener)
-
-    return __traverse_raw_lines_via_traversal_stream(_)
-
-
-def __traverse_raw_lines_via_traversal_stream(opened):
-
-    with opened as dcts:
         branch_dct = next(dcts)
         assert(branch_dct['_is_branch_node'])
 
@@ -149,8 +97,7 @@ def simplified_key_via_markdown_link_er():  # #html2markdown
     import re
     markdown_link_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
 
-    from kiss_rdb.LEGACY_normal_field_name_via_string import (
-            normal_field_name_via_string as normal_via_str)
+    from kiss_rdb import normal_field_name_via_string as normal_via_str
 
     return simplified_key_via_markdown_link
 
@@ -207,16 +154,11 @@ def collection_identifier_via_parsed_arg_(arg):
 def __collection_identifier_via_stdin(stdin):
     import json
     _itr = (json.loads(s) for s in stdin)
-    from data_pipes import my_contextlib as _
-    return _.context_manager_via_iterator__(_itr)
+    from data_pipes import ThePassThruContextManager
+    return ThePassThruContextManager(_itr)
 
 
-if __name__ == '__main__':
-    import sys as o
-    o.path[0] = ''
-    _exitstatus = _run_CLI(o.stdin, o.stdout, o.stderr, o.argv)
-    exit(_exitstatus)
-
+# #history-A.3: no more executable script
 # #history-A.2: no more sync-side entity-mapping
 # #history-A.1: MD table generation overhaul & becomes library when gets covg
 # #born.

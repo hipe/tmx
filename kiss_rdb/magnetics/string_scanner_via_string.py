@@ -1,7 +1,7 @@
 import re
 
 
-class Scanner:  # #[#008.4] a scanner
+class StringScanner:  # #[#008.4] a scanner
     """many others like it, but this one is ours
 
     attempts to wrap up higher-level behavior we always end up wanting
@@ -179,6 +179,5 @@ class pattern_via_description_and_regex_string:
         self.description = desc
         self.regex = re.compile(rx_string, *flags)
 
-# #pending-rename: move this to that one place
 # #history-A.1
 # #born.

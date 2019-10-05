@@ -623,7 +623,6 @@ ellipsis_join = _ellipsis_join
 # we want the doctest tests to read as if it's an "ordinary" function.
 
 
-# #pending-rename: magnetics/via_collection.py
 # #history-A.4
 # #history-A.3 (as referenced)
 # #history-A.2

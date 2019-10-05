@@ -47,8 +47,7 @@ def __producer_script_via_producer_script_path(producer_script_path):
 
 def _exit_code_via_producer_script(ps):
     _my_CLI = __CLI_function_via_producer_script(ps)
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
+    from script_lib.cheap_arg_parse import cheap_arg_parse
     import sys as o
     return cheap_arg_parse(
         CLI_function=_my_CLI,
@@ -153,7 +152,10 @@ def _this_typical_humkey_via_td():
         url = a_tag['href']
         # ..
         return markdown_link_via(_string_via_el(a_tag), url)
-    markdown_link_via = _md_lib().markdown_link_via
+
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            markdown_link_via)
+
     return f
 
 
@@ -165,11 +167,6 @@ def _string_via_el(el):  # td.text() would be same, but this gives sanity
 def _filter(sel, el):
     import soupsieve as sv
     return sv.filter(sel, el)
-
-
-def _md_lib():
-    from data_pipes import common_producer_script as mod
-    return mod.LEGACY_markdown_lib()
 
 
 def _top_html_lib():

@@ -22,10 +22,9 @@ class attribute_name_functions_:
 
 def _build_name_gist_via_name():
 
-    from kiss_rdb.magnetics_.string_scanner_via_definition import (
-            Scanner,
-            pattern_via_description_and_regex_string as o,
-            )
+    from kiss_rdb.magnetics.string_scanner_via_string import (
+            StringScanner,
+            pattern_via_description_and_regex_string as o)
 
     # define some reflexive regexes
 
@@ -44,7 +43,7 @@ def _build_name_gist_via_name():
     def name_gist_via_name(attr_name_string, listener):
         # (before #history-A.1, this was how _AttributeName was built
 
-        scn = Scanner(attr_name_string, listener)
+        scn = StringScanner(attr_name_string, listener)
         pieces = []
         while True:
             s = scn.scan_required(all_LC_or_UC)
@@ -370,7 +369,7 @@ class _multi_line_attribute_block_via:  # ..
     def to_line_stream(self):
         return self._lines
 
-    is_attribute_block = True  # (Case6075)
+    is_attribute_block = True  # (Case6258)
 
 
 class _MultiLineAttributeBlock:

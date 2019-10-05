@@ -340,6 +340,5 @@ def _rotbuf_lib():
             rotating_buffer_via_positional_functions as lib)
     return lib
 
-# #pending-rename: to we don't know what
 # #history-A.1: introduce word wrap
 # #born.

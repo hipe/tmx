@@ -203,7 +203,7 @@ class Case3067DP_FA_help_screen(_CommonCase):
 
     def test_200_stdout_lines_look_like_items__at_least_one(self):
         import re
-        rx = re.compile(r'^ +[_a-z]+ \(\*\.[a-z]{2,3}\)$')  # ..
+        rx = re.compile(r'^ +[_a-z]+ \([^(]+\)$')  # ..
         s_a = self._end_state().first_section('stdout').lines
         self.assertGreaterEqual(len(s_a), 1)
         for s in s_a:

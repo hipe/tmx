@@ -152,20 +152,6 @@ class Case1432_succeed(_CommonCase):
         return _collection_C()
 
 
-class Case1434_ASSORTED_STOWAWAYS(_CommonCase):  # [#874.6] stowaway about refl
-
-    def test_100_SNEAK_IN_TEST_ABOUT_REFLECTION(self):
-        count = 0
-        import kiss_rdb.LEGACY_format_adapter_collection as lib
-        for mod in lib.EVERY_MODULE():
-            fa = mod.FORMAT_ADAPTER
-            if fa is not None:
-                # make some contact with the format adapter. OK if None.
-                mod.FORMAT_ADAPTER.associated_filename_globs
-                count += 1
-        self.assertNotEqual(0, count)
-
-
 @lazy
 def _collection_C():
     x = 'no see'
@@ -202,12 +188,11 @@ def _collection_via_pairs(pairs):
 
 @lazy
 def _subject_module():
-    import kiss_rdb.LEGACY_collection_lib as x
+    import kiss_rdb.magnetics.via_collection as x
     return x
 
 
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: make this match the asset (`via_collection`) mebbe
 # #born.

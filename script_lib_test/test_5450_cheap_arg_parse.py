@@ -433,8 +433,7 @@ def parse_lib():
 
 
 def subject_module():
-    from script_lib.magnetics import (
-            argument_parser_index_via_stderr_and_command_stream as mod)
+    from script_lib import cheap_arg_parse as mod
     return mod
 
 

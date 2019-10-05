@@ -88,43 +88,24 @@ some figure 1 work we would have to do that is not yet implemented.)
 .:[#457.A]
 """
 
-from kiss_rdb import (
-        LEGACY_format_adapter_via_definition as format_adapter_via_definition)
-from os import path as os_path
-import re
 
-
-def _dicty(f):  # #decorator
-    def use_f(request):
-        return f(** request.to_dictionary())
-    return use_f
-
-
-@_dicty
-def PRODUCER_SCRIPT_VIA(
-        cached_document_path,
-        collection_identifier,
-        datastore_resources,
-        format_adapter,
-        listener):
-    return _module_via(collection_identifier, listener)
-
-
-@_dicty
-def _open_filter_or_traversal_stream(
-            cached_document_path,
-            collection_identifier,
-            datastore_resources,
-            format_adapter,
-            listener):
-
-    mod = _module_via(collection_identifier, listener)
+def OHAI(collection_identity, random_number_generator, filesystem, listener):
+    mod = producer_script_module_via_path(
+            collection_identity.collection_path, listener)
     if mod is None:
         return
-    return mod.open_traversal_stream(listener, cached_document_path)
+    return _CollectionImplementation(mod)
 
 
-def _module_via(collection_identifier, listener):
+class _CollectionImplementation:
+    def __init__(self, mod):
+        self.PRODUCER_SCRIPT_MODULE = mod
+
+
+def producer_script_module_via_path(script_path, listener):
+
+    from os import path as os_path
+    import re
 
     def main():
         path_stem = path_stem_via_path()
@@ -190,7 +171,7 @@ def _module_via(collection_identifier, listener):
         (this is a sanity check only while provision #here1 holds)
         """
 
-        stem, ext = os_path.splitext(collection_identifier)
+        stem, ext = os_path.splitext(script_path)
         assert('.py' == ext)  # else the #here1 provision may have changed..
         return stem
 
@@ -200,36 +181,5 @@ def _module_via(collection_identifier, listener):
     return main()
 
 
-def _native_item_normalizer(dct):
-    # (Case1320DP)
-    return dct  # provision [#458.E.2] dictionary is the standard item
-
-
-def _value_readers_via_field_names(*names):  # (Case2662DP)
-    def reader_for(name):
-        def read(normal_dict):
-            return normal_dict[name]
-        return read
-    return [reader_for(name) for name in names]
-
-
-# --
-
-_functions = {
-        'modality_agnostic': {
-            'PRODUCER_SCRIPT_VIA': PRODUCER_SCRIPT_VIA,
-            'open_filter_stream': _open_filter_or_traversal_stream,
-            'open_traversal_stream': _open_filter_or_traversal_stream,
-            }
-        }
-
-FORMAT_ADAPTER = format_adapter_via_definition(
-        functions_via_modality=_functions,
-        native_item_normalizer=_native_item_normalizer,
-        value_readers_via_field_names=_value_readers_via_field_names,
-        associated_filename_globs=('*.py',),  # :+#here1
-        format_adapter_module_name=__name__,
-        )
-
-# #pending-rename: producer script (maybe)
+# #history-A.1: storage adapter not format adapter
 # #born.

@@ -23,7 +23,6 @@ your result; but in fact we do something simpler.
 
 from data_pipes.magnetics import (
         synchronized_stream_via_far_stream_and_near_stream as _top_sync)
-from data_pipes import pop_property
 from modality_agnostic import streamlib
 import contextlib
 
@@ -284,6 +283,12 @@ class _Newstream_via:
             orig_listener(typ, *a)
         self._OK = True
         return f
+
+
+def pop_property(obj, attr):
+    x = getattr(obj, attr)
+    delattr(obj, attr)
+    return x
 
 
 def cover_me(s):  # #open [#876] cover me

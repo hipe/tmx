@@ -17,10 +17,6 @@ migrate real doc fragments to eno
 have full on eno
 flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
-[#874.6] away this stowaway test and arch for data pipes format collection
 [#874.5] scripts that used to be executable either move under proj/cli or etc
 [#874.8] multiple scripts that generated markdown. change them to be the new way
-[#874.7] non-CLI should not load CLI to use this
-the script that was once called "stream" done or absorbed
-destroy existng sync architecture to be some new way
 pass-thru translation integrated into CLI for create collection (CSV to MD)

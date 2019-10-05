@@ -64,14 +64,14 @@ class _Collection:  # #tespoint
                 s_a.append(f"('{adapter_variant}' variant)")
             return ' '.join(s_a)
 
-        from kiss_rdb.LEGACY_collection_lib import DIGGY_DIG
+        from kiss_rdb.magnetics.via_collection import DIGGY_DIG
         funcer = DIGGY_DIG(impl, use_dig_path(),  say_collection, listener)
         if funcer is None:
             return
         return funcer(impl)
 
     @property
-    def YIKES__(self):  # track where we do this bad thing
+    def COLLECTION_IMPLEMENTATION(self):  # track where we do this bad thing
         return self._impl
 
 
@@ -376,6 +376,15 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
                     raise Exception(_say_extname_collision(en, dct[en], key))
                 dct[en] = key
         self._key_via_extname = dct
+
+    def DO_SPLAY_OF_STORAGE_ADAPTERS(self):
+        def build_dereferencer(key):  # (Case3067DP)
+            def f():
+                return self._dereference(key)
+            return f
+
+        for key in self._reference_via_key:
+            yield (key, build_dereferencer(key))
 
     def _dereference(self, key):
         ref = self._reference_via_key[key]

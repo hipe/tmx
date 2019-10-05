@@ -9,8 +9,8 @@ seems almost certain that we can future-fit the below implementation while
 preserving this "block scanner"-style interface for our one client.
 """
 
-from kiss_rdb.magnetics_.string_scanner_via_definition import (
-        Scanner,
+from kiss_rdb.magnetics.string_scanner_via_string import (
+        StringScanner,
         pattern_via_description_and_regex_string as o)
 
 
@@ -116,7 +116,7 @@ def _field_via_line(line, parse_state, listener):
 
     # we black-box reverse-engineer a TINY part of recfiles
 
-    scn = Scanner(line, use_listener)
+    scn = StringScanner(line, use_listener)
 
     field_name = scn.scan_required(_field_name)
     if field_name is None:

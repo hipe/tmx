@@ -1,4 +1,4 @@
-from script_lib.magnetics.ellipsified_string_via import (
+from script_lib.magnetics.via_words import (
         fixed_shape_word_wrapperer as word_wrapperer)
 
 

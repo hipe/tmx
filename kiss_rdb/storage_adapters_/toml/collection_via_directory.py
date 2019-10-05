@@ -56,7 +56,7 @@ class collection_via_directory_and_schema:
         with self._open_locked_mutable_indexy_file() as indexy_file:
 
             if indexy_file.is_of_single_file_schema:  # as #here5
-                locked_file = _PassthruContextManager(indexy_file.handle)
+                locked_file = _pass_thru_context_manager(indexy_file.handle)
             else:
                 locked_file = self._open_locked_mutable_entities_file(path)
 
@@ -123,7 +123,7 @@ class collection_via_directory_and_schema:
             mde = _create_MDE_via_ID_and_request(
                     id_s, cuds_request, self, listener)
             if mde is None:
-                return  # (Case6067) (CLI) #here6
+                return  # (Case6250) (CLI) #here6
 
             # from the identifier derive the entities path
 
@@ -145,7 +145,7 @@ class collection_via_directory_and_schema:
                 # file below. here we "back hack" it so the 2nd lock session
                 # below can remain unaware of this. :#here5
 
-                locked_file = _PassthruContextManager(indexy_file.handle)
+                locked_file = _pass_thru_context_manager(indexy_file.handle)
                 yes_do_cleanup = False
 
             elif os_path.exists(path):  # :#here3
@@ -261,19 +261,7 @@ class collection_via_directory_and_schema:
         return lib.DEFAULT_BUSINESS_SCHEMA
 
 
-class _PassthruContextManager:
-
-    def __init__(self, x):
-        self._mixed = x
-
-    def __enter__(self):
-        return self._mixed
-
-    def __exit__(self, *_3):
-        return False
-
 # ==
-
 
 def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
 
@@ -441,7 +429,7 @@ def _create_MDE_via_ID_and_request(identifier_string, req, coll, listener):
     _ok = req.mutate_created_document_entity__(mde, _business_schema, listener)
 
     if not _ok:
-        return  # (Case6067) (CLI) #here6
+        return  # (Case6250) (CLI) #here6
 
     return mde  # (Case4302)
 
@@ -510,6 +498,13 @@ def _whine_about_no_path(pieces, iden, verb):
         reason = f"cannot {verb} '{iden.to_string()}' because {reason}"
 
     return {'reason': reason}
+
+
+# ==
+
+def _pass_thru_context_manager(x):
+    from data_pipes import ThePassThruContextManager
+    return ThePassThruContextManager(x)
 
 
 def cover_me(msg=None):  # #open [#876] cover me

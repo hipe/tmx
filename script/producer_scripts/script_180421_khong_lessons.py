@@ -29,11 +29,14 @@ _use_key = 'href'  # internally (in function) which component to use for ID
 
 
 def stream_for_sync_via_stream(dcts):
-    o = _md_lib()
-    markdown_link_via = o.markdown_link_via
-    url_via_href = o.url_via_href_via_domain(_domain)
-    label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
+
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            markdown_link_via,
+            url_via_href_via_domain as url_via_href,
+            label_via_string_via_max_width)
+
+    label_via_string = label_via_string_via_max_width(70)
+
     for dct in dcts:
         if _use_key not in dct:
             assert('header_content' in dct)
@@ -272,11 +275,6 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-def _md_lib():
-    from data_pipes import common_producer_script as mod
-    return mod.LEGACY_markdown_lib()
-
-
 def _ps_lib():
     import data_pipes.format_adapters.html.script_common as x
     return x
@@ -288,8 +286,7 @@ def cover_me(s):
 
 if __name__ == '__main__':
     import sys as o
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
+    from script_lib.cheap_arg_parse import cheap_arg_parse
     exit(cheap_arg_parse(
             CLI_function=_my_CLI,
             stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,

@@ -6,7 +6,7 @@ out into a tower of abstracted segments as needed.
 
 three-laws compliant, but all coverage is from (Case001SA).
 """
-# #open :[#607.G] chop this whole fille
+# #open :[#607.G] sunset this module
 
 
 class common_upstream_argument_parser_via_everything:

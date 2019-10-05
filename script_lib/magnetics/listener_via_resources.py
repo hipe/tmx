@@ -50,8 +50,7 @@ def help_lines(program_name, desc_lineser, opts, args):
         for row in rows:
             opt_rows.append(row)
 
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-        FormalOption_)
+    from script_lib.cheap_arg_parse import FormalOption_
 
     _help_option = FormalOption_('-h', ('help', None), ('show this screen',))
     for opt in opts:

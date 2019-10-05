@@ -160,8 +160,7 @@ class Case2019DP_omg_syncing(ProducerCaseMethods, _CommonCase):
     def producer_script(self):
         from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
                 markdown_link_via, simple_key_via_normal_key)
-        from kiss_rdb.LEGACY_normal_field_name_via_string import (
-                normal_field_name_via_string)
+        from kiss_rdb import normal_field_name_via_string
 
         def stream_for_sync_via_stream(dcts):
             for dct in dcts:

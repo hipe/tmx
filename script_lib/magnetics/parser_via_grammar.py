@@ -11,7 +11,7 @@ class parser_via_grammar_and_symbol_table:
     def __init__(self, tokens, symbol_table):
         self._digraph, self._sequence_grammar = _build_digraph(tokens)
 
-        from kiss_rdb.LEGACY_collection_lib import (
+        from kiss_rdb.magnetics.via_collection import (
                 CACHING_COLLECTION_VIA_COLLECTION,
                 collection_via_DICTIONARY_OF_DEREFERENCERS)
 

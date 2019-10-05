@@ -52,7 +52,7 @@ def pretend_file_via_path_and_big_string(path, big_string):
     return PretendFile(unindent(big_string), path)
 
 
-class PretendFile:
+class PretendFile:  # (LIKE [#510.12] pass-thru etc but plus a `path` param)
 
     def __init__(self, lines, path):
         self._lines = lines

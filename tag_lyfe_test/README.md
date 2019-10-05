@@ -1,14 +1,10 @@
-# this one order
+# so..
 
-  - 100's  private models
-  - 200's  private magnetics
-  - 300's  public models
-  - 400's  public magnetics
-  - 500's  integration: API endpoints
-  - 600's  integration: CLI
+(deleted unused fixture files at #history-A.1)
 
 
 
 
 ## (document-meta)
+  - #history-A.1
   - #born.

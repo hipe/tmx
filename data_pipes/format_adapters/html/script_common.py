@@ -8,7 +8,6 @@ so:
 
 NOTE - this is NOT yet useful as a standalone CLI script..
 """
-# #[#874.5] file used to be executable script and may need further changes
 
 
 """
@@ -22,37 +21,6 @@ def _required(self, s, x):
         self._become_not_OK()
     else:
         setattr(self, s, x)
-
-
-def common_CLI_for_json_stream_(  # via abstraction at #history-A.3
-        traversal_function,
-        doc_string,
-        description_template_valueser=None,
-        ):
-
-    raise Exception('not used, but..')  # possible future home of [#607.4]
-
-    def my_CLI(error_monitor, sin, sout, serr, IS_FOR_SYNC):
-        _rc = traversal_function(None, listener=error_monitor.listener)
-        with _rc as itr:
-                flush_JSON_stream_into(sout, serr, itr)
-        return 0 if error_monitor.ok else 456
-
-    my_CLI.__doc__ = doc_string
-
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
-    import sys as o
-    _exitstatus = cheap_arg_parse(
-        CLI_function=my_CLI,
-        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-        formal_parameters=(
-            ('-s', '--for-sync', 'COMING SOON'),
-            ),
-        description_template_valueser=description_template_valueser,
-        )
-
-    return _exitstatus
 
 
 def flush_JSON_stream_into(sout, serr, itr):
@@ -75,14 +43,11 @@ def the_function_called_markdown_link_via():
 
 
 def the_function_called_normal_field_name_via_string():
-    # #open [#459.Q] assess the placement of the below file
-    from kiss_rdb.LEGACY_normal_field_name_via_string import (
-            normal_field_name_via_string)
+    from kiss_rdb import normal_field_name_via_string
     return normal_field_name_via_string
 
 
 def the_function_called_simple_key_via_normal_key():
-    # #open [#459.Q] assess the placement of the below file (again)
     from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
             simple_key_via_normal_key)
     return simple_key_via_normal_key
@@ -197,25 +162,10 @@ def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
     return _(filesystem_path, url, 'HTML', listener)
 
 
-class _this_lazy:  # [#510.4] experiment (copy-paste)
-
-    def __init__(self, f):
-        self._is_first_call = True
-        self._function = f
-
-    def __call__(self, *a):
-        if self._is_first_call:
-            self._is_first_call = False
-            f = self._function
-            del self._function
-            import data_pipes as top_mod
-            self._use_function = getattr(top_mod, f.__name__)
-        return self._use_function(*a)
-
-
-@_this_lazy
-def pop_property(o, s):
-    pass
+def pop_property(obj, attr):
+    x = getattr(obj, attr)
+    delattr(obj, attr)
+    return x
 
 # --
 

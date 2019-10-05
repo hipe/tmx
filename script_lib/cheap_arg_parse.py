@@ -146,7 +146,7 @@ def _express_parameter_error(state, error_case, structurer):
     yield f"parameter error: {' '.join(mutable_words)}"
 
     if token_pos is not None:
-        from kiss_rdb.magnetics_.string_scanner_via_definition import (
+        from kiss_rdb.magnetics.string_scanner_via_string import (
                 two_lines_of_ascii_art_via_position_and_line)
         for s in two_lines_of_ascii_art_via_position_and_line(token_pos, tok):
             yield s
@@ -846,7 +846,7 @@ def _ap_lib():
 
 
 def _parse_lib():
-    from . import parser_via_grammar as parse_lib
+    from .magnetics import parser_via_grammar as parse_lib
     return parse_lib
 
 
@@ -877,7 +877,6 @@ _exe = Exception
 _DASH_DASH = '--'
 _NEWLINE = '\n'
 
-# #pending-rename: to "cheap arg parse" or something
 # #history-A.4: help & initial integration
 # #history-A.3: begin parser-generator-backed rewrite of "cheap arg parse"
 # #history-A.2: MASSIVE exodus

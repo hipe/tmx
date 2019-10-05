@@ -2,11 +2,9 @@ from data_pipes_test.common_initial_state import (
         build_end_state_commonly,
         markdown_fixture,
         executable_fixture)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.memoization import dangerous_memoize as shared_subject
 from modality_agnostic.test_support.structured_emission import (
-        minimal_listener_spy)
+        listener_and_emission_objecter_for)
 import unittest
 
 
@@ -22,46 +20,84 @@ class _CommonCase(unittest.TestCase):
         return self._end_state().actual_emission_index.actual_emission_via_name(name)  # noqa: E501
 
     def _fail_against(self, s):
-
-        msgs, listener = minimal_listener_spy()
-
-        _cr = _build_collection_reference(s)
-
-        ps = _cr.TO_PRODUCER_SCRIPT(listener)
-        assert(not ps)
+        listener, emissioner = listener_and_emission_objecter_for(self)
+        coll = _build_collection(s, _yes_cheat, listener)
+        assert(coll is None)
+        em = emissioner()
+        msgs = em.to_raw_lines()
         msg, = msgs  # assertion
         return msg
 
     _build_end_state = build_end_state_commonly
 
 
-class Case1312_producer_script_via_path(_CommonCase):
+class Case1302_this_path_fails_because_absolute_path_too_crazy(_CommonCase):
 
-    def test_010_format_adapter_loads(self):
-        self.assertIsNotNone(_subject_format_adapter())
-
-    def test_100_collection_reference_builds(self):
-        _cr = _build_collection_reference('//Any-PATH at all 100.xx')
-        self.assertIsNotNone(_cr)
-
-    def test_210_this_one_file_fails_because_absolute_path_too_crazy(self):
+    def test_100_fails(self):
         _msg = self._fail_against('/egads/ohai.py')
         self.assertRegex(_msg, r'\babsolute path outside of ecosystem\b')
 
-    def test_220_this_one_file_fails_because_invalid_chars_in_name(self):
+
+class Case1305_this_one_file_fails_because_invalid_chars_in_name(_CommonCase):
+
+    def test_100_fails(self):
         _path = executable_fixture('no-ent.py')
         _msg = self._fail_against(_path)
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
-    def test_500_RUMSKALLA(self):
+
+class Case1308_here_is_a_low_level_doo_hah(_CommonCase):
+    # at #history-A.2 imported this from a whole other dedicated file
+
+    def test_100_runs(self):
+        self.assertIsNotNone(self._state())
+
+    def test_200_skipped_the_header_record(self):
+        _ = [pair[0] for pair in self._state()]
+        self.assertEqual(_, ['four', 'seven'])
+
+    @shared_subject
+    def _state(self):
+        flat = []
+
+        listener = None  # or throwing listener
+        _path = executable_fixture('exe_130_edit_add.py')
+
+        from data_pipes.format_adapters.producer_script import (
+                producer_script_module_via_path)
+
+        ps = producer_script_module_via_path(_path, listener)
+
+        def recv_far_stream(normal_far_st):
+            _one = next(normal_far_st)
+            flat.append(_one)
+            _two = next(normal_far_st)
+            flat.append(_two)
+            for no_see in normal_far_st:
+                raise Exception('no')
+
+        assert(ps.stream_for_sync_is_alphabetized_by_key_for_sync)
+
+        with ps.open_traversal_stream(listener) as dcts:
+            recv_far_stream(ps.stream_for_sync_via_stream(dcts))
+
+        return flat
+
+
+class Case1311_RUMSKALLA:
+
+    def test_100_rumspringa(self):
         _path = _chimi_churri_far_path()
-        _cref = _build_collection_reference(_path)
+
         # from script_lib import filesystem_functions as rsx
 
-        listener = None
-        ps = _cref.TO_PRODUCER_SCRIPT(listener)
+        _coll = _build_collection(_path, _no_cheat)
+
+        ps = _coll.COLLECTION_IMPLEMENTATION.PRODUCER_SCRIPT_MODULE
 
         self.assertTrue(ps.stream_for_sync_is_alphabetized_by_key_for_sync)
+
+        listener = None
 
         with ps.open_traversal_stream(listener) as dcts:
             dcts = tuple(dcts)  # see it all now
@@ -190,18 +226,19 @@ def _same_near_collection():
     return markdown_fixture('0080-cel-underflow.md')
 
 
-def _build_collection_reference(string):
-    return _subject_format_adapter().FORMAT_ADAPTER.collection_reference_via_string(string)  # noqa: E501
+def _build_collection(path, yes_no, listener=None):
+    _kwargs = {'format_name': 'producer-script'} if yes_no else {}
+    from kiss_rdb import collection_via_collection_path
+    return collection_via_collection_path(path, listener, **_kwargs)
 
 
-@lazy
-def _subject_format_adapter():
-    import data_pipes.format_adapters.json_script as x
-    return x
+_yes_cheat = True
+_no_cheat = False
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.2 turned tests to cases, absorbed another file
 # #history-A.1
 # #born.

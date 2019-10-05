@@ -174,8 +174,8 @@ def __yikes_sort(raw_order):
 
 
 def _not_OK_when_CM_expected():
-    from data_pipes import my_contextlib
-    return my_contextlib.not_OK_context_manager()
+    from data_pipes import The_Not_OK_Context_Manager
+    return The_Not_OK_Context_Manager()
 
 
 def cover_me(msg):  # #open [#876] cover me

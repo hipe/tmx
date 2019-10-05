@@ -5,9 +5,10 @@ we use for coarse, line-based parsing of toml files.
 it is a near-exact adaptation of [#863]
 """
 
-from kiss_rdb.magnetics_ import (
-        string_scanner_via_definition as scn_lib,
-        state_machine_via_definition as sm_lib)
+from kiss_rdb.magnetics_.state_machine_via_definition import StateMachine
+from kiss_rdb.magnetics.string_scanner_via_string import (
+        StringScanner,
+        pattern_via_description_and_regex_string)
 
 
 def table_start_line_stream_via_file_lines_(file_lines, listener):
@@ -247,7 +248,7 @@ def _name_components_via_line(line, listener):
         ["foo", "bar", "baz123"]
     """
 
-    scn = scn_lib.Scanner(line, listener)
+    scn = StringScanner(line, listener)
 
     if not scn.skip_required(_open_brace):
         return
@@ -272,7 +273,7 @@ def _name_components_via_line(line, listener):
     return name_components
 
 
-o = scn_lib.pattern_via_description_and_regex_string
+o = pattern_via_description_and_regex_string
 _open_brace = o('open brace ("[")', r'\[')
 _loosey_goosey_identifier = o('identifier ([a-zA-Z0-9]+)', r'[a-zA-Z0-9]+')
 _dot = o('dot (".")', r'\.')
@@ -416,7 +417,7 @@ def _define_state_machine(funcs):  # interface here is VERY experimental!
             }
 
 
-state_machine_ = sm_lib.StateMachine(_define_state_machine)
+state_machine_ = StateMachine(_define_state_machine)
 
 
 # ==

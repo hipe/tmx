@@ -90,22 +90,22 @@ def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
     from script_lib.magnetics import listener_via_stderr
     listener = listener_via_stderr(serr)
 
-    from data_pipes import common_producer_script as mod
-    _ = mod.LEGACY_markdown_lib().collection_identifier_via_parsed_arg_
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            collection_identifier_via_parsed_arg_ as _)
 
     far_collection = _(parsed_arg)
 
     _near_collection = _these()
 
-    from data_pipes import common_producer_script as mod
-    sync = mod.TEMPORARY_LEGACY_USE_OF_SYNC_LIB()
+    from data_pipes.cli.sync import open_new_lines_via_sync
+    # #open [#874.8] this is a dirty reach but it should go away with this issu
 
     if isinstance(far_collection, str):  # [#873.I] ick/meh
         ps = far_collection
     else:
         ps = _CustomProducerScript(far_collection)
 
-    _opened = sync.open_new_lines_via_sync(
+    _opened = open_new_lines_via_sync(
             producer_script_path=ps,
             near_collection=_near_collection,
             near_format='markdown-table',
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv)
     exit(_exitstatus)
 
-# #pending-rename
+# #pending-rename waiting for [#874.8] generate markdown
 # #history-A.2: move out of scripts directory. no longer an excutable.
 # #history-A.1: (can be temporary) used to use putser_via_IO
 # #history-A.1: big refactor, sunsetted file of origin

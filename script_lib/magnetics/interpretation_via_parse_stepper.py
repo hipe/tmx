@@ -85,11 +85,11 @@ class interpretationer_via_resources:
         rsx = self._resources
         del self._resources
 
+        from script_lib.cheap_arg_parse import argument_parser_index_via
         from script_lib.magnetics import (
-            parse_stepper_via_argument_parser_index,
-            argument_parser_index_via_stderr_and_command_stream as argparse_lib)  # noqa: E501
+            parse_stepper_via_argument_parser_index)
 
-        ap_idx = argparse_lib.argument_parser_index_via(
+        ap_idx = argument_parser_index_via(
                 stderr=rsx.stderr,
                 description_string=desc,
                 command_stream=command_stream,

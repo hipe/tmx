@@ -83,8 +83,8 @@ def _SIMPLE_STEP(
 
     """#NOT_COVERED experiment (at #history-A.2)"""
 
+    from script_lib import cheap_arg_parse as argparse_lib
     from script_lib.magnetics import (
-            argument_parser_index_via_stderr_and_command_stream as argparse_lib,  # noqa: E501
             deque_via_ARGV as argv_stream_f,
             resources_via_ARGV_stream_and_stderr_and_stdout as rsx_f)
     from modality_agnostic.magnetics import (

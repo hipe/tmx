@@ -1,6 +1,17 @@
-"""LONGWINDED DISCUSSION
+"""
+A defining principle of this format adapter (like many) is that it should
+be "streaming" and not a "memory hog" (don't read every entity into memory).
 
-this module pre-dates the existence of kiss-rdb.
+"kiss-rdb" was frontiered to make a toml storage adapter, but to establish
+a test case canon, we frontiered an even easier, better known format:
+markdown tables. Towards this objective we rewrote a quick-and-dirty,
+single-file format adapte for markdown tables meant only to satisfy the
+creation of the canon.
+
+So there are *two* DNA strains of markdown table format adapeter, and this
+is the older one. Maybe one day we will unify the whole stack.
+
+:[#873.N]:
 """
 
 
@@ -16,7 +27,7 @@ def __new_doc_lines_via_sync(
 
     # #provision [#458.L.2] iterate empty on failure
 
-    from .magnetics_.stream_for_sync_via import (
+    from .stream_for_sync_via import (
             OPEN_NEAR_SESSION, FAR_STREAM_FOR_SYNC_VIA)
 
     _near_path = near_collection_implementation.collection_identity.collection_path  # noqa: E501
@@ -39,7 +50,7 @@ def __new_doc_lines_via_sync(
 
     def open_out(near):
         _tagged_line_items = near.release_tagged_doc_line_item_stream()
-        from .magnetics_.synchronized_stream_via_far_stream_and_near_stream import (  # noqa: E501
+        from .synchronized_stream_via_far_stream_and_near_stream import (  # noqa: E501
                 OPEN_NEWSTREAM_VIA)
         return OPEN_NEWSTREAM_VIA(
                 normal_far_stream=far,
@@ -152,7 +163,7 @@ class LightweightCollectionJustForStreaming_:
 
 def _open_traversal_stream(collection_path, listener):
 
-    from .magnetics_.markdown_table_scanner_via_lines import MarkdownTableScanner  # noqa: E501
+    from .markdown_table_scanner_via_lines import MarkdownTableScanner  # noqa: E501
 
     class ContextManager:
 
@@ -232,11 +243,10 @@ class ExpectedTagOrder_:
 
 
 def _empty_context_manager():
-    from data_pipes import my_contextlib
-    return my_contextlib.empty_iterator_context_manager()
+    from data_pipes import TheEmptyIteratorContextManager
+    return TheEmptyIteratorContextManager()
 
 
-# #pending-rename: magnetics_/entities_via_collection.py
 # #history-A.4: no more format adapter
 # #history-A.3: no more sync-side entity mapping
 # #history-A.2

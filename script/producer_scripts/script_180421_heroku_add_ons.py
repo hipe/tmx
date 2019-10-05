@@ -65,8 +65,7 @@ def _ps_lib():
 
 if __name__ == '__main__':
     import sys as o
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
+    from script_lib.cheap_arg_parse import cheap_arg_parse
     exit(cheap_arg_parse(
             CLI_function=_my_CLI,
             stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,

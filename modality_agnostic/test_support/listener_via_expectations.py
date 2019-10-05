@@ -31,7 +31,7 @@ def for_DEBUGGING(*a):
 
 def listener_via_emission_receiver(receive_emission):  # :[#509.2]
     def listener(*args):
-        receive_emission(_ActualEmission(args))
+        receive_emission(ActualEmission_(args))
     return listener
 
 
@@ -47,7 +47,7 @@ class expecter_via_expected_emissions:
     def listener(self, *args):
         """NOTE - you won't typically call this directly"""
 
-        ae = _ActualEmission(args)
+        ae = ActualEmission_(args)
         if self._some_emission_models_remain():
             self.__when_expecting_emission(ae)
             return
@@ -102,7 +102,7 @@ class _ActualEmissionIndex:
         return self.actual_emissions[_offset]
 
 
-class _ActualEmission:
+class ActualEmission_:
 
     def __init__(self, args):
         self.channel = args[:-1]

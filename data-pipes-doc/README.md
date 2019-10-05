@@ -12,9 +12,8 @@ date: 2019-07-09T10:20:00-04:00
 |                  [#476]   | #open | catch-all to track every `cover_me`
 |                  [#472]   |       | multi-tablism ..
 |                  [#463]   |       | functional pipelines (2 files)
-|                  [#459.Q] | #open | sign-off on placement of some resources
 |                  [#459.P] | #open | tmpfile is hardcoded
-|                  [#459.O] | #trak | the empty context manager
+|                  [#459.O] | #hole |
 |                  [#459.N] | #open | producer scripts shouldn't have knowledge of near format
 |                  [#459.M] | #open | dashes to underscores is getting annoying
 |                  [#459.L] | #wish | we want regex escape

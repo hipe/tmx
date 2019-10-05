@@ -27,7 +27,7 @@ class ProducerCaseMethods:
 
     def build_YIKES_SYNC_(self):
 
-        _producer_script = PS_via(self.producer_script())
+        _producer_script = PS_path_or_PS_via(self.producer_script())
         _near_coll_id = self.near_collection_identifier()
         _listener = self.use_listener()
 
@@ -44,24 +44,23 @@ class ProducerCaseMethods:
 
     def build_pair_list_for_inspect_(self):
 
-        _cdp = self.cached_document_path()
-        _ps = PS_via(self.producer_script())
-        _listener = self.use_listener()
-        _ = _this_stream_lib()._traversal_stream_for_sync(
-                cached_document_path=_cdp,
-                collection_identifier=_ps,
-                listener=_listener)
-        return tuple(_)
+        ps = PS_via_mixed(self.producer_script())
+        cached_doc_path = self.cached_document_path()
+        listener = self.use_listener()
+        if isinstance(cached_doc_path, tuple):
+            opened = _pass_thru_context_manager(cached_doc_path)  # (Case2016)
+        else:
+            opened = ps.open_traversal_stream(listener, cached_doc_path)
+        with opened as dcts:
+            _pairs = ps.stream_for_sync_via_stream(dcts)
+            return tuple(_pairs)
 
     def build_dictionaries_tuple_from_traversal_(self):
 
-        _cdp = self.cached_document_path()
-        _ps = PS_via(self.producer_script())
-        _listener = self.use_listener()
-        _ = _this_stream_lib().open_traversal_stream_TEMPORARY_LOCATION(
-                cached_document_path=_cdp,
-                collection_identifier=_ps,
-                listener=_listener)
+        ps = PS_via_mixed(self.producer_script())
+        cached_doc_path = self.cached_document_path()
+        listener = self.use_listener()
+        _ = ps.open_traversal_stream(listener, cached_doc_path)
         with _ as dcts:
             return tuple(dcts)  # (much simplified at #history-A.2)
 
@@ -78,7 +77,15 @@ class ProducerCaseMethods:
         return for_DEBUGGING
 
 
-def PS_via(mixed):
+def PS_via_mixed(mixed):
+    if isinstance(mixed, str):
+        from data_pipes.format_adapters.producer_script import (
+                producer_script_module_via_path)
+        return producer_script_module_via_path(mixed, None)
+    return FakeProducerScript(**mixed)
+
+
+def PS_path_or_PS_via(mixed):
     if isinstance(mixed, str):
         return mixed
     return FakeProducerScript(**mixed)
@@ -102,22 +109,9 @@ class FakeProducerScript:
     def open_traversal_stream(self, listener, cached_document_path):
         x = self._dictionaries
         del self._dictionaries
-        return _AbsractMe(x)
+        return _pass_thru_context_manager(x)
 
     HELLO_I_AM_A_PRODUCER_SCRIPT = None
-
-
-class _AbsractMe:
-    def __init__(self, x):
-        self._value = x
-
-    def __enter__(self):
-        x = self._value
-        del self._value
-        return x
-
-    def __exit__(self, *_3):
-        return False
 
 
 class _EndState:
@@ -148,9 +142,9 @@ def _top_test_dir():
     return os_path.dirname(__file__)
 
 
-def _this_stream_lib():
-    from data_pipes import common_producer_script
-    return common_producer_script.common_CLI_library()
+def _pass_thru_context_manager(x):
+    from data_pipes import ThePassThruContextManager
+    return ThePassThruContextManager(x)
 
 
 def cover_me(s=None):

@@ -18,6 +18,16 @@ def one_and_none(tc, run):
     return ee.channel, ee.payloader
 
 
+def listener_and_emission_objecter_for(tc):
+    listener, emissioner = listener_and_emissioner_for(tc)
+
+    def emission_objecter():
+        chan, payloader = emissioner()
+        from .listener_via_expectations import ActualEmission_
+        return ActualEmission_((*chan, payloader))
+    return listener, emission_objecter
+
+
 def listener_and_emissioner_for(tc):
     def emissioner():
         ee.ran()

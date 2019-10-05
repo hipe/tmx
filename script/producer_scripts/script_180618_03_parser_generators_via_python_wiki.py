@@ -66,11 +66,11 @@ def open_traversal_stream(listener, html_document_path=None):
 
 def _this_more_complicated_string_via_td():
 
-    o = _md_lib()
-    markdown_link_via = o.markdown_link_via
-    url_via_href = o.url_via_href_via_domain(_domain)
-    # label_via_string = o.label_via_string_via_max_width(70)
-    del(o)
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+            markdown_link_via,
+            url_via_href_via_domain)
+
+    url_via_href = url_via_href_via_domain(_domain)
 
     def f(td):
         _p, = _filter('p', td)
@@ -103,11 +103,6 @@ def _filter(sel, el):
     return sv.filter(sel, el)
 
 
-def _md_lib():
-    from data_pipes import common_producer_script as mod
-    return mod.LEGACY_markdown_lib()
-
-
 def _ps_lib():
     import data_pipes.format_adapters.html.script_common as lib
     return lib
@@ -115,8 +110,7 @@ def _ps_lib():
 
 if __name__ == '__main__':
     import sys as o
-    from script_lib.magnetics.argument_parser_index_via_stderr_and_command_stream import (  # noqa: E501
-            cheap_arg_parse)
+    from script_lib.cheap_arg_parse import cheap_arg_parse
     exit(cheap_arg_parse(
             CLI_function=_my_CLI,
             stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,

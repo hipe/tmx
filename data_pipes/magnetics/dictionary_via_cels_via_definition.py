@@ -16,7 +16,6 @@ generically this whole mess of fields and their directives is specified
 under the "special field instructions".)
 """
 
-from data_pipes import pop_property
 import sys
 
 
@@ -30,8 +29,7 @@ def dictionary_via_cels_via_definition(
     specials = (special_field_instructions or ())
     default_tup = ('string_via_cel', string_via_cel)
 
-    from kiss_rdb.LEGACY_normal_field_name_via_string import (
-            normal_field_name_via_string)
+    from kiss_rdb import normal_field_name_via_string
 
     def formal_via(unsanitized_far_field_name):
         far_k = normal_field_name_via_string(unsanitized_far_field_name)
@@ -186,7 +184,9 @@ class _RowManifold:
         _fm.WRITE_VALUES_NOW(self._dict, cel)
 
     def release_dictionary(self):
-        return pop_property(self, '_dict')
+        x = self._dict
+        del self._dict
+        return x
 
 
 sys.modules[__name__] = dictionary_via_cels_via_definition

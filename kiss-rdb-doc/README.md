@@ -31,17 +31,17 @@ woah boy.
 |[#880-899]                 |       | narrow allocation for "pho" for now
 |[#876]                     | #open | catch-all to track every `cover_me`
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
-|[#874.9]                   |       | files marked with "LEGACY"
 |[#874.8]                   |       | multiple scripts that generated markown. change them to be the new way
-|[#874.7]                   |       | non-CLI should not load CLI to use this
-|[#874.6]                   |       | away this test, arch for data pipes
-|[#874.5]                   |       | scripts that USED TO be executable
+|[#874.7]                   | #hole |
+|[#874.6]                   | #hole |
+|[#874.5]                   | #open | files that used to be executable scripts and should no longer be
 |[#874.4]                   |       | multi-tablism
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
+|[#873.M]                   |       | integrating external format adapters (storage adapters)
 |[#873.12]                  |       | #experimental. we may remove this API point. capability functions
-|[#873.K]                   | #open | sunset or dissolve LEGACY_stream module
 |[#873.J]                   | #open | debugging `print` statements for kiss-rdb commit
 |[#873.I]                   | #trak | ugly
 |[#873.H]                   | #wish | customizable functional pipelines (map, filter in any order etc)
@@ -50,7 +50,7 @@ woah boy.
 |[#873.D]                   | #trak | spots to change if we add this feature (see)
 |[#873.C]                   | #wish | a `--oneline` option for CLI
 |[#873.B]                   | #wish | this one smell in emissions
-|[#873.A]                   | #hole |
+|[#873.A]                   | #open | modernize the CLI of this hidden exe
 |[#873]                     |       | internal tracking (extended)
 |[#872.B]                   | #edit | edit documentation
 |[#872]                     |       | multi-line strings: the document

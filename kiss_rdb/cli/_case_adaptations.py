@@ -147,7 +147,7 @@ def __pieces_for_first_line(slots):
         if y():
             yield ': '
         yield slots['B']
-        y.clear()  # (Case6067)
+        y.clear()  # (Case6258)
 
     if slots.slot_is_occupied('C'):
         if y():
@@ -162,7 +162,7 @@ def __pieces_for_first_line(slots):
         yield o.filename_or_path
 
     if slots.do_use_final_period:
-        yield '.'  # (Case6067) (again)
+        yield '.'  # (Case6258) (again)
 
 
 # each expresser function will register under its identifier (integer)
@@ -228,13 +228,12 @@ def _pathish_stuff(slots, dim_pool):
 
 @_define(_context_for_parse_error)
 def _context_for_parse_error(slots, dim_pool):
-    slots.did_express_path_on_multi_lines = True  # (Case5918)
+    slots.did_express_path_on_multi_lines = True  # (Case6248)
     _ = tuple(__lines_for_context_for_parse_error(dim_pool))
     slots.occupy_slot('multiple_lines', _)
 
 
 def __lines_for_context_for_parse_error(dim_pool):
-
     # we fold "filename" in because even though it is not used as part of
     # parse error context metadata, its surface format is the same
 
@@ -245,7 +244,7 @@ def __lines_for_context_for_parse_error(dim_pool):
     lineno = o('lineno', None)
     position = o('position')
     # --
-    from kiss_rdb.magnetics_.string_scanner_via_definition import (
+    from kiss_rdb.magnetics.string_scanner_via_string import (
             two_lines_of_ascii_art_via_position_and_line)
     _2 = tuple(two_lines_of_ascii_art_via_position_and_line(position, line))
 
@@ -253,7 +252,7 @@ def __lines_for_context_for_parse_error(dim_pool):
         num_as_s = ' '
         spacer = ''
     else:
-        num_as_s = f'{lineno}:'
+        num_as_s = f'{lineno}:'  # (Case6248)
         spacer = ' ' * len(num_as_s)
 
     if path is not None:

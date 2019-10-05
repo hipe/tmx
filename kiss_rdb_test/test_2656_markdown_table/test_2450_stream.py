@@ -32,16 +32,13 @@ class _CommonCase(unittest.TestCase):
         if coll is None:
             return (), None  # (Case2449DP)
 
-        cm = coll.YIKES__.OPEN_TRAVERSAL_STREAM__(listener)
+        cm = coll.COLLECTION_IMPLEMENTATION.OPEN_TRAVERSAL_STREAM__(listener)
         with cm as dcts:
             business_objects = tuple(dcts)
         return business_objects
 
 
 class Case2449DP_fail(_CommonCase):
-
-    def test_100_loads(self):
-        self.assertIsNotNone(_subject_module())
 
     def test_200_fails(self):
         (chan, payloader), = self._state().emissions
@@ -87,11 +84,6 @@ class _State:
 
 def _failey_listener(*a):
     raise Exception('expecting no emissions')
-
-
-def _subject_module():
-    import kiss_rdb.cli.LEGACY_stream as mod
-    return mod
 
 
 if __name__ == '__main__':

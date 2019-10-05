@@ -83,8 +83,8 @@ def __open_upstream_path_challenge_mode(x):
         else:
             yes = False
     if yes:
-        from data_pipes import my_contextlib as my_clib
-        return my_clib.context_manager_via_iterator__(x)
+        from data_pipes import ThePassThruContextManager
+        return ThePassThruContextManager(x)
     else:
         raise Exception(f'can we keep this simple? had {type(x)}')
 

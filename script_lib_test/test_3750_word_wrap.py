@@ -8,7 +8,7 @@ class _CommonCase(unittest.TestCase):
     def build_result_lines(self):
         given = _Given()
         self.given(given.initialize)
-        from script_lib.magnetics.ellipsified_string_via import (
+        from script_lib.magnetics.via_words import (
                 fixed_shape_word_wrapperer as word_wrapperer)
         ww = word_wrapperer(
                 row_max_widths=given.row_max_widths,

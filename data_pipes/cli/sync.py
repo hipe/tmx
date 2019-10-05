@@ -12,11 +12,12 @@ this will express an error and halt further processing.
 # NOTE some of the content of the above text is covered by (Case3066)
 # [#447] describes the above algorithm more formally
 
-
-from data_pipes import common_producer_script
-cli_lib = common_producer_script.common_CLI_library()
-biz_lib = cli_lib
-
+from . import (
+        parse_args_,
+        try_help_,
+        maybe_express_help_for_format,
+        must_be_interactive_,
+        listener_for_)
 
 _desc = __doc__
 
@@ -28,7 +29,7 @@ def _my_parameters(o, param):
             )
 
     o['near_format'] = param(
-            description=biz_lib.try_help_('«the near_format»'),
+            description=try_help_('«the near_format»'),
             argument_arity='OPTIONAL_FIELD',
             )
 
@@ -45,9 +46,10 @@ def _my_parameters(o, param):
             )
 
 
-def _pop_property(self, prop):
-    from data_pipes import pop_property
-    return pop_property(self, prop)
+def _pop_property(obj, attr):
+    x = getattr(obj, attr)
+    delattr(obj, attr)
+    return x
 
 
 class _CLI:  # #open [#607.4] de-customize this custom CLI
@@ -59,13 +61,12 @@ class _CLI:  # #open [#607.4] de-customize this custom CLI
         self.OK = True
 
     def execute(self):
-        cl = cli_lib
-        cl.must_be_interactive_(self)
-        self.OK and cl.parse_args_(self, '_namespace', _my_parameters, _desc)
+        must_be_interactive_(self)
+        self.OK and parse_args_(self, '_namespace', _my_parameters, _desc)
         self.OK and self.__init_normal_args_via_namespace()
-        self.OK and biz_lib.maybe_express_help_for_format(
+        self.OK and maybe_express_help_for_format(
                 self, self._normal_args['near_format'])
-        self.OK and setattr(self, '_listener', cl.listener_for_(self))
+        self.OK and setattr(self, '_listener', listener_for_(self))
         self.OK and self.__call_over_the_wall()
         return self._pop_property('exitstatus')
 
@@ -147,8 +148,11 @@ def open_new_lines_via_sync(  # #testpoint
         # #open [#873.K] after you load markdown tables the new way,
         # load the producer script the new way too, then get rid of this file
 
-        from kiss_rdb.cli.LEGACY_stream import module_via_path
-        ps = module_via_path(producer_script_path, listener)
+        from data_pipes.format_adapters.producer_script import (
+                producer_script_module_via_path)
+
+        ps = producer_script_module_via_path(
+                producer_script_path, listener)
 
         if ps is None:
             return _empty_context_manager()
@@ -251,12 +255,9 @@ class _LineConsumer_via_STDOUT:
         return False
 
 
-class _empty_context_manager:  # :[#459.O] the empty context manager
-    def __enter__(self):
-        return ()
-
-    def __exit__(self, *_3):
-        return False
+def _empty_context_manager():
+    from data_pipes import TheEmptyIteratorContextManager
+    return TheEmptyIteratorContextManager()
 
 
 def cli_for_production():

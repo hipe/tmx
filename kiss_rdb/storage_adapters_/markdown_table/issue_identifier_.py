@@ -2,7 +2,7 @@
 
 
 def build_parser(but_wrong):
-    from kiss_rdb.magnetics_.string_scanner_via_definition import (
+    from kiss_rdb.magnetics.string_scanner_via_string import (
             pattern_via_description_and_regex_string as o)
 
     if but_wrong:

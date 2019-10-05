@@ -16,7 +16,41 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
     might_debug = False
 
 
-class Case6067_modality_specific_whiner(_CommonCase):
+class Case6248_schema_parse_error(_CommonCase):
+
+    def test_100_fails(self):
+        self.assertEqual(self.end_state().exit_code, 400)
+
+    def test_200_expresses(self):
+        # == BEGIN normalize a long path into a short path
+        from os import path as os_path
+        lines = list(self.end_state().lines)  # ..
+        line = lines[1]
+        head, tail = line.split(' ', 1)
+        tail = os_path.basename(tail)
+        lines[1] = ' '.join((head, tail))
+        # == END
+
+        _expected = tuple(unindent('''
+        input error: expecting colon
+        in schema.rec
+          3:    xx yy zz
+                 --^
+        '''))
+        self.assertSequenceEqual(lines, _expected)
+
+    @shared_subject
+    def end_state(self):
+        return self.build_end_state('stderr',  None)
+
+    def given_args(self):
+        return (*common_args_head(), 'traverse', '040-schema-parse-error')
+
+    def filesystem(self):
+        return None  # use real filesystem
+
+
+class Case6250_modality_specific_whiner(_CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
         self.expect_exit_code_for_bad_request()
@@ -54,7 +88,7 @@ class Case6067_modality_specific_whiner(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(0)  # ..
 
 
-class Case6075_multi_line_create(_CommonCase):
+class Case6258_multi_line_create(_CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -65,8 +99,6 @@ class Case6075_multi_line_create(_CommonCase):
         self.assertIsNone(line2)
 
     def test_300_outputs_created(self):
-        from script_lib.test_support import unindent
-
         _actual = self.common_entity_screen().stdout_lines
 
         _expected = tuple(unindent('''
@@ -102,6 +134,11 @@ class Case6075_multi_line_create(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(2)
 
 
+def unindent(big_s):
+    from script_lib.test_support import unindent
+    return unindent(big_s)
+
+
 common_args_head = functions_for('toml').common_args_head
 
 
@@ -111,6 +148,4 @@ _common_collection = '050-rumspringa'
 if __name__ == '__main__':
     unittest.main()
 
-
-# #pending-rename: decide later the defining doo-hah of this file
 # #born.

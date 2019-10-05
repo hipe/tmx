@@ -15,7 +15,7 @@ class MarkdownTableScanner:
     def __init__(self, lines, do_parse_example_row, listener):
         # (Case2451), (Case3306DP)
 
-        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_format_adapter import (  # noqa: E501
+        from kiss_rdb.storage_adapters_.markdown_table.magnetics_.entities_via_collection import (  # noqa: E501
                 ExpectedTagOrder_)
         self._ETO = ExpectedTagOrder_()
 
@@ -144,8 +144,8 @@ def __whine_about_no_whatever(dct, listener):
 
     # (may have lost coverage at [#707.J])
 
-    import script_lib.magnetics.ellipsified_string_via as _
-    ellipsis_join = _.complicated_join
+    from script_lib.magnetics.via_words import (
+            complicated_join as ellipsis_join)
 
     def msg_f():
         yield "your example row needs at least one cel with a hashtag in it."

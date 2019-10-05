@@ -37,8 +37,9 @@ class Case2435_camel_case(_CommonCase):
     _this = _split_like_so
 
     def _go_subject(self, big_s):
-        _f = _stowaway_subject_module()._split_on_camel_case
-        return tuple(s for s in _f(big_s))
+        from kiss_rdb import _memoized
+        f = _memoized.namer.split_on_camel_case
+        return tuple(s for s in f(big_s))
 
 
 class Case2436_normalize_freeform_strings(_CommonCase):  # #midpoint
@@ -69,12 +70,8 @@ class Case2437_encap_is_required(_CommonCase):
 
 
 def _stowaway_subject_function():
-    return _stowaway_subject_module().normal_field_name_via_string
-
-
-def _stowaway_subject_module():
-    import kiss_rdb.LEGACY_normal_field_name_via_string as mod
-    return mod
+    from kiss_rdb import normal_field_name_via_string
+    return normal_field_name_via_string
 
 
 def _subject_module():

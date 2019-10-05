@@ -3,13 +3,13 @@
 
 # == decorators
 
-def lazy_experiment(attr_name, build):  # [#510.6]
+def lazy_reader(attr_name, build):  # [#510.6]
     def decorator(f):
-        return _do_lazy_experiment(f, attr_name, build)
+        return _do_lazy_reader(f, attr_name, build)
     return decorator
 
 
-def _do_lazy_experiment(f, attr_name, build):
+def _do_lazy_reader(f, attr_name, build):
     def use_f(self):
         if hasattr(self, attr_name):
             return getattr(self, attr_name)
@@ -33,16 +33,61 @@ def collection_via_collection_path(
         format_name=None,
         **injections):
 
-    return _memoized._collectioner.collection_via_path_and_injections_(
+    return _memoized.collectioner.collection_via_path_and_injections_(
             collection_path=collection_path,
             adapter_variant=adapter_variant, format_name=format_name,
             listener=listener, **injections)
 
 
+def normal_field_name_via_string(big_s):
+    return _memoized.namer(big_s)
+
+
+class _NormalFieldNameViaString:
+    """produce a "normal field name" from any string (maybe)
+
+    Our working definition of "normal field name" is a string name that
+    consists of only lowercase alpha and the underscore (and maybe some
+    integers somewhere).
+    """
+    # moved here from elsewhere #history-A.5
+
+    def __init__(self):
+        import re
+        self.camelcase_rx = re.compile('(?<=[a-z])(?=[A-Z])')
+        self.lowlevel_blacklist_rx = re.compile('[^-a-zA-Z0-9_ \t]+')
+        self.whitespace_rx = re.compile(r'[- \t]+')
+
+    def __call__(self, big_s):
+        _sanitized_s = self.lowlevel_blacklist_rx.sub('', big_s)
+        _ = self.split_on_everything(_sanitized_s)
+        return '_'.join(s.lower() for s in _)
+
+    def split_on_everything(self, big_s):
+        for mid_s in self.split_on_camel_case(big_s):
+            for s in self.split_on_whitespace(mid_s):
+                yield s
+
+    def split_on_camel_case(self, s):  # #testpoint
+        offset = 0
+        for md in self.camelcase_rx.finditer(s):  # ruby has to be better at s
+            offset_ = md.start()
+            yield s[offset:offset_]
+            offset = offset_
+        yield s[offset:]
+
+    def split_on_whitespace(self, s):
+        return self.whitespace_rx.split(s)
+
+
 # == access memoized things
 
+def SPLAY_OF_STORAGE_ADAPTERS():
+    return _memoized.collectioner.DO_SPLAY_OF_STORAGE_ADAPTERS()
+
+
 def real_filesystem_read_only_():
-    return _memoized._real_filesystem_read_only
+    return _memoized.real_filesystem_read_only
 
 
 # == define memoized things
@@ -67,17 +112,22 @@ def _build_real_filesystem():
 class _Memoized:
 
     @property
-    @lazy_experiment('_thing', _build_collectioner)
-    def _collectioner(self):
+    @lazy_reader('_collectioner', _build_collectioner)
+    def collectioner(self):
         pass
 
     @property
-    @lazy_experiment('_real_filesystem', _build_real_filesystem)
-    def _real_filesystem_read_only(self):
+    @lazy_reader('_namer', _NormalFieldNameViaString)
+    def namer(self):
+        pass
+
+    @property
+    @lazy_reader('_real_filesystem_read_ony', _build_real_filesystem)
+    def real_filesystem_read_only(self):
         pass
 
 
-_memoized = _Memoized()
+_memoized = _Memoized()  # #testpoint
 
 
 # == internal, related to modality adaptation
@@ -113,6 +163,7 @@ def dictionary_dumper_as_JSON_via_output_stream(fp):  # (Case6080)
 
 # ==
 
+# #history-A.5
 # #history-A.4 lose error monitor
 # #history-A.3 lose throwing listener
 # #history-A.2 modality adaptation injections moved to here

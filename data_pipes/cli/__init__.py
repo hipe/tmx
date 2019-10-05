@@ -1,173 +1,11 @@
-"""simply traverse ("dump") the whole collection by expressing each item in
-
-the lingua franca format: the simple JSON object.
-
-possibly useful for piping the collection stream to another process,
-or for debugging collections for example in syncing.
-"""
-# NOTE above is expressed in helpscreen :[#415]
-# #[#874.5] file used to be executable script and may need further changes
-# #[#874.9] file is "LEGACY"
-
-from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
-
-_is_entrypoint_file = __name__ == '__main__'
-
-
-def _my_parameters(o, param):
-
-    __common_parameters_from_the_script_called_stream(o, param)
-
-    def dsc_for_etc():  # be like [#511.3]
-        yield 'apply any custom mappers, keyers, etc for syncing.'
-        yield 'with this, you see exactly what the syncing operation sees.'
-        yield 'without this, you see the "raw" output of the producer script.'
-
-    o['apply_sync_related_functions'] = param(
-            description=dsc_for_etc,
-            argument_arity='FLAG',
-            )
-
-
-def __common_parameters_from_the_script_called_stream(o, param):
-    # (no longer used by a different sub-project at #history-A.3)
-
-    def _far_coll_desc(style):  # [#511.4] linser with styler
-        _ = style.em('far_collection')
-        yield f'«help for {_}'
-        yield '2nd line'
-
-    o['far_collection'] = param(
-             description=_far_coll_desc,
-             )
-
-
-class _CLI:  # #open [#607.4] de-customize this custom CLI
-
-    def __init__(self, sin, sout, serr, argv):
-        self.stdin = sin
-        self._sout = sout
-        self.stderr = serr
-        self.ARGV = argv
-        self.OK = True
-        self.exitstatus = 0
-
-    def execute(self):
-        # stopping early is (Case3063DP)
-        must_be_interactive_(self)
-        self.OK and parse_args_(self, '_namespace', _my_parameters, _desc)
-        self.OK and self.__init_attributes_via_namespace()
-        self.OK and maybe_express_help_for_format(self, self._coll_id)
-        self.OK and setattr(self, '_listener', listener_for_(self))
-        self.OK and self.__work()
-        return self.exitstatus
-
-    def __work(self):
-        if self._yes_apply_sync_related_funcs:
-            self.__work_complicated()
-        else:
-            self.__work_simple()
-
-    def __work_complicated(self):
-        sout = self._sout
-
-        pairs = _traversal_stream_for_sync(
-                cached_document_path=None,
-                collection_identifier=self._coll_id,
-                listener=self._listener)
-
-        if pairs is None:
-            raise Exception('cover me - the above failed')
-
-        for (key, dct) in pairs:
-            sout.write(f'{key}  {dct}\n')
-
-    def __work_simple(self):
-
-        visit = dictionary_dumper_as_JSON_via_output_stream(self._sout)
-
-        cm = open_traversal_stream_TEMPORARY_LOCATION(
-                cached_document_path=None,  # (we don't test CLI)
-                collection_identifier=self._coll_id,
-                intention=None,
-                listener=self._listener)
-
-        with cm as dcts:
-            trav_params = next(dcts)  # ..
-            metadata_row_dict = trav_params.to_dictionary()
-            visit(metadata_row_dict)
-            for dct in dcts:
-                visit(dct)
-
-    def __init_attributes_via_namespace(self):
-        # (unlike sibling at namespace, we'll use attrs instead of a dict.)
-        ns = _pop_property(self, '_namespace')
-        self._yes_apply_sync_related_funcs = ns.apply_sync_related_functions
-        self._coll_id = getattr(ns, 'far-collection')  # #open [#601]
-
-
-def _traversal_stream_for_sync(  # #testpoint
-        cached_document_path,
-        collection_identifier,
-        listener):
-
-    # rewritten at #history-A.4 just for bloody survival
-
-    coll_ref = collection_reference_via_(collection_identifier, listener)
-    if coll_ref is None:
-        return
-
-    ps = coll_ref.TO_PRODUCER_SCRIPT(listener)
-    if ps is None:
-        return
-
-    def fml(dcts):
-        return ps.stream_for_sync_via_stream(dcts)
-
-    if isinstance(cached_document_path, tuple):
-        for pair in fml(cached_document_path):
-            yield pair
-    else:
-        opened = ps.open_traversal_stream(listener, cached_document_path)
-        with opened as dcts:
-            for pair in fml(dcts):
-                yield pair
-
-
-def open_traversal_stream_TEMPORARY_LOCATION(
-        cached_document_path,
-        collection_identifier,
-        listener,
-        ):
-    """ #[#020.3]. just glue.
-
-    [#874.7] non-CLI should not load CLI to use this
-    """
-
-    coll_ref = collection_reference_via_(collection_identifier, listener)
-    if coll_ref is None:
-        return  # (Case2449DP) (new at #history-A.3)
-
-    return coll_ref.open_traversal_stream(
-            cached_document_path=cached_document_path,
-            datastore_resources=_filesystem_functions,
-            listener=listener)
-
-
-_desc = __doc__
-
-
 def maybe_express_help_for_format(cli, arg):
     """if the user passes the string "help" for the argument, display
 
     help for that format and terminate early. otherwise, do nothing.
     """
 
-    if 'help' == arg:
-        return _do_express_help_for_formats(cli)
-
-
-def _do_express_help_for_formats(cli):
+    if 'help' != arg:
+        return
 
     o = cli.stderr.write
     o('the filename extension can imply a format adapter.\n')
@@ -175,11 +13,21 @@ def _do_express_help_for_formats(cli):
     o('known format adapters (and associated extensions):\n')
 
     out = cli.stdout.write  # imagine piping output (! errput) (Case3067DP)
-
     count = 0
-    for (k, mod) in _format_adapters_module().to_name_value_pairs():
-        _these = ', '.join(mod.FORMAT_ADAPTER.associated_filename_globs)
-        out(f'    {k} ({_these})\n')
+
+    from kiss_rdb import SPLAY_OF_STORAGE_ADAPTERS
+    _ = SPLAY_OF_STORAGE_ADAPTERS()
+
+    for (k, ref) in _:
+        _storage_adapter = ref()
+        mod = _storage_adapter.module
+        if mod.STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES:
+            _these = mod.STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS
+            _these = ', '.join(_these)
+            _surface = f'({_these})'
+        else:
+            _surface = '(schema-based)'
+        out(f'    {k} {_surface}\n')
         count += 1
     o(f'({count} total.)\n')
     cli.exitstatus = 0  # because [#608.7] it was "guilty till proven innocent"
@@ -278,65 +126,7 @@ def try_help_(s):
     return lineser
 
 
-def module_via_path(path, listener):  # #[#510.10] module via path. #testpoint
-    # introduced at #history-A.3 just as bridge code. not sure if this
-    # file is the best location for this. it may be too high-level, it may
-    # be too tightly bound to legacy stufff #open [#432.2]
-
-    far_coll_ref = collection_reference_via_(
-            path, listener,
-            format_identifier='json_script')  # ..
-    if far_coll_ref is None:
-        return
-    return far_coll_ref.TO_PRODUCER_SCRIPT(listener)
-
-
-def collection_reference_via_(
-        collection_identifier,
-        listener,
-        format_identifier=None,
-        ):
-    pair = _format_adapters_module().procure_format_adapter(
-            collection_identifier=collection_identifier,
-            format_identifier=format_identifier,
-            listener=listener)
-    if not pair:
-        return
-    FA_NAME, format_adapter_module = pair
-    _fa = format_adapter_module.FORMAT_ADAPTER
-    return _fa.collection_reference_via_string(collection_identifier)
-
-
-def _format_adapters_module():
-    """by putting this in a function that is called 3x in this file..
-
-    (virtually a singleton object), we free ourselves from passing it from
-    the higher-level modality- to the lower-level API-endpiont; so that
-    callers to the latter need not concern themselves with it as a
-    parameter. (but note it's a challenge to OCD that this is called 2x
-    per typical invocation.)
-    """
-
-    import kiss_rdb.LEGACY_format_adapter_collection as mod
-    return mod
-
-
-def _filesystem_functions():
-    from script_lib import filesystem_functions as _
-    return _
-
-
-def _pop_property(self, var):  # #cp
-    x = getattr(self, var)
-    delattr(self, var)
-    return x
-
-
-if _is_entrypoint_file:
-    import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
-
+# #history-A.4: become not executable any more
 # #history-A.3: no more sync-side stream-mapping
 # #history-A.2 can be temporary. as referenced.
 # #history-A.1: begin become library, will eventually support "map for sync"
