@@ -56,9 +56,11 @@ class Report:
 
     def _yield_lines(self, big_index):
 
-        yield 'THE FINAL REPORT (alternatives and thier useful phenomenon):'
+        yield 'THE FINAL REPORT (alternatives and their useful phenomenon):'
 
-        for dct in self._dictionario_dawson(big_index):
+        _dicts = self._yield_dictionaries(big_index)
+
+        for dct in _dicts:
             _use_label = dct['label']
             dct['url']  # ignored, but hi
             _tags = dct['tags_generated']

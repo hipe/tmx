@@ -287,7 +287,7 @@ def __fix_this_one_smell(channel_tail, dim_pool):  # #point-1
     if 'input_error_type' in dim_pool:
         channel_tail.append(dim_pool.pop('input_error_type'))
 
-
+# #pending-rename: to script-lib somewhere
 # #history-A.2
 # #history-A.1
 # #abstracted.

@@ -55,97 +55,66 @@ _os_path_basename = os_path.basename
 _doc = __doc__
 
 
-class _CLI_for_all:
+def _CLI_for_all(stdin, stdout, stderr, argv):
 
-    def __init__(self, *_CLI_4):
-        self.stdin, self.stdout, self.stderr, self.ARGV = _CLI_4
-        self.listener = _listener_for_CLI(self)
-        self.exitstatus = 0
+    def do_CLI_for_all(mon, sin, sout, serr, htd):
+        _cli = _CLI_Client(mon.listener, sout, serr, argv)
+        return _do_CLI_for_all(_cli, mon, sin, sout, serr, htd)
 
-    def execute(self):
-        if not _parse_args(self):
-            return self.exitstatus
-        _these = (_module_via_path(x) for x in _report_paths())
-        _run_these_reports_for_CLI(self, _these)
-        return self.exitstatus
+    do_CLI_for_all.__doc__ = _doc
 
-    def _big_help_string(self):
-        return _doc
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            CLI_function=do_CLI_for_all,
+            stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+            formal_parameters=(_same_option(),),
+            description_template_valueser=lambda: {})
+
+
+def _do_CLI_for_all(cli, monitor, sin, sout, serr, htd):
+    _these = (_module_via_path(x) for x in _report_paths())
+    _run_these_reports_for_CLI(cli, htd, _these)
+    monitor.exitstatus
 
 
 def CLI_for_Report(report_module):
-    def f(*_four):
-        return _CLI_for_Report(report_module, *_four)
+    def f(sin, sout, serr, argv):
+        return _do_CLI_for_report(sin, sout, serr, argv, report_module)
     return f
 
 
-class _CLI_for_Report:
+def _do_CLI_for_report(sin, sout, serr, argv, report_module):
 
-    def __init__(self, report_module, * _CLI_4):
-        self.stdin, self.stdout, self.stderr, self.ARGV = _CLI_4
-        self._report_module = report_module
-        self.listener = _listener_for_CLI(self)
-        self.exitstatus = 0
+    def do_CLI(mon, sin, sout, serr, htd):
+        _cli = _CLI_Client(mon.listener, sout, serr, argv)
+        _run_these_reports_for_CLI(_cli, htd, (report_module,))
+        return mon.exitstatus
 
-    def execute(self):
-        if not _parse_args(self):
-            return self.exitstatus
-        _run_these_reports_for_CLI(self, [self._report_module])
-        return self.exitstatus
+    do_CLI.__doc__ = report_module.__doc__
 
-    def _big_help_string(self):
-        return self._report_module.__doc__
-
-
-def _parse_args(cli):  # [#607.4] custom CLI
-    argv = cli.ARGV
-    length = len(argv)
-    if 1 == length:
-        return True
-    io = cli.stderr
-    rx = re.compile('^--?h(?:e(?:lp?)?)?$')  # --help  ##[608.4]
-    _ = next((True for i in range(1, length) if rx.match(argv[i])), False)
-    if _:
-        io.write(f"usage: {argv[0]}\n")
-        io.write('\n')
-        io.write('arguments: this script requires the environment '
-        f'variable {_this_one_env_var} to be set set.\n')  # noqa: E501
-        io.write('\n')
-        io.write('description:\n')
-        io.flush()
-        io.write(cli._big_help_string())
-    else:
-        cli.exitstatus = 334
-        io.write(f'no arguments allowed for {argv[0]}\n')
-    io.flush()
-    return False
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            CLI_function=do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=argv,
+            formal_parameters=(_same_option(),),
+            description_template_valueser=lambda: {})
 
 
-def _listener_for_CLI(cli):  # meh
-    serr = cli.stderr
-
-    def f(*args):
-        flavor, shape, *_, express = args
-        assert('expression' == shape)
-        if 'info' == flavor:
-            io = serr
-        else:
-            assert('error' == flavor)
-            io = serr
-            if not cli.exitstatus:
-                cli.exitstatus = 333
-        for line in express():
-            io.write(f'{line}\n')
-            io.flush()
-    return f
+def _same_option():
+    return (f'{_this_one_opt}=DIR',
+            f'or set {_this_one_env_var} environment variable')
 
 
-def _run_these_reports_for_CLI(cli, report_modules):
+def _run_these_reports_for_CLI(cli, themes_dir, report_modules):
     listener = cli.listener
-    themes_dir = _THEMES_DIR_PLACEHOLDER(listener)
+
     if themes_dir is None:
-        cli.stderr.write(f"see '{cli.ARGV[0]} -h' for help.\n")
-        return
+        themes_dir = cli.require_environment_variable_value(
+                _this_one_env_var, _this_one_opt)
+        if themes_dir is None:
+            cli.stderr.write(f"see '{cli.program_name} -h' for help.\n")
+            return
+
     rd = _report_dispatcher(report_modules, 'CLI', listener)
     _big_index = _big_index_via_walk(rd, themes_dir, listener)
 
@@ -154,9 +123,30 @@ def _run_these_reports_for_CLI(cli, report_modules):
         write(line + '\n')
 
 
+class _CLI_Client:
+
+    def __init__(self, listener, sout, serr, argv):
+        self.listener = listener
+        self.stdout = sout
+        self.stderr = serr
+        self.argv = argv
+
+    def require_environment_variable_value(self, env_name, opt_name):
+        def lineser():
+            yield f"pass the '{opt_name}' option or"
+            yield f"use the '{env_name}' environment variabler"
+        return _require_of_environment(env_name, lineser, self.listener)
+
+    @property
+    def program_name(self):
+        return _os_path_basename(self.argv[0])
+
+
 def API_for_Report__(themes_dir, report_module, listener):
     if themes_dir is None:
-        themes_dir = _THEMES_DIR_PLACEHOLDER(listener)
+        def lineser():
+            yield f"please set the '{_this_one_env_var} environemnt variable"
+        themes_dir = _require_of_environment(_this_one_env_var, lineser, listener)  # noqa: E501
     if themes_dir is None:
         return iter(())
     rd = _report_dispatcher([report_module], 'API', listener)
@@ -164,16 +154,14 @@ def API_for_Report__(themes_dir, report_module, listener):
     return rd._dictionaries_via_dispatch_big_index(_big_index)
 
 
-def _THEMES_DIR_PLACEHOLDER(listener):
+def _require_of_environment(env_name, lineser, listener):
     # this makes things untestable - is just a stand-in for now
 
     from os import environ
-    if _this_one_env_var in environ:
-        return environ[_this_one_env_var]
+    if env_name in environ:
+        return environ[env_name]
 
-    def f():
-        yield f'please set this environment variable: {_this_one_env_var}'
-    listener('error', 'expression', 'missing_environment_variable', f)
+    listener('error', 'expression', 'missing_environment_variable', lineser)
 
 
 # -- the reports (dispatching)
@@ -489,13 +477,13 @@ _word_boundary_rx = re.compile(r'[- ]|(?<=[a-z])(?=[A-Z])')
 # (that's a "positive lookbehind" and a "positive lookahead")
 
 
+_this_one_opt = '--hugo-themes-dir'
 _this_one_env_var = 'SAKIN_AGAC_HUGO_THEMES_DIR'
 
 
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI_for_all(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI_for_all(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #history-A.1
 # #born.

@@ -1,126 +1,57 @@
-import re
+# == BEGIN [#607.6] hidden CLI
 
-_this_var_name = '<template-file>'
+_this_var_name = 'template-file'
 
-_my_doc = f"""experiment in using python templates
+_my_doc = """experiment in using python templates
 
-the file pointed to by {_this_var_name} should have variables
+the file pointed to by <{_this_var_name}> should have variables
 in it $like_this. set environment variables with names TMPL_LIKE_THIS.
 etc.
 """
+# #coverage-island
 
 
-class _CLI:  # #open [#873.A] modernize this CLI
+def _CLI(sin, sout, serr, ARGV):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            CLI_function=_do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=ARGV,
+            formal_parameters=(
+                (_this_var_name, 'ohai i am thing 1'),
+                ),
+            description_template_valueser=lambda: {'_this_var_name': _this_var_name},)  # noqa: E501
 
-    def __init__(self, *four):
-        self.stdin, self.stdout, self.stderr, self.ARGV = four
 
-    def execute(self):
-        self.exitstatus = 5  # generic failure, guilty til proven innocent
-        self._work()
-        return self.exitstatus
+def _do_CLI(error_monitor, sin, sout, serr, file_1_abc_CHAGEME_):
 
-    def _work(self):
-        if not self.__validate_arguments():
-            return
+    with open(file_1_abc_CHAGEME_) as fh:
+        big_string = fh.read()
 
-        if not self.__resolve_big_string():
-            return
+    def key_via(template_variable_name):
+        return f'TMPL_{template_variable_name.upper()}'
 
-        def my_key_via(template_variable_name):
-            return f'TMPL_{template_variable_name.upper()}'
+    from os import environ
 
-        from os import environ
+    lines = _lines_via(
+        data_source=environ,
+        template_big_string=big_string,
+        data_source_key_via_template_variable_name=key_via,
+        listener=error_monitor.listener)
 
-        from script_lib.magnetics import listener_via_stderr
-        _listener = listener_via_stderr(self.stderr)
+    if lines is None:
+        return error_monitor.listener
 
-        lines = _lines_via(
-            data_source=environ,
-            template_big_string=self._big_string,
-            data_source_key_via_template_variable_name=my_key_via,
-            listener=_listener)
+    write = sout.write
+    for line in lines:
+        write(line)  # assume newline
 
-        if lines is None:
-            return
+    return error_monitor.listener
 
-        io = self.stdout
-        for line in lines:
-            io.write(line)  # assume newline
 
-        self.exitstatus = _success_exitstatus
+_do_CLI.__doc__ = _my_doc
 
-    def __resolve_big_string(self):
-        with open(self._file) as fh:
-            self._big_string = fh.read()
-        return True
 
-    # --
-
-    def __validate_arguments(self):
-        num_args = len(self.ARGV) - 1
-        self._num_args = num_args
-        if 0 == num_args:
-            self.__when_no_arguments()
-        elif 1 == num_args:
-            if '-' == self.ARGV[1][0]:
-                self.__when_request_starts_with_dash()
-            else:
-                self._file = self.ARGV[1]
-                del(self.ARGV)
-                return True
-        else:
-            self.__when_too_many_arguments()
-
-    def __when_request_starts_with_dash(self):
-        arg = self.ARGV[1]
-        if arg in ('-h', '--help'):
-            self.__express_help()
-            self.exitstatus = _success_exitstatus
-        else:
-            o = self._usage_talkinbout
-            o(f'this application takes no options (had "{arg}")')
-
-    def __express_help(self):  # experiment
-        line = r'([^\n]+)\n'
-        blank_line = r'\n'
-        the_rest = r'((?:.|\n)+)\n'
-
-        md = re.search(f'^{line}{blank_line}{line}{the_rest}\\Z', _my_doc)
-
-        o = self._express_stderr_line
-        o(f'synopsis: {md[1]}')
-        o()
-        self._express_usage_line()
-        o()
-        o(f'description: {md[2]}')
-        o(md[3])
-
-    def __when_too_many_arguments(self):
-        self._usage_talkinbout(f'need one argument had {self._num_args}')
-
-    def __when_no_arguments(self):
-        self._usage_talkinbout('no arguments')
-
-    def _usage_talkinbout(self, msg):
-        o = self._express_stderr_line
-        o(f'argument error: {msg}')
-        self._express_usage_line()
-        o(f'try "{self._prog_name} -h" for help')
-
-    def _express_usage_line(self):
-        o = self._express_stderr_line
-        o(f'usage: {self._prog_name} {_this_var_name}')
-
-    @property
-    def _prog_name(self):
-        return self.ARGV[0]
-
-    def _express_stderr_line(self, line=None):
-        if line is None:
-            self.stderr.write('\n')
-        else:
-            self.stderr.write(line + '\n')
+# == END
 
 
 def _lines_via(  # #testpoint
@@ -183,15 +114,12 @@ def __dictionary_via_etc(
 
 
 def __template_variable_names_via_big_string(big_string):
+    import re
     return re.findall(r'\$([a-zA-Z_][a-zA-Z0-9_]*)', big_string)
-
-
-_success_exitstatus = 0
 
 
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

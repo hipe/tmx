@@ -41,11 +41,11 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
         return self._stderr_line(-1)
 
     def _stderr_line(self, offset):
-        return self.end_state().first_section('stderr').lines[offset]
+        return self.end_state().first_line_run('stderr').lines[offset]
 
     def build_end_state(self):
         # sout, serr, end_stater = _this_one_lib().for_DEBUGGING()
-        sout, serr, end_stater = _this_one_lib().for_flip_flopping_sectioner()
+        sout, serr, end_stater = _this_one_lib().three_for_line_runner()
 
         _stdin = self.stdin()
 
@@ -73,7 +73,7 @@ class Case010SA_help(_CommonCase):
         self.succeeds()
 
     def test_200_content(self):
-        lines = self.end_state().first_section('stderr').lines
+        lines = self.end_state().first_line_run('stderr').lines
 
         self.assertIn('usage: ', lines[0])
 
@@ -174,7 +174,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):
 
     @shared_subject
     def table_lines(self):
-        return self.end_state().first_section('stdout').lines
+        return self.end_state().first_line_run('stdout').lines
 
     @shared_subject
     def end_state(self):
@@ -201,7 +201,7 @@ class Case060SA_one_arg_which_is_token(_CommonCase):
 
     @shared_subject
     def table_lines(self):
-        return self.end_state().first_section('stdout').lines
+        return self.end_state().first_line_run('stdout').lines
 
     @shared_subject
     def end_state(self):

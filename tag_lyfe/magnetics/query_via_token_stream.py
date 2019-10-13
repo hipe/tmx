@@ -24,15 +24,15 @@ def RUMSKALLA(serr, query_s):
     print('the unsani:')
     unsani = next(itr)
 
-    from script_lib.magnetics import listener_via_stderr
-    listener = listener_via_stderr(serr)
+    from script_lib.magnetics import error_monitor_via_stderr
+    monitor = error_monitor_via_stderr(serr)
 
-    wat = unsani.sanitize(listener)
+    wat = unsani.sanitize(monitor.listener)
 
     print('the sani:')
     my_pprint(wat)
 
-    return 1 if wat is None else 0
+    return monitor.exitstatus
 
 
 def MAKE_CRAZY_ITERATOR_THING(query_s):

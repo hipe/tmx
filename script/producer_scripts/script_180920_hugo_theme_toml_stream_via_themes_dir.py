@@ -17,30 +17,22 @@ from os import path as os_path
 _my_desc = __doc__
 
 
-def _my_parameters(o, param):
+def _CLI(stdin, stdout, stderr, argv):
+    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
 
-    o['themes_dir'] = param(  # ..
-            description='«help for themes_dir»',
-            )
+    if not require_interactive(stderr, stdin, argv):
+        return _exitstatus_for_failure
+
+    return cheap_arg_parse(
+        CLI_function=_do_CLI,
+        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+        formal_parameters=(
+            ('themes-dir', 'ohai «help for themes_dir»'),
+            ),
+        description_template_valueser=lambda: {})
 
 
-class _CLI:  # #open [#607.4] de-customize this custom CLI
-
-    def __init__(self, *_four):
-        self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]
-        self.exitstatus = 1
-        self.OK = True
-
-    def execute(self):
-        from data_pipes import common_producer_script as mod
-        cl = mod.common_CLI_library()  # cl = CLI library
-        cl.must_be_interactive_(self)
-        cl.parse_args_(self, '_namespace', _my_parameters, _my_desc)
-        self.OK and setattr(self, '_listener', cl.listener_for_(self))
-        self.OK and self._work()
-        return self.exitstatus
-
-    def _work(self):
+def _do_CLI(monitor, sin, sout, serr, themes_dir):
 
         def visit(path, dct):
             sout.write(path)
@@ -49,15 +41,16 @@ class _CLI:  # #open [#607.4] de-customize this custom CLI
 
         def write_newline():
             sout.write('\n')
-        sout = self.stdout
+
         import pprint
         pp = pprint.PrettyPrinter(indent=2, stream=sout).pprint
-        self.exitstatus = 0
         except_first_time = _ExceptFirstTime(write_newline)
-        _ = getattr(self._namespace, 'themes-dir')
-        for path, dct in theme_toml_stream_via_themes_dir(_, self._listener):
+        _ = theme_toml_stream_via_themes_dir(themes_dir, monitor.listener)
+        for path, dct in _:
             except_first_time()
             visit(path, dct)
+
+        return monitor.exitstatus
 
 
 def theme_toml_stream_via_themes_dir(themes_dir, listener):  # glue
@@ -136,9 +129,11 @@ def woot(*_):
     raise Exception('woot')
 
 
+_exitstatus_for_failure = 345
+
+
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

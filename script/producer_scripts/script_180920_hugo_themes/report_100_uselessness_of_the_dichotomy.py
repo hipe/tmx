@@ -86,8 +86,15 @@ we can perhaps devise:
 from fractions import Fraction as _Fraction
 
 
-raise Exception("#not-covered and untestable at writing")
-# we deleted the huge hugo-themes directory..
+def _CLI(sin, sout, serr, argv):
+    raise Exception("#not-covered and untestable at writing")  # #todo
+    # we deleted the huge hugo-themes directory..
+
+    import sys
+    _me_module = sys.modules[__name__]
+    from all import CLI_for_Report  # can't do relative import
+    _CLI_for_report = CLI_for_Report(_me_module)
+    return _CLI_for_report(sin, sout, serr, argv)
 
 
 class Report:
@@ -195,12 +202,7 @@ def _join(s_a):
 # --
 
 if __name__ == '__main__':
-    import sys
-    _me = sys.modules[__name__]
-    from all import CLI_for_Report as _
-    _CLI = _(_me)
-    o = sys
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    import sys as o
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

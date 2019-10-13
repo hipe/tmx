@@ -155,29 +155,6 @@ def deindent_doc_string_(big_string, do_append_newlines):
             yield indented_line_md[0]
 
 
-def listener_via_error_listener_and_IO(when_error, serr):  # 1x: KR
-
-    from script_lib.magnetics import listener_via_stderr
-    downstream_listener = listener_via_stderr(serr)
-
-    def listener(head_channel, *a):
-        if 'error' == head_channel:
-            when_error()
-        downstream_listener(head_channel, *a)
-    return listener
-
-
-def build_simple_business_listener_for_case_expression__(serr):  # #[#607.C]
-    def listener(sev, shape, emission_category, payloader):
-        assert('expression' == shape)  # else cover me
-        # (at #history-A.2 got rid of remnants of the old way)
-        lineser = payloader
-        for line in lineser():  # #[#511.3]
-            write_line(line)
-    write_line = ___line_writer_via_putsernvia_IO(serr)
-    return listener
-
-
 class filesystem_functions:  # as namespace
     """with this you "inject" the "filesystem" *as* a dependency into your
 
@@ -207,14 +184,6 @@ class filesystem_functions:  # as namespace
         cover_me('not used')  # [#676] cover me
 
 
-def ___line_writer_via_putsernvia_IO(io):
-    def write_line(s):
-        _len = io.write(f'{s}\n')  # :[#607.B]
-        assert(isinstance(_len, int))  # sort of like ~[#022]
-        return _len
-    return write_line
-
-
 def cover_me(s):
     raise _exe('cover me: {}'.format(s))
 
@@ -234,6 +203,5 @@ TEMPORARY_DIR = 'z'  # ick/meh
 
 
 # #history-A.3: "cheap arg parse" moves to dedicated file
-# #history-A.2; as referenced
 # #history-A.1: as referenced
 # #born: abstracted

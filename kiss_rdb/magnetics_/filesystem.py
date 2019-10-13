@@ -106,9 +106,8 @@ class Filesystem_EXPERIMENTAL:  # #testpoint
 class _FILE_REWRITE_TRANSACTION:
 
     def __init__(self, commit_file_rewrite, listener):
-        from modality_agnostic import listening
-        ErrorMonitor = listening.ErrorMonitor
-        self._monitor = ErrorMonitor(listener)
+        from modality_agnostic import ModalityAgnosticErrorMonitor
+        self._monitor = ModalityAgnosticErrorMonitor(listener)
         self._commit_file_rewrite = commit_file_rewrite
         self._units_of_work = []
         self._exit_me = []

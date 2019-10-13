@@ -159,11 +159,17 @@ class _ExecutableTerminalStepResolution:
         rsx = self.__modality_resources
         del self.__modality_resources
 
-        from script_lib.magnetics import listener_via_stderr
+        # == BEGIN #history-A.4 temporary retro-fitting. normally the error
+        # monitor ('s listener) would be injected and we would use the e.m
+        # to determine our exitstatus.
+        # but this whole topic module will be re-written or sunsetted.
+
+        from script_lib.magnetics import error_monitor_via_stderr
 
         def extraneous_f():
-            _listener = listener_via_stderr(rsx.stderr)  # maybe more later
-            return _listener
+            _em = error_monitor_via_stderr(rsx.stderr)
+            return _em.listener
+        # == END
         return extraneous_f
 
     OK = True
@@ -211,6 +217,7 @@ def _name_via_slug(name):
 import sys  # noqa E402
 sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
 
+# #history-A.4 (as referenced, can be temporary)
 # #history-A.3 (as referenced, can be temporary)
 # #history-A.2 (as referenced, can be temporary)
 # #abstracted.

@@ -32,14 +32,6 @@ class _CommonCase(unittest.TestCase):
 
     # -- assertion assist
 
-    def _displays_usage(self):
-        _lines = self._stderr_lines()
-        self.assertRegex(
-                _lines[0],
-                r'^usage: me \[-h\] \[--near-format FORMAT\] '
-                r'\[--diff\]'
-                r' +near-collection producer-script$')
-
     def _first_line(self):
         return self._this_line(0)
 
@@ -63,9 +55,9 @@ class _CommonCase(unittest.TestCase):
         stdout, stderr, end_stater = self._sout_and_serr_and_end_stater()
         # stdout, stderr, end_stater = _these().for_DEBUGGING()
 
-        _cli = _subject_script()._CLI(_stdin, stdout, stderr, _argv)
+        _ss = _subject_script()
 
-        _actual_exitstatus = _cli.execute()
+        _actual_exitstatus = _ss._CLI(_stdin, stdout, stderr, _argv)
 
         return end_stater(_actual_exitstatus)
 
@@ -91,7 +83,8 @@ class Case3061_must_be_interactive(_CommonCase):
         self._CLI_client_results_in_failure_exitstatus()
 
     def test_110_first_line_explains(self):
-        self.assertEqual(self._first_line(), 'cannot yet read from STDIN.\n')
+        _exp = 'usage error: cannot read from STDIN.\n'
+        self.assertEqual(self._first_line(), _exp)
 
     @shared_subject
     def _end_state(self):
@@ -101,7 +94,7 @@ class Case3061_must_be_interactive(_CommonCase):
         return _these().MINIMAL_NON_INTERACTIVE_IO
 
     def _argv(self):
-        return ()
+        return ('hoopie-doopie',)
 
     def _sout_and_serr_and_end_stater(self):
         return self._expect_this_many_on_stderr(2)
@@ -112,12 +105,15 @@ class Case3063DP_strange_option(_CommonCase):
     def test_100_fails(self):
         self._CLI_client_results_in_failure_exitstatus()
 
-    def test_110_SECOND_line_explains(self):
-        _ = self._second_line()
-        self.assertEqual(_, 'me: error: unrecognized arguments: --zazoozle\n')
+    def test_110_first_line_explains(self):
+        _act = self._first_line()
+        _exp = "parameter error: unrecognized option: '--zazoozle'\n"
+        self.assertEqual(_act, _exp)
 
-    def test_120_displays_usage(self):
-        self._displays_usage()
+    def test_120_invites_to_help(self):
+        _act = self._second_line()
+        _exp = "see 'me --help'\n"
+        self.assertEqual(_act, _exp)
 
     @shared_subject
     def _end_state(self):
@@ -135,11 +131,10 @@ class Case3064_missing_requireds(_CommonCase):
     def test_100_fails(self):
         self._CLI_client_results_in_failure_exitstatus()
 
-    def test_110_umm(self):
-        _act = self._second_line()
-        _exp = 'the following arguments are required: '
-        'near-collection, far-collection'
-        self.assertIn(_exp, _act)
+    def test_110_says_expecting(self):
+        _act = self._first_line()
+        _exp = 'parameter error: expecting <near-collection>\n'
+        self.assertEqual(_act, _exp)
 
     @shared_subject
     def _end_state(self):
@@ -163,19 +158,20 @@ class Case3066_top_help_screen(_CommonCase):
     def test_300_something_about_description(self):
         _sect = self._section('description')
         _first_line = _sect.children[0].styled_content_string
-        self.assertIn('description: for each entity in a far', _first_line)
+        _second_line = _sect.children[1].styled_content_string
+        self.assertEqual(_first_line, 'description: ')
+        self.assertIn('Mutate a near collection by merging', _second_line)
 
     def test_400_something_about_arguments(self):
-        self._num_children(self._section('positional arguments'), 2)
+        self._num_children(self._section('arguments'), 2)
 
     def test_500_something_about_options(self):
-        self._num_children(self._section('optional arguments'), 3)  # -h + 1
+        self._num_children(self._section('options'), 1)
 
     def _num_children(self, sect, num):
-        cx = sect.children
-        self.assertEqual(len(cx), 2)
-        _act = len(cx[1].children)
-        self.assertEqual(_act, num)
+        title_line, *cx = sect.children
+        assert(isinstance(title_line.styled_content_string, str))
+        self.assertEqual(len(cx), num)
 
     def _section(self, key):
         return self._section_index()[key]
@@ -204,19 +200,19 @@ class Case3067DP_FA_help_screen(_CommonCase):
     def test_200_stdout_lines_look_like_items__at_least_one(self):
         import re
         rx = re.compile(r'^ +[_a-z]+ \([^(]+\)$')  # ..
-        s_a = self._end_state().first_section('stdout').lines
+        s_a = self._end_state().first_line_run('stdout').lines
         self.assertGreaterEqual(len(s_a), 1)
         for s in s_a:
             self.assertRegex(s, rx)
 
     def test_300_total_number_of_format_adapters_at_end(self):
-        s_a = self._end_state().last_section('stderr').lines
+        s_a = self._end_state().last_line_run('stderr').lines
         self.assertEqual(len(s_a), 1)
         self.assertRegex(s_a[0], r'^\(\d+ total\.\)$')
 
     def test_400_something_about_content(self):
         # (this was a more pointed message before #history-A.1)
-        _s_a = self._end_state().first_section('stderr').lines
+        _s_a = self._end_state().first_line_run('stderr').lines
         _ = 'the filename extension can imply a format adapter.\n'
         self.assertEqual(_s_a[0], _)
 
@@ -225,13 +221,13 @@ class Case3067DP_FA_help_screen(_CommonCase):
         return self._build_end_state()
 
     def _sout_and_serr_and_end_stater(self):
-        return _these().for_flip_flopping_sectioner()
+        return _these().three_for_line_runner()
 
     def _argv(self):
         return ('me', '--near-format', 'help', 'xx', 'yy')
 
 
-class Case3069_strange_format_adapter_name(_CommonCase):
+class Case3069DP_strange_format_adapter_name(_CommonCase):
     """(this is to get us "over the wall - there is another test just like
 
     it that is modality-agnostic. (but this one came first! yikes)
@@ -242,7 +238,7 @@ class Case3069_strange_format_adapter_name(_CommonCase):
 
     def test_200_says_not_found(self):
         _ = self._two_sentences()[0]
-        self.assertEqual(_, "unrecognized format name 'zig-zag'")
+        self.assertIn("unrecognized format name 'zig-zag'", _)
 
     def test_300_says_did_you_mean(self):
         _ = self._two_sentences()[1]

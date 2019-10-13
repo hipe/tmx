@@ -39,6 +39,7 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
 |[#873.M]                   |       | integrating external format adapters (storage adapters)
 |[#873.12]                  |       | #experimental. we may remove this API point. capability functions

@@ -28,51 +28,46 @@ there are alternatives to what we do here..
 
 import re
 
+
 _my_desc = __doc__
 
 
-def _my_params(o, param):
+def _CLI(stdin, stdout, stderr, argv):
+    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+    if not require_interactive(stderr, stdin, argv):
+        return _exitstatus_for_failure
+    return cheap_arg_parse(
+        CLI_function=_do_CLI,
+        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+        formal_parameters=(
+            ('themes-dir', 'ohai «help for themes_dir»'),
+            ),
+        description_template_valueser=lambda: {})
 
-    o['themes_dir'] = param(  # ..
-            description='«help for themes_dir»',
+
+def _do_CLI(monitor, stdin, stdout, stderr, themes_dir):
+
+    cm = relevant_themes_collection_metadata_via_themes_dir(
+            themes_dir, monitor.listener)
+    # ..
+    dct = cm.to_dictionary()
+    if False:  # worked but
+        import pprint
+        pprint.pprint(dct, stderr)
+        return _exitstatus_for_success
+
+    import json
+    _big_s = json.dumps(
+            dct,
+            indent=4,
+            sort_keys=False,  # currently aesthetically ordered.
             )
+    stderr.write(_big_s)
+    stderr.write('\n')
+    return monitor.exitstatus
 
 
-class _CLI:  # #open [#607.4] de-customize this custom CLI
-
-    def __init__(self, *_):
-        self.stdin, self.stdout, self.stderr, self.ARGV = _
-        self._exitstatus = 1
-        self._OK = True
-
-    def execute(self):
-        from data_pipes import common_producer_script as mod
-        cl = mod.common_CLI_library()  # cl = CLI library
-        cl.must_be_interactive_(self)
-        cl.parse_args_(self, '_namespace', _my_params, _my_desc)
-        self.OK and setattr(self, '_listener', cl.listener_for_(self))
-        self.OK and self._work()
-        return self._exitstatus
-
-    def _work(self):
-        self._exitstatus = 0
-        _ = getattr(self._namespace, 'themes-dir')
-        cm = relevant_themes_collection_metadata_via_themes_dir(
-                _, self._listener)
-        # ..
-        dct = cm.to_dictionary()
-        if False:  # worked but
-            import pprint
-            pprint.pprint(dct, self.stderr)
-        else:
-            import json
-            _big_s = json.dumps(
-                    dct,
-                    indent=4,
-                    sort_keys=False,  # currently aesthetically ordered.
-                    )
-            self.stderr.write(_big_s)
-            self.stderr.write('\n')
+_do_CLI.__doc__ = _my_desc
 
 
 def relevant_themes_collection_metadata_via_themes_dir(themes_dir, listener):
@@ -183,10 +178,12 @@ def cover_me(s):
 
 
 _bash_interpolation_expression = '${themesDir}'
+_exitstatus_for_failure = 456
+_exitstatus_for_success = 0
+
 
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

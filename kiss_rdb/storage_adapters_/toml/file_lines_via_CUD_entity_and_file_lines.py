@@ -22,7 +22,9 @@ def _do_do_verb(existing_file_lines, listener, client_args, f, do_future):
 
     # what a ride:
 
-    monitor = __monitor_via_listener(listener)  # peek when an iterator failed
+    # peek when an iterator failed
+    from modality_agnostic import ModalityAgnosticErrorMonitor
+    monitor = ModalityAgnosticErrorMonitor(listener)
 
     # monitor.DEBUGGING_TURN_ON()
 
@@ -272,12 +274,6 @@ def __lines_via_blocks(blocks):  # #c/p
 def __block_stream_via_file_lines(existing_file_lines, listener):
     from . import blocks_via_file_lines as block_lib
     return block_lib.block_stream_via_file_lines(existing_file_lines, listener)
-
-
-def __monitor_via_listener(listener):
-    from modality_agnostic import listening
-    ErrorMonitor = listening.ErrorMonitor
-    return ErrorMonitor(listener)
 
 
 # ==

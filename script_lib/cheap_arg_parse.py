@@ -1,12 +1,9 @@
-"""this is the next level up from "fixed argument parser"..
+"""this is the next level up from "fixed argument parser #todo"..
 
 you want to use this magnetic directly if you want to build your argument
 parser from modality agnostic commands, but otherwise manage your own
 parsing.
 """
-
-from modality_agnostic.memoization import lazy
-import re
 
 
 _THIS_NAME = 'chosen_sub_command'
@@ -22,69 +19,90 @@ def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
     arguments. Its exit criteria was only that the many involved producer
     scripts continued to work as they did. #here marks new API experiments or
     places where we carry over some weaknesses from the previous code.
+    :[#608.L]
     """
 
     _syntax_AST = _syntax_AST_via_parameters_definition(formal_parameters)
     CLI = _CLI_via_syntax_AST(_syntax_AST)
 
-    tox = _parse_lib().TokenScanner(argv)
+    from .magnetics.parser_via_grammar import TokenScanner
+    tox = TokenScanner(argv)
+
     long_program_name = tox.shift()
 
-    state = _InvocationState()
+    memoized = _Memoizations()
 
-    @state.lazy_reader
+    @memoized.lazy_reader
     def program_name():
-        from os import path as os_path
-        return os_path.basename(long_program_name)
-
-    @state.lazy_method_receiver
-    def business_listener():  # ##here only 'expression' not 'structure'
-        from script_lib import (
-                build_simple_business_listener_for_case_expression__)
-        return build_simple_business_listener_for_case_expression__(stderr)
+        return _program_name_via_long_program_name(long_program_name)
 
     def listener_for_parse_errors(*a):
-        sev, shape, cat, error_case, structurer = a
-        assert((sev, shape, cat) == ('error', 'structure', 'parameter_error'))
 
+        em = _emission_via_args(a)
+        assert('error' == em.severity)
+        assert('structure' == em.shape)
+        error_category, error_case = em.channel_tail  # ..
+        assert('parameter_error' == error_category)  # not sure
+
+        dct = em.flush_payloader()
+
+        # == BEGIN
         # catching help this way has some benefits but is mostly a hack
-        if ('unrecognized_option' == error_case and
-                structurer()['token'] in ('-h', '--help')):
-            __write_help_lines(stderr, description_template_valueser,
-                               CLI_function, state.program_name(), CLI)
-            state.exitstatus = 0
+        if 'unrecognized_option' == error_case and dct['token'] in ('-h', '--help'):  # noqa: E501
+            _write_help_lines(
+                    stderr, description_template_valueser,
+                    CLI_function, program_name(), CLI)
             return
+        # == END
 
-        for line in _express_parameter_error(state, error_case, structurer):
-            stderr.write(line)
-            stderr.write('\n')
-        stderr.write(f"see '{state.program_name()} --help'\n")
+        for line in _express_parameter_error(mon, error_case, dct):
+
+            assert(_eol not in line)  # catch these early for now
+
+            # before #history-A.5 we would put the raw line and the EOL in
+            # two separate calls to `write` (think of the memory savings!);
+            # but the "expect STD's" library we are now targeting wants us
+            # to write only terminated lines for its reasons [#605.2]
+
+            stderr.write(f"{line}{_eol}")
+
+        stderr.write(f"see '{program_name()} --help'{_eol}")
+
+    from .magnetics import error_monitor_via_stderr
+    mon = error_monitor_via_stderr(stderr)
 
     two = _do_parse(tox, CLI, listener_for_parse_errors)
     if two is None:
-        return state.exitstatus
+        return mon.exitstatus
     opt_vals, arg_vals = two
 
-    from modality_agnostic import listening
-    ErrorMonitor = listening.ErrorMonitor
-
-    es = CLI_function(ErrorMonitor(state.business_listener),  # #here
-                      stdin, stdout, stderr, *opt_vals, *arg_vals)
+    es = CLI_function(mon, stdin, stdout, stderr, *opt_vals, *arg_vals)
     assert(isinstance(es, int))  # #[#022]
-    return es
+
+    # user can return from the above function any arbitrary exitstatus. also
+    # any arbitary emission could have "set" (elevated) the exitstatus.
+    mon.see_exitstatus(es)
+    return mon.exitstatus
 
 
-class _InvocationState:  # [#503.11] blank slate, plus one thing
+def require_interactive(stderr, stdin, argv):
+    if stdin.isatty():
+        return True
+    o = stderr.write
+    o(f"usage error: cannot read from STDIN.{_eol}")
+    o(f"see '{_program_name_via_long_program_name(argv[0])} -h'{_eol}")
 
-    def lazy_method_receiver(self, f):  # #[#510.6] experimental
-        def use_f(*a):
-            return getattr(self, method_reader_method_name)()(*a)
-        method_reader_method_name = f'{f.__name__}_method'
-        self._add_lazy_reader(method_reader_method_name, f)
-        setattr(self, f.__name__, use_f)
+
+def _program_name_via_long_program_name(long_program_name):
+    from os import path as os_path
+    return os_path.basename(long_program_name)
+
+
+class _Memoizations:
 
     def lazy_reader(self, f):  # #[#510.6] experimental
         self._add_lazy_reader(f.__name__, f)
+        return getattr(self, f.__name__)
 
     def _add_lazy_reader(self, method_name, f):
         def use_f():
@@ -95,25 +113,25 @@ class _InvocationState:  # [#503.11] blank slate, plus one thing
         setattr(self, method_name, use_f)
 
 
-def __write_help_lines(stderr, description_template_valueser,
-                       CLI_function, program_name, CLI):
+def _write_help_lines(
+        stderr, description_template_valueser,
+        CLI_function, program_name, CLI):
 
-    from script_lib.magnetics.listener_via_resources import (
+    from .magnetics.listener_via_resources import (  # will rename
             desc_lineser_via, help_lines)
 
     _descser = desc_lineser_via(description_template_valueser, CLI_function)
 
     for line in help_lines(program_name, _descser, CLI.opts, CLI.args):
-        stderr.write('\n' if line is None else f'{line}\n')
+        stderr.write(_eol if line is None else f'{line}{_eol}')
 
 
-def _express_parameter_error(state, error_case, structurer):
+def _express_parameter_error(monitor, error_case, dct):
     # cases covered visually: (Case5470) (Case5470) (Case5424) (Case5438)
     # (Case5459) (Case5463) (Case5480) (Case5484) (Case5442) (Case5445)
     # (Case5449) (Case5452) (Case5456)
 
     opt, arg, token_pos, tok = (None, None, None, None)
-    dct = structurer()
     dct = {k: v for k, v in dct.items()}
     if 'option' in dct:
         opt = dct.pop('option')
@@ -151,22 +169,22 @@ def _express_parameter_error(state, error_case, structurer):
         for s in two_lines_of_ascii_art_via_position_and_line(token_pos, tok):
             yield s
 
-    state.exitstatus = 456
-
-
-def _init_CLI(o, syntax_AST):
-    # pre-compute things that can be pre-computed
-    o.opts, o.args = syntax_AST
-    _ = __build_option_index(o.opts)
-    o.opt_offset_via_short_name, o.opt_offset_via_long_name = _
-    o.sequence_grammar = tuple(__sequence_grammar_via_syntax_args(o.args))
+    monitor.see_exitstatus(456)
 
 
 class _CLI_via_syntax_AST:  # #testpoint
-    __init__ = _init_CLI
+
+    def __init__(self, syntax_AST):
+        # pre-compute things that can be pre-computed
+        opts, args = syntax_AST
+        _two = _build_option_index(opts)
+        self.opt_offset_via_short_name, self.opt_offset_via_long_name = _two
+        self.sequence_grammar = tuple(_sequence_grammar_via_syntax_args(args))
+        self.opts = opts
+        self.args = args
 
 
-# #refo [#608.K] you could eliminate (at writing) all `lazy` here (look)
+# == BEGIN away soon
 
 class argument_parser_index_via:
     """a collection of commands is passed over the transation boundary
@@ -364,27 +382,40 @@ def _CLI_parser_function_via_syntax_AST(syntax_AST):  # #testpoint
 class _CLI:  # #[#510.2] blank state
     pass
 
+# == END away soon
+
 
 def _do_parse(tox, CLI, listener):  # #testpoint
 
-    inner_parser = _parse_lib().parser_via_grammar_and_symbol_table(
+    from .magnetics.parser_via_grammar import (
+            parser_via_grammar_and_symbol_table,
+            TokenScanner)
+
+    inner_parser = parser_via_grammar_and_symbol_table(
         CLI.sequence_grammar, {
             'option': lambda: option_parsing,
             'argument': lambda: argument_parsing})
 
-    def inner_parser_listener(*a):
-        *severity_shape_categ, error_case, structurer = a
-        assert(severity_shape_categ == ['error', 'structure', 'parse_error'])
+    def listener_for_inner_parse(*a):
+        em = _emission_via_args(a)
+        assert('error' == em.severity)
+        assert('structure' == em.shape)
+        error_category, error_case = em.channel_tail
+        assert('parse_error' == error_category)
+
         if 'missing_required' == error_case:
-            i = structurer()['offset_in_grammar']
+            dct = em.flush_payloader()
+            i = dct['offset_in_grammar']
             assert(1 == i % 2)  # (Case5452)
             return when('expecting', argument=CLI.args[int(i/2)])
+
         if 'extra_input' == error_case:
             return when('unexpected_argument')  # (Case5449)
+
         assert(False)
 
     def main():
-        big_flat = inner_parser.parse(tox, inner_parser_listener)
+        big_flat = inner_parser.parse(tox, listener_for_inner_parse)
         if big_flat is None:
             return  # (Case5442)
         # roll up big flat so it is in formal parameter order (Case5421)
@@ -402,7 +433,7 @@ def _do_parse(tox, CLI, listener):  # #testpoint
 
     def parse_option():
 
-        chars = _parse_lib().TokenScanner(tox.peek)  # YIKES but it works well
+        chars = TokenScanner(tox.peek)  # YIKES but it works well
         assert('-' == chars.shift())  # skip over first '-'
         assert(not chars.is_empty)
 
@@ -519,6 +550,7 @@ def _do_parse(tox, CLI, listener):  # #testpoint
             is_short = True
         return is_short, i
 
+    import re
     long_name_rx = re.compile(_long_name_rxs)
 
     # -- parsing the argument expressions
@@ -565,7 +597,7 @@ def _do_parse(tox, CLI, listener):  # #testpoint
     return main()
 
 
-def __build_option_index(opts):
+def _build_option_index(opts):
     opt_offset_via_short_name = {}
     opt_offset_via_long_name = {}
 
@@ -618,30 +650,32 @@ def __two_tuples_via_big_flat(big_flat, opts, args):
     return tuple(actual_options), tuple(actual_arguments)
 
 
-def __sequence_grammar_via_syntax_args(args):
+def _sequence_grammar_via_syntax_args(args):
 
     # "flatten" the syntax so we can use our sequence grammar. For a two-arg
     # syntax, the grammar is `opt* arg1 opt* arg2 opt*` and so on. For an N-
     # arg syntax
 
-    for s_a in __sequence_grammar_via_syntax_args_pcs(args):
+    for s_a in __sequence_grammars_via_syntax_arguments(args):
         for s in s_a:
             yield s
 
 
-def __sequence_grammar_via_syntax_args_pcs(args):
+def __sequence_grammars_via_syntax_arguments(args):
     yield 'zero or more', 'option'
     for _ in range(0, len(args)):
         yield 'one', 'argument', 'zero or more', 'option'  # ..
 
+
 # ==
 
-
 def _syntax_AST_via_parameters_definition(tups):  # #testpoint
-    parse_lib = _parse_lib()
-    build_parser = parse_lib.parser_via_grammar_and_symbol_table
 
-    parser = build_parser(
+    from .magnetics.parser_via_grammar import (
+        parser_via_grammar_and_symbol_table,
+        TokenScanner)
+
+    parser = parser_via_grammar_and_symbol_table(
             ('zero or more', 'option',
              'zero or more', 'argument'),
             {'option': lambda: FormalOptionParser(),
@@ -652,7 +686,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
             self._parser = None
 
         def parse_as_subparser(self, tox, listener):
-            _subtox = parse_lib.TokenScanner(tox.peek)
+            _subtox = TokenScanner(tox.peek)
             x = self.parser.parse(_subtox, listener)
             if x is None:
                 return
@@ -674,7 +708,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
             return looks_like_long_rx.match(first_token)
 
         def build_parser(self):
-            return build_parser(
+            return parser_via_grammar_and_symbol_table(
                 ('any', 'short', 'one', 'long', 'one or more', 'desc'),
                 {'short': lambda: formal_short_parser,
                  'long': lambda: formal_long_parser,
@@ -686,7 +720,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
             return multi_purpose_rx.match(tox.peek[0])  # BE CAREFUL
 
         def build_parser(self):
-            return build_parser(
+            return parser_via_grammar_and_symbol_table(
                 ('one', 'arg name', 'one or more', 'desc'),
                 {'arg name': lambda: arg_name_parser,
                  'desc': lambda: desc_parser})
@@ -723,6 +757,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
         def parse_as_subparser(tox, _listener):
             return (tox.shift(),)  # #wrapped-AST-value
 
+    import re
     looks_like_short_rx = re.compile('-[a-z]')
     formal_short_rx = re.compile('-([a-z])$')
     looks_like_long_rx = re.compile('--[a-z][-a-z]')  # ..
@@ -734,7 +769,7 @@ def _syntax_AST_via_parameters_definition(tups):  # #testpoint
     from modality_agnostic import listening
     listener = listening.throwing_listener
 
-    opts, args = parser.parse(parse_lib.TokenScanner(tups), listener)
+    opts, args = parser.parse(TokenScanner(tups), listener)
     if opts is None:
         opts = ()
     else:
@@ -824,8 +859,18 @@ def _infer_metavar_via_name(name):
     return __the_infer_metavar_via_name_function()(name)
 
 
+def lazy(build):
+    def f():
+        if 0 == len(sinful):
+            sinful.append(build())
+        return sinful[0]
+    sinful = []
+    return f
+
+
 @lazy
 def __the_infer_metavar_via_name_function():
+    import re
     regex = re.compile('[^_]+$')
 
     def f(name):
@@ -860,6 +905,11 @@ def _():
     return f
 
 
+def _emission_via_args(a):
+    from modality_agnostic import listening
+    return listening.emission_via_args(a)
+
+
 def _wish(s):
     raise Exception(f'future feature expected here: {s}')
 
@@ -875,7 +925,7 @@ def cover_me(msg):
 _exe = Exception
 
 _DASH_DASH = '--'
-_NEWLINE = '\n'
+_eol = '\n'
 
 # #history-A.4: help & initial integration
 # #history-A.3: begin parser-generator-backed rewrite of "cheap arg parse"

@@ -14,7 +14,22 @@ design.
 
 (there used to be an [#608.5] older way but at #history-A.1 it was sunsetted.)
 
-the "holy 6" are 6 attributes typical CLI clients are expected to have:
+At #history-A.2 we sunsetted *this* API for several reasons we explain
+further below.
+
+(Being "sunsetted" carries a stronger weight than just being "deprecated":
+by being "sunsetted", we mean that any current code that uses this API
+(excepting module-private implementation employment that resembles this API
+in just an incidental way or a pattern sense) must be considered broken and
+must at least raise an exception in lieu of being re-architected or itself
+sunsetted.)
+
+This description is all that remains of the once vast empire of this now
+sunsetted API. For a fuller explanation of the API, see the state of this
+document before the aforementioned history marker.
+
+The "holy 6" were 6 attributes typical CLI clients were expected to have:
+
   - stdin
   - stdout
   - stderr
@@ -22,30 +37,15 @@ the "holy 6" are 6 attributes typical CLI clients are expected to have:
   - OK
   - exitstatus
 
-the first four are straightforward and should be familiar to anyone who
-has written for CLI (indeed, we call them the `_CLI_4` in an oft-used
-glob variable).
+CLI-related functions would communicate success/failure thru calls to
+property writer methods on a given client (which looked like and often were
+just plain old state changes to a mutable object).
 
-(note that `ARGV` is capitalized and not the others, as a point of
-specification here. this is mostly due to arbitrary historic details of how
-we would access ARGV on other platforms. be advised that we might change this
-to lower case for consistency.)
+We sunsetted this API for these reasons:
 
-the last one (`exitstatus`) is again something that should be familiar,
-but it will tie-in to our discussion of `OK`, which deserves a little
-explanation:
-
-although it is not necessary for CLI's to "know about" exit statuses,
-we consider its use a best practice. the exit status is an integer that the
-CLI will send back to the calling entity. (we consider it a poor practice
-for the CLI ever to call `exit()` directly.) so..
-
-the "holy 6" API pattern differs from its [#608.5] forebear fundamentally:
-instead of a tightly defined but somewhat obtuse use of a response object
-with a `result_values` dictionary and so on; under this newer API, library
-functions can simply write to `OK` and `exitstatus` attributes directly..
-
-(the client can use `@property` ..)
+  - the ascention of [#608.L] "cheap arg parse" singals our trend towards
+    API's that assume smaller, simple, composable functions and more
+    immutability and statelessness.
 
 
 
@@ -58,21 +58,24 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 |---------------------------|:-----:|---|
 |[#676]                     | #open | track `cover_me`
 |[#610]                     |       | line stream via big string
-|[#608.K]                   | #refa | lazy not necessary
+|[#608.L]                   |       | [ cheap arg parse ]
+|[#608.K]                   | #hole |
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
-|[#608.7]                   | #trak | track fellows whose CLI exitstatus is "guilty til proven innocent"
-|[#608.6]                   | #trak | this other approach to a library interface (see)
-|[#608.5]                   | #trak | this one approach to a library interface (see)
+|[#608.7]                   | #hole |
+|[#608.6]                   |       | sunsetted. for now this identifier is retired.
+|[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | all the places you write this same `--help` regex |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
+|[#607.H]                   | #open | delete or rewrite these files
 |[#607.G]                   | #open | sunset the common upstream argument parser module
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
 |[#607.E]                   | #refa | there's no way this is right
-|[#607.4]                   | #open | producer scripts w/ small custom CLI's to be de-customized
-|[#607.C]                   | #trak | business listener for case expressions
+|[#607.4]                   | #hole |
+|[#607.C]                   | #hole |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
+|[#605]                     |       | [ expect STD's ]
 |[#604.2]                   | #open | known limitation of our arg parsing
 |[#603]                     |       | [the help screen parser] |
 |:[#602]                    | #open | track that one issue with argparse (should patch) |
@@ -82,5 +85,6 @@ functions can simply write to `OK` and `exitstatus` attributes directly..
 
 ## (document-meta)
 
+  - #history-A.2 (as referenced)
   - #history-A.1 (as referenced)
   - #broke-out & expanded

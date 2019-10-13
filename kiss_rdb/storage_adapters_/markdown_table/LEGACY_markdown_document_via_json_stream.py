@@ -142,6 +142,7 @@ def markdown_link_via(label, url):
     return f'[{label}]({url})'  # (you could get bit)..
 
 
+# #todo
 def collection_identifier_via_parsed_arg_(arg):
     typ = arg.argument_type
     if 'stdin_as_argument' == typ:

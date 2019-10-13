@@ -54,60 +54,36 @@ we do it our way and not the above way for a couple reasons:
 _my_doc = __doc__
 
 
-def _my_parameters(o, param):
+def _CLI(stdin, stdout, stderr, argv):
 
-    o['markdown_file'] = param(
-            description="the path to the conventional markdown document",
-            argument_arity='REQUIRED_FIELD',
-            )
+    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+
+    if not require_interactive(stderr, stdin, argv):
+        return _exitstatus_for_failure
+
+    return cheap_arg_parse(
+        CLI_function=_do_CLI,
+        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+        formal_parameters=(
+            ('markdown-file', "the path to the conventional markdown document"),  # noqa: E501
+            ),
+        description_template_valueser=lambda: {})
 
 
-class _CLI:
+def _do_CLI(monitor, sin, sout, serr, markdown_file):
 
-    def __init__(self, *four):
-        self.stdin, self.stdout, self.stderr, self.ARGV = four  # #[#608.6]
-        self.exitstatus = 5
-        self.OK = True
+    dct = _dictionary_via_file(markdown_file, monitor.listener)
+    if dct is None:
+        return
 
-    def execute(self):
-        self._work()
-        return self.exitstatus
+    write = sout.write
+    for line in _frontmatter_lines_via_dictionary(dct):
+        write(line)
 
-    def _work(self):
-        self._parse_arguments()
-        if not self.OK:
-            return
+    return monitor.exitstatus
 
-        import script_lib.magnetics as _
-        listener = _.listener_via_resources(self)
 
-        dct = _dictionary_via_file(self._markdown_file, listener)
-        if dct is None:
-            return
-
-        io = self.stdout
-        for line in _frontmatter_lines_via_dictionary(dct):
-            io.write(line)
-
-        self.exitstatus = 0
-
-    def _parse_arguments(cli):
-
-        from script_lib.magnetics import (
-                parse_stepper_via_argument_parser_index as _)
-
-        reso = _.SIMPLE_STEP(
-                cli.stdin, cli.stderr, cli.ARGV, _my_parameters,
-                stdin_OK=True,
-                description=_my_doc,
-                )
-        ok = reso.OK
-        cli.OK = ok  # make extra unnecessary contact for now..
-        if not ok:
-            cli.exitstatus = reso.exitstatus
-            return
-        ns = reso.namespace
-        cli._markdown_file = getattr(ns, 'markdown-file')
+_do_CLI.__doc__ = _my_doc
 
 
 def _frontmatter_lines_via_dictionary(dct):
@@ -209,9 +185,11 @@ def _date_string_via_conventional_markdown_file(path, listener):
     return md2[1]  # the datestamp
 
 
+_exitstatus_for_failure = 456
+
+
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

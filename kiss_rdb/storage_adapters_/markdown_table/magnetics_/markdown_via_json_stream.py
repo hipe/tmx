@@ -87,8 +87,8 @@ def _these():
 
 def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
 
-    from script_lib.magnetics import listener_via_stderr
-    listener = listener_via_stderr(serr)
+    from script_lib.magnetics import error_monitor_via_stderr
+    monitor = error_monitor_via_stderr(serr)
 
     from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
             collection_identifier_via_parsed_arg_ as _)
@@ -109,12 +109,13 @@ def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
             producer_script_path=ps,
             near_collection=_near_collection,
             near_format='markdown-table',
-            listener=listener)
+            listener=monitor.listener)
     f = sout.write
     with _opened as lines:
         for line in lines:
             f(line)
-    return 0  # ..
+
+    return monitor.exitstatus
 
 
 class _CustomProducerScript:

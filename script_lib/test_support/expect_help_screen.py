@@ -9,7 +9,7 @@ import re
 
 def optional_args_index_via_section_index(si):
     cx = si['optional arguments'].children
-    None if len(cx) == 2 else cover_me('needs work')
+    assert(len(cx) == 2)  # else needs work
     cx = cx[1].children
     d = {}
     for ch in cx:
@@ -22,7 +22,7 @@ def optional_args_index_via_section_index(si):
 
 def positional_args_index_via_section_index(si):
     cx = si['positional arguments'].children
-    None if len(cx) == 2 else cover_me('needs work')
+    assert(len(cx) == 2)  # else needs work
     xch = cx[1]
     # we can't know the structure of the above beforehand so we normalize it
     # here by promoting terminals to branch node-ishes (#provision #[#014.A])
@@ -32,7 +32,7 @@ def positional_args_index_via_section_index(si):
         cx = cx[1].children
     d = {}
     for ch in cx:
-        None if ch.is_terminal else cover_me('fine but cover')
+        assert(ch.is_terminal)  # else fine but cover
         _use_s = ch.styled_content_string
         _match = re.search('^([^ ]+)[ ]{2,}', _use_s)  # ..
         d[_match[1]] = ch
@@ -94,18 +94,17 @@ def __option_line_challenge_mode(line_s):
 
     def _scan(rx_s):
         match = _match(rx_s)
-        if match is not None:
-            _advance_cursor_to(match.end())
-            s_a = match.groups()
-            num = len(s_a)
-            if num is 0:
-                return match[0]
-            elif num is 1:
-                return s_a[0]
-            else:
-                cover_me(
-                      'if you use groups in your scan regex, ' +
-                      'you can only have one group')
+        if match is None:
+            return
+        _advance_cursor_to(match.end())
+        s_a = match.groups()
+        leng = len(s_a)
+        if leng is 0:
+            return match[0]
+        assert(leng == 1)
+        # if you use groups in your scan regex,
+        # you can only have one group'
+        return s_a[0]
 
     def _skip(rx_s):
         match = _match(rx_s)
@@ -159,15 +158,32 @@ def __my_named_tuple_for_above():
 
 def section_index_via_chunks(s_a):
 
-    None if len(s_a) == 1 else cover_me('see me')
-    # ☝️ would require a flat map; read: lowlevel stream tooling & testing
+    # the following message is from the future
+    # before #history-X.X we were using some vendor library to generate help
+    # screens. it (not us) flattened our multi-lines messages and also word-
+    # wrapped them (?), such that our helps screens were in ONE BIG STRING.
+    # now that this testlib is used against our own generated help screens,
+    # we no longer have to turn ONE BIG STRING into a line stream.
 
-    _line_st = _this_lib().line_stream_via_big_string(s_a[0])
-    return _section_index_via_line_stream(_line_st)
+    leng = len(s_a)
+    assert(leng)
+    if 1 == leng:  # #todo
+        big_string, = s_a
+        assert('\n' in big_string)
+        from .expect_treelike_screen import line_stream_via_big_string
+        _lines = line_stream_via_big_string(big_string)
+        return _section_index_via_line_stream(_lines)
+
+    assert(1 < len(s_a))  # ☝️
+    assert(s_a[0][-1] == '\n')  # ..
+
+    return _section_index_via_line_stream(s_a)
 
 
 def _section_index_via_line_stream(line_st):
-    tree = _this_lib().tree_via_line_stream(line_st)
+
+    from .expect_treelike_screen import tree_via_line_stream
+    tree = tree_via_line_stream(line_st)
     cx = tree.children
     node_d = {}
     for node in cx:
@@ -218,11 +234,6 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
     tc.assertEqual(0, rslt.exitstatus)
     is_open = False
     return chunks
-
-
-def _this_lib():
-    import script_lib.test_support.expect_treelike_screen as mod
-    return mod
 
 
 def _my_exception(msg):  # #copy-pasted

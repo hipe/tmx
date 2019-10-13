@@ -40,10 +40,10 @@ class listening:  # (as namespace only)
         return _.flush_some_message()
 
 
-class _ErrorMonitor:
+class ModalityAgnosticErrorMonitor:  # :[#507.9]
     """Construct the error monitor with one listener. It has two attributes:
 
-    `listener` and `ok`. Pass *this* listener to a client, and if it fails
+    `listener` and `OK`. Pass *this* listener to a client, and if it fails
     (by emitting an `error`), the `ok` attribute (which started out as True)
     will be set to False. The emission is passed thru to the argument listener
     unchanged.
@@ -73,9 +73,6 @@ class _ErrorMonitor:
         def f(a):
             stderr.write(listening.emission_via_args(a).flush_to_trace_line())
         self._debug = f
-
-
-setattr(listening, 'ErrorMonitor', _ErrorMonitor)
 
 
 # == "views" on the emission

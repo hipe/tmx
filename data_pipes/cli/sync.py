@@ -1,116 +1,89 @@
 """
-description: for each entity in a far collection, try match it
-to an entity in the near collection using the "sync key" of each entity.
+Mutate a near collection by merging ("syncing") a far collection in to it.
 
-If a match is made, the subset of attributes that are set in both entities
-will be updated in the near entity to have the values from the far entity.
+(This describes a sync where both collections are well-formed and valid, and
+the "interleaving" sync algorithm (described elsewhere) is employed.)
 
-Attributes set in the near entity that are not set in the far entity are
-preserved; but if there any attributes in the far that are not in the near,
-this will express an error and halt further processing.
+For each entity in the far collection, try to match it to an entity in the
+near collection using the "sync key" of each entity.
+
+Entities in the far collection but not the near collection (by sync key) will
+be inserted (and surface-represented) into the near collection.
+
+Entities in the near collection but not the far collection (by sync key) will
+be left "where they are". (There is currently no `--prune` option).
+
+When a match-pair is made (one near and one far), we attempt an "entity sync",
+which is solved in a manner somewhat recurive to the above but different:
+
+Attributes in the near and not the far remain as they are.
+
+For attributes set in both near and far, the far value clobbers the near.
+
+But, if there are attributes in the far that are not present in the near
+(by name), this is expressed as an error and we exit early.
+
+(At writing, the above proviso is only for one particular format adapter,
+but there is only one participating format adapter for near collections
+so it holds for "all".)
 """
+
 # NOTE some of the content of the above text is covered by (Case3066)
 # [#447] describes the above algorithm more formally
 
-from . import (
-        parse_args_,
-        try_help_,
-        maybe_express_help_for_format,
-        must_be_interactive_,
-        listener_for_)
+# at #history-A.3, you can visual test this with
+# kiss_rdb_test/fixture-directories/2656-markdown-table/0100-hello.md
+# data_pipes_test/fixture_executables/exe_130_edit_add.py
+
 
 _desc = __doc__
 
 
-def _my_parameters(o, param):
-
-    o['near_collection'] = param(
-            description='«help for near_collection»',
-            )
-
-    o['near_format'] = param(
-            description=try_help_('«the near_format»'),
-            argument_arity='OPTIONAL_FIELD',
-            )
-
-    o['producer_script'] = param(
-            description='«help for producer_script»',
-            )
-
-    def diff_desc():  # be like [#511.3]
-        yield "show only the changed lines as a diff"
-
-    o['diff'] = param(
-            description=diff_desc,
-            argument_arity='FLAG',
-            )
+_formal_parameters = (
+        ('--near-format=FORMAT_NAME', 'ohai «the near_format»'),
+        ('--diff', 'show only the changed lines as a diff'),
+        ('near-collection', 'ohai «help for near_collection»', "try 'help'"),
+        ('producer-script', 'ohai «help for producer_script»'),
+        )
 
 
-def _pop_property(obj, attr):
-    x = getattr(obj, attr)
-    delattr(obj, attr)
-    return x
+def _CLI(sin, sout, serr, argv):
+    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+    if not require_interactive(serr, sin, argv):
+        return 456  # _exitstatus_for_error
+    return cheap_arg_parse(
+            CLI_function=_do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=argv,
+            formal_parameters=_formal_parameters,
+            description_template_valueser=lambda: {})
 
 
-class _CLI:  # #open [#607.4] de-customize this custom CLI
+def _do_CLI(monitor, sin, sout, serr, near_fmt, do_diff, near_coll, ps_path):
 
-    def __init__(self, *_four):
-        # (Case3061)
-        self.stdin, self.stdout, self.stderr, self.ARGV = _four  # #[#608.6]
-        self.exitstatus = 5  # starts as guilty til proven innocent
-        self.OK = True
+    if 'help' == near_fmt:
+        from data_pipes.cli import SPLAY_FORMAT_ADAPTERS
+        return SPLAY_FORMAT_ADAPTERS(sout, serr)
 
-    def execute(self):
-        must_be_interactive_(self)
-        self.OK and parse_args_(self, '_namespace', _my_parameters, _desc)
-        self.OK and self.__init_normal_args_via_namespace()
-        self.OK and maybe_express_help_for_format(
-                self, self._normal_args['near_format'])
-        self.OK and setattr(self, '_listener', listener_for_(self))
-        self.OK and self.__call_over_the_wall()
-        return self._pop_property('exitstatus')
+    _opened = open_new_lines_via_sync(
+            ps_path, near_coll, monitor.listener, near_fmt)
 
-    def __call_over_the_wall(self):
-
-        self.exitstatus = 0  # now that u made it this far innocent til guilty
-
-        _d = self._pop_property('_normal_args')
-        _context_manager = open_new_lines_via_sync(
-                **_d,
-                listener=self._listener,
-                )
-
-        if self._do_diff:
-            line_consumer = self.__build_line_consumer_for_dyff_lyfe()
-        else:
-            line_consumer = _LineConsumer_via_STDOUT(self.stdout)
-
-        with _context_manager as lines, line_consumer as receive_line:
-            for line in lines:
-                receive_line(line)
-
-    def __build_line_consumer_for_dyff_lyfe(self):
-        return _FancyDiffLineConsumer(
-                stdout=self.stdout,
-                near_collection_path=self._near_collection,
+    if do_diff:
+        line_consumer = _FancyDiffLineConsumer(
+                stdout=sout,
+                near_collection_path=near_coll,
                 tmp_file_path='z/tmp',  # #open [#459.P] currently hard-coded
                 )
+    else:
+        line_consumer = _LineConsumer_via_STDOUT(sout)
 
-    def __init_normal_args_via_namespace(self):
-        ns = self._pop_property('_namespace')
+    with _opened as lines, line_consumer as receive_line:
+        for line in lines:
+            receive_line(line)
 
-        near_collection = getattr(ns, 'near-collection')
-        self._near_collection = near_collection
+    return monitor.exitstatus
 
-        self._do_diff = ns.diff
-        self._normal_args = {
-                # #open [#459.M]: dashes to underscores is getting annoying:
-                'producer_script_path': getattr(ns, 'producer-script'),
-                'near_collection': near_collection,
-                'near_format': ns.near_format,
-                }
 
-    _pop_property = _pop_property
+_do_CLI.__doc__ = _desc
 
 
 def open_new_lines_via_sync(  # #testpoint
@@ -216,7 +189,8 @@ class _FancyDiffLineConsumer:
         # (the thing doesn't output this line but we need it to use gitx)
         sout.write("diff %s %s\n" % (use_fromfile, use_tofile))
 
-        to_IO = _pop_property(self, '_tmp_file')
+        to_IO = self._tmp_file
+        del self._tmp_file
         to_IO.seek(0)
 
         YUCK_to_lines = [x for x in to_IO]
@@ -262,9 +236,9 @@ def _empty_context_manager():
 
 def cli_for_production():
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-A.3: no more formal parameters. cheap arg parse not older API's
 # #history-A.2: map-for-sync abstracted out of this
 # #history-A.1: replace hand-written argparse with agnostic modeling
 # #born.

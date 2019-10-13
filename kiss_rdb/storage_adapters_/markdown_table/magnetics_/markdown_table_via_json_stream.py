@@ -1,3 +1,5 @@
+raise Exception('xx')
+
 # #[#874.8] file generates mardown the old way and may need to be the new way
 # #[#874.4] module is concerned with multi-tablism. (maybe frontiered it)
 
@@ -5,12 +7,10 @@
 class _CLI:
 
     def __init__(self, *four):
-        def f():
-            self.exitstatus = 5
-        self.exitstatus = 0
         self.stdin, self.stdout, self.stderr, self.ARGV = four
-        import script_lib as _
-        self._listener = _.listener_via_error_listener_and_IO(f, self.stderr)
+        from script_lib.magnetics import error_monitor_via_stderr
+        self._monitor = error_monitor_via_stderr(self.stderr)
+        self._listener = self._monitor.listener
 
     def execute(self):
         if self.stdin.isatty():
@@ -23,7 +23,7 @@ class _CLI:
             for line in _lines_via_dicts(dicts, self._listener):
                 write(line + '\n')
 
-        return self.exitstatus
+        return self._monitor.exitstatus
 
     def _when_tty(self):
 

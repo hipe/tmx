@@ -5,10 +5,6 @@ listeners, the essential "modality-agnostic" [#017] concept.
 
 👉 We have #history-A.2 buried an explanation of listeners because it doesn't
 belong here but we might want to find it in the :[#017] future.
-
-👉 This file is at the bottom of a #[#607.C] stack of three areas concerned
-with making listeners for this modality. Currently this only has help screen.
-See the others for "generic case expression" etc.
 """
 
 
@@ -164,6 +160,7 @@ class _MaxWidthSeer:
         if self.max_width < w:
             self.max_width = w
 
+# #pending-rename: help screen via..
 # #history-A.2: spike help screen, archive older explanation of listeners
 # #history-A.1: introduce the 'structure' shape
 # #abstracted.

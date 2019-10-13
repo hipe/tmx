@@ -2,34 +2,49 @@
 
 
 raise Exception("#not-covered - comment out if you're feelng lucky")
-# (restored to work "visually" at #history-A.1, but not covered hence broken)
+
+"""A sort of producer script sourced from kubernetes documentation.
+
+At birth this scraped a url like:
+
+{eg_url}
+
+, turning it ☝️  into an entity stream presumably for use in generating
+a punchlist somehow.
+"""
+
+_doc = __doc__
+
+_example_url = 'https://kubernetes.io/docs/concepts/'
 
 
-class _CLI:  # [#607.4] custom CLI
+# (worked "visually" (mostly) at #history-A.2)
 
-    def __init__(self, *four):
-        self.stdin, self.stdout, self.stderr, self.ARGV = four
 
-    def execute(self):
-        def f():
-            self.exitstatus = 5
-        import script_lib as _
-        self._listener = _.listener_via_error_listener_and_IO(f, self.stderr)
+def _CLI(stdin, stdout, stderr, argv):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+        CLI_function=_do_CLI,
+        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+        formal_parameters=(
+            ('url', 'example: https://some-k8s-site.com/docs/foo-bar/'),
+            ),
+        description_template_valueser=lambda: {'eg_url': _example_url})
 
-        a = self.ARGV
-        if 2 != len(a) or '-' == a[1][0]:  # meh
-            o = self.stderr.write
-            o(f'usage: {a[0]} https://some-k8s-site.com/docs/foo-bar/\n')
-            return 5
-        _, url = a
 
-        from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
-        write = dictionary_dumper_as_JSON_via_output_stream(self.stdout)
+def _do_CLI(monitor, stdin, stdout, stderr, url):
 
-        for obj in object_stream_via_url_(None, url, self._listener):
-            write(obj)
+    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
+    write = dictionary_dumper_as_JSON_via_output_stream(stdout)
 
-        self.stdout.write('\n')
+    for obj in object_stream_via_url_(None, url, monitor.listener):
+        write(obj)
+
+    stdout.write('\n')
+    return _exitstatus_for_success
+
+
+_do_CLI.__doc__ = _doc
 
 
 def object_stream_via_url_(cached_path, url, listener):
@@ -174,10 +189,13 @@ _label = 'label'
 _url = 'url'
 
 
+_exitstatus_for_success = 0
+
+
 if __name__ == '__main__':
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-A.2
 # #history-A.1
 # #born.

@@ -24,7 +24,22 @@ _raw_url = (
         )
 
 
-def _my_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
+def _CLI(sin, sout, serr, argv):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            CLI_function=_do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=argv,
+            formal_parameters=(
+                ('-p', '--prepared-for-sync',
+                 'map certain fields from far to near (1 rename, 1 split)'),
+                ('-s', '--for-sync',
+                 'translate to a stream suitable for use in [#447] syncing'),
+            ),
+            description_template_valueser=lambda: {'raw_url': _raw_url},
+            )
+
+
+def _do_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
     listener = error_monitor.listener
 
     if do_prepare or is_for_sync:
@@ -37,10 +52,10 @@ def _my_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
             dcts = stream_for_sync_via_stream(dcts)
         _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
 
-    return 0 if error_monitor.OK else 456
+    return error_monitor.exitstatus
 
 
-_my_CLI.__doc__ = __doc__
+_do_CLI.__doc__ = __doc__
 
 
 stream_for_sync_is_alphabetized_by_key_for_sync = False
@@ -212,18 +227,7 @@ def _ps_lib():
 
 if __name__ == '__main__':
     import sys as o
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    exit(cheap_arg_parse(
-            CLI_function=_my_CLI,
-            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-            formal_parameters=(
-                ('-p', '--prepared-for-sync',
-                 'map certain fields from far to near (1 rename, 1 split)'),
-                ('-s', '--for-sync',
-                 'translate to a stream suitable for use in [#447] syncing'),
-            ),
-            description_template_valueser=lambda: {'raw_url': _raw_url},
-            ))
+    exit(_CLI(o.stdin, o.stdout, o.sterr, o.argv))
 
 # #history-A.4: rewrite: no more sync-side stream mapping
 # #history-A.3: key simplifier found to be not covered and left broken

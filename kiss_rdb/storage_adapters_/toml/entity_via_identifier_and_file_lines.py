@@ -61,10 +61,9 @@ class _Main:
         # build our parser "by hand" so we have a handle on the parse state
 
         from . import identifiers_via_file_lines as grammar_lib
-        from modality_agnostic import listening
-        ErrorMonitor = listening.ErrorMonitor
+        from modality_agnostic import ModalityAgnosticErrorMonitor
 
-        mon = ErrorMonitor(listener)
+        mon = ModalityAgnosticErrorMonitor(listener)
 
         _sm = grammar_lib.state_machine_
 

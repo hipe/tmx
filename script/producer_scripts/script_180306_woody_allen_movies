@@ -14,7 +14,7 @@ broadly there are 3 steps to this:
 """
 
 
-raise Exception('not covered')  # [#676] cover me. worked at #history-A.1
+raise Exception("worked visually once")  # at #history-A.2 [#676] cover me but:
 # NOTE - this writes tempfiles so take that into account when you cover
 
 
@@ -40,13 +40,20 @@ tmp_numbers_file = 'tmp.woody-allen.numbers.list'
 tmp_html_file = 'tmp.woody-allen.page.html'
 
 
-def _execute_into(client, argv):
+def _CLI(stdin, stdout, stderr, argv):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+        CLI_function=_do_CLI,
+        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
+        formal_parameters=(
+            ('--use-numpy', 'do the full monty. requires things'),
+            ),
+        description_template_valueser=lambda: {})
+
+
+def _do_CLI(error_monitor, sin, sout, serr, do_use_numpy):
 
     def __main():
-        ok, do_thing = __parse_argv()
-        if not ok:
-            return exitstatus
-
         ok = __resolve_html_file()
         if not ok:
             return exitstatus
@@ -55,7 +62,7 @@ def _execute_into(client, argv):
         if not ok:
             return exitstatus
 
-        return _display_thing(client, do_thing)
+        return _display_thing(client, do_use_numpy)
 
     def __resolve_numbers():
         if client.path_exists(tmp_numbers_file):
@@ -71,50 +78,21 @@ def _execute_into(client, argv):
         else:
             return _write_html_file(client)
 
-    def __parse_argv():
-        program_name, *rest = argv
-        leng = len(rest)
-        if 0 == leng:
-            return True, False
-        this_one_option = '--use-numpy'
-        do_explain = False
-        if 1 == leng:
-            tok, = rest
-            if tok == this_one_option:
-                return True, True
-            if tok in ('-h', '--help'):
-                do_explain = True
-            else:
-                client.error(f"unrecognized option/argument '{tok}'")
-        else:
-            client.error('too many arguments')
-
-        client.info(f'usage: {program_name} [--help|--use-numpy]')
-        if do_explain:
-            for line in __do_explain():
-                client.stderr.write(f'{line}\n')
-        return False, None
-
-    def __do_explain():
-        itr = (line for line in _doc.split('\n') if len(line))
-        yield f'description: {next(itr)}'
-        for line in itr:
-            yield line
-        yield 'options:'
-        yield '    --use-numpy  do the full monty. requires things'
-
+    client = _Client(sout, serr)
     exitstatus = 5
 
     return __main()
+
+
+_do_CLI.__doc__ = _doc
 
 
 def _display_thing(client, do_thing):
 
     float_a = tuple(__floats_via_file())
     if do_thing:
-        __display_thing_using_numpy(client, float_a)
-    else:
-        __display_thing_simply(client, float_a)
+        return __display_thing_using_numpy(client, float_a)
+    return __display_thing_simply(client, float_a)
 
 
 def __display_thing_using_numpy(client, float_a):
@@ -130,6 +108,7 @@ def __display_thing_using_numpy(client, float_a):
     pp.plot(ar, np.zeros_like(ar) + val, 'x')
     client.info('(showing. close window there to return.)')
     pp.show()
+    return _exitstatus_for_success
 
 
 def __display_thing_simply(client, float_a):
@@ -139,6 +118,7 @@ def __display_thing_simply(client, float_a):
         count += 1
         io.write('%0.2f\n' % f)
     client.info('({} items total)', count)
+    return _exitstatus_for_success
 
 
 def __floats_via_file():
@@ -235,13 +215,12 @@ def _write_html_file(client):
     return ok
 
 
-class _Client:  # [#607.4] custom CLI
+class _Client:
     """("modality" "injection")"""
 
-    def __init__(self, sin, sout, serr):
-        self.stdin = sin
-        self.stdout = sout
-        self.stderr = serr
+    def __init__(self, stdout, stderr):
+        self.stdout = stdout
+        self.stderr = stderr
 
     def remove_file(self, path):
         import os
@@ -261,10 +240,13 @@ class _Client:  # [#607.4] custom CLI
         self.stderr.write(fmt.format(*args)+'\n')
 
 
-if __name__ == '__main__':
-    import sys
-    _client = _Client(sys.stdin, sys.stdout, sys.stderr)
-    exit(_execute_into(_client, sys.argv))
+_exitstatus_for_success = 0
 
+
+if __name__ == '__main__':
+    import sys as o
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
+
+# #history-A.2 refactor to cheap arg parse
 # #history-A.1
 # #born.

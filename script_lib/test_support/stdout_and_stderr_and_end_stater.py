@@ -60,19 +60,19 @@ def for_DEBUGGING():
     return _sout_proxy, _serr_proxy, finish
 
 
-def for_flip_flopping_sectioner():
+def three_for_line_runner():
     """this recorder does no real-time assertion.
 
     vaguely similar to [#603] the help screen parser, this partitions
     contiguous lines into groupings based on which channel the line is
-    on. the `sections` of the resulting end state will either be the
+    on. the `line_runs` of the resulting end state will either be the
     empty tuple, or have `which` of the form
 
         stderr [stdout [stderr [stdout [stderr [..]]]]]
     or:
         stdout [stderr [stdout [stderr [stdout [..]]]]]
 
-    each section will also have a `lines`.
+    each line run will also have a `lines`.
     """
 
     class _StatefulFellow:
@@ -80,7 +80,7 @@ def for_flip_flopping_sectioner():
         def __init__(self):
             self._current_state = 'closed'
             self._current_lines = None
-            self._sections = []
+            self._line_runs = []
 
         def receive_stdout_write(self, s):
             return self._receive_write('stdout', s)
@@ -89,30 +89,30 @@ def for_flip_flopping_sectioner():
             return self._receive_write('stderr', s)
 
         def _receive_write(self, which, s):
-            self._maybe_close_current_section(which)
+            self._maybe_close_current_line_run(which)
             self._current_lines.append(s)
             return len(s)  # you have to be like write, e.g [#607.B]
 
         def finish(self, actual_exitstatus):
-            self._maybe_close_current_section('closed')
+            self._maybe_close_current_line_run('closed')
             del(self._current_lines)  # sanity
-            return _SectionedEndState(actual_exitstatus, tuple(self._sections))
+            return _LineRuns(actual_exitstatus, tuple(self._line_runs))
 
-        def _maybe_close_current_section(self, which):
+        def _maybe_close_current_line_run(self, which):
             if self._current_state != which:
                 if self._current_lines is None:
                     # the first state change you have is from the closed state
                     self._current_lines = []
                 else:
-                    self.__close_current_section(which)
+                    self.__close_current_line_run(which)
                 self._current_state = which
 
-        def __close_current_section(self, which):
+        def __close_current_line_run(self, which):
             a = self._current_lines
-            self._sections.append(_Section(self._current_state, tuple(a)))
+            self._line_runs.append(LineRun(self._current_state, tuple(a)))
             a.clear()
 
-    class _Section:
+    class LineRun:
         def __init__(self, which, lines):
             self.which = which
             self.lines = lines
@@ -196,20 +196,20 @@ def __recording_list_and_expectation_functions_via_count(num):
     return actual_lines, _line_expectations
 
 
-class _SectionedEndState:
+class _LineRuns:
 
-    def __init__(self, d, sections):
+    def __init__(self, d, line_runs):
         self.exitstatus = d
-        self.sections = sections
+        self.line_runs = line_runs
 
-    def first_section(self, which):
+    def first_line_run(self, which):
         return self._first(False, which)
 
-    def last_section(self, which):
+    def last_line_run(self, which):
         return self._first(True, which)
 
     def _first(self, do_reverse, which):
-        a = self.sections
+        a = self.line_runs
         r = range(0, len(a))
         if do_reverse:
             r = reversed(r)
@@ -222,7 +222,7 @@ class _SectionedEndState:
         if did_find:
             return a[found_offset]
         else:
-            raise Exception(f'no {which} output ({len(a)} sections of output)')
+            raise Exception(f'no {which} output ({len(a)} line_runs of output)')
 
 
 class _EndState:

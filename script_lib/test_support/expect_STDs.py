@@ -36,7 +36,7 @@ possible issues:
     lines per write..
 
 
-:[#009]
+:[#605]
 (Case0250)
 """
 
@@ -108,7 +108,7 @@ class _Performance:
         reporting facilities may assume that the string ends in a newline
         elsewhere. (this assuption can impact reporting efforts both
         positively and negatively. if this provision changes, we MUST check
-        each :[#here.B], which represents a subscription to this assumption.)
+        each :[605.2], which represents a subscription to this assumption.)
         """
 
         if not _ends_in_newline(line):
@@ -216,7 +216,7 @@ class _StringBasedLineExpectation(_LineExpectation):
 
     def failure_tuple_against(self, line):
         if self._string != line:
-            fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume [#here.B]
+            fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume [#605.2]
             dic = {'had': line, 'exp': self._string}
             return (dic, fmt)
 
