@@ -192,7 +192,7 @@ def _subject_magnetic():
 
 @lazy
 def _subject_magnetic_file():
-    import modality_agnostic.magnetics.parameter_via_definition as x
+    import modality_agnostic.magnetics.formal_parameter_via_definition as x
     return x
 
 

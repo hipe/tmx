@@ -160,7 +160,6 @@ class _MaxWidthSeer:
         if self.max_width < w:
             self.max_width = w
 
-# #pending-rename: help screen via..
 # #history-A.2: spike help screen, archive older explanation of listeners
 # #history-A.1: introduce the 'structure' shape
 # #abstracted.

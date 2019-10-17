@@ -88,7 +88,7 @@ def _SIMPLE_STEP(
             deque_via_ARGV as argv_stream_f,
             resources_via_ARGV_stream_and_stderr_and_stdout as rsx_f)
     from modality_agnostic.magnetics import (
-            parameter_via_definition as param_f)
+            formal_parameter_via_definition as param_f)
     argv_stream = argv_stream_f(argv)
     prog = argv_stream.popleft()
 

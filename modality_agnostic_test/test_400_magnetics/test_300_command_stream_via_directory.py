@@ -36,7 +36,7 @@ def _this_one_module():
 
 
 def _subject_magnetic():
-    import modality_agnostic.magnetics.command_stream_via_directory as x
+    import modality_agnostic.magnetics.commands_via_directory as x
     return x.SELF
 
 

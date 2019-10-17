@@ -172,7 +172,7 @@ class CLI_CaseMethods:
         return s_a, _f_a
 
     def main_magnetic_(self):
-        import script_lib.magnetics.interpretation_via_parse_stepper as x
+        import script_lib.cheap_arg_parse_branch as x
         return x
 
     # --
@@ -215,7 +215,7 @@ class CLI_CaseMethods:
 def _command_named(name):
 
     from modality_agnostic_test.public_support import empty_command_module as ecm  # noqa: E501
-    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    import modality_agnostic.magnetics.command_via_formal_parameters as x
     return x.SELF(
             name=name,
             command_module=ecm(),

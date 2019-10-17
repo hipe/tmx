@@ -31,7 +31,7 @@ tokens start with dashes.)
 we follow [#006.regression-order] in naming the test cases and test methods
 """
 
-from script_lib.test_support.generic_CLI_helper import (
+from script_lib.test_support.CLI_canon import (
         CLI_CaseMethods,
         the_empty_ARGV,
         ARGV,

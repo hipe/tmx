@@ -47,7 +47,8 @@ class _CommonFunctions:
 def _express_error_structure(echo_error_line, channel_tail, struct):
     # (Case6080)
 
-    from ._case_adaptations import WHINE_ABOUT
+    from script_lib.magnetics.expression_via_structured_emission import (
+        WHINE_ABOUT)
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 

@@ -1,4 +1,4 @@
-from script_lib.test_support.generic_CLI_helper import (
+from script_lib.test_support.CLI_canon import (
         CLI_CaseMethods,
         ARGV)
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
@@ -32,7 +32,7 @@ class Case6150_ohai(CLI_CaseMethods, unittest.TestCase):
         from modality_agnostic_test.fixture_directories import (
                 _010_cha_cha as mod,
                 )
-        import modality_agnostic.magnetics.command_stream_via_directory as x
+        import modality_agnostic.magnetics.commands_via_directory as x
         return x.SELF(mod)
 
 

@@ -117,7 +117,7 @@ def _write_help_lines(
         stderr, description_template_valueser,
         CLI_function, program_name, CLI):
 
-    from .magnetics.listener_via_resources import (  # will rename
+    from .magnetics.help_lines_via import (  # will rename
             desc_lineser_via, help_lines)
 
     _descser = desc_lineser_via(description_template_valueser, CLI_function)

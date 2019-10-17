@@ -37,7 +37,7 @@ def _final_stream_via_generator(gen, collection_module):
 
 
 def _command_via_module(mod, stem):
-    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    import modality_agnostic.magnetics.command_via_formal_parameters as x
     return x.SELF(
             name=stem,
             command_module=mod,

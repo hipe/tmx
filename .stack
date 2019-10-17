@@ -21,3 +21,8 @@ flush pending renames
 [#874.8] multiple scripts that generated markdown. change them to be the new way
 pass-thru translation integrated into CLI for create collection (CSV to MD)
 there are todo's
+the upstream resolver thing
+agnostic integration/massive unification of CLI not to use vendor argparse
+add syntax features to cheap arg parse
+CLI branch parsing the new way (not agnostic yet)
+flush pending renames

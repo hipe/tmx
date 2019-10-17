@@ -26,7 +26,7 @@ class Case8063_the_only_case(unittest.TestCase):
 
 
 def _subject_module():
-    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    import modality_agnostic.magnetics.command_via_formal_parameters as x
     return x.SELF
 
 

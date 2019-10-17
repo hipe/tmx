@@ -185,7 +185,7 @@ def _index_parameters(
 
 @lazy
 def _default_formal_parameter():  # #testpoint
-    import modality_agnostic.magnetics.parameter_via_definition as mag
+    import modality_agnostic.magnetics.formal_parameter_via_definition as mag
     return mag(
             description=None,  # hi.
             default_value=None,  # hi.

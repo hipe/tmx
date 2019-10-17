@@ -152,12 +152,12 @@ def _generic_parameter():
 
 
 def _command():
-    import modality_agnostic.magnetics.command_via_parameter_stream as x
+    import modality_agnostic.magnetics.command_via_formal_parameters as x
     return x
 
 
 def _parameter():
-    import modality_agnostic.magnetics.parameter_via_definition as x
+    import modality_agnostic.magnetics.formal_parameter_via_definition as x
     return x
 
 # #born.

@@ -162,11 +162,8 @@ _my_CLI.__doc__ = __doc__
 
 
 def _CLI(sin, sout, serr, argv):  # #testpoint
-
-    from script_lib.magnetics import (
-            common_upstream_argument_parser_via_everything)
-
-    _exitstatus = common_upstream_argument_parser_via_everything(
+    from script_lib.magnetics import upstream_IO_via_arguments
+    _exitstatus = upstream_IO_via_arguments(
             CLI_function=_my_CLI,
             std_tuple=(sin, sout, serr, argv),
             argument_moniker='<script>',

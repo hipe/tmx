@@ -45,7 +45,8 @@ class error_monitor_via_stderr:
             _new_errno = dct.pop('errno')  # it's bad to mutate it but w/e
             self.see_exitstatus(_new_errno)
 
-        from kiss_rdb.cli._case_adaptations import WHINE_ABOUT  # will rename
+        from script_lib.magnetics.expression_via_structured_emission import (
+                WHINE_ABOUT)
         WHINE_ABOUT(self._write_line, em.channel_tail, dct)
 
     def __express_when_shape_is_expression(self, em):
