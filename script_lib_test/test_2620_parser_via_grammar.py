@@ -88,7 +88,7 @@ class Case2617_no_optional(against_grammar_B):
         return ('--foo-bar',)
 
 
-class Case2620_yes_optional(against_grammar_B):
+class Case2620_yes_optional(against_grammar_B):  # #midpoint
 
     def test_100_parses(self):
         ast = self.run_expecting_success()

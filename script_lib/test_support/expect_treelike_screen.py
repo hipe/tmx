@@ -43,9 +43,8 @@ but we are letting this issue incubate for now.
 from modality_agnostic.memoization import lazy
 
 
-def tree_via_line_stream(line_st):
-
-    _scanned_line_itr = (_ScannedLine(s) for s in line_st)
+def tree_via_lines(lines):
+    _scanned_line_itr = (_ScannedLine(s) for s in lines)
     scn = _scanner_via_iterator(_scanned_line_itr)
 
     if scn.has_current_token:
@@ -128,8 +127,7 @@ def __tree_when_one_or_more_lines(scn):
         return scn.current_token
     state = _StateMachine(_l, _this_one_state_machine_definition())
     __main_loop()
-    _tree = state.end_of_input()
-    return _tree
+    return state.end_of_input()
 
 
 @lazy
@@ -481,7 +479,7 @@ class _ScannedLine:
     )
 
 
-def line_stream_via_big_string(big_s):
+def lines_via_big_string(big_s):
     """convert any string into a stream of "lines" (isomorphically)..
 
     ## objective & scope

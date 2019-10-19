@@ -84,7 +84,7 @@ def RESOLVE_UPSTREAM_EXPERIMENT(cli):
 
     def _liner_for(io):
         def o(s=None):
-            write('\n' if s is None else f'{s}\n')
+            write(_eol if s is None else f'{s}{_eol}')  # [#607.I]
         write = io.write
         return o
 
@@ -136,6 +136,13 @@ def _cached_doc_via_url(url, listener):
 
 def deindent_doc_string_(big_string, do_append_newlines):
     # convert a PEP-257-like string into an iterator of lines
+
+    if _eol not in big_string:
+        if do_append_newlines:
+            yield f'{big_string}{_eol}'
+        else:
+            yield big_string
+        return
 
     if do_append_newlines:
         iter_rxs = '^.*\n'
@@ -200,6 +207,9 @@ class Exception(Exception):
 GENERIC_ERROR = 2
 SUCCESS = 0
 TEMPORARY_DIR = 'z'  # ick/meh
+
+
+_eol = '\n'
 
 
 # #history-A.3: "cheap arg parse" moves to dedicated file

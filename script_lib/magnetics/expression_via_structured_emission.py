@@ -33,7 +33,7 @@ A simple case as a regression-point: (Case5918)
 # this is the most apotheotic extant implementation (at writing) of #[#008.11]
 
 
-def WHINE_ABOUT(echo, channel_tail, dim_pool):
+def express_structured_emission(echo, channel_tail, dim_pool):
     # dim_pool = "diminishing pool"
     for line in __lines(channel_tail, dim_pool):
         echo(line)

@@ -381,9 +381,8 @@ class _Ensure:
 # == PUBLICOS
 
 def tree_via_lines(lines):
-    from script_lib.test_support.expect_treelike_screen import (
-            tree_via_line_stream as _)
-    return _(lines)
+    from script_lib.test_support.expect_treelike_screen import tree_via_lines
+    return tree_via_lines(lines)
 
 
 def build_filesystem_expecting_num_file_rewrites(expected_num):

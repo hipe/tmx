@@ -19,29 +19,41 @@ class parser_via_grammar_and_symbol_table:
 
         self._symbols = CACHING_COLLECTION_VIA_COLLECTION(_inner_coll)
 
-    def parse(self, token_scanner, listener):
+    def parse(self, token_scanner, listener, stop_ASAP=False):
         def symbol_via(symbol_name):
             return _(symbol_name, None)  # ..
         _ = self._symbols.retrieve_entity_as_storage_adapter_collection
-        return _parse(token_scanner, self._digraph, symbol_via,
-                      self._sequence_grammar, listener)
+        return _parse(
+                token_scanner, stop_ASAP,
+                self._digraph, symbol_via, self._sequence_grammar, listener)
 
 
-def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
+def _parse(
+        token_scanner, stop_ASAP,
+        digraph, symbol_table, sequence_grammar, listener):
 
     ast = [None for _ in range(0, len(sequence_grammar))]
     transitions = digraph[0]  # #transitions
+    grammar_length = len(sequence_grammar)
 
     last_used_offset_in_grammar = -1  # BE CAREFUL
     did_plurals_at = []
 
-    def offset_of_any_next_missing_required():
-        for i in range(last_used_offset_in_grammar + 1, len(sequence_grammar)):
+    def offset_of_first_missing():
+        for i in range(last_used_offset_in_grammar + 1, grammar_length):
             if sequence_grammar[i].is_required:  # #term
                 return i
 
+    def finish_AST():
+        for i in did_plurals_at:
+            ast[i] = tuple(ast[i])
+        return tuple(ast)
+
     while not token_scanner.is_empty:
         # the essence of all (packrat?) parsing: first match wins
+
+        if stop_ASAP and offset_of_first_missing() is None:
+            return finish_AST()
 
         # step one: find the first match based on peeking
 
@@ -56,9 +68,11 @@ def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
                 break
 
         if not did_match:
-            _i = offset_of_any_next_missing_required()
+            i = offset_of_first_missing()
+            if stop_ASAP and i is None:
+                return finish_AST()
             return _when_transition_not_found(
-                    listener, _i, token_scanner, transitions)
+                    listener, i, token_scanner, transitions)
 
         # step two: does the ONE matching symbol succeed in parsing?
 
@@ -82,14 +96,11 @@ def _parse(token_scanner, digraph, symbol_table, sequence_grammar, listener):
     # We have succeeded it getting the grammar to satisfy the input tokens,
     # but did the input tokens satisfy all of the grammar? We must check:
 
-    i = offset_of_any_next_missing_required()
+    i = offset_of_first_missing()
     if i is not None:
         return _when_missing_required(listener, i)
 
-    for i in did_plurals_at:
-        ast[i] = tuple(ast[i])
-
-    return tuple(ast)
+    return finish_AST()
 
 
 def _build_digraph(tokens):  # #[#008.2]-adjacent (state machine sort of)

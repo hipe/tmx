@@ -19,7 +19,7 @@ class _NormalLinerCase(unittest.TestCase):
         self.assertEqual(num, len(_s_a))
 
     def _lines_via_big_string(self, big_s):
-        _iter = _subject_module().line_stream_via_big_string(big_s)
+        _iter = _subject_module().lines_via_big_string(big_s)
         return [x for x in _iter]
 
 
@@ -138,7 +138,7 @@ class Case0449_scanner_via_iterator(_CommonCase):
 class Case0452_nonplural_inputs(_CommonCase):
 
     def test_010_zero_lines(self):
-        _x = _tree_via_line_stream(_empty_iterator())
+        _x = _tree_via_lines(_empty_iterator())
         self.assertIsNone(_x)
 
     def test_020_one_line_builds(self):
@@ -176,7 +176,7 @@ class Case0455_these_errors(_CommonCase):
     def _expect_this_one_error_from_this_one_line(self, exp_s, input_s):
         e = None
         try:
-            _tree_via_line_stream(iter([input_s]))
+            _tree_via_lines(iter([input_s]))
         except MyException as _e:
             e = _e
         self.assertEqual(exp_s, str(e))
@@ -321,7 +321,7 @@ class Case0464_first_target_case(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-def _line_stream_for_testing_via_tree(tree):  # :#here1
+def _lines_for_testing_via_tree(tree):  # :#here1
 
     # (near #history-A.1 this seemed to work. but it is not covered.)
 
@@ -374,15 +374,15 @@ def _line_stream_for_testing_via_tree(tree):  # :#here1
 
 
 def _tree_via_docstring(doc_s):
-    _line_stream = _line_stream_via_docstring(doc_s)
-    return _tree_via_line_stream(_line_stream)
+    _lines = _lines_via_docstring(doc_s)
+    return _tree_via_lines(_lines)
 
 
-def _tree_via_line_stream(line_stream):
-    return _subject_module().tree_via_line_stream(line_stream)
+def _tree_via_lines(lines):
+    return _subject_module().tree_via_lines(lines)
 
 
-def _line_stream_via_docstring(big_s):
+def _lines_via_docstring(big_s):
     """de-indent our doc-strings"""
 
     import re

@@ -46,8 +46,8 @@ class error_monitor_via_stderr:
             self.see_exitstatus(_new_errno)
 
         from script_lib.magnetics.expression_via_structured_emission import (
-                WHINE_ABOUT)
-        WHINE_ABOUT(self._write_line, em.channel_tail, dct)
+                express_structured_emission)
+        express_structured_emission(self._write_line, em.channel_tail, dct)
 
     def __express_when_shape_is_expression(self, em):
 

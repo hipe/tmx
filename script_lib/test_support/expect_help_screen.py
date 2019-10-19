@@ -8,28 +8,46 @@ import re
 
 
 def optional_args_index_via_section_index(si):
-    cx = si['optional arguments'].children
-    assert(len(cx) == 2)  # else needs work
-    cx = cx[1].children
-    d = {}
-    for ch in cx:
-        None if ch.is_terminal else cover_me('fine but cover')
-        _use_s = ch.styled_content_string
+    return {k: v for k, v in __do_optionals_index(si)}
+
+
+def section_index_via_lines__(unsanitized_strings):
+    _tree = __tree_via_unsanitized_strings(unsanitized_strings)
+    return __section_index_via_tree(_tree)
+
+
+section_index_via_chunks = section_index_via_lines__  # #todo
+
+
+def __do_optionals_index(si):
+    against = set(si)
+    needles = {'options', 'option'}
+    these = needles.intersection(against)
+    if not len(these):  # #todo
+        needles = {'optional arguments', 'optional argument'}
+        these = needles.intersection(against)
+    key, = these
+    _head_node, one_single_branch_node_why = si[key].children
+    for node in one_single_branch_node_why.children:
+        _use = (node if node.is_terminal else node.children[0])
+        # (if multi-line entries, skip second etc line)
+        _use_s = _use.styled_content_string
         o = __option_line_challenge_mode(_use_s)
-        d[o.main_long_switch] = o
-    return d
+        yield o.main_long_switch, o
 
 
 def positional_args_index_via_section_index(si):
-    cx = si['positional arguments'].children
-    assert(len(cx) == 2)  # else needs work
-    xch = cx[1]
+    against = set(si)
+    needles = {'arguments', 'sub-commands', 'agrument', 'sub-command'}
+    these = needles.intersection(against)
+    if not len(these):  # #todo
+        needles = {'positional arguments', 'positional argument'}
+        these = needles.intersection(against)
+    key, = these
+    _, node = si[key].children  # else needs work
     # we can't know the structure of the above beforehand so we normalize it
     # here by promoting terminals to branch node-ishes (#provision #[#014.A])
-    if xch.is_terminal:
-        cx = [xch]
-    else:
-        cx = cx[1].children
+    cx = (node,) if node.is_terminal else node.children
     d = {}
     for ch in cx:
         assert(ch.is_terminal)  # else fine but cover
@@ -45,9 +63,8 @@ def __option_line_challenge_mode(line_s):
     ... if this proves at all useful it should certainly be abstracted.
     """
 
-    out = {}
-
     def __main():
+        out = {}
         out['main_short_switch'] = __parse_any_short()
         out['main_long_switch'] = __parse_long()
         out['args_tail_of_long'] = __parse_any_args()
@@ -60,7 +77,7 @@ def __option_line_challenge_mode(line_s):
 
     def __parse_any_args():
         if self.cursor is not len(haystack_s):
-            return _assert_scan('[ ]([^ ].+)$')  # soften if necessary
+            return _assert_scan('[ =]([^ ].+)$')  # soften if necessary
 
     def __parse_long():
         return _assert_scan('--[a-z]+(?:-[a-z]+)*')  # ..
@@ -80,8 +97,7 @@ def __option_line_challenge_mode(line_s):
             if x is None:
                 _msg = __build_assertion_failure_message(f, rx_s)
                 raise _my_exception(_msg)
-            else:
-                return x
+            return x
         return g
 
     @assertify
@@ -156,7 +172,7 @@ def __my_named_tuple_for_above():
     ])
 
 
-def section_index_via_chunks(s_a):
+def __tree_via_unsanitized_strings(unsanitized_strings):
 
     # the following message is from the future
     # before #history-X.X we were using some vendor library to generate help
@@ -165,30 +181,27 @@ def section_index_via_chunks(s_a):
     # now that this testlib is used against our own generated help screens,
     # we no longer have to turn ONE BIG STRING into a line stream.
 
-    leng = len(s_a)
+    leng = len(unsanitized_strings)
     assert(leng)
     if 1 == leng:  # #todo
-        big_string, = s_a
+        big_string, = unsanitized_strings
         assert('\n' in big_string)
-        from .expect_treelike_screen import line_stream_via_big_string
-        _lines = line_stream_via_big_string(big_string)
-        return _section_index_via_line_stream(_lines)
+        from .expect_treelike_screen import lines_via_big_string
+        sanitized_lines = lines_via_big_string(big_string)
+    else:
+        sanitized_lines = __sanitized_lines_via_unsanitized_strings(
+                unsanitized_strings)
 
-    assert(1 < len(s_a))  # ☝️
-    assert(s_a[0][-1] == '\n')  # ..
-
-    return _section_index_via_line_stream(s_a)
+    from .expect_treelike_screen import tree_via_lines
+    return tree_via_lines(sanitized_lines)
 
 
-def _section_index_via_line_stream(line_st):
-
-    from .expect_treelike_screen import tree_via_line_stream
-    tree = tree_via_line_stream(line_st)
+def __section_index_via_tree(tree):
     cx = tree.children
     node_d = {}
     for node in cx:
         _use_s = __header_line_via_node(node)
-        match = re.search('(^[a-z]+(?:[ ][a-z]+)?):', _use_s)
+        match = re.match('^([a-z]+(?:[ -][a-z]+)*):', _use_s)
         if match is not None:
             node_d[match[1]] = node
 
@@ -204,6 +217,7 @@ def __header_line_via_node(node):
 
 
 def help_screen_chunks_via_test_case(tc):  # tc=test case
+    # #todo away or rewrite soon. half of this should be in the test file
 
     chunks = []
     is_open = True
@@ -236,6 +250,13 @@ def help_screen_chunks_via_test_case(tc):  # tc=test case
     return chunks
 
 
+def __sanitized_lines_via_unsanitized_strings(unsanitized_strings):
+    _normal_line_rx = re.compile(r'[^\r\n]*\n\Z')  # _eol
+    for unsanitized_string in unsanitized_strings:
+        assert(_normal_line_rx.match(unsanitized_string))
+        yield unsanitized_string
+
+
 def _my_exception(msg):  # #copy-pasted
     from script_lib import Exception as MyException
     return MyException(msg)
@@ -243,5 +264,8 @@ def _my_exception(msg):  # #copy-pasted
 
 def cover_me(s):
     raise Exception('cover me - {}'.format(s))
+
+
+_eol = '\n'
 
 # #born.

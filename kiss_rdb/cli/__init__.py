@@ -48,13 +48,13 @@ def _express_error_structure(echo_error_line, channel_tail, struct):
     # (Case6080)
 
     from script_lib.magnetics.expression_via_structured_emission import (
-        WHINE_ABOUT)
+            express_structured_emission)
 
     dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
 
     dim_pool.pop('errno', None)  # get rid of it, if any. was handled #here2
 
-    WHINE_ABOUT(echo_error_line, channel_tail, dim_pool)
+    express_structured_emission(echo_error_line, channel_tail, dim_pool)
 
 
 def _express_info_structure(info_category, dct):  # (Case6129)

@@ -24,5 +24,3 @@ there are todo's
 the upstream resolver thing
 agnostic integration/massive unification of CLI not to use vendor argparse
 add syntax features to cheap arg parse
-CLI branch parsing the new way (not agnostic yet)
-flush pending renames

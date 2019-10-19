@@ -33,7 +33,7 @@ class Case5414_AST(CommonCase):
         self.assertIsNone(self.second_option.short_name)
 
     def test_200_arg_name(self):
-        self.assertEqual(self.first_argument.name, 'arg-num1')
+        self.assertEqual(self.first_argument.styled_moniker, 'arg-num1')
 
     @property
     def first_option(self):
@@ -250,7 +250,7 @@ class Case5449_an_extra_positional_arg_looks_like_this(same):
         return ('AA', 'BB', 'CC')
 
 
-# #midpoint
+# Case5450  # #midpoint
 
 
 class Case5452_an_missing_positional_arg_looks_like_this(same):
@@ -260,7 +260,7 @@ class Case5452_an_missing_positional_arg_looks_like_this(same):
 
     def test_200_payload(self):
         _arg = self.flush_end_state_payload()['argument']
-        self.assertEqual(_arg.name, 'arg2')
+        self.assertEqual(_arg.styled_moniker, 'arg2')
 
     def given_args(self):
         return ('AA',)
@@ -417,14 +417,14 @@ def grammar_one():
 
 def CLI_parse_function_via(syntax_AST):
     def parse(token_scanner, listener):
-        return sm._do_parse(token_scanner, CLI, listener)
+        return sm.do_parse_(token_scanner, CLI, listener)
     sm = subject_module()
-    CLI = sm._CLI_via_syntax_AST(syntax_AST)
+    CLI = sm.CLI_via_syntax_AST_(syntax_AST)
     return parse
 
 
 def AST_via(tups):
-    return subject_module()._syntax_AST_via_parameters_definition(tups)
+    return subject_module().syntax_AST_via_parameters_definition_(tups)
 
 
 def parse_lib():

@@ -67,6 +67,8 @@ We sunsetted this API for these reasons:
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | all the places you write this same `--help` regex |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
+|[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
+|[#607.I]                   | #trak | maybe one day DRY this `_eol` pattern
 |[#607.H]                   | #open | delete or rewrite these files
 |[#607.G]                   | #open | sunset the common upstream argument parser module
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
