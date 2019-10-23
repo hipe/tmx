@@ -383,7 +383,7 @@ class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
         return ('-abdx1',)
 
 
-# Case5487 currently_cannot_pass_option_looking_values_as_arguments:
+# currently_cannot_pass_option_looking_values_as_arguments:
 # this is #open [#604.2] a known issue. perhaps a property of all arg parsers.
 # writing a test for this would just look silly - the issue stems from a core
 # assumption that perhaps all CLI's are built on.

@@ -1,5 +1,7 @@
 """this testing library is for testing what is written to STDOUT and STDERR.
 
+(See also the much simpler version under this same identifier.)
+
 write your test case by modeling what *lines* you expect to be written to
 those IO's, in the order you expect them to be written in, variously for
 STDOUT and STDERR, possibly alternating back and forth between them as
@@ -36,7 +38,7 @@ possible issues:
     lines per write..
 
 
-:[#605]
+#:[#605.1]
 (Case0250)
 """
 

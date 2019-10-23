@@ -80,6 +80,7 @@ class error_monitor_via_stderr:
     def see_exitstatus(self, new_errno):
         if self.exitstatus < new_errno:
             self.exitstatus = new_errno
+            self.OK = False  # might be multiple
 
 
 def _line_writer_via_IO(io):  # (move this to wherever)

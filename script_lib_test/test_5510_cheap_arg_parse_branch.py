@@ -89,23 +89,10 @@ class CommonCase(unittest.TestCase):
             return self.build_IO_recorder(msg)
         return lambda: None, None
 
-    def build_IO_recorder(self, msg):
-        lines = []
-
-        def write(s):
-            assert(re.match(r'[^\r\n]*\n\Z', s))  # [#607.I]
-            if self.do_debug:
-                from sys import stderr
-                if self._is_first_debug:
-                    self._is_first_debug = False
-                    stderr.write('\n')  # _eol
-                stderr.write(f"{msg}{s}")
-            lines.append(s)
-            return len(s)
-        import re
-        from modality_agnostic import io as io_lib
-        _spy_IO = io_lib.write_only_IO_proxy(write=write)
-        return lambda: tuple(lines), _spy_IO
+    def build_IO_recorder(self, dbg_msg_head):
+        from script_lib.test_support import lines_and_spy_io_for_test_context
+        lines, spy_IO = lines_and_spy_io_for_test_context(self, dbg_msg_head)
+        return lambda: tuple(lines), spy_IO
 
     def given_CLI_functions(self):
         yield ('foo-bar', lambda: the_CLI_function_called_foo_bar)

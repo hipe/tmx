@@ -25,6 +25,30 @@ def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
     _syntax_AST = syntax_AST_via_parameters_definition_(formal_parameters)
     CLI = CLI_via_syntax_AST_(_syntax_AST)
 
+    def when_help(parameter_error):
+        _pn = Renderers_(parameter_error.long_program_name).program_name
+        __write_help_lines(
+                stderr, description_template_valueser,
+                CLI_function.__doc__, _pn, CLI)
+
+    two, mon = _parse_CLI_args(stderr, argv, CLI, when_help)
+
+    if two is None:
+        return mon.exitstatus
+    opt_vals, arg_vals = two
+
+    es = CLI_function(mon, stdin, stdout, stderr, *opt_vals, *arg_vals)
+
+    # user can return from the above function any arbitrary exitstatus. also
+    # any arbitary emission could have "set" (elevated) the exitstatus.
+    assert(isinstance(es, int))  # #[#022]
+    mon.see_exitstatus(es)
+
+    return mon.exitstatus
+
+
+def _parse_CLI_args(stderr, argv, CLI, when_help=None):  # #testpoint
+
     from .magnetics.parser_via_grammar import TokenScanner
     tox = TokenScanner(argv)
 
@@ -39,28 +63,12 @@ def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
             return when_help(pe)
         when_parameter_error(pe)
 
-    def when_help(parameter_error):
-        _pn = Renderers_(parameter_error.long_program_name).program_name
-        __write_help_lines(
-                stderr, description_template_valueser,
-                CLI_function.__doc__, _pn, CLI)
-
     def when_parameter_error(parameter_error):
         write_parameter_error_lines_(stderr, parameter_error)
         mon.see_exitstatus(456)
 
     two = do_parse_(tox, CLI, listener_for_parse_errors)
-    if two is None:
-        return mon.exitstatus
-    opt_vals, arg_vals = two
-
-    es = CLI_function(mon, stdin, stdout, stderr, *opt_vals, *arg_vals)
-    assert(isinstance(es, int))  # #[#022]
-
-    # user can return from the above function any arbitrary exitstatus. also
-    # any arbitary emission could have "set" (elevated) the exitstatus.
-    mon.see_exitstatus(es)
-    return mon.exitstatus
+    return two, mon
 
 
 def require_interactive(stderr, stdin, argv):
@@ -138,9 +146,6 @@ def write_parameter_error_lines_(stderr, pe):
 
 
 def __lines_for_parameter_error(error_case, dct):
-    # cases covered visually: (Case5470) (Case5470) (Case5424) (Case5438)
-    # (Case5459) (Case5463) (Case5480) (Case5484) (Case5442) (Case5445)
-    # (Case5449) (Case5452) (Case5456)
 
     opt, arg, token_pos, tok = (None, None, None, None)
     dct = {k: v for k, v in dct.items()}
@@ -159,7 +164,7 @@ def __lines_for_parameter_error(error_case, dct):
     mutable_words = error_case.split('_')
 
     if opt is not None:
-        assert('option' == mutable_words[0])
+        assert('option' == mutable_words[0])  # #here5
         mutable_words[0] = opt_moniker
     else:
         assert('option' != mutable_words[0])
@@ -197,12 +202,13 @@ class CLI_via_syntax_AST_:  # #testpoint
 
     def __init__(self, syntax_AST):
         # pre-compute things that can be pre-computed
-        opts, args = syntax_AST
+        opts, args, req_opt_offsets = syntax_AST
         _two = _build_option_index(opts)
         self.opt_offset_via_short_name, self.opt_offset_via_long_name = _two
         self.sequence_grammar = tuple(_sequence_grammar_via_syntax_args(args))
         self.opts = opts
         self.args = args
+        self.offsets_of_required_options = req_opt_offsets
 
 
 # == BEGIN away soon
@@ -379,30 +385,6 @@ class _populate_via_parameter_dictionary:
         d['help'] = s
         return d
 
-
-#
-# argument parser (build with functions not methods, expermentally)
-#
-
-
-def _CLI_parser_function_via_syntax_AST(syntax_AST):  # #testpoint
-
-    # pre-compute things that can be pre-computed
-    o = _CLI()
-    o.opts, o.args = syntax_AST
-    _ = __build_option_index(o.opts)
-    o.opt_offset_via_short_name, o.opt_offset_via_long_name = _
-    o.sequence_grammar = tuple(__sequence_grammar_via_syntax_args(o.args))
-
-    def parse(token_scanner, listener):
-        return _do_parse(token_scanner, o, listener)
-
-    return parse
-
-
-class _CLI:  # #[#510.2] blank state
-    pass
-
 # == END away soon
 
 
@@ -435,11 +417,24 @@ def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
         assert(False)
 
     def main():
+
+        # parse
         big_flat = inner_parser.parse(tox, listener_for_inner_parse, stop_ASAP)
         if big_flat is None:
             return  # (Case5442)
+
         # roll up big flat so it is in formal parameter order (Case5421)
-        return __two_tuples_via_big_flat(big_flat, CLI.opts, CLI.args)
+        opts, args = __two_tuples_via_big_flat(big_flat, CLI.opts, CLI.args)
+
+        # this crazy thing with required optionals
+        if len(CLI.offsets_of_required_options):
+            for i in CLI.offsets_of_required_options:
+                if opts[i] is not None:
+                    continue
+                # #here5: must start with 'option'
+                return when('option_is_required', option=CLI.opts[i])
+
+        return opts, args
 
     # -- parsing the option expressions
 
@@ -481,12 +476,12 @@ def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
         else:
             # is flag, formally and actually
             tox.advance()  # (Case5428)
-            wv = (True,)  # #wrapped-AST-value
+            wv = (True,)  # #wrapped-AST-value # #option-value:for-flag
         if wv is None:
             return
         # unwrap the wrapped value to get the value. then re-wrap it crazily
         value, = wv
-        # #option-value #options-values-term #wrapped-AST-value
+        # #option-value #option-slot-values #wrapped-AST-value
         return (((opt_offset, value),),)
 
     def parse_flagball(chars, opt_offset):
@@ -496,9 +491,9 @@ def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
         # the same token. We intentionally do *not* support this form because
         # we find it aesthetically upsetting for a savings of only 2 chars.
 
-        these = []  # #options-values-term
+        these = []  # #option-slot-values
         while True:
-            these.append((opt_offset, True))  # #option-value
+            these.append((opt_offset, True))  # #option-value:for-flag
             if chars.is_empty:  # never the first time
                 break
             opt_offset = CLI.opt_offset_via_short_name.get(chars.peek, None)
@@ -618,6 +613,8 @@ def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
 
 
 def _build_option_index(opts):
+    # associate every short name and every long name back to a formal option
+
     opt_offset_via_short_name = {}
     opt_offset_via_long_name = {}
 
@@ -637,59 +634,187 @@ def _build_option_index(opts):
 # == the trick with winding and unwinding the thing
 
 def __two_tuples_via_big_flat(big_flat, opts, args):
+    """`big_flat` is a tuple of the actual values whose structure matches
 
-    num_args = len(args)
+    the sequence grammar produced at #here3. Here we "decode" what was
+    "encoded" there: re-arrange the actuals so they are in two tuples: one for
+    options and one for arguments. (Both tuples have a length and structure
+    derived from the user's formal params.)
+    """
+
     actual_options = [None for _ in range(0, len(opts))]
-    actual_arguments = [None for _ in range(0, num_args)]
+    actual_arguments = []
+    tuplize_these = []
 
-    i = 0
-    stop_here = 2 * num_args
-    arg_offset = -1  # BE CAREFUL
+    def see_actual_options(option_slots_values):
+        if option_slots_values is None:
+            return
+        # one syntax can have many slots where expressions can go. each slot
+        # can have many expressions of option value. so, loop inside loop.
+        for option_slot_values in option_slots_values:  # #option-slot-values
+            for opt_offset, value in option_slot_values:  # #option-value
+                formal = opts[opt_offset]
+                if formal.is_plural:
+                    if formal.takes_argument:
+                        if actual_options[opt_offset] is None:
+                            actual_options[opt_offset] = []
+                            tuplize_these.append(opt_offset)
+                        actual_options[opt_offset].append(value)
+                        continue
+                    if actual_options[opt_offset] is None:
+                        actual_options[opt_offset] = 0
+                    actual_options[opt_offset] += 1
+                    continue
+                actual_options[opt_offset] = value
 
-    while True:
-        options_values_terms = big_flat[i]
-        if options_values_terms is not None:
-            # #options-values-term
-            for options_values_term in options_values_terms:
-                for opt_offset, value in options_values_term:  # #option-value
-                    if opts[opt_offset].is_plural:
-                        _wish('plurals (1/2)')
-                    else:
-                        actual_options[opt_offset] = value
-        if stop_here == i:
-            break
-        i += 1
-        arg_offset += 1
-        value = big_flat[i]
-        if args[arg_offset].is_plural:
-            _wish('plurals (2/2)')
-        else:
-            actual_arguments[arg_offset] = value
-        i += 1
+    def see_actual_argument(decoded_value):
+        actual_arguments.append(decoded_value)  # hi.
+
+    _ = __do_two_tuples_via_big_flat(big_flat, opts, args)
+    do_this = {
+            'actual_options': see_actual_options,
+            'actual_argument': see_actual_argument,
+            }
+    for which, payload in _:
+        do_this[which](payload)
+
+    assert(len(actual_arguments) == len(args))
+
+    for i in tuplize_these:
+        actual_options[i] = tuple(actual_options[i])
 
     return tuple(actual_options), tuple(actual_arguments)
 
 
+def __do_two_tuples_via_big_flat(big_flat, opts, args):  # see caller
+
+    num_args = len(args)
+    has_glob = args[-1].is_plural if num_args else False
+
+    if has_glob:
+        use_num_args = num_args - 1  # traversal stops before
+    else:
+        use_num_args = num_args
+
+    use_num_terms = 1 + 2 * use_num_args  # exactly #here4
+
+    if has_glob:
+        assert(len(big_flat) == use_num_terms + 1)
+    else:
+        assert(len(big_flat) == use_num_terms)
+
+    yield 'actual_options', big_flat[0]  # at least one per #here4
+
+    for i in range(1, use_num_terms, 2):
+        yield 'actual_argument', big_flat[i]
+        yield 'actual_options', big_flat[i + 1]
+
+    if not has_glob:
+        return
+
+    glob_value = big_flat[-1]
+    sub_yield = []
+    for arg_value_item, option_slot_values in (glob_value or ()):
+        yield 'actual_options', option_slot_values
+        sub_yield.append(arg_value_item)
+
+    yield 'actual_argument', tuple(sub_yield)
+
+
 def _sequence_grammar_via_syntax_args(args):
+    """The bulk of this module's workload is concerned with realizing the
 
-    # "flatten" the syntax so we can use our sequence grammar. For a two-arg
-    # syntax, the grammar is `opt* arg1 opt* arg2 opt*` and so on. For an N-
-    # arg syntax
+    client's target CLI syntax by encoding it into a "sequence grammar", then
+    using that sequence grammar to parse user input, then taking the resulting
+    AST and decoding it back into a structure that the client can recognize
+    by associating actual values with formal parameters from the syntax.
 
-    for s_a in __sequence_grammars_via_syntax_arguments(args):
-        for s in s_a:
-            yield s
+    For a simple two-arg syntax, the sequence grammar we want is:
+    `opt* arg1 opt* arg2 opt*`.
 
+    (`*` (kleene-star) means "zero or more of the previous thing".)
 
-def __sequence_grammars_via_syntax_arguments(args):
-    yield 'zero or more', 'option'
-    for _ in range(0, len(args)):
-        yield 'one', 'argument', 'zero or more', 'option'  # ..
+    The sequence grammar is peppered with so many `opt*` terms (one at each
+    outer boundary and one at each joint between positional arguments) so
+    that we can parse options passed "anywhere" in the input: at the front,
+    at the end, or between any two adjacent positional arguments.
+
+    We can generalize this approach to all N-arg syntaxes with either:
+
+        opt* (arg opt*){N}
+    or
+        (opt* arg){N} opt*
+
+    We use the former just for better code narrative, so we ease-in to
+    complexity.
+
+    Our sequence grammar system does not have the ability to express that
+    a grammatical term should be repeated some specific N number of times
+    (because, in part, it's straightforward to write this out "by hand" (when
+    you are writing your grammar by hand)).
+
+    As such, essentially all we're doing here is taking some non-negative
+    integer N and exploding it into a sequence grammar according to above.
+
+    Note that even for a syntax of zero positional arguments, the generated
+    sequence grammar will still have one `opt*` term. :#here4
+
+    Syntaxes with a glob term (i.e plural, min zero or one, must be at end)
+    are more complictaed. We introduced "sub-expressions" for this
+    (at #history-A.6). This syntatical feature is expressed here as
+    either `( arg opt* )+` or `( arg opt* )*`, at the end.
+    """  # :#here3
+
+    yield 'zero or more'
+    yield 'option'
+    if not len(args):
+        return
+    if args[-1].is_plural:
+        *non_globs, glob = args
+        has_glob = True
+    else:
+        non_globs = args
+        has_glob = False
+    for arg in non_globs:
+        assert(arg.is_plural is False)
+        yield 'one'
+        yield 'argument'
+        yield 'zero or more'
+        yield 'option'
+    if has_glob:
+        if '*' == glob.arity_string:
+            yield 'zero or more'
+        else:
+            assert('+' == glob.arity_string)
+            yield 'one or more'
+        yield '('
+        yield 'one'
+        yield 'argument'
+        yield 'zero or more'
+        yield 'option'
+        yield ')'
 
 
 # ==
 
 def syntax_AST_via_parameters_definition_(tups):  # #testpoint
+    opts, args, req_opt_offsets = __first_pass(tups)
+
+    # check that any glob is in the right place
+    leng = len(args)
+    for i in range(0, leng):
+        if not args[i].is_plural:
+            continue
+        if i == (leng - 1):
+            break
+        _ = args[i].formal_name
+        _msg = f"plural positional args can only occur at the end: '{_}'"
+        raise FormalParametersSyntaxError(_msg)
+
+    return opts, args, req_opt_offsets
+
+
+def __first_pass(tups):
 
     from .magnetics.parser_via_grammar import (
         parser_via_grammar_and_symbol_table,
@@ -759,7 +884,12 @@ def syntax_AST_via_parameters_definition_(tups):  # #testpoint
             return looks_like_long_rx.match(tox.peek)
 
         def parse_as_subparser(tox, listener):
-            return (formal_long_rx.match(tox.shift()).groups(),)  # ..
+            md = formal_long_rx.match(tox.peek)
+            if md is None:
+                _ = f'long option has invalid character(s): {repr(tox.peek)}'
+                raise FormalParametersSyntaxError(_)
+            tox.advance()
+            return (md.groups(),)
 
     class arg_name_parser:
 
@@ -768,11 +898,11 @@ def syntax_AST_via_parameters_definition_(tups):  # #testpoint
 
         def parse_as_subparser(tox, listener):
             md = formal_positional_arg_name_rx.match(tox.peek)
-            if md is not None:
-                tox.advance()
-                return ((md[1], md[2]),)  # #NT_formal_positional_arg
-            _ = f'argument name has invalid character(s): {repr(tox.peek)}'
-            raise Exception(_)
+            if md is None:
+                _ = f'argument name has invalid character(s): {repr(tox.peek)}'
+                raise FormalParametersSyntaxError(_)
+            tox.advance()
+            return ((md[1], md[2]),)  # #NT_formal_positional_arg
 
     class desc_parser:  # #class-as-namespace
 
@@ -787,7 +917,7 @@ def syntax_AST_via_parameters_definition_(tups):  # #testpoint
     looks_like_short_rx = o('-[a-z]')
     formal_short_rx = o('-([a-z])$')
     looks_like_long_rx = o('--[a-z][-a-z]')  # ..
-    formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z]+))?$')
+    formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z]+))?([*!])?$')
     looks_like_desc_rx = o('[a-zA-Z(«]')  # ..
     formal_positional_arg_name_head_rx = o('[a-zA-Z<]')
 
@@ -806,18 +936,23 @@ def syntax_AST_via_parameters_definition_(tups):  # #testpoint
     from modality_agnostic import listening
     listener = listening.throwing_listener
 
+    req_opt_offsets = []
+
     opts, args = parser.parse(TokenScanner(tups), listener)
-    if opts is None:
-        opts = ()
-    else:
-        opts = tuple(FormalOption_(*opt_parts) for opt_parts in opts)
 
-    if args is None:
-        args = ()
-    else:
-        args = tuple(_FormalArgument(*arg_parts) for arg_parts in args)
+    a = []
+    for opt_parts in (opts or ()):
+        short_name, (long_name, meta_var, arity_string), descs = opt_parts
+        formal = FormalOption_(
+                short_name, long_name, meta_var, arity_string, descs)
+        if formal.is_required:
+            req_opt_offsets.append(len(a))
+        a.append(formal)
+    opts = tuple(a)
 
-    return opts, args
+    args = tuple(_FormalArgument(*arg_parts) for arg_parts in (args or ()))
+
+    return opts, args, req_opt_offsets
 
 
 def _argument_parser_via(stderr, prog, **platform_kwargs):
@@ -833,28 +968,57 @@ def _argument_parser_via(stderr, prog, **platform_kwargs):
 
 class FormalOption_:
 
-    def __init__(self, any_short_name, long_two, descs):
-        if any_short_name is not None:
-            assert(1 == len(any_short_name))
-        self.short_name = any_short_name
-        self.long_name, self.meta_var = long_two
+    def __init__(self, short_name, long_name, meta_var, arity_string, descs):
+
+        if arity_string is None:
+            self.is_plural = False
+        elif '*' == arity_string:
+            # arg-taking form ok, flag form ok
+            self.is_plural = True
+        else:
+            assert('!' == arity_string)
+            if meta_var is None:
+                _msg = (f"'!' cannot be used on flags, only optional fields "
+                        f"('--{long_name}')")
+                raise FormalParametersSyntaxError(_msg)
+            self.is_required = True
+            self.is_plural = False
+
+        if short_name is not None:
+            assert(1 == len(short_name))
+
+        self.short_name = short_name
+        self.long_name = long_name
+        self.meta_var = meta_var
+        self.arity_string = arity_string
         self.description_lines = descs
 
     @property
     def takes_argument(self):
         return self.meta_var is not None  # meh
 
-    is_plural = False
+    is_required = False
 
 
 class _FormalArgument:
 
     def __init__(self, styled_moniker_and_arity, descs):  # ..
         self.styled_moniker, self.arity_string = styled_moniker_and_arity
+
+        if self.arity_string is None:
+            self.is_plural = False
+        else:
+            assert self.arity_string in ('+', '*')
+            self.is_plural = True
+
         # #NT_formal_positional_arg
         self.description_lines = descs
 
-    is_plural = False
+    @property
+    def formal_name(self):
+        if self.arity_string is None:
+            return self.styled_moniker
+        return f"{self.styled_moniker}{self.arity_string}"
 
 
 def _element_description_string_via_mixed(x):
@@ -962,11 +1126,17 @@ def cover_me(msg):
     raise _exe(f'cover me: {msg}')
 
 
+class FormalParametersSyntaxError(Exception):
+    pass
+
+
 _exe = Exception
 
 _DASH_DASH = '--'
 _eol = '\n'
 
+
+# #history-A.6: sub-expressions
 # #history-A.5: expose API for "cheap arg parse branch"
 # #history-A.4: help & initial integration
 # #history-A.3: begin parser-generator-backed rewrite of "cheap arg parse"

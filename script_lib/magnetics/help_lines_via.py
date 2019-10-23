@@ -41,7 +41,9 @@ def help_lines_via(
 
     from script_lib.cheap_arg_parse import FormalOption_
 
-    _help_option = FormalOption_('h', ('help', None), ('show this screen',))
+    _help_option = FormalOption_(
+            'h', 'help', None, None, ('show this screen',))
+
     for opt in opts:
         renderer = _OptionRenderer(opt)
         add_option_rows(renderer)

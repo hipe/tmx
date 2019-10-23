@@ -2,31 +2,45 @@ from modality_agnostic.memoization import lazy
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
+
+    # -- assertions
+
+    def expect_sequence_equals_recursive(self, ast, exp):
+        from script_lib.test_support import assert_sequence_equals_recursive
+        return assert_sequence_equals_recursive(ast, exp, self)
+
+    # -- create end state
 
     def run_expecting_failure(self, error_case_name):
         # ..
         from modality_agnostic.test_support.structured_emission import (
                 one_and_none)
-        channel, payloader = one_and_none(self, self.my_run)
+
+        def run(listener):
+            return self._do_run(listener, self.given_tokens())
+
+        channel, payloader = one_and_none(self, run)
         # ..
         expect = ('error', 'structure', 'parse_error', error_case_name)
         self.assertSequenceEqual(expect, channel)
         return channel, payloader
 
     def run_expecting_success(self):
+        return self.run_expecting_success_against(self.given_tokens())
+
+    def run_expecting_success_against(self, tokens):
         from modality_agnostic import listening
         listener = listening.throwing_listener
-        return self.my_run(listener)
+        return self._do_run(listener, tokens)
 
-    def my_run(self, listener):  # NOTE you can't call it `run` because unittst
-        _tokens = self.given_tokens()
-        _scn = subject_module().TokenScanner(_tokens)
+    def _do_run(self, listener, tokens):  # can't call it `run` b.c unittest
+        _scn = subject_module().TokenScanner(tokens)
         _grammar = self.given_grammar()
         return _grammar.parse(_scn, listener)
 
 
-class against_grammar_A(_CommonCase):
+class against_grammar_A(CommonCase):
 
     def given_grammar(self):
         return just_the_letter_A()
@@ -72,7 +86,7 @@ class Case2614_none_is_too_few(against_grammar_A):
         return ()
 
 
-class against_grammar_B(_CommonCase):
+class against_grammar_B(CommonCase):
 
     def given_grammar(self):
         return grammar_B_thing_ding()
@@ -107,7 +121,7 @@ class Case2623_too_many_optionals(against_grammar_B):
         return ('-x', '-x', '--foo-bar')
 
 
-class against_grammar_C(_CommonCase):
+class against_grammar_C(CommonCase):
 
     def given_grammar(self):
         return grammar_C_plurality_intro()
@@ -121,6 +135,55 @@ class Case2626_introduce_plural_grammar(against_grammar_C):
 
     def given_tokens(self):
         return ('A', 'A')
+
+
+class Case2629_introduce_sub_expressions(CommonCase):
+
+    def test_010_parses(self):
+        ast = self.run_expecting_success()
+        _exp = ('A', (('B', 'C'), ('B', 'C')))
+        self.expect_sequence_equals_recursive(ast, _exp)
+
+    def given_tokens(self):
+        return ('A', 'B', 'C', 'B', 'C')
+
+    def given_grammar(self):
+        return grammar_D1_subexpression_intro_NOT_MEMOIZED()
+
+
+class Case2632_optional_glob_with_none_is_none_not_empty_list(CommonCase):
+
+    def test_010_parses(self):
+
+        _given_tokens = ('A',)
+        ast = self.run_expecting_success_against(_given_tokens)
+        _exp = ('A', None)  # NOTE second term is `None` not `()`
+        self.expect_sequence_equals_recursive(ast, _exp)
+
+        # curb check (tests similar input structure to previous case)
+        _given_tokens = ('A', 'B', 'C')
+        ast = self.run_expecting_success_against(_given_tokens)
+        _exp = ('A', (('B', 'C'),))
+        self.expect_sequence_equals_recursive(ast, _exp)
+
+    def given_grammar(self):
+        return grammar_D2_optional_list()
+
+
+# stop: Case3735
+
+
+@lazy
+def grammar_D2_optional_list():
+    return build_grammar(
+            'one', 'A',
+            'zero or more', '(', 'one', 'B', 'one', 'C', ')')
+
+
+def grammar_D1_subexpression_intro_NOT_MEMOIZED():
+    return build_grammar(
+            'zero or one', 'A',
+            'one or more', '(', 'one', 'B', 'one', 'C', ')')
 
 
 @lazy
@@ -147,6 +210,8 @@ def build_grammar(*tokens):
 def symbol_table():
     return {
             'A': lambda: build_minimal_parser('A'),
+            'B': lambda: build_minimal_parser('B'),
+            'C': lambda: build_minimal_parser('C'),
             'long': lambda: build_minimal_parser('--foo-bar'),
             'short': lambda: build_minimal_parser('-x'),
             }
