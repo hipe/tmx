@@ -4,57 +4,8 @@ digraph g {
 n_01393240332[label="start"]
 
 
-n_01393240332->n_01334532623
-n_01334532623[label="stepper stuff"]
-
-
-n_01334532623->n_01393239423
-n_01393239423[label="delete or rewrite this
-\"fixed arg parse\" file #[607.H]"]
-n_01393239423->n_01334532521
-
-
-n_01334532623->n_01393233913
-n_01393233913[label="delete or rewrite this
-bigger parse stepper file #[607.H]"]
-n_01393233913->n_01334532521
-
-
-n_01334532623->n_01393238382
-n_01393238382[label="delete or rewrite this
-ANEMIC parse stepper file #[607.H]"]
-n_01393238382->n_01334532521
-
-
-n_01334532521[label="stepper stuff"]
-n_01334532521->n_92310482392
-
-
-n_01393240332->n_23948233209
-n_23948233209[label="cover and unify
-upstream resolution"]
-n_23948233209->n_92310482392
-
-
-n_01393240332->n_92310482024
-n_92310482024[label="cover and rewrite
-hugo themes all"]
-n_92310482024->n_92310482392
-
-
+n_01393240332->n_92310482392
 n_92310482392[label="acceptance\ncriteria"]
-
-
-n_92310482392->n_92828392343
-n_92828392343[label="can we eliminate all
-inline help token parsing [#608.4]"]
-n_92828392343->n_99838742542
-
-
-n_92310482392->n_92828050582
-n_92828050582[label="eradicated all old
-use of \"holy 6\" [#608.6]"]
-n_92828050582->n_99838742542
 
 
 n_92310482392->n_92828109398

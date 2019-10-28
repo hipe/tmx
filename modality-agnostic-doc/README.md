@@ -42,15 +42,15 @@ only in modeling interfaces for this purpose.
 |[#507.H]                   |       | [ this lightweight listening library ]
 |[#507.G]                   | #open | idiomize something for the test platform
 |[#507.F]                   | #open | integrate this with teardown so the memory is reclaimed
-|[#507.E]                   | #open | what is this idea
+|[#507.E]                   | #hole |
 |[#507.D]                   | #open | gross violation of python internals
 |[#507.C]                   | #open | remove this redundancy
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |
-|[#504]                     | #open | magnetics/command-via-command-stream
-|[#503]                     | #open | magnetics/command-via-parameter-stream
-|[#502]                     | #open | magnetics/parameter-via-definition
+|[#504]                     | #hole |
+|[#503]                     | #hole |
+|[#502]                     | #open | parameter modeling thoery & API
 |[#501]                     |       | (placeholder for this readme)
 
 

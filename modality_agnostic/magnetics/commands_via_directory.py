@@ -16,7 +16,7 @@ the name of this magnetic is more nominal/aspirational than it is actual:
 """
 
 
-def SELF(collection_module):
+def commands_via_MODULE(collection_module):
     # (indented 2x anticipating possible upgrade to a class-based magnetic)
 
         _dir_path = _dir_path_via_module(collection_module)
@@ -32,16 +32,8 @@ def _final_stream_via_generator(gen, collection_module):
         stem = posix_path.stem
         _import_this = head_s + stem
         _mod = importlib.import_module(_import_this)
-        return _command_via_module(_mod, stem)
+        return (stem, _mod)
     return(_money(x) for x in gen)
-
-
-def _command_via_module(mod, stem):
-    import modality_agnostic.magnetics.command_via_formal_parameters as x
-    return x.SELF(
-            name=stem,
-            command_module=mod,
-            )
 
 
 def _generator_via_dir_path(dir_path):

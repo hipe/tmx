@@ -53,9 +53,9 @@ class CommonCase(unittest.TestCase):
 
     def _build_help_screen_sect_idx(self):
         from script_lib.test_support.expect_help_screen import (
-                section_index_via_lines__)
+                section_index_via_lines)
         _lines = self.end_state.stderr_lines
-        return section_index_via_lines__(_lines)
+        return section_index_via_lines(_lines)
 
     @property
     @dangerous_memoize_in_child_classes('_ES', 'build_end_state')

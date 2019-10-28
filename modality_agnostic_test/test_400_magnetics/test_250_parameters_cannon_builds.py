@@ -1,83 +1,50 @@
-"""modality agnostic. reconcile parameter detail with function parameters.
-
-
-(NOTE about placement:
-  - this test placement doesn't isomorph with a magnetic.
-  - this test is placed for regression friendliness
-  - in fact it should be under the test_support counterpart node, but etc
-"""
-
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
-    # -- assertions (all)
+    def expect_foo_bar_and_biff_baz_both_required(self):
+        (one_name, one_val), (two_name, two_val) = self.build_params()
+        assert('foo_bar' == one_name)
+        assert('biff_baz' == two_name)
+        assert(one_val.is_required)
+        assert(two_val.is_required)
 
-    def _these_two(self, cmd):
-        self._expect_these(['foo_bar', 'biff_baz'], cmd)
-
-    def _expect_these(self, names, cmd):
-        # flatten view:
-        _exp = [x for x in cmd.formal_parameter_dictionary.keys()]
-        self.assertEqual(names, _exp)
-
-    def _this_builds(self, x):
-        self.assertIsNotNone(x)
-
-    def _raises(self, msg, f):
-        # #open [#507.G] idiomize this for the test platform
-        import modality_agnostic
-        exe = None
-        try:
-            f()
-        except modality_agnostic.Exception as e:
-            exe = e
-        _act = str(exe)
-        self.assertEqual(msg, _act)
+    def build_params(self):
+        command_module = self.given_command_module(command_modules())
+        assert(command_module.PARAMETERS is None)
+        from modality_agnostic.magnetics.formal_parameter_via_definition import (  # noqa: E501
+                parameter_index_via_mixed)
+        _param_index = parameter_index_via_mixed(command_module.Command)
+        return _param_index.parameters_that_do_not_start_with_underscores
 
 
-class Case8189_build_and_see_component_names(_CommonCase):
+class Case8186_func_with_two_params(CommonCase):
 
-    def test_010_class_only_builds(self):
-        _ = _command_modules().two_crude_function_parameters_by_class()
-        self._this_builds(_)
+    def test_010_function_index(self):
+        self.expect_foo_bar_and_biff_baz_both_required()
 
-    def test_020_function_only_builds(self):
-        _ = _command_modules().two_crude_function_parameters_by_function()
-        self._this_builds(_)
-
-    def test_030_first_has_those_two(self):
-        _ = _command_modules().two_crude_function_parameters_by_class()
-        self._these_two(_)
-
-    def test_040_first_has_those_two(self):
-        _ = _command_modules().two_crude_function_parameters_by_function()
-        self._these_two(_)
-
-    def test_050_one_detailed_inside_one_outside_ERRORS(self):
-        _exp = ('this/these parameter detail(s) must have ' +
-                'corresponding function parameters: (boozo_bozzo, biffo)')
-        _act = _command_modules().one_inside_one_outside_NOT_MEMOIZED
-        self._raises(_exp, _act)
-
-    def test_060_dont_do_defaults(self):
-        _exp = "for 'fez_boz' use details to express a default"
-        self._raises(_exp, _command_modules().dont_do_defaults_NOT_MEMOIZED)
-
-    def test_070_dont_do_strange_shaped_params(self):
-        _exp = "'kw_arggos' must be of kind POSITIONAL_OR_KEYWORD (had VAR_KEYWORD)"  # noqa E501
-        _act = _command_modules().weird_parameter_shape_NOT_MEMOIZED
-        self._raises(_exp, _act)
+    def given_command_module(self, o):
+        return o.two_crude_function_parameters_by_function
 
 
-def _command_modules():
-    from modality_agnostic.test_support.parameters_canon import (
-            command_modules as x)
-    return x
+class Case8189_class_with_two_params(CommonCase):
+
+    def test_010_function_index(self):
+        self.expect_foo_bar_and_biff_baz_both_required()
+
+    def given_command_module(self, o):
+        return o.two_crude_function_parameters_by_class
+
+
+def command_modules():
+    from modality_agnostic.test_support.parameters_canon import command_modules
+    return command_modules
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: to case number
+# #history-A.1: full rewrite
 # #born.

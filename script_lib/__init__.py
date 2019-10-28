@@ -1,110 +1,46 @@
 import re
 
 
-def RESOLVE_UPSTREAM_EXPERIMENT(cli):
-    """
-    so:
-      - this is [#608.3] an early abstraction
-      - this is the first thing to use [#608.6] our new simplified API
-    """
+def OPEN_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
+    # At #history-A.4 this shurnk to tiny,  re-written for API change.
+    # At this same time, we sunsetted a whole redundant module (file).
+    # Using stderr instead of listener is an experimental simplification..
+    # Result value is experimental.
 
-    def __main():
-        if cli.stdin.isatty():
-            __resolve_upstream_when_interactive()
-        else:
-            __resolve_upstream_when_non_interactive()
+    typ = RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin)
+    if typ is None:
+        return
 
-    def __resolve_upstream_when_interactive():
-        if _an_argument_was_passed():
-            if _help_was_requested():
-                _express_help()
-            elif __more_than_one_argument_was_passed():
-                __THEN_complain_about_too_many_arguments()
-            else:
-                __THEN_use_that_one_arguent()
-        else:
-            __THEN_complain_about_no_arguments()
+    if 'stdin_as_argument' == typ:
+        from data_pipes import ThePassThruContextManager
+        return ThePassThruContextManager(stdin)
 
-    def __resolve_upstream_when_non_interactive():
-        if _an_argument_was_passed():
-            if _help_was_requested():
-                _express_help()
-            else:
-                __THEN_complain_about_cant_have_both()
-        else:
-            __THEN_use_stdin_as_upstream()
+    assert('path_as_argument' == typ)
+    return open(arg_value)
 
-    def _an_argument_was_passed():
-        return 1 < _number_of_arguments()
 
-    def __more_than_one_argument_was_passed():
-        return 2 < _number_of_arguments()
+def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
+    # (see note at above function)
 
-    def _help_was_requested():
-        import re
-        rx = re.compile('^--?h(?:e(?:lp?)?)?$')  # #[#608.4] DRY one day
-        a = cli.ARGV
-        return next((i for i in range(1, len(a)) if rx.match(a[i])), None)
+    def main():
+        if stdin.isatty():
+            if '-' == arg_value:
+                return when_neither()
+            return 'path_as_argument'
+        if '-' == arg_value:
+            return 'stdin_as_argument'
+        return when_both()
 
-    def _express_help():
+    def when_both():
+        whine(f'when piping from STDIN, {arg_moniker} must be "-"')
 
-        _ = ' '.join(cli.description_raw_lines_for_resolve_upstream())  # ..
+    def when_neither():
+        whine(f'when {arg_moniker} is "-", STDIN must be pipe')
 
-        o = _liner_for(cli.stderr)
-        program_name = _program_name()
-        o(f'usage: {program_name} {_lone_argument_moniker()}')
-        o(f'       some-stream | {program_name}')
-        o()
-        o(f'description: {_}')
+    def whine(msg):
+        stderr.write(f'parameter error: {msg}\n')  # [#607.I] _eol
 
-        cli.OK = False
-
-    def __THEN_complain_about_cant_have_both():
-        _arg_error("can't have both STDIN and arguments")
-
-    def __THEN_complain_about_no_arguments():
-        _complain(f'expecting {_lone_argument_moniker()} or STDIN')
-
-    def __THEN_complain_about_too_many_arguments():
-        _arg_error(f'had {_number_of_arguments()} arguments, '
-                   'needed one.')
-
-    def _arg_error(msg):
-        _complain(f'argument error: {msg}')
-
-    def _complain(msg):
-        o = _liner_for(cli.stderr)
-        o(msg)
-        o(f"see '{_program_name()} -h' for help.")
-        cli.OK = False
-        cli.exitstatus = 444
-
-    def _program_name():
-        return cli.ARGV[0]
-
-    def _liner_for(io):
-        def o(s=None):
-            write(_eol if s is None else f'{s}{_eol}')  # [#607.I]
-        write = io.write
-        return o
-
-    def _number_of_arguments():
-        return len(cli.ARGV)  # ..
-
-    def __THEN_use_stdin_as_upstream():
-        cli.upstream = cli.stdin
-
-    def __THEN_use_that_one_arguent():
-        cli.upstream = open(cli.ARGV[1])
-
-    # --
-
-    def _lone_argument_moniker():
-        return cli.lone_argument_moniker_for_resolve_upstream()
-
-    return __main()
-
-    # == END
+    return main()
 
 
 # -- abstracted at #history-A.1 - scream case because kludge, reach-down
@@ -212,6 +148,7 @@ TEMPORARY_DIR = 'z'  # ick/meh
 _eol = '\n'
 
 
+# #history-A.4
 # #history-A.3: "cheap arg parse" moves to dedicated file
 # #history-A.1: as referenced
 # #born: abstracted

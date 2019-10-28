@@ -103,20 +103,6 @@ class STYLER_:
 
 # == END listener stowaway
 
-class resources_via_ARGV_stream_and_stderr_and_stdout:  # #todo
-
-    def __init__(self, ARGV_stream, stderr, stdout):
-        self.ARGV_stream = ARGV_stream
-        self.stdout = stdout
-        self.stderr = stderr
-
-
-def deque_via_ARGV(ARGV):  # #todo
-    """(just saves you the one line)"""
-
-    from collections import deque
-    return deque(ARGV)
-
 # #history-A.2 rewrite
 # #history-A.1
 # #abstracted.

@@ -31,7 +31,7 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
         return es
 
     def invites(self):
-        _exp = "'ohai-mami -h' for help\n"
+        _exp = "see 'ohai-mami --help'\n"
         self.assertEqual(self.last_stderr_line(), _exp)
 
     def first_stderr_line(self):
@@ -74,10 +74,8 @@ class Case010SA_help(_CommonCase):
 
     def test_200_content(self):
         lines = self.end_state().first_line_run('stderr').lines
-
         self.assertIn('usage: ', lines[0])
-
-        self.assertAlmostEqual(len(lines), 6, delta=3)
+        self.assertAlmostEqual(len(lines), 10, delta=2)
 
     @shared_subject
     def end_state(self):
@@ -87,7 +85,7 @@ class Case010SA_help(_CommonCase):
         return self.stdin_that_IS_interactive()  # be jerks
 
     def argv_tail(self):
-        return ('--hel',)
+        return ('--help',)
 
 
 class Case020SA_no_args(_CommonCase):
@@ -96,7 +94,7 @@ class Case020SA_no_args(_CommonCase):
         self.fails()
 
     def test_200_whines(self):
-        _exp = 'provide STDIN or <script>\n'
+        _exp = 'parameter error: expecting <script>\n'
         self.assertEqual(self.first_stderr_line(), _exp)
 
     def test_300_invites(self):
@@ -119,7 +117,7 @@ class Case030SA_args_and_stdin(_CommonCase):
         self.fails()
 
     def test_200_content(self):
-        _exp = "can't have both STDIN and argument(s)\n"
+        _exp = 'parameter error: when piping from STDIN, <script> must be "-"\n'  # noqa: E501
         self.assertEqual(self.first_stderr_line(), _exp)
 
     def test_300_invites(self):
@@ -142,7 +140,7 @@ class Case040SA_too_many_args(_CommonCase):
         self.fails()
 
     def test_200_content(self):
-        _exp = 'too many args (had 3 need 1)\n'
+        _exp = "parameter error: unrecognized option: '--fing-foo'\n"
         self.assertEqual(self.first_stderr_line(), _exp)
 
     def test_300_invites(self):
@@ -188,7 +186,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):
                 )
 
     def argv_tail(self):
-        return ()
+        return ('-',)
 
 
 class Case060SA_one_arg_which_is_token(_CommonCase):

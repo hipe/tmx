@@ -10,43 +10,9 @@ design.
 
 ### our :[#608.6] "holy 6" internal API for CLI components
 
-#### _(don't get attached to the number "6" - it might increase)_
-
-(there used to be an [#608.5] older way but at #history-A.1 it was sunsetted.)
-
-At #history-A.2 we sunsetted *this* API for several reasons we explain
-further below.
-
-(Being "sunsetted" carries a stronger weight than just being "deprecated":
-by being "sunsetted", we mean that any current code that uses this API
-(excepting module-private implementation employment that resembles this API
-in just an incidental way or a pattern sense) must be considered broken and
-must at least raise an exception in lieu of being re-architected or itself
-sunsetted.)
-
-This description is all that remains of the once vast empire of this now
-sunsetted API. For a fuller explanation of the API, see the state of this
-document before the aforementioned history marker.
-
-The "holy 6" were 6 attributes typical CLI clients were expected to have:
-
-  - stdin
-  - stdout
-  - stderr
-  - ARGV
-  - OK
-  - exitstatus
-
-CLI-related functions would communicate success/failure thru calls to
-property writer methods on a given client (which looked like and often were
-just plain old state changes to a mutable object).
-
-We sunsetted this API for these reasons:
-
-  - the ascention of [#608.L] "cheap arg parse" singals our trend towards
-    API's that assume smaller, simple, composable functions and more
-    immutability and statelessness.
-
+(At #history-A.3 we susetted the description of this API. At #history-A.2
+we susetted the use of the API itself. At #history-A.1 we sunsetted [#608.5]
+the related API that preceded this one.)
 
 
 
@@ -65,11 +31,11 @@ We sunsetted this API for these reasons:
 |[#608.7]                   | #hole |
 |[#608.6]                   |       | sunsetted. for now this identifier is retired.
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
-|[#608.4]                   | #trak | all the places you write this same `--help` regex |
+|[#608.4]                   | #hole |
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
 |[#607.I]                   | #trak | maybe one day DRY this `_eol` pattern
-|[#607.H]                   | #open | delete or rewrite these files
+|[#607.H]                   | #hole |
 |[#607.G]                   | #open | sunset the common upstream argument parser module
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
 |[#607.E]                   | #refa | there's no way this is right
@@ -87,6 +53,7 @@ We sunsetted this API for these reasons:
 
 ## (document-meta)
 
+  - #history-A.3 (as referenced)
   - #history-A.2 (as referenced)
   - #history-A.1 (as referenced)
   - #broke-out & expanded

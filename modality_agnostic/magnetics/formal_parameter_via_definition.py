@@ -111,7 +111,71 @@ parameter); but don't do that.
 from modality_agnostic.memoization import dangerous_memoize
 
 
-class _SELF:
+# == BEGIN [#008.12] function reflection
+#    At #history-A.3 this became stowaway here & sunsetted anemic other file.
+#    There are lots of holes here that would be straightforward to fill,
+#    but we haven't done so because we don't use this system in production.
+
+
+class parameter_index_via_mixed:
+
+    def __init__(self, function_or_method):
+
+        starts_with_underscore = []
+        does_not_start_with_underscore = []
+
+        fparam_args_via = _formal_parameter_argumentser()
+
+        from inspect import signature
+        _items = signature(function_or_method).parameters.items()
+        for name, param in _items:
+
+            if '_' == name[0]:
+                starts_with_underscore.append(name)
+                continue
+
+            _dct = {k: v for k, v in fparam_args_via(param)}
+            _fparam = _FormalParameter(**_dct)
+            does_not_start_with_underscore.append((name, _fparam))
+
+        self.parameters_that_start_with_underscores = tuple(starts_with_underscore)  # noqa: E501
+        self.parameters_that_do_not_start_with_underscores = tuple(does_not_start_with_underscore)  # noqa: E501
+
+
+def _formal_parameter_argumentser():
+
+    from inspect import Parameter, _empty
+
+    def via(param):
+        x = param.kind
+        if (x == Parameter.POSITIONAL_OR_KEYWORD):
+            x = param._default
+            if _empty == x:
+                yield 'argument_arity', arities.REQUIRED_FIELD
+                return
+            yield 'argument_arity', arities.OPTIONAL_FIELD
+            yield 'default_value', x
+            return
+
+        if x == Parameter.KEYWORD_ONLY:
+            xx()
+
+        if x == Parameter.POSITIONAL_ONLY:
+            xx()
+
+        if x == Parameter.VAR_KEYWORD:
+            xx()
+
+        assert (x == Parameter.VAR_POSITIONAL)
+        xx()
+
+    return via
+
+
+# == END
+
+
+class _FormalParameter:
 
     def __init__(
             self,
@@ -120,10 +184,10 @@ class _SELF:
             argument_arity=None,
     ):
         if argument_arity is None:
-            argument_arity = _arities.REQUIRED_FIELD
-        elif type(argument_arity) is str:
+            argument_arity = arities.REQUIRED_FIELD
+        elif isinstance(argument_arity, str):
             # #NOT_COVERED #history-A.2
-            argument_arity = getattr(_arities, argument_arity)
+            argument_arity = getattr(arities, argument_arity)
 
         self.argument_arity_range = argument_arity
 
@@ -131,8 +195,11 @@ class _SELF:
         self.default_value = default_value
 
     @property
-    def generic_universal_type(self):  # contact-point for the idea [#507.E]
-        pass
+    def is_required(self):
+        return (False, True)[self.argument_arity_range.start]
+
+
+define = _FormalParameter
 
 
 class _CommonArityKinds:
@@ -169,7 +236,7 @@ class _CommonArityKinds:
         return range(0, 0)
 
 
-_arities = _CommonArityKinds()
+arities = _CommonArityKinds()
 
 
 class _MyArity:
@@ -180,10 +247,10 @@ class _MyArity:
         self.stop = stop
 
 
-_SELF.arities = _arities
-import sys  # noqa E402
-sys.modules[__name__] = _SELF  # #[#008.G] so module is callable
+def xx():
+    raise Exception('write me')
 
+# #history-A.3
 # #history-A.2: (can be temporary) for not covered
 # #history-A.1: large doc spike of parameter modeling theory
 # #born.

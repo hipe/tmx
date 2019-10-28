@@ -17,7 +17,7 @@ class _CommonCase(unittest.TestCase):
 class Case7755_default_argument_arity(_CommonCase):
 
     def test_010_magnetic_loads(self):
-        self.assertIsNotNone(_subject_magnetic())
+        self.assertIsNotNone(_subject_module())
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -46,8 +46,9 @@ class Case7765_flag_argument_arity_intro(_CommonCase):
         self.assertEqual(0, r.stop)
 
     @property
+    @shared_subject
     def parameter_(self):
-        return _parameter_with_flag_argument_arity()
+        return _build_parameter_via_argument_arity_string('FLAG')
 
 
 class Case7775_list_argument_arity(_CommonCase):
@@ -61,8 +62,9 @@ class Case7775_list_argument_arity(_CommonCase):
         self.assertEqual(None, r.stop)
 
     @property
+    @shared_subject
     def parameter_(self):
-        return _parameter_with_list_argument_arity()
+        return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
 
 
 class Case7785_default_value_everything(_CommonCase):
@@ -81,7 +83,7 @@ class Case7785_default_value_everything(_CommonCase):
     @property
     @shared_subject
     def parameter_(self):
-        return _subject_magnetic()(
+        return define(
                 default_value=123,
         )
 
@@ -138,65 +140,53 @@ def _lines_of_description(param):
     arr = []
     import inspect
     if 2 == len(inspect.signature(f).parameters):
-        f(o, _styler())
+        f(o, _STYLER)
     else:
         f(o)
     return arr
 
 
-@lazy
-def _styler():
-    class _STYLER:
+class _STYLER:  # #class-as-namespace
         def em(s):
             return '*%s*' % s
-    return _STYLER
 
 
 # -- some memoized parameters
 
 @lazy
-def _parameter_with_list_argument_arity():
-    return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
-
-
-@lazy
-def _parameter_with_flag_argument_arity():
-    return _build_parameter_via_argument_arity_string('FLAG')
-
-
-@lazy
 def _the_totally_empty_parameter():
-    return _subject_magnetic()()
+    return define()
 
 
 # -- build parameter given one meta-parameter
 
 def _build_parameter_with_this_description(f):
-    return _subject_magnetic()(
+    return define(
             description=f,
     )
 
 
 def _build_parameter_via_argument_arity_string(s):
-    _r = getattr(_subject_magnetic_file().arities, s)
-    return _subject_magnetic()(
+    mod = _subject_module()
+    _r = getattr(mod.arities, s)
+    return mod.define(
             argument_arity=_r,
     )
 
 
 # --
 
-def _subject_magnetic():
-    return _subject_magnetic_file()
+def define(**kwargs):
+    return _subject_module().define(**kwargs)
 
 
-@lazy
-def _subject_magnetic_file():
-    import modality_agnostic.magnetics.formal_parameter_via_definition as x
-    return x
+def _subject_module():
+    from modality_agnostic.magnetics import formal_parameter_via_definition
+    return formal_parameter_via_definition
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: to case number
 # #born.

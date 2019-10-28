@@ -179,7 +179,7 @@ class Case3066_top_help_screen(_CommonCase):
     @shared_subject
     def _section_index(self):
         _lines = self._end_state().stderr_lines
-        return _help_screen_lib().section_index_via_chunks(_lines)
+        return _help_screen_lib().section_index_via_lines(_lines)
 
     @shared_subject
     def _end_state(self):

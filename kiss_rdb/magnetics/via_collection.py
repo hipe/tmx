@@ -45,7 +45,7 @@ def DIGGY_DIG(top_object, dig_path, say_collection, listener):
         offset += 1
 
         assert(isinstance(current_item, dict))  # retrofitting for #history-A.4
-        current_item = __collection_implementation_via_dictionary(current_item)
+        current_item = collection_via_DICTIONARY(current_item)
 
     return current_item
 
@@ -461,7 +461,10 @@ class _OpenState:
             yield k
 
     def _each_next_real_new_key(self):
-        """with this architecture, certain operations (like traversal) could
+        """
+        (the below precaution was removed at #history-A.5)
+
+        with this architecture, certain operations (like traversal) could
 
         be NASTY under some circumstances like loops inside loops that each
         try to traverse the same collection concurrently (#cover-me).
@@ -488,24 +491,9 @@ class _OpenState:
         """
 
         cache = self._cache
-
-        is_open = True
-        while True:  # at each step of the traversal:
-            self._change_state(None)  # lock it
-            try:
-                k, v = next(self._pairs)  # this could throw arbitrary
-                cache[k] = v
-            except StopIteration:
-                is_open = False
-            finally:
-                self._change_state(self)  # whether or not raised, unlock
-
-            if is_open:
-                # yield this out only once we've unlocked again
-                # (so allow the client to retrieve the value of this key)
-                yield k
-            else:
-                break
+        for k, v in self._pairs:
+            cache[k] = v
+            yield k
 
         """true or false?: you don't reach this point in code UNLESS:
 
@@ -569,7 +557,7 @@ class collection_via_DICTIONARY_OF_DEREFERENCERS:  # 1x
         return self._special_dictionary[key]()  # ..
 
 
-class __collection_implementation_via_dictionary:
+class collection_via_DICTIONARY:
 
     def __init__(self, dct):
         self._dictionary = dct
@@ -623,6 +611,7 @@ ellipsis_join = _ellipsis_join
 # we want the doctest tests to read as if it's an "ordinary" function.
 
 
+# #history-A.5
 # #history-A.4
 # #history-A.3 (as referenced)
 # #history-A.2

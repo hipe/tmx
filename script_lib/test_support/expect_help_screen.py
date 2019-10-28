@@ -11,12 +11,9 @@ def optional_args_index_via_section_index(si):
     return {k: v for k, v in __do_optionals_index(si)}
 
 
-def section_index_via_lines__(unsanitized_strings):
+def section_index_via_lines(unsanitized_strings):
     _tree = __tree_via_unsanitized_strings(unsanitized_strings)
     return __section_index_via_tree(_tree)
-
-
-section_index_via_chunks = section_index_via_lines__  # #todo
 
 
 def __do_optionals_index(si):
@@ -27,18 +24,48 @@ def __do_optionals_index(si):
         needles = {'optional arguments', 'optional argument'}
         these = needles.intersection(against)
     key, = these
-    _head_node, one_single_branch_node_why = si[key].children
-    for node in one_single_branch_node_why.children:
-        _use = (node if node.is_terminal else node.children[0])
-        # (if multi-line entries, skip second etc line)
-        _use_s = _use.styled_content_string
+    for node in __flatten_the_option_section(si[key]):
+        _use_s = node.styled_content_string
         o = __option_line_challenge_mode(_use_s)
         yield o.main_long_switch, o
 
 
+def __flatten_the_option_section(parent_node):
+
+    _header_node, *cx_nodes = parent_node.children
+    assert('option' in _header_node.styled_content_string)
+
+    # this sucks and we are not sure what's going on:
+    # if there's only one node then assume it's a branch node with a bunch
+    # of children nodes, such that each item is a single-line item.
+
+    if 1 == len(cx_nodes):
+        only_node, = cx_nodes
+        assert(not only_node.is_terminal)
+        for node in only_node.children:
+            assert(node.is_terminal)
+            yield node
+
+    # otherwise, each item might be single line or multiple line. when
+    # multiple line, we only want the first line
+
+    for node in cx_nodes:
+        if node.is_terminal:
+            yield node
+            continue
+
+        # not sure how everything parses any more.
+        sub_cx_nodes = node.children
+
+        for sub_node in sub_cx_nodes:
+            assert(sub_node.is_terminal)
+
+        yield sub_cx_nodes[0]
+
+
 def positional_args_index_via_section_index(si):
     against = set(si)
-    needles = {'arguments', 'sub-commands', 'agrument', 'sub-command'}
+    needles = {'arguments', 'sub-commands', 'argument', 'sub-command'}
     these = needles.intersection(against)
     if not len(these):  # #todo
         needles = {'positional arguments', 'positional argument'}
@@ -214,40 +241,6 @@ def __header_line_via_node(node):
     else:
         use_node = node.children[0]
     return use_node.styled_content_string
-
-
-def help_screen_chunks_via_test_case(tc):  # tc=test case
-    # #todo away or rewrite soon. half of this should be in the test file
-
-    chunks = []
-    is_open = True
-
-    def write(s):
-        assert(is_open)
-        if tc.do_debug:
-            import sys
-            io = sys.stderr
-            io.write("(begin help screen chunk)\n")
-            io.write(s)
-            io.write("(end help screen chunk)\n")
-        chunks.append(s)
-
-    from modality_agnostic import io as io_lib
-    mock_IO = io_lib.write_only_IO_proxy(write=write)
-
-    import script_lib.cheap_arg_parse_branch as _mag
-    _oo = _mag.interpretationer_via_individual_resources(
-        ARGV=['ohai', 'my-command', '--help'],
-        stdout=None,
-        stderr=mock_IO,
-    )
-
-    _cmd = tc.command_module_()
-    rslt = _oo.interpretation_via_command_stream([_cmd])
-    tc.assertFalse(rslt.OK)
-    tc.assertEqual(0, rslt.exitstatus)
-    is_open = False
-    return chunks
 
 
 def __sanitized_lines_via_unsanitized_strings(unsanitized_strings):

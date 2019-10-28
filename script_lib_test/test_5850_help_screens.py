@@ -1,10 +1,10 @@
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
-        lazy)
+        dangerous_memoize_in_child_classes)
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
     """you might think that some of these should be pushed up to the..
 
     test helper library for help screens (and you might be right) but for
@@ -20,16 +20,14 @@ class _CommonCase(unittest.TestCase):
         all their parameters in the call).
     """
 
-    def __init__(self, test_name):
-        self.do_debug = False
-        super().__init__(test_name)
-
     # -- assertions
 
     def _in_usage_expect_interesting_tail(self, tail_s):
         import re
-        _s = self._section_index()['usage'].styled_content_string
-        _match = re.search('^usage: ohai my-command \\[-h\\] (.+)$', _s)
+        node = self._section_index()['usage']
+        _use_node = node if node.is_terminal else node.children[0]
+        _s = _use_node.styled_content_string
+        _match = re.search('^usage: ohai-mumo my-command (.+)$', _s)
         _act = _match[1]
         self.assertEqual(tail_s, _act)
 
@@ -39,7 +37,7 @@ class _CommonCase(unittest.TestCase):
 
     def _in_details_expect_positionals(self, *s_a):
         _act = self._section_index()
-        _pai = _lib().positional_args_index_via_section_index(_act)
+        _pai = EHS().positional_args_index_via_section_index(_act)
         self._same_expect(_pai, s_a)
 
     def _same_expect(self, xai, s_a):
@@ -48,27 +46,56 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(_exp, _act)
 
     def _help_screen_renders(self):
-        _chunks = self._chunks()
-        self.assertIsNot(0, len(_chunks[0]))
+        _lines = self.end_state_lines()
+        self.assertIsNot(0, len(_lines[0]))
 
     # -- builders
 
     def _build_optional_args_index(self):
         _act = self._section_index()
-        oai = _lib().optional_args_index_via_section_index(_act)
+        oai = EHS().optional_args_index_via_section_index(_act)
         del oai['--help']  # tacit assertion that it exists, as well as norm
         return oai
 
-    def _section_index_via_chunks(self):
-        return _lib().section_index_via_chunks(self._chunks())
+    def build_section_index(self):
+        return EHS().section_index_via_lines(self.end_state_lines())
 
-    def _chunks_via_work(self):
-        return _lib().help_screen_chunks_via_test_case(self)
+    @dangerous_memoize_in_child_classes('_END_STATE_LINES', 'build_lines')
+    def end_state_lines(self):
+        pass
+
+    def build_lines(self):
+
+        # moved here from a library file at #history-A.1.
+        # will DRY with sibling file and maybe push back up maybe later.
+        # right now scope is just to green this file
+
+        from script_lib.test_support import lines_and_spy_io_for_test_context
+        lines, spy_IO = lines_and_spy_io_for_test_context(self, 'DEBUG: ')
+
+        _argv = ('/fake-fs/xx/yy/ohai-mumo', 'my-command', '--help')
+
+        from script_lib.magnetics.CLI_formal_parameters_via_formal_parameters import (  # noqa: E501
+                CLI_function_via_command_module)
+        _command_module = self.given_command_module()
+        _CLI_function = CLI_function_via_command_module(_command_module)
+
+        _cx_CLI_funcs = (('my-command', lambda: _CLI_function),)
+
+        from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
+        es = cheap_arg_parse_branch(
+                stdin=None, stdout=None, stderr=spy_IO, argv=_argv,
+                children_CLI_functions=_cx_CLI_funcs)
+
+        self.assertEqual(0, es)
+        return tuple(lines)
+
+    do_debug = False
 
 
 # (each "category N" below is from the list at [#502])
 
-class Case6244_category_4_required_field(_CommonCase):
+class Case5844_category_4_required_field(CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -81,17 +108,13 @@ class Case6244_category_4_required_field(_CommonCase):
 
     @shared_subject
     def _section_index(self):
-        return self._section_index_via_chunks()
+        return self.build_section_index()
 
-    @shared_subject
-    def _chunks(self):
-        return self._chunks_via_work()
-
-    def command_module_(self):
-        return _command_modules().two_crude_function_parameters_by_function()
+    def given_command_module(self):
+        return command_modules().two_crude_function_parameters_by_function
 
 
-class Case6247_category_1_flag(_CommonCase):
+class Case5847_category_1_flag(CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -108,17 +131,13 @@ class Case6247_category_1_flag(_CommonCase):
 
     @shared_subject
     def _section_index(self):
-        return self._section_index_via_chunks()
+        return self.build_section_index()
 
-    @shared_subject
-    def _chunks(self):
-        return self._chunks_via_work()
-
-    def command_module_(self):
-        return _command_modules().category_1_flag_minimal()
+    def given_command_module(self):
+        return command_modules().category_1_flag_minimal
 
 
-class Case6250_category_2_optional_field_NOTE(_CommonCase):
+class Case5850_category_2_optional_field_NOTE(CommonCase):
     """NOTE - there is a #aesthetic-hueristic vaporware here that has
 
     yet to be specified (in this project). it's something like this: an
@@ -143,7 +162,7 @@ class Case6250_category_2_optional_field_NOTE(_CommonCase):
         self.assertIsNone(_guy.main_short_switch)
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('[--opto-fieldo FIELDO]')
+        self._in_usage_expect_interesting_tail('[--opto-fieldo=FIELDO]')
 
     @property
     @shared_subject
@@ -155,22 +174,18 @@ class Case6250_category_2_optional_field_NOTE(_CommonCase):
     def _optional_args_index(self):
         return self._build_optional_args_index()
         _act = self._section_index()
-        oai = _lib().optional_args_index_via_section_index(_act)
+        oai = EHS().optional_args_index_via_section_index(_act)
         del oai['--help']  # tacit assertion that it exists, as well as norm
 
     @shared_subject
     def _section_index(self):
-        return self._section_index_via_chunks()
+        return self.build_section_index()
 
-    @shared_subject
-    def _chunks(self):
-        return self._chunks_via_work()
-
-    def command_module_(self):
-        return _command_modules().category_2_optional_field_minimal()
+    def given_command_module(self):
+        return command_modules().category_2_optional_field_minimal
 
 
-class Case6253_category_3_optional_list(_CommonCase):
+class Case5853_category_3_optional_list(CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -179,22 +194,18 @@ class Case6253_category_3_optional_list(_CommonCase):
         self._in_details_expect_positionals('listo-boyo', 'wingo-wanno')
 
     def test_030_usage_tail_is_this(self):
-        _exp = '[listo-boyo [listo-boyo ...]] wingo-wanno'
+        _exp = 'wingo-wanno [listo-boyo [listo-boyo …]]'
         self._in_usage_expect_interesting_tail(_exp)
 
     @shared_subject
     def _section_index(self):
-        return self._section_index_via_chunks()
+        return self.build_section_index()
 
-    @shared_subject
-    def _chunks(self):
-        return self._chunks_via_work()
-
-    def command_module_(self):
-        return _command_modules().category_3_optional_list_minimal()
+    def given_command_module(self):
+        return command_modules().category_3_optional_list_minimal
 
 
-class Case6256_category_5_required_list(_CommonCase):
+class Case5856_category_5_required_list(CommonCase):
 
     def test_010_help_screen_renders(self):
         self._help_screen_renders()
@@ -203,35 +214,29 @@ class Case6256_category_5_required_list(_CommonCase):
         self._in_details_expect_positionals('reqo-listo')
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('reqo-listo [reqo-listo ...]')
+        self._in_usage_expect_interesting_tail('reqo-listo [reqo-listo …]')
 
     @shared_subject
     def _section_index(self):
-        return self._section_index_via_chunks()
+        return self.build_section_index()
 
-    @shared_subject
-    def _chunks(self):
-        return self._chunks_via_work()
-
-    def command_module_(self):
-        return _command_modules().category_5_required_list_minimal()
+    def given_command_module(self):
+        return command_modules().category_5_required_list_minimal
 
 
-@lazy
-def _lib():
-    import script_lib.test_support.expect_help_screen as x
-    return x
+def EHS():
+    from script_lib.test_support import expect_help_screen
+    return expect_help_screen
 
 
-@lazy
-def _command_modules():
+def command_modules():
     from modality_agnostic.test_support.parameters_canon import (
-            command_modules as x,
-            )
-    return x
+            command_modules)
+    return command_modules
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1
 # #born.

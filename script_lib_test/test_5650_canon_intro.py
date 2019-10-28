@@ -1,14 +1,7 @@
-"""cover the "magnetic" module that isomorphs with the name of this test file.
+"""
+At #history-A.1 #todo
 
-the scope of this test file is currently broad: cover all the things
-involved in CLI-specific parsing of a request. this means options,
-positional arguments, (what is known in platform as) sub-parsers, and
-whatever else.
 
-here's a rough skeleton we typically use to permute the core cases we
-need to test. each test case has a name composed of two integers (as
-"integer dot integer"). the first integer represents how many actual
-elements will be in the ARGV of the test case (sort of (see #here1)).
 
   - case 0: zero arguments when one (or more) is expected.
 
@@ -17,170 +10,153 @@ elements will be in the ARGV of the test case (sort of (see #here1)).
   - case 1.3: one sub-parser argument that *is* recognized.
   - case 1.4: one option-looking argument that *is* recognized.
 
-for those cases that have them in their name, the second integer is a sort
-of arbitary identifier; but as a mnemonic: the order of the cases is
-vaguely based on the idea of what cases are most likely to occur by pure
-chance - i.e, almost literally a monkey typing random keys on a keyboard:
-
 typing a random word that starts with a dash ("-") is less likely to happen
 to happen than not; and randomly typing a correct option or positional
 argument is generally to happen than not (and in turn, probably less likely
 than typing a word that ramdomly starts with a dash. (by the way: option
 tokens start with dashes.)
-
-we follow [#006.regression-order] in naming the test cases and test methods
 """
 
 from script_lib.test_support.CLI_canon import (
-        CLI_CaseMethods,
-        the_empty_ARGV,
-        ARGV,
-        PROGRAM_NAME,
-        NEWLINE)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+        THESE_TWO_CHILDREN_CLI_METHODS,
+        CLI_Canon_Case_Methods)
+from modality_agnostic.memoization import dangerous_memoize as shared_subject
+# lazy ^
 import unittest
 
 
-class _CommonCase(CLI_CaseMethods, unittest.TestCase):
+class _CommonCase(CLI_Canon_Case_Methods, unittest.TestCase):
 
     # -- assertion
 
-    def one_line_says_usage_(self):
-        """insulate main body of test code from having to know ..
-
-        that currently the usage line WEIRDLY shows up before the main line
-        """
-        self._this_line_says_usage('first_line')
-
-    def _this_line_says_usage(self, attr):
-        _actual_line = getattr(self.magnetic_call_, attr)
-        self.assertEqual(_foo_bar_usage_line(), _actual_line)
+    def second_line_invites_to(self, program_name):
+        # (at #history-A.1 we lost the gross behavior)
+        _exp = f"see '{program_name} --help'\n"
+        self.assertEqual(self.second_line, _exp)
 
     # -- setup hook-outs common to all/most cases in this file
 
-    def command_stream_(self):
-        return self.stream_with_two_commands_()
+    def given_children_CLI_functions(self):
+        return THESE_TWO_CHILDREN_CLI_METHODS()
+
+    long_program_name = '/fake-fs/foo/bar/ohai-mami'
 
     # -- setup support
 
-    def _interpretation_when_two_stderr_lines_expected(self):
-        return self.interpretation_when_expected_(2, STDERR)
+    do_debug = False
 
 
-class Case6146_no_args(_CommonCase):  # classically case 0
+class Case5643_no_args(_CommonCase):  # classically case 0
 
     def test_010_subject_module_loads(self):
-        self.assertIsNotNone(self.main_magnetic_())
+        from script_lib import cheap_arg_parse_branch
+        self.assertIsNotNone(cheap_arg_parse_branch)
 
-    def test_020_magnetic_call_happens(self):
-        self.magnetic_call_happens_()
+    def test_020_fails(self):
+        self.invocation_fails()
 
-    def test_050_second_line_says_usage(self):
-        self._this_line_says_usage('second_line')
+    def test_030_invocation_results_in_this_exitstatus(self):
+        self.invocation_results_in_this_exitstatus(457)
 
-    def test_060_first_line_says_this(self):
-        _actual_line = self.magnetic_call_.first_line
-        self.assertEqual(_actual_line, 'expecting sub-command.'+NEWLINE)
+    def test_050_first_line_says_expecting_sub_command(self):
+        _exp = 'parameter error: expecting <sub-command>\n'
+        self.assertEqual(self.first_line, _exp)
+
+    def test_060_second_line_says_invite(self):
+        self.assertEqual(self.second_line[0:4], 'see ')
 
     @property
     @shared_subject
-    def magnetic_call_(self):
-        return self._interpretation_when_two_stderr_lines_expected()
+    def end_state(self):
+        return self.invoke_expecting(line_count=2, which='STDERR')
 
-    def ARGV_(self):
-        return the_empty_ARGV()
+    def given_argv_tail(self):
+        return ()
 
 
-class Case6149_strange_subparser_name(_CommonCase):  # classically case 1.1
+class Case5647_strange_subparser_name(_CommonCase):  # classically case 1.1
 
-    def test_020_magnetic_call_happens(self):
-        self.magnetic_call_happens_()
+    def test_020_invokes(self):
+        self.invokes()
 
-    def test_030_magnetic_call_results_in_failure(self):
-        self.magnetic_call_results_in_failure_()
+    def test_030_invocation_results_in_failure(self):
+        self.invocation_fails()
 
-    def test_040_magnetic_call_has_particular_exitstatus(self):
-        self.magnetic_call_has_exitstatus_of_common_error_()
-
-    def test_050_one_line_says_usage(self):
-        self.one_line_says_usage_()
+    def test_040_invocation_has_particular_exitstatus(self):
+        self.invocation_results_in_this_exitstatus(1)
 
     def test_060_main_line_says_this(self):
-        self.main_line_says_this_(
-          "invalid choice: 'fhqwhgads' (choose from 'foo-bar', 'biff-baz')")
+        import re
+        md = re.match(r'([^(]+) \(([^)]+)\)$', self.first_line)
+        head, tail = md.groups()
+        self.assertEqual(head, "no sub-command for 'fhqwhgads'.")
+        self.assertEqual(tail, "there's 'foo-bar' and 'biff-baz'")
+
+    def test_070_second_line_says_invite(self):
+        self.second_line_invites_to('ohai-mami')
 
     @property
     @shared_subject
-    def magnetic_call_(self):
-        return self._interpretation_when_two_stderr_lines_expected()
+    def end_state(self):
+        return self.invoke_expecting(line_count=2, which='STDERR')
 
-    @ARGV
-    def ARGV_(self):
-        return ['fhqwhgads']
-
-
-# Case6150  # #midpoint
+    def given_argv_tail(self):
+        return ('fhqwhgads',)
 
 
-class Case6152_strange_option(_CommonCase):  # classically case 1.2
+# Case5650  # #midpoint
 
-    def test_020_magnetic_call_happens(self):
-        self.magnetic_call_happens_()
 
-    def test_030_magnetic_call_results_in_failure(self):
-        self.magnetic_call_results_in_failure_()
+class Case5653_strange_option(_CommonCase):  # classically case 1.2
 
-    def test_040_magnetic_call_has_particular_exitstatus(self):
-        self.magnetic_call_has_exitstatus_of_common_error_()
+    def test_020_invokes(self):
+        self.invokes()
 
-    def test_050_one_line_says_usage(self):
-        self.one_line_says_usage_()
+    def test_030_invocation_results_in_failure(self):
+        self.invocation_fails()
+
+    def test_040_invocation_has_particular_exitstatus(self):
+        self.invocation_results_in_this_exitstatus(457)
 
     def test_060_main_line_says_this(self):
-        self.main_line_says_this_('unrecognized arguments: -x --another --etc')
+        self.assertIn("unrecognized option: '-x'", self.first_line)
+
+    def test_070_second_line_says_invite(self):
+        self.second_line_invites_to('ohai-mami')
 
     @property
     @shared_subject
-    def magnetic_call_(self):
-        return self._interpretation_when_two_stderr_lines_expected()
+    def end_state(self):
+        return self.invoke_expecting(line_count=2, which='STDERR')
 
-    @ARGV
-    def ARGV_(self):
-        return ['-x', '--another', '--etc']
+    def given_argv_tail(self):
+        return ('-x', '--another', '--etc')
 
 
-class Case6155_good_sub_command(_CommonCase):  # classically case 1.3
+class Case5656_good_sub_command(_CommonCase):  # classically case 1.3
 
-    def test_020_magnetic_call_happens(self):
-        self.magnetic_call_happens_()
+    def test_010_invokes(self):
+        self.invokes()
 
-    def test_050_has_command(self):
-        self.assertIsNotNone(self.magnetic_call_._command)
+    def test_020_user_thing_writes(self):
+        _exp = "hello from 'ohai-mami foo-bar'. args: ['foobie-1', 'foob-2']\n"
+        _act = self.first_line
+        self.assertEqual(_act, _exp)
 
-    def test_050_has_namespace(self):
-        self.assertIsNotNone(self.magnetic_call_._namespace)
+    def test_results_in_user_exitstatus(self):
+        self.invocation_results_in_this_exitstatus(4321)
 
     @property
     @shared_subject
-    def magnetic_call_(self):
-        return self.result_when_expecting_no_output_or_errput_()
+    def end_state(self):
+        return self.invoke_expecting(line_count=1, which='STDOUT')
 
-    @ARGV
-    def ARGV_(self):
-        return ['foo-bar']
-
-
-@lazy
-def _foo_bar_usage_line():
-    return 'usage: %s [-h] {foo-bar,biff-baz} ...%s' % (PROGRAM_NAME, NEWLINE)
-
-
-STDERR = 'STDERR'
+    def given_argv_tail(self):
+        return ('foo-bar', 'foobie-1', 'foob-2')
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1
 # #born.

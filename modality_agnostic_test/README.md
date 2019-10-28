@@ -48,7 +48,7 @@ In the category of magnetics for modality adaptations
 
   - 7751-7805  parameter via definition (7813)
   - 8063-8063  command via parameter stream (8063)
-  - 8189-8189  parameters cannon (8189)
+  - 8186-8189  parameters cannon (8189)
   - 8313-8313  command stream (8313)
 
 

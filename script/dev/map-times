@@ -1,22 +1,45 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 
-class _CLI:
+def _CLI(sin, sout, serr, argv):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            CLI_function=_do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=argv,
+            formal_parameters=(
+                ('<file>',
+                 'The input file to look for timestamps in.',
+                 "Use '-' to read from STDIN."),),
+            description_template_valueser=lambda: {})
 
-    def __init__(self, *_CLI_4):
-        self.stdin, self.stdout, self.stderr, self.ARGV = _CLI_4
-        self.OK = True
 
-    def execute(self):
-        self.exitstatus = 0
-        from script_lib import RESOLVE_UPSTREAM_EXPERIMENT as _
-        _(self)
-        self.OK and self.__do_next_thing()
-        return self.exitstatus
+def _do_CLI(monitor, sin, sout, serr, path):
+    """
+    A one-off script (possibly re-usable) meant to format streams of lines
 
-    def __do_next_thing(self):
+    that may contain timetamps of a certain format.
 
-        w = self.stderr.write
+    (The commit message from the birth commit of this script contains the
+    only input data ever we ever used against it.)
+
+    An internal, hard-coded pattern is employed to match timestamps of a
+    certain format. For every line that matches the pattern whose previous
+    line also matches the pattern, we do simple arithmatic to *replace*
+    the timestamp portion of the *latter* line to instead show the time
+    elapsed between the two times (duration).
+
+    (It's a major UX issue having the duration of the previous "item" occur
+    on each next line, but this is just a sketch for now.)
+    """
+
+    from script_lib import OPEN_UPSTREAM
+    opened = OPEN_UPSTREAM(serr, '<file>', path, sin)
+    if opened is None:
+        return 567
+
+    w = serr.write
+
+    if True:  # legacy indent
 
         def receive_parsed_line(o):
 
@@ -35,19 +58,14 @@ class _CLI:
                 receive_parsed_line=receive_parsed_line,
                 receive_other_line=receive_other_line,
                 )
-        with self.upstream as lines:
-            for line in lines:
-                mp.receive_line(line)
 
-        self.stderr.write('done!\n')
+    recv = mp.receive_line
+    with opened as lines:
+        for line in lines:
+            recv(line)
 
-    # -- hook-out's
-
-    def description_raw_lines_for_resolve_upstream(self):
-        yield 'parse timestamps in the first "cel" of lines to do a thing'
-
-    def lone_argument_moniker_for_resolve_upstream(self):
-        return '<file>'
+    serr.write('done!\n')
+    return monitor.exitstatus
 
 
 # #[#458.Z.4] "mad parse"
@@ -142,7 +160,6 @@ def _msg(body, header):
 
 if '__main__' == __name__:
     import sys as o
-    _es = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_es)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

@@ -2,232 +2,99 @@
 """
 
 
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
-
-
-def ARGV(f):
-    """decorator to turn "short ARGVs" into "long ARGVs"
-
-    :#here1: ARGV does or does not include PROGRAM_NAME:
-
-    the system under test expects that the argument passed to `ARGV` will be
-    structurally equivalent to `sys.argv`; by which we mean that it always
-    has at least one element and that the first element is PROGRAM_NAME (or
-    equivalent).
-
-    however, neither the argument parser (from platform `argparse`) nor in
-    our test stories is PROGRAM_NAME considered part of the ARGV.
-    """
-
-    def g(*args):
-        a = f(*args)
-        a.insert(0, PROGRAM_NAME)
-        return a
-    return g
-
-
-def decoratorize_dangerously(define_two):  # [#510.6]
-    def use_decorator(m):
-        def use_method(tc):
-            if state._is_first_call:
-                state._is_first_call = False
-                state._value = build_once(tc)
-            return retrieve_subsequently(state._value)
-        state = _BlankState()
-        state._is_first_call = True
-        build_once, retrieve_subsequently = tuple(define_two(m))
-        return use_method
-    return use_decorator
-
-
-class _BlankState:  # #[#510.5]
-    pass
-
-
-@decoratorize_dangerously
-def stream_via_memoized_array(m):
-    def build_once(tc):
-        return m(tc)
-    yield build_once
-
-    def retrieve_subsequently(tup):
-        return iter(tup)
-    yield retrieve_subsequently
-
-
-class CLI_CaseMethods:
+class CLI_Canon_Case_Methods:
 
     # -- assertion methods
 
-    def main_line_says_this_(self, wat):
-        """insulate main body of test code from having to know ..
+    def invokes(self):
+        self.assertIsNotNone(self.end_state)
 
-        ..whether the "main" line is the first or second line
-        """
-        _full_line = self.magnetic_call_.second_line
-        _expected_line = '%s: error: %s%s' % (PROGRAM_NAME, wat, NEWLINE)
-        self.assertEqual(_expected_line, _full_line)
+    def invocation_fails(self):
+        self.assertFalse(self.end_state.OK)
 
-    def magnetic_call_has_exitstatus_of_common_error_(self):
-        self.assertEqual(2, self.magnetic_call_.exitstatus)
+    def invocation_results_in_this_exitstatus(self, es):
+        self.assertEqual(self.end_state.exitstatus, es)
 
-    def magnetic_call_results_in_failure_(self):
-        self.assertFalse(self.magnetic_call_.OK)
+    @property
+    def first_line(self):
+        return self.end_state.first_line
 
-    # magnetic_call_succeeds_ (track subscribers)
-
-    def magnetic_call_happens_(self):
-        self.assertIsNotNone(self.magnetic_call_)
+    @property
+    def second_line(self):
+        return self.end_state.second_line
 
     # -- these
 
-    def invocation_when_expected_(self, num_lines, which):
+    def invoke_expecting(self, line_count, which):
 
         def f(sout, serr):
-            interpretation_result = self._interpretation__CLI(sout, serr)
-            self.assertTrue(interpretation_result.OK)
-            _exe = interpretation_result.FLUSH_TO_EXECUTABLE()
-            mixed_x = _exe()
-            if mixed_x is None:
-                return _OK_interpretation_result()
-            else:
-                cover_me('when execute results in a value')
+            return _invoke_CLI(sout, serr, self)
 
-        return self._same_when_expected(f, num_lines, which)
-
-    def interpretation_when_expected_(self, num_lines, which):
-
-        def f(sout, serr):
-            return self._interpretation__CLI(sout, serr)
-
-        return self._same_when_expected(f, num_lines, which)
-
-    def _same_when_expected(self, f, num_lines, which):
-
-        s_a, f_a = self._build_recording_list_and_expectation_list__CLI(num_lines)  # noqa: E501
-        from script_lib.test_support import expect_STDs
-
-        _expectation = expect_STDs.expect_lines(f_a, which)
-        perf = _expectation.to_performance_under(self)
-
-        _sout, _serr = self._appropriate_stdout_and_stderr__CLI(perf)
-
-        interpretation_result = f(_sout, _serr)
-
-        perf.finish()
-        return _Invocation(interpretation_result, s_a)
-
-    def result_when_expecting_no_output_or_errput_(self):
-
-        return self._interpretation__CLI(None, None)
-
-    def _interpretation__CLI(self, stdout, stderr):
-        _argv = self.ARGV_()
-        _command_st = self.command_stream_()
-
-        _bldr = self.main_magnetic_().interpretationer_via_individual_resources(  # noqa: E501
-            ARGV=_argv,
-            stdout=stdout,
-            stderr=stderr,
-        )
-        return _bldr.interpretation_via_command_stream(_command_st)
-
-    def _appropriate_stdout_and_stderr__CLI(self, perf):
-        if self.do_debug:
-            # (below we assume the [#009.B] provision 2x)
-            stdout = self._debugging_IO__CLI(perf.stdout, '%sohai stdout: %s')
-            stderr = self._debugging_IO__CLI(perf.stderr, '%sohai stderr: %s')
-        else:
-            stdout = perf.stdout
-            stderr = perf.stderr
-        return stdout, stderr
-
-    def _debugging_IO__CLI(self, upstream_IO, format):
-        def write(s):
-            sys.stderr.write(format % (NEWLINE, s))
-            upstream_IO.write(s)
-        import sys
-        from modality_agnostic import io as io_lib
-        return io_lib.write_only_IO_proxy(write)
-
-    def _build_recording_list_and_expectation_list__CLI(self, num_lines):
-        """given an expected number of lines, result in two components:
-
-
-        the "recording list" is an empty list that will be filled during
-        the expected invocation with lines (strings).
-
-        the "expectation list" models each expectation for each line..
-        """
-        s_a = []
-
-        def f(line):
-            s_a.append(line)
-
-        _f_a = tuple(f for _ in range(0, num_lines))
-        # the above could just as soon be a generator expression (right?)
-
-        return s_a, _f_a
-
-    def main_magnetic_(self):
-        import script_lib.cheap_arg_parse_branch as x
-        return x
+        return _invocation_via(f, line_count, which, self)
 
     # --
 
-    @stream_via_memoized_array
-    def stream_with_two_commands_(self):
-        return [self._command_one__CLI(), self._command_two__CLI()]
 
-    # --
+# --
 
-    @shared_subject
-    def _command_one__CLI(self):
-        return _command_named('foo_bar')
+def _invoke_CLI(stdout, stderr, tc):
 
-    @shared_subject
-    def _command_two__CLI(self):
-        return _command_named('biff_baz')
+    _argv = (tc.long_program_name, *tc.given_argv_tail())
+    _children = tc.given_children_CLI_functions()
 
-    @property
-    def do_debug(self):
-        """.#open [#607.E] there's no way this is the right way to do this..
-
-        all we're trying to do is establish `do_debug` as a plain old
-        attribute here that defaults to false-ish.
-
-        the idiomatic way to do this seems to be to do
-        `self.do_debug = False` from an `__init__` method BUT when we
-        override `__init__` in our _CommonCase and call up to super by
-        `super(self, unittest.TestCase).__init__(test_name)`, the number of
-        parameters we arecalled with seems to vary?
-        """
-        if 'do_debug' in self.__dict__:
-            return self.__dict__['do_debug']
-
-    @do_debug.setter
-    def do_debug(self, x):
-        self.__dict__['do_debug'] = x
+    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
+    return cheap_arg_parse_branch(
+            stdin=None, stdout=stdout, stderr=stderr, argv=_argv,
+            children_CLI_functions=_children)
 
 
-def _command_named(name):
+def _invocation_via(run, num_lines, which, tc):
 
-    from modality_agnostic_test.public_support import empty_command_module as ecm  # noqa: E501
-    import modality_agnostic.magnetics.command_via_formal_parameters as x
-    return x.SELF(
-            name=name,
-            command_module=ecm(),
-    )
+    s_a, f_a = __recording_and_recorders(num_lines)
+
+    from script_lib.test_support import expect_STDs
+    _expectation = expect_STDs.expect_lines(f_a, which)
+    perf = _expectation.to_performance_under(tc)
+
+    _sout, _serr = __stdout_and_stderr(perf, tc)
+
+    es = run(_sout, _serr)
+    assert(isinstance(es, int))
+
+    perf.finish()
+    return _EndState(es, s_a)
 
 
-class _Invocation:
-    """simple delegator that wraps emitted lines, exitstatus, and OK"""
+def __stdout_and_stderr(perf, tc):
+    if not tc.do_debug:
+        return perf.stdout, perf.stderr
 
-    def __init__(self, inter_res, s_a):
-        self._interpretation_result = inter_res
+    _sout = _debugging_IO(perf.stdout, '%sohai stdout: %s')
+    _serr = _debugging_IO(perf.stderr, '%sohai stderr: %s')
+    return _sout, _serr
+
+
+def _debugging_IO(upstream_IO, fmt):
+    def write(s):
+        sys.stderr.write(fmt % (_eol, s))
+        upstream_IO.write(s)
+    import sys
+    from modality_agnostic.io import write_only_IO_proxy
+    return write_only_IO_proxy(write)
+
+
+def __recording_and_recorders(num_lines):
+    def f(line):
+        s_a.append(line)  # hi.
+    s_a = []
+    return s_a, tuple(f for _ in range(0, num_lines))
+
+
+class _EndState:
+
+    def __init__(self, es, s_a):
         self._lines = s_a
+        self.exitstatus = es
 
     @property
     def second_line(self):
@@ -245,34 +112,35 @@ class _Invocation:
         return len(self._lines)
 
     @property
-    def exitstatus(self):  # assume failure result
-        return self._interpretation_result.exitstatus
-
-    @property
-    def OK(self):
-        return self._interpretation_result.OK
+    def OK(self):  # retro-fitting this idiom for posterity (#history-A.1)
+        assert(isinstance(self.exitstatus, int))
+        return 0 == self.exitstatus
 
 
-@lazy
-def _OK_interpretation_result():
-    class _OK_Result:
-        def __init__(self):
-            self.OK = True
-    return _OK_Result()
+def THESE_TWO_CHILDREN_CLI_METHODS():
+
+    def _the_foo_bar_CLI(stdin, stdout, stderr, argv):
+        long_prog_name, *argv_tail = argv
+        assert(' ' in long_prog_name)
+        head, tail = long_prog_name.split(' ', 1)
+        _basename = head[(head.rindex('/')+1):]
+        _use_pn = f'{_basename} {tail}'
+        stdout.write(f"hello from '{_use_pn}'. args: {repr(argv_tail)}\n")
+        return 4321
+
+    yield 'foo-bar', lambda: _the_foo_bar_CLI
+
+    def _the_biff_baz_CLI(*a):
+        xx()
+
+    yield 'biff-baz', lambda: _the_biff_baz_CLI
 
 
-@lazy
-@ARGV
-def the_empty_ARGV():
-    return []  # EMPTY_A
+def xx():
+    raise Exception('write me')
 
 
-def cover_me(s):
-    raise Exception(s)
+_eol = '\n'
 
-
-NEWLINE = "\n"  #: it's not about saving memory, it's about tracking patterns
-PROGRAM_NAME = 'DTF-app'
-
-
+# #history-A.1
 # #born.

@@ -16,10 +16,8 @@ class Case8313_the_only_case(_CommonCase):
         self.assertIsNotNone(self._items)
 
     def test_030_item_constituency_without_asserting_order(self):
-        # NOTE - now this asserts that `name` means lowercase with underscores
-        a = self._items
-        _exp = set(['chupa_cabre', 'oh_hello'])
-        _act = set(cmd.name for cmd in a)
+        _exp = {'chupa_cabre', 'oh_hello'}
+        _act = set(name for name, mod in self._items)
         self.assertEqual(_exp, _act)
 
     @property
@@ -36,11 +34,13 @@ def _this_one_module():
 
 
 def _subject_magnetic():
-    import modality_agnostic.magnetics.commands_via_directory as x
-    return x.SELF
+    from modality_agnostic.magnetics.commands_via_directory import (
+            commands_via_MODULE)
+    return commands_via_MODULE
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: to case number
 # #born.

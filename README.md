@@ -210,7 +210,7 @@ then in your 'main' terminal:
 |[#014]                     |       | [expect tree-like screen]
 |[#013]                     |       | modality-agnostic parameter expression
 |[#012]                     |       | generic microservice arch (placeheld)
-|[#011]                     |       | commands/parameters API (placeheld)
+|[#011]                     | #hole |
 |[#010.B]                   | #edit | edit documentation
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     | #hole |

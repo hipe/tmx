@@ -1,14 +1,3 @@
-"""this is the next level up from "fixed argument parser #todo"..
-
-you want to use this magnetic directly if you want to build your argument
-parser from modality agnostic commands, but otherwise manage your own
-parsing.
-"""
-
-
-_THIS_NAME = 'chosen_sub_command'
-
-
 def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
                     formal_parameters, description_template_valueser=None):
     """
@@ -65,7 +54,7 @@ def _parse_CLI_args(stderr, argv, CLI, when_help=None):  # #testpoint
 
     def when_parameter_error(parameter_error):
         write_parameter_error_lines_(stderr, parameter_error)
-        mon.see_exitstatus(456)
+        mon.see_exitstatus(456)  # be like 457 in sibling
 
     two = do_parse_(tox, CLI, listener_for_parse_errors)
     return two, mon
@@ -211,184 +200,7 @@ class CLI_via_syntax_AST_:  # #testpoint
         self.offsets_of_required_options = req_opt_offsets
 
 
-# == BEGIN away soon
-
-class argument_parser_index_via:
-    """a collection of commands is passed over the transation boundary
-
-    as a stream (actually iterator), streams being the lingua franca for
-    collections passed over transactional boundaries. however it's more
-    convenient to have this collection be in a dictionary after the work
-    is done of building the argument parser..
-    """
-
-    def __init__(self, stderr, prog, command_stream, description_string):
-
-        ap = _argument_parser_via(stderr, prog, description=description_string)
-
-        self.command_dictionary = _populate_via_command_stream(
-                stderr, ap, command_stream)
-        self.argument_parser = ap
-
-    this_one_name__ = _THIS_NAME
-
-
-def _populate_via_command_stream(stderr, ap, command_stream):
-
-    d = {}
-    subparsers = ap.add_subparsers(dest=_THIS_NAME)
-    for cmd in command_stream:
-        k = cmd.name
-        if k in d:
-            _msg = "name collision - multiple commands named '%s'"
-            cover_me(_msg % k)
-        d[k] = cmd
-        __populate_via_command(subparsers, stderr, cmd)
-    return d
-
-
-def __populate_via_command(subparsers, stderr, cmd):
-
-    desc_s = _element_description_string_via_mixed(cmd.description)
-    if desc_s is None:
-        _tmpl = "«desc for subparser (place 2) '{}'»\nline 2"
-        desc_s = _tmpl.format(cmd.name)
-
-    ap = subparsers.add_parser(
-        _slug_via_name(cmd.name),
-        description=desc_s,
-        add_help=False,
-        help='«help for command»',  # `add_help = False` 🤔
-    )
-    _hack_argument_parser(ap, stderr)
-
-    _populate_via_parameter_dictionary(
-        parser=ap,
-        parameter_dictionary=cmd.formal_parameter_dictionary,
-        )
-
-
-def argument_parser_via_parameter_dictionary__(
-        stderr, prog, parameter_dictionary, **platform_kwargs):
-
-    description = platform_kwargs['description']  # no prisoners
-
-    desc_s = _element_description_string_via_mixed(description)
-    if desc_s is None:
-        desc_s = '«DUMMY DESC FOR NEW THING»'
-
-    platform_kwargs['description'] = desc_s
-
-    ap = _argument_parser_via(stderr, prog, **platform_kwargs)
-    _populate_via_parameter_dictionary(ap, parameter_dictionary)
-    return ap
-
-
-class _populate_via_parameter_dictionary:
-
-    def __init__(self, parser, parameter_dictionary):
-
-        self._parser = parser
-        self._count_of_positional_args_added = 0
-
-        for name in parameter_dictionary:
-            self.__add_parameter(parameter_dictionary[name], name)
-
-    def __add_parameter(self, param, name):
-        """[#502] discusses different ways to conceive of parameters ..
-
-        in terms of ther argument arity. here we could either follow the
-        "lexicon" (`is_required`, `is_flag`, `is_list`) or the numbers. we
-        follow the numbers for no good reason..
-        """
-
-        r = param.argument_arity_range
-        min = r.start
-        max = r.stop
-        if min is 0:
-            if max is 0:
-                self.__add_flag(param, name)
-            elif max is 1:
-                self.__add_optional_field(param, name)
-            else:
-                assert(max is None)
-                self.__add_optional_list(param, name)
-        else:
-            assert(1 == min)
-            if max is 1:
-                self.__add_required_field(param, name)
-            else:
-                assert(max is None)
-                self.__add_required_list(param, name)
-
-    def __add_required_field(self, param, name):
-        """purely from an interpretive standpoint, we could express any number..
-
-        of required fields as positional arguments when as a CLI command.
-        HOWEVER from a usability standpoint, as an #aesthetic-heuristic
-        we'll say experimentally that THREE is the max number of positional
-        arguments a command should have.
-        """
-
-        if 3 > self._count_of_positional_args_added:
-            self._count_of_positional_args_added += 1
-            self.__do_add_required_field(param, name)
-        else:
-            cover_me('many required fields')
-
-    def __add_required_list(self, param, name):  # category 5
-        self._parser.add_argument(
-            _slug_via_name(name),
-            ** self._common_kwargs(param, name),
-            nargs='+',
-            # action = 'append', ??
-        )
-
-    def __do_add_required_field(self, param, name):  # category 4
-        self._parser.add_argument(
-            _slug_via_name(name),
-            ** self._common_kwargs(param, name))
-
-    def __add_optional_list(self, param, name):  # category 3
-        self._parser.add_argument(
-            _slug_via_name(name),
-            ** self._common_kwargs(param, name),
-            nargs='*',
-            # action = 'append', ??
-        )
-
-    def __add_optional_field(self, param, name):  # category 2
-        self._parser.add_argument(
-            (_DASH_DASH + _slug_via_name(name)),
-            ** self._common_kwargs(param, name),
-            metavar=_infer_metavar_via_name(name),
-        )
-
-    def __add_flag(self, param, name):  # category 1
-        self._parser.add_argument(
-            (_DASH_DASH + _slug_via_name(name)),
-            ** self._common_kwargs(param, name),
-            action='store_true',  # this is what makes it a flag
-        )
-
-    def _common_kwargs(self, param, name):
-
-        s = param.generic_universal_type
-        if s is not None:
-            implement_me()
-
-        d = {}
-        s = _element_description_string_via_mixed(param.description)
-        if s is None:
-            s = "«the '{}' parameter»".format(name)
-
-        d['help'] = s
-        return d
-
-# == END away soon
-
-
-def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
+def do_parse_(tox, CLI, listener, stop_ASAP=False):
 
     from .magnetics.parser_via_grammar import (
             parser_via_grammar_and_symbol_table,
@@ -585,7 +397,8 @@ def do_parse_(tox, CLI, listener, stop_ASAP=False):  # #testpoint
         if '-' != tok[0]:
             return
         if 1 == leng:
-            _wish('dash as valid positional argument value')
+            assert('-' == tok)
+            return  # #todo not covered - pass thru dash as valid arg value
         return True
 
     # -- whiners
@@ -955,17 +768,6 @@ def __first_pass(tups):
     return opts, args, req_opt_offsets
 
 
-def _argument_parser_via(stderr, prog, **platform_kwargs):
-
-    ap_lib = _ap_lib()
-    ap = ap_lib.begin_native_argument_parser_to_fix__(
-        prog=prog,
-        **platform_kwargs
-        )
-    _hack_argument_parser(ap, stderr)
-    return ap
-
-
 class FormalOption_:
 
     def __init__(self, short_name, long_name, meta_var, arity_string, descs):
@@ -1021,121 +823,21 @@ class _FormalArgument:
         return f"{self.styled_moniker}{self.arity_string}"
 
 
-def _element_description_string_via_mixed(x):
-
-    if callable(x):
-        desc_s = _string_via_description_function(x)
-    elif type(x) is str:
-        desc_s = x
-    elif x is None:
-        desc_s = None
-    else:
-        cover_me('command desc as {}'.format(type(x)))
-    return desc_s
-
-
-def _string_via_description_function(lineser):
-
-    # FRONTIER of how to support passing a [#511.4] styler to a linser
-
-    import inspect
-    if len(inspect.signature(lineser).parameters):
-        def use_lineser():
-            return lineser(STYLER_)
-        from script_lib.magnetics import STYLER_
-    else:
-        use_lineser = lineser
-    return ''.join(use_lineser())
-
-
-def _hack_argument_parser(ap, stderr):
-
-    ap_lib = _ap_lib()
-    ap_lib.fix_argument_parser__(ap, stderr)
-
-
-def _infer_metavar_via_name(name):
-    """given an optional field named eg. "--important-file", name its
-
-    argument moniker 'FILE' rather than'IMPORTANT_FILE'
-    """
-
-    return __the_infer_metavar_via_name_function()(name)
-
-
-def lazy(build):
-    def f():
-        if 0 == len(sinful):
-            sinful.append(build())
-        return sinful[0]
-    sinful = []
-    return f
-
-
-@lazy
-def __the_infer_metavar_via_name_function():
-    import re
-    regex = re.compile('[^_]+$')
-
-    def f(name):
-        return regex.search(name)[0].upper()
-    return f
-
-
 _long_name_rxs = '[a-z]+(?:-[a-z0-9]+)*'
 
 
-def _slug_via_name(name):
-    return name.replace('_', '-')  # UNDERSCORE, DASH
-
-
-def _ap_lib():
-    import script_lib.magnetics.fixed_argument_parser_via_argument_parser as x
-    return x
-
-
-def _parse_lib():
-    from .magnetics import parser_via_grammar as parse_lib
-    return parse_lib
-
-
-@lazy
-def _():
-    # #wish [#008.E] gettext uber alles
-    from gettext import gettext as g
-
-    def f(s):
-        return g(s)
-    return f
-
-
-def _emission_via_args(a):
-    from modality_agnostic import listening
-    return listening.emission_via_args(a)
-
-
-def _wish(s):
-    raise Exception(f'future feature expected here: {s}')
-
-
-def implement_me():
-    raise _exe('implement me')
-
-
 def cover_me(msg):
-    raise _exe(f'cover me: {msg}')
+    raise Exception(f"cover me: {msg}")
 
 
 class FormalParametersSyntaxError(Exception):
     pass
 
 
-_exe = Exception
-
-_DASH_DASH = '--'
 _eol = '\n'
 
 
+# #history-A.7: sunsetted last traces of stepper
 # #history-A.6: sub-expressions
 # #history-A.5: expose API for "cheap arg parse branch"
 # #history-A.4: help & initial integration

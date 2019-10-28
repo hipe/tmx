@@ -152,7 +152,7 @@ avoiding inheritence altogether.
 in our own code we avoid subclasssing almost as a rule, except:
 
   - where the use of the class makes it almost more like a DSL (for
-    example, our [#011] commands/parameters API).
+    example, our [#502] agnostic parameter modeling API).
 
   - in test code, where "test case" base classes and helper mixings
     make the code (again) approach something like a DSL. (a bit more

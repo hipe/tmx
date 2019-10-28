@@ -1,5 +1,4 @@
-"""this is the next level up from "parse stepper", and the highest level.
-
+"""
 this encompases what is perhaps the central algorithm of the whole
 sub-project. at its essence it's a tail-call recursion (if you like)
 implemented as a loop:
@@ -77,7 +76,7 @@ def cheap_arg_parse_branch(stdin, stdout, stderr, argv, children_CLI_functions):
 
     def when_parameter_error(pe):
         write_parameter_error_lines_(stderr, pe)
-        mon.see_exitstatus(457)
+        mon.see_exitstatus(457)  # be like 456 in sibling
 
     # loop
 
@@ -123,85 +122,7 @@ def cheap_arg_parse_branch(stdin, stdout, stderr, argv, children_CLI_functions):
     return terminal_CLI_function(stdin, stdout, stderr, use_argv)
 
 
-def _MAIN_AGORITHM(rsx, top_stepper):
-
-    current_stepper = top_stepper
-    while True:  # PEP 315 (rejected) - there is no `do while` loop
-        reso = current_stepper.step_for_branch_against_modality_resources(rsx)
-        if reso.is_terminal:
-            break
-        current_stepper = reso.microservice_tree_branch_node
-    return reso
-
-
-def interpretationer_via_individual_resources(ARGV, stderr, stdout):
-    from script_lib.magnetics import (
-            resources_via_ARGV_stream_and_stderr_and_stdout as x,
-            deque_via_ARGV,
-            )
-    _rsx = x(deque_via_ARGV(ARGV), stderr, stdout)
-    return interpretationer_via_resources(_rsx)
-
-
-class interpretationer_via_resources:
-    """(wrapper made for injection)
-
-    so:
-      - must be mutable because it is single use because it take the head
-        off ARGV (and must do so only once) to determine the program name.
-    """
-
-    def __init__(self, rsx):
-        self._resources = rsx
-
-    def interpretation_via_command_stream(self, command_stream, desc=None):
-
-        rsx = self._resources
-        del self._resources
-
-        from script_lib.cheap_arg_parse import argument_parser_index_via
-        from script_lib.magnetics import (
-            parse_stepper_via_argument_parser_index)
-
-        ap_idx = argument_parser_index_via(
-                stderr=rsx.stderr,
-                description_string=desc,
-                command_stream=command_stream,
-                prog=rsx.ARGV_stream.popleft(),
-                )
-
-        _top_stepper = parse_stepper_via_argument_parser_index(
-                element_dictionary=ap_idx.command_dictionary,
-                moniker=ap_idx.this_one_name__,
-                argument_parser=ap_idx.argument_parser,
-                )
-
-        return _MAIN_AGORITHM(rsx, _top_stepper)
-
-
-"""
-if you like, the above is
-an exemplary instance of our modality-agnostic 'injection' pattern:
-
-wrap the modality-specific unsanitized request data (the ARGV) in a subject
-(the "interpretation maker") and "inject" it into the microservice.
-
-then, as the "invocation" is being processed, the subject (once injected)
-receives the command collection from the service..
-
-from these two elements (the ARGV and the collection of commands), the
-subject's charge is to parse the one against the other and produce an
-"interpretation" object (or on failure produce a result object that knows
-a suggested exitstatus).
-
-because the order feels somewhat counterintuitive (ARGV *then* commands)
-and also is somewhat arbitrary, we have given the module a name that
-flattens this order out of it (in part in case we want to change it, the
-rename won't be drastic.)
-"""
-
-
-# == BEGIN
+# == BEGIN help screen
 
 def __help_lines(CLI_functions, long_program_name, CLI):
     program_name = _renderers(long_program_name).program_name
@@ -325,5 +246,6 @@ def _renderers(long_program_name):
 _eol = '\n'
 
 
+# #history-A.2: remove legacy stepper stuff
 # #history-A.1: spike cheap arg parse branch
 # #abstracted.

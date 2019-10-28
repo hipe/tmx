@@ -56,6 +56,17 @@ def help_lines_via(
         args_max_width_seer.see(name)
         for row in _rows_via(name, arg.description_lines):
             arg_rows.append(row)
+
+        if arg.is_plural:
+            inner = f'{name} [{name} …]'
+            char = arg.arity_string
+            if '*' == char:
+                arg_shorties.append(f'[{inner}]')
+                continue
+            assert('+' == char)
+            arg_shorties.append(inner)
+            continue
+
         arg_shorties.append(name)
 
     # -- usage lines

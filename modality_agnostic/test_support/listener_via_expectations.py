@@ -61,7 +61,7 @@ class expecter_via_expected_emissions:
         d = self._offset_via_name
         a = self._actual_emissions
 
-        name = emission_model.name
+        name = emission_model.emission_name
         offset = len(a)
 
         a.append(actual_emission)
@@ -132,9 +132,9 @@ class ActualEmission_:
 class _EmissionModel:
 
     def __init__(self, s_a):
-        channel_model, name = _crazy_parse(s_a)
+        channel_model, emission_name = _crazy_parse(s_a)
         self.channel_model = channel_model
-        self.name = name
+        self.emission_name = emission_name
 
     def assert_against(self, actual_emission):
         from collections import deque

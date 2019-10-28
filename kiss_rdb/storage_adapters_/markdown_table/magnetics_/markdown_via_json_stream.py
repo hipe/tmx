@@ -85,25 +85,51 @@ def _these():
     return tuple(a)
 
 
-def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
+def _CLI(sin, sout, serr, argv):  # #testpoint
 
-    from script_lib.magnetics import error_monitor_via_stderr
-    monitor = error_monitor_via_stderr(serr)
+    from script_lib.cheap_arg_parse import cheap_arg_parse
 
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            collection_identifier_via_parsed_arg_ as _)
+    def _do_CLI(monitor, sin, sout, serr, script):
+        return _do_do_CLI(monitor, sin, sout, serr, script, argv[0])
 
-    far_collection = _(parsed_arg)
+    return cheap_arg_parse(
+            CLI_function=_do_CLI,
+            stdin=sin, stdout=sout, stderr=serr, argv=argv,
+            formal_parameters=(
+                ('script', 'the script'),
+                ),
+            description_template_valueser=lambda: {},
+            )
+
+
+def _do_do_CLI(monitor, sin, sout, serr, script, pn):
+
+    # (Case050SA)
+
+    # == BEGIN
+
+    from script_lib import RESOLVE_UPSTREAM
+    typ = RESOLVE_UPSTREAM(serr, '<script>', script, sin)
+    if typ is None:
+        serr.write(f"see '{pn} --help'\n")  # needs design
+        return 567
+
+    if 'stdin_as_argument' == typ:
+        import json
+        _dictionaries = (json.loads(s) for s in sin)
+        from data_pipes import ThePassThruContextManager
+        _cm = ThePassThruContextManager(_dictionaries)
+        ps = _CustomProducerScript(_cm)
+    else:
+        assert('path_as_argument' == typ)
+        ps = script  # [#873.I] ugly but meh
+
+    # == END
 
     _near_collection = _these()
 
     from data_pipes.cli.sync import open_new_lines_via_sync
     # #open [#874.8] this is a dirty reach but it should go away with this issu
-
-    if isinstance(far_collection, str):  # [#873.I] ick/meh
-        ps = far_collection
-    else:
-        ps = _CustomProducerScript(far_collection)
 
     _opened = open_new_lines_via_sync(
             producer_script_path=ps,
@@ -118,22 +144,25 @@ def _my_CLI(parsed_arg, program_name, sout, serr):  # (Case050SA)
     return monitor.exitstatus
 
 
+_do_do_CLI.__doc__ = __doc__
+
+
 class _CustomProducerScript:
 
-    def __init__(self, far_CM):
-        self._far_CM = far_CM
+    def __init__(self, CM):
+        self._CM = CM
 
     stream_for_sync_is_alphabetized_by_key_for_sync = False
 
-    def stream_for_sync_via_stream(self, dcts):
-        return _stream_for_sync_via_stream(dcts)
+    def stream_for_sync_via_stream(self, CM):
+        return _stream_for_sync_via_stream(CM)
 
     near_keyerer = None
 
     def open_traversal_stream(self, listener, cached_document_path):
-        cm = self._far_CM
-        del self._far_CM
-        return cm
+        CM = self._CM
+        del self._CM
+        return CM
 
     HELLO_I_AM_A_PRODUCER_SCRIPT = None
 
@@ -158,24 +187,9 @@ def _stream_for_sync_via_stream(dcts):
         yield (dct[key], dct)
 
 
-_my_CLI.__doc__ = __doc__
-
-
-def _CLI(sin, sout, serr, argv):  # #testpoint
-    from script_lib.magnetics import upstream_IO_via_arguments
-    _exitstatus = upstream_IO_via_arguments(
-            CLI_function=_my_CLI,
-            std_tuple=(sin, sout, serr, argv),
-            argument_moniker='<script>',
-            ).execute()
-    return _exitstatus
-
-
 if __name__ == '__main__':
     import sys as o
-    o.path.insert(0, '')
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv)
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #pending-rename waiting for [#874.8] generate markdown
 # #history-A.2: move out of scripts directory. no longer an excutable.
