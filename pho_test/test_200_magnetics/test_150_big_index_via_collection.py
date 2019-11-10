@@ -1,6 +1,5 @@
 from pho_test.common_initial_state import (
         fixture_directory,
-        kiss_rdber,
         throwing_listenerer)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -100,8 +99,8 @@ class Case158_generate_one_document(_CommonCase):
     def ad_hoc_end_state(self):
 
         writes = []
-        from modality_agnostic import io as io_lib
-        spy = io_lib.write_only_IO_proxy(
+        from modality_agnostic import write_only_IO_proxy
+        spy = write_only_IO_proxy(
                 write=writes.append,
                 on_OK_exit=lambda: None,
                 )
@@ -208,7 +207,8 @@ def _big_index_one():
 @lazy
 def _collection_one():
     _dir = fixture_directory('collection-00500-intro')
-    return kiss_rdber().collection_via_collection_path(_dir)
+    from kiss_rdb import collectionerer
+    return collectionerer().collection_via_path(_dir)
 
 
 if __name__ == '__main__':

@@ -110,13 +110,15 @@ class Case5739_strange_arg(_CommonCase):
 
     @shared_subject
     def _exe(self):
-        o = self.build_end_state('stdout', 'usage error')
+        o = self.build_end_state('stdout', 'usage_error')
         lines = tuple(o.lines)  # #here3
         self.assertEqual(len(lines), 0)
         return o.exception
 
     def given_args(self):
         return ('foo-fah-fee',)
+
+    do_debug = True
 
 
 class Case5756_strange_option(_CommonCase):
@@ -422,7 +424,7 @@ class Case6129_create(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stdout and stderr', None)
+        return self.build_end_state('stdout_and_stderr', None)
 
     def given_args(self):
         return (*common_args_head(), 'create', _common_collection,
@@ -484,7 +486,7 @@ class Case6177_delete(_CommonCase):
     @shared_subject
     def end_state(self):
         # return self.build_end_state_FOR_DEBUGGING()
-        return self.build_end_state('stdout and stderr', None)
+        return self.build_end_state('stdout_and_stderr', None)
 
     def given_args(self):
         return (*common_args_head(), 'delete', _common_collection, 'B7G')
@@ -541,7 +543,7 @@ class Case6226_update(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stdout and stderr', None)
+        return self.build_end_state('stdout_and_stderr', None)
 
     def given_args(self):
         return (*common_args_head(), 'update', _common_collection,
@@ -580,6 +582,7 @@ def _CASE_A():  # usually it's one invocation
         return _.stderr
 
     o = CLI_support.BIG_FLEX(
+            given_stdin=None,
             given_args=('--help',),
             allow_stdout_lines=True,
             allow_stderr_lines=False,

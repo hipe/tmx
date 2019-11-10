@@ -36,9 +36,4 @@ def throwing_listenerer():
     from modality_agnostic import listening
     return listening.throwing_listener
 
-
-def kiss_rdber():
-    import kiss_rdb as _
-    return _
-
 # #born.

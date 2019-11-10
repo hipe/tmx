@@ -238,6 +238,7 @@ def __lines_for_context_for_parse_error(dim_pool):
     # parse error context metadata, its surface format is the same
 
     # this will fail eventually, not all PE's provide all these (right?)
+
     o = dim_pool.pop
     path = o('path', None)
     line = o('line')
@@ -252,14 +253,15 @@ def __lines_for_context_for_parse_error(dim_pool):
         num_as_s = ' '
         spacer = ''
     else:
-        num_as_s = f'{lineno}:'  # (Case6248)
+        _ = '%2d' % lineno
+        num_as_s = f'{_}:'  # (Case6248)
         spacer = ' ' * len(num_as_s)
 
     if path is not None:
         yield f"in {path}"
 
     yield f'  {num_as_s}{_2[0]}'
-    yield f'  {spacer} {_2[1]}'
+    yield f'  {spacer}{_2[1]}'
 
 
 # mishmash

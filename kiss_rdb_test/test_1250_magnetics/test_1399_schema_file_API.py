@@ -144,7 +144,7 @@ class Case1399_fields_with_no_content_will_not_even_parse(_CommonCase):
     #
     """
     We don't want to support even the possibility of this as a surface
-    expession in the documents we parse. See [#867.Y] no-value-ism.
+    expession in the documents we parse. See [#873.5] no-value-ism.
     """
     # #midpoint-case
 

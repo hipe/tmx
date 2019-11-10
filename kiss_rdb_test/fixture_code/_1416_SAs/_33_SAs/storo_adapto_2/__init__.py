@@ -4,7 +4,7 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.xtc', '.qkr')
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         collection_identity, random_number_generator, filesystem, listener):
 
     collection_path = collection_identity.collection_path  # hello

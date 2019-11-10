@@ -10,12 +10,20 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
-def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+def COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(stdout):
+    from .magnetics_.markdown_via_json_stream import (
+            COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE)
+    return COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(stdout)
+
+
+def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         collection_identity,
         random_number_generator,
         filesystem,
         listener):
 
+    # #open [#873.P] one day we will always do the stream way and never
+    # do the random access way.
     adapter_variant = collection_identity.adapter_variant
     if adapter_variant is not None:
         assert('THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant)
@@ -158,7 +166,7 @@ Why a tail-anchored pipe is hard to interpret correctly :#here5
             surface forms. Two, we don't *want* to support the distinction,
             because in practice this infects business code with the smell of
             not knowing whether you need to check for null/empty/blank for a
-            given value, a smell that can spread deep into the code. :[#867.Y]
+            given value, a smell that can spread deep into the code. :[#873.5]
 
             Rather, we conflate all such cases into one we call "no-value",
             and we leave it up to the client to decide how or whether to
@@ -389,7 +397,7 @@ def _create(lines, dct, schema, g, listener):
 
         # creation is implemented as a specialized update
 
-        fake_before_ent = _RowAsEntity(None, (), has_trailing_pipe=False)
+        fake_before_ent = RowAsEntity_(None, (), has_trailing_pipe=False)
         tup = tuple(('create_attribute', k, v) for k, v in dct.items())
         UCDs = _prepare_edit(fake_before_ent, tup, schema, 'create', listener)
         if UCDs is None:
@@ -590,10 +598,11 @@ def _flush_edit(original_ent, updates_creates_deletes, schema):
         assert(len(new_cels) == i + 1)
         new_cels.pop()
 
+    # make sure none of the current cels are none (there has to be a better wa)
     _make_sure = filter(lambda i: new_cels[i] is None, range(0, len(new_cels)))
     assert(0 == len(tuple(_make_sure)))
 
-    return _RowAsEntity(
+    return RowAsEntity_(
             identifier_cel=original_ent._identifier_cel_,
             attribute_cels=tuple(new_cels),
             has_trailing_pipe=original_ent._has_trailing_pipe_,
@@ -771,19 +780,19 @@ def _entities_via_lines_and_schema(lines, schema, g, listener):
     for line in lines:
         tup = tuple(asts_via_line(line))
         my_listener.is_first = False
-        if len(tup) < 2:
+        if len(tup) < 2:  # #todo: document
             if my_listener.do_ignore:
                 continue
             else:
                 return
         identi_cel, *attr_cels, has_t = tup
-        yield _RowAsEntity(identi_cel, tuple(attr_cels), has_t)
+        yield RowAsEntity_(identi_cel, tuple(attr_cels), has_t)
 
 
 def _entity_from_these_two(identi_cel, asts):
     asts = list(asts)
     _has_trailing_pipe = asts.pop().has_trailing_pipe
-    return _RowAsEntity(identi_cel, tuple(asts), _has_trailing_pipe)
+    return RowAsEntity_(identi_cel, tuple(asts), _has_trailing_pipe)
 
 
 def _stateful_grammar_via(schema):
@@ -1043,17 +1052,28 @@ _table_open_line_rx = re.compile(r'^\|([^\|]+(?:\|[^\|]+)+)\|$')
 
 # == models
 
-class _RowAsEntity:
+class RowAsEntity_:
     # introduced at (Case2587)
+    # this is partially redudant with another nearby, older system
+    # and probably this newer code will go to live there #open [#873.Q]
 
     def __init__(self, identifier_cel, attribute_cels, has_trailing_pipe):
-        assert(isinstance(attribute_cels, tuple))  # #[#022] strong type
+        assert isinstance(attribute_cels, tuple)  # [#022]
         self._identifier_cel_ = identifier_cel
         self._attribute_cels_ = attribute_cels
         self._has_trailing_pipe_ = has_trailing_pipe
 
     @string_via_pieces
     def _TO_LINE_(self):
+        for s in self._to_line_content_pieces():
+            yield s
+        yield '\n'  # _eol
+
+    @string_via_pieces
+    def to_line_content_(self):
+        return self._to_line_content_pieces()
+
+    def _to_line_content_pieces(self):
         all_cels = (self._identifier_cel_, * self._attribute_cels_)
         * all_but_last, last_cel = all_cels
         for cel in all_but_last:
@@ -1065,7 +1085,6 @@ class _RowAsEntity:
             yield '|'
         else:
             yield last_cel.to_cel_string_with_head_padding_only()
-        yield '\n'  # ..
 
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
         _ = self.core_attributes_dictionary_as_storage_adapter_entity
@@ -1149,6 +1168,9 @@ class _AttributeCel(_Cel):
         if boole is not None:
             return ('no', 'yes').index(boole)
         return other  # string
+
+
+AttributeCel_ = _AttributeCel
 
 
 _crazy_rx = re.compile(r"""^(?:

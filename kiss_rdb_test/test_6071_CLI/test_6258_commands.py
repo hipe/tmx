@@ -1,14 +1,8 @@
-from kiss_rdb_test.common_initial_state import (
-        functions_for)
+from kiss_rdb_test.common_initial_state import functions_for
 from kiss_rdb_test import CLI as CLI_support
-from kiss_rdb_test.CLI import (
-        build_filesystem_expecting_num_file_rewrites)
+from kiss_rdb_test.CLI import build_filesystem_expecting_num_file_rewrites
 import unittest
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
-
-
-# 830-840
+from modality_agnostic.memoization import dangerous_memoize as shared_subject
 
 
 class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
@@ -34,7 +28,7 @@ class Case6248_schema_parse_error(_CommonCase):
         _expected = tuple(unindent('''
         input error: expecting colon
         in schema.rec
-          3:    xx yy zz
+           3:    xx yy zz
                  --^
         '''))
         self.assertSequenceEqual(lines, _expected)
@@ -76,10 +70,8 @@ class Case6250_modality_specific_whiner(_CommonCase):
         return self.build_end_state('stderr',  None)
 
     def given_args(self):
-        return (
-                *common_args_head(), 'create', _common_collection,
-                '-val', 'qq', 'foo\nbar',
-                )
+        return (*common_args_head(), 'create', _common_collection,
+                '-val', 'qq', 'foo\nbar')
 
     def random_number(self):
         return 123
@@ -88,7 +80,7 @@ class Case6250_modality_specific_whiner(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(0)  # ..
 
 
-class Case6258_multi_line_create(_CommonCase):
+class Case6258_multi_line_create(_CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -117,7 +109,7 @@ class Case6258_multi_line_create(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self.build_end_state('stdout and stderr', None)
+        return self.build_end_state('stdout_and_stderr', None)
 
     def given_args(self):
         return (

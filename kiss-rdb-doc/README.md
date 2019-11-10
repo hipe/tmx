@@ -31,14 +31,13 @@ woah boy.
 |[#880-899]                 |       | narrow allocation for "pho" for now
 |[#876]                     | #open | catch-all to track every `cover_me`
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
-|[#874.8]                   |       | multiple scripts that generated markown. change them to be the new way
-|[#874.7]                   | #hole |
-|[#874.6]                   | #hole |
-|[#874.5]                   | #open | files that used to be executable scripts and should no longer be
-|[#874.4]                   |       | multi-tablism
+|[#874.4]                   |       | multi-tablism  (see also #multi-tablism)
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.R]                   | #open | unify error monitor
+|[#873.Q]                   | #open | #related-to: [#873.P] unify how we render markdown
+|[#873.P]                   | #open | unify all markdown parsing so it's stream-based and not random access
 |[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
 |[#873.M]                   |       | integrating external format adapters (storage adapters)
@@ -47,7 +46,7 @@ woah boy.
 |[#873.I]                   | #trak | ugly
 |[#873.H]                   | #wish | customizable functional pipelines (map, filter in any order etc)
 |[#873.6]                   | #trak | would redis etc
-|[#873.5]                   | #trak | #provsion: where sparseness is implemented - prune "empty" cels
+|[#873.5]                   | #trak | #provision: where sparseness is implemented - prune "empty" cels
 |[#873.D]                   | #trak | spots to change if we add this feature (see)
 |[#873.C]                   | #wish | a `--oneline` option for CLI
 |[#873.B]                   | #wish | this one smell in emissions
@@ -60,7 +59,7 @@ woah boy.
 |[#869]                     |       | near term end game
 |[#868]                     |       | test number allocation
 |[#867.Z]                   |       | get rid of toml leaks
-|[#867.Y]                   |       | provision: no-value-ism (see)
+|[#867.Y]                   | #trak | parsing our own markdown is the wrong way
 |[#867.W]                   | #trak | this #[#020] annoyance with python CLI argv
 |[#867.V]                   | #open | the way we keep id (int) 0 free is hackish
 |[#867.U]                   | #trak | injections (discussion)

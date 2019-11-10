@@ -69,7 +69,7 @@ def stream_for_sync_via_stream(dcts):
     for dct in dcts:
         # #[#873.5] how sparseness (holes) must be filled lost at #history-A.4
         # lost at #history-A.3 or before was `simplify_keys_`
-        yield (key_via(dct['name']),  dct)
+        yield (key_via(dct['name']), dct)
 
 
 def open_traversal_stream(listener, markdown_path=None):

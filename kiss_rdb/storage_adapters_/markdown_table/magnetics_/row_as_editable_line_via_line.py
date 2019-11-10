@@ -2,7 +2,7 @@
 
 the caveats from a sibling file apply here:
 
-  - don't get too attached to this. this is the wrong way.
+  - don't get too attached to this. this is the wrong way. [#867.Y]
 
 having said that,
 
@@ -14,6 +14,10 @@ having said that,
   - also, see note on "efficiency" over in the test
 
   - also (new at #history-A.1) a trailing pipe at the end of the line
+
+This is partially redundant with another nearby, newer system; and probably
+the newer system will mostly get moved to here and supercede some/all of this.
+of this code #open [#873.Q]
 
 (Case2407)
 """

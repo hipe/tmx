@@ -84,7 +84,7 @@ def relevant_themes_collection_metadata_via_themes_dir(themes_dir, listener):
     return parse.finish(themes_dir)
 
 
-class _MadParseBashScript:  # #pattern #[#458.Z.4] "mad parse"
+class _MadParseBashScript:  # the [#608.4] "mad parse" pattern
     """like grep but ..
     """
 

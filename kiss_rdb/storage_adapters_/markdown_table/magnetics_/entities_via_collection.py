@@ -5,7 +5,7 @@ be "streaming" and not a "memory hog" (don't read every entity into memory).
 "kiss-rdb" was frontiered to make a toml storage adapter, but to establish
 a test case canon, we frontiered an even easier, better known format:
 markdown tables. Towards this objective we rewrote a quick-and-dirty,
-single-file format adapte for markdown tables meant only to satisfy the
+single-file format adapter for markdown tables meant only to satisfy the
 creation of the canon.
 
 So there are *two* DNA strains of markdown table format adapeter, and this

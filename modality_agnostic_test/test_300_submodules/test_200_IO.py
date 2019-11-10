@@ -92,8 +92,8 @@ class Case1030_context_manager(_CommonCase):
 
 
 def _write_only_IO_proxy(*args, **kwargs):
-    from modality_agnostic import io as io_lib
-    return io_lib.write_only_IO_proxy(*args, **kwargs)
+    from modality_agnostic import write_only_IO_proxy
+    return write_only_IO_proxy(*args, **kwargs)
 
 
 if __name__ == '__main__':

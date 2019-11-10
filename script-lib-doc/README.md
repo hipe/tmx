@@ -19,6 +19,7 @@ the related API that preceded this one.)
 ## <a name="node-table"></a>the node table
 
 (this is a [\[#002\]] node table.)
+(our range is 601-699)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
@@ -31,7 +32,7 @@ the related API that preceded this one.)
 |[#608.7]                   | #hole |
 |[#608.6]                   |       | sunsetted. for now this identifier is retired.
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
-|[#608.4]                   | #hole |
+|[#608.4]                   | #trak | "mad parse" (whatever that is)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
 |[#607.I]                   | #trak | maybe one day DRY this `_eol` pattern

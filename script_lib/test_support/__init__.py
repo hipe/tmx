@@ -30,8 +30,8 @@ def lines_and_spy_io_for_test_context(tc, dbg_msg_head):  # #:[#605.1]
         return len(s)
     import re
 
-    from modality_agnostic import io as io_lib
-    _spy_IO = io_lib.write_only_IO_proxy(write=write)
+    from modality_agnostic import write_only_IO_proxy
+    _spy_IO = write_only_IO_proxy(write=write)
 
     return lines, _spy_IO
     # (abstracted at #history-A.1)

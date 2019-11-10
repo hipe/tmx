@@ -60,7 +60,14 @@ def for_DEBUGGING():
     return _sout_proxy, _serr_proxy, finish
 
 
-def three_for_line_runner():
+def THREE_FOR_LINE_RUNNER():  # 1x
+    recv_stdout, recv_stderr, finish = stdout_stderr_partitioner()
+    _sout_proxy = _write_only_IO_proxy(recv_stdout)
+    _serr_proxy = _write_only_IO_proxy(recv_stderr)
+    return _sout_proxy, _serr_proxy, finish
+
+
+def stdout_stderr_partitioner():
     """this recorder does no real-time assertion.
 
     vaguely similar to [#603] the help screen parser, this partitions
@@ -117,12 +124,8 @@ def three_for_line_runner():
             self.which = which
             self.lines = lines
 
-    stateful_fellow = _StatefulFellow()
-
-    _sout_proxy = _write_only_IO_proxy(stateful_fellow.receive_stdout_write)
-    _serr_proxy = _write_only_IO_proxy(stateful_fellow.receive_stderr_write)
-
-    return _sout_proxy, _serr_proxy, stateful_fellow.finish
+    o = _StatefulFellow()
+    return o.receive_stdout_write, o.receive_stderr_write, o.finish
 
 
 def for_expect_on_which_this_many_under(which, num, test_context):
@@ -222,7 +225,8 @@ class _LineRuns:
         if did_find:
             return a[found_offset]
         else:
-            raise Exception(f'no {which} output ({len(a)} line_runs of output)')
+            _msg = f'no {which} output ({len(a)} line_runs of output)'
+            raise Exception(_msg)
 
 
 class _EndState:
@@ -238,7 +242,7 @@ class _ExitstatusOnly:
         self.exitstatus = d
 
 
-class STDERR_CRAZYTOWN:
+class FAKE_STDIN:  # 1x
 
     def __init__(self, *lines):
         self._lines = lines
@@ -263,7 +267,7 @@ class MINIMAL_INTERACTIVE_IO:  # as namespace only
 
 
 def _write_only_IO_proxy(f):
-    from modality_agnostic import io as io_lib
-    return io_lib.write_only_IO_proxy(f)
+    from modality_agnostic import write_only_IO_proxy
+    return write_only_IO_proxy(f)
 
 # #abstracted

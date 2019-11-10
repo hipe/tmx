@@ -96,7 +96,8 @@ def _sync_context_manager_via(**kwargs):
     return open_new_lines_via_sync(**kwargs)
 
 
-class FakeProducerScript:
+class FakeProducerScript:  # [#459.17] a fake producer script
+
     def __init__(
             self, stream_for_sync_is_alphabetized_by_key_for_sync,
             stream_for_sync_via_stream, dictionaries, near_keyerer):

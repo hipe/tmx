@@ -1,0 +1,66 @@
+digraph g {
+
+05000[label="start"]
+05000->15000[label="header 1"]
+15000[shape=rect label="output header 1"]
+15000->15500[label="header 2"]
+15000->25000[label="entity"]
+05000->05500[label="entity"]
+05500[shape=rect label="output\nPLACEHOLDER\nheader 1"]
+05500->25000[label="(go)"]
+15500[shape=rect label="memo header 2\noutput header 2"]
+15500->25000[label="entity"]
+15500->15550[label="header 3"]
+15550[shape=rect label="output header 2\nplus header 3"]
+15550->25000[label="entity"]
+25000[shape=rect label="output table\nheader (2 lines)"]
+25000->25500[label="(go)"]
+25500[shape=rect label="output entity"]
+25500->15000[label="header 1"]
+25500->25500[label="entity"]
+25500->15500[label="header 2"]
+25500->15550[label="header 3"]
+
+
+label="
+(fig. 874.4) State machine showing how we get from a
+producer script's data \"statements\" to a markdown file.
+
+This FSA is derived *only* from the real-world use cases it was abstracted
+from, with these corollaries:
+
+1) It has a hand-rolled state machine engine bespoke to its use-cases.
+In an experimental exercise in simplicity, we conflated \"states\" and \"actions\".
+The smell from this is slight but pleasantly negligible.
+
+2) This FSA does not \"fully isomorph\" with the document grammar it may seem
+to imply; as such it doesn't throughput all sequences it would \"seem\" to support.
+
+3) This FSA supports sequences that we would prefer not to see in real life
+(the converse of (2)).
+
+To \"correct\" (2) and (3) is out of this iteration's scope; so keep
+these issues (and issues like them) in mind when working with this FSA:
+
+• That there is no generalized support for arbitrary-depth headers is
+perhaps the loudest pronouncement of this FSA's shortcomings (if only from
+an implementation standpoint if not also API). Hopefully this iteration can
+serve as a sketch for the hypothetical eventuality of something more robust.
+
+• This FSA supports a sequence like \"(entity, header 1, entity)\". We would
+prefer that when headers are used at all, the first statement(s) are headers.
+
+• This FSA can transition over a header 3 with no anywhere-preceding header 2.
+Ideally such in input would fail gracefully; currently the behavior is undefined.
+
+• We might prefer that all \"very deep\" documents are at a uniform depth; e.g.,
+if header 3's are employed, no entities immediately follow a header 1 or header 2.
+
+• For simplicity, we model no \"end of stream\" transition; but if we did we
+would use it to check that we didn't end the document on a header statement.
+"
+}
+
+/*
+  - #born.
+*/

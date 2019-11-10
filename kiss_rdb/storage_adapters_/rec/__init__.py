@@ -20,7 +20,7 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         collection_identity,
         random_number_generator,
         filesystem,
@@ -132,7 +132,7 @@ def _field_via_line(line, parse_state, listener):
 
     posov = scn.pos  # posov = position of start of value
 
-    content_s = scn.scan_required(_some_content)  # (Case1403) ⏛ [#867.Y]
+    content_s = scn.scan_required(_some_content)  # (Case1403) ⏛ [#873.5]
 
     if content_s is None:
         return

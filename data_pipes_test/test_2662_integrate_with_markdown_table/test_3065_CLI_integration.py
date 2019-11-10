@@ -221,7 +221,7 @@ class Case3067DP_FA_help_screen(_CommonCase):
         return self._build_end_state()
 
     def _sout_and_serr_and_end_stater(self):
-        return _these().three_for_line_runner()
+        return _these().THREE_FOR_LINE_RUNNER()
 
     def _argv(self):
         return ('me', '--near-format', 'help', 'xx', 'yy')

@@ -111,6 +111,7 @@ class _FakeFile:
     def __init__(self, lines, path):
         self._lines = lines
         self.name = path  # be like `_io.TextIOWrapper`
+        self._is_opened_mutex = None
 
     def __enter__(self):
         return self
@@ -123,6 +124,10 @@ class _FakeFile:
 
     def __next__(self):
         return next(self._lines)
+
+    def close(self):
+        del self._is_opened_mutex
+        return None
 
 
 class _RecordOfFileRewrite:

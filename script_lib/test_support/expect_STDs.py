@@ -81,8 +81,7 @@ class _Performance:
 
     def __init__(self, test_case, line_expectations):
 
-        from modality_agnostic import io as io_lib
-        proxy = io_lib.write_only_IO_proxy
+        from modality_agnostic import write_only_IO_proxy as proxy
         self.stdout = proxy(self._receive_stdout_line)
         self.stderr = proxy(self._receive_stderr_line)
 

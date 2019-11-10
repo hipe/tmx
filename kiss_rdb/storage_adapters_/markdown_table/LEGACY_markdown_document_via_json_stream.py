@@ -1,73 +1,11 @@
 """experiment.."""
-# #[#874.8] file generates mardown the old way and may need to be the new way
 # #[#874.9] file is LEGACY
-
-
-def _lines_via_traversal_stream(dcts):
-
-        branch_dct = next(dcts)
-        assert(branch_dct['_is_branch_node'])
-
-        stateful = _Stateful()
-
-        table_lines_via = _build_table_linser(stateful, dcts)
-
-        while True:
-            for line in table_lines_via(branch_dct):
-                yield line
-
-            branch_dct = stateful.release_any_next_branch_node()
-            if branch_dct is None:
-                break
-
-            yield ''
-
-
-def _build_table_linser(stateful, dcts):
-
-    def table_lines(branch_dct):
-
-        yield f'### {branch_dct["label"]}'
-        yield '|document node|about|'
-        yield '|---|---|'  # black friday needs at least three
-
-        if stateful.do_example_rows_once():
-            yield '|(example)|#example|'  # ballsy
-
-        for dct in dcts:
-            if '_is_branch_node' in dct:
-                stateful.receive_next_branch_node(dct)
-                break
-            _markdown_link = _markdown_link_via_dictionary(dct)
-            yield f'|{_markdown_link}||'
-
-    return table_lines
-
-
-class _Stateful:
-
-    def __init__(self):
-        self._yes_do_once = True
-        self._next_branch_node = None
-
-    def do_example_rows_once(self):
-        if self._yes_do_once:
-            self._yes_do_once = False
-            return True
-
-    def receive_next_branch_node(self, dct):
-        self._next_branch_node = dct
-
-    def release_any_next_branch_node(self):
-        x = self._next_branch_node
-        self._next_branch_node = None
-        return x
 
 
 # (COMMON_FAR_KEY_SIMPLIFIER gone a #history-A.2)
 
 
-def COMMON_NEAR_KEY_SIMPLIFIER(key_via_row_DOM, schema, listener):
+def simplified_key_via_markdown_link_er():  # #html2markdown
     """
     my hands look like this:
         [Foo Fa 123](bloo blah)
@@ -76,16 +14,6 @@ def COMMON_NEAR_KEY_SIMPLIFIER(key_via_row_DOM, schema, listener):
 
     (transplated & simplified from its first home to here at #history-A.1)
     """
-
-    def f(row_DOM):
-        _orig_key = key_via_row_DOM(row_DOM)
-        return simplified_key_via_markdown_link(_orig_key)
-    simplified_key_via_markdown_link = simplified_key_via_markdown_link_er()
-    return f
-
-
-def simplified_key_via_markdown_link_er():  # #html2markdown
-    # ich muss sein notwithstanding #history-A.1. (Case1640DP)
 
     def simplified_key_via_markdown_link(markdown_link_string):
         md = markdown_link_rx.search(markdown_link_string)
@@ -104,16 +32,6 @@ def simplified_key_via_markdown_link_er():  # #html2markdown
 
 def simple_key_via_normal_key(normal_key):
     return normal_key.replace('_', '')
-
-
-def common_mapper_(key, listener):
-    def mapper(dct):
-        md_link = _markdown_link_via_dictionary(dct)
-        dct.pop('label')  # ..
-        dct.pop('url')  # ..
-        dct[key] = md_link  # ..
-        return dct
-    return mapper
 
 
 def label_via_string_via_max_width(max_width):  # (Case0810DP)
@@ -142,23 +60,7 @@ def markdown_link_via(label, url):
     return f'[{label}]({url})'  # (you could get bit)..
 
 
-# #todo
-def collection_identifier_via_parsed_arg_(arg):
-    typ = arg.argument_type
-    if 'stdin_as_argument' == typ:
-        return __collection_identifier_via_stdin(arg.stdin)
-    else:
-        assert('path_as_argument' == typ)
-        return arg.path  # [#873.I] ugly but meh
-
-
-def __collection_identifier_via_stdin(stdin):
-    import json
-    _itr = (json.loads(s) for s in stdin)
-    from data_pipes import ThePassThruContextManager
-    return ThePassThruContextManager(_itr)
-
-
+# #pending-rename: we are thinking kiss_rdb/storage_adapters/markdown.py
 # #history-A.3: no more executable script
 # #history-A.2: no more sync-side entity-mapping
 # #history-A.1: MD table generation overhaul & becomes library when gets covg

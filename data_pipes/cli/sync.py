@@ -94,8 +94,8 @@ def open_new_lines_via_sync(  # #testpoint
         cached_document_path=None,  # for tests
         ):
 
-    from kiss_rdb import collection_via_collection_path
-    near_coll = collection_via_collection_path(
+    from kiss_rdb import collectionerer
+    near_coll = collectionerer().collection_via_path(
             collection_path=near_collection,
             adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
             format_name=near_format,

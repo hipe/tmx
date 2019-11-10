@@ -68,9 +68,7 @@ def _do_CLI(monitor, sin, sout, serr, path):
     return monitor.exitstatus
 
 
-# #[#458.Z.4] "mad parse"
-
-class _MadParse:
+class _MadParse:  # the [#608.4] "mad parse" pattern
     """look for lines that have timestamps and also follow (immediately)
 
     another line that has a timestamp. when this "pattern" is matched,

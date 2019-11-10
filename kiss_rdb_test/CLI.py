@@ -80,7 +80,7 @@ class CLI_Test_Case_Methods:
             yes_stdout = False
             yes_stderr = True
         else:
-            assert('stdout and stderr' == which_IO)
+            assert('stdout_and_stderr' == which_IO)
             yes_stdout = True
             yes_stderr = True
 
@@ -127,20 +127,21 @@ class CLI_Test_Case_Methods:
                     }
 
         return BIG_FLEX(
-            given_args=self.given_args(),
-            allow_stdout_lines=allow_stdout_lines,
-            allow_stderr_lines=allow_stderr_lines,
-            exception_category=exception_category,
-            injections_dictionary=injections_dict,
-            might_debug=self.might_debug,
-            do_debug_f=lambda: self.do_debug,
-            debug_IO_f=lambda: _sys().stderr,
-            )
+                given_stdin=None,  # not faked here but faked elsewhere
+                given_args=self.given_args(),
+                allow_stdout_lines=allow_stdout_lines,
+                allow_stderr_lines=allow_stderr_lines,
+                exception_category=exception_category,
+                injections_dictionary=injections_dict,
+                might_debug=self.might_debug,
+                do_debug_f=lambda: self.do_debug,
+                debug_IO_f=lambda: _sys().stderr)
 
 
 # == BEGIN stdout capture and support #here2
 
 def BIG_FLEX(
+        given_stdin,
         given_args,
         allow_stdout_lines,
         allow_stderr_lines,
@@ -183,7 +184,7 @@ def BIG_FLEX(
         err_WR = es.MuxingWriteReceiver((_edwr, err_WR))
 
     def invoke_CLI():
-        return _invoke_CLI(given_args, injections_dictionary)
+        return _invoke_CLI(given_stdin, given_args, injections_dictionary)
 
     def clean_up_writes():
         if is_complicated:
@@ -195,10 +196,7 @@ def BIG_FLEX(
         with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
             fs_finish, exit_code = invoke_CLI()
 
-        if fs_finish is None:
-            fsr = None
-        else:
-            fsr = fs_finish()
+        fsr = None if fs_finish is None else fs_finish()
 
         _lines = clean_up_writes()
         return _BigFlexEndStateWithLala(
@@ -207,13 +205,13 @@ def BIG_FLEX(
                 exit_code=exit_code)
 
     def these(s):
-        if 'click exception' == s:
+        if 'click_exception' == s:
             yield ce('ClickException')
-        elif 'system exit' == s:
+        elif 'system_exit' == s:
             yield SystemExit
-        elif 'usage error' == s:
+        elif 'usage_error' == s:
             yield ce('UsageError')
-        elif 'anything experiment' == s:
+        elif 'anything_experiment' == s:
             yield ce('ClickException')
             yield ce('UsageError')
             yield SystemExit
@@ -265,7 +263,7 @@ def _expecting_no_writes(s):
 _no_WR = _write_receiver_via_function(_expecting_no_writes)
 
 
-def _invoke_CLI(given_args, injections_dictionary):
+def _invoke_CLI(given_stdin, given_args, injections_dictionary):
     from kiss_rdb.cli import cli
     from kiss_rdb import ModalityAdaptationInjections_
 
@@ -283,16 +281,29 @@ def _invoke_CLI(given_args, injections_dictionary):
     (Although this is not as relevant from #history-A.1 when we mock read-only)
     """
 
+    # stdin is kept out of the injections dictionary because of how we
+    # might want it to be exposed way upstream to override in vendor like
+    # we do for sout & serr. (we don't currently for 2 reasons)
+
     if injections_dictionary is None:
-        injections_obj = None
+        use_RNG = None
+        use_FSer = None
         filesystem_finish = None
     else:
-        random_number, filesystem = __flatten_these(**injections_dictionary)
-        _random_number_generator = __rng_via(random_number)
-        filesystemer, filesystem_finish = __these_two_via_filesystem(filesystem)  # noqa: E501
+        random_number, FS = __flatten_these(**injections_dictionary)
+        use_RNG = __rng_via(random_number)
+        use_FSer, filesystem_finish = __these_two_via_filesystem(FS)
+
+    if use_RNG is None and use_FSer is None and given_stdin is None:
+        injections_obj = None
+    else:
+        if use_FSer is None:
+            use_FSer = lambda: None
+
         injections_obj = ModalityAdaptationInjections_(
-                random_number_generator=_random_number_generator,
-                filesystemer=filesystemer)
+                random_number_generator=use_RNG,
+                filesystemer=use_FSer,
+                stdin=given_stdin)
 
     _exit_code = cli.main(
                 args=given_args,
@@ -423,8 +434,8 @@ def __lines_via_writes(writes):
 
 
 def _write_only_facade(receiver):
-    from modality_agnostic import io as io_lib
-    return io_lib.write_only_IO_proxy(
+    from modality_agnostic import write_only_IO_proxy
+    return write_only_IO_proxy(
             write=lambda s: receiver.receive_write(s),
             flush=lambda: receiver.receive_flush(),
             )

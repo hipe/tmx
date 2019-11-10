@@ -65,6 +65,9 @@ class StringScanner:  # #[#008.4] a scanner
         self._position = m.end()
         return m.group(0)  # ..
 
+    def advance_by_one(self):
+        self._position += 1
+
     # == READ ONLY things
 
     def rest(self):  # #cover-me

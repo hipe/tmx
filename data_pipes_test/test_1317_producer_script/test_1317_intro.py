@@ -228,8 +228,8 @@ def _same_near_collection():
 
 def _build_collection(path, yes_no, listener=None):
     _kwargs = {'format_name': 'producer-script'} if yes_no else {}
-    from kiss_rdb import collection_via_collection_path
-    return collection_via_collection_path(path, listener, **_kwargs)
+    from kiss_rdb import collectionerer
+    return collectionerer().collection_via_path(path, listener, **_kwargs)
 
 
 _yes_cheat = True

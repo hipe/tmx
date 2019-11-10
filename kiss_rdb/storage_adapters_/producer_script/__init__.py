@@ -22,14 +22,23 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.py',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def RESOLVE_SINGLE_FILE_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         collection_identity,
         random_number_generator,
         filesystem,
         listener):
 
-    from data_pipes.format_adapters.producer_script import OHAI  # ..
-    return OHAI(
+    from data_pipes.format_adapters.producer_script import \
+            COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
+
+    return COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
             collection_identity, random_number_generator, filesystem, listener)
+
+
+def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, monitor):
+    from data_pipes.format_adapters.producer_script import \
+            COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM
+
+    return COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, monitor)
 
 # #born.

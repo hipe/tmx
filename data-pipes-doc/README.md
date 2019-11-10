@@ -10,8 +10,8 @@ date: 2019-07-09T10:20:00-04:00
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |                  [#476]   | #open | catch-all to track every `cover_me`
-|                  [#472]   |       | multi-tablism ..
 |                  [#463]   |       | functional pipelines (2 files)
+|                 [#459.17] | #trak | producer script moudules that aren't modules
 |                  [#459.P] | #open | tmpfile is hardcoded
 |                  [#459.O] | #hole |
 |                  [#459.N] | #open | producer scripts shouldn't have knowledge of near format

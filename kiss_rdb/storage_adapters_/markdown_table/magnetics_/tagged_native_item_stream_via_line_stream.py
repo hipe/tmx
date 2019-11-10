@@ -1,4 +1,4 @@
-"""this is for exactly [#447.G].
+"""this is for exactly [#447.7] document-centric synchronization
 
 provisions (requirements):
 

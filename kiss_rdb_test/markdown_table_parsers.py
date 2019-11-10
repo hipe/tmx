@@ -2,7 +2,7 @@
 ## design objectives
 
 this is a quick-and-dirty solution to the problem of parsing markdown
-tables for the propose of verifying output during tests.
+tables for the purpose of verifying output during tests.
 
 it's written to accomodate a "spiral downward"-style of testing, where
 input is first parsed in a coarse pass, and then in subsequent passes
@@ -24,6 +24,7 @@ such an undertaking should trigger several "attack vectors" of smell:
     - why not use our existing business logic that parses markdown?
     - better still, why not use a purpose-built vendor library that already
       parses markdown (tables)? (we echo this concern in the asset code.)
+      [#867.Y]
 
 currently, our answers to the above are:
     - reducing dependencies generally (e.g on vendor libraries) can be a good
@@ -46,26 +47,23 @@ ground calculus whenever things change.
 import re
 
 
-def line_sections_via_lines(lines):
-    return _mad_parse(lines, _MadParseLineSections())
-
-
 def table_via_lines(lines):
-    return _mad_parse(lines, _MadParseTable())
-
-
-def _mad_parse(lines, parse):
+    parse = _MadParseTable()
     for line in lines:
         parse.receive_line(line)
     return parse.finish()
 
 
-class _MadParseTable:  # #pattern #[#458.Z.4] "mad parse"
+class _MadParseTable:  # #pattern [#608.4] "mad parse"
 
     def __init__(self):
         self._state = 'receive_header_line'
         self._can_finish = False
         self._mutex = None
+        self._header_row_one = None
+        self._header_row_two = None
+        self._example_row = None
+        self._item_rows = None
 
     def receive_line(self, line):
         getattr(self, self._state)(line)
@@ -74,17 +72,20 @@ class _MadParseTable:  # #pattern #[#458.Z.4] "mad parse"
         if '#' != line[0]:
             raise Exception(f'expecting header had {line!r}')
         self._header_line = line
+        self._can_finish = True
         self._state = 'receive_table_header_line_one'
 
     def receive_table_header_line_one(self, line):
         self._header_row_one = _parse_markdown_row(line)
+        self._can_finish = False
         self._state = 'receive_table_header_line_two'
 
     def receive_table_header_line_two(self, line):
         row = _parse_markdown_row(line)
         for cel in row:
             if dash_dash_dash_rx.match(cel) is None:
-                raise Exception('expecting /{rx.pattern}/ had {cel!r}')
+                _ = f'expecting /{dash_dash_dash_rx.pattern}/ had {cel!r}'
+                raise Exception(_)
         self._header_row_two = row
         self._can_finish = True
         self._example_row = None
@@ -121,7 +122,7 @@ class _MadParseTable:  # #pattern #[#458.Z.4] "mad parse"
                 )
 
 
-dash_dash_dash_rx = re.compile(r'^-{3}$')  # ..
+dash_dash_dash_rx = re.compile(r'^-{3,}$')  # ..
 example_rx = re.compile(r'(^|\W)example($|\W)')
 # example_rx = re.compile(r'\bexample\b')  unbelievable - '(', ')' are etc
 
@@ -142,62 +143,72 @@ def _parse_markdown_row(line):
 def _yield_markdown_table_cel_strings(line):
     # we would use regexp but we don't know how to do scanner
 
-    last_cursor = len(line) - 1
     cursor = 0
-
     act = line[cursor]
     if '|' != act:
         raise Exception(f'expected pipe had {act!r} at {cursor}: {line!r}')
+
     cursor = 1
     while True:
-        next_pipe = line.index('|', cursor)
-        if next_pipe is None:
-            raise Exception(f'no closing pipe: {line[cursor:]!r}')
+        next_pipe = line.find('|', cursor)
+        if -1 == next_pipe:
+            assert('\n' == line[cursor])
+            assert(cursor + 1 == len(line))
+            return
         yield line[cursor:next_pipe]
-        if last_cursor == next_pipe:
-            break
         cursor = next_pipe + 1
 
 
-class _MadParseLineSections:  # #wish, #pattern #[#458.Z.4] "mad parse"
+def nonblank_line_runs_via_lines(lines):
+    # (used to be [#608.4] "mad parse" pattern, til #history-A.1)
 
-    def __init__(self):
-        self._state = 'receive_initial_line'
-        self._sections = []
-        self._stop_OK = False
+    def main():
 
-    def receive_line(self, line):
-        getattr(self, self._state)(line)
+        run = []
 
-    def receive_initial_line(self, line):
-        if _is_blank(line):
-            raise Exception('blank line when beginning of section expected')
-        self._current_section = [line]
-        self._state = 'receive_subsequent_line'
-        self._stop_OK = True
+        def store_line():
+            run.append(data)
 
-    def receive_subsequent_line(self, line):
-        if _is_blank(line):
-            self._rollover()
-            self._stop_OK = False
-            self._state = 'receive_initial_line'
-        else:
-            self._current_section.append(line)
+        def flush_run():
+            res = tuple(run)
+            run.clear()
+            return res
 
-    def finish(self):
-        if not self._stop_OK:
-            raise Exception('empty file or file ended on blank line')
-        self._rollover()
-        a = self._sections
-        del(self._sections)
-        return a
+        def none():
+            pass
 
-    def _rollover(self):
-        self._sections.append(self._current_section)
-        del(self._current_section)
+        transitions = {
+                # (from categor, to category): (transition, step)
+                ('start', 'blank'): (none, none),
+                ('start', 'not_blank'): (none, store_line),
+                ('blank', 'not_blank'): (none, store_line),
+                ('not_blank', 'blank'): (flush_run, none),
+                ('start', 'end'): none,
+                ('not_blank', 'end'): flush_run,
+                ('blank', 'end'): none}
 
+        current_category = 'start'
+        for category, data in tokenized():
+            if current_category != category:
+                trans, step = transitions[(current_category, category)]
+                current_category = category
+                piece = trans()
+                if piece is not None:
+                    yield piece
+            step()
 
-def _is_blank(line):
-    return '' == line
+        piece = transitions[(current_category, 'end')]()
+        if piece is not None:
+            yield piece
 
+    def tokenized():
+        for line in lines:
+            if '\n' == line:  # _eol
+                yield 'blank', None
+            else:
+                yield 'not_blank', line
+
+    return main()
+
+# #history-A.1: no more mad-parse pattern for line runser
 # #born.

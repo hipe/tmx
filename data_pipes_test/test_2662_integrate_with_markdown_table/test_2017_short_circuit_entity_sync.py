@@ -212,12 +212,19 @@ def _production_producer_script():
 
 
 def near_keyerer_common(key_via_native, schema, listener):  # pure pass-thru
+
     from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            COMMON_NEAR_KEY_SIMPLIFIER)
+            simplified_key_via_markdown_link_er)
 
     # (reminder: function takes a row_DOM and returns a sync_key)
 
-    return COMMON_NEAR_KEY_SIMPLIFIER(key_via_native, schema, listener)
+    simplified_key_via_markdown_link = simplified_key_via_markdown_link_er()
+
+    def simplified_key_via_row_DOM(row_DOM):
+        _orig_key = key_via_native(row_DOM)
+        return simplified_key_via_markdown_link(_orig_key)
+
+    return simplified_key_via_row_DOM
 
 
 _reduced_number = 4  # how many business items in our reduced collection?

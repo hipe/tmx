@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 -W error::Warning::0
 
 
-raise Exception("#not-covered - comment out if you're feelng lucky")
+raise Exception("worked at #history-A.3 - comment out if you're feeling lucky")
 
 """A sort of producer script sourced from kubernetes documentation.
 
@@ -35,19 +35,46 @@ def _CLI(stdin, stdout, stderr, argv):
 def _do_CLI(monitor, stdin, stdout, stderr, url):
 
     from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
-    write = dictionary_dumper_as_JSON_via_output_stream(stdout)
+    recv = dictionary_dumper_as_JSON_via_output_stream(stdout)
 
-    for obj in object_stream_via_url_(None, url, monitor.listener):
-        write(obj)
+    _opened = open_traversal_stream(monitor.listener, url)
+    with _opened as dcts:
+        for dct in dcts:
+            recv(dct)
 
-    stdout.write('\n')
-    return _exitstatus_for_success
+    stdout.write('\n')  # _eol
+    return monitor.exitstatus
 
 
 _do_CLI.__doc__ = _doc
 
 
-def object_stream_via_url_(cached_path, url, listener):
+def initial_normal_nodes_via_stream(dcts):
+
+    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import markdown_link_via  # noqa: E501
+
+    for dct in dcts:
+        if '_is_branch_node' in dct:
+            yield dct
+            continue
+        yield {'document': markdown_link_via(**dct)}
+
+
+class open_traversal_stream:  # write our own [#510.12] pass-thru context manag
+
+    def __init__(self, listener, url, cache_path=None):
+        self._generator = _build_traversal_stream(listener, url, cache_path)
+
+    def __enter__(self):
+        gen = self._generator
+        del self._generator
+        return gen
+
+    def __exit__(self, *_3):
+        pass
+
+
+def _build_traversal_stream(listener, url, cached_path=None):
 
     if not _validate_url(url, listener):
         return
@@ -74,13 +101,12 @@ def object_stream_via_url_(cached_path, url, listener):
     for item in itr:
         name = item.name
         if 'a' == name:
-            for obj in _objects_via_anchor_tag_up_top(item):
-                yield obj
-        else:
-            assert('div' == name)
-            for obj in _objects_via_div_tag(item):
-                yield obj
-        item
+            for dct in _objects_via_anchor_tag_up_top(item):
+                yield dct
+            continue
+        assert('div' == name)
+        for dct in _objects_via_div_tag(item):
+            yield dct
 
 
 def _validate_url(url, listener):
@@ -189,13 +215,11 @@ _label = 'label'
 _url = 'url'
 
 
-_exitstatus_for_success = 0
-
-
 if __name__ == '__main__':
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-A.3
 # #history-A.2
 # #history-A.1
 # #born.

@@ -32,7 +32,7 @@ def filter_by_tags(ctx, collection, query):
     _inj = cf.release_these_injections('filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     _ents = coll._impl.to_entity_stream_as_storage_adapter_collection(listener)
@@ -46,7 +46,7 @@ def filter_by_tags(ctx, collection, query):
 
     q = prepare_query(query, listener)
     if q is None:
-        return mon.some_error_code()
+        return mon.errno
 
     itr = stats_future_and_results_via_entity_stream_and_query(_ents, q)
     future = next(itr)
@@ -103,4 +103,5 @@ def __summarize_search_stats(o):  # deleted coverage at #history-A.3
     else:
         yield o(f'{matched} match(es) of {total} item(s) seen')
 
+# #pending-rename: might as well change to _foo_bar from foo_bar_
 # #re-housed #abstracted

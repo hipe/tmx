@@ -21,24 +21,6 @@ def _do_lazy_reader(f, attr_name, build):
 # ==
 
 
-def _throwing_listenerer(*args):
-    from modality_agnostic import listening
-    return listening.throwing_listener(*args)
-
-
-def collection_via_collection_path(
-        collection_path,
-        listener=_throwing_listenerer,  # (as 2nd arg for tigher 2-arg calls)
-        adapter_variant=None,
-        format_name=None,
-        **injections):
-
-    return _memoized.collectioner.collection_via_path_and_injections_(
-            collection_path=collection_path,
-            adapter_variant=adapter_variant, format_name=format_name,
-            listener=listener, **injections)
-
-
 def normal_field_name_via_string(big_s):
     return _memoized.namer(big_s)
 
@@ -82,8 +64,8 @@ class _NormalFieldNameViaString:
 
 # == access memoized things
 
-def SPLAY_OF_STORAGE_ADAPTERS():
-    return _memoized.collectioner.DO_SPLAY_OF_STORAGE_ADAPTERS()
+def collectionerer():
+    return _memoized.collectioner
 
 
 def real_filesystem_read_only_():
@@ -134,10 +116,11 @@ _memoized = _Memoized()  # #testpoint
 
 class ModalityAdaptationInjections_:  # see [#867.U] "why we inject"
 
-    def __init__(self, random_number_generator, filesystemer):
+    def __init__(self, random_number_generator, filesystemer, stdin):
         once = {}
         once['filesystem'] = lambda: filesystemer()
         once['random_number_generator'] = lambda: random_number_generator
+        once['stdin'] = lambda: stdin
         self._once = once
 
     def RELEASE_THESE(self, names):

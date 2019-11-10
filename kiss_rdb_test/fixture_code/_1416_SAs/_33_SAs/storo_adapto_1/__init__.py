@@ -3,7 +3,7 @@ STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = False
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def RESOLVE_SCHEMA_BASED_COLLECTION_AS_STORAGE_ADAPTER(
+def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
         schema_file_scanner, collection_identity,
         random_number_generator, filesystem, listener):
 

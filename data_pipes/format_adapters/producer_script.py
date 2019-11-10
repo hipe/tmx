@@ -1,16 +1,17 @@
 """the "JSON script" format adapter is currently for circumventing process:
 
-the "central conceit" of JSON scripts is that they are the grand unifier
+The "central conceit" of JSON scripts is that they are the grand unifier
 lingua franca: they can be implemented by any language/runtime environment,
-(possibly even happening through sockets over a network). the client need
+(possibly even happening through sockets over a network). The client need
 only know that she will have a stream of lines on STDOUT, and that each line
-will parse as a simple JSON object.
+will parse as a JSON object.
 
-however, having said all this it can *really* flare up one's OCD having to
+But once you appreciate the elegance of this arrangement, you can also see
+its clunkiness for certain cases: it can *really* flare up one's OCD having to
 go through this "great wall of normalization" just to get what amounts to
 a stream of python dictionaries from one python module to another.
 
-imagine two python modules as separate processes, one a producer and one
+Imagine two python modules as separate processes, one a producer and one
 a consumer, passing a stream of items from producer to consumer:
 
 
@@ -89,17 +90,90 @@ some figure 1 work we would have to do that is not yet implemented.)
 """
 
 
-def OHAI(collection_identity, random_number_generator, filesystem, listener):
+"""
+# The producer script function API
+
+The multi-function API of producer scripts is premised around one low-level
+producer function whose product is altered through higher-level purpose-built
+map-reduce functions.
+
+When you're syncing (complicated): 1) no branch statements, 2) change source-
+leaning dictionaries into column-targeted dictionaries, 3) generate a sync-key.
+
+When you're converting (simpler): 1) yes branch statements, 2) yes column-
+targeted dictionaries and 3) we don't use sync-keys.
+
+In the most hopeful narrative, a producer script is used once to create the
+initial collection, and then used any number of subsequent times to update
+the collection.
+
+We don't want to require yet another mandatory API function to our already
+full producer script API, so.. (:#here2)
+"""
+
+
+def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
+        collection_identity, random_number_generator, filesystem, listener):
+
     mod = producer_script_module_via_path(
             collection_identity.collection_path, listener)
     if mod is None:
         return
-    return _CollectionImplementation(mod)
+    return _collection_implementation_via_module(mod)
 
 
-class _CollectionImplementation:
-    def __init__(self, mod):
-        self.PRODUCER_SCRIPT_MODULE = mod
+def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, _monitor_):
+
+    class CollectionImplementationViaOpenUpstream:
+
+        def OPEN_INITIAL_NORMAL_NODES_AS_STORAGE_ADAPTER(self, args, _monitor):
+            assert(0 == len(args))
+            from json import loads
+            _itr = (loads(s) for s in stdin)
+            from data_pipes import ThePassThruContextManager
+            return ThePassThruContextManager(_itr)
+
+    return CollectionImplementationViaOpenUpstream()
+
+
+def _collection_implementation_via_module(module):  # #testpoint
+
+    class CollectionImplementationViaModule:
+
+        def OPEN_INITIAL_NORMAL_NODES_AS_STORAGE_ADAPTER(self, args, mon):
+
+            if 1 < len(args):
+                raise Exception('cover me - multiple pass-thru args')
+
+            class ContextManagerForNormalNodes:
+
+                def __enter__(self):
+
+                    opened = module.open_traversal_stream(mon.listener, *args)
+                    self._close_me = opened
+                    dcts = opened.__enter__()
+
+                    # this is optional for the producer script (see #here2)
+
+                    if hasattr(module, 'initial_normal_nodes_via_stream'):
+                        return module.initial_normal_nodes_via_stream(dcts)
+
+                    # as a default, we use the same function as for when
+                    # syncing but we discard the sync key.
+
+                    _these = module.stream_for_sync_via_stream(dcts)
+                    return (dct for _ignore_sync_key, dct in _these)
+
+                def __exit__(self, typ, e, stack):
+                    close_me = self._close_me
+                    if close_me is None:
+                        return
+                    self._close_me = None
+                    return close_me.__exit__(typ, e, stack)
+
+            return ContextManagerForNormalNodes()
+
+    return CollectionImplementationViaModule()
 
 
 def producer_script_module_via_path(script_path, listener):
@@ -181,5 +255,6 @@ def producer_script_module_via_path(script_path, listener):
     return main()
 
 
+# #history-A.2: collection conversion
 # #history-A.1: storage adapter not format adapter
 # #born.

@@ -74,8 +74,6 @@ class FakeFilesystem:
         if mode not in ('w', 'x'):
             raise Exception(f'cover me: {repr(mode)}')
 
-        from modality_agnostic import io as io_lib
-
         buff = []
         mutex = OneShotMutex()
 
@@ -83,10 +81,10 @@ class FakeFilesystem:
             mutex.shoot()
             self._receive_writes(buff, path)
 
-        return io_lib.write_only_IO_proxy(
+        from modality_agnostic import write_only_IO_proxy
+        return write_only_IO_proxy(
                 write=lambda s: buff.append(s),  # #hi.
-                on_OK_exit=on_OK_exit,
-                )
+                on_OK_exit=on_OK_exit)
 
     def _receive_writes(self, writes, path):
         if path not in self._order:

@@ -24,8 +24,8 @@ class _CommonCase(unittest.TestCase):
 
     def _run(self, path, listener):
 
-        from kiss_rdb import collection_via_collection_path
-        coll = collection_via_collection_path(
+        from kiss_rdb import collectionerer
+        coll = collectionerer().collection_via_path(
                 collection_path=path,
                 adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
                 listener=listener)

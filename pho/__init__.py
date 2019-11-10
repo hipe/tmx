@@ -13,8 +13,8 @@ def emit_error(listener, error_symbol, msg):
 # == stowaway support for magnetics
 
 def big_index_and_collection_via_path(collection_path, listener):
-    import kiss_rdb
-    coll = kiss_rdb.collection_via_collection_path(collection_path, listener)
+    from kiss_rdb import collectionerer
+    coll = collectionerer().collection_via_path(collection_path, listener)
     if coll is None:
         return
 

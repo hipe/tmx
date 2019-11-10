@@ -11,18 +11,91 @@ the branch boundaries are being detected and emitted.
 from data_pipes_test.common_initial_state import (
         html_fixture,
         ProducerCaseMethods)
-from kiss_rdb_test import markdown_table_parsers as parsers
+from kiss_rdb_test.markdown_table_parsers import (
+        table_via_lines, nonblank_line_runs_via_lines)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
 import unittest
 
 
-class _CommonCase(ProducerCaseMethods, unittest.TestCase):
-    pass
+class CommonCase(ProducerCaseMethods, unittest.TestCase):
+
+    def build_bespoke_sections(self):
+        # experiment - group markdown headers with the next run
+        run_with_header = None
+        for run in nonblank_line_runs_via_lines(self.output_lines):
+            if '#' == run[0][0] and 1 == len(run):
+                if run_with_header:
+                    yield run_with_header
+                run_with_header = run
+                continue
+            if run_with_header is None:
+                yield run
+                continue
+            use = (*run_with_header, *run)
+            run_with_header = None
+            yield use
+
+    def build_output_lines(self):
+
+        from kiss_rdb.magnetics_.collection_via_path import _Collection
+
+        # make the from collection (around the dictionaries)
+
+        _d_a = _these_dictionaries()
+
+        class FakeProducerScript:  # #class-as-namespace
+            # [#459.17] producer script fake modules (see nearby other)
+
+            def initial_normal_nodes_via_stream(dcts):
+                return dcts
+
+            def open_traversal_stream(listener):
+                from data_pipes import ThePassThruContextManager
+                return ThePassThruContextManager(_d_a)
+
+        from data_pipes.format_adapters.producer_script import \
+            _collection_implementation_via_module
+        _impl = _collection_implementation_via_module(FakeProducerScript)
+
+        _from_coll = _Collection(_impl)
+
+        # make the to collection (around a fake stdout)
+
+        if self.do_debug:
+            from sys import stderr
+            stderr.write('\n')  # meh _eol
+
+            def recv_write(s):
+                stderr.write(f'DEBUG STDOUT: {s}')
+        else:
+            lines = []
+            recv_write = lines.append
+
+        from modality_agnostic import write_only_IO_proxy
+        _fake_stdout = write_only_IO_proxy(recv_write)
+
+        from kiss_rdb.storage_adapters_.markdown_table import \
+            COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE
+        _impl = COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(_fake_stdout)
+
+        _to_coll = _Collection(_impl)
+
+        # get busy
+
+        class FakeMonitor:  # #class-as-namespace
+            listener = None
+            OK = True
+
+        _from_coll.convert_collection_into((), _to_coll, FakeMonitor)
+
+        return tuple(lines)
+
+    do_debug = False
 
 
-class Case1747_does_scrape_work(_CommonCase):
+class Case1747_does_scrape_work(CommonCase):
 
     def test_010_scrape_works(self):
         self.assertGreaterEqual(len(self._dicts()), 2)  # meh whatever
@@ -77,66 +150,74 @@ class Case1747_does_scrape_work(_CommonCase):
         return html_fixture('0170-hugo-docs.html')
 
 
-class Case1749DP_generate(_CommonCase):
+class Case1749DP_generate(CommonCase):
 
-    def test_100_does_something(self):
-        self.assertLessEqual(1, len(self._lines()))
+    def test_100_outputs_more_than_one_line(self):
+        self.assertLessEqual(1, len(self.output_lines))
 
-    def test_200_sections_separated_by_one_line(self):
-        self.assertEqual(3, len(self._line_sections()))
+    def test_230_first_section_is_frontmaattery(self):
+        run = self.bespoke_sections[0]
+        self.assertEqual(run[0], '---\n')
+        self.assertEqual(run[-1], '---\n')
+        self.assertLess(2, len(run))
+
+    def test_260_last_section_is_this_one_footer(self):
+        run = self.bespoke_sections[-1]
+        self.assertIn('document-meta', run[0])
+        self.assertIn('#born', run[-1])
 
     def test_300_each_table_parses(self):
-        self.assertEqual(3, len(self._tables()))
+        self.assertEqual(3, len(self.tables))
 
     def test_400_table_names_occur_as_markdown_headers(self):
-        def f(table):
-            return table.header_line[4:]
-        _act = tuple(f(x) for x in self._tables())
+        def big_rx_hack(s):
+            return rx.search(s)[0]
+        import re
+        rx = re.compile(r'[A-Z][A-Za-z ]+')
+        _act = tuple(big_rx_hack(table.header_line) for table in self.tables)
         _exp = ('About Hugo', 'Getting Started', 'Maintenance')
         self.assertSequenceEqual(_act, _exp)
 
     def test_500_all_expected_business_items(self):
-        act = []
-        import re
-        rx = re.compile(r'^\[([^]]+)\]')
-        for table in self._tables():
-            rows = table.business_rows
-            if rows is not None:
+        def these():
+            for table in self.tables:
+                rows = table.business_rows
+                if rows is None:
+                    continue
                 for row in rows:
-                    act.append(rx.match(row[0])[1])
-
+                    yield row[0].strip()
+        _act = tuple(these())
         _exp = ('Overview', 'Get Started Overview', 'Quick Start')
-        self.assertSequenceEqual(act, _exp)
-
-    def test_600_last_table_has_no_items(self):
-        self.assertIsNone(self._tables()[-1].business_rows)
-
-    def test_700_only_first_table_has_example_row(self):
-        def f(table):
-            return False if table.example_row is None else True
-        _act = tuple(f(x) for x in self._tables())
-        _exp = (True, False, False)
         self.assertSequenceEqual(_act, _exp)
 
+    def test_600_last_table_has_no_items(self):
+        self.assertIsNone(self.tables[-1].business_rows)
+
+    def test_700_currently_none_of_the_tables_have_example_rows(self):
+        def f(table):
+            return False if table.example_row is None else True
+        _act = tuple(f(x) for x in self.tables)
+        _exp = (False, False, False)
+        self.assertSequenceEqual(_act, _exp)
+
+    # == FROM use dangerous_memoize_in_child_classes if etc
+
+    @property
     @shared_subject
-    def _tables(self):
-        def f(lines):
-            return parsers.table_via_lines(lines)
-        return list(f(x) for x in self._line_sections())
+    def tables(self):
+        return tuple(table_via_lines(tu) for tu in self.bespoke_sections[1:-1])
 
+    @property
     @shared_subject
-    def _line_sections(self):
-        return parsers.line_sections_via_lines(self._lines())
+    def bespoke_sections(self):
+        return tuple(self.build_bespoke_sections())
 
+    @property
     @shared_subject
-    def _lines(self):
-        _d_a = _these_dictionaries()
+    def output_lines(self):
+        return self.build_output_lines()
 
-        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            _lines_via_traversal_stream)
-
-        _lines = _lines_via_traversal_stream(iter(_d_a))
-        return tuple(_lines)
+    # == TO
 
 
 @lazy
@@ -161,4 +242,5 @@ _url = 'https://gohugo.io'
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.1 big spike of ad-hocs
 # #born.

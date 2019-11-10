@@ -4,9 +4,6 @@ import click
 # (got rid of conditional requirement of option (require hub) at #history-A.3)
 
 
-_empty_mapping = {}  # OCD
-
-
 class _CommonFunctions:
 
     def __init__(self, collections_hub, injections):
@@ -35,13 +32,33 @@ class _CommonFunctions:
             import os.path as os_path
             coll_path = os_path.join(s, collection_argument)
 
-        from kiss_rdb import collection_via_collection_path
-        return collection_via_collection_path(
+        return self.collectioner.collection_via_path(
                 coll_path, listener, **injections)
+
+    @property
+    def collectioner(self):
+        from kiss_rdb import collectionerer
+        return collectionerer()
 
     def build_monitor(self):
         return _Monitor(
                 _express_error_structure, _echo_error, _express_info_structure)
+
+    def echo_error_line(self, line):
+        _echo_error(line)
+
+    @property
+    def stdin(self):  # .. #todo
+        from sys import stdin
+        return stdin
+
+    @property
+    def stdout(self):  # (get it from click because we hack override it)
+        from click.utils import _default_text_stdout
+        return _default_text_stdout()
+
+
+_empty_mapping = {}  # OCD
 
 
 def _express_error_structure(echo_error_line, channel_tail, struct):
@@ -66,8 +83,6 @@ def _express_info_structure(info_category, dct):  # (Case6129)
 _coll_hub_opt = '--collections-hub'
 _coll_hub_env_var = 'KSS_HUB'
 
-
-# == BELOW
 
 def cli_for_production():
 
@@ -118,8 +133,11 @@ def cli_for_production():
             argv[i] = argv[i].encode('utf-8').decode('unicode_escape')  # ..
     # == END
 
+    from sys import stdin
+
     from kiss_rdb import ModalityAdaptationInjections_
     _inj = ModalityAdaptationInjections_(
+            stdin=stdin,
             random_number_generator=rng, filesystemer=filesystem)
     _ = cli.main(obj=_inj)
     cover_me(f'do you ever see this? {_}')
@@ -145,6 +163,11 @@ def cli(ctx, collections_hub):
     """
 
 
+# == BEGIN commands
+#    (they are in the order we would like them to appear in in the UI,
+#    but NOTE click sorts them alphabetically 🙃)
+
+
 @cli.command()
 @click.option('-val', '--value', nargs=2, multiple=True)
 @click.argument('collection')
@@ -162,7 +185,7 @@ def create(ctx, collection, value):
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     _cuds = {name_s: val_s for name_s, val_s in value}  # ..
@@ -172,7 +195,7 @@ def create(ctx, collection, value):
     # exact same thing as 2 others #here3
 
     if doc_ent is None:
-        return mon.some_error_code()
+        return mon.errno
 
     sout = click.utils._default_text_stdout()
 
@@ -213,7 +236,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     _inj = cf.release_these_injections('filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     cuds = []
@@ -229,7 +252,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     # exact same thing as 2 others #here3:
 
     if before_after is None:
-        return mon.some_error_code()
+        return mon.errno
 
     before_ent, after_ent = before_after
 
@@ -266,7 +289,7 @@ def get(ctx, collection, internal_identifier):
     _inj = cf.release_these_injections('filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     dct = coll.retrieve_entity(internal_identifier, listener)
@@ -299,7 +322,7 @@ def delete(ctx, collection, internal_identifier):
     _inj = cf.release_these_injections('random_number_generator', 'filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     doc_ent = coll.delete_entity(internal_identifier, listener)
@@ -307,7 +330,7 @@ def delete(ctx, collection, internal_identifier):
     # exact same thing as 2 others #here3:
 
     if doc_ent is None:
-        return mon.some_error_code()
+        return mon.errno
 
     sout = click.utils._default_text_stdout()
     serr = click.utils._default_text_stderr()
@@ -340,7 +363,7 @@ def traverse(ctx, collection):
     _inj = cf.release_these_injections('filesystem')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
-        return mon.some_error_code()
+        return mon.errno
     # end
 
     _iids = coll.to_identifier_stream(listener)
@@ -350,8 +373,8 @@ def traverse(ctx, collection):
         # (Case5934)
         echo(iid.to_string())
 
-    if len(mon.error_categories_box.set):
-        return mon.some_error_code()
+    if len(mon.error_categories_seen):
+        return mon.errno()
     else:
         return success_exit_code_
 
@@ -365,11 +388,6 @@ def select():
     click.echo('#open [#867.M] select')
 
 
-def _filter_by_tags():
-    from . import filter_by_tags_
-    return filter_by_tags_
-
-
 @cli.command(short_help='reduce entity collection by tags')
 @click.argument('collection')
 @click.argument('query', nargs=-1)
@@ -381,10 +399,50 @@ def filter_by_tags(ctx, collection, query):
     because there's no easy way for us to blit all of it here and there's a lot
     """
 
-    return _filter_by_tags().filter_by_tags(ctx, collection, query)
+    from .filter_by_tags_ import filter_by_tags  # this-CLI-specific library
+    return filter_by_tags(ctx, collection, query)
 
 
-# ==
+# -- commands concerned with CRUD of collections themselves (and adjacent)
+
+_same_help = "(or will try to infer from file extension if present)"
+
+
+@cli.command()
+@click.option('--from-format', metavar='<fmt>', help=_same_help)
+@click.option('--from-arg', metavar='<arg>', multiple=True,
+              help='EXPERIMENTAL pass thru to producer script (yikes)')
+@click.argument('from-collection')
+@click.option('--to-format', metavar='<fmt>', help=_same_help)
+@click.argument('to-collection')
+@click.pass_context
+def convert_collection(
+        ctx, from_format, from_arg, from_collection,
+        to_format, to_collection):
+
+    """EXPERIMENTAL.
+
+    Created as a cheap-and-easy way to create and populate a collection
+    with a producer script or similar.
+
+    With FROM_COLLECTION of "-", lines of the indicated format are read from
+    STDIN. With TO_COLLECTION of "-", lines of the specified format are
+    written to STDOUT. Only certain formats are available for certain cases;
+    for example an output of "-" is available only for single-file formats.
+
+    There is only one particiapting output format at writing, and it
+    only writes to STDOUT.
+    """
+
+    from ._convert_collection import ConvertCollection
+    return ConvertCollection(
+            ctx.obj, from_format, from_arg, from_collection,
+            to_format, to_collection
+    ).execute()
+
+
+# == END commands
+
 
 class _Monitor:
     """this is an experimental example of a "modality-specific" adaptation
@@ -395,6 +453,8 @@ class _Monitor:
     for this monitor, we care about gathering simple "statistics" about all
     the emissions; like whether a certain kind of error was emitted, or what
     the highest level of "errno" was..
+
+    .#open [#873.4] use that other one
     """
 
     def __init__(
@@ -403,7 +463,7 @@ class _Monitor:
 
         self._init_errno_stuff()
 
-        error_categories_box = _Box()
+        error_categories_seen = set()
 
         def listener(severity, *rest):
             # (Case5918)
@@ -415,34 +475,42 @@ class _Monitor:
 
         def when_info(rest):
             shape, info_category, *detail, payloader = rest
+            if 'expression' == shape:
+                express_expression(payloader)
+                return
             assert('structure' == shape)
             dct = payloader()
             express_info_structure(info_category, *detail, dct)
 
         def when_error(rest):
             shape, error_category, *detail, payloader = rest
+            self.OK = False
 
-            error_categories_box.see(error_category)
+            if error_category not in error_categories_seen:
+                error_categories_seen.add(error_category)
 
             # express the emission appropriately for the shape
             if 'expression' == shape:
+                express_expression(payloader)
+                return
 
-                # (error category & detail is disregarded here - meh for now)
-                for line in payloader():
-                    echo_error_line(line)
-            elif 'structure' == shape:
+            assert('structure' == shape)
 
-                dct = payloader()
-                if 'errno' in dct:
-                    self._see_errno(dct['errno'])  # #here2
+            dct = payloader()
+            if 'errno' in dct:
+                self._see_errno(dct['errno'])  # #here2
 
-                express_error_structure(
-                        echo_error_line, (error_category, *detail), dct)
-            else:
-                assert(False)
+            express_error_structure(
+                    echo_error_line, (error_category, *detail), dct)
 
+        def express_expression(payloader):
+            # (error category & detail is disregarded here - meh for now)
+            for line in payloader():
+                echo_error_line(line)
+
+        self.OK = True
+        self.error_categories_seen = error_categories_seen
         self.listener = listener
-        self.error_categories_box = error_categories_box
 
     def _init_errno_stuff(self):
 
@@ -458,23 +526,17 @@ class _Monitor:
             if self.max_errno < errno:
                 self.max_errno = errno
 
-    def some_error_code(self):
+    @property
+    def errno(self):
         if self.max_errno is None:
             return _failure_exit_code_bad_request
-        else:
-            return self.max_errno
+        return self.max_errno
 
-
-class _Box:  # OCD..
-
-    def __init__(self):
-        self.set = set()
-        self.list = []
-
-    def see(self, item):
-        if item not in self.set:
-            self.set.add(item)
-        self.list.append(item)
+    @property
+    def exitstatus(self):
+        if self.max_errno is None:
+            return success_exit_code_
+        return self.max_errno
 
 
 def _echo_error(line):

@@ -12,8 +12,8 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
     out = stdout.write  # imagine piping output (! errput) (Case3067DP)
     count = 0
 
-    from kiss_rdb import SPLAY_OF_STORAGE_ADAPTERS
-    _ = SPLAY_OF_STORAGE_ADAPTERS()
+    from kiss_rdb import collectionerer
+    _ = collectionerer().splay_storage_adapters__()
 
     for (k, ref) in _:
         _storage_adapter = ref()

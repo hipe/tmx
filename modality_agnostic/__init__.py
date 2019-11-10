@@ -178,7 +178,7 @@ class _InfoEmission(_Emission):
     severity = 'info'
 
 
-class _write_only_IO_proxy:
+class write_only_IO_proxy:
     """A sort-of proxy (façade?) of a filehandle open for writing defined..
 
     ..with a set of callbacks defining what to do at each IO operation.
@@ -219,10 +219,6 @@ class _write_only_IO_proxy:
 
     def __exit__(self, typ, err, stack):
         return self._exit(typ, err, stack)
-
-
-class io:  # #as-namespace-only
-    write_only_IO_proxy = _write_only_IO_proxy
 
 
 class streamlib:  # (as namespace only)
