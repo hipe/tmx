@@ -1,169 +1,148 @@
-from pho.cli import pass_context
-import click
+def CLI(sin, sout, serr, argv, enver=None):
+    from script_lib.cheap_arg_parse import cheap_arg_parse
+    return cheap_arg_parse(
+            _do_CLI, sin, sout, serr, argv, tuple(_params()), enver=enver)
 
 
-_help_for_frag_ID_and_out_path = (
-    "To generate one particular document, don't pass --recursive. "
-    '«fragment-ID» (required) indicates the head fragment of the document'
-    ' to generate. '
-    'Output is written to «out-path» if provided, otherwise STDOUT. '
-    'You currently have the option to generate *all* documents "in" the '
-    'collection (with --recursive) but NOTE this point of interface '
-    'will likely be refined with experience once we have it. '
-    'Pass no «fragment-ID». '
-    '«out-path» (required) is the directory into which to write the files'
-    ' (whose filenames are derived from the head fragment headings).'
-    )
+def _params():
+    from pho.cli import CP_
+
+    yield ('-c', '--collection-path=PATH', * CP_().descs)
+
+    yield ('-r', '--recursive',
+           'TEMPORARY/EXPERIMENTAL attempts to generate *all* documents "in"',
+           'the collection. <fragment-ID> (required) is ignored.')
+
+    yield '-F', '--force', 'Must be provided to overwrite existing file(s)'
+
+    yield '-n', '--dry-run', "Don't actually write the output file(s)"
+
+    yield 'fragment-id', 'The head fragment of the document to generate.'
+
+    yield ('out-path',
+           'The directory into which to write the files',
+           '(whose filenames are derived from the head fragment headings).',
+           'Use "-" to write to STDOUT (IN PROGRESS).')
 
 
-@click.command(
-        'NO SEE',
-        short_help='Generate a document or documents.',
-        help=(
-            "Generate a document or documents from"
-            " the fragments in the collection."
-            f' {_help_for_frag_ID_and_out_path}'
-            )
-        )
-@click.option(
-        '-R', '-r', '--recursive',
-        is_flag=True,
-        help=(
-            'TEMPORARY/EXPERIMENTAL this option is likely to evolve (or'
-            " perhaps go away entirely) once we figure some things out"
-            ),
-        )
-@click.option(
-        '-F', '--force',
-        is_flag=True,
-        help=(
-            'Must be provided to overwrite existing file(s)'
-            ),
-        )
-@click.option(
-        '-n', '--dry-run',
-        is_flag=True,
-        help=(
-            "Don't actually write the output file(s)"
-            ),
-        )
-@click.argument(
-        'fragment_id',
-        metavar='[«fragment-ID»]',
-        required=False,  # we require it conditionally by hand
-        )
-@click.argument(
-        'out_path',
-        metavar='[«out-path»]',
-        required=False,
-        )
-@pass_context
-def cli(
-        ctx,
-        fragment_id,
-        out_path,
-        recursive,
-        force,
-        dry_run,
-        ):
-    """Generates a document or documents."""
+def _do_CLI(
+        monitor, sin, sout, serr, enver,
+        collection_path, recursive, force, dry_run, fragment_id, out_path):
 
-    listener = ctx.build_structure_listener()
+    """Generate a document or documents.
 
-    # == crazy custom argument combination parsing
+    Generate a document or documents from the fragments in the collection.
+    """
 
-    def e(is_recursive, frag_id_yes, out_path_yes):
-        _msg = ''.join(_pieces(is_recursive, frag_id_yes, out_path_yes))
-        _emit_error(listener, 'conditional_argument_error', _msg)
+    # simple normalizations (partly because #wish [#608.13] `<arg-like-this>?`)
 
-    # do the crazy rule-table-like thing
-    # FFF x
-    # FFT x
-    # FTF x
-    # FTT x
-    # TFF x
-    # TFT x
-    # TTF x
-    # TTT x
+    if out_path in ('-', ''):
+        out_path = None
 
-    can_be_dry = True
+    if fragment_id == '':
+        fragment_id = None
 
-    collection_path = ctx.user_provided_collection_path
-    if recursive:
-        if fragment_id is None:
-            if out_path is None:
-                # TFF: in recursive mode you must provide a directory
-                return e(True, None, False)
-            else:
-                assert(False)  # TFT: impossible to express
-        elif out_path is None:
-            # NOTE TTF: this is where you hack things to make it make sense
-            # because you can't in real life express this on CLI w positionals
-            out_tuple = ('output_directory_path', fragment_id)
-            fragment_id = None
-        else:
-            # TTT: you cannot express fragment ID when doing recursive
-            return e(True, True, None)
-    elif fragment_id is None:
-        # FFF: FFT: in single-file mode you must provide a fragment ID
-        return e(False, False, None)
-    elif out_path is None:
-        # FTF: write one document to stdout
-        import sys
-        out_tuple = ('open_output_filehandle', sys.stdout)
-        can_be_dry = False
-    else:
-        # FTT: write one document to file
-        out_tuple = ('output_file_path', out_path)
+    listener = monitor.listener
 
     # ==
 
-    # this one custom conditional validation
+    def main():
+        tup = resolve_conditionally_required_arguments()
+        if tup is None:
+            return
+        can_be_dry, out_type, out_value = tup
 
-    if dry_run and not can_be_dry:
-        _emit_error(listener, 'parameter_conditionally_unavailable',
-                    '«dry-run» is meaningless when output is stdout')
-        return
+        if dry_run and not can_be_dry:
+            return _whine_about_dry_run(listener)
 
-    # resolve the collection then the big index
+        from pho import big_index_and_collection_via_path
+        tup = big_index_and_collection_via_path(collection_path, listener)
+        if tup is None:
+            return
+        big_index, _ = tup
 
-    from pho import big_index_and_collection_via_path
-    tup = big_index_and_collection_via_path(collection_path, listener)
-    if tup is None:
-        return
-    big_index, _ = tup
+        # get money
 
-    # get money
+        from pho.magnetics_.document_tree_via_fragment import \
+            document_tree_via_fragment
+        _ok = document_tree_via_fragment(
+                out_tuple=(out_type, out_value),
+                fragment_IID_string=fragment_id,
+                big_index=big_index,
+                be_recursive=recursive,
+                force_is_present=force,
+                is_dry_run=dry_run,
+                listener=listener)
 
-    from pho.magnetics_.document_tree_via_fragment import (
-            document_tree_via_fragment)
+        assert _ok in (None, True)
 
-    ok = document_tree_via_fragment(
-            out_tuple=out_tuple,
-            fragment_IID_string=fragment_id,
-            big_index=big_index,
-            be_recursive=recursive,
-            force_is_present=force,
-            is_dry_run=dry_run,
-            listener=listener)
+    def resolve_conditionally_required_arguments():
 
-    if ok is None:
-        if ctx.DID_ERROR:
+        can_be_dry = True
+
+        # a rule table with three inputs: (recursve, fragment_id, out_path)
+
+        if recursive:
+            if fragment_id is not None:
+                # for recursive, you can't pass a fragment ID
+                return error('is_recursive', 'has_frag_id')
+
+            if out_path is None:
+                # for recursive, output must be to directory not STDOUT
+                return error('is_recursive', 'has_out_path')
+
+            # write recursively to directory
+            return can_be_dry, 'output_directory_path', out_path
+
+        if fragment_id is None:
+            # for single document, you must pass fragment ID
+            return error('is_recursive', 'has_frag_id')
+
+        if out_path is None:
+            # write single document to STDOUT
             import sys
-            sys.exit(5678)  # anything not zero
-        return
+            can_be_dry = False
+            return can_be_dry, 'open_output_filehandle', sys.stdout
 
-    assert(ok is True)
+        # write single document to file
+        return can_be_dry, 'output_file_path', out_path
+
+    def error(focus_one, focus_two):
+        o = {'is_recursive': lambda: recursive,
+             'has_frag_id': lambda: fragment_id is not None,
+             'has_out_path': lambda: out_path is not None}
+        kwargs = {k: o.pop(k)() for k in (focus_one, focus_two)}
+        k, = o.keys()
+        kwargs[k] = None
+        _whine_big_flex(listener, kwargs)
+
+    def resolve_collection_path():
+        if collection_path is not None:
+            return collection_path
+        from pho.cli import CP_
+        return CP_().require_collection_path(enver, listener)
+
+    main()
+    return monitor.exitstatus
 
 
-# == whiners
+def _whine_about_dry_run(listener):
+    def _():
+        return {'reason': '«dry-run» is meaningless when output is stdout'}
+    listener('error', 'structure', 'parameter_conditionally_unavailable', _)
 
-def _pieces(is_recursive, frag_id_yes, out_path_yes):
 
-    these = (
-            (frag_id_yes, '«fragment-ID»', 'a'),
-            (out_path_yes, '«out-path»', 'an'),
-            )
+def _whine_big_flex(listener, kwargs):
+    def payloader():
+        _msg = ''.join(__whine_big_flex_pieces(**kwargs))
+        return {'reason_tail': _msg}
+    listener('error', 'structure', 'conditional_argument_error', payloader)
+
+
+def __whine_big_flex_pieces(is_recursive, has_frag_id, has_out_path):
+
+    these = ((has_frag_id, '«fragment-ID»', 'a'),
+             (has_out_path, '«out-path» on the filesystem', 'an'))
 
     # eliminate the None's from our expression
     these = tuple(x for x in these if x[0] is not None)
@@ -173,24 +152,19 @@ def _pieces(is_recursive, frag_id_yes, out_path_yes):
 
     (t_or_f, label, article), = these
 
-    # True = "you cannot pass a"
-    # False = "you must provide a"
+    if is_recursive:
+        pp = "for --recursive"
+    else:
+        pp = "when outputting a single document"
 
     if t_or_f:
-        yield f'you cannot pass {article} {label}'
+        sp = f"""you can't pass {article} {label} (maybe use "" instead)"""
     else:
-        yield f'you must provide {article} {label}'
+        sp = f'you must provide {article} {label}'
 
-    yield ' '
+    yield pp
+    yield ', '
+    yield sp
 
-    if is_recursive:
-        yield "in --recursive mode"
-    else:
-        yield "in single-file mode"
-
-
-def _emit_error(listener, channel_tail, reason):
-    from pho import emit_error
-    return emit_error(listener, channel_tail, reason)
-
+# #history-A.1 rewrite during cheap arg parse not click
 # #born.

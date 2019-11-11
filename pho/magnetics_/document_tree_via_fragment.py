@@ -12,9 +12,6 @@ def document_tree_via_fragment(
         listener,
         ):
 
-    from pho import errorer
-    e = errorer(listener)
-
     fw = _FileWriter(force_is_present, is_dry_run)
 
     if be_recursive:
@@ -22,16 +19,19 @@ def document_tree_via_fragment(
         assert('output_directory_path' == out_type)
         return _when_recursive(
                 fw, out_dir,
-                big_index, e, listener)
+                big_index, listener)
     else:
         return _when_single_file(
-                fw, out_tuple, fragment_IID_string,
-                big_index, e, listener)
+                fw, *out_tuple, fragment_IID_string,
+                big_index, listener)
 
 
-def _when_recursive(fw, out_dir, big_index, e, listener):
+def _when_recursive(fw, out_dir, big_index, listener):
+
     if not os.path.isdir(out_dir):
-        return e('directory_must_exist', out_dir)
+        def _():
+            return {'path': out_dir}
+        return listener('error', 'structure', 'directory_must_exist', _)
 
     _doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
 
@@ -57,10 +57,8 @@ def _when_recursive(fw, out_dir, big_index, e, listener):
                 ))
         seen.add(filename)
 
-        _out_file_path = os.path.join(out_dir, filename)
-        _out_tuple = ('output_file_path', _out_file_path)
-
-        _ok = fw.write_file(_out_tuple, facets, doc, listener)
+        _ = os.path.join(out_dir, filename)
+        _ok = fw.write_file('output_file_path', _, facets, doc, listener)
         if _ok:
             count_files_written += 1
 
@@ -71,8 +69,8 @@ def _when_recursive(fw, out_dir, big_index, e, listener):
 
 
 def _when_single_file(
-        fw, out_tuple, fragment_IID_string,
-        big_index, e, listener):
+        fw, out_type, out_value, fragment_IID_string,
+        big_index, listener):
 
     doc = big_index.RETRIEVE_DOCUMENT(fragment_IID_string, listener)
     if doc is None:
@@ -82,7 +80,7 @@ def _when_single_file(
     if facets is None:
         return
 
-    ok = fw.write_file(out_tuple, facets, doc, listener)
+    ok = fw.write_file(out_type, out_value, facets, doc, listener)
     if ok:
         fw.express_summary_into(listener, 1, 1)
     return ok
@@ -100,8 +98,8 @@ class _FileWriter:
         self.force_is_present = force_is_present
         self.is_dry = is_dry
         if is_dry:
-            import modality_agnostic.io as io_lib
-            self._dry_open_file = io_lib.write_only_IO_proxy(
+            from modality_agnostic import write_only_IO_proxy
+            self._dry_open_file = write_only_IO_proxy(
                     write=lambda x: None,
                     on_OK_exit=lambda: None)
 
@@ -117,14 +115,12 @@ class _FileWriter:
             return {'message': _message}
         listener('info', 'structure', 'wrote_files', f)
 
-    def write_file(self, out_tuple, facets, doc, listener):
+    def write_file(self, out_type, out_value, facets, doc, listener):
 
-        out_type, out_value = out_tuple
         if 'output_file_path' == out_type:
             out_path = out_value
             if os.path.exists(out_path) and not self.force_is_present:
-                _emit_error(listener, 'cannot_overwrite_file',
-                            f"(without «force») {out_path}")
+                _whine_about_no_clobber(listener, out_path)
                 return
             is_stdout_probably = False
         else:
@@ -172,12 +168,7 @@ def _facets_for_publishing_via_doc(doc, listener):
 
     dt = doc.document_datetime
     if dt is None:
-        _iid_s = doc.head_fragment_identifier_string
-        reason = (
-                f'head fragment {repr(_iid_s)} must have `document_datetime`'
-                ' (this is liable to change eventually)'
-                )
-        _emit_error(listener, 'missing_required_attribute', reason)
+        _whine_about_datetime(listener, doc)
         return
 
     return _FacetsForPublishing(dt, doc)
@@ -260,9 +251,19 @@ class _FacetsForPublishing:
         yield '---\n'
 
 
-def _emit_error(listener, channel_tail, reason):
-    from pho import emit_error
-    return emit_error(listener, channel_tail, reason)
+def _whine_about_datetime(listener, doc):
+    def payloader():
+        _ = doc.head_fragment_identifier_string
+        _ = f'head fragment {repr(_)} must have `document_datetime`' \
+            ' (this is liable to change eventually)'
+        return {'reason_tail': _}
+    listener('error', 'structure', 'missing_required_attribute', payloader)
+
+
+def _whine_about_no_clobber(listener, out_path):
+    def payloader():
+        return {'reason_tail': f"(without «force») {out_path}"}
+    listener('error', 'structure', 'cannot_overwrite_file', payloader)
 
 
 def cover_me(msg=None):

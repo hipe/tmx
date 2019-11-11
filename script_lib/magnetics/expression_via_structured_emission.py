@@ -22,7 +22,7 @@ issues with setting an entity attribute value (CREATE or UPDATE).
 👉 "slot D" is specialized for expressing a path/filename *when* it will not
 already be expressed in the below multiple lines.
 
-👉 "multiple lines" slot is specialzied for rendering "parse error context"
+👉 "multiple lines" slot is specialized for rendering "parse error context"
 
 
 History:
@@ -80,6 +80,7 @@ _func_via_key = {
         'filename': _pathish_stuff,
         'line': _context_for_parse_error,
         'lineno': _context_for_parse_error,
+        'message': _reason_stuff,
         'path': _pathish_stuff,
         'position': _context_for_parse_error,
         'reason': _reason_stuff,
@@ -180,7 +181,7 @@ def _define(i):
 # define the functions
 
 def __occupy_slot_A(slots, channel_tail):
-    slots.occupy_slot('A', [s.split('_') for s in channel_tail])
+    slots.occupy_slot('A', [s.split('_') for s in channel_tail])  # #here2
 
 
 @_define(_attr_value_thing)
@@ -194,9 +195,11 @@ def _attr_value_thing(slots, dim_pool):
 
 @_define(_reason_stuff)
 def _reason_stuff(slots, dim_pool):
-    k, = [k for k in ('expecting', 'reason_tail', 'reason') if k in dim_pool]
+    _all = {'reason', 'message', 'reason_tail', 'expecting'}
+    k, = set(dim_pool.keys()) & _all  # ..
     content_s = dim_pool.pop(k)
-    if 'reason' == k:
+
+    if k in ('reason', 'message'):
         s = content_s
         y = True
     elif 'reason_tail' == k:
@@ -278,7 +281,7 @@ def __reduce_redundancy(slots):
     _first_word_of_last_human = slots['A'][-1][0]
     if _first_word_of_last_human == _first_word.lower():
         # covered at: ('collection_not_found', 'no_such_file_or_directory')
-        slots['A'].pop()
+        slots['A'].pop()  # #here2
 
 
 def __fix_this_one_smell(channel_tail, dim_pool):  # #point-1

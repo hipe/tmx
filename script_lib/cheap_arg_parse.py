@@ -1,5 +1,9 @@
-def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
-                    formal_parameters, description_template_valueser=None):
+
+
+def cheap_arg_parse(
+        CLI_function, stdin, stdout, stderr, argv, formal_parameters,
+        description_template_valueser=None, enver=None):
+
     """
     NOTE This is still highly experimental: it is almost guaranteed that the
     API will change (in terms of both function signatures and the exposed
@@ -26,7 +30,8 @@ def cheap_arg_parse(CLI_function, stdin, stdout, stderr, argv,
         return mon.exitstatus
     opt_vals, arg_vals = two
 
-    es = CLI_function(mon, stdin, stdout, stderr, *opt_vals, *arg_vals)
+    _ = () if enver is None else (enver,)
+    es = CLI_function(mon, stdin, stdout, stderr, *_, *opt_vals, *arg_vals)
 
     # user can return from the above function any arbitrary exitstatus. also
     # any arbitary emission could have "set" (elevated) the exitstatus.
@@ -727,8 +732,8 @@ def __first_pass(tups):
 
     import re
     o = re.compile
-    looks_like_short_rx = o('-[a-z]')
-    formal_short_rx = o('-([a-z])$')
+    looks_like_short_rx = o('-[a-zA-Z]')
+    formal_short_rx = o('-([a-zA-Z])$')
     looks_like_long_rx = o('--[a-z][-a-z]')  # ..
     formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z]+))?([*!])?$')
     looks_like_desc_rx = o('[a-zA-Z(«]')  # ..

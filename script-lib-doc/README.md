@@ -25,6 +25,7 @@ the related API that preceded this one.)
 |---------------------------|:-----:|---|
 |[#676]                     | #open | track `cover_me`
 |[#610]                     |       | line stream via big string
+|[#608.13]                  | #wish | argument arity `<like-this>?`
 |[#608.L]                   |       | [ cheap arg parse ]
 |[#608.K]                   | #hole |
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method

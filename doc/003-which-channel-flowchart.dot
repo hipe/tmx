@@ -3,11 +3,21 @@ digraph g {
 the DTF (\"botnoise\") landscape you should
 post your message. whew!                           
 
-also: \"kiki\" and \"bouba\" you should probaly
-just google :P. familiarity is assumed here    "
+here, have the graph-viz source for this file:
+https://github.com/hipe/downtownfun/blob/master/doc/003-which-channel-flowchart.dot
+"
 
 
-  t_start [label="start" shape=rect]
+  t_start [label="start
+NOTE june 2019: hipe wants to
+overhaul this structurally so
+it scales out better to the many
+channels we have (all of which are
+righteous and good and normal) but
+it will take work and the amount of
+work it will take might not be justified
+by the current utility value in having
+it" shape=rect]
 
   t_start->q_sfw
 
@@ -78,16 +88,27 @@ t_autistes2 [label="join any existing one or
 create it, invite appropriate ppl &
 announce it in #autistes. (currently
 there's one for black mirror
-and one for the last star war.)"
+and one for the last star war.)
+(june 2019: we haven't been creating
+ad-hoc channels for shows as much lately)
+"
 shape=rect]
 
-  t_austiesgunnit [label="#austiesgunnit" shape=rect]
+  t_austiesgunnit [label="#free-speech-zone" shape=rect]
   t_aotd [label="#aotd\n(attractive\nor titillating\ndistraction)" shape=rect]
   t_bouba [label="#bouba" shape=rect]
-  t_kiki [label="#kiki" shape=rect]
+  t_kiki [label="#kiki
+(june 2019: lately
+#free-speech-zone or
+#austies-taxit have
+been the thing)"
+shape=rect]
   t_memes [label="#memes" shape=rect]
-  t_modern_love [label="#modern-love" shape=rect]
-  t_motd [label="#motd\n(mike of\nthe day)" shape=rect]
+  t_modern_love [label="#lamour-modern" shape=rect]
+  t_motd [label="#motd (mike of the day)
+(june 2019: this is archived
+but left here b.c 😂"
+shape=rect]
   t_oc [label="#oc" shape=rect]
   t_tech [label="#tech" shape=rect]
   t_vidya [label="#gaming" shape=rect]

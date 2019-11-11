@@ -48,7 +48,9 @@ for two classes, one branchy and one terminal-y.
 """
 
 
-def cheap_arg_parse_branch(stdin, stdout, stderr, argv, children_CLI_functions):  # noqa: E501
+def cheap_arg_parse_branch(
+        stdin, stdout, stderr, argv, children_CLI_functions,
+        help_lineser=None, enver=None):
 
     cx_CLI_functions = children_CLI_functions
 
@@ -71,7 +73,9 @@ def cheap_arg_parse_branch(stdin, stdout, stderr, argv, children_CLI_functions):
         when_parameter_error(pe)
 
     def when_help(pe):
-        for line in __help_lines(cx_CLI_functions, pe.long_program_name, CLI):
+        _ = __help_lines(
+                cx_CLI_functions, pe.long_program_name, CLI, help_lineser)
+        for line in _:
             stderr.write(_eol if line is None else f'{line}{_eol}')  # [#607.I]
 
     def when_parameter_error(pe):
@@ -119,20 +123,24 @@ def cheap_arg_parse_branch(stdin, stdout, stderr, argv, children_CLI_functions):
     while not tox.is_empty:
         use_argv.append(tox.shift())
 
-    return terminal_CLI_function(stdin, stdout, stderr, use_argv)
+    _ = () if enver is None else (enver,)
+    return terminal_CLI_function(stdin, stdout, stderr, use_argv, *_)
 
 
 # == BEGIN help screen
 
-def __help_lines(CLI_functions, long_program_name, CLI):
+def __help_lines(CLI_functions, long_program_name, CLI, descer=None):
     program_name = _renderers(long_program_name).program_name
-    from .magnetics.help_lines_via import (
-            help_lines_via, desc_lineser_via, lines_for_items)
+    from .magnetics.help_lines_via import help_lines_via, lines_for_items
 
-    doc_string = f"«these are the sub-commands»{_eol}"  # #guillemets
-    _descser = desc_lineser_via(None, doc_string)
+    if descer is None:
+        def use_descer():
+            yield "«these are the sub-commands»"  # #guillemets NO _eol
+    else:
+        use_descer = descer
+
     _lines = help_lines_via(
-            program_name, _descser, CLI.opts, CLI.args,
+            program_name, use_descer, CLI.opts, CLI.args,
             usage_tail='..', do_splay=False)
     for line_content in _lines:
         yield line_content

@@ -1,154 +1,89 @@
-import click
-import os
-import sys
+def cli_for_production():
+    def enver():
+        from os import environ
+        return environ
+    import sys as o
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv, enver))
 
 
-_env_var_prefix = 'PHO'
-_CONTEXT_SETTINGS = {'auto_envvar_prefix': _env_var_prefix}
+def _CLI(sin, sout, serr, argv, enver):
+    def line_contents():
+        yield 'experiments in generating documents from "fragments"'
+    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
+    return cheap_arg_parse_branch(
+            sin, sout, serr, argv, _big_flex(), line_contents, enver)
 
 
-def lazy(f):  # #[#510.8]
-    class EvaluateLazily:
+def _lazy(build):  # [#510.8] yet another take on "lazy"
+    class Lazy:
         def __init__(self):
-            self._has_been_evaluated = False
+            self._is_first = True
 
         def __call__(self):
-            if not self._has_been_evaluated:
-                self._has_been_evaluated = True
-                self._value = f()
+            if self._is_first:
+                self._is_first = False
+                self._value = build()
             return self._value
-    return EvaluateLazily()
+    return Lazy()
 
 
-class _ComplexCLI(click.MultiCommand):
+def _build_memoized_thing():
 
-    def list_commands(self, ctx):
-        return (cmd.command_name for cmd in _command_branch().sorted)
+    coll_path_env_var_name = 'PHO_COLLECTION_PATH'
 
-    def get_command(self, ctx, name):
+    class Fellow:
 
-        dct = _command_branch().command_via_name
-        if name not in dct:
-            return
+        @property
+        def descs(_):
+            yield 'The path to the directory with the fragments '
+            yield '(the directory that contains the `entities` directory)'
+            yield f'(or set the env var {coll_path_env_var_name})'
 
-        _module_name = _commands_module_name_for(dct[name].module_tail)
-        mod = __import__(_module_name, None, None, ['cli'])
-        return mod.cli
+        def require_collection_path(_, enver, listener):
+            collection_path = enver().get(coll_path_env_var_name)
+            if collection_path is not None:
+                return collection_path
+            whine_about(listener)
 
+    def whine_about(listener):
+        listener('error', 'structure', 'parameter_is_currently_required',
+                 lambda: {'reason_tail': '--collection-path'})
 
-class _Context:
-
-    def __init__(self):
-        self.user_provided_collection_path = None
-        self._do_express_verbose = False
-        self.DID_ERROR = False
-
-    def build_structure_listener(self):
-        def did_error():
-            self.DID_ERROR = True
-        return _build_structure_listener(did_error, self._do_express_verbose)
+    return Fellow()
 
 
-pass_context = click.make_pass_decorator(_Context, ensure=True)
+CP_ = _lazy(_build_memoized_thing)
 
 
-def _build_structure_listener(did_error, do_express_verbose):
-    def listener(*a):
-        mood, shape, *_, payloader = a
+def _big_flex():
 
-        if 'info' == mood:
-            if not do_express_verbose:
-                return
-            key = 'message'
-            write_to = sys.stderr
-        elif 'error' == mood:
-            did_error()
-            key = 'reason'
-            write_to = sys.stderr
-        else:
-            assert(False)
+    these = ('cli', 'commands')
 
-        assert('structure' == shape)
+    from os import path as o
+    _pho_project_dir = o.abspath(o.join(__file__, '..', '..'))
+    _commands_dir = o.join(_pho_project_dir, *these)
 
-        sct = payloader()
-        _msg = sct[key]
-        click.echo(_msg, file=write_to)
+    mod_head = '.'.join(('pho', *these))
+    from importlib import import_module
 
-    return listener
+    def build_loader(mod_tail):
+        def load_CLI_function():
+            _mod_name = '.'.join((mod_head, mod_tail))
+            _mod = import_module(_mod_name)
+            return _mod.CLI
 
+        return load_CLI_function
 
-# ==
-
-@click.command(cls=_ComplexCLI, context_settings=_CONTEXT_SETTINGS)
-@click.option(
-        '--collection-path',
-        metavar='PATH',
-        help=(
-            'The path to the directory with the fragments '
-            '(the directory that contains the `entities` directory)'
-            f' (or set the env var {_env_var_prefix}_COLLECTION_PATH)'
-            ),
-        )
-@click.option(
-        '-v', '--verbose',
-        is_flag=True,
-        help='Express informational emissions where available.',
-        )
-@pass_context
-def cli_for_production(
-        ctx,
-        collection_path,
-        verbose,
-        ):
-    '''experiments in generating documents from "fragments"'''
-
-    ctx.user_provided_collection_path = collection_path
-    ctx._do_express_verbose = verbose
+    from os import listdir
+    for fn in listdir(_commands_dir):
+        if not fn.endswith('.py'):
+            continue
+        if fn.startswith('_'):
+            continue
+        module_tail = fn[0:-3]
+        _slug = module_tail.replace('_', '-')
+        yield _slug, build_loader(module_tail)
 
 
-# ==
-
-
-@lazy
-def _command_branch():
-    return _CommandBranch()
-
-
-class _CommandBranch:
-
-    def __init__(self):
-        _ = self.__unordered_commands()
-        self.sorted = sorted(_, key=lambda cmd: cmd.command_name)
-        self.command_via_name = {cmd.command_name: cmd for cmd in self.sorted}
-
-    def __unordered_commands(self):
-        for fn in os.listdir(_commands_directory()):
-            if not fn.endswith('.py'):
-                continue
-            module_tail = fn[0:-3]
-            yield _Command(
-                    command_name=module_tail.replace('_', '-'),
-                    module_tail=module_tail)
-
-
-class _Command:
-
-    def __init__(self, module_tail, command_name):
-        self.module_tail = module_tail
-        self.command_name = command_name
-
-
-def _commands_directory():
-    return os.path.join(_mono_repo_dir(), 'pho', 'cli', 'commands')
-
-
-def _commands_module_name_for(name):
-    return f'pho.cli.commands.{name}'
-
-
-@lazy
-def _mono_repo_dir():
-    o = os.path
-    return o.abspath(o.join(__file__, '..', '..', '..'))
-
+# #history-A.1 rewrite during cheap arg parse not click
 # #born.

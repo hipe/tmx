@@ -56,12 +56,13 @@ when you click create
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
 |[#882.G]                   | #trak | empty but self-documentary files
 |[#882.F]                   | #open | we need proper markdown parsing
-[[#882.E]                   | #open | give the dylib a better name #after:[#882.B]
-[[#882.D]                   | #open | refactor to make sexp's classes
-[[#882.C]                   | #open | prove by trying it that NSTask is not wha..
-[[#882.B]                   | #open | learn swift build tool enough to automate..
-[[#882.A]                   | #open | any unit tests at all ASAP!
+|[#882.E]                   | #open | give the dylib a better name #after:[#882.B]
+|[#882.D]                   | #open | refactor to make sexp's classes
+|[#882.C]                   | #open | prove by trying it that NSTask is not wha..
+|[#882.B]                   | #open | learn swift build tool enough to automate..
+|[#882.A]                   | #open | any unit tests at all ASAP!
 |[#882]                     |       | (internal tracking)
+|[#881.2]                   |       | roadmap-2.dot
 |[#881]                     |       | roadmap.dot
 |[#880.B]                   | #edit | edit documentation
 |[#880]                     |       | README

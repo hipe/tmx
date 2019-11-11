@@ -1,6 +1,7 @@
 [item.48R.attributes]
-heading = "we like the UI introduced here; but we must come back later.."
-body = """
+heading = "swift cocoa UI intro"
+document_datetime=2019-05-14 09:10:11-0400
+body = '''
 Here are reading notes from [this older blog][1] from February, 2017; that
 will serve as our very first introduction to swift and Xcode for macOS
 development. (Reminder that macOS development is not really the goal here,
@@ -27,5 +28,5 @@ for about one minute.)
 
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
-"""
+'''
 # #born.

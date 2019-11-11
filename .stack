@@ -12,7 +12,6 @@ python that you write processing a request & giving a response into a swift app
 learn python extensions: a C extension lib for some minimal python you write
 archive cruft
 cleanup to try and use swift package manager
-graph viz for fragments and generate docs from current frags
 migrate real doc fragments to eno
 have full on eno
 flush pending renames

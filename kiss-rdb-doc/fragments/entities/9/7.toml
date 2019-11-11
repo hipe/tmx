@@ -1,0 +1,49 @@
+[item.979.attributes]
+heading = "let's do eno"
+body = """
+👉 Use [the website][1] not [the github][2] for an intro.
+
+👉 We feel like reading all the docs cover-to-cover.
+
+👉 Looks like recfiles.
+
+
+# some comments about interesting or counter-expectation stuff
+
+👉 It bothers me that the start of a fieldset looks like a no-value field.
+
+👉 Neat
+> Just as in sections, any key [of a fieldset] can appear multiple times,
+> but applications may choose to accept only unique keys when that behavior
+> fits the usecase better.
+
+👉 PogChamp copying and modifying a fieldset!
+
+👉 The way you escape a `--` expression in a multiline field is by using
+*more* dashes in the delimiter expression. (So if you were this
+programmatically, add one to the longest doo-hah). Open question if it matters
+if the in-string expression is anchored to the line head. Another open question
+is whether the string is EOL-terminated (and if so, whether you can encode one
+that is not).
+
+👉 Open question: how can you tell the difference between an empty list and
+a null value?
+
+👉 "Empties" are interesting.
+
+👉 The one-line comment delimiter is ">".
+
+👉 "Associated Comments" (before the thing they comment, with no interceding
+blank line).
+
+👉 Line continuations with "\". WHITESPACE PLAYS NO ROLE. Direct line
+continuation with "|".
+
+👉 Recursive copy with "<<" instead of "<".
+
+
+[2]: https://github.com/eno-lang/eno
+[1]: https://eno-lang.org/
+"""
+
+# #born.
