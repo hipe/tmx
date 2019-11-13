@@ -1,11 +1,6 @@
 /.ackrc
 /*.egg-info
-/my-venv
-node_modules
-/project/project
-/project/target
 *.pyc
 __pycache__
-/target
 /themes/hyde
 /z

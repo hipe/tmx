@@ -155,7 +155,10 @@ then in your 'main' terminal:
 
 ## <a name=aliases></a>(these aliases)
 
-    alias py='python3 -W error::Warning::0'
+    # alias py='python3 -W error::Warning::0'
+    # (gotta let warnings thru at #history-A.2, for tatsu)
+
+    alias py=python3
     alias pud='py -m unittest discover'
 
 
@@ -228,7 +231,7 @@ then in your 'main' terminal:
 |[#008]                     |       | (placeheld for small internal tracking)
 |[#007.E]                   | #open | probably refactor all `format` and (probably) `%` to use f-strings
 |[#007.D]                   | #open | PEP8 (now that we know how to activate it)
-|[#007.C]                   | #open | lock current stable (python 3.6.4) w/ virtualenv/VCS
+|[#007.C]                   | #hole |
 |[#007.2]                   | #open | refactor helper.py memoizers to use doctest (now, general doctest wishers)
 |[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server
@@ -264,5 +267,6 @@ then in your 'main' terminal:
 
 ## document-meta
 
+  - #history-A.2
   - spike node table
   - #born.

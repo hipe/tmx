@@ -41,7 +41,7 @@ in [the next section](#running-tests). (the tests take less than a second
 to run on my 5 years old laptop.) there are no requirements other than
 a specific version of python.
 
-see [installing and deploying python](../README.md#018) (#open [#007.C]).
+see [installing and deploying python](../README.md#018).
 
 
 

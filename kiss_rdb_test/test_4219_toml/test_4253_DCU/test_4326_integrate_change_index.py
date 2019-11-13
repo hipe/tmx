@@ -229,8 +229,6 @@ class Case4322_entity_not_found(_CommonCase):
 # Case4323 - not found because bad ID
 # Case4324 - not found because no dir
 # Case4325 - not found because no file
-# ✔️ Case4326 - not found because no ent in file
-# ✔️ Case4259 - win
 
 
 class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint

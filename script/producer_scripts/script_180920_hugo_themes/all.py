@@ -185,7 +185,7 @@ class _ReportDispatcher:
     # --
 
     def receive_subscription_to_tap_each_alternative(self, tap_f, done_f=None):
-        if self._tappers_count is 0:
+        if self._tappers_count == 0:
             self._tappers = []
             self._doners = []
         self._tappers_count += 1
@@ -246,7 +246,7 @@ def _big_index_via_walk(rd, themes_dir, listener):
 
     if rd._tappers_count:
         real_threer = threer
-        if rd._tappers_count is 1:
+        if rd._tappers_count == 1:
             tap = rd._tappers[0]
 
             def threer(alternative):
