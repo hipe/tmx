@@ -17,3 +17,9 @@ have full on eno
 flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
+be able to add a new pho fragment to the (eno) collection
+be able to create a new eno collection
+remove this line and maybe explode parts of that one pho roadmap
+hand-migrate all existing toml-based pho fragments to eno (this dups something above)
+whatever you gotta do to get eno entities to be read as pho fragments
+eno storage adapter read-only features

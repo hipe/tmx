@@ -88,7 +88,7 @@ class _CommonCase(unittest.TestCase):
 
         def identifier_via_string(s):
             id_o = id_via_s(s, None)
-            assert(depth == len(id_o.native_digits))
+            assert(depth == id_o.number_of_digits)
             return id_o
 
         _identifiers = (identifier_via_string(s) for s in use_identifiers())

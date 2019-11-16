@@ -6,7 +6,7 @@ digraph g {
 10000->15000
 10000->17000
 10000->20000
-15000[label="the very beginnings\nof eno kiss adaptation"]
+15000[label="the very beginnings\nof eno kiss adaptation" style=filled]
 15000->25000
 17000[label="short streams\nnot long-running\nopen files"]
 17000->17333
@@ -27,7 +27,7 @@ digraph g {
 25000->25300
 25000->25500
 25000->25700
-25300[label="retrieve"]
+25300[label="retrieve" style=filled]
 25300->25900
 25500[label="delete"]
 25500->25900

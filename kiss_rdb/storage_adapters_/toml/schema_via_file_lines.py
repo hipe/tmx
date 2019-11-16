@@ -122,7 +122,7 @@ class _SchemaPather:
     def file_path_pieces_via__(self, identifier):
 
         nds = identifier.native_digits
-        length = len(nds)
+        length = identifier.number_of_digits
         assert(1 < length)
 
         if self._is_single_file_schema:  # (Case4364)
@@ -149,8 +149,8 @@ class Schema_:
         return _SchemaPather(coll_path, self)
 
     @property
-    def identifier_depth(self):
-        return self._storage_schema.identifier_depth
+    def identifier_number_of_digits(self):
+        return self._storage_schema.identifier_number_of_digits
 
 
 # == populate the storage schemas with lazy definitions
@@ -209,17 +209,17 @@ class _StorageSchema:
             paths_function,
             ):
         self.name_of_paths_function = paths_function
-        self.identifier_depth = identifier_depth
+        self.identifier_number_of_digits = identifier_depth
         self.filetree_depth = filetree_depth
 
     def _build_check_depth(self):
         def check_depth(id_obj, listener):
-            length = len(id_obj.native_digits)
+            length = id_obj.number_of_digits
             if identifier_depth != length:
                 _whine_about_ID_depth(id_obj, identifier_depth, listener)
                 return
             return id_obj
-        identifier_depth = self.identifier_depth
+        identifier_depth = self.identifier_number_of_digits
         return check_depth
 
 
@@ -317,7 +317,7 @@ def vendor_parse_toml_or_catch_exception__(big_string):
 
 def _whine_about_ID_depth(identifier, expected_length, listener):
     def structer():  # (Case4318)
-        act = len(identifier.native_digits)
+        act = identifier.number_of_digits
         if act < expected_length:
             head = 'not enough'
         elif act > expected_length:

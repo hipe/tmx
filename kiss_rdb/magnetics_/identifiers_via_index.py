@@ -49,7 +49,7 @@ class _CLI:
 
         _ = _iid_lib()
         for iid in itr:
-            _id_depth = len(iid.native_digits)
+            _id_depth = iid.number_of_digits
             iid_via_int, int_via_iid, cap = _.three_via_depth_(_id_depth)
             vis(iid)
             break
@@ -165,7 +165,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
 
         # identifier depth is the initial indent depth of the file plus two.
 
-        self.identifier_depth = indent_depth + _two
+        self.number_of_digits = indent_depth + _two
         self.max_indent_depth = indent_depth
 
         self.significants = [None for _ in range(0, indent_depth)]
@@ -205,7 +205,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
 
         nd = self.native_digit_via_character(rest, None)  # #no-listener
 
-        _use_offset = self.identifier_depth - indent_depth - _two
+        _use_offset = self.number_of_digits - indent_depth - _two
 
         self.significants[_use_offset] = nd
 

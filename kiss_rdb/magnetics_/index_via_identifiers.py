@@ -187,7 +187,7 @@ class _CLI:
         _ids = _pather.to_identifier_stream(listener)
 
         _lines = index_lib.lines_of_index_via_identifiers(
-                _ids, schm.identifier_depth)
+                _ids, schm.number_of_digits)
 
         for line in _lines:
             self.stdout.write(line)
@@ -294,7 +294,7 @@ def new_lines_via_delete_identifier_from_index__(
 
     # death if there wasn't at least one :(
 
-    _depth = len(this_iid.native_digits)
+    _depth = this_iid.number_of_digits
 
     return lines_of_index_via_identifiers(keep_iids, _depth)
 
@@ -308,7 +308,7 @@ def new_lines_via_add_identifier_into_index__(identifier, iids, listener):
             yield iid
         yield identifier
 
-    _depth = len(identifier.native_digits)  # ..
+    _depth = identifier.number_of_digits
 
     return lines_of_index_via_identifiers(sorted(unsorted()), _depth)
 

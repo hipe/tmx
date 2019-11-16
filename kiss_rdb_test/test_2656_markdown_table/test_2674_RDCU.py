@@ -32,6 +32,9 @@ class Case2606_entity_not_found_because_identifier_too_deep(_CommonCase):
     def subject_collection(self):
         return _collection_empty_wont_mutate()
 
+    def given_identifier_string(self):
+        return 'AB23'
+
     @property
     def _canon_case(self):
         return canon.case_of_entity_not_found_because_identifier_too_deep
@@ -49,7 +52,7 @@ class Case2609_entity_not_found(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
-    def IDENTIFIER_STRING(self):
+    def given_identifier_string(self):
         return 'AB2'
 
     def subject_collection(self):
@@ -92,7 +95,7 @@ class Case2641_delete_but_entity_not_found(_CommonCase):
     def subject_collection(self):
         return _collection_ordinary_will_mutate()  # but actually won't
 
-    def IDENTIFIER_STRING(self):
+    def given_identifier_string(self):
         return 'AB2'
 
     @property

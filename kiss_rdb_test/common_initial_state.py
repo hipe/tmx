@@ -149,6 +149,12 @@ def _woah(k):
     return decorator
 
 
+@_woah('eno')
+class ___funcs_for_eno(_FunctionsFor):
+    fixture_directory_for = _path_for
+    fixture_dir_name = '4844-eno'
+
+
 @_woah('markdown')
 class ___funcs_for_MD(_FunctionsFor):
     fixture_path = _path_for

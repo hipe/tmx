@@ -127,6 +127,9 @@ class Case4318_identifier_too_short_or_long(_CommonCase):
     def _canon_case(self):
         return canon.case_of_entity_not_found_because_identifier_too_deep
 
+    def given_identifier_string(self):
+        return 'AB23'
+
 
 class Case4319_some_top_directory_not_found(_CommonCase):
 
@@ -180,7 +183,7 @@ class Case4320_delete_but_file_not_found(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
-    def IDENTIFIER_STRING(self):
+    def given_identifier_string(self):
         return 'B42'
 
     def subject_collection(self):
@@ -213,7 +216,7 @@ class Case4322_entity_not_found(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
-    def IDENTIFIER_STRING(self):
+    def given_identifier_string(self):
         return 'B7J'
 
     def subject_collection(self):

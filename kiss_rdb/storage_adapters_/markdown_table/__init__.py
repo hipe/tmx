@@ -697,7 +697,7 @@ def _prepare_edit(ent, tups, schema, create_or_update, listener):
 
 
 def _retrieve(lines, identi, schema, g, listener):
-    if _max_depth < len(identi.native_digits):
+    if _max_depth < identi.number_of_digits:
         return __whine_about_identifier_depth(listener, identi)
     asts_via_line = g.ASTs_via_line_via_listener(listener, schema)
     found = False
@@ -1429,7 +1429,7 @@ def _whine_about_entity_not_found(listener, num_lines, iden, head=None):
 
 def __whine_about_identifier_depth(listener, iden):
     def structer():
-        _actual = len(iden.native_digits)  # (Case2606)
+        _actual = iden.number_of_digits  # (Case2606)
         _reason = (
             f"can't retrieve '{iden.to_string()}' because "
             f"that identifier depth ({_actual}) exceeds "

@@ -108,7 +108,7 @@ class collection_via_directory_and_schema:
             tup = _.PROVISION_NEW_IDENTIFIER(
                     random_number_generator=self._random_number_generator,
                     indexy_file=indexy_file,
-                    identifier_depth=self._schema.identifier_depth,
+                    identifier_depth=self._schema.identifier_number_of_digits,
                     listener=listener)
 
             if tup is None:

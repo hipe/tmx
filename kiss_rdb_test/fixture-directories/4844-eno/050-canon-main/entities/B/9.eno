@@ -1,0 +1,17 @@
+# entity: B9G: attributes
+hi-G: hey G
+
+
+# entity: B9H: attributes
+thing-A: hi i'm B9H
+thing-B: hey i'm B9H
+
+
+# entity: B9J: attributes
+hi-J: hey J
+
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

@@ -1,0 +1,9 @@
+# entity: B8H: attributes
+thing-1: hi i'm B8H
+thing-2: hey i'm B8H
+
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

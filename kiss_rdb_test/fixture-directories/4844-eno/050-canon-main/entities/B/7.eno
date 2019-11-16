@@ -1,0 +1,17 @@
+# entity: B7E: attributes
+thing-1: "hi E"
+thing-2: "hey E"
+
+# entity: B7F: attributes
+thing-1: "hi F"
+thing-2: "hey F"
+
+# entity: B7G: attributes
+thing-1: "hi G"
+thing-2: "hey G"
+
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

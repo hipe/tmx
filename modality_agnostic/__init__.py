@@ -44,7 +44,7 @@ class ModalityAgnosticErrorMonitor:  # :[#507.9]
     """Construct the error monitor with one listener. It has two attributes:
 
     `listener` and `OK`. Pass *this* listener to a client, and if it fails
-    (by emitting an `error`), the `ok` attribute (which started out as True)
+    (by emitting an `error`), the `OK` attribute (which started out as True)
     will be set to False. The emission is passed thru to the argument listener
     unchanged.
 
@@ -143,9 +143,9 @@ class _Emission:
 
     def _flush_to_some_message_when_structure(self):
         sct = self.flush_payloader()
-        key = self._message_key_
-        if key in sct:
-            return sct[key]
+        msg = self._message_via_struct_(sct)
+        if msg is not None:
+            return msg
         _these = ', '.join(sct.keys())
         return f"(unknown {key}, keys: ({_these}))"  # key as natural key
 
@@ -168,11 +168,21 @@ class _ErrorEmission(_Emission):
             yield self._prefix_via_channel_tail_()
         yield self.flush_some_message()
 
+    def _message_via_struct_(self, sct):
+        ks = set(sct.keys()) & {'reason', 'reason_tail'}
+        if len(ks):
+            key, = ks
+            return sct[key]
+
     _message_key_ = 'reason'
     severity = 'error'
 
 
 class _InfoEmission(_Emission):
+
+    def _message_via_struct_(self, sct):
+        if 'message' in sct:
+            return sct['message']
 
     _message_key_ = 'message'
     severity = 'info'

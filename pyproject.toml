@@ -11,8 +11,11 @@ toml = "^0.10.0"
 click = "^7.0"
 soupsieve = "^1.9.5"
 bs4 = "^0.0.1"
+enolib = "^0.8.1"
 
 [tool.poetry.dev-dependencies]
+flake8 = "^3.7.9"
+pyflakes = { git = "https://github.com/PyCQA/pyflakes.git", branch = "master" }
 
 [build-system]
 requires = ["poetry>=0.12"]

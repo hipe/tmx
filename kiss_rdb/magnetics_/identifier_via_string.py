@@ -97,14 +97,14 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
 
     if int_via_id == func:
         ln = len(stack)
-        if 1 is not ln:
+        if ln != 1:
             return invite(f'need 1 had {ln} argument(s) for IDENTIFIER.')
         arg, = stack
         iid = identifier_via_string_(arg, listener)
         if iid is None:
             return 3
 
-        _, int_via_iid, _ = three_via_depth_(len(iid.native_digits))
+        _, int_via_iid, _ = three_via_depth_(iid.number_of_digits)
 
         _int = int_via_iid(iid)
         serr.write(f'{_int}\n')
@@ -112,7 +112,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
 
     if id_via_int == func:
         ln = len(stack)
-        if 2 is not ln:
+        if ln != 2:
             return invite(f'need 2 had {ln} argument(s) for DEPTH INTEGER.')
         integer, depth = stack  # BACKWARDS! because stack
         depth = int(depth)  # meh
@@ -251,6 +251,10 @@ class Identifier_:
 
     def to_string(self):
         return ''.join(nd.character for nd in self.native_digits)
+
+    @property
+    def number_of_digits(self):
+        return len(self.native_digits)
 
 
 def integer_via_identifier_er__():

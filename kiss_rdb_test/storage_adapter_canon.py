@@ -223,10 +223,10 @@ class case_of_entity_not_found_because_identifier_too_deep:
 
         # assert that the identifier is in the expression (..)
 
-        _assert_says_identifier_probably(tc, reason, 'AB23')
+        _assert_says_identifier_probably(tc, reason, tc.given_identifier_string())
 
     def build_end_state(tc):
-        return _end_state_for_retrieve_via_string(tc, 'AB23')
+        return _end_state_for_retrieve_via_string(tc, tc.given_identifier_string())
 
 
 class case_of_entity_not_found:  # #as-namespace-only
@@ -238,11 +238,11 @@ class case_of_entity_not_found:  # #as-namespace-only
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
-        _assert_says_identifier_probably(tc, reason, tc.IDENTIFIER_STRING())
+        _assert_says_identifier_probably(tc, reason, tc.given_identifier_string())
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
-        return _end_state_for_retrieve_via_string(tc, tc.IDENTIFIER_STRING())
+        return _end_state_for_retrieve_via_string(tc, tc.given_identifier_string())
 
 
 class case_of_retrieve_OK:  # #as-namespace-only
@@ -272,12 +272,12 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
 
         _assert_says_cannot_verb(tc, reason, 'delete')
 
-        _assert_says_identifier_probably(tc, reason, tc.IDENTIFIER_STRING())
+        _assert_says_identifier_probably(tc, reason, tc.given_identifier_string())
 
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
-        return _end_state_for_delete_via_string(tc, tc.IDENTIFIER_STRING())
+        return _end_state_for_delete_via_string(tc, tc.given_identifier_string())
 
 
 class _common_delete:  # as-namespace-only
