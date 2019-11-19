@@ -1,14 +1,14 @@
 # entity: B9G: attributes
-hi-G: hey G
+hi_G: hey G
 
 
 # entity: B9H: attributes
-thing-A: hi i'm B9H
-thing-B: hey i'm B9H
+thing_A: hi i'm B9H
+thing_B: hey i'm B9H
 
 
 # entity: B9J: attributes
-hi-J: hey J
+hi_J: hey J
 
 
 # document-meta

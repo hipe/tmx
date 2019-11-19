@@ -876,7 +876,7 @@ def _stateful_grammar_via(schema):
 
                 # allow for cels that are nothing but 1 or more spaces
                 w_left = skip_any_whitespace()
-                if w_left is 0:
+                if 0 == w_left:
                     content_s = scn.scan_required(some_non_empty_cel_content)
                 else:
                     content_s = scn.scan(some_non_empty_cel_content)
@@ -1089,7 +1089,7 @@ class RowAsEntity_:
     def to_dictionary_two_deep_as_storage_adapter_entity(self):
         _ = self.core_attributes_dictionary_as_storage_adapter_entity
         return {
-                'identifier': self.identifier_string,
+                'identifier_string': self.identifier_string,
                 'core_attributes': _}
 
     @property
@@ -1231,7 +1231,8 @@ class _TableSchema:
         def normal_field_name_of(content):
             # treat dashes, spaces, and underscores as all one unified separato
             _pieces = re.split(r'[- _]', content)
-            return '-'.join(normal_piece_via_piece(piece) for piece in _pieces)
+            # that separator is [#873.21] the underscore
+            return '_'.join(normal_piece_via_piece(piece) for piece in _pieces)
 
         def normal_piece_via_piece(piece):
             # lowercase the piece unless it is all caps EXPERIMENTAL

@@ -1,7 +1,7 @@
-[item.PBR.attributes]
-parent = "8W2"
-heading = "gcc and linking: gotta learn this first"
-body = """
+# entity: PBR: attributes
+parent: 8W2
+heading: gcc and linking: gotta learn this first
+-- body
 
 gotta learn [gcc][1] first.
 
@@ -15,6 +15,11 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 
 [1]: https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
-"""
 
+-- body
+
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

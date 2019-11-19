@@ -37,22 +37,22 @@ class Case4257_simplifed_typical(_CommonCase):
 
     def expect_entity_body_lines(self):
         return """
-        aa-aa = 1
-        bb-bb = \"\"\"
+        aa_aa = 1
+        bb_bb = \"\"\"
         line 1
         line 2
         \"\"\"
-        cc-cc = 3
+        cc_cc = 3
         """
 
     def given_request_tuples(self):
-        return (('update_attribute', 'bb-bb', "line 1\nline 2\n"),)
+        return (('update_attribute', 'bb_bb', "line 1\nline 2\n"),)
 
     def given_entity_body_lines(self):
         return """
-        aa-aa = 1
-        bb-bb = 2
-        cc-cc = 3
+        aa_aa = 1
+        bb_bb = 2
+        cc_cc = 3
         """
 
 
@@ -63,7 +63,7 @@ class Case4258KR_empty_string(_CommonCase):
 
     def test_200_attr_name_and_bad_attr_value(self):
         o = self.error_structure
-        self.assertEqual(o['attribute_name'], 'aa-aa')
+        self.assertEqual(o['attribute_name'], 'aa_aa')
         self.assertEqual(o['unsanitized_attribute_value'], '')
 
     def test_300_suggestion(self):
@@ -76,7 +76,7 @@ class Case4258KR_empty_string(_CommonCase):
         return self.expect_input_error()
 
     def given_request_tuples(self):
-        return (('create_attribute', 'aa-aa', ''),)
+        return (('create_attribute', 'aa_aa', ''),)
 
     def given_entity_body_lines(self):
         return ''
@@ -89,11 +89,11 @@ class Case4259_one_line_special_char(_CommonCase):  # #midpoint
 
     def expect_entity_body_lines(self):
         return """
-        aa-aa = \"\\\" 👈 a quote\"
+        aa_aa = \"\\\" 👈 a quote\"
         """
 
     def given_request_tuples(self):
-        return (('create_attribute', 'aa-aa', '" 👈 a quote'),)
+        return (('create_attribute', 'aa_aa', '" 👈 a quote'),)
 
     def given_entity_body_lines(self):
         return ''
@@ -106,22 +106,22 @@ class Case4260_multiple_lines_and_special_chars(_CommonCase):
 
     def expect_entity_body_lines(self):
         return """
-        aa-aa = 1
-        bb-bb = \"\"\"
+        aa_aa = 1
+        bb_bb = \"\"\"
         line 1
         a quote: \\\"
         \"\"\"
-        cc-cc = 3
+        cc_cc = 3
         """
 
     def given_request_tuples(self):
-        return (('update_attribute', 'bb-bb', "line 1\na quote: \"\n"),)
+        return (('update_attribute', 'bb_bb', "line 1\na quote: \"\n"),)
 
     def given_entity_body_lines(self):
         return """
-        aa-aa = 1
-        bb-bb = "only one line"
-        cc-cc = 3
+        aa_aa = 1
+        bb_bb = "only one line"
+        cc_cc = 3
         """
 
 
@@ -132,7 +132,7 @@ class Case4261_no_newline_on_final_line(_CommonCase):
 
     def test_200_attr_name_and_bad_attr_value(self):
         o = self.error_structure
-        self.assertEqual(o['attribute_name'], 'aa-aa')
+        self.assertEqual(o['attribute_name'], 'aa_aa')
         self.assertEqual(o['unsanitized_attribute_value'], 'line 1\nline 2')
 
     @property
@@ -141,7 +141,7 @@ class Case4261_no_newline_on_final_line(_CommonCase):
         return self.expect_input_error()
 
     def given_request_tuples(self):
-        return (('create_attribute', 'aa-aa', "line 1\nline 2"),)
+        return (('create_attribute', 'aa_aa', "line 1\nline 2"),)
 
     def given_entity_body_lines(self):
         return ''

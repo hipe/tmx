@@ -10,6 +10,49 @@ we mean the path to the particular file in the multi-file collection.
 """
 
 
+# == BEGIN
+
+def section_line(label, depth=1):
+    assert(1 == depth)
+    return f'# {label}\n'
+
+
+def multiline_field_lines(var_name, lines, yes_trailing_newline=True):
+    delim = f'-- {var_name}\n'  # _eol
+    yield delim
+    for line in lines:
+        assert('--' != line[0:2])
+        yield line
+    if yes_trailing_newline:
+        yield '\n'  # _eol - without this, no trailing newline in decoded str
+    yield delim
+
+
+def field_line(var_name, string_value):
+    return f'{var_name}: {string_value}\n'
+
+# == END
+
+
+def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
+        schema_file_scanner, collection_identity,
+        random_number_generator, filesystem, listener):
+
+    # #open [#873.S] at birth of this storage adapter, we are hard-coding it
+    # to support only one storage schema. but when the day comes, abstract
+    # the things out of the sibling spot in the toml adapter
+
+    dct = schema_file_scanner.flush_to_config(
+            listener,
+            storage_schema='allowed')
+
+    if 'storage_schema' in dct:
+        assert('32x32x32' == dct['storage_schema'])
+
+    return _stateless_collection_implementation_via_directory(
+            collection_identity.collection_path)
+
+
 def _stateless_collection_implementation_via_directory(directory):
 
     class StatelessCollectionImplementation:  # #class-as-namespace
@@ -40,6 +83,11 @@ def _read_only_entity(sect_el, ID, mon):
         return
 
     class ReadOnlyEntity:  # #class-as-namespace
+
+        def to_dictionary_two_deep_as_storage_adapter_entity():
+            return {'identifier_string': ID.to_string(),
+                    'core_attributes': dct}
+
         core_attributes_dictionary_as_storage_adapter_entity = dct
         identifier = ID
 
@@ -48,8 +96,8 @@ def _read_only_entity(sect_el, ID, mon):
 
 def _attribute_keys_and_values(sect_el, mon):
 
-    # import re
-    # rx = re.compile('[a-zA-Z_0-9]+$')
+    import re
+    rx = re.compile('[a-z0-9_A-Z]+$')
 
     section = sect_el.to_section()  # #here3
     for el in section.elements():  # #here2
@@ -64,11 +112,10 @@ def _attribute_keys_and_values(sect_el, mon):
         field = el.to_field()
 
         # we haven't formally specified this anywhere yet. just a sketch..
-        label = field.string_key()
-        assert('_' not in label)
-        use_key = label
-        # use_key = label.replace('-', '_')
-        # assert(rx.match(use_key))  # ..
+        use_key = field.string_key()
+        if not rx.match(use_key):
+            _msg = f"field key is not up to current spec - '{use_key}'"
+            raise AssertionError(_msg)  # courtesy
 
         yield use_key, field.required_string_value()
 
@@ -315,8 +362,8 @@ def _eno_document_via_path(path, listener):
     with opened as fh:  # ..
         big_string = fh.read()
 
-    import enolib
-    return enolib.parse(big_string), None  # ..
+    from enolib import parse as enolib_parse
+    return enolib_parse(big_string), None  # ..
 
 
 def _when_section_not_found(listener, count, target_ID_s, path):

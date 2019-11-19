@@ -1,7 +1,7 @@
-[item.8W2.attributes]
-parent = "AZC"
-heading = "heading for FRAG: 8WZ"
-body = '''
+# entity: 8W2: attributes
+parent: AZC
+heading: heading for FRAG: 8WZ
+-- body
 we love [Python interoperability][12] and we love it.
 line 2 of this para.
 
@@ -26,7 +26,12 @@ line 2
 [1]: url_for_python_kit_doc
 [12]: url_for_tensor_flow_python_interop
 [13]: url_for_python_kit_repo
-'''
-previous = "48R"
 
+-- body
+
+previous: 48R
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

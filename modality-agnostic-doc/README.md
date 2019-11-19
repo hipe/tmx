@@ -37,9 +37,9 @@ only in modeling interfaces for this purpose.
 |[#510.2]                   |       | track blank states
 |[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
-|[#508]                     | #hole |
+|[#508]                     |       | [ this lightweight listening library ]
 |[#507.9]                   |       | [ modality agnostic error monitor ]
-|[#507.H]                   |       | [ this lightweight listening library ]
+|[#507.H]                   | #hole |
 |[#507.G]                   | #open | idiomize something for the test platform
 |[#507.F]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #hole |

@@ -1,7 +1,7 @@
-[item.48R.attributes]
-heading = "heading for (FRAG: 48R)"
-document_datetime=2019-05-24 18:41:19-04:00
-body = '''
+# entity: 48R: attributes
+heading: heading for (FRAG: 48R)
+document_datetime: 2019-05-24 18:41:19-04:00
+-- body
 We enjoyed reading [this older blog][1] from February, 2017; but blah
 line 2
 
@@ -20,5 +20,10 @@ sec 2 para 2 line 2
 
 
 [1]: url_for_this_blog
-'''
+
+-- body
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

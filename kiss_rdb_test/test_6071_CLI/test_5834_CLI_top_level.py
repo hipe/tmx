@@ -315,8 +315,8 @@ class Case6080_get(_CommonCase):
         {
           "identifier_string": "B9H",
           "core_attributes": {
-            "thing-A": "hi i'm B9H",
-            "thing-B": "hey i'm B9H"
+            "thing_A": "hi i'm B9H",
+            "thing_B": "hey i'm B9H"
           }
         }
         """
@@ -468,8 +468,8 @@ class Case6177_delete(_CommonCase):
 
         _expected = tuple(unindent("""
         [item.B7G.attributes]
-        thing-1 = "hi G"
-        thing-2 = "hey G"
+        thing_1 = "hi G"
+        thing_2 = "hey G"
         """))
 
         self.assertSequenceEqual(_actual, _expected)
@@ -523,10 +523,10 @@ class Case6226_update(_CommonCase):
 
         _expected = tuple(unindent("""
         [item.B7F.attributes]
-        thing-2 = "hey F updated"
+        thing_2 = "hey F updated"
 
-        thing-3 = "T3"
-        thing-4 = "T4"
+        thing_3 = "T3"
+        thing_4 = "T4"
         """))
 
         self.assertSequenceEqual(_actual, _expected)
@@ -548,10 +548,10 @@ class Case6226_update(_CommonCase):
     def given_args(self):
         return (*common_args_head(), 'update', _common_collection,
                 'B7F',
-                '-delete', 'thing-1',
-                '-change', 'thing-2', 'hey F updated',
-                '-add', 'thing-3', 'T3',
-                '-add', 'thing-4', 'T4',
+                '-delete', 'thing_1',
+                '-change', 'thing_2', 'hey F updated',
+                '-add', 'thing_3', 'T3',
+                '-add', 'thing_4', 'T4',
                 )
 
     def filesystem(self):

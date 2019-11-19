@@ -2,7 +2,7 @@
 Lightweight listening testing library.
 (Compare heavier-weight counterpart: [#509].)
 """
-# :[#507.H]
+# :[508]
 # (keeping track of clients for now: kiss_rdb_test)
 
 

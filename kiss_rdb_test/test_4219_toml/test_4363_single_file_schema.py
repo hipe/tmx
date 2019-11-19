@@ -159,7 +159,7 @@ class Case4368_create_into_existing_file(_CommonCase):
         _expect = tuple(unindent("""
         [item.43.attributes]
         abc = "123"
-        de-fg = "true"
+        de_fg = "true"
         [item.68.attributes]
         """))
 
@@ -169,7 +169,7 @@ class Case4368_create_into_existing_file(_CommonCase):
     def recorded_file_rewrites(self):
         cuds = {
                 'abc': '123',
-                'de-fg': 'true',
+                'de_fg': 'true',
                 }
         return filesystem_recordings_of(self, 'create', cuds)
 

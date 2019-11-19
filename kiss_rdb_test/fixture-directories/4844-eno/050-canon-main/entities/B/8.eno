@@ -1,6 +1,6 @@
 # entity: B8H: attributes
-thing-1: hi i'm B8H
-thing-2: hey i'm B8H
+thing_1: hi i'm B8H
+thing_2: hey i'm B8H
 
 
 # document-meta

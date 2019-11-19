@@ -1,6 +1,6 @@
 """
 Mocking (expectation) library for [#017] emissions.
-(Compare lighter-weight counterpart: [#507.H].)
+(Compare lighter-weight counterpart: [#508].)
 :[#509]
 """
 

@@ -1,7 +1,7 @@
-[item.DC7.attributes]
-heading="import in swift"
-document_datetime=2019-05-21 23:50:03-0400
-body='''
+# entity: DC7: attributes
+heading: import in swift
+document_datetime: 2019-05-21 23:50:03-0400
+-- body
 We decided to take a step back and google (again) what we were looking for.
 This time we searched for "python swift interoperability". (Using this
 keyword "interoperability" was key.)
@@ -32,6 +32,11 @@ END
 [3]: https://artsy.github.io/blog/2018/12/21/why-is-swiftpm-taking-so-long/
 [2]: https://youtu.be/p64f6befZkw
 [1]: https://github.com/pvieito/PythonKit
-'''
 
+-- body
+
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

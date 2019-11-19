@@ -160,7 +160,7 @@ class Case4154_all_three_kinds_of_lines(_CommonCase):
 
     def expect_these_body_lines_before_edit(self):
         return """
-        foo-bar = BAZ
+        foo_bar = BAZ
 
         # comment line
         """
@@ -168,7 +168,7 @@ class Case4154_all_three_kinds_of_lines(_CommonCase):
     @shared_subject
     def subject(self):
         _given = (
-                'foo-bar = BAZ\n',
+                'foo_bar = BAZ\n',
                 '\n',
                 '# comment line\n',
                 )
@@ -199,8 +199,8 @@ class Case4155_index_gist_collision_in_entity(_CommonCase):
         self.expect_structure_value(
                 'reason',
                 (
-                    "new name 'BIFFB-on-ZO10' too similar to "
-                    "existing name 'biff-BON-zo-10'"
+                    "new name 'BIFFB_on_ZO10' too similar to "
+                    "existing name 'biff_BON_zo_10'"
                 ))
 
     @shared_subject
@@ -217,9 +217,9 @@ class Case4155_index_gist_collision_in_entity(_CommonCase):
 
     def given_lines(self):
         return unindent("""
-        biff-BON-zo-10 = 'bangeurs'
-        foo-bar = BAZ
-        BIFFB-on-ZO10 = 123
+        biff_BON_zo_10 = 'bangeurs'
+        foo_bar = BAZ
+        BIFFB_on_ZO10 = 123
         """)
 
 
@@ -374,7 +374,7 @@ class Case4151_delete_at_head_to_make_non_empty(_CommonCase):
 
     def given_lines(self):
         return unindent("""
-        foo-bar = BAZ
+        foo_bar = BAZ
         # comment line
 
         """)

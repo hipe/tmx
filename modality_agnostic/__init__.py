@@ -147,7 +147,7 @@ class _Emission:
         if msg is not None:
             return msg
         _these = ', '.join(sct.keys())
-        return f"(unknown {key}, keys: ({_these}))"  # key as natural key
+        return f"(unknown {self._message_key_}, keys: ({_these}))"
 
     def flush_payloader(self):  # near [#511.3] expression with yield
         return self.release_payloader()()
@@ -156,6 +156,10 @@ class _Emission:
         f = self._payloader_HOT
         del self._payloader_HOT
         return f
+
+    @property
+    def is_error_emission(self):
+        return 'error' == self.severity
 
 
 class _ErrorEmission(_Emission):

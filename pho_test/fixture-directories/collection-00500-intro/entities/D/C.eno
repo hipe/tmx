@@ -1,7 +1,7 @@
-[item.DC7.attributes]
-heading="heading for (FRAG: DC7)"
-document_datetime=2019-05-24 18:41:19-04:00
-body='''
+# entity: DC7: attributes
+heading: heading for (FRAG: DC7)
+document_datetime: 2019-05-24 18:41:19-04:00
+-- body
 Hello this is an intro paragraph.
 Para 1 line 2.
 
@@ -13,6 +13,11 @@ to use PythonKit..
 
 [2]: url_for_tanmay_bakshi_youtube
 [1]: url_for_pythonkit
-'''
 
+-- body
+
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

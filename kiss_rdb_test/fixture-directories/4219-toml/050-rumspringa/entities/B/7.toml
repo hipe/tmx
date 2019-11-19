@@ -1,11 +1,11 @@
 [item.B7E.attributes]
-thing-1 = "hi E"
-thing-2 = "hey E"
+thing_1 = "hi E"
+thing_2 = "hey E"
 
 [item.B7F.attributes]
-thing-1 = "hi F"
-thing-2 = "hey F"
+thing_1 = "hi F"
+thing_2 = "hey F"
 
 [item.B7G.attributes]
-thing-1 = "hi G"
-thing-2 = "hey G"
+thing_1 = "hi G"
+thing_2 = "hey G"

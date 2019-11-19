@@ -55,6 +55,9 @@ class Case2587_traverse_whole_collection_as_entities(_CommonCase):
     def flattened_collection_for_traversal_case(self):
         return canon.build_flattened_collection_for_traversal_case(self)
 
+    def given_identifier_string(self):
+        return 'B9H'
+
     def subject_collection(self):
         return _build_same_collection_anew_BUT_FOR_FIELDS()
 

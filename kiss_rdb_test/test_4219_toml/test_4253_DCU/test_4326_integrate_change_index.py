@@ -66,6 +66,13 @@ class _CommonCase(unittest.TestCase):
     def listener(self):
         pass
 
+    @property
+    def debug_IO(self):
+        import sys
+        return sys.stderr
+
+    do_debug = True
+
 
 # (Case4334) is a "collection not found" case
 
@@ -120,15 +127,15 @@ class Case4318_identifier_too_short_or_long(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
+    def given_identifier_string(self):
+        return 'AB23'
+
     def subject_collection(self):
         return _collection_with_NO_filesystem()
 
     @property
     def _canon_case(self):
         return canon.case_of_entity_not_found_because_identifier_too_deep
-
-    def given_identifier_string(self):
-        return 'AB23'
 
 
 class Case4319_some_top_directory_not_found(_CommonCase):
@@ -257,6 +264,9 @@ class Case4327_retrieve_OK(_CommonCase):
     def end_state(self):  # NOTE  not memoized
         return self._canon_case.build_end_state(self)
 
+    def given_identifier_string(self):
+        return 'B9H'
+
     def subject_collection(self):
         return _collection_with_NO_filesystem()
 
@@ -279,8 +289,8 @@ class Case4329_delete_OK(_CommonCase):
     def CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(self, table_block):
         _expected = tuple(_unindent("""
         [item.B7F.attributes]
-        thing-1 = "hi F"
-        thing-2 = "hey F"
+        thing_1 = "hi F"
+        thing_2 = "hey F"
 
         """))
         _actual = tuple(table_block.to_line_stream())
@@ -297,12 +307,12 @@ class Case4329_delete_OK(_CommonCase):
     def test_300_entities_file_lines_look_good(self):
         expect = tuple(_unindent("""
         [item.B7E.attributes]
-        thing-1 = "hi E"
-        thing-2 = "hey E"
+        thing_1 = "hi E"
+        thing_2 = "hey E"
 
         [item.B7G.attributes]
-        thing-1 = "hi G"
-        thing-2 = "hey G"
+        thing_1 = "hi G"
+        thing_2 = "hey G"
         """))
 
         self.assertSequenceEqual(self.entity_file_rewrite().lines, expect)
@@ -366,7 +376,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
 class Case4332_update_OK(_CommonCase):
     """
     at #history-A.1 we had to un-cover this issue, but re-cover it by creating
-    "thing-C" instead of "thing-2" (numbers come before letters lexically)
+    "thing_C" instead of "thing_2" (numbers come before letters lexically)
 
     .#open [#867.H] it "thinks of" {whitespace|comments} as being
 
@@ -415,14 +425,14 @@ class Case4332_update_OK(_CommonCase):
     def _expecting_these(self):
         return '''
         [item.B9G.attributes]
-        hi-G = "hey G"
+        hi_G = "hey G"
 
         [item.B9H.attributes]
-        thing-2 = "I'm created \\"thing-2\\""
-        thing-B = "I'm modified \\"thing-B\\""
+        thing_2 = "I'm created \\"thing_2\\""
+        thing_B = "I'm modified \\"thing_B\\""
 
         [item.B9J.attributes]
-        hi-J = "hey J"
+        hi_J = "hey J"
         '''
 
     @shared_subject
@@ -431,9 +441,12 @@ class Case4332_update_OK(_CommonCase):
 
     def request_tuple_for_update_that_will_succeed(self):
         return 'B9H', (
-            ('delete_attribute', 'thing-A'),
-            ('update_attribute', 'thing-B', "I'm modified \"thing-B\""),
-            ('create_attribute', 'thing-2', "I'm created \"thing-2\""))
+            ('delete_attribute', 'thing_A'),
+            ('update_attribute', 'thing_B', "I'm modified \"thing_B\""),
+            ('create_attribute', 'thing_2', "I'm created \"thing_2\""))
+
+    def given_identifier_string(self):
+        return 'B9H'
 
     def subject_collection(self):
         return _build_collection(
@@ -481,7 +494,7 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
             for _ in _itr:
                 self.fail()
         coll = self.subject_collection()
-        return canon.end_state_via_run(self, run)
+        return canon.end_state_via_(self, run, expecting_OK=False)
 
     def subject_collection(self):
         return _build_collection(
@@ -523,8 +536,8 @@ class Case4336_create_into_existing_file(_CommonCase):
 
         expect = tuple(_unindent("""
         [item.2HG.attributes]
-        thing-2 = -2.718
-        thing-B = false
+        thing_2 = -2.718
+        thing_B = false
         [item.2HJ.attributes]
         """))
 
@@ -600,7 +613,7 @@ class Case4338_create_into_noent_file(_CommonCase):
         expect = tuple(_unindent("""
         [item.2J3.attributes]
         abc = "456"
-        de-fg = "false"
+        de_fg = "false"
         """))
 
         self.assertSequenceEqual(efr.lines, expect)
@@ -614,7 +627,7 @@ class Case4338_create_into_noent_file(_CommonCase):
     def recorded_file_rewrites(self):
         dct = {
                 'abc': '456',
-                'de-fg': 'false',
+                'de_fg': 'false',
                 }
 
         entities_path = _entities_file_path_for_2J()

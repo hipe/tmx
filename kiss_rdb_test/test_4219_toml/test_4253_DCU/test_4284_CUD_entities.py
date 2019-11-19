@@ -206,25 +206,25 @@ class Case4280_create_that_inserts_in_between(_CommonCase):
     def expect_these_lines(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.B.meta]
-        prop-b = val-b
+        prop_b = val-b
         [item.C.attributes]
-        prop-c = val-c
+        prop_c = val-c
         """
 
     def given_identifer_and_lines_for_new_entity(self):
         return ('B', """
         [item.B.meta]
-        prop-b = val-b
+        prop_b = val-b
         """)
 
     def given_big_string(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.C.attributes]
-        prop-c = val-c
+        prop_c = val-c
         """
 
 
@@ -260,7 +260,7 @@ class Case4283_delete_at_head_no_fluff(_CommonCase):
     def expect_these_lines(self):
         return """
         [item.BB.attributes]
-        prop-b = val-b
+        prop_b = val-b
         """
 
     def given_identifer_for_entity_to_delete(self):
@@ -269,9 +269,9 @@ class Case4283_delete_at_head_no_fluff(_CommonCase):
     def given_big_string(self):
         return """
         [item.AA.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.BB.attributes]
-        prop-b = val-b
+        prop_b = val-b
         """
 
 
@@ -285,7 +285,7 @@ class Case4284_delete_at_head_yes_fluff(_CommonCase):  # #midpoint in file
         # this file is blah blah
 
         [item.BB.attributes]
-        prop-b = val-b
+        prop_b = val-b
         """
 
     def given_identifer_for_entity_to_delete(self):
@@ -296,9 +296,9 @@ class Case4284_delete_at_head_yes_fluff(_CommonCase):  # #midpoint in file
         # this file is blah blah
 
         [item.AA.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.BB.attributes]
-        prop-b = val-b
+        prop_b = val-b
         """
 
 
@@ -332,7 +332,7 @@ class Case4286_delete_at_end(_CommonCase):
     def expect_these_lines(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         """
 
     def given_identifer_for_entity_to_delete(self):
@@ -341,9 +341,9 @@ class Case4286_delete_at_end(_CommonCase):
     def given_big_string(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.B.meta]
-        prop-b = val-b
+        prop_b = val-b
         """
 
 
@@ -361,7 +361,7 @@ class Case4288_delete_leaving_effectively_empty_file(_CommonCase):
     def given_big_string(self):
         return """
         [item.XYZ.attributes]
-        attr-one = value 1
+        attr_one = value 1
         """
 
 
@@ -375,7 +375,7 @@ class Case4289_update_at_beginning(_CommonCase):
         hallo line 1
         hallo line 2
         [item.BBB.meta]
-        prop-b = val-b
+        prop_b = val-b
         """
 
     def given_identifer_and_new_lines_for_existing_entity(self):
@@ -387,9 +387,9 @@ class Case4289_update_at_beginning(_CommonCase):
     def given_big_string(self):
         return """
         [item.AAA.meta]
-        prob-a = val-a
+        prob_a = val-a
         [item.BBB.meta]
-        prop-b = val-b
+        prop_b = val-b
         """
 
 
@@ -424,11 +424,11 @@ class Case4291_update_in_middle(_CommonCase):
     def expect_these_lines(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         new line 1
         new line 2
         [item.C.attributes]
-        prop-c = val-c
+        prop_c = val-c
         """
 
     def given_identifer_and_new_lines_for_existing_entity(self):
@@ -440,11 +440,11 @@ class Case4291_update_in_middle(_CommonCase):
     def given_big_string(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.B.meta]
-        prop-b = val-b
+        prop_b = val-b
         [item.C.attributes]
-        prop-c = val-c
+        prop_c = val-c
         """
 
 
@@ -456,7 +456,7 @@ class Case4292_update_at_end(_CommonCase):
     def expect_these_lines(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         new line 1
         new line 2
         """
@@ -470,9 +470,9 @@ class Case4292_update_at_end(_CommonCase):
     def given_big_string(self):
         return """
         [item.A.meta]
-        prop-a = val-a
+        prop_a = val-a
         [item.B.meta]
-        prop-b = val-b
+        prop_b = val-b
         """
 
 

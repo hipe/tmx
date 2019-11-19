@@ -1,6 +1,6 @@
-[item.979.attributes]
-heading = "let's do eno"
-body = """
+# entity: 979: attributes
+heading: let's do eno
+-- body
 👉 Use [the website][1] not [the github][2] for an intro.
 
 👉 We feel like reading all the docs cover-to-cover.
@@ -44,6 +44,11 @@ continuation with "|".
 
 [2]: https://github.com/eno-lang/eno
 [1]: https://eno-lang.org/
-"""
 
+-- body
+
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

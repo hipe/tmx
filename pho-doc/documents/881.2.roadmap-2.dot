@@ -48,7 +48,7 @@ digraph g {
 31500->32500
 31700[label="manage fragment\nassociations and content\nby hand"]
 31700->32500
-32500[label="massive acceptance\ntest:\ hand-migrate all old\ntoml fragments"]
+32500[label="massive acceptance\ntest:\ hand-migrate all old\ntoml fragments" style=filled]
 32500->35000
 35000[shape=rect label="NOW YOU HAVE THE ABILITY
 TO TAKE NOTES AND SEE THEM RENDERED"]

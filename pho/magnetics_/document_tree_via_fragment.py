@@ -178,6 +178,31 @@ class _FacetsForPublishing:
     # (described at #here1)
 
     def __init__(self, document_datetime, doc):
+        self.__init_filename_and_frontmatter_title(doc)
+
+        # toml (like json, sort of) has built-in types; eno does not. The
+        # KISS-iest thing would seem to be to proscribe that we use the any
+        # available built-in types in the expected way. (Especially when you're
+        # hand-editing files, not to support built-in types would seem to be
+        # a major usability/design flaw, in a poka-yoke sense.)
+
+        # But doing this presents a nasty smell of its own: with no other
+        # provisions, a migration to a new storage adapter can break the
+        # fundamental storage-retrieval contract: get back out exactly what
+        # you put in ("data-integrity"?).
+
+        # .#wish [#873.20] is our would-be solution to this: a schema-types
+        # layer that communicates to the adapter what the expected type is and
+        # the adapter acts in an adapter-appropriate way to fulfill the
+        # contract (or fail loudly and clearly when it can't (yet)).
+
+        # Barring that, we have this band-aid:
+
+        assert(isinstance(document_datetime, str))
+        from datetime import datetime  # reminder: toml does RFC3339
+        self.frontmatter_datetime = datetime.fromisoformat(document_datetime)
+
+    def __init_filename_and_frontmatter_title(self, doc):
 
         # we don't care about efficiency here.
         # for readability we break it up into steps.
@@ -192,7 +217,7 @@ class _FacetsForPublishing:
         _ = document_title
 
         # Then eliminate all invalid characters. (Note this will leave behind
-        # any spaces that were formerly adjacet to invalid characters, and so
+        # any spaces that were formerly adjacent to invalid characters, and so
         # may result in runs of multiple spaces where before there were none.)
         # Also note: we are allowing thru [- _] (those three)
 
@@ -226,8 +251,6 @@ class _FacetsForPublishing:
 
         _head = '-'.join(_pieces_for_filename())
         self.filename = f'{_head}.md'
-
-        self.frontmatter_datetime = document_datetime
 
     def to_frontmatter_lines(self):
 

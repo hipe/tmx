@@ -149,8 +149,10 @@ def __help_lines(CLI_functions, long_program_name, CLI, descer=None):
     leng = len(CLI_functions)
     if not leng:
         return
+
     yield None
-    yield ('sub-command:', 'sub-commands:')[(1, 2).index(leng)]
+    yield 'sub-command:' if 1 == leng else 'sub-commands:'
+
     max_width, rows = __max_width_and_rows(CLI_functions)
     for line_content in lines_for_items(max_width, rows):
         yield line_content

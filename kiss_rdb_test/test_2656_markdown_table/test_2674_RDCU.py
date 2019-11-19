@@ -16,6 +16,8 @@ class _CommonCase(unittest.TestCase):
     def reason(self):  # must be used with _flush_reason_early
         return self.end_state()['reason']
 
+    do_debug = False
+
 
 class Case2606_entity_not_found_because_identifier_too_deep(_CommonCase):
 
@@ -72,6 +74,9 @@ class Case2612_retrieve_OK(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
+    def given_identifier_string(self):
+        return 'B9H'
+
     def subject_collection(self):
         return _collection_ordinary_wont_mutate()
 
@@ -116,8 +121,8 @@ class Case2644_delete_OK_resulting_in_non_empty_collection(_CommonCase):
 
     def CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(self, ent):
         dct = canon.yes_value_dictionary_of(ent)
-        self.assertEqual(dct['thing-A'], "hi i'm B9H")
-        self.assertEqual(dct['thing-B'], "hey i'm B9H")
+        self.assertEqual(dct['thing_A'], "hi i'm B9H")
+        self.assertEqual(dct['thing_B'], "hey i'm B9H")
         self.assertEqual(len(dct), 2)
 
     @shared_subject
@@ -145,8 +150,8 @@ class Case2647_delete_OK_resulting_in_empty_collection(_CommonCase):
 
     def CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(self, ent):
         dct = canon.yes_value_dictionary_of(ent)
-        self.assertEqual(dct['thing-1'], 'xx')
-        self.assertEqual(dct['thing-A'], 'zz')
+        self.assertEqual(dct['thing_1'], 'xx')
+        self.assertEqual(dct['thing_A'], 'zz')
         self.assertEqual(len(dct), 2)
 
     @shared_subject
@@ -170,7 +175,7 @@ class Case2676_create_but_something_is_invalid(_CommonCase):
         self._canon_case.confirm_emitted_accordingly(self)
 
     def CONFIRM_THE_REASON_SAYS_WHAT_IS_WRONG_WITH_IT(self, reason):
-        self.assertIn("the field 'thing-C' does not appear", reason)
+        self.assertIn("the field 'thing_C' does not appear", reason)
 
     def test_600_also_says_table_name(self):
         self.assertIn(' in "table uno"', self.reason())
@@ -187,9 +192,9 @@ class Case2676_create_but_something_is_invalid(_CommonCase):
 
     def dictionary_for_create_with_something_invalid_about_it(self):
         return {
-                'thing-1': 123.45,
-                'thing-A': True,
-                'thing-C': 'false',
+                'thing_1': 123.45,
+                'thing_A': True,
+                'thing_C': 'false',
                 }
 
     def subject_collection(self):
@@ -286,7 +291,7 @@ class Case2713_update_but_attribute_not_found(_CommonCase):
 
     def request_tuple_for_update_that_will_fail_because_attr(self):
         return 'B9H', (
-                ('update_attribute', 'thing-1', 'no see'),
+                ('update_attribute', 'thing_1', 'no see'),
                 )
 
     def subject_collection(self):
@@ -345,7 +350,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_656_field_two_is_created_and_clobbers_the_weird_padding(self):
         s = self.cel_at(2)
-        self.assertEqual(s, ' I\'m created "thing-2" ')
+        self.assertEqual(s, ' I\'m created "thing_2" ')
 
     def test_719_deleted_cel_is_now_zero_width(self):
         s = self.cel_at(3)
@@ -353,7 +358,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_781_updating_DOES_inherit_the_leading_padding(self):
         s = self.cel_at(4)
-        exp = '  I\'m modified "thing-B"'
+        exp = '  I\'m modified "thing_B"'
         self.assertEqual(s.index(exp), 0)
 
     def test_844_still_no_trailing_pipe(self):
@@ -372,7 +377,7 @@ class Case2716_update_OK(_CommonCase):
 
     def test_969_no_trailing_whitespace_because_no_trailing_pipe(self):
         s = self.cel_at(4)
-        exp = 'I\'m modified "thing-B"'
+        exp = 'I\'m modified "thing_B"'
         act = s[-len(exp):]
         self.assertEqual(act, exp)
 
@@ -408,10 +413,13 @@ class Case2716_update_OK(_CommonCase):
 
     def request_tuple_for_update_that_will_succeed(self):
         return 'B9H', (
-            ('delete_attribute', 'thing-A'),
-            ('update_attribute', 'thing-B', "I'm modified \"thing-B\""),
-            ('create_attribute', 'thing-2', "I'm created \"thing-2\""),
+            ('delete_attribute', 'thing_A'),
+            ('update_attribute', 'thing_B', "I'm modified \"thing_B\""),
+            ('create_attribute', 'thing_2', "I'm created \"thing_2\""),
             )
+
+    def given_identifier_string(self):
+        return 'B9H'
 
     def subject_collection(self):
         return _collection_ordinary_will_mutate()

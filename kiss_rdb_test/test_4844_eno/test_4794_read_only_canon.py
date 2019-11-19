@@ -20,6 +20,8 @@ class CommonCase(unittest.TestCase):
     def subject_collection(self):
         return stateless_collection()
 
+    do_debug = False
+
 
 class Case4788_retrieve_OK(CommonCase):
 
@@ -28,6 +30,9 @@ class Case4788_retrieve_OK(CommonCase):
 
     def end_state(self):  # NOTE  not memoized
         return self.canon_case.build_end_state(self)
+
+    def given_identifier_string(self):
+        return 'B9H'
 
     @property
     def canon_case(self):
@@ -108,14 +113,51 @@ class Case4803_entity_not_found_in_file(CommonCase):
         return canon.case_of_entity_not_found
 
 
+# == collection resolution is more boring, so down here
+
+
+# Case4806 collection not found
+# is hard to test for reasons hard to explain:
+# testing a corrupted directory-based collection is out of scope
+# support for single-file collections is out of scope
+# as such, to even setup such a case is impractical or impossible
+
+
+class Case4809_non_empty_collection_found(CommonCase):
+
+    def test_100_result_is_not_none(self):
+        canon.case_of_non_empty_collection_found.confirm_collection_is_not_none(self)  # noqa: E501
+
+    def subject_collection(self):
+        listener = _debugging_listener
+        # listener = None
+
+        from kiss_rdb import collectionerer
+        return collectionerer().collection_via_path(
+                collection_path=_main_dir(),
+                format_name=None,
+                listener=listener)
+
+
 @lazy
 def stateless_collection():
+    return _stateless_collection_via_directory(_main_dir())
+
+
+@lazy
+def _main_dir():
+    return fixture_directory_for('050-canon-main')
+
+
+def _stateless_collection_via_directory(dir_path):
     from kiss_rdb.storage_adapters_.eno import \
             _stateless_collection_implementation_via_directory
+    return _stateless_collection_implementation_via_directory(dir_path)
 
-    _dir = fixture_directory_for('050-canon-main')
 
-    return _stateless_collection_implementation_via_directory(_dir)
+def _debugging_listener(*args):
+    from modality_agnostic.test_support import structured_emission
+    structured_emission.debugging_listener()(*args)
 
 
 fixture_directory_for = functions_for('eno').fixture_directory_for

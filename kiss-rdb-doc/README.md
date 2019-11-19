@@ -35,6 +35,9 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.21]                  | #API  | #provision: use underscores (not dashes or spaces) in eno document field names
+|[#873.20]                  |       | places where we relied on toml types and lost them, also wish for type schema
+|[#873.S]                   | #trak | eno has fixed storage schema for now
 |[#873.R]                   | #open | unify error monitor
 |[#873.Q]                   | #open | #related-to: [#873.P] unify how we render markdown
 |[#873.P]                   | #open | unify all markdown parsing so it's stream-based and not random access

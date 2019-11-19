@@ -1,8 +1,10 @@
 # at #history-A.1 we renamed this file from "toml" to "rec", but it wasn't
 # till #history-A.2 that we changed the format of the file (and parser) over.
+# at #history-A.3 we migrated from toml to eno
 
-storage_adapter: toml
+storage_adapter: eno
 storage_schema: 32x32x32
 
+# #history-A.3
 # #history-A.2
 # #history-A.1

@@ -1,7 +1,7 @@
-[item.PBR.attributes]
-parent = "8W2"
-heading = "heading for (FRAG: PBR)"
-body = """
+# entity: PBR: attributes
+parent: 8W2
+heading: heading for (FRAG: PBR)
+-- body
 
 gotta learn [gcc][1] first.
 
@@ -15,6 +15,11 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 
 [1]: url_for_gcc
-"""
 
+-- body
+
+
+# document-meta
+-- string_as_comment
 # #born.
+-- string_as_comment

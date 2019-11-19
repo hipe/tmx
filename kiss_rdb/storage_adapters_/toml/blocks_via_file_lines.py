@@ -32,7 +32,8 @@ def _build_name_gist_via_name():
         'all lowercase or all uppercase attribute name piece',
         r'[a-z0-9]+|[A-Z0-9]+')
 
-    stacey_dash = o('dash', '-')
+    field_name_word_separator = o('underscore', '_')
+    # at #history-A.3, changed from dash for [#873.21] (use underscores not..)
 
     # exactly_one_space = o('exactly one space', ' ')
 
@@ -52,7 +53,7 @@ def _build_name_gist_via_name():
             pieces.append(s)
             if scn.eos():
                 break
-            if not scn.skip_required(stacey_dash):
+            if not scn.skip_required(field_name_word_separator):
                 return
         return ''.join(s.lower() for s in pieces)
 
@@ -440,6 +441,7 @@ class AppendableDiscretionaryBlock_:
     is_discretionary_block = True
 
 
+# #history-A.3
 # #history-A.2: mutable document entity breaks out
 # #history-A.1: massive rewrite to accomodate multi-line
 # #born.
