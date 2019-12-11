@@ -1,4 +1,5 @@
 /.build
+/pho-gui/node_modules
 PhoGUI/NumpyConversion.swift
 PhoGUI/Python.swift
 PhoGUI/PythonLibrary+Symbols.swift

@@ -1,0 +1,122 @@
+# entity: ELE: attributes
+heading: First Notes on the Electron Framework
+document_datetime: 2019-11-20 18:43:00-0400
+-- body
+
+- Visual Studio Code is written on Electron
+
+> Most of Electron's APIs are written in C++ or Objective-C and then exposed
+> directly to the application code through JS bindings (from [wikipedia][1])
+
+(Random side note: their [website][2] is really responsive.)
+
+
+
+
+# electron flask cursory notes
+
+[Adil Addiya][4] ok. May 1, 2019.
+
+[Sourav Johar][5] STDOUT/STDERR thing May 2, 2018.
+
+"python-shell" is imported at 13:32.
+
+It gets interesting at 19:50, about using flask to make a long-running daemon.
+
+
+
+
+# Let's Get Busy: cover-to-cover
+
+(the below could be generated from the [electon docs][3] page.)
+
+* About Electron (-52)
+* Setting up the Development Environment
+  * Setting up macOS (-51)
+  * Setting up Windows (-50)
+  * Setting up Linux (-49)
+  * Choosing an Editor (-48)
+* Creating your First App
+  * Installing Electron (-47)
+  * Electron Development in a Nutshell (-46)
+  * Running Your App (-45)
+* Boilerplates and CLIs
+  * Boilerplate vs CLI (-44)
+  * electron-forge (-43)
+  * electron-builder (-42)
+  * electron-react-boilerplate (-41)
+  * Other Tools and Boilerplates (-40)
+* Application Architecture
+  * Main and Renderer Processes (-39)
+  * Using Electron's APIs (-38)
+  * Using Node.js APIs (-37)
+  * Using Native Node.js Modules (-36)
+  * Performance Strategies (-35)
+* Adding Features to Your App
+  * Notifications (-34)
+  * Recent Documents (-33)
+  * Application Progress (-32)
+  * Custom Dock Menu (-31)
+  * Custom Windows Taskbar (-30)
+  * Custom Linux Desktop Actions (-29)
+  * Keyboard Shortcuts (-28)
+  * Offline/Online Detection (-27)
+  * Represented File for macOS BrowserWindows (-26)
+  * Native File Drag & Drop (-25)
+  * Offscreen Rendering (-24)
+  * Supporting macOS Dark Mode (-23)
+* Accessibility
+  * Spectron (-22)
+  * Devtron (-21)
+  * Enabling Accessibility (-20)
+* Testing and Debugging
+  * Debugging the Main Process (-19)
+  * Debugging the Main Process with Visual Studio Code (-18)
+  * Using Selenium and WebDriver (-17)
+  * Testing on Headless CI Systems (Travis, Jenkins) (-16)
+  * DevTools Extension (-15)
+  * Automated Testing with a Custom Driver (-14)
+* Distribution
+  * Supported Platforms (-13)
+  * Code Signing (-12)
+  * Mac App Store (-11)
+  * Windows Store (-10)
+  * Snapcraft (-9)
+* Security
+  * Reporting Security Issues (-8)
+  * Chromium Security Issues and Upgrades (-7)
+  * Electron Security Warnings (-6)
+  * Security Checklist (-5)
+* Updates
+  * Deploying an Update Server (-4)
+  * Implementing Updates in Your App (-3)
+  * Applying Updates (-2)
+* Getting Support (-1)
+
+
+As (-47), we did `npm init` and made the file look so.
+
+Then `npm install --save-dev electron`.
+
+We copy-pasted `main.js` and `index.html`. Ran it with `npm start`. It worked!
+
+
+
+
+Maybe later: [Building a deployable Python-Electron App][6]
+
+
+
+
+[6]: https://medium.com/@abulka/electron-python-4e8c807bfa5e
+[5]: https://youtu.be/627VBkAhKTc
+[4]: https://youtu.be/ty-n33mHwC4
+[3]: https://electronjs.org/docs
+[2]: https://electronjs.org/
+[1]: https://en.wikipedia.org/wiki/Electron_(software_framework)
+-- body
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

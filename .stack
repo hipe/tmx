@@ -28,5 +28,59 @@ pho mocked for delete fragment
 maybe restructure fragment data model to have (only) children and next
 nagivate to adjacent fragments
 read-only any one fragment
-some hello world in electron
-begin study of electron framework
+python-shell called from electron app
+* Getting Support (-1)
+  * Applying Updates (-2)
+  * Implementing Updates in Your App (-3)
+  * Deploying an Update Server (-4)
+* Updates
+  * Security Checklist (-5)
+  * Electron Security Warnings (-6)
+  * Chromium Security Issues and Upgrades (-7)
+  * Reporting Security Issues (-8)
+* Security
+  * Snapcraft (-9)
+  * Windows Store (-10)
+  * Mac App Store (-11)
+  * Code Signing (-12)
+  * Supported Platforms (-13)
+* Distribution
+  * Automated Testing with a Custom Driver (-14)
+  * DevTools Extension (-15)
+  * Testing on Headless CI Systems (Travis, Jenkins) (-16)
+  * Using Selenium and WebDriver (-17)
+  * Debugging the Main Process with Visual Studio Code (-18)
+  * Debugging the Main Process (-19)
+* Testing and Debugging
+  * Enabling Accessibility (-20)
+  * Devtron (-21)
+  * Spectron (-22)
+* Accessibility
+  * Supporting macOS Dark Mode (-23)
+  * Offscreen Rendering (-24)
+  * Native File Drag & Drop (-25)
+  * Represented File for macOS BrowserWindows (-26)
+  * Offline/Online Detection (-27)
+  * Keyboard Shortcuts (-28)
+  * Custom Linux Desktop Actions (-29)
+  * Custom Windows Taskbar (-30)
+  * Custom Dock Menu (-31)
+  * Application Progress (-32)
+  * Recent Documents (-33)
+  * Notifications (-34)
+* Adding Features to Your App
+  * Performance Strategies (-35)
+  * Using Native Node.js Modules (-36)
+  * Using Node.js APIs (-37)
+  * Using Electron's APIs (-38)
+  * Main and Renderer Processes (-39)
+* Application Architecture
+  * Other Tools and Boilerplates (-40)
+  * electron-react-boilerplate (-41)
+  * electron-builder (-42)
+  * electron-forge (-43)
+  * Boilerplate vs CLI (-44)
+* Boilerplates and CLIs
+  * Running Your App (-45)
+  * Electron Development in a Nutshell (-46)
+  * Installing Electron (-47)
