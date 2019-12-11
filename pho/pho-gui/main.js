@@ -1,5 +1,14 @@
 const { app, BrowserWindow } = require('electron')
 
+const { PythonShell } = require('python-shell')
+
+PythonShell.runString('x=1+1;print(x)', null, function (err) {
+  if (err) throw err;
+  console.log('finished');
+});
+
+
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win

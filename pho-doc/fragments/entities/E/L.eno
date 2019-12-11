@@ -100,6 +100,8 @@ Then `npm install --save-dev electron`.
 
 We copy-pasted `main.js` and `index.html`. Ran it with `npm start`. It worked!
 
+Then we did several small visual tests base on example code in
+the [python-shell documentation][7].
 
 
 
@@ -108,6 +110,7 @@ Maybe later: [Building a deployable Python-Electron App][6]
 
 
 
+[7]: https://www.npmjs.com/package/python-shell
 [6]: https://medium.com/@abulka/electron-python-4e8c807bfa5e
 [5]: https://youtu.be/627VBkAhKTc
 [4]: https://youtu.be/ty-n33mHwC4
