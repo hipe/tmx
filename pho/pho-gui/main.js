@@ -2,10 +2,24 @@ const { app, BrowserWindow } = require('electron')
 
 const { PythonShell } = require('python-shell')
 
-PythonShell.runString('x=1+1;print(x)', null, function (err) {
+const path = require('path')
+
+
+let _options = {
+  args: ['aa', 'bb', 'cc'],
+  scriptPath: path.resolve(path.join(__dirname, '..')),
+  pythonPath: 'python3',  // ..
+  pythonOptions: ['-u'],  // stdin, stdout & stderr unbuffered
+  mode: 'text'
+}
+
+PythonShell.run('backend.py', _options, function (err, results) {
   if (err) throw err;
-  console.log('finished');
-});
+  for (var x of results) {
+    console.log('one item: %j', x)
+  }
+  console.log('finished with thing.');
+})
 
 
 
