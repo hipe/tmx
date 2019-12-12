@@ -1,11 +1,33 @@
+def _print(msg):
+    from sys import stdout
+    stdout.write(msg)
+    stdout.write('\n')
+    stdout.flush()
+
+
 if '__main__' == __name__:
 
     from sys import argv
+    args = argv[1:]
 
-    _ = ', '.join(argv[1:])
+    if len(args):
+        from time import sleep
+        first, *rest = args
 
-    print(f'ohai: {_}')
+        _print(f"one argument: '{first}'")
 
+        count = 1
+        for arg in rest:
+            count += 1
+
+            if 0 == count % 2:
+                sleep(0.718)
+            else:
+                sleep(1.180)
+
+            _print(f"one argument: '{arg}'")
+
+    _print("done from backend.")
     exit(0)
 
 

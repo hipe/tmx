@@ -4,8 +4,7 @@ const { PythonShell } = require('python-shell')
 
 const path = require('path')
 
-
-let _options = {
+const _options = {
   args: ['aa', 'bb', 'cc'],
   scriptPath: path.resolve(path.join(__dirname, '..')),
   pythonPath: 'python3',  // ..
@@ -13,11 +12,18 @@ let _options = {
   mode: 'text'
 }
 
-PythonShell.run('backend.py', _options, function (err, results) {
+const pyshell = new PythonShell('backend.py', _options)
+
+// pyshell.send('some user data')
+
+pyshell.on('message', (message) => {
+  console.log('receceived message: ' + message)
+})
+
+pyshell.end((err, code, signal) => {
   if (err) throw err;
-  for (var x of results) {
-    console.log('one item: %j', x)
-  }
+  console.log('the exit code was: ' + code)
+  console.log('the exit signal was ' + signal)
   console.log('finished with thing.');
 })
 
