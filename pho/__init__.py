@@ -17,4 +17,7 @@ def big_index_and_collection_via_path(collection_path, listener):
 
     return big_index, coll
 
+
+HELLO_FROM_PHO = "hello from pho"
+
 # #born.

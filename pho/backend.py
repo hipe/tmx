@@ -7,7 +7,11 @@ def _print(msg):
 
 if '__main__' == __name__:
 
+    from pho import HELLO_FROM_PHO as hello_message
     from sys import argv
+
+    _print(hello_message)
+
     args = argv[1:]
 
     if len(args):
