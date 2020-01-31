@@ -238,6 +238,13 @@ def cli_for_production():
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+
+if '__main__' == __name__:
+    # until we #open [#008.13] figure out how to setup.py, we added this
+    # (at #history-A.4) so that we can invoke this script directly
+    cli_for_production()
+
+# #history-A.4
 # #history-A.3: no more formal parameters. cheap arg parse not older API's
 # #history-A.2: map-for-sync abstracted out of this
 # #history-A.1: replace hand-written argparse with agnostic modeling

@@ -227,7 +227,7 @@ def _ps_lib():
 
 if __name__ == '__main__':
     import sys as o
-    exit(_CLI(o.stdin, o.stdout, o.sterr, o.argv))
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #history-A.4: rewrite: no more sync-side stream mapping
 # #history-A.3: key simplifier found to be not covered and left broken

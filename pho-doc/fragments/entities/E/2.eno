@@ -1,0 +1,125 @@
+# entity: E2B: attributes
+heading: electron getting started guides
+document_datetime: 2020-01-13 02:03:00-0400
+previous: ELE
+-- body
+
+# Overview: 3 bodies of documentation
+
+We tried to find one definitive intro/tutorial to electron.
+We read thru *three* documentation bodies in pursuit of this, and it was
+all a disappointment. We'll narrate this in the order it happened:
+
+First we read thru the [website docs][1] covered in a different document
+fragemnt. It was disappointing:
+
+  - there's that one list of links that's partially redundant with that other
+  - lots of low-level API and edge-case concerns, not good intro or tut
+
+
+In the above documentation on the "boilerplates and CLI's" page, they
+reference this "awesome list". In that collection of links, there was
+a collection of links to electron articles. We made a scraper at #birth
+to populate the below table to annotate these resources and track our
+progress with them.
+
+
+# Scraped from the "awesome list" of articles
+
+|main tag|resource|
+|---|---|
+|#yes|[Electron Fundamentals](http://maxogden.com/electron-fundamentals.html)|
+|#YES|[Building a desktop application with Electron](https://medium.com/@bojzi/building-a-desktop-application-with-electron-204203eeb658)|
+|#YES|[Building a desktop app with Electron, React, and Redux](https://anadea.info/blog/building-desktop-app-with-electron)|
+|#l8r|[Bringing Native Performance to Electron](https://blog.realm.io/native-performance-electron-realm/)|
+|#l8r|[Codesigning your app for macOS](http://jbavari.github.io/blog/2015/08/14/codesigning-electron-applications/)|
+|#l8r|[Electron on the App Store](https://medium.com/@yoannm/pushing-electron-on-the-mac-appstore-early-stages-7dcb85936f92)|
+|#l8r|[How To Make Your Electron App Sexy](https://blog.dcpos.ch/how-to-make-your-electron-app-sexy)|
+|#l8r|[Auto-updating apps for macOS and Windows: The complete guide](https://medium.com/@svilen/auto-updating-apps-for-windows-and-osx-using-electron-the-complete-guide-4aa7a50b904c)|
+|#meh|[Introducing BrowserView for Electron](https://blog.figma.com/introducing-browserview-for-electron-7b40b4b493d5)|
+|#meh|[Migrating Slack's Desktop App to BrowserView](https://slack.engineering/growing-pains-migrating-slacks-desktop-app-to-browserview-2759690d9c7b)|
+|#meh|[Using Google Analytics to gather usage statistics in Electron](https://kilianvalkhof.com/2018/apps/using-google-analytics-to-gather-usage-statistics-in-electron/)|
+|#nev|[Building a file explorer with Electron, Quasar, and Vue](https://medium.com/quasar-framework/building-an-electron-file-explorer-with-quasar-and-vue-7bf94f1bbf6)|
+
+
+# reading notes of the above items
+
+- "electron fundamentals" is from july 2015 so we skim it. about 10 min.
+- "build desktop app with electron" from august 2015. this tut is old but good
+- "..with electron, react and redux" is from 2016 :(
+
+Conclusion: using the awesome list was a mistake.
+
+
+# this API thing
+
+Our current recommended approach is to start with the [quickstart][2],
+and then work through this [API thing][3].
+
+- Windows
+  - Create and manage windows
+    - Create a new window
+    - Manage window state
+    - Window events: blur and focus
+    - Create a frameless window
+  - Handling window crashes and hangs
+    - Relaunch window after the process crashes
+    - Relaunch window after the process hangs
+- Menus
+  - Customizable menus
+    - Create an application menu
+    - Create a context menu
+  - Register keyboard shortcuts
+    - Register a global keyboard shortcut
+- Native user interface
+  - Open external links for system file manager
+    - Open path in file manager
+    - Open external links
+  - Notifications with and w/o custom image
+    - Basic notification
+    - Notifcation with image
+  - Use system dialogs
+    - Open a file or directory
+    - Error dialog
+    - Information dialog
+    - Save dialog
+  - Put your app in the tray
+  - Drag and drop files
+- Communication between the two processes
+  - Asynchronous messages
+  - Synchronoous messages
+  - Communicate with an invisible window
+- System
+  - Get app or user system information
+    - Get app information
+    - Get version information
+    - Get system information
+    - Get screen information
+  - Copy and paste from the clipboard
+    - Copy
+    - Paste
+  - Launch app from protocol handler (from URL in another app)
+- Media
+  - Take a screenshot
+
+
+# and then into the wild
+
+Broke down and googled "electron tutorials".
+
+medium dot com recommended [this one][4], but it was too short.
+
+High hopes for [this todo app][5]. Thank god that worked.
+
+
+[5]: https://codeburst.io/build-a-todo-app-with-electron-d6c61f58b55a
+[4]: https://medium.com/ingeniouslysimple/building-an-electron-app-from-scratch-part-1-a1d9012c146a
+[3]: https://github.com/electron/electron-api-demos
+[2]: https://github.com/electron/electron-quick-start
+[1]: https://www.electronjs.org/docs
+-- body
+
+# document-meta
+-- string_as_comment
+# #birth.
+-- string_as_comment

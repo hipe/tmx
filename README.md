@@ -217,6 +217,7 @@ then in your 'main' terminal:
 |[#010.B]                   | #edit | edit documentation
 |[\[#010\]]                 |       | extra-conventional conventions
 |[#009]                     | #hole |
+|[#008.13]                  | #open | how to setup.py
 |[#008.12]                  | #trak | function reflection
 |[#008.11]                  | #trak | CLI error case expression
 |[#008.10]                  | #trak | places where you refer to that-other-project

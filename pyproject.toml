@@ -12,6 +12,7 @@ click = "^7.0"
 soupsieve = "^1.9.5"
 bs4 = "^0.0.1"
 enolib = "^0.8.1"
+requests = "^2.22.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"

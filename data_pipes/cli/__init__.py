@@ -24,7 +24,9 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
             _surface = f'({_these})'
         else:
             _surface = '(schema-based)'
-        out(f'    {k} {_surface}\n')
+
+        _name = k.replace('_', '-')
+        out(f'    {_name} {_surface}\n')
         count += 1
     o(f'({count} total.)\n')
     return 0  # _exitstatus_for_success

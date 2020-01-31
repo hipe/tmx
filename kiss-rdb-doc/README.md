@@ -71,7 +71,7 @@ woah boy.
 |[#867.R]                   | #prov | provision: failure is None not False
 |[#867.Q]                   | #prov | provision: do index file second
 |[#867.P]                   | #trak | possible issue on windows
-|[#867.N]                   | #open | (OUTSIDE OF SUB-PROJECT) how to setup.py
+|[#867.N]                   | #hole |
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
