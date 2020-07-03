@@ -6,7 +6,7 @@ def rm_minus_rf_via_directory(dir_path):
     """generator that generates units of work for equivalent of `rm -rf`..
 
     on each unit of work, you must call `uow.execute_emitting_into(listener)`
-    where you 'inject' into the execution of the UoW your [#017] listener.
+    where you 'inject' into the execution of the UoW your [#017.3] listener.
 
     you must execute each unit of work (A) and generally do so in the
     order is received (B). failure to do so will lead to general failure,

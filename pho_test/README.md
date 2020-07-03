@@ -20,7 +20,7 @@ OCD is preventing us from bumping up to 4 digits for now. (10 thousand
 spots sounds like too many.)
 
   - 001-099:  (placeholder for models)
-  - 100-299:  magnetics
+  - 100-299:  [#019.3] magnetics
               - 110 cases about headers (100-119)
               - 130 cases about footnotes (120-139)
               - 150 big index and rough gen (140-159)

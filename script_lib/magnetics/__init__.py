@@ -5,7 +5,7 @@ class error_monitor_via_stderr:
     """a common CLI-targeted expression strategy for emissions
 
     Its main useful exposure is a modality-specific implementation of a
-    [#017] listener, one that will reach out to an unified expressor
+    [#017.3] listener, one that will reach out to an unified expressor
     for structured emissions.
 
     The reason we need an error monitor bespoke for CLI is that if a structured

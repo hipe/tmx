@@ -1,4 +1,4 @@
-"""to provide experimental assistant magnetics for html scraping..
+"""to provide experimental assistant [#019.3] magnetics for html scraping..
 
 ..is currently the only purpose of this whole node.)
 """

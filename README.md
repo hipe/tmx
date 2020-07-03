@@ -207,7 +207,7 @@ then in your 'main' terminal:
 |[#019]                     |       | package filesystem conventions ..
 |[#018.B]                   | #edit | edit documentation
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
-|[#017]                     |       | placeholder to explain our listener pattern - use [#511] now instead
+|[#017.3]                   |       | placeholder to explain our listener pattern - use [#511] now instead
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [tickler numberspace]
 |[#014]                     |       | [expect tree-like screen]

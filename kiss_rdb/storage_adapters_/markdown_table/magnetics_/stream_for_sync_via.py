@@ -8,7 +8,7 @@ item and then, using that item we output a stream of far items that get
 necessary.
 
 in fact this module does not accomplish this feat on its own in one
-unified magnetic, but rather it has *all* (?) the constituent magnetics
+unified magnetic, but rather it has *all* (?) the constituent [#019.3] magnetics
 that do this (with a bit of coordination required).
 
 [#457.C.2] discusses this challenge in more depth.

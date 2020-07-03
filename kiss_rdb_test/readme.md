@@ -16,7 +16,7 @@ our manifestation of regression-friendliness at this level.
 ## storage support
 
   - 0001-1249  models
-  - 1250-2499  magnetics
+  - 1250-2499  [#019.3] magnetics
 
 
 ## storage adapters

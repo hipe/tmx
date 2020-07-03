@@ -7,7 +7,7 @@ a "regression-friendly" naming convention for toplevel test nodes that
 we use elsewhere, where we progress from low-level to high-level:
 
   - 100's: private models
-  - 200's: private magnetics
+  - 200's: private [#019.3] magnetics
   - 300's: public models
   - 400's: public magnetics
   - 500's: API calls ("actions")

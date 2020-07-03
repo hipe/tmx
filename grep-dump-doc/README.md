@@ -33,7 +33,7 @@ two ends (variously) appear in the next two below sections; one for
 
 whether or not you need to be running the server when you are working
 on the backend depends on what you are doing: generally you won't need
-to - the backend is mostly implemented thru pure-python [#017]
+to - the backend is mostly implemented thru pure-python [#019.3]
 "magnetics" (plain old functions) which generally won't interact
 with the webserver in a highly coupled way.
 

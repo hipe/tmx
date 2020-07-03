@@ -1,5 +1,5 @@
 """
-Mocking (expectation) library for [#017] emissions.
+Mocking (expectation) library for [#017.3] emissions.
 (Compare lighter-weight counterpart: [#508].)
 :[#509]
 """

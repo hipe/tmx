@@ -7,7 +7,7 @@ Regardless, this will generally be the case and so at the top level here,
 the numbers and names will correspond to etc. (Really there's no reason
 to number them at this node but meh.)
 
-Also keep in mind that that most functions ("magnetics") that process "files"
+Also keep in mind that that most functions ([#019.3] "magnetics") that process "files"
 are written with an interface that just processes stream of lines, so they
 can be ignorant of the underlying storage substrate (while still streaming).
 

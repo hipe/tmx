@@ -1,4 +1,4 @@
-From parent: 1250-2499  magnetics
+From parent: 1250-2499  [#019.3] magnetics
 
 The amount of magnetics we have right now: 5 (then 4)
 Multiply it by 3 for expansion: 15

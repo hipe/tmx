@@ -1,68 +1,179 @@
 #!/usr/bin/env bash
 
+# constants (""):
+
 file='z/times'
+
+# parsing argv sets these:
 
 is_supplemental=''
 is_date=''
+do_echo=''
 do_help=''
 do_invite=''
 
+# we can't reach ARGV via $#, $1 etc from within functions, so imagine using
+# BASH_ARGV universally instead. issues/gotchas with that:
+# 👉 BASH_ARGV is a stack so the elements are in reverse order from ARGV
+# 👉 we lose the elegance of `shift` (which doesn't mutate BASH_ARGV)
+# 👉 BASH_ARGV appears to be immutable magic: assigning to it silently fails
+# 👉 it's bad style to litter our code with lots of refs to a magic global.
+# so:
 
-if [[ "$1" == '-s' ]] ; then
-  is_supplemental=1
-  shift
-elif [[ "$1" == '-d' ]] ; then
-  is_date=1
-  shift
+bash_argv=("${BASH_ARGV[@]}")
+
+# parse-off business options from the "front" (top of stack)
+
+# always keep `len` current because it is a file-global, used everywhere.
+len="${#bash_argv[@]}"
+while [ "$len" -ne 0 ]; do
+
+  # negative offsets are a new feature of bash not supported in mine at writing
+  arg="${bash_argv[$len - 1]}"
+
+  # keep parsing IFF argument starts with a dash and is two chars long
+  if [[ ! "$arg" =~ ^-.$ ]]; then
+    break
+  fi
+
+  # substring in bash: start from offset 1, length 1
+  char="${arg:1:1}"
+
+  case "$char" in
+    's')
+      is_supplemental=1
+      ;;
+    'd')
+      is_date=1
+      ;;
+    'e')
+      do_echo=1
+      ;;
+    *)
+      # the first unrecognized flag is left at the head (top) of the stack
+      break
+      ;;
+  esac
+
+  # array pop in bash (1 of 2) (what we do instead of `shift`)
+  unset 'bash_argv[$len - 1]'
+  ((len --))
+done
+
+# It's of no value to have a timetracking file with timestamps but no
+# descriptions (or blank lines) so <message> is generaly required. However:
+# the --echo option exists mainly to get (possibly just) the formatted (maybe
+# date and) time output to STDOUT, so for this case we annul the requirement.
+# --supplemental is explicitly for adding additional lines to a multi-line
+# description, so this requires a message. As such, a message is required for
+# all cases except when -e and not -s.
+
+if [[ -n "$do_echo" && -z "$is_supplemental" ]]; then
+  message_is_required=''
+else
+  message_is_required=1
 fi
 
-if [[ "$#" -eq 0 ]] ; then
-  echo "expecting <msg1> .." >&2
-  do_invite=1
-else
-  char=$(echo "$1" | cut -c1)
-  if [[ $char == "-" ]] ; then
-    if [[ "$1" == '-h' ]] ; then
-      do_help=1
-    elif [[ "$1" == '--help' ]] ; then
-      do_help=1
-    else
-      echo "unrecognized option: \"${1}\"" >&2
-      do_invite=1
+validate() {
+
+  # (in a function so we can short-circuit out of it early with return lol)
+
+  # look for more specific errors first before more general ones, because
+  # it's super confusing getting a generic error message when the underlying
+  # cause of the error is something more specific
+
+  if [[ -n "$is_date" && -n "$is_supplemental" ]]; then
+    echo "-d and -s are mutually exclusive" >&2
+    do_invite=1
+    return
+  fi
+
+  # if more arguments
+  if [ "$len" -ne 0 ]; then
+
+    # see "negative offsets" above)
+    arg="${bash_argv[$len - 1]}"
+
+    # if it looks like an option
+    if [[ "$arg" =~ ^- ]]; then
+
+      # if it looks like a 'stop parsing' operative
+      if [[ "$arg" =~ ^--?$ ]]; then
+
+        # array pop in bash (2 of 2)
+        bash_argv=("${bash_argv[@]:0:$len - 1}")
+        ((len --))
+
+      else
+        if [[ "$arg" =~ ^-(h|-help)$ ]]; then
+          do_help=1
+          # exit early. don't parse remaining args or validate missing args
+          return
+        fi
+        echo "unrecognized option: \"$arg\"" >&2
+        do_invite=1
+        return
+      fi
     fi
   fi
-fi
 
-if [ -n "$do_invite" ] ; then
+  if [[ -n "$message_is_required" && "$len" -eq 0 ]]; then
+    echo "expecting <msg1> .." >&2
+    do_invite=1
+  fi
+}
+
+validate
+
+if [ -n "$do_invite" ]; then
   echo "use \"$0 -h\" for help" >&2
   exit 5
 fi
 
-if [ -n "$do_help" ] ; then
-  echo "usage: $0 [-d|-s] msg1 msg2 .." >&2
+if [ -n "$do_help" ]; then
+  echo "usage: $0 [-d|-s] [-e] [-[-]] msg1 msg2 .." >&2
   echo "" >&2
-  echo "description: appends a timestamp line to ${file}" >&2
+  echo "description: append a timestamp line to ${file}" >&2
+  echo "             (our minimal time tracking system)" >&2
   echo "" >&2
   echo "options:" >&2
   echo "    -d    date. uglyly include month-day in timestamp" >&2
   echo "    -s    supplemental. only appends message, no timestamp" >&2
+  echo "    -e    echo the would-be appended line to STDOUT and exit" >&2
+  echo "    -, -- stop parsing subsequent arguments for options" >&2
   exit 0
 fi
 
-if [ ! -f "$file" ] ; then
-  echo "for now, file must exist: $file" >&2
-  exit 5
-fi
-
-if [ -n "$is_date" ] ; then
+if [ -n "$is_date" ]; then
   da=$(date '+%m-%d %H:%M:%S')
-elif [ -n "$is_supplemental" ] ; then
+elif [ -n "$is_supplemental" ]; then
   da='              '
 else
   da=$(date '+      %H:%M:%S')
 fi
 
-line="  ${da}  $@"
+if [ "$len" -eq 0 ]; then
+  tail_string=""
+else
+  # array reverse in bash. (one way of several)
+  args=()
+  for (( i="$len" - 1; i > -1; i-- )); do
+    args+=("${bash_argv[$i]}")
+  done
+  tail_string="  ${args[@]}"
+fi
+
+line="  ${da}${tail_string}"
+
+if [ -n "$do_echo" ]; then
+  echo "$line"
+  exit 0
+fi
+
+if [ ! -f "$file" ]; then
+  echo "for now, file must exist: $file" >&2
+  exit 5
+fi
 
 echo "(did: echo \"$line\" >> $file)" >&2
 

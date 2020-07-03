@@ -18,7 +18,7 @@ submodules to live at the top of the package.
 ## test case numbering allocation table:
 
   - 0001-4999  submodules
-  - 5000-9999  magnetics
+  - 5000-9999  [#019.3] magnetics
 
 
 In that first category we break it into 20 spans to start
