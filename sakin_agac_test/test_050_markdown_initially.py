@@ -30,7 +30,7 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
 
     def invites(self):
         # _exp = "see 'ohai-mami --help'\n"
-        _exp = 'Try "ohai-mami convert-collection --help" for help.\n'
+        _exp = "Try 'ohai-mami convert-collection --help' for help.\n"
         _act = self.stderr_lines[1]
         self.assertEqual(_act, _exp)
 
@@ -218,7 +218,7 @@ class Case020_no_args(_CommonCase):
         self.fails()
 
     def test_200_whines(self):
-        _exp = 'Error: Missing argument "FROM_COLLECTION".\n'
+        _exp = "Error: Missing argument 'FROM_COLLECTION'.\n"
         # _exp = 'parameter error: expecting <script>\n'
         self.assertEqual(self.reason_stderr_line, _exp)
 

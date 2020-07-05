@@ -70,32 +70,90 @@ def _cached_doc_via_url(url, listener):
 # --
 
 
-def deindent_doc_string_(big_string, do_append_newlines):
+def deindented_lines_via_big_string_(big_string):
     # convert a PEP-257-like string into an iterator of lines
 
-    if _eol not in big_string:
-        if do_append_newlines:
-            yield f'{big_string}{_eol}'
-        else:
-            yield big_string
+    return _deindent(lines_via_big_string(big_string), _eol)
+
+
+def deindented_strings_via_big_string_(big_string):
+    # convert a PEP-257-like string into an iterator of strings
+
+    return _deindent(_strings_via_big_string(big_string), '')
+
+
+def _deindent(item_itr, empty_item):
+
+    def peek():
+        item = next(item_itr)  # ..
+        peeked.append(item)
+        return item
+    peeked = []
+
+    item = next(item_itr)  # .., don't cache the throwaway item
+
+    if empty_item != item:
+        for _ in item_itr:
+            cover_me('where')
+        yield item
         return
 
-    if do_append_newlines:
-        iter_rxs = '^.*\n'
-        # two_tabs_rxs = '^[ ]{8}(.*\n)'
-    else:
-        iter_rxs = '^.*(?=\n)'
-        # two_tabs_rxs = '^[ ]{8}(.*)\n'
+    # find the margin (the first nonzero length one in the first N lines)
 
-    # two_tabs_rx = re.compile(two_tabs_rxs)
-    indented_line_md = None
-    for line_md in re.compile(iter_rxs, re.MULTILINE).finditer(big_string):
-        line = line_md[0]
-        # indented_line_md = two_tabs_rx.match(line)
-        if True or indented_line_md is None:
-            yield line
-        else:
-            yield indented_line_md[0]
+    for _ in range(0, 3):
+        item = peek()  # ..
+        md = re.match('^([ ]+)[^ ]', item)
+        if md is not None:
+            break
+
+    def f():
+        for item in peeked:
+            yield item
+        for item in item_itr:
+            yield item
+
+    use_itr = f()
+
+    if md is None:
+        # cheap_arg_parse (at #history-A.5) wants to be able to use this w/o
+        # knowing beforehand whether the big string has any margin anywhere
+        # (some docstrings are flush-left with the whole file).
+
+        for item in use_itr:
+            yield item
+        return
+
+    margin = md[1]
+    rx = re.compile(f'^[ ]{{{len(margin)}}}([^\\n]+{empty_item})\\Z')
+
+    for item in use_itr:
+
+        if empty_item == item:
+            yield item
+            continue
+
+        md = rx.match(item)
+        if md is None:
+            # assume convention of """ is flush with content or 1 tab to the L
+            if margin != item:
+                assert(margin[0:-4] == item)
+
+            assert(0 == len(tuple(use_itr)))
+            return
+
+        yield md[1]
+
+
+def lines_via_big_string(big_string):  # :[#610]
+    return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_string))
+
+
+def _strings_via_big_string(big_string):
+    if _eol not in big_string:
+        if '' == big_string:
+            return iter(())
+        return iter((big_string,))
+    return (md[1] for md in re.finditer('([^\n]*)\n', big_string))
 
 
 class filesystem_functions:  # as namespace
@@ -148,6 +206,7 @@ TEMPORARY_DIR = 'z'  # ick/meh
 _eol = '\n'
 
 
+# #history-A.5
 # #history-A.4
 # #history-A.3: "cheap arg parse" moves to dedicated file
 # #history-A.1: as referenced

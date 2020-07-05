@@ -1,0 +1,11 @@
+beautifulsoup4==4.9.1
+bs4==0.0.1
+click==7.1.2
+enolib==0.8.1
+soupsieve==2.0.1
+TatSu==5.5.0
+toml==0.10.1
+z-data-pipes==0.0
+z-game-server==0.0
+z-kiss-rdb==0.0
+z-pho==0.0

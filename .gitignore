@@ -1,5 +1,6 @@
 /.ackrc
 /*.egg-info
+/my-venv
 *.pyc
 __pycache__
 /themes/hyde

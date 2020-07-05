@@ -8,10 +8,10 @@ def desc_lineser_via(description_template_valueser, doc_string):
     else:
         content_big_s = doc_string.format(** description_template_valueser())
 
-    from script_lib import deindent_doc_string_
+    from script_lib import deindented_strings_via_big_string_
 
     def desc_lineser():
-        return deindent_doc_string_(content_big_s, False)
+        return deindented_strings_via_big_string_(content_big_s)
     return desc_lineser
 
 
@@ -85,7 +85,7 @@ def help_lines_via(
     use_program_name = os_path.basename(program_name)
 
     yield f'usage: {use_program_name}{_opts_s}{_args_s}'
-    yield f'usage: {use_program_name} --help'
+    yield f'       {use_program_name} --help'
 
     # -- desco
 

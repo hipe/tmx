@@ -11,9 +11,18 @@ def optional_args_index_via_section_index(si):
     return {k: v for k, v in __do_optionals_index(si)}
 
 
-def section_index_via_lines(unsanitized_strings):
-    _tree = __tree_via_unsanitized_strings(unsanitized_strings)
-    return __section_index_via_tree(_tree)
+def section_index_via_unsanitized_strings_(unsanitized_strings):
+    lines = _lines_via_unsanitized_strings(unsanitized_strings)
+    cx = _tree_via_lines(lines).children
+    return {s.label: cx[s.offset] for s in _sections_via_tree_children(cx)}
+
+
+class BIG_EXPERIMENTAL_SECTION_INDEX:
+    def __init__(self, unsanitized_strings):
+        lines = _lines_via_unsanitized_strings(unsanitized_strings)
+        self.tree = _tree_via_lines(lines)
+        _ = _sections_via_tree_children(self.tree.children)
+        self.sections = {s.label: s for s in _}
 
 
 def __do_optionals_index(si):
@@ -24,43 +33,15 @@ def __do_optionals_index(si):
         needles = {'optional arguments', 'optional argument'}
         these = needles.intersection(against)
     key, = these
-    for node in __flatten_the_option_section(si[key]):
-        _use_s = node.styled_content_string
+    node = si[key]
+
+    assert('option' in node.head_line.styled_content_string)
+
+    for node in node.children:
+        _use_n = node if node.is_terminal else node.head_line
+        _use_s = _use_n.styled_content_string
         o = __option_line_challenge_mode(_use_s)
         yield o.main_long_switch, o
-
-
-def __flatten_the_option_section(parent_node):
-
-    _header_node, *cx_nodes = parent_node.children
-    assert('option' in _header_node.styled_content_string)
-
-    # this sucks and we are not sure what's going on:
-    # if there's only one node then assume it's a branch node with a bunch
-    # of children nodes, such that each item is a single-line item.
-
-    if 1 == len(cx_nodes):
-        only_node, = cx_nodes
-        assert(not only_node.is_terminal)
-        for node in only_node.children:
-            assert(node.is_terminal)
-            yield node
-
-    # otherwise, each item might be single line or multiple line. when
-    # multiple line, we only want the first line
-
-    for node in cx_nodes:
-        if node.is_terminal:
-            yield node
-            continue
-
-        # not sure how everything parses any more.
-        sub_cx_nodes = node.children
-
-        for sub_node in sub_cx_nodes:
-            assert(sub_node.is_terminal)
-
-        yield sub_cx_nodes[0]
 
 
 def positional_args_index_via_section_index(si):
@@ -71,10 +52,7 @@ def positional_args_index_via_section_index(si):
         needles = {'positional arguments', 'positional argument'}
         these = needles.intersection(against)
     key, = these
-    _, node = si[key].children  # else needs work
-    # we can't know the structure of the above beforehand so we normalize it
-    # here by promoting terminals to branch node-ishes (#provision #[#014.A])
-    cx = (node,) if node.is_terminal else node.children
+    cx = si[key].children
     d = {}
     for ch in cx:
         assert(ch.is_terminal)  # else fine but cover
@@ -142,7 +120,7 @@ def __option_line_challenge_mode(line_s):
         _advance_cursor_to(match.end())
         s_a = match.groups()
         leng = len(s_a)
-        if leng is 0:
+        if leng == 0:
             return match[0]
         assert(leng == 1)
         # if you use groups in your scan regex,
@@ -199,10 +177,35 @@ def __my_named_tuple_for_above():
     ])
 
 
-def __tree_via_unsanitized_strings(unsanitized_strings):
+def _sections_via_tree_children(cx):
+    for i in range(0, len(cx)):
+        node = cx[i]
+        if node.is_terminal:
+            if node.is_blank_line:
+                continue
+            s = node.styled_content_string
+        else:
+            s = node.head_line.styled_content_string
+        md = re.match('^([a-z]+(?:[ -][a-z]+)*):', s)
+        if md is None:
+            continue
+        yield _Section(label=md[1], offset=i)
 
-    # the following message is from the future
-    # before #history-X.X we were using some vendor library to generate help
+
+class _Section:
+    def __init__(self, label, offset):
+        self.label = label
+        self.offset = offset
+
+
+def _tree_via_lines(lines):
+    from .expect_treelike_screen import tree_via_lines
+    return tree_via_lines(lines)
+
+
+def _lines_via_unsanitized_strings(unsanitized_strings):
+
+    # in the past we used a vendor library (click) to generate help
     # screens. it (not us) flattened our multi-lines messages and also word-
     # wrapped them (?), such that our helps screens were in ONE BIG STRING.
     # now that this testlib is used against our own generated help screens,
@@ -212,35 +215,11 @@ def __tree_via_unsanitized_strings(unsanitized_strings):
     assert(leng)
     if 1 == leng:  # #todo
         big_string, = unsanitized_strings
-        assert('\n' in big_string)
-        from .expect_treelike_screen import lines_via_big_string
-        sanitized_lines = lines_via_big_string(big_string)
-    else:
-        sanitized_lines = __sanitized_lines_via_unsanitized_strings(
-                unsanitized_strings)
+        assert(_eol in big_string)
+        from script_lib import lines_via_big_string
+        return lines_via_big_string(big_string)
 
-    from .expect_treelike_screen import tree_via_lines
-    return tree_via_lines(sanitized_lines)
-
-
-def __section_index_via_tree(tree):
-    cx = tree.children
-    node_d = {}
-    for node in cx:
-        _use_s = __header_line_via_node(node)
-        match = re.match('^([a-z]+(?:[ -][a-z]+)*):', _use_s)
-        if match is not None:
-            node_d[match[1]] = node
-
-    return node_d
-
-
-def __header_line_via_node(node):
-    if node.is_terminal:
-        use_node = node
-    else:
-        use_node = node.children[0]
-    return use_node.styled_content_string
+    return __sanitized_lines_via_unsanitized_strings(unsanitized_strings)
 
 
 def __sanitized_lines_via_unsanitized_strings(unsanitized_strings):

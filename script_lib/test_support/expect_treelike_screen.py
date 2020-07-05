@@ -12,35 +12,8 @@
         right arm
       legs
 
-
-
-## experimental provision/issue :[#here.A]
-
-with the goal of reducing complexity ("") of the parse tree, the grammar
-minimizes the number of branch nodes created by creating one only when it
-is deemed necessary by there being a plural (two or more) number of children
-to be placed into the tree at that point.
-
-(this is perhaps akin to the way you might use folders to organize your
-iPhone apps - if you have a folder with only one app in it, you may
-eliminate the folder (branch node) altogether and promote the app up one
-level (i.e move it out of the folder))
-
-another sub-provision near (perhaps as a corollary of )the above one is that
-a deepening of the indent level does not necessarily confer the creation of
-a branch node, when it might be intuitive to assume so.
-
-so for in the above example, `mouth` and `arms` do not have the same
-structure. they are each branch nodes with two children, but `arms`'s
-second child is a branch node, whereas `mouth`'s is a terminal node.
-
-this provision is subject to change so that parse trees are more consistent,
-but we are letting this issue incubate for now.
-
 :[#014]
 """
-
-from modality_agnostic.memoization import lazy
 
 
 def tree_via_lines(lines):
@@ -109,8 +82,7 @@ def __tree_when_one_or_more_lines(scn):
             if this_line.is_blank_line:
                 state.blank_line()
             else:
-                prev_line = state.use_this_line_as_reference
-                prev_num = prev_line.effective_margin_length
+                prev_num = state.effective_margin_length
                 this_num = this_line.effective_margin_length
                 if prev_num < this_num:
                     state.more_indent()
@@ -123,302 +95,89 @@ def __tree_when_one_or_more_lines(scn):
             if not scn.has_current_token:
                 break
 
-    def _l():
+    def current_tokener():
         return scn.current_token
-    state = _StateMachine(_l, _this_one_state_machine_definition())
+    state = _state_machine(current_tokener)
     __main_loop()
     return state.end_of_input()
 
 
-@lazy
-def _this_one_state_machine_definition():
-    """the definitional structure of our state machine
+def _state_machine(current_tokener):  # #[#008.2] a state machine
+    # (state machine made less obtuse at #history-A.2)
 
-    in part, the state machine helps assert which kinds of transitions
-    can and cannot happen from various states. (for example, we do not
-    allow that the very first line is blank or indented. for now, these
-    provisions appear to extend also to every line that comes in after
-    a blank line. we model both these cases under a single state we call
-    'nothingness'.)
+    class StateMachine:
 
-    this is memoized in part to emphasize that it is immutable, invariant
-    structure through the course of our execution.
+        def less_indent(self):
+            line = current_tokener()
+            leng = line.effective_margin_length
+            while True:
+                stack_of_margin_lengths.pop()
+                stack.pop()
 
-    (dynamic grammars *are* a thing but we'd rather avoid them if possible..)
-    """
+                compare = stack_of_margin_lengths[-1]
 
-    return {
-        'nothingness': {
-            'same_indent': 'indeterminate_line',  # read 'no_indent'
-        },
-        'indeterminate_line': {
-            'blank_line': 'nothingness',
-            'same_indent': 'branch_node',
-            'more_indent': 'indeterminate_line',
-            'less_indent': 'indeterminate_line',
-            'end_of_input': 'closed',
-        },
-        'branch_node': {
-            'blank_line': 'nothingness',
-            'same_indent': 'branch_node',
-            'more_indent': 'indeterminate_line',
-            'less_indent': 'indeterminate_line',
-            'end_of_input': 'closed',
-        },
-    }
+                if compare > leng:
+                    continue
 
-
-class _StateMachine:  # #[#008.2] a state machine
-    """(the more abstract parts of this could certainly be abstracted out..)
-
-    (..the bulk of this is business-specific but etc.)
-    """
-
-    def __init__(self, curr_tok_f, states_d):
-
-        self._current_line_function = curr_tok_f
-        self._use_the_special_reference_line_for_nothingness()
-        self._stack = [_StackFrame()]
-
-        self._current_state_name = 'nothingness'
-        self._states = states_d
-
-    def from__nothingness__to__indeterminate_line__because__same_indent(self):
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def from__indeterminate_line__to__nothingness__because__blank_line(self):
-        self._add_indeterminate_line_to_branch_node()
-        self._common_after_blank_line()
-
-    def from__indeterminate_line__to__branch_node__because__same_indent(self):
-        self._begin_branch_node_with_indeterminate_line_as_header_line()
-        # self._add_indeterminate_line_to_branch_node()
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def from__indeterminate_line__to__indeterminate_line__because__more_indent(self):  # noqa: E501
-        self._begin_branch_node_with_indeterminate_line_as_header_line()
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def from__indeterminate_line__to__indeterminate_line__because__less_indent(self):  # noqa: E501
-        self._common_pop()
-
-    def from__branch_node__to__nothingness__because__blank_line(self):
-        self._add_indeterminate_line_to_branch_node()
-        self._common_after_blank_line()
-
-    def from__branch_node__to__branch_node__because__same_indent(self):
-        self._add_indeterminate_line_to_branch_node()
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def from__branch_node__to__indeterminate_line__because__more_indent(self):
-        self._begin_branch_node_with_indeterminate_line_as_header_line()
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def from__branch_node__to__indeterminate_line__because__less_indent(self):
-        self._common_pop()
-
-    def from__branch_node__to__closed__because__end_of_input(self):
-        return self._common_close()
-
-    def from__indeterminate_line__to__closed__because__end_of_input(self):
-        return self._common_close()
-
-    # --
-
-    def _common_pop(self):
-        self.__add_indeterminate_line_to_branch_node_and_pop_stack_appropriately()  # noqa: E501
-        self._use_current_line_as_indeterminate_line_and_reference_line()
-
-    def _common_close(self):
-        self._add_indeterminate_line_to_branch_node()
-        return self._close()
-
-    # --
-
-    def __add_indeterminate_line_to_branch_node_and_pop_stack_appropriately(self):  # noqa: E501
-        self._add_indeterminate_line_to_branch_node()
-        target_num = self._current_line_function().effective_margin_length
-
-        if _D:
-            _tmpl = (
-                "POPPING STACK down to a guy with an indent of {}" +
-                "HACKING STATE CHANGE")
-            print(_tmpl.format(target_num))
-
-        stack = self._stack
-        while True:
-            frame = stack.pop()
-            this_num = frame.the_effective_margin_length
-            if this_num > target_num:
-                # it is normal to see a depth deeper than your taregt depth
-                pass  # (Case0464)
-            elif this_num == target_num:
-                # if the depth of this item we just popped off the stack
-                # IS EQUAL to the depth of the current line, that means they
-                # are siblings, and that the stack is now ready to accept
-                # this child (the current line) when it reaches determinancy.
+                assert(compare == leng)
                 break
-            else:
-                cover_me('strange indent level')
+            accept()
 
-        self._current_state_name = 'branch_node'
+        def same_indent(self):
+            accept()
 
-    def _common_after_blank_line(self):
+        def more_indent(self):
+            branch_above_children = stack[-1].children
+            line_above = branch_above_children[-1]
+            assert(line_above.is_terminal)
 
-        _D and print("POP STACK down to first frame because blank line")
+            line = current_tokener()
+            new_branch = ChildBranchNode(line_above, line)
 
-        stack = self._stack
-        while len(stack) is not 1:
-            stack.pop()
+            # commit
+            branch_above_children[-1] = new_branch
+            stack_of_margin_lengths.append(line.effective_margin_length)
+            stack.append(new_branch)
 
-        self._use_the_special_reference_line_for_nothingness()  # :#here2
+        def blank_line(self):
+            accept()
 
-    def _begin_branch_node_with_indeterminate_line_as_header_line(self):
+        def end_of_input(self):
+            del(state._mutex)
+            return root
 
-        _line = self._release_indeterminate_line()
+        @property
+        def effective_margin_length(self):
+            return stack_of_margin_lengths[-1]
 
-        if _D:
-            _tmpl = 'creating and PUSHing branch node with header line: {}'
-            print(_tmpl.format(_line._match[0]))
+    def accept():
+        line = current_tokener()
+        stack[-1].children.append(line)
 
-        former_top = self._top_frame()
-        next_frame = former_top.__class__()
-        next_frame.append_terminal_item(_line)
+    class RootBranchNode:
+        def __init__(self):
+            self.children = []
 
-        former_top.append_child_frame(next_frame)
+        is_terminal = False
 
-        self._stack.append(next_frame)
+    class ChildBranchNode:
+        def __init__(self, head_line, first_child):
+            self.head_line = head_line
+            self.children = [first_child]
 
-    def _add_indeterminate_line_to_branch_node(self):
-        _line = self._release_indeterminate_line()
-        if _D:
-            _tmpl = 'ACTUALLY adding this line to existing branch node: {}'
-            print(_tmpl.format(_line._match[0]))
-        self._top_frame().append_terminal_item(_line)
+        is_terminal = False
 
-    def _release_indeterminate_line(self):
-        line = self._indeterminate_line
-        del self._indeterminate_line
-        return line
+    class PrivateState:
+        def __init__(self):
+            self._mutex = None
 
-    def _use_current_line_as_indeterminate_line_and_reference_line(self):
-        line = self._current_line_function()
-        self._indeterminate_line = line
-        self.use_this_line_as_reference = line
+    sm = StateMachine()
+    root = RootBranchNode()
+    stack = [root]
+    stack_of_margin_lengths = [0]
+    state = PrivateState()
 
-    def _use_the_special_reference_line_for_nothingness(self):
-        self.use_this_line_as_reference = _IMAGINARY_LINE_BEFORE_FIRST_LINE
-
-    def _top_frame(self):
-        return self._stack[-1]
-
-    def _close(self):
-        del self._current_line_function
-        del self._current_state_name
-        del self._states
-        del self.use_this_line_as_reference
-        stack = self._stack
-        del self._stack
-
-        assert(len(self.__dict__) == 0)
-        return stack[0].close_stack()
-
-    # --
-
-    def transition(f):
-        """(decorator)"""
-
-        transition_name = f.__name__
-
-        def g(self):
-            state_name = self._current_state_name
-            state_d = self._states[state_name]
-            if transition_name in state_d:
-                return self._do_transition(
-                        state_d[transition_name],
-                        transition_name)
-            else:
-                _fmt = "cannot have '{t}' from '{s}'"
-                _msg = _fmt.format(s=state_name, t=transition_name)
-                raise _my_exception(_msg)
-        return g
-
-    def _do_transition(self, new_state_name, trans_name):
-        s = self._current_state_name
-        self._current_state_name = new_state_name
-        _m = 'from__%s__to__%s__because__%s' % (s, new_state_name, trans_name)
-        return getattr(self.__class__, _m)(self)
-
-    @transition
-    def blank_line(self):
-        pass
-
-    @transition
-    def less_indent(self):
-        pass
-
-    @transition
-    def same_indent(self):
-        pass
-
-    @transition
-    def more_indent(self):
-        pass
-
-    @transition
-    def end_of_input(self):
-        pass
-
-
-class _ThisDummy:
-    def __init__(self):
-        self.effective_margin_length = 0
-        self.is_blank_line = False
-
-
-_IMAGINARY_LINE_BEFORE_FIRST_LINE = _ThisDummy()
-
-
-class _StackFrame:
-
-    def __init__(self):
-        self.children = []
-
-    def append_child_frame(self, x):
-        x.hello_stack_frame()
-        self.children.append(x)
-
-    def append_terminal_item(self, x):
-        assert(x.is_terminal)
-        self.children.append(x)
-
-    def close_stack(self):
-        lis = self.children
-        del self.children
-
-        def f(x):
-            if x.is_terminal:
-                return x
-            else:
-                return x.close_stack()
-        return _BranchNode([f(x) for x in lis])
-
-    @property
-    def the_effective_margin_length(self):  # assume 1st child is terminal eek
-        return self.children[0].effective_margin_length
-
-    def hello_stack_frame(self):
-        pass  # #[#022] a substitute for strong typing
-
-    is_terminal = False
-
-
-class _BranchNode:
-
-    def __init__(self, cx):
-        self.children = cx
-
-    is_terminal = False
+    return sm
 
 
 class _ScannedLine:
@@ -458,6 +217,12 @@ class _ScannedLine:
         return f
 
     @property
+    def s(self):
+        _ = (self.margin_string or '')
+        __ = (self.styled_content_string or '')
+        return f'{_}{__}'
+
+    @property
     @reader_for_named_group
     def styled_content_string():
         pass
@@ -477,74 +242,6 @@ class _ScannedLine:
         '(?P<styled_content_string>[^\n\r]+)?' +  # there need not .. ibid.
         '(?:\n|\r\n?)'
     )
-
-
-def lines_via_big_string(big_s):
-    """convert any string into a stream of "lines" (isomorphically)..
-
-    ## objective & scope
-
-    intended for for "consuming agents" that want to parse a "big string"
-    one "line" at at time.
-
-    in practice this is useful for implementing a parser for line-centric
-    grammars. i.e, this produces a tokenizer (scanner) whose tokens are
-    lines.
-
-
-    ## implementation notes (and possible counter-justification)
-
-    in ruby and perhaps python, the spirit of this could be achieved with
-    a oneliner something like `big_s.split(/(?<=\n)/)`. but in the current
-    stable version of python, they disallow this "zero-width regex" (even
-    though it does not cause the kind of problems they are trying to prevent.
-    this sounds like it's getting some attention there.)
-
-    fortunately python's `re.finditer()` does not have the same limitation
-    as `re.split()` (weirdly), and produces a function that is as
-    elegant and more memory efficient, scaling to "large" strings more
-    reasonably. (we didn't always use a generator expression for this.
-    see #history-A.1 for its clunkier predecessor.)
-
-
-    ## theory & details
-
-    in the unix world, lines are terminated by the the newline character
-    ("\n"). but it would be trivial to extend this work to other formats
-    (MS-DOS/windows "\r\n", ancient mac "\r") if (in our language if not
-    our code) we broaden the conception of this "newline character" into
-    the more abstract-sounding "line terminator sequence" ("LTS").
-
-    it's now worth considering the difference between "separator semantics"
-    and "terminator semantics"; a distinction discussed in the manpage for
-    `git-log` near those terms. the question basically amounts to whether
-    the last line (of a file, e.g) should itself end with the LTS or not.
-
-    fortunately there's a strong convention, as is suggested by the manpage
-    for the unix utility `wc`:
-
-    > A line is defined as a string of characters
-    > delimited by a <newline> character
-
-    this is to say, it appears that terminator (not separator) semantics
-    are considered the norm.
-
-    however, if we were to omit into oblivion any one-or-more non-LTS
-    characters that trail the "big string" of input (as `wc` does), this
-    would very likely effect unexpected behavior, with users wondering
-    where the rest of their string went.
-
-    as such, the subject does not act as a "normalizer" in this regard -
-    it's garbage-in, garbage-out if you like. if your "big string"'s final
-    "line" does *not* have an LTS, this "line" will still come back out as-
-    is (i.e without an LTS). (tests cover this).
-
-    as this is so short, it may be copy-pasted elsewhere. track with :[#610].
-    """
-
-    import re
-    return (match[0] for match in re.finditer('[^\n]*\n|[^\n]+', big_s))
-    # (note we aren't even messing with non-unix line-ending formats for now)
 
 
 class _scanner_via_iterator:  # #testpoint
@@ -581,18 +278,8 @@ def _my_exception(msg):  # #copy-pasted
     return MyException(msg)
 
 
-def cover_me(s):
-    raise _exe('cover me: {}'.format(s))
-
-
-def _exe(s):
-    return Exception(s)
-
-
-_EMPTY_S = ''  # ..
 _TAB = "\t"
 
-_D = False  # turn on debugging output
-
+# #history-A.2: overhaul state machine to be less obtuse
 # #history-A.1: refactor line streamer to use generator expression
 # born.

@@ -153,33 +153,29 @@ class Case3066_top_help_screen(_CommonCase):
         self._CLI_client_results_in_success_exitstatus()
 
     def test_200_something_about_usage(self):
-        self._section('usage')  # exists
+        self.section('usage')  # exists
 
     def test_300_something_about_description(self):
-        _sect = self._section('description')
-        _first_line = _sect.children[0].styled_content_string
-        _second_line = _sect.children[1].styled_content_string
-        self.assertEqual(_first_line, 'description: ')
-        self.assertIn('Mutate a near collection by merging', _second_line)
+        _ = self.section('description').styled_content_string
+        self.assertIn('Mutate a near collection by merging', _)
 
     def test_400_something_about_arguments(self):
-        self._num_children(self._section('arguments'), 2)
+        s = self.section('arguments')
+        self.assertEqual(len(s.children), 2)
 
     def test_500_something_about_options(self):
-        self._num_children(self._section('options'), 1)
+        s = self.section('options')
+        self.assertEqual(len(s.children), 4)
 
-    def _num_children(self, sect, num):
-        title_line, *cx = sect.children
-        assert(isinstance(title_line.styled_content_string, str))
-        self.assertEqual(len(cx), num)
-
-    def _section(self, key):
-        return self._section_index()[key]
+    def section(self, label):
+        si = self._section_index()
+        se = si.sections[label]
+        return si.tree.children[se.offset]
 
     @shared_subject
-    def _section_index(self):
-        _lines = self._end_state().stderr_lines
-        return _help_screen_lib().section_index_via_lines(_lines)
+    def _section_index(self):  # ..
+        _ = self._end_state().stderr_lines
+        return _help_screen_lib().BIG_EXPERIMENTAL_SECTION_INDEX(_)
 
     @shared_subject
     def _end_state(self):
@@ -199,7 +195,7 @@ class Case3067DP_FA_help_screen(_CommonCase):
 
     def test_200_stdout_lines_look_like_items__at_least_one(self):
         import re
-        rx = re.compile(r'^ +[_a-z]+ \([^(]+\)$')  # ..
+        rx = re.compile(r'^ +[-a-z]+ \([^(]+\)$')  # ..
         s_a = self._end_state().first_line_run('stdout').lines
         self.assertGreaterEqual(len(s_a), 1)
         for s in s_a:

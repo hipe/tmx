@@ -15,12 +15,8 @@ class _NormalLinerCase(unittest.TestCase):
     # -- assertion
 
     def _this_many_lines(self, num):
-        _s_a = self._lines()
+        _s_a = self.lines()
         self.assertEqual(num, len(_s_a))
-
-    def _lines_via_big_string(self, big_s):
-        _iter = _subject_module().lines_via_big_string(big_s)
-        return [x for x in _iter]
 
 
 class Case0437_empty_string(_NormalLinerCase):
@@ -32,8 +28,8 @@ class Case0437_empty_string(_NormalLinerCase):
         self._this_many_lines(0)
 
     @shared_subject
-    def _lines(self):
-        return self._lines_via_big_string('')  # EMPTY_S
+    def lines(self):
+        return line_tuple_via_big_string('')  # EMPTY_S
 
 
 class Case0440_one_string_no_newline(_NormalLinerCase):
@@ -42,34 +38,31 @@ class Case0440_one_string_no_newline(_NormalLinerCase):
         self.assertIsNotNone(_subject_module())
 
     def test_020_one_line__content_OK(self):
-        _s_a = self._lines()
-        self.assertEqual(['foo'], _s_a)
+        self.assertSequenceEqual(self.lines(), ('foo',))
 
     @shared_subject
-    def _lines(self):
-        return self._lines_via_big_string('foo')
+    def lines(self):
+        return line_tuple_via_big_string('foo')
 
 
 class Case0443_one_string_yes_newline(_NormalLinerCase):
 
     def test_010_one_line__content_OK(self):
-        _s_a = self._lines()
-        self.assertEqual(["foo\n"], _s_a)
+        self.assertSequenceEqual(self.lines(), ('foo\n',))
 
     @shared_subject
-    def _lines(self):
-        return self._lines_via_big_string("foo\n")
+    def lines(self):
+        return line_tuple_via_big_string("foo\n")
 
 
 class Case0446_blank_lines_inside(_NormalLinerCase):
 
     def test_010_three_lines__content_OK(self):
-        _s_a = self._lines()
-        self.assertEqual(["foo\n", "\n", "bar\n"], _s_a)
+        self.assertSequenceEqual(self.lines(), ('foo\n', '\n', 'bar\n'))
 
     @shared_subject
-    def _lines(self):
-        return self._lines_via_big_string("foo\n\nbar\n")
+    def lines(self):
+        return line_tuple_via_big_string("foo\n\nbar\n")
 
 
 class _CommonCase(unittest.TestCase):
@@ -122,7 +115,7 @@ class Case0449_scanner_via_iterator(_CommonCase):
         while scn.has_current_token:
             act_num_a.append(scn.current_token)
             scn.advance_by_one_token()
-        self.assertEqual([x for x in num_a], act_num_a)
+        self.assertSequenceEqual(act_num_a, num_a)
 
     def _build_empty(self):
         return self._subject_function(_empty_iterator())
@@ -182,18 +175,16 @@ class Case0455_these_errors(_CommonCase):
         self.assertEqual(exp_s, str(e))
 
 
-class Case0458_cover_edge__end_of_input_during_branch(_CommonCase):
+class Case0458_two_lines_no_indent(_CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
 
     def test_020_this_is_NOT_seen_as_two_toplevel_items_but_multiple_lines_of_a_section(self):  # noqa: E501
         t = self._tree
-        self._assertThisManyChildren(1, t)
-        t, = self._children_of(t)
+        self._assertThisManyChildren(2, t)
         _act = [self._styled_content_string(x) for x in self._children_of(t)]
-        _exp = ['one', 'two']
-        self.assertEqual(_exp, _act)
+        self.assertSequenceEqual(_act, ('one', 'two'))
 
     @property
     @shared_subject
@@ -205,24 +196,20 @@ class Case0458_cover_edge__end_of_input_during_branch(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case0461_cover_edge__indet_to_indet(_CommonCase):
+class Case0461_introduce_less_indent(_CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
 
-    def test_020_look_upon_this_beautiful_structure(self):
-        # if you refactor and this test is cumbersome, consider #here1
-        t = self._tree
-        self._assertThisManyChildren(1, t)
-        one_t, = self._children_of(t)
-        self._assertThisManyChildren(3, one_t)
-        one, two_t, four = self._children_of(one_t)
-        self._assertThisManyChildren(2, two_t)
-        two, three = self._children_of(two_t)
-        self._assertStyledContentString('one', one)
-        self._assertStyledContentString('two', two)
-        self._assertStyledContentString('three', three)
-        self._assertStyledContentString('four', four)
+    def test_020_structure(self):
+        actual = debugging_strings_for_tree(self._tree)
+        expected = deindented_strings("""
+            one
+            > two
+            > > three
+            > four
+        """)
+        self.assertSequenceEqual(actual, expected)
 
     @property
     @shared_subject
@@ -241,61 +228,27 @@ class Case0464_first_target_case(_CommonCase):
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
 
-    def test_020_section_one_is_itself_terminal(self):
-        t = self._tree
-        self._assertThisManyChildren(4, t)
-        section_one = self._nth_child(0, t)
-        self._assertStyledContentString('very first line', section_one)
+    def test_020_structure(self):
+        actual = debugging_strings_for_tree(self._tree)
+        expected = deindented_strings("""
+            very first line
 
-    def test_030_section_four_EXPERIMENTAL_FLATNESS(self):
-        _section_four = self._nth_child(3, self._tree)
-        self._assert_all_terminals(
-            _section_four,
-            'header of this other section',
-            'one fellow',
-        )
+            desc line one
+            desc line two
+            desc line three
 
-    def test_040_section_two_consists_of_three_terminals(self):
-        _section_two = self._nth_child(1, self._tree)
-        self._assert_all_terminals(
-            _section_two,
-            'desc line one',
-            'desc line two',
-            'desc line three',
-        )
-
-    def test_050_section_three_EXPERMENTAL_FLATNESS_FURTHER(self):
-        section_three = self._nth_child(2, self._tree)
-        self._assertThisManyChildren(4, section_three)
-        _1, _2, _3, _4 = self._children_of(section_three)
-        self._assertStyledContentString('header of this one section', _1)
-        self._assertStyledContentString('item two', _3)
-
-        # at first glance we don't love what's going on here: look how
-        # 'item one' and 'item three' look structurally similar in the
-        # input, but in the parse tree they are structurally different.
-
-        # the trick seems to be that there must be at least 2 items
-        # to justify making a branch node.
-
-        self._assert_all_terminals(
-            _4,
-            'item three',
-            'subdesc line 3.two',
-        )
-
-        self._assertThisManyChildren(2, _2)
-        one, the_rest = self._children_of(_2)
-        self._assertStyledContentString('item one', one)
-        self._assert_all_terminals(
-            the_rest,
-            'subdesc line 1.two',
-            'subdesc line 1.three',
-        )
-
-    def _assert_all_terminals(self, br, *s_a):
-        _act = [self._styled_content_string(x) for x in self._children_of(br)]
-        self.assertEqual(list(s_a), _act)
+            header of this one section
+            > item one
+            > > subdesc line 1.two
+            > > subdesc line 1.three
+            > item two
+            > item three
+            > > subdesc line 3.two
+            > >
+            header of this other section
+            > one fellow
+        """)
+        self.assertSequenceEqual(actual, expected)
 
     @property
     @shared_subject
@@ -321,60 +274,33 @@ class Case0464_first_target_case(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-def _lines_for_testing_via_tree(tree):  # :#here1
+def debugging_strings_for_tree(tree):
+    return tuple(_debugging_strings_recurse(tree, 0))
 
-    # (near #history-A.1 this seemed to work. but it is not covered.)
 
-    def _scanner_via_branch(branch):
-        return _scanner_via_iterator(iter(branch.children))
-    _scanner_via_iterator = _subject_module()._scanner_via_iterator
+def _debugging_strings_recurse(tree, depth):
+    deeper = depth + 1
+    for node in tree.children:
+        if node.is_terminal:
+            yield _string_via_terminal(node, depth)
+            continue
 
-    stack = [_scanner_via_branch(tree)]
+        yield _string_via_terminal(node.head_line, depth)
 
-    def initial_step_fuction():
-        frm = stack[-1]
-        use_stack_depth = len(stack) - 1
-        while not frm.current_token.is_terminal:
-            frm = _scanner_via_branch(frm.current_token)
-            stack.append(frm)
-            use_stack_depth += 1
+        for string in _debugging_strings_recurse(node, deeper):
+            yield string
 
-        term = frm.current_token
 
-        while True:
-            frm.advance_by_one_token()
-            if frm.has_current_token:
-                break
-            stack.pop()
-            if len(stack) is 0:
-                self._function = lambda: None
-                break
-            frm = stack[-1]
-
-        return ('> ' * use_stack_depth) + term.styled_content_string
-
-    class _StateAndAlsoIterator:  # #[#510.3]
-
-        def __init__(self):
-            self._function = initial_step_fuction
-
-        def __iter__(self):
-            return self
-
-        def __next__(self):
-            x = self._function()
-            if x is None:
-                del self._function
-                raise StopIteration
-            else:
-                return x
-
-    self = _StateAndAlsoIterator()
-    return iter(self)
+def _string_via_terminal(terminal, depth):
+    pieces = ['>' for _ in range(0, depth)]
+    s = terminal.styled_content_string
+    if s is not None:
+        pieces.append(s)
+    return ' '.join(pieces)
 
 
 def _tree_via_docstring(doc_s):
-    _lines = _lines_via_docstring(doc_s)
+    _lines = deindented_lines(doc_s)
     return _tree_via_lines(_lines)
 
 
@@ -382,19 +308,19 @@ def _tree_via_lines(lines):
     return _subject_module().tree_via_lines(lines)
 
 
-def _lines_via_docstring(big_s):
-    """de-indent our doc-strings"""
+def deindented_lines(big_string):
+    from script_lib import deindented_lines_via_big_string_
+    return deindented_lines_via_big_string_(big_string)
 
-    import re
-    match = re.search('^\n([ ]+)', big_s)
-    _how_many_spaces = len(match[1])
 
-    _yikes_re_s = '(?:[ ]{%d}|)([^\n]*\n)' % _how_many_spaces
+def deindented_strings(big_string):
+    from script_lib import deindented_strings_via_big_string_
+    return tuple(deindented_strings_via_big_string_(big_string))
 
-    iter = re.finditer(_yikes_re_s, big_s)
-    next(iter)  # skip the very first "\n" that is right after the """
 
-    return (match[1] for match in iter)
+def line_tuple_via_big_string(big_string):
+    from script_lib import lines_via_big_string
+    return tuple(lines_via_big_string(big_string))
 
 
 @lazy

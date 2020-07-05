@@ -24,9 +24,7 @@ class CommonCase(unittest.TestCase):
 
     def _in_usage_expect_interesting_tail(self, tail_s):
         import re
-        node = self._section_index()['usage']
-        _use_node = node if node.is_terminal else node.children[0]
-        _s = _use_node.styled_content_string
+        _s = self._section_index()['usage'].head_line.styled_content_string
         _match = re.search('^usage: ohai-mumo my-command (.+)$', _s)
         _act = _match[1]
         self.assertEqual(tail_s, _act)
@@ -58,7 +56,8 @@ class CommonCase(unittest.TestCase):
         return oai
 
     def build_section_index(self):
-        return EHS().section_index_via_lines(self.end_state_lines())
+        _ = self.end_state_lines()
+        return EHS().section_index_via_unsanitized_strings_(_)
 
     @dangerous_memoize_in_child_classes('_END_STATE_LINES', 'build_lines')
     def end_state_lines(self):

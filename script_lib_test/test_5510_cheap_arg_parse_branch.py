@@ -53,9 +53,9 @@ class CommonCase(unittest.TestCase):
 
     def _build_help_screen_sect_idx(self):
         from script_lib.test_support.expect_help_screen import (
-                section_index_via_lines)
+                section_index_via_unsanitized_strings_)
         _lines = self.end_state.stderr_lines
-        return section_index_via_lines(_lines)
+        return section_index_via_unsanitized_strings_(_lines)
 
     @property
     @dangerous_memoize_in_child_classes('_ES', 'build_end_state')
@@ -173,7 +173,7 @@ class Case5507_requesting_help_shows_special_branch_screen_CRAZY(CommonCase):
     def test_040_theres_just_the_usual_help_option(self):
         _exp = '-h, --help  show this screen'
         _node = self.section('option')
-        self.assertEqual(_node.children[1].styled_content_string, _exp)
+        self.assertEqual(_node.children[0].styled_content_string, _exp)
 
     def test_050_all_the_subcommands_are_listed(self):
         one, two = (row[0] for row in self.this_table)
@@ -196,7 +196,7 @@ class Case5507_requesting_help_shows_special_branch_screen_CRAZY(CommonCase):
         def f(line):
             return re.match(r'([^ ]+)[ ]{2}(.+)', line).groups()
         import re
-        _header, branch = self.section('sub-commands').children
+        branch = self.section('sub-commands')
         return tuple(f(ch.styled_content_string) for ch in branch.children)
 
     def given_argv_tail(self):

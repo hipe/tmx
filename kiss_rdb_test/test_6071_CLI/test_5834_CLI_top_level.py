@@ -106,7 +106,7 @@ class Case5739_strange_arg(_CommonCase):
 
     def test_200_whines_with_this_message(self):
         _msg = self._exe().message
-        self.assertEqual(_msg, 'No such command "foo-fah-fee".')
+        self.assertEqual(_msg, "No such command 'foo-fah-fee'.")
 
     @shared_subject
     def _exe(self):
@@ -146,20 +146,24 @@ class Case5772_toplevel_help_in_general(_CommonCase):
         self.assertIsNotNone(_ok)
 
     def test_300_options_section(self):
-        _section = _CASE_A().tree.children[1]
-        first, *rest = _section.children
+        node = _CASE_A().tree.children[2]  # the Options: section
 
         # the title of this section is something like "options"
-        self.assertEqual(first.styled_content_string, 'Options:')
+        self.assertEqual(node.head_line.styled_content_string, 'Options:')
+
+        cx = [x for x in node.children]  # make a mutable copy
+
+        assert(cx[-1].is_blank_line)
+        cx.pop()
 
         # the last item in the list of options is the self-referential one
-        _actual = rest[0].children[-1].styled_content_string
         self.assertRegex(
-                _actual,
+                cx[-1].styled_content_string,
                 r'^--help[ ]+Show this message and exit\.$')
 
-        # there are no other items
-        self.assertEqual(len(rest), 1)
+        cx.pop()
+        self.assertEqual(len(cx), 1)
+        self.assertIn('collections-hub', cx[0].styled_content_string)
 
 
 class Case5778_toplevel_help_plus_argument(_CommonCase):
