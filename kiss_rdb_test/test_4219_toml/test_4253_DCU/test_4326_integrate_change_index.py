@@ -71,6 +71,8 @@ class _CommonCase(unittest.TestCase):
         import sys
         return sys.stderr
 
+    identifier_via_primitive = storage_adapter_canon.identifier_via_string
+
     do_debug = True
 
 

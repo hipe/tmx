@@ -22,17 +22,7 @@ canon = storage_adapter_canon.produce_agent()
 class _CommonCase(unittest.TestCase):
 
     def build_end_state_expecting_failure(self):
-        from modality_agnostic.test_support import structured_emission as se_lib  # noqa: E501
-        listener, emissioner = se_lib.listener_and_emissioner_for(self)
-        x = self.resolve_collection(listener)
-        chan, payloader = emissioner()
-        sct = payloader()  # make it not hot
-        return {
-                'result_value': x,
-                'channel': chan,
-                'payloader_CAUTION_HOT': lambda: sct,
-                }
-        # eventually #open [#867.J] re-redund this
+        return canon.build_end_state_expecting_failure_via(self)
 
     def resolve_collection(self, listener):
         from kiss_rdb.storage_adapters_ import markdown_table as lib

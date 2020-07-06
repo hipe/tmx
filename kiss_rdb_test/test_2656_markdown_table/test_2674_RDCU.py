@@ -16,6 +16,8 @@ class _CommonCase(unittest.TestCase):
     def reason(self):  # must be used with _flush_reason_early
         return self.end_state()['reason']
 
+    identifier_via_primitive = storage_adapter_canon.identifier_via_string
+
     do_debug = False
 
 
@@ -491,10 +493,6 @@ def _build_collection_via_path_and_big_string(path, big_string):  # #COPY-PASTE
     _coll_ID = StubCollectionIdentity(pfile)
     from kiss_rdb.storage_adapters_ import markdown_table as lib
     return lib._resolve_collection_via_file(pfile, _coll_ID, None)
-
-
-def do_me():
-    raise Exception('do me')
 
 
 if __name__ == '__main__':

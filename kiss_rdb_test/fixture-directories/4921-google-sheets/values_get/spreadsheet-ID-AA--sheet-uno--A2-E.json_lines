@@ -1,0 +1,19 @@
+# wierd experimental new file micro-format implemented at #birth
+# Blank lines (like the next line) are ignored
+
+# (Blank lines must have no trailing ws)
+# Lines that start with a '#' are also ignored (for comments)
+# The '#' must be at the very start of the line
+# All other lines are parsed as json, line-by-line
+# (so no json strings with newlines in them)
+
+["hello mom", "hi mother"]
+
+["kanye west", 123]
+
+"qq mm aa"
+
+123.45
+
+
+# #birth.

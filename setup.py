@@ -16,6 +16,8 @@ install this with:
 |script_lib_test         | (none)
 |tag_lyfe_test           | tatsu
 |kiss_rdb_test           | toml, enolib, click
+|^ google sheets         | google-api-python-client, google-auth-httplib2,
+|                        | google-auth-oauthlib
 |data_pipes_test         | soupsieve, bs4
 |sakin_agac_test         | (none)
 |pho_test                | (none)

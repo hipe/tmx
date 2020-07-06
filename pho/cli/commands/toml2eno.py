@@ -162,8 +162,4 @@ def __yield_none_at_EOF(fh):
 
     yield None
 
-
-def xx():
-    raise Exception('xx')  # #todo
-
 # #born.

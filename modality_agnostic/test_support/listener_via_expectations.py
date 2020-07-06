@@ -20,8 +20,9 @@ def for_DEBUGGING(*a):
         io.write(f'meta-doh-dah: {repr(payloader())}')
     elif 'expression' == shape:
         # (at #history-A.1 got rid of old way)
-        _lines = tuple(payloader())
-        io.write(f'messages: {repr(_lines)}')
+        if payloader is not None:
+            _lines = tuple(payloader())
+            io.write(f'messages: {repr(_lines)}')
     else:
         raise Exception(f'strange shape: {repr(shape)}')
 

@@ -246,7 +246,7 @@ class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
     @shared_subject
     def end_state(self):
         class identifier_lol:
-            def to_string():
+            def to_primitive():
                 return 'thing_1'
         es = self._canon.end_state_via_(self, self.given_run, False)
         es['identifier'] = identifier_lol

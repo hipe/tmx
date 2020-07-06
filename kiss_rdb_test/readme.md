@@ -31,6 +31,7 @@ py -c 'print(tuple(round(2500 + (2500/16) + (2500 * (i/8))) for i in range(0, 8)
   - toml (was first) (4219)
   - yaml (fallback) (4531)
   - eno (dream) (4844)
+  - google sheets (4921)
 
 
 ## modality adaptations

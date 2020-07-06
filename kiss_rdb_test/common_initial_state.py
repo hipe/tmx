@@ -122,7 +122,7 @@ functions_for = __make_functions_for()
 
 
 def _path_for(self, tail):
-    _ = self.fixture_directories_directory()
+    _ = self.fixture_directories_directory
     return os_path.join(_, tail)
 
 
@@ -130,38 +130,45 @@ class _FunctionsFor:
 
     @memoize_into('_ca_head')
     def common_args_head(self):
-        _ = self.fixture_directories_directory()
+        _ = self.fixture_directories_directory
         return ('--collections-hub', _)
 
+    @property
     @memoize_into('_fdd')
     def fixture_directories_directory(self):
         _ = top_fixture_directories_directory()
         return os_path.join(_, self.fixture_dir_name)
 
 
-_these_classes = {}
-
-
-def _woah(k):
+def o(k):
     def decorator(cls):
         _these_classes[k] = cls
         return cls
     return decorator
 
 
-@_woah('eno')
+_these_classes = {}
+
+
+@o('eno')
 class ___funcs_for_eno(_FunctionsFor):
     fixture_directory_for = _path_for
     fixture_dir_name = '4844-eno'
 
 
-@_woah('markdown')
+@o('google_sheets')
+class ___funcs_for_google_sheets(_FunctionsFor):
+    fixture_directory_for = _path_for
+    fixture_dir_name = '4921-google-sheets'
+
+
+@o('markdown')
 class ___funcs_for_MD(_FunctionsFor):
     fixture_path = _path_for
     fixture_dir_name = '2656-markdown-table'
 
 
-@_woah('toml')
+@o('toml')
 class ___funcs_for_TOML(_FunctionsFor):
     fixture_directory_for = _path_for
     fixture_dir_name = '4219-toml'

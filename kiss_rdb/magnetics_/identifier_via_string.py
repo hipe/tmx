@@ -252,6 +252,8 @@ class Identifier_:
     def to_string(self):
         return ''.join(nd.character for nd in self.native_digits)
 
+    to_primitive = to_string
+
     @property
     def number_of_digits(self):
         return len(self.native_digits)

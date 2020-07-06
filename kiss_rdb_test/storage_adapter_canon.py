@@ -139,7 +139,7 @@ class case_of_traverse_IDs_from_non_empty_collection:  # #as-namespace-only
     def confirm_all_IDs_in_any_order_no_repeats(tc):  # similar to #here1
         coll = tc.subject_collection()
         _iids = _do_to_ID_stream(coll, None)
-        _string_tup = tuple(iid.to_string() for iid in _iids)  # sim to #here2
+        _string_tup = tuple(iid.to_primitive() for iid in _iids)  # see #here2
         _actual_sorted = sorted(_string_tup)
         tc.assertSequenceEqual(_actual_sorted, _these_N_IDs)
 
@@ -155,14 +155,14 @@ class case_of_traverse_all_entities:  # #as-namespace
 
     def confirm_all_IDs_in_any_order_no_repeats(tc):
         _tup = tc.flattened_collection_for_traversal_case()
-        _string_tup = tuple(ent.identifier.to_string() for ent in _tup)
+        _string_tup = tuple(ent.identifier.to_primitive() for ent in _tup)
         _actual_sorted = sorted(_string_tup)  # similar to #here2
         tc.assertSequenceEqual(_actual_sorted, _these_N_IDs)
 
     def confirm_particular_entity_knows_one_of_its_field(tc):
-        id_s = tc.given_identifier_string()
+        id_s = _ID_primitive_via_TC(tc)
         _tup = tc.flattened_collection_for_traversal_case()
-        ent = next(ent for ent in _tup if id_s == ent.identifier.to_string())
+        ent = next(ent for ent in _tup if id_s == ent.identifier.to_primitive())  # noqa: E501
         _actual = _yes_value_dict(ent)['thing_A']  # #watch [#867.B] getters?
         tc.assertEqual(_actual, f"hi i'm {id_s}")
 
@@ -172,8 +172,8 @@ class case_of_traverse_all_entities:  # #as-namespace
         itr = (ent for ent in _tup if ent.identifier.to_string() in these)
         left = next(itr)
         right = next(itr)
-        tc.assertNotEqual(left.identifier.to_string(),
-                          right.identifier.to_string())
+        tc.assertNotEqual(left.identifier.to_primitive(),
+                          right.identifier.to_primitive())
         left_dct = _yes_value_dict(left)
         right_dct = _yes_value_dict(right)
         tc.assertNotEqual(left_dct, right_dct)
@@ -227,11 +227,11 @@ class case_of_entity_not_found_because_identifier_too_deep:
         # assert that the identifier is in the expression (..)
 
         _assert_says_identifier_probably(
-                tc, reason, tc.given_identifier_string())
+                tc, reason, _ID_primitive_via_TC(tc))
 
     def build_end_state(tc):
         return _end_state_for_retrieve_via_string(
-                tc, tc.given_identifier_string(), _expecting_not_OK)
+                tc, _ID_primitive_via_TC(tc), _expecting_not_OK)
 
 
 class case_of_entity_not_found:  # #as-namespace-only
@@ -244,12 +244,12 @@ class case_of_entity_not_found:  # #as-namespace-only
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
         _assert_says_identifier_probably(
-                tc, reason, tc.given_identifier_string())
+                tc, reason, _ID_primitive_via_TC(tc))
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
         return _end_state_for_retrieve_via_string(
-                tc, tc.given_identifier_string(), _expecting_not_OK)
+                tc, _ID_primitive_via_TC(tc), _expecting_not_OK)
 
 
 class case_of_retrieve_OK:  # #as-namespace-only
@@ -257,12 +257,12 @@ class case_of_retrieve_OK:  # #as-namespace-only
     def confirm_entity_is_retrieved_and_looks_ok(tc):
         # assume no emissions bc we built it belo with this implicit assumption
         ent = tc.end_state()['result_value']
-        _ = tc.given_identifier_string()
+        _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_before_update(tc, ent, _)
 
     def build_end_state(tc):
-        # we have to deconstruct and duplicate "build end state" b.c no emmiss
-        iden = _identifier_via_string(tc.given_identifier_string())
+        # we have to deconstruct and duplicate "build end state" b.c no emissio
+        iden = tc.identifier_via_primitive(_ID_primitive_via_TC(tc))
         coll = tc.subject_collection()
         wat = _do_retrieve(coll, iden, None)
         return {'result_value': wat, 'collection': coll, 'identifier': iden}
@@ -281,13 +281,13 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
         _assert_says_cannot_verb(tc, reason, 'delete')
 
         _assert_says_identifier_probably(
-                tc, reason, tc.given_identifier_string())
+                tc, reason, _ID_primitive_via_TC(tc))
 
         tc.assertRegex(reason, r'\bnot found\b')
 
     def build_end_state(tc):
         return _end_state_for_delete_via_string(
-                tc, tc.given_identifier_string(), _expecting_not_OK)
+                tc, _ID_primitive_via_TC(tc), _expecting_not_OK)
 
 
 class _common_delete:  # as-namespace-only
@@ -304,7 +304,7 @@ class _common_delete:  # as-namespace-only
         es = tc.end_state()
         tc.assertSequenceEqual(
                 es['channel'], ('info', 'structure', 'deleted_entity'))
-        _iid_s = es['identifier'].to_string()
+        _iid_s = es['identifier'].to_primitive()
         message = _message_from(es)
         _assert_says_identifier_probably(tc, message, _iid_s)
         tc.assertRegex(message, r'\bdeleted\b')
@@ -428,7 +428,7 @@ class case_of_update_but_entity_not_found:  # #as-namespace-only
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
         _assert_says_cannot_verb(tc, reason, 'update')
-        _iid_s = es['identifier'].to_string()
+        _iid_s = es['identifier'].to_primitive()
         _assert_says_identifier_probably(tc, reason, _iid_s)
         tc.assertIn(' not found ', reason)  # ..
 
@@ -450,7 +450,7 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
         _assert_says_cannot_verb(tc, reason, 'update')
 
         _assert_says_identifier_probably(
-                tc, reason, es['identifier'].to_string())
+                tc, reason, es['identifier'].to_primitive())
 
         tc.assertRegex(reason, r'\b(?:has no existing value|not found in entity)\b')  # noqa: E501
 
@@ -472,7 +472,7 @@ class case_of_update_OK:  # #as-namespace-only
         chan = es['channel']
         tc.assertSequenceEqual(chan, ('info', 'structure', 'updated_entity'))
         message = _message_from(es)
-        _ = tc.given_identifier_string()
+        _ = _ID_primitive_via_TC(tc)
         # a big flex 👇
         _exp = f"updated '{_}' "\
                '(created 1, updated 1 and deleted 1 attribute)'
@@ -480,12 +480,12 @@ class case_of_update_OK:  # #as-namespace-only
 
     def confirm_the_before_entity_has_the_before_values(tc):
         before_ent, after_ent = tc.end_state()['result_value']
-        _ = tc.given_identifier_string()
+        _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_before_update(tc, before_ent, _)
 
     def confirm_the_after_entity_has_the_after_values(tc):
         before_ent, after_ent = tc.end_state()['result_value']
-        _ = tc.given_identifier_string()
+        _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_after_update(tc, after_ent, _)
 
     def confirm_retrieve_after_shows_updated_value(tc):
@@ -493,7 +493,7 @@ class case_of_update_OK:  # #as-namespace-only
         identi = es['identifier']
         coll = es['collection']
         ent = _do_retrieve(coll, identi, None)
-        _ = tc.given_identifier_string()
+        _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_after_update(tc, ent, _)
 
     def build_end_state(tc):
@@ -504,7 +504,7 @@ class case_of_update_OK:  # #as-namespace-only
 # == support that helps make asssertions of states
 
 def _same_confirmation_of_after_update(tc, after_ent, ID_s):
-    _ = after_ent.identifier.to_string()
+    _ = after_ent.identifier.to_primitive()
     tc.assertEqual(_, ID_s)  # might become own test
     dct = _yes_value_dict(after_ent)
     act_left = dct['thing_B']
@@ -515,7 +515,7 @@ def _same_confirmation_of_after_update(tc, after_ent, ID_s):
 
 
 def _same_confirmation_of_before_update(tc, ent, ID_s):
-    tc.assertEqual(ent.identifier.to_string(), ID_s)  # might become own test
+    tc.assertEqual(ent.identifier.to_primitive(), ID_s)  # maybe dedicated test
     dct = _yes_value_dict(ent)
     tc.assertEqual(dct['thing_A'], f"hi i'm {ID_s}")
     tc.assertEqual(dct['thing_B'], f"hey i'm {ID_s}")
@@ -584,13 +584,6 @@ def _yes_value_dict(ent):
 yes_value_dictionary_of = _yes_value_dict
 
 
-def _identifier_via_string(s):
-    from modality_agnostic import listening
-    listener = listening.throwing_listener
-    from kiss_rdb.magnetics_ import identifier_via_string as lib
-    return lib.identifier_via_string_(s, listener)
-
-
 # == support that helps set up state
 
 # -- update
@@ -599,7 +592,7 @@ def _end_state_for_update(tc, tup, iid_s, expecting_OK):
     def run(listener):
         return coll.update_entity_as_storage_adapter_collection(
                 identifier, tup, listener)
-    identifier = _identifier_via_string(iid_s)
+    identifier = tc.identifier_via_primitive(iid_s)
     coll = tc.subject_collection()
     return _end_state_plus(tc, run, coll, identifier, expecting_OK)
 
@@ -622,7 +615,7 @@ def _end_state_for_create(tc, dct, expecting_OK, with_coll=None):
 def _end_state_for_delete_via_string(tc, iid_s, expecting_OK):
     def run(listener):
         return coll.delete_entity_as_storage_adapter_collection(iden, listener)
-    iden = _identifier_via_string(iid_s)
+    iden = tc.identifier_via_primitive(iid_s)
     coll = tc.subject_collection()
     return _end_state_plus(tc, run, coll, iden, expecting_OK)
 
@@ -630,7 +623,7 @@ def _end_state_for_delete_via_string(tc, iid_s, expecting_OK):
 # -- retrive
 
 def _end_state_for_retrieve_via_string(tc, iid_s, expecting_OK):
-    iden = _identifier_via_string(iid_s)
+    iden = tc.identifier_via_primitive(iid_s)
     coll = tc.subject_collection()
 
     def run(listener):
@@ -647,6 +640,20 @@ def _do_to_ID_stream(coll, listener):
 
 
 # -- support
+
+def build_end_state_expecting_failure_via(tc):
+    from modality_agnostic.test_support import structured_emission as se_lib
+    listener, emissioner = se_lib.listener_and_emissioner_for(tc)
+    x = tc.resolve_collection(listener)
+    chan, payloader = emissioner()
+    sct = payloader()  # make it not hot
+    return {
+            'result_value': x,
+            'channel': chan,
+            'payloader_CAUTION_HOT': lambda: sct,
+            }
+    # eventually #open [#867.J] re-redund this
+
 
 def _end_state_plus(tc, run, coll, identifier, expecting_OK):
     es = end_state_via_(tc, run, expecting_OK)
@@ -721,6 +728,19 @@ def end_state_via_(tc, run, expecting_OK):
             'channel': chan,
             'payloader_CAUTION_HOT': payloader,
             }
+
+
+def identifier_via_string(_, s):  # #method
+    from modality_agnostic import listening
+    listener = listening.throwing_listener
+    from kiss_rdb.magnetics_ import identifier_via_string as lib
+    return lib.identifier_via_string_(s, listener)
+
+
+def _ID_primitive_via_TC(tc):
+    if hasattr(tc, 'given_identifier_string'):
+        return tc.given_identifier_string()
+    return tc.given_identifier_primitive()
 
 
 _expecting_not_OK = False
