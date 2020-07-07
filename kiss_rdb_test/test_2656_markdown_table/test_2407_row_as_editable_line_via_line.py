@@ -66,7 +66,7 @@ class _CommonCase(unittest.TestCase):
 
     def _cel(self, offset):
         case = self.case()
-        return case.row.cel_at_offset(offset)
+        return case.row.cell_at_offset(offset)
 
 
 def given_input_string(f):  # #decorator #[#510.6]

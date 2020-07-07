@@ -383,8 +383,8 @@ def _create(lines, dct, schema, g, listener):
     iden_via_int = codec.identifier_via_integer
     int_via_ident = codec.integer_via_identifier
 
-    def cel_via_iden(iden):
-        return _IdentifierInFirstCel(_w_left, iden, _w_right)
+    def cell_via_iden(iden):
+        return _IdentifierInFirstCell(_w_left, iden, _w_right)
 
     def future_then_new_lines():
 
@@ -420,7 +420,7 @@ def _create(lines, dct, schema, g, listener):
 
         if table_is_empty:
             new_iden = iden_via_s('223')  # not iden_via_int(1) because depth
-            new_ent._identifier_cel_ = cel_via_iden(new_iden)
+            new_ent._identifier_cel_ = cell_via_iden(new_iden)
             yield new_ent._TO_LINE_()
             new_entity = succeeded()
             return
@@ -462,7 +462,7 @@ def _create(lines, dct, schema, g, listener):
 
         _my_int = prev_int + 1
         new_iden = iden_via_int(_my_int)  # who knows what depth
-        new_ent._identifier_cel_ = cel_via_iden(new_iden)
+        new_ent._identifier_cel_ = cell_via_iden(new_iden)
         yield new_ent._TO_LINE_()
 
         if output_this_line is not None:
@@ -555,7 +555,7 @@ def _flush_edit(original_ent, updates_creates_deletes, schema):
         original_cel = orig_cels[i]
         assert(k == original_cel.field_name)
         assert(0 < len(original_cel.content_string))
-        new_cel = _AttributeCel(
+        new_cel = _AttributeCell(
                 original_cel.left_number_of_spaces,
                 new_content_s,
                 original_cel.right_number_of_spaces,
@@ -570,10 +570,10 @@ def _flush_edit(original_ent, updates_creates_deletes, schema):
 
     for k, new_content_s in creates:
         i = offset_via_name[k]
-        new_cel = _AttributeCel(_w_left, new_content_s, _w_right, k)
+        new_cel = _AttributeCell(_w_left, new_content_s, _w_right, k)
         if this_offset < i:  # (or sort the request components)
             for j in range(this_offset+1, i):
-                new_cels[j] = _AttributeCel(0, '', 0, field_names[j])
+                new_cels[j] = _AttributeCell(0, '', 0, field_names[j])
             this_offset = i
         else:
             original_cel = orig_cels[i]
@@ -588,7 +588,7 @@ def _flush_edit(original_ent, updates_creates_deletes, schema):
         i = offset_via_name[k]
         original_cel = orig_cels[i]
         assert(0 < len(original_cel.content_string))
-        new_cels[i] = _AttributeCel(0, '', 0, k)
+        new_cels[i] = _AttributeCell(0, '', 0, k)
 
     # Finally: you null-paddded the result list way above.
     # Now, take out the tail-anchored nulls you didn't need
@@ -843,7 +843,7 @@ def _stateful_grammar_via(schema):
 
         w_right = skip_any_whitespace()
 
-        yield _IdentifierInFirstCel(w_left, identi, w_right)
+        yield _IdentifierInFirstCell(w_left, identi, w_right)
 
         field_names = schema.normal_field_names
         current_field_offset = 0  # off by one: we would start this at -1
@@ -871,7 +871,7 @@ def _stateful_grammar_via(schema):
 
                 pipe_w = scn.skip(pipe)
                 if pipe_w is not None:
-                    yield _AttributeCel(0, '', 0, field_name)
+                    yield _AttributeCell(0, '', 0, field_name)
                     continue
 
                 # allow for cels that are nothing but 1 or more spaces
@@ -884,7 +884,7 @@ def _stateful_grammar_via(schema):
                         content_s = ''
                 w_right = skip_any_whitespace()
                 has_trailing_pipe = False
-                yield _AttributeCel(w_left, content_s, w_right, field_name)
+                yield _AttributeCell(w_left, content_s, w_right, field_name)
                 break
 
         assert(scn.eos())
@@ -1114,7 +1114,7 @@ class RowAsEntity_:
     table_type = 'attributes'  # #cover-me:w
 
 
-class _Cel:  # #abstract
+class _Cell:  # #abstract
 
     def __init__(self, w_left, w_right):
         self.left_number_of_spaces = w_left
@@ -1135,7 +1135,7 @@ class _Cel:  # #abstract
         yield self._to_main_piece_()
 
 
-class _IdentifierInFirstCel(_Cel):
+class _IdentifierInFirstCell(_Cell):
 
     def __init__(self, w_left, identi, w_right):
         super().__init__(w_left, w_right)
@@ -1145,7 +1145,7 @@ class _IdentifierInFirstCel(_Cel):
         return self.identifier_in_first_cel.to_string()
 
 
-class _AttributeCel(_Cel):
+class _AttributeCell(_Cell):
 
     def __init__(self, w_left, content_string, w_right, field_name):
         super().__init__(w_left, w_right)
@@ -1170,7 +1170,7 @@ class _AttributeCel(_Cel):
         return other  # string
 
 
-AttributeCel_ = _AttributeCel
+AttributeCell_ = _AttributeCell
 
 
 _crazy_rx = re.compile(r"""^(?:

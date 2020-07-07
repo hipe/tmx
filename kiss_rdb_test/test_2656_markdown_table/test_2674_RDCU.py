@@ -343,23 +343,23 @@ class Case2716_update_OK(_CommonCase):
     """
 
     def test_531_padding_of_ID_cel_surface_is_unchanged(self):
-        s = self.cel_at(0)
+        s = self.cell_at(0)
         self.assertEqual(s, '  B9H ')
 
     def test_594_field_one_is_still_zero_width(self):
-        s = self.cel_at(1)
+        s = self.cell_at(1)
         self.assertEqual(s, '')
 
     def test_656_field_two_is_created_and_clobbers_the_weird_padding(self):
-        s = self.cel_at(2)
+        s = self.cell_at(2)
         self.assertEqual(s, ' I\'m created "thing_2" ')
 
     def test_719_deleted_cel_is_now_zero_width(self):
-        s = self.cel_at(3)
+        s = self.cell_at(3)
         self.assertEqual(s, '')
 
     def test_781_updating_DOES_inherit_the_leading_padding(self):
-        s = self.cel_at(4)
+        s = self.cell_at(4)
         exp = '  I\'m modified "thing_B"'
         self.assertEqual(s.index(exp), 0)
 
@@ -378,12 +378,12 @@ class Case2716_update_OK(_CommonCase):
         self.assertEqual(_num, 5)
 
     def test_969_no_trailing_whitespace_because_no_trailing_pipe(self):
-        s = self.cel_at(4)
+        s = self.cell_at(4)
         exp = 'I\'m modified "thing_B"'
         act = s[-len(exp):]
         self.assertEqual(act, exp)
 
-    def cel_at(self, i):
+    def cell_at(self, i):
         return self.my_custom_index()['cels'][i]
 
     @shared_subject

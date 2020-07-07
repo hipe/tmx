@@ -87,9 +87,9 @@ class Case0130DP_adds_only(_CommonCase):
 
         items = self._items()
         row = items[1]
-        cel0 = row.cel_at_offset(0)
-        cel1 = row.cel_at_offset(1)
-        cel2 = row.cel_at_offset(2)
+        cel0 = row.cell_at_offset(0)
+        cel1 = row.cell_at_offset(1)
+        cel2 = row.cell_at_offset(2)
 
         self.assertEqual(cel0.content_string(), '3A')
         self.assertEqual(cel1.to_string(), '|   ')
@@ -121,7 +121,7 @@ class Case0140DP_MERGE(_CommonCase):
         items = self._items()
         self.assertEqual(len(items), 2)
         row = items[1]
-        t = tuple(row.cel_at_offset(i).content_string() for i in range(0, 3))
+        t = tuple(row.cell_at_offset(i).content_string() for i in range(0, 3))
 
         self.assertEqual(t[0], 'four')
         self.assertEqual(t[1], '5')
@@ -176,7 +176,7 @@ class Case0160DP_custom_keyer_for_syncing(_CommonCase):
     @shared_subject
     def _cel_strings(self):
         _row = self._this_one_business_object_row()
-        return tuple(_row.cel_at_offset(i).to_string() for i in range(0, 3))
+        return tuple(_row.cell_at_offset(i).to_string() for i in range(0, 3))
 
     @shared_subject
     def _sections_index(self):

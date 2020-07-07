@@ -65,7 +65,7 @@ class _row_DOM_via_line:
         class symbols:  # #class-as-namespace
 
             def cel(begin, end):
-                _ = _CelDOM()._init_via_begin_and_end(begin, end, self._line)
+                _ = _CellDOM()._init_via_begin_and_end(begin, end, self._line)
                 a.append(_)
                 self._last_end = end
 
@@ -175,7 +175,7 @@ class _RowDOM(_BranchDOM):
         _s_a = [ch.to_string() for ch in self.children]
         return ''.join(_s_a)
 
-    def cel_at_offset(self, offset):
+    def cell_at_offset(self, offset):
         if offset < 0 or offset >= self.cels_count:
             cover_me('out of range')
         return self.children[offset]
@@ -185,7 +185,7 @@ class _RowDOM(_BranchDOM):
             return self.children[-2]  # yikes
 
 
-class _CelDOM(_BranchDOM):
+class _CellDOM(_BranchDOM):
 
     def _init_via_begin_and_end(self, begin, end, line):
         _ = _LeafDOM(line[(begin+1):end])

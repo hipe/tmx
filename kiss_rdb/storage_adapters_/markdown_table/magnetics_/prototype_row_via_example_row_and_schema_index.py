@@ -25,19 +25,19 @@ when the new content string is of a different width than the old one (and
 even when it is the same width as the old one),
 
   - do we simply re-use the padding characters ("coddling") from before?
-  - do we try to keep the width of the cel the same?
-  - or do we try to make the width of the cel match the example row?
-  - wat do when the new content string makes the resulting cel so wide
+  - do we try to keep the width of the cell the same?
+  - or do we try to make the width of the cell match the example row?
+  - wat do when the new content string makes the resulting cell so wide
     that it violates any of the above provisions that you might have?
 
 we assume users may want to "normalize" their formatting to some latest and
 greatest conventional formatting so that the rows generally line up prettily.
 (we arrived at this heuristically.) as such we follow the third option above,
-and when (4) we just let the content push the cel outwards infinitely. (data
+and when (4) we just let the content push the cell outwards infinitely. (data
 producers can of course always trim their own value strings, too.)
 
 but then that's not all. whenever the content string changes width, or the
-target width of the cel changes; we're typically adding or removing
+target width of the cell changes; we're typically adding or removing
 "coddling" spaces (padding).
 
 (this is where the right description of our wrong behavior begins.)
@@ -119,9 +119,9 @@ class _SELF:
         tainted_example_cel_DOM.content_string()  # be sure it's decomposed
         childreners = _childreners_via(tainted_example_cel_DOM)
 
-        _CelDOM = orig_children[0].__class__  # use any child
+        _CelllDOM = orig_children[0].__class__  # use any child
         _celer_via = _celer_via_via(
-                childreners, row_schema_for_alignment, _CelDOM)
+                childreners, row_schema_for_alignment, _CelllDOM)
 
         self._celers = [f(i) for i in range(0, example_row.cels_count)]
         self._offset_via_field_name = complete_schema.offset_via_field_name__
@@ -131,7 +131,7 @@ class _SELF:
         self._natural_key_field_name = natural_key_field_name
 
     def new_row_via_far_pairs_and_near_row_DOM__(self, far_pairs, near_row_DOM):  # noqa: E501 #testpoint
-        """for each key-value in the far pairs, make the new cel.
+        """for each key-value in the far pairs, make the new cell.
 
         for all the rest, use the doo-hah that was there already!
         """
@@ -177,7 +177,7 @@ class _SELF:
         return self._build_new_row(near_f, new_value_via_offset, use_endcap)
 
     def new_via_normal_dictionary(self, far_dict):
-        """for each key-value in the far pairs, make the new cel.
+        """for each key-value in the far pairs, make the new cell.
 
         for all the rest, make them blank cels.
         """
@@ -246,9 +246,9 @@ class _SELF:
         return has
 
 
-def _celer_via_via(childreners, cel_schema, _CelDOM):
+def _celer_via_via(childreners, cell_schema, _CelllDOM):
 
-    def _celer_via(tainted_example_cel_DOM, cel_schema):
+    def _celer_via(tainted_example_cel_DOM, cell_schema):
 
         """a "celer" is a function that makes cels
         """
@@ -265,7 +265,7 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
             cx = [reuse_pipe]
             for x in _gen:
                 cx.append(x)
-            return _CelDOM().init_via_children__(cx)
+            return _CelllDOM().init_via_children__(cx)
 
         tainted_example_cel_DOM.content_string()  # ensure decomposed
         tainted_cx = tainted_example_cel_DOM.children
@@ -279,7 +279,7 @@ def _celer_via_via(childreners, cel_schema, _CelDOM):
         if _do_shrink_to_fit_hack:
             use_alignment = 'align_always_shrink_to_fit'
         else:
-            use_alignment = cel_schema.alignment
+            use_alignment = cell_schema.alignment
         aligned_children = getattr(childreners, use_alignment)
 
         return f
@@ -342,7 +342,7 @@ def _childreners_via(tainted_example_cel_DOM):
     return _childreners
 
 
-def _cel_schema_via(cel_DOM):
+def _cel_schema_via(cell_DOM):
     """so,
 
     these:
@@ -354,7 +354,7 @@ def _cel_schema_via(cel_DOM):
     """
     import re
 
-    s = cel_DOM.content_string()
+    s = cell_DOM.content_string()
     md = re.search(r'^(?:(:)|(-))(?:-*(?:(:)|(-)))?$', s)
 
     if md[1] is None:
@@ -374,17 +374,17 @@ def _cel_schema_via(cel_DOM):
         return _cel_schemas.center_aligned
 
 
-class _CelSchema:
+class _CelllSchema:
     def __init__(self, s):
         self.alignment = s
 
 
 class _cel_schemas:  # #class-as-namespace
 
-    left_aligned = _CelSchema('align_left')
-    center_aligned = _CelSchema('align_center')
-    right_aligned = _CelSchema('align_right')
-    no_alignment_specified = _CelSchema('no_alignment_specified')
+    left_aligned = _CelllSchema('align_left')
+    center_aligned = _CelllSchema('align_center')
+    right_aligned = _CelllSchema('align_right')
+    no_alignment_specified = _CelllSchema('no_alignment_specified')
 
 
 def cover_me(msg=None):  # #open [#876] cover me

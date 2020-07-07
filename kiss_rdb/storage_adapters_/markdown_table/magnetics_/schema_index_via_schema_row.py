@@ -158,7 +158,7 @@ def _the_index_components_via(cels_count, header_row1_DOM):
 
     def normal_field_name_via_offset(offset):
         from kiss_rdb import normal_field_name_via_string as name_via
-        _cel_DOM = header_row1_DOM.cel_at_offset(offset)
+        _cel_DOM = header_row1_DOM.cell_at_offset(offset)
         _s = _cel_DOM.content_string()
         return name_via(_s)
 
@@ -173,7 +173,7 @@ def _the_index_components_via(cels_count, header_row1_DOM):
         offset = offset_via_normal_field_name[s]
 
         def g(item):
-            _cel = item.ROW_DOM_.cel_at_offset(offset)
+            _cel = item.ROW_DOM_.cell_at_offset(offset)
             return _cel.content_string()
         return g
     return (f, offset_via_normal_field_name, field_names)

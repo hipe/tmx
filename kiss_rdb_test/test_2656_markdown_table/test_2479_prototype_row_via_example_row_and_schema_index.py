@@ -31,13 +31,13 @@ class _CommonCase(unittest.TestCase):
 
     def _the_two_cel_byteses(self):
         row = self._row_after()
-        return tuple(row.cel_at_offset(offset).to_string() for offset in (0, 1))  # noqa: E501
+        return tuple(row.cell_at_offset(offset).to_string() for offset in (0, 1))  # noqa: E501
 
     def _content_string_after(self):
         return self._cel_after().content_string()
 
     def _cel_after(self):
-        return self._row_after().cel_at_offset(self._offset_of_interest())
+        return self._row_after().cell_at_offset(self._offset_of_interest())
 
     def _row_after(self):
         return self._state().row_after
@@ -160,7 +160,7 @@ class Case2480KR_change_natural_key_only_OK(_CommonCase):
         NOTE also: when an odd number of spare space, the extra one is on RT
         """
 
-        str1 = self._row_after().cel_at_offset(0).to_string()
+        str1 = self._row_after().cell_at_offset(0).to_string()
         self.assertEqual(str1, '|        Z1         ')
 
     @shared_subject

@@ -35,6 +35,7 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.V]                   | #open | google sheets: learn & document this one thing
 |[#873.21]                  | #API  | #provision: use underscores (not dashes or spaces) in eno document field names
 |[#873.20]                  |       | places where we relied on toml types and lost them, also wish for type schema
 |[#873.S]                   | #trak | eno has fixed storage schema for now
@@ -71,7 +72,7 @@ woah boy.
 |[#867.R]                   | #prov | provision: failure is None not False
 |[#867.Q]                   | #prov | provision: do index file second
 |[#867.P]                   | #trak | possible issue on windows
-|[#867.N]                   | #hole |
+|[#867.N]                   | #trak | google sheets: dimensionality hardcoded to ROWS for now
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib

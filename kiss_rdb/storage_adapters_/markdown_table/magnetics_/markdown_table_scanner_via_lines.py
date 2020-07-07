@@ -158,7 +158,7 @@ def __whine_about_no_whatever(dct, listener):
 def _dict_via_row_dom(field_names):
     def f(dom):
         _r = range(0, dom.cels_count)
-        _pairs = ((i, dom.cel_at_offset(i).content_string()) for i in _r)
+        _pairs = ((i, dom.cell_at_offset(i).content_string()) for i in _r)
         # #[#873.5] where sparseness is implemented (Case2451)
         return {field_names[t[0]]: t[1] for t in _pairs if len(t[1])}
     return f

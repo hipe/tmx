@@ -316,7 +316,7 @@ def sync_stream_using_column_A(dcts):
 
 def near_keyerer_minimal(key_via_native, schema, listener):
     def near_keyer(native):
-        return native.cel_at_offset(0).content_string()
+        return native.cell_at_offset(0).content_string()
     return near_keyer
 
 

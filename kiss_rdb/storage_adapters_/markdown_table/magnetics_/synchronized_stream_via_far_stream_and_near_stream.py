@@ -184,7 +184,7 @@ class _Newstream_via:
         if 1 == length:
             # short circuit certain cases, implementing [#458.7]
             far_nat_key = next(iter(far_dct.values()))
-            near_nat_key_s = near_row_DOM.cel_at_offset(0).content_string()
+            near_nat_key_s = near_row_DOM.cell_at_offset(0).content_string()
 
             assert(isinstance(far_nat_key, str))  # have fun when not
 
@@ -225,7 +225,7 @@ class _Newstream_via:
 
         def key_via_row_DOM_normally(row_DOM):
             # for now KISS and #provision [#458.I.2] (leftmost is guy)
-            return row_DOM.cel_at_offset(0).content_string()
+            return row_DOM.cell_at_offset(0).content_string()
 
         f_f = pop_property(self, '_near_keyerer')
         if f_f is None:

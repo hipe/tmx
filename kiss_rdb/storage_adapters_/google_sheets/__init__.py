@@ -11,17 +11,31 @@ class Collection:
         self._transactor = transactor
         self._schema = schema
 
+    def insert_records_at_top_natively(self, recs, listener):
+        req = _InsertOrUpdateRequest(recs, listener, 'insert', self._schema)
+        return self._transactor.insert_at_top(req)
+
     def values_get_all_native_records(self, listener):
         req = _GetAllRequest(listener, self._schema)
         return self._transactor.values_get(req)
 
 
-class _GetAllRequest:
-
-    def __init__(self, listener, schema):
-        self.cel_range_string = schema.cel_range_string
-        self.subsheet_name = schema.subsheet_name
+class _CommonRequest:
+    def _init_as_common_request(self, listener, schema):
+        self.schema = schema
         self.listener = listener
+
+
+class _InsertOrUpdateRequest(_CommonRequest):
+    def __init__(self, records, listener, which, schema):
+        assert('insert' == which)
+        self.records = records
+        self._init_as_common_request(listener, schema)
+
+
+class _GetAllRequest(_CommonRequest):
+    def __init__(self, listener, schema):
+        self._init_as_common_request(listener, schema)
 
 
 class LiveTransactor:
@@ -30,7 +44,10 @@ class LiveTransactor:
 
         def build_sheet_API(listener):
             # if you modify these scopes, delete the file at token_path
-            scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+            # scopes =['https://www.googleapis.com/auth/spreadsheets.readonly']
+
+            del(self._single_use_mutex)  # else memoize this API facade
+            scopes = ['https://www.googleapis.com/auth/spreadsheets']
             creds = _credentials_via(
                     token_path, credentials_path, scopes, listener)
             service = _service_via_credentials(creds)
@@ -40,20 +57,184 @@ class LiveTransactor:
         self._spreadsheet_ID = spreadsheet_ID
         self._single_use_mutex = None
 
-    def values_get(self, req):
-        del self._single_use_mutex
-
-        left = req.subsheet_name
-        right = req.cel_range_string
-        full_range_name = f'{left}!{right}'
-
-        sheet = self._build_sheet_API(req.listener)
-
-        result = sheet.values().get(
+    def insert_at_top(self, req):
+        requests = self._build_requests_for_insert_at_top(req)
+        spreadsheets = self._build_sheet_API(req.listener)
+        return spreadsheets.batchUpdate(
                 spreadsheetId=self._spreadsheet_ID,
-                range=full_range_name).execute()
+                body={'requests': requests}).execute()
 
+    def _build_requests_for_insert_at_top(self, req):  # #testpoint
+        sch, recs = (getattr(req, k) for k in ('schema', 'records'))
+        requests = []
+        requests.append(_component_for_insert_dimension_request(recs, sch))
+        requests.append(_component_for_update_cells_request(recs, sch))
+        return requests
+
+    def values_get(self, req):
+        range_s = _full_range_string_via_schema(req.schema)
+        spreadsheets = self._build_sheet_API(req.listener)
+        result = spreadsheets.values().get(
+                spreadsheetId=self._spreadsheet_ID, range=range_s,
+                ).execute()
         return result.get('values', [])
+
+
+def _component_for_insert_dimension_request(recs, schema):
+    start, end = _start_end_row_index(len(recs), schema)  # #[#867.N]
+
+    return {
+        'insertDimension': {
+            'range': {
+                'sheetId': schema.sheet_ID,
+                'startIndex': start,
+                'endIndex': end,
+                'dimension': 'ROWS',  # #[#867.N]
+                },
+            'inheritFromBefore': False,  # can't b true when insert at very top
+            }
+        }
+
+
+def _component_for_update_cells_request(records, schema):
+    assert('ROWS' == schema.dimension)
+
+    num_fields = _effective_num_fields_with_sanity_check(records, schema)
+    r = range(0, num_fields)
+
+    cfs = schema.cell_formats or tuple(None for _ in r)
+
+    assert(num_fields == len(cfs))  # per #here1. OK if change, but change here
+
+    value_componenter_via_offset = \
+            tuple(_value_componenter_via_cel_format(cfs[i]) for i in r)
+
+    def row_component_for(rec):
+        values = tuple(value_componenter_via_offset[i](rec[i]) for i in r)
+        return {'values': values}
+
+    row_components = tuple(row_component_for(rec) for rec in records)
+
+    start_row_index, end_row_index = _start_end_row_index(len(records), schema)
+
+    start_col_index, end_col_index = _start_end_col_index(schema)
+
+    return {
+        'updateCells': {
+            'rows': row_components,
+            'range': {
+                'sheetId': schema.sheet_ID,
+                'startRowIndex': start_row_index,
+                'endRowIndex': end_row_index,
+                'startColumnIndex': start_col_index,
+                'endColumnIndex': end_col_index,
+                },
+            'fields': '*',  # #open [#873.21] understand this
+            },
+        }
+
+
+def _value_componenter_via_cel_format(cf):
+
+    def value_component_via(x):
+        dct = {}
+        if x is None:  # sparseness
+            return dct  # for now we don't apply any formats. might change
+        write_value_component(dct, x)
+        if cf is not None:  # this check can be precomputed but it's not worth
+            _write_user_entered_format_component(dct, cf)
+        return dct
+
+    if cf and (f := cf.get('numberFormat')) and f['type'] in _date_timey_types:
+        write_value_component = _write_value_component_when_datetimey(f)
+    else:
+        write_value_component = _write_value_component_normally
+
+    return value_component_via
+
+
+_date_timey_types = {'DATE', 'TIME', 'DATE_TIME'}
+
+
+def _write_value_component_when_datetimey(number_format_component):
+    # "Dates, Times and DateTimes are represented as doubles in serial number format" from  # noqa: E501
+    # https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/cells#CellData  # noqa: E501
+
+    def write_value_component(dct, x):
+        use_x = convert(x)
+        _ = _user_entered_value_component_via(use_x, 'numberValue')
+        _write_user_entered_value_component(dct, _)
+
+    typ, pattern = (number_format_component[k] for k in ('type', 'pattern'))
+
+    import datetime as dt  # heavily modified adaptation of SO #9574793 below
+
+    if typ == 'DATE':
+        now = dt.datetime.now()  # what year is it
+        excel_serial_date_epoch_start = dt.date(1899, 12, 30)
+
+        def convert(x):
+            mine = dt.datetime.strptime(x, '%m-%d')  # ..
+            use = dt.date(now.year, mine.month, mine.day)
+            delta = use - excel_serial_date_epoch_start
+            return float(delta.days)
+
+    elif typ == 'TIME':
+        def convert(x):
+            mine = dt.datetime.strptime(x, '%H:%M')  # ..
+            previous_midnight = dt.datetime(mine.year, mine.month, mine.day)
+            delta = mine - previous_midnight
+            return delta.seconds / 86400.0  # year etc is 1900, is that okay?
+
+    else:
+        assert('DATE_TIME' == typ)
+        do_me()
+
+    return write_value_component
+
+
+def _write_value_component_normally(dct, x):
+    _ = _extended_value_key_via_type_of(x)
+    _ = _user_entered_value_component_via(x, _)
+    _write_user_entered_value_component(dct, _)
+
+
+def _write_user_entered_format_component(dct, cf):
+    dct['userEnteredFormat'] = cf
+
+
+def _write_user_entered_value_component(dct, uevc):
+    dct['userEnteredValue'] = uevc
+
+
+def _user_entered_value_component_via(x, extended_value_key):
+    return {extended_value_key: x}
+
+
+def _extended_value_key_via_type_of(x):
+    typ = type(x)
+    if str == typ:
+        return 'stringValue'
+    if int == typ or float == typ:
+        return 'numberValue'
+    if bool == typ:
+        return 'boolValue'
+    do_me()
+
+
+def _effective_num_fields_with_sanity_check(records, schema):
+    # we don't yet know what our API design will be for handling sparseness
+    # in incoming records, so for now we err on the side of strictness
+
+    num_new_records = len(records)
+    assert(num_new_records)  # don't get this far inserting zero records
+
+    requisite_length = schema.number_of_fields
+
+    for i in range(0, num_new_records):
+        assert(requisite_length == len(records[i]))  # for now
+
+    return requisite_length
 
 
 def _service_via_credentials(creds):
@@ -71,9 +252,8 @@ def _credentials_via(token_path, creds_path, scopes, listener):
     from os import path as os_path
     if os_path.exists(token_path):
         listener('debug', 'expression', 'load_token_with_pickle', None)
-        import pickle
         with open(token_path, 'rb') as token:
-            creds = pickle.load(token)
+            creds = _pickle().load(token)
 
     # if no creds to load or they're invalid, let the user log in
     if not creds or not creds.valid:
@@ -91,9 +271,14 @@ def _credentials_via(token_path, creds_path, scopes, listener):
         # store the credentials so it can be re-used above
         with open(token_path, 'wb') as token:
             listener('debug', 'expression', 'writing_credentials', None)
-            pickle.dump(creds, token)
+            _pickle().dump(creds, token)
 
     return creds
+
+
+def _pickle():
+    import pickle
+    return pickle
 
 
 class RecordingWritingTransactor:
@@ -223,14 +408,15 @@ def _recordings_lib():
             yield json.loads(line)
 
     def _path_via(req, ss_ID_ID, recs):
+        sch = req.schema
 
         direc = os_path.join(recs.path, 'values_get')
 
         pieces = []
         pieces.append(ss_ID_ID)
-        pieces.append(req.subsheet_name.lower().replace(' ', '-'))
+        pieces.append(sch.sheet_name.lower().replace(' ', '-'))
 
-        frm, to = req.cel_range_string.split(':')
+        frm, to = sch.cell_range_string.split(':')
         pieces.append(f'{frm}-{to}')
 
         filename_head = '--'.join(pieces)
@@ -263,7 +449,7 @@ class InMemoryStubTransactor:
         return self._values_get(req)
 
 
-class Cypher:  # experimental
+class Cypher:  # experimental: implement resolving ss ID's from env vars
 
     def __init__(self, environ):
         self._environ = environ
@@ -311,12 +497,56 @@ class SpreadsheetIdentifierEXPERIMENTAL:
         self.spreadsheet_ID = spreadsheet_ID
 
 
+def _full_range_string_via_schema(sch):
+    left = sch.sheet_name
+    right = sch.cell_range_string
+    return f'{left}!{right}'
+
+
+def _start_end_col_index(schema):
+    return schema.start_column_index, schema.end_column_index
+
+
+def _start_end_row_index(num_records, schema):
+    return (i := schema.start_row_index), i + num_records
+
+
 class Schema:
 
-    def __init__(self, cel_range, subsheet_name):
-        assert(_re_match('[A-Z]+[0-9]+:[A-Z]+$', cel_range))  # ..
-        self.cel_range_string = cel_range
-        self.subsheet_name = subsheet_name
+    def __init__(self, cell_range, sheet_name, cell_formats=None):
+
+        md = _re_match('([A-Z])([0-9]+):([A-Z])$', cell_range)
+
+        left_col, top_row, right_col = md.groups()
+
+        self.start_column_index = ord(left_col) - _sixty_five
+        self.end_column_index = (ord(right_col) - _sixty_five) + 1
+
+        assert(self.end_column_index > self.start_column_index)
+
+        self.number_of_fields = self.end_column_index - self.start_column_index
+
+        top_row_i = int(top_row)
+        assert(0 < top_row_i)
+        self.start_row_index = top_row_i - 1
+
+        self.cell_formats = cell_formats
+        if cell_formats is not None:  # #here1
+            assert(self.number_of_fields == len(cell_formats))  # for now
+
+        self.cell_range_string = cell_range
+        self.sheet_name = sheet_name
+
+    @property
+    def dimension(self):
+        return 'ROWS'
+
+    @property
+    def sheet_ID(self):
+        return 0  # ..
+
+
+_sixty_five = ord('A')
 
 
 def _re_match(rxs, s):  # ..

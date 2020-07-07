@@ -17,12 +17,12 @@ def transactor_lib():
 
     class Lib:
 
-        def native_records_via(self, listener, tra, subsheet_name=None):
-            if subsheet_name is None:
+        def native_records_via(self, listener, tra, sheet_name=None):
+            if sheet_name is None:
                 sch = common_schema
             else:
                 sch = self.build_schema(
-                        subsheet_name=subsheet_name, cel_range='A2:E')
+                        sheet_name=sheet_name, cell_range='A2:E')
 
             col = self.collection_via(tra, sch)
             return col.values_get_all_native_records(listener)
@@ -65,11 +65,15 @@ def transactor_lib():
                 print(f'wahoo: {x}')
             print('done.')
 
+        @property
+        def asset_lib(self):
+            return lib
+
     res = Lib()
 
     common_schema = res.build_schema(
-            subsheet_name='sheet uno',
-            cel_range='A2:E')
+            sheet_name='sheet uno',
+            cell_range='A2:E')
 
     return res
 

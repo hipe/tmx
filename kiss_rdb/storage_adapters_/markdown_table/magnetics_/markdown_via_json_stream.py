@@ -233,7 +233,7 @@ def _BUILD_ACTIONS_INDEX(stdout, MONITOR):
 
 def _hand_written_state_machine(STDOUT, MONITOR):
 
-    cel_via = _cel_via_er()
+    cell_via = _cel_via_er()
 
     from kiss_rdb.storage_adapters_.markdown_table import RowAsEntity_
 
@@ -270,14 +270,14 @@ def _hand_written_state_machine(STDOUT, MONITOR):
             # give each label cel ONE space to its left and ONE to its right
 
             for k, label in self._labels_as_entity.items():
-                yield cel_via(1, label, 1, k)
+                yield cell_via(1, label, 1, k)
 
         @row_via_cels
         def __build_dashes_row(self):
             # make the dashes fill every ASCII pixel, given index. ick/meh
 
             for k, w in self._content_width_via_key.items():
-                yield cel_via(0, '-' * (w + 2), 0, k)
+                yield cell_via(0, '-' * (w + 2), 0, k)
 
         def output_entity(self, dct):
             _cels = self._cels_via_entity(dct)
@@ -333,7 +333,7 @@ def _celer_via_offset_via(content_width_via_key):
 
     # EXPERIMENTAL this is where we would want to do crazy padding
 
-    cel_via = _cel_via_er()
+    cell_via = _cel_via_er()
 
     def build_cel_builders():
         for k in content_width_via_key.keys():
@@ -342,8 +342,8 @@ def _celer_via_offset_via(content_width_via_key):
     def build_cel_builder(content_width, key):
         def build_cel(s):
             if '' == s:
-                return cel_via(0, '', 0, key)
-            return cel_via(1, s, 1, key)  # CHANGE ME
+                return cell_via(0, '', 0, key)
+            return cell_via(1, s, 1, key)  # CHANGE ME
         return build_cel
 
     return tuple(build_cel_builders())
@@ -414,8 +414,8 @@ def _BUILD_THIS_STATE_MACHINE(action_index, these):  # [#008.2] state machine
 
 
 def _cel_via_er():
-    from kiss_rdb.storage_adapters_.markdown_table import AttributeCel_
-    return AttributeCel_
+    from kiss_rdb.storage_adapters_.markdown_table import AttributeCell_
+    return AttributeCell_
 
 # #history-A.3: full rewrite (unification, multi-table, state machine)
 # #pending-rename: maybe to "via dictionaries"
