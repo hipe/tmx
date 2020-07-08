@@ -74,6 +74,14 @@ else
   message_is_required=1
 fi
 
+
+if [ -t 0 ]; then
+  is_interactive=1
+else
+  is_interactive=''
+fi
+
+
 validate() {
 
   # (in a function so we can short-circuit out of it early with return lol)
@@ -83,8 +91,7 @@ validate() {
   # cause of the error is something more specific
 
   if [[ -n "$is_date" && -n "$is_supplemental" ]]; then
-    echo "-d and -s are mutually exclusive" >&2
-    do_invite=1
+    nope "-d and -s are mutually exclusive"
     return
   fi
 
@@ -110,18 +117,53 @@ validate() {
           # exit early. don't parse remaining args or validate missing args
           return
         fi
-        echo "unrecognized option: \"$arg\"" >&2
-        do_invite=1
+        nope "unrecognized option: \"$arg\""
         return
       fi
     fi
   fi
 
-  if [[ -n "$message_is_required" && "$len" -eq 0 ]]; then
-    echo "expecting <msg1> .." >&2
-    do_invite=1
+  message_is_provided=''
+
+  if [[ -z "$is_interactive" ]]; then
+    if [[ "$len" -ne 0 ]]; then
+      nope "can't read from both STDIN and args"
+      return
+    fi
+    message_is_provided=1
+    seen=''
+    while read line; do
+      if [ -n "$seen" ]; then
+        nope "for now can't have more than one line in STDIN"
+        return
+      fi
+      seen=1
+      line_read_from_stdin="$line"
+    done
+    if [ -z "$seen" ]; then
+      nope "no lines were in STDIN"
+      return
+    fi
+    if [ -z "$line_read_from_stdin" ]; then
+      nope "xx yy zz"
+      return
+    fi
+
+  elif [[ "$len" -ne 0 ]]; then
+    message_is_provided=1
+  fi
+
+  if [[ -n "$message_is_required" && -z "$message_is_provided" ]]; then
+    nope "expecting <msg1> .."
   fi
 }
+
+
+nope() {
+  echo "$1" >&2
+  do_invite=1
+}
+
 
 validate
 
@@ -153,7 +195,11 @@ else
 fi
 
 if [ "$len" -eq 0 ]; then
-  tail_string=""
+  if [ -z "$is_interactive" ]; then
+    tail_string="  $line_read_from_stdin"
+  else
+    tail_string=""
+  fi
 else
   # array reverse in bash. (one way of several)
   args=()
@@ -176,5 +222,4 @@ if [ ! -f "$file" ]; then
 fi
 
 echo "(did: echo \"$line\" >> $file)" >&2
-
 echo "$line" >> "$file"

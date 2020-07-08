@@ -53,6 +53,7 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.J]                   | #trak | timetrack syncing: local vs remote, time field
 |[#882.I]                   | #edit | edits to do in fragments
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
 |[#882.G]                   | #trak | empty but self-documentary files

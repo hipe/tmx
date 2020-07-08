@@ -5,6 +5,10 @@ STORAGE_ADAPTER_IS_AVAILABLE = False
 STORAGE_ADAPTER_UNAVAILABLE_REASON = "building backend (transactors) first"
 
 
+SERIALIZED_OAUTH_TOKEN_PATH_ = 'token.pickle'  # will change
+OAUTH_CREDENTIALS_PATH_ = 'credentials.json'  # will change
+
+
 class Collection:
 
     def __init__(self, transactor, schema):
@@ -107,7 +111,7 @@ def _component_for_update_cells_request(records, schema):
     assert(num_fields == len(cfs))  # per #here1. OK if change, but change here
 
     value_componenter_via_offset = \
-            tuple(_value_componenter_via_cel_format(cfs[i]) for i in r)
+        tuple(_value_componenter_via_cel_format(cfs[i]) for i in r)
 
     def row_component_for(rec):
         values = tuple(value_componenter_via_offset[i](rec[i]) for i in r)
@@ -281,6 +285,54 @@ def _pickle():
     return pickle
 
 
+# ==== BEGIN EXPERIMENTAL HIGHER-LEVEL RECORDING API ====
+
+def EXPERIMENT_RECORD(
+        directory_for_recordings, spreadsheet_ID_ID, sheet_name, cell_range):
+
+    cypher = _build_live_cypher()
+    si = SpreadsheetIdentifierEXPERIMENTAL(
+            spreadsheet_ID_ID=spreadsheet_ID_ID)
+    ss_ID = cypher.spreadsheet_ID_via_identifier(si)
+    tr1 = _live_transactor_via(ss_ID)
+
+    recs = Recordings(directory_for_recordings)
+    tr2 = RecordingWritingTransactor(spreadsheet_ID_ID, tr1, recs)
+
+    sch = Schema(sheet_name, cell_range)
+    col = Collection(tr2, sch)
+
+    return col.values_get_all_native_records(_debugging_listener())
+
+
+def EXPERIMENT_READ(
+        directory_for_recordings, spreadsheet_ID_ID, sheet_name, cell_range):
+
+    cypher = _build_live_cypher()
+    si = SpreadsheetIdentifierEXPERIMENTAL(
+            spreadsheet_ID_ID=spreadsheet_ID_ID)
+    recs = Recordings(directory_for_recordings)
+    tra = RecordingReadingTransactor(recs, si, cypher)
+    sch = Schema(sheet_name, cell_range)
+    col = Collection(tra, sch)
+
+    return col.values_get_all_native_records(_debugging_listener())
+
+
+def _live_transactor_via(ss_ID):
+    return LiveTransactor(
+            ss_ID, SERIALIZED_OAUTH_TOKEN_PATH_, OAUTH_CREDENTIALS_PATH_)
+
+
+def _debugging_listener():
+    from modality_agnostic.test_support.listener_via_expectations import \
+        for_DEBUGGING as listener
+    return listener
+
+
+# ==== END
+
+
 class RecordingWritingTransactor:
 
     def __init__(self, ss_ID_ID, tra, recs):
@@ -449,6 +501,11 @@ class InMemoryStubTransactor:
         return self._values_get(req)
 
 
+def _build_live_cypher():
+    from os import environ
+    return Cypher(environ)
+
+
 class Cypher:  # experimental: implement resolving ss ID's from env vars
 
     def __init__(self, environ):
@@ -513,7 +570,7 @@ def _start_end_row_index(num_records, schema):
 
 class Schema:
 
-    def __init__(self, cell_range, sheet_name, cell_formats=None):
+    def __init__(self, sheet_name, cell_range, cell_formats=None):
 
         md = _re_match('([A-Z])([0-9]+):([A-Z])$', cell_range)
 

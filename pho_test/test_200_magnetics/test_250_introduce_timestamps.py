@@ -1,4 +1,5 @@
-from modality_agnostic.memoization import lazy
+from modality_agnostic.memoization import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -66,6 +67,74 @@ class Case255_normal_structs(CommonCase):
         return normal_structs_one()
 
 
+class Case260_normal_entities_for_sync(CommonCase):
+
+    def test_100_works(self):
+        self.assertIsNotNone(self.result)
+
+    def test_150_first_element_is_remote_reference_entity(self):
+        ref = self.result[0]
+        self.assertSequenceEqual(dat(ref), ('07-06', '11:12'))
+        lines = ("humongous mungus", "line 2")
+        self.assertSequenceEqual(msgs(ref), lines)
+
+    def test_200_second_and_last_element_is_entities_to_add(self):
+        res = self.result
+        self.assertEqual(len(res), 2)
+
+        ent1, ent2 = res[1]  # implicit assertion
+        self.assertSequenceEqual(dat(ent1), ('07-06', '11:13:00'))
+        self.assertSequenceEqual(msgs(ent1), (("ohai i am a new guy",)))
+
+        self.assertSequenceEqual(dat(ent2), ('07-06', '11:14:00'))
+        lines = ("i am another new guy", "new guy line 2")
+        self.assertSequenceEqual(msgs(ent2), lines)
+
+    def test_250_big_money_lets_go(self):
+        x = asset_lib()._records_to_push_via_entities_to_push(*self.result)
+        expected = (
+            ('', '11:14', 'i am another new guy'),
+            ('', '', 'new guy line 2'),
+            ('', '11:13', 'ohai i am a new guy'))
+
+        sequence_equal_recursive(self, tuple(x), expected)
+
+    @property
+    @shared_subject
+    def result(self):
+        lines = (
+                "  05-05 55:55:55  will be passed over\n",
+                "  07-06 66:66:66  also passed over\n",
+                "        11:12:00  humongous mungus\n",
+                "                  line 2\n",
+                "        11:13:00  ohai i am a new guy\n",
+                "        11:14:00  i am another new guy\n",
+                "                  new guy line 2\n")
+
+        local_itr = normal_structs_via_lines(lines)
+
+        from kiss_rdb.storage_adapters_.google_sheets import \
+            EXPERIMENT_READ as f
+        remote_itr = f(recordings_dir(), _ss_ID_ID, _sheet_name, _cell_range)
+
+        f = asset_lib()._reference_and_normal_entities_to_sync
+        return f(local_itr, remote_itr, listener=None)
+
+
+def dat(normal):
+    return (normal.date_string, normal.time_string)
+
+
+def msgs(normal):
+    return normal.message_strings
+
+
+def sequence_equal_recursive(tc, have, expect):
+    tc.assertEqual(len(have), len(expect))
+    for i in range(0, len(expect)):
+        tc.assertSequenceEqual(have[i], expect[i])  # ..
+
+
 @lazy
 def normal_structs_one():
     _ = raw_structs_one()
@@ -81,6 +150,38 @@ def raw_structs_one():
     return tuple(asset_lib().line_record_structs_via_lines(lines))
 
 
+def normal_structs_via_lines(lines):  # migth become assset
+    _line_rec_scts = asset_lib().line_record_structs_via_lines(lines)
+    return asset_lib().normal_structs_via_line_record_structs(_line_rec_scts)
+
+
+def read_live_recordings_as_main():
+    from kiss_rdb.storage_adapters_.google_sheets import EXPERIMENT_READ as f
+    itr = f(recordings_dir(), _ss_ID_ID, _sheet_name, _cell_range)
+    for rec in itr:
+        print(f'Ok wow: {rec}')
+    print('done.')
+
+
+def make_live_recording_as_main():
+    from kiss_rdb.storage_adapters_.google_sheets import EXPERIMENT_RECORD as f
+    itr = f(recordings_dir(), _ss_ID_ID, _sheet_name, _cell_range)
+    for rec in itr:
+        pass
+    print('done.')
+
+
+_ss_ID_ID = 'spreadsheet-ID-PAA'
+_sheet_name = 'Sheet Onezo'
+_cell_range = 'A2:C'
+
+
+@lazy
+def recordings_dir():
+    from pho_test.common_initial_state import fixture_directory
+    return fixture_directory('google-sheets')
+
+
 def asset_lib():
     from pho.magnetics import timestamp_records_via_lines
     return timestamp_records_via_lines
@@ -91,6 +192,10 @@ def do_me():
 
 
 if __name__ == '__main__':
+    # visual / fixture creators
+    # make_live_recording_as_main()
+    # read_live_recordings_as_main()
+
     unittest.main()
 
 # #born.

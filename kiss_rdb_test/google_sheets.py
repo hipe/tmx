@@ -41,11 +41,10 @@ def transactor_lib():
             ss_iden = lib.SpreadsheetIdentifierEXPERIMENTAL(
                     spreadsheet_ID_ID=ss_ID_ID)
             ss_ID = cypher.spreadsheet_ID_via_identifier(ss_iden)
-
             return lib.LiveTransactor(
                     spreadsheet_ID=ss_ID,
-                    token_path='token.pickle',  # ..
-                    credentials_path='credentials.json')  # ..
+                    token_path=lib.SERIALIZED_OAUTH_TOKEN_PATH_,
+                    credentials_path=lib.OAUTH_CREDENTIALS_PATH_)
 
         def write_recordings_transactor_via_transactor(_, ss_ID_ID, tra):
             return lib.RecordingWritingTransactor(ss_ID_ID, tra, recs)
