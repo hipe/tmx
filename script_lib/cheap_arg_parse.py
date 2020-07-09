@@ -735,17 +735,14 @@ def __first_pass(tups):
     looks_like_short_rx = o('-[a-zA-Z]')
     formal_short_rx = o('-([a-zA-Z])$')
     looks_like_long_rx = o('--[a-z][-a-z]')  # ..
-    formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z]+))?([*!])?$')
+    formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z0-9]+))?([*!])?$')
     looks_like_desc_rx = o('[a-zA-Z(«]')  # ..
     formal_positional_arg_name_head_rx = o('[a-zA-Z<]')
 
-    lowcase = '[a-z][a-z0-9]*'
-    upcase = '[A-Z][A-Z0-9]*'
-
     # == BEGIN :#here2:
-    _A = f'<{lowcase}(?:-{lowcase})*>'
-    _B = f'{upcase}(?:_{upcase})*'
-    _C = f'{lowcase}(?:-{lowcase})*'  # might deprecate
+    _A = f'<{_lowcase}(?:-{_either_or})*>'
+    _B = f'{_upcase}(?:_{_upcase})*'
+    _C = f'{_lowcase}(?:-{_lowcase})*'  # might deprecate
 
     formal_positional_arg_name_rx = o(fr'({_A}|{_B}|{_C})([*+])?$')
     # #NT_formal_positional_arg
@@ -828,7 +825,12 @@ class _FormalArgument:
         return f"{self.styled_moniker}{self.arity_string}"
 
 
-_long_name_rxs = '[a-z]+(?:-[a-z0-9]+)*'
+_lowcase = '[a-z][a-z0-9]*'
+_upcase = '[A-Z][A-Z0-9]*'
+_either_or = f'(?:{_lowcase}|{_upcase})'
+
+
+_long_name_rxs = f'{_either_or}(?:-{_either_or})*'
 
 
 def cover_me(msg):

@@ -3,12 +3,21 @@ import re
 # ==== BEGIN SYNC STUFF ======================================================
 
 # Terminology: The local collection is the "logfile" and the remote collection
-# the "spreadhseet".
+# the "spreadsheet".
 #
 # Design choices and premises:
 #
+# 👉 For the near forseeable future, this syncing operation only ever pushes
+#    "up" to the spreadsheet. It never pulls "down" from the spreadsheet in
+#    to the logfile. So a better name might be "push" rather than "sync",
+#    but for the fact that "sync" is such a well-known idiom.
+#
+# 👉 For the near forseeable future, this syncing operation only ever adds
+#    rows (it never deletes or modifies) to the existing spreadsheet.
+#
 # 👉 The logfile is appended to (it grows downward) whereas in the spreadsheet,
-#    each next entity is inserted at the top (it grows upwards). (Both choices
+#    each next entity is inserted at the top (it grows upwards). That is to
+#    say, the two sides grow in opposite directions. (Both choices
 #    have reasons, of UI and idiomatic and historical.) In a broad sense the
 #    dimensionality is arbitrary but in practice it impacts every aspect of
 #    the algorithm, including how we describe everything here.
@@ -16,7 +25,8 @@ import re
 # 👉 In both cases, multi-line entries read downward; i.e., the logfile reads
 #    "normally" in both respects; but on the spreadsheet, the most recent
 #    entity is at the top but you won't have to read its lines from down
-#    to up, that is, within the entity you still read the lines normally.
+#    to up. That is, within the entity you still read the lines "normally",
+#    no matter which side you're looking at.
 #    As such, when you have multi-line entities, the same two collections
 #    won't have the same line order even after you take in to account the
 #    opposite growth directions.
@@ -32,7 +42,7 @@ import re
 #    with a straightforward workaround: hand-insert the very first entry.)
 #
 # So the algortihm for a typical sync: Get the topmost entity from the
-# spreadhseet. (You will have to read multiple rows to know if you got all
+# spreadsheet. (You will have to read multiple rows to know if you got all
 # the messages and possibly to populate the date field.)
 #
 # Traverse the local entities (top-to-bottom, earlier to later) looking for
@@ -44,13 +54,7 @@ import re
 # Excercise to the reader: sparsifying the years. That's it!
 
 
-def SYNC(local_normal_record_stream, remote_collection, listener):
-    tup = xxx()
-    # ..
-    ref, add_me = tup
-
-
-def _records_to_push_via_entities_to_push(ref, add_me):
+def records_to_push_via_entities_to_push_(ref, add_me):
     # we determine whether or not to show the dates by going forwards in time
     # and then we replay it backwards in time to get the newest at the top.
     # so we use two parallel stacks, sort of for giggles
@@ -90,7 +94,7 @@ def _records_to_push_via_entities_to_push(ref, add_me):
             break
 
 
-def _reference_and_normal_entities_to_sync(
+def reference_and_normal_entities_to_sync_(
         local_normals_iterator, remote_records_iterator, listener):
     # the main workhorse of the syncing operation (see algorithm) #testpoint
 
@@ -195,7 +199,12 @@ def _normal_topmost_entity(remote_records_iterator, listener):
 # ==== END SYNC STUFF ========================================================
 
 
-def normal_structs_via_line_record_structs(structs):
+def normal_structs_via_lines(lines):
+    _line_rec_scts = line_record_structs_via_lines_(lines)
+    return normal_structs_via_line_record_structs_(_line_rec_scts)
+
+
+def normal_structs_via_line_record_structs_(structs):
 
     most_recent_date_string = None
     most_recent_time_string = None
@@ -266,7 +275,7 @@ class _NormalStruct:
         self.lineno = lineno
 
 
-def line_record_structs_via_lines(lines):
+def line_record_structs_via_lines_(lines):
     class LineCounter():
         def __init__(self):
             self.count = 0
@@ -333,6 +342,13 @@ class _LineRecordStruct:
 class _ScannerViaIterator:  # #[#008.4] a scanner
 
     def __init__(self, itr):
+        # == begin #[#022] it's crucial that this is a generator and not e.g
+        # a tuple or a list because otherwise #here2 will inf loop
+        # (doesn't work for list_iterator: from types import GeneratorType)
+        if not hasattr(itr, '__next__'):
+            raise TypeError('need iterator had %s' % (type(itr)))
+        # == end
+
         self._iterator = itr
         self.peek = None  # be careful
         self.is_empty = False  # be careful
@@ -345,7 +361,7 @@ class _ScannerViaIterator:  # #[#008.4] a scanner
         return x
 
     def advance(self):
-        for x in self._iterator:
+        for x in self._iterator:  # #here2
             self.lineno += 1
             self.peek = x
             return
@@ -386,8 +402,8 @@ if __name__ == '__main__':
     filename, = args  # ..
 
     with open(filename) as lines:
-        _ = line_record_structs_via_lines(lines)
-        for o in normal_structs_via_line_record_structs(_):
+        _ = line_record_structs_via_lines_(lines)
+        for o in normal_structs_via_line_record_structs_(_):
             so(f"{o.date_string} {o.time_string} (line {o.lineno}):\n")
             count = 0
             for msg in o.message_strings:

@@ -50,8 +50,13 @@ class error_monitor_via_stderr:
         express_structured_emission(self._write_line, em.channel_tail, dct)
 
     def __express_when_shape_is_expression(self, em):
-
+        write_line = self._write_line
         payloader = em.release_payloader()
+
+        if payloader is None:
+            _ = em.channel_tail[0].replace('_', ' ')  # ..
+            write_line(f'{em.severity}: {_}')
+            return
 
         num_args = payloader.__code__.co_argcount
         if num_args:
@@ -60,7 +65,6 @@ class error_monitor_via_stderr:
         else:
             lines = payloader()
 
-        write_line = self._write_line
         for line in lines:
             write_line(line)
 

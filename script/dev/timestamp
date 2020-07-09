@@ -1,16 +1,40 @@
 #!/usr/bin/env bash
 
-# constants (""):
 
-file='z/times'
-
-# parsing argv sets these:
-
-is_supplemental=''
-is_date=''
+# parsing options off the head of argv sets these to true. help screen order
+do_date=''
+do_supplemental=''
 do_echo=''
+do_sync=''
+
+
+# runtime stuff
+[ -t 0 ] && is_interactive=1 || is_interactive=''
+
+
+# internal booleans to flag our flow
 do_help=''
 do_invite=''
+saw_stop_token=''
+ok=1
+
+
+# constants (""):
+file='z/times'
+
+
+
+# funcos
+
+nope() {
+  echo "$1" >&2
+  do_invite=1
+  ok=''
+}
+
+
+
+# ==== PARSE ARGV (FIRST HALF) ====
 
 # we can't reach ARGV via $#, $1 etc from within functions, so imagine using
 # BASH_ARGV universally instead. issues/gotchas with that:
@@ -31,23 +55,26 @@ while [ "$len" -ne 0 ]; do
   # negative offsets are a new feature of bash not supported in mine at writing
   arg="${bash_argv[$len - 1]}"
 
-  # keep parsing IFF argument starts with a dash and is two chars long
-  if [[ ! "$arg" =~ ^-.$ ]]; then
+  # keep parsing IFF argument starts with a dash and is at least two chars long
+  if [[ ! "$arg" =~ ^-. ]]; then
     break
   fi
 
-  # substring in bash: start from offset 1, length 1
-  char="${arg:1:1}"
+  # substring in bash: from offset 1 to the end
+  char="${arg:1}"
 
   case "$char" in
-    's')
-      is_supplemental=1
-      ;;
     'd')
-      is_date=1
+      do_date=1
+      ;;
+    's')
+      do_supplemental=1
       ;;
     'e')
       do_echo=1
+      ;;
+    'sync')
+      do_sync=1
       ;;
     *)
       # the first unrecognized flag is left at the head (top) of the stack
@@ -60,40 +87,50 @@ while [ "$len" -ne 0 ]; do
   ((len --))
 done
 
-# It's of no value to have a timetracking file with timestamps but no
-# descriptions (or blank lines) so <message> is generaly required. However:
-# the --echo option exists mainly to get (possibly just) the formatted (maybe
-# date and) time output to STDOUT, so for this case we annul the requirement.
-# --supplemental is explicitly for adding additional lines to a multi-line
-# description, so this requires a message. As such, a message is required for
-# all cases except when -e and not -s.
 
-if [[ -n "$do_echo" && -z "$is_supplemental" ]]; then
-  message_is_required=''
-else
-  message_is_required=1
+# ==== CHECK MUTUAL EXCLUSIVITIES ====
+
+# Go through the flag options one-by-one in help screen order. For each flag,
+# if it was invoked, affirm that any other conflicting flags are not invoked.
+# It's vital that we check these in a known, consistent order so that latter
+# code can assume that previous checks that should have happened happened.
+# For now we treat is_interactive as a pseudo-flag (experimentally)
+
+
+# check them in help screen order so you don't have to check redundantly
+
+if [ "$do_date" ]; then
+  if [ "$do_supplemental" ]; then
+    nope "-d and -s are mutually exclusive"
+  fi
+  if [ "$do_sync" ]; then
+    nope "-d and -sync are mutually exclusive"
+  fi
+fi
+
+if [ "$do_supplemental" ]; then
+  if [ "$do_sync" ]; then
+    nope "-s and -sync are mutually exclusive"
+  fi
+fi
+
+if [ "$do_echo" ]; then
+  true  # even ok with sync for now  #here1
+fi
+
+if [ "$do_sync" ]; then
+  if [ ! "$is_interactive" ]; then
+    nope "for now, -sync can only be used interactively (this may change)"
+  fi
 fi
 
 
-if [ -t 0 ]; then
-  is_interactive=1
-else
-  is_interactive=''
-fi
+# ==== PARSE FOR REMAINING OPTIONS ====
 
 
-validate() {
+parse_any_remaining_options() {
 
   # (in a function so we can short-circuit out of it early with return lol)
-
-  # look for more specific errors first before more general ones, because
-  # it's super confusing getting a generic error message when the underlying
-  # cause of the error is something more specific
-
-  if [[ -n "$is_date" && -n "$is_supplemental" ]]; then
-    nope "-d and -s are mutually exclusive"
-    return
-  fi
 
   # if more arguments
   if [ "$len" -ne 0 ]; then
@@ -110,6 +147,7 @@ validate() {
         # array pop in bash (2 of 2)
         bash_argv=("${bash_argv[@]:0:$len - 1}")
         ((len --))
+        saw_stop_token=1
 
       else
         if [[ "$arg" =~ ^-(h|-help)$ ]]; then
@@ -122,57 +160,120 @@ validate() {
       fi
     fi
   fi
+}
 
-  message_is_provided=''
+parse_any_remaining_options
 
-  if [[ -z "$is_interactive" ]]; then
-    if [[ "$len" -ne 0 ]]; then
-      nope "can't read from both STDIN and args"
+
+# ==== PREPARE AND VALIDATE MESSAGES ====
+
+# It's of no value to have a timetracking file with timestamps but no
+# descriptions (or blank lines) so <message> is generaly required. However:
+# the --echo option exists mainly to get (possibly just) the formatted (maybe
+# date and) time output to STDOUT, so for this case we annul the requirement.
+# --supplemental is explicitly for adding additional lines to a multi-line
+# description, so this requires a message. As such, a message is required for
+# all cases except when -e and not -s. (And then there's -sync ..)
+
+
+prepare_and_validate_message() {
+
+  # array reverse in bash. (one way of several)
+  tail_args_length="$len"
+  tail_args=()
+  for (( i="$len" - 1; i > -1; i-- )); do
+    tail_args+=("${bash_argv[$i]}")
+  done
+  len=0
+
+  if [ "$do_sync" ]; then
+    # if it's a sync, the only way you can have remaining args is if they
+    # used the stop token
+
+    if [[ "$tail_args_length" -ne 0 && ! "$saw_stop_token" ]]; then
+      nope "When -sync, you can't pass message args"
+      echo "Use \"-\" to pass arguments in to the sync command" >&2
+    fi
+    return
+  fi
+
+  # after this cluster, handling STDIN should be but a dream
+  if [ ! "$is_interactive" ]; then
+    if [ "$tail_args_length" -ne 0 ]; then
+      nope "can't pass message in args when also reading from STDIN"
       return
     fi
-    message_is_provided=1
     seen=''
     while read line; do
-      if [ -n "$seen" ]; then
+      if [ "$seen" ]; then
         nope "for now can't have more than one line in STDIN"
         return
       fi
+      first_line="$line"
       seen=1
-      line_read_from_stdin="$line"
     done
-    if [ -z "$seen" ]; then
+    if [ ! "$seen" ]; then
       nope "no lines were in STDIN"
       return
     fi
-    if [ -z "$line_read_from_stdin" ]; then
-      nope "xx yy zz"
+    if [ -z "$first_line" ]; then
+      nope "STDIN line was empty"
       return
     fi
-
-  elif [[ "$len" -ne 0 ]]; then
-    message_is_provided=1
+    tail_args=("$first_line")
+    tail_args_length=1
   fi
 
-  if [[ -n "$message_is_required" && -z "$message_is_provided" ]]; then
+  # There are circumstances where message arguments are disallowed but we
+  # handled those above. See comment before this function explaining this
+
+  if [[ ( "$is_supplemental" || ! "$do_echo" ) && "$tail_args_length" -eq 0 ]]
+  then
     nope "expecting <msg1> .."
+    return
   fi
+
+  tail_string="  ${tail_args[@]}"
+}
+
+[ "$ok" ] && prepare_and_validate_message
+
+
+
+# ==== MAYBE EXIT EARLY / DO STRANGE STUFF
+
+
+maybe_do_sync(){
+  if [ ! "$do_sync" ]; then
+    return
+  fi
+
+  args=(--timestamp-file "$file")
+  if [ "$do_echo" ]; then
+    args+=("--dry-run")  # #here1
+  fi
+  if [ "${#tail_args[@]}" -ne 0 ]; then
+    args+=("${tail_args[@]}")
+  fi
+
+  export TMX_USE_THIS_PROGRAM_NAME="$0 -sync -"
+
+  exec tmx-timestamp sync "${args[@]}"
+
+  echo "never see"
+  exit 0
 }
 
 
-nope() {
-  echo "$1" >&2
-  do_invite=1
-}
+[ "$ok" ] && maybe_do_sync
 
 
-validate
-
-if [ -n "$do_invite" ]; then
+if [ "$do_invite" ]; then
   echo "use \"$0 -h\" for help" >&2
   exit 5
 fi
 
-if [ -n "$do_help" ]; then
+if [ "$do_help" ]; then
   echo "usage: $0 [-d|-s] [-e] [-[-]] msg1 msg2 .." >&2
   echo "" >&2
   echo "description: append a timestamp line to ${file}" >&2
@@ -182,42 +283,32 @@ if [ -n "$do_help" ]; then
   echo "    -d    date. uglyly include month-day in timestamp" >&2
   echo "    -s    supplemental. only appends message, no timestamp" >&2
   echo "    -e    echo the would-be appended line to STDOUT and exit" >&2
+  echo "    -sync (experimental)" >&2
   echo "    -, -- stop parsing subsequent arguments for options" >&2
   exit 0
 fi
 
-if [ -n "$is_date" ]; then
+
+
+# ==== EXECUTE ====
+
+if [ "$do_date" ]; then
   da=$(date '+%m-%d %H:%M:%S')
-elif [ -n "$is_supplemental" ]; then
+elif [ "$do_supplemental" ]; then
   da='              '
 else
   da=$(date '+      %H:%M:%S')
 fi
 
-if [ "$len" -eq 0 ]; then
-  if [ -z "$is_interactive" ]; then
-    tail_string="  $line_read_from_stdin"
-  else
-    tail_string=""
-  fi
-else
-  # array reverse in bash. (one way of several)
-  args=()
-  for (( i="$len" - 1; i > -1; i-- )); do
-    args+=("${bash_argv[$i]}")
-  done
-  tail_string="  ${args[@]}"
-fi
-
 line="  ${da}${tail_string}"
 
-if [ -n "$do_echo" ]; then
+if [ "$do_echo" ]; then
   echo "$line"
   exit 0
 fi
 
 if [ ! -f "$file" ]; then
-  echo "for now, file must exist: $file" >&2
+  nope "for now, file must exist: $file"
   exit 5
 fi
 

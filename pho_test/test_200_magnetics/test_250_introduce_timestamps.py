@@ -91,7 +91,7 @@ class Case260_normal_entities_for_sync(CommonCase):
         self.assertSequenceEqual(msgs(ent2), lines)
 
     def test_250_big_money_lets_go(self):
-        x = asset_lib()._records_to_push_via_entities_to_push(*self.result)
+        x = asset_lib().records_to_push_via_entities_to_push_(*self.result)
         expected = (
             ('', '11:14', 'i am another new guy'),
             ('', '', 'new guy line 2'),
@@ -111,13 +111,13 @@ class Case260_normal_entities_for_sync(CommonCase):
                 "        11:14:00  i am another new guy\n",
                 "                  new guy line 2\n")
 
-        local_itr = normal_structs_via_lines(lines)
+        local_itr = asset_lib().normal_structs_via_lines(lines)
 
         from kiss_rdb.storage_adapters_.google_sheets import \
             EXPERIMENT_READ as f
         remote_itr = f(recordings_dir(), _ss_ID_ID, _sheet_name, _cell_range)
 
-        f = asset_lib()._reference_and_normal_entities_to_sync
+        f = asset_lib().reference_and_normal_entities_to_sync_
         return f(local_itr, remote_itr, listener=None)
 
 
@@ -138,7 +138,7 @@ def sequence_equal_recursive(tc, have, expect):
 @lazy
 def normal_structs_one():
     _ = raw_structs_one()
-    return tuple(asset_lib().normal_structs_via_line_record_structs(_))
+    return tuple(asset_lib().normal_structs_via_line_record_structs_(_))
 
 
 @lazy
@@ -147,12 +147,7 @@ def raw_structs_one():
              "        11:52:02  same day different time\n",
              "                  this is a follow-up line\n")
 
-    return tuple(asset_lib().line_record_structs_via_lines(lines))
-
-
-def normal_structs_via_lines(lines):  # migth become assset
-    _line_rec_scts = asset_lib().line_record_structs_via_lines(lines)
-    return asset_lib().normal_structs_via_line_record_structs(_line_rec_scts)
+    return tuple(asset_lib().line_record_structs_via_lines_(lines))
 
 
 def read_live_recordings_as_main():

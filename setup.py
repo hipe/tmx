@@ -24,12 +24,16 @@ install this with:
 
 
 
-Current status (#history-A.5):
+Current status (#history-A.6):
 
-Reinstate pip/virtualenv over poetry
+The objective is only to get #here2 this endpoint installed (which we achieve).
 
-We don't have confirmation that this fill still works as written, for
-lack of need. But soon
+Some time between now and before the changeover to poetry, things changed such
+this setupfile "broke" because it specifies multiple egg (names). This might
+be a blessing in disguise because it fortells the need for one of these files
+fore each sub-project.
+
+We would like to know how to make uninstallers, if that's a thing.
 
 
 
@@ -45,6 +49,8 @@ At #history-A.3 we added a couple more
 At #history-A.4 this stopped working, probably coinciding with the change
 to "poetry", but the workaround was to invoke the CLI scripts by name;
 which is fine for now. Part of #open [#008.13]
+
+At #history-A.5 we reinstated pip/virtualenv over poetry
 
 Ideally we will eventually know how we can have this file live in the
 sub-project directory if possible
@@ -66,7 +72,11 @@ setup(
         entry_points='''
             [console_scripts]
             pho=pho.cli:cli_for_production
+            tmx-timestamp=pho.cli.timestamp:cli_for_production
         ''')
+
+
+exit(0)  # added at at #history-A.6. see #here2
 
 
 setup(
@@ -100,6 +110,7 @@ setup(
             DTF_game_server_server=game_server.cli.game_server_server:cli_for_production
         ''')
 
+# #history-A.6
 # #history-A.5
 # #history-A.4
 # #history-A.3

@@ -28,7 +28,7 @@ class listening:  # (as namespace only)
 
     def emission_via_args(args):
         error_or_info, *rest = args
-        _i = ('error', 'info').index(error_or_info)
+        _i = ('error', 'info', 'debug').index(error_or_info)
         return (_InfoEmission if _i else _ErrorEmission)(*rest)
 
     def reason_via_error_emission(shape, error_category, *rest):

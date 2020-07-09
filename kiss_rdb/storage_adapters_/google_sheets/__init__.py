@@ -5,8 +5,8 @@ STORAGE_ADAPTER_IS_AVAILABLE = False
 STORAGE_ADAPTER_UNAVAILABLE_REASON = "building backend (transactors) first"
 
 
-SERIALIZED_OAUTH_TOKEN_PATH_ = 'token.pickle'  # will change
-OAUTH_CREDENTIALS_PATH_ = 'credentials.json'  # will change
+SERIALIZED_OAUTH_TOKEN_PATH = 'token.pickle'  # will change
+OAUTH_CREDENTIALS_PATH = 'credentials.json'  # will change
 
 
 class Collection:
@@ -50,7 +50,6 @@ class LiveTransactor:
             # if you modify these scopes, delete the file at token_path
             # scopes =['https://www.googleapis.com/auth/spreadsheets.readonly']
 
-            del(self._single_use_mutex)  # else memoize this API facade
             scopes = ['https://www.googleapis.com/auth/spreadsheets']
             creds = _credentials_via(
                     token_path, credentials_path, scopes, listener)
@@ -59,11 +58,10 @@ class LiveTransactor:
 
         self._build_sheet_API = build_sheet_API
         self._spreadsheet_ID = spreadsheet_ID
-        self._single_use_mutex = None
 
     def insert_at_top(self, req):
         requests = self._build_requests_for_insert_at_top(req)
-        spreadsheets = self._build_sheet_API(req.listener)
+        spreadsheets = self._sheets_API(req.listener)
         return spreadsheets.batchUpdate(
                 spreadsheetId=self._spreadsheet_ID,
                 body={'requests': requests}).execute()
@@ -77,11 +75,18 @@ class LiveTransactor:
 
     def values_get(self, req):
         range_s = _full_range_string_via_schema(req.schema)
-        spreadsheets = self._build_sheet_API(req.listener)
+        spreadsheets = self._sheets_API(req.listener)
         result = spreadsheets.values().get(
                 spreadsheetId=self._spreadsheet_ID, range=range_s,
                 ).execute()
         return result.get('values', [])
+
+    def _sheets_API(self, listener):
+        if self._build_sheet_API is not None:
+            f = self._build_sheet_API
+            self._build_sheet_API = None
+            self._sheets_API_value = f(listener)
+        return self._sheets_API_value
 
 
 def _component_for_insert_dimension_request(recs, schema):
@@ -178,6 +183,8 @@ def _write_value_component_when_datetimey(number_format_component):
         excel_serial_date_epoch_start = dt.date(1899, 12, 30)
 
         def convert(x):
+            if '' == x:
+                return None  # .. #cover-me visual confirmed from live
             mine = dt.datetime.strptime(x, '%m-%d')  # ..
             use = dt.date(now.year, mine.month, mine.day)
             delta = use - excel_serial_date_epoch_start
@@ -185,6 +192,8 @@ def _write_value_component_when_datetimey(number_format_component):
 
     elif typ == 'TIME':
         def convert(x):
+            if '' == x:
+                return None  # .. #cover-me visual confirmed from live
             mine = dt.datetime.strptime(x, '%H:%M')  # ..
             previous_midnight = dt.datetime(mine.year, mine.month, mine.day)
             delta = mine - previous_midnight
@@ -290,7 +299,7 @@ def _pickle():
 def EXPERIMENT_RECORD(
         directory_for_recordings, spreadsheet_ID_ID, sheet_name, cell_range):
 
-    cypher = _build_live_cypher()
+    cypher = build_live_cypher()
     si = SpreadsheetIdentifierEXPERIMENTAL(
             spreadsheet_ID_ID=spreadsheet_ID_ID)
     ss_ID = cypher.spreadsheet_ID_via_identifier(si)
@@ -308,7 +317,7 @@ def EXPERIMENT_RECORD(
 def EXPERIMENT_READ(
         directory_for_recordings, spreadsheet_ID_ID, sheet_name, cell_range):
 
-    cypher = _build_live_cypher()
+    cypher = build_live_cypher()
     si = SpreadsheetIdentifierEXPERIMENTAL(
             spreadsheet_ID_ID=spreadsheet_ID_ID)
     recs = Recordings(directory_for_recordings)
@@ -321,7 +330,7 @@ def EXPERIMENT_READ(
 
 def _live_transactor_via(ss_ID):
     return LiveTransactor(
-            ss_ID, SERIALIZED_OAUTH_TOKEN_PATH_, OAUTH_CREDENTIALS_PATH_)
+            ss_ID, SERIALIZED_OAUTH_TOKEN_PATH, OAUTH_CREDENTIALS_PATH)
 
 
 def _debugging_listener():
@@ -501,7 +510,7 @@ class InMemoryStubTransactor:
         return self._values_get(req)
 
 
-def _build_live_cypher():
+def build_live_cypher():
     from os import environ
     return Cypher(environ)
 
