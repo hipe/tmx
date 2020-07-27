@@ -1,0 +1,113 @@
+digraph g {
+label="\n(fig. 3)  rough sketch of project"
+rankdir="BT"  /* bottom to top. here, arrow means "leads to" */
+
+/* the tier structure */
+
+
+begin_4
+
+subgraph clusterTierThree {
+  label="Tier Three"
+  hosting
+  pics
+}
+
+begin_2->begin_3
+
+subgraph clusterTierTwo {
+  label="Tier Two"
+}
+
+begin_2
+
+subgraph clusterTierOne {
+  label="Tier One"
+  doc_server
+  ds
+  vc
+  vt
+  vt_ss
+  vt_bubbles
+  vt_bubbles_integrated
+}
+
+begin_1
+
+
+
+begin_4[label=""]
+begin_3[label=""]
+begin_2[label=""]
+begin_1[label="begin development" shape=rect]
+
+
+
+
+/* alphabetical list by node name, mainly for their labels */
+
+ds[label="deployment strategy:
+second line of deployment strategy" style=filled]
+doc_server[label="document how to start\nthe local server" style=filled]
+hosting[label="mature, grown up hosting"]
+pics[label="selfies \n(rough thing)"]
+vc[label="essential froz biz" style=filled]
+vt[label="make a page of selenium tests" style=filled]
+vt_bubbles[label="basic wiz-bangs\n(deploy cosmograph)" style=filled]
+vt_bubbles_integrated[label="bubbles integrated\nwith datasource
+(very basic)"]
+vt_ss[label="basic working\nexample of reading\nfrom remote data source" style=filled]
+
+
+
+/* Alpha by depender. dependee on the left, depender on the right  */
+
+
+/* doc_server */
+doc_server->begin_2
+vc->doc_server
+
+
+/* ds */
+begin_1->ds
+
+
+/* hosting */
+begin_3->hosting
+hosting->begin_4
+
+
+/* pics */
+begin_3->pics
+pics->begin_4
+
+
+/* vc */
+ds->vc
+
+
+/* vt */
+vt->begin_2
+vt_bubbles->vt
+vt_bubbles_integrated->vt
+vt_ss->vt
+
+
+/* vt bubbles */
+vc->vt_bubbles
+
+
+/* vt bubbles integrated */
+vt_bubbles->vt_bubbles_integrated
+vt_ss->vt_bubbles_integrated
+
+
+
+/* vt spreadsheet */
+vc->vt_ss
+
+
+}
+/*
+# #born
+*/

@@ -10,8 +10,8 @@ design.
 
 ### our :[#608.6] "holy 6" internal API for CLI components
 
-(At #history-A.3 we susetted the description of this API. At #history-A.2
-we susetted the use of the API itself. At #history-A.1 we sunsetted [#608.5]
+(At #history-A.3 we sunsetted the description of this API. At #history-A.2
+we sunsetted the use of the API itself. At #history-A.1 we sunsetted [#608.5]
 the related API that preceded this one.)
 
 

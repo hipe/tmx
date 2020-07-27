@@ -3,6 +3,9 @@
 
 This was early-abstracted from a rough sketch of an attempt at adding
 options to cheap_arg_parse..
+
+.#history-A.1 gets a new parser with a similar "philosophy" but an all new,
+ground-up, blind rewrite. One day unify.
 """
 
 """
@@ -263,6 +266,318 @@ def _parse_parse(tox, keep_going):
     return states, sequence_grammar, sub_expressions
 
 
+def WIP_TOPMOST_PARSER_VIA_GRAMMAR(define_grammar):
+    # this returns a "parser" that requires the client to know about our
+    # internal parser workings (directives). It should probably not stay
+    # exposed like this but for reasons, during development it is.
+
+    return _BuildTopmostParser(define_grammar).execute()
+
+
+class _BuildTopmostParser:
+
+    def __init__(self, defintion):
+        self._forward_reference_names = set()
+        self._symbol_definitions = {}
+        defintion(self)
+
+    def define(self, symbol_name, parser):
+        if symbol_name in self._symbol_definitions:
+            raise _MyRuntimeError(f"already defined: '{symbol_name}'")
+        self._symbol_definitions[symbol_name] = parser
+
+    def sequence(self, *component_tuples):
+        return _SequenceNonterminal(component_tuples, self)
+
+    def alternation(self, *symbol_names):
+        return _AlternationNonterminal(symbol_names, self)
+
+    def regex(self, rxs):
+        return _RegexTerminal(rxs)
+
+    # ==
+
+    def see_symbol_name(self, sym):
+        self._forward_reference_names.add(sym)
+
+    def execute(self):
+
+        forward_refs = tuple(self._forward_reference_names)
+        del self._forward_reference_names
+
+        symbol_defs = self._symbol_definitions
+        del self._symbol_definitions
+
+        missing = tuple(k for k in forward_refs if k not in symbol_defs)
+        if len(missing):
+            raise _MyRuntimeError(f'define these: ({", ".join(missing)})')
+
+        symbol_names = tuple(symbol_defs.keys())
+
+        parser_builders = {}
+        for k in symbol_names:
+            parser_builders[k] = symbol_defs[k].build_parser_builder(parser_builders)  # noqa: E501
+
+        topmost_symbol = symbol_names[0]
+        return topmost_symbol, parser_builders[topmost_symbol](topmost_symbol)
+
+
+def _build_sequence_parser_builder(components, pbs):
+
+    length = len(components)
+    assert(length)
+
+    full_range = range(0, length)
+
+    offset_of_last_required = None
+    for i in full_range:
+        if components[i].must_match:
+            offset_of_last_required = i
+
+    has_required = offset_of_last_required is not None
+
+    class SequenceParser:
+
+        def __init__(self, name):
+            self._NAME = name
+            self._parsers = [None for _ in full_range]
+            self._did_thing = [False for _ in full_range]
+            self._ = [0, 0]
+            self._find_next_end()
+            self._AST = {}
+
+        def parse_line(self, line):
+
+            while True:
+                direc = None
+                for parser, comp, offset in self._current_swath:
+                    direc = parser.parse_line(line)
+                    if direc is not None:
+                        break  # first match always wins for now (no lookahead)
+
+                if direc is None:
+                    return self._when_not_found()
+
+                direc_name = direc[0]
+
+                if 'done_but_rewind' == direc_name:
+                    tup = self._when_child_done(direc[1], parser, comp, offset)
+                    if 'stay' != tup[0]:
+                        xx()
+                    continue
+                break
+
+            if 'stop' == direc_name:
+                return direc
+
+            return self._when_found(direc, parser, comp, offset)
+
+        def _when_not_found(self):
+            if has_required:
+                if offset_of_last_required < self._[0]:
+                    # if you didn't find a match for this token but you have
+                    # passed your last required component,
+                    return 'done_but_rewind', self._releast_AST_er()  # #here1
+                else:
+                    return  # #here2
+            else:
+                xx()
+
+        def _when_found(self, direc, parser, comp, offset):
+            direc_name, direc_data = direc
+
+            if 'done' == direc_name:
+                return self._when_child_done(direc_data, parser, comp, offset)
+
+            if 'stay' == direc_name:
+                assert(direc_data is None)
+
+                # now that this component is matching, you don't want to
+                # include components to the left of us. inch forward if nec.
+                self._[0] = offset
+                return direc
+
+            xx()
+
+        def _when_child_done(self, AST_er, parser, comp, offset):
+
+            # no matter what, don't send a parser more lines when it says done
+            self._parsers[offset] = None
+
+            if comp.do_keep:
+                self._store_AST(AST_er(), comp)
+
+            if comp.can_be_many:
+                return self._when_plural_child_done(parser, comp, offset)
+            else:
+                return self._when_singular_child_done(parser, comp, offset)
+
+        def _when_plural_child_done(self, parser, comp, offset):
+
+            # when a plural parser reports 'done', we will have stored its
+            # AST and released the parser, but we don't move the swath head
+            # past this slot yet, so that future tokens (many) may match it.
+
+            # however, because it matched, move (once) the swath head forward
+            # to point at this slot. (no previous grammatical terms can match)
+
+            # now that the slot is satisfied, if it was formerly constituting
+            # the tail of the swath, move the swath forward when approriate.
+
+            # we are asking to stay so we will likely use this:
+            self._parsers[offset] = parser.cleared_parser()
+
+            next_offset = offset + 1
+
+            if not self._did_thing[offset]:
+                self._did_thing[offset] = True
+                self._[0] = offset
+
+                # if the component was last in the swath
+                if next_offset == self._[1]:
+                    # if the component was last in the world
+                    if length == next_offset:
+                        # probably do nothing
+                        # (plurals last in world are kinda tricky..)
+                        pass
+                    else:
+                        # the component was last in the swath but not world,
+                        # find new ending for the swath, now that it's satisf.
+                        assert(comp.must_match)
+                        self._find_next_end()
+                else:
+                    # the component was not last in the swath.
+                    # nothing to advance.
+                    pass
+
+            return 'stay', None  # #here1
+
+        def _when_singular_child_done(self, parser, comp, offset):
+
+            next_offset = offset + 1
+
+            # since component is done (and not plural) always move past it
+            self._[0] = next_offset
+
+            # if the component was the last in the swath
+            if next_offset == self._[1]:
+
+                # if the component was the last in the world
+                if length == next_offset:
+                    return 'done', self._releast_AST_er()
+
+                assert(comp.must_match)
+
+                # the component was last in the swath but not last in
+                # the world. there are more components after it
+                self._find_next_end()
+
+            return 'stay', None  # #here1
+
+        def _store_AST(self, child_AST, comp):
+            k = comp.symbol_name  # one day an 'as' option
+            if comp.can_be_many:
+                # set it as a list the first time, else append to it
+                if k not in self._AST:
+                    self._AST[k] = []
+                self._AST[k].append(child_AST)
+            else:
+                assert(k not in self._AST)  # else an 'as' option
+                self._AST[k] = child_AST
+
+        def _releast_AST_er(self):
+            del self._
+
+            def AST_er():
+                x = self._AST
+                del self._AST
+                return x
+            return AST_er
+
+        def cleared_parser(self):
+            return self.__class__(self._NAME)
+
+        def phrase_for_expecting(self, symbol_name):
+            return _PhraseViaPhrases(*self._phrases_for_expecting(symbol_name))
+
+        def _phrases_for_expecting(self, symbol_name):
+            def each_phrase():
+                for parser, comp, _ in self._current_swath:
+                    yield parser.phrase_for_expecting(comp.symbol_name)
+            itr = iter(each_phrase())
+            yield next(itr)
+            or_p = _PhraseViaWords('or')
+            for p in itr:
+                yield or_p
+                yield p
+
+        @property
+        def _current_swath(self):
+            for i in range(* self._):
+                yield self._parsers[i], components[i], i
+
+        def _find_next_end(self):
+            while True:
+                old_begin, i = self._
+                new_end = i + 1
+
+                c = components[i]
+
+                assert(self._parsers[i] is None)
+                self._parsers[i] = pbs[c.symbol_name](c.symbol_name)
+
+                self._[1] = new_end
+                if length == new_end:
+                    return
+
+                if c.must_match:
+                    break
+
+    return SequenceParser
+
+
+class _SequenceNonterminal:
+
+    def __init__(self, component_tuples, g):
+        def o(tup):
+            c = _SequenceComponent(*tup)
+            g.see_symbol_name(c.symbol_name)
+            return c
+        self._components = tuple(o(tup) for tup in component_tuples)
+
+    def build_parser_builder(self, pbs):
+        return _build_sequence_parser_builder(self._components, pbs)
+
+
+class _SequenceComponent:
+
+    def __init__(self, arity, symbol_name, *rest):
+        self.do_keep = False
+        if len(rest):
+            # one day an 'as' feller
+            keep, = rest
+            assert('keep' == keep)
+            self.do_keep = True
+
+        if 'zero_or_one' == arity:
+            can_be_zero = True
+            can_be_many = False
+        elif 'zero_or_more' == arity:
+            can_be_zero = True
+            can_be_many = True
+        elif 'one' == arity:
+            can_be_zero = False
+            can_be_many = False
+        else:
+            assert('one_or_more' == arity)
+            can_be_zero = False
+            can_be_many = True
+
+        self.must_match = not can_be_zero
+        self.can_be_many = can_be_many
+        self.symbol_name = symbol_name
+
+
 __arities = {
         # excludes zero, goes to infinity
         'any': (False, False),  # (Case2617)
@@ -271,6 +586,135 @@ __arities = {
         'one or more': (True, True),
         'zero or more': (False, True),
         }
+
+
+def _build_alternation_parser_builder(symbol_names, parser_builders):
+
+    class AlternationParser:
+
+        def __init__(self, name):
+            self._NAME = name
+            self._is_collapsed = False
+
+        def parse_line(self, line):
+            # no lookahead, so we've got to resolve one immediately.
+            # first one wins. if not found it's a failure
+
+            if self._is_collapsed:
+                direc = self._parser.parse_line(line)
+                if direc is None:
+                    # what to do when a long running fails. stop
+                    return ('stop', None)
+                found_sym = self._found_sym
+            else:
+                direc = None
+                for found_sym in symbol_names:
+                    parser = parser_builders[found_sym](found_sym)
+                    direc = parser.parse_line(line)
+                    if direc is not None:
+                        break
+
+                if direc is None:
+                    return  # #here2
+
+            # when a child reports done, we will report done,
+            # and take me off the field coach.
+
+            direc_name, direc_data = direc
+            if 'done' == direc_name:
+                def AST_er():
+                    # a matchdata with no specific symbol name is useless
+                    _child_AST = direc_data()
+                    return (found_sym, _child_AST)
+                return 'done', AST_er  # #here1
+
+            # but if a child is long-running, we may have to change state to
+            # remember this..
+
+            if 'stay' == direc_name:
+                if not self._is_collapsed:
+                    self._is_collapsed = True
+                    self._parser = parser
+                    self._found_sym = found_sym
+                return direc
+
+            xx()
+
+        def phrase_for_expecting(self, symbol_name):
+            if self._is_collapsed:
+                return self._parser.phrase_for_expecting(symbol_name)
+            return _PhraseViaPhrases(*self._phrases_for_expecting(symbol_name))
+
+        def _phrases_for_expecting(self, symbol_name):
+            # we perhaps don't want symbol names in expressions. experimental
+            yield _PhraseViaWords(
+                    f"'{symbol_name}',", "which", "is", "one", "of", "(")
+            itr = iter(each_phrase())
+            yield next(itr)
+            or_p = _PhraseViaWords('or')
+            for p in itr:
+                yield or_p
+                yield p
+            yield _PhraseViaWords(')')
+
+        def cleared_parser(self):
+            return self.__class__(self._NAME)
+
+    def each_phrase():
+        for symbol_name in symbol_names:
+            parser = parser_builders[symbol_name](symbol_name)
+            yield parser.phrase_for_expecting(symbol_name)
+
+    return AlternationParser
+
+
+class _AlternationNonterminal:
+
+    def __init__(self, symbol_names, g):
+        for s in symbol_names:
+            g.see_symbol_name(s)
+        self._forward_reference_names = symbol_names
+
+    def build_parser_builder(self, pbs):
+        return _build_alternation_parser_builder(
+                self._forward_reference_names, pbs)
+
+
+def _build_regex_parser(rx):
+
+    class RegexParser:
+        # stateless, no members
+
+        def parse_line(self, line):
+            md = rx.search(line)
+            if md is None:
+                return  # #here2
+
+            def AST_er():
+                return md
+            return 'done', AST_er  # #here1
+
+        def cleared_parser(self):
+            return self
+
+        def phrase_for_expecting(self, symbol_name):
+            return _PhraseViaWords(f"'{symbol_name}'", f"(/{rx.pattern}/)")
+
+    return RegexParser()
+
+
+class _RegexTerminal:
+
+    def __init__(self, rxs):
+        self._rxs = rxs
+
+    def build_parser_builder(self, _):
+        import re
+        parser = _build_regex_parser(re.compile(self._rxs))
+
+        def build_parser(ignore_name):
+            return parser
+        return build_parser
 
 
 def _THING_FROM_THING(symbol_table):
@@ -365,4 +809,64 @@ def _when_unrecognized_input(listener, token_scanner, transitions):
         raise Exception('cover me')  # [#676] cover me
     listener('error', 'structure', 'parse_error', 'unrecognized_input', stcter)
 
+
+def lines_via_words(words, limit):
+
+    class WordBuffer:
+        def __init__(self):
+            self._line_words = []
+            self._char_count_minus_spaces = 0
+
+        def add_word(self, w):
+            self._line_words.append(w)
+            self._char_count_minus_spaces += len(w)
+            if limit <= self._char_count_minus_spaces:
+                return self._flush()
+
+        def close(self):
+            if len(self._line_words):
+                return self._flush()
+
+        def _flush(self):
+            self._char_count_minus_spaces = 0
+            s = ' '.join(self._line_words)
+            self._line_words.clear()
+            return s
+
+    buff = WordBuffer()
+    for w in words:
+        s = buff.add_word(w)
+        if s is not None:
+            yield s
+    s = buff.close()
+    if s is not None:
+        yield s
+
+
+class _PhraseViaPhrases:
+    def __init__(self, *phrases):
+        self._phrases = phrases
+
+    def to_words(self):
+        for p in self._phrases:
+            for w in p.to_words():
+                yield w
+
+
+class _PhraseViaWords:
+    def __init__(self, *words):
+        self._words = words
+
+    def to_words(self):
+        return self._words
+
+
+def xx():
+    raise RuntimeError('do me')
+
+
+class _MyRuntimeError(RuntimeError):
+    pass
+
+# #history-A.1
 # #born.

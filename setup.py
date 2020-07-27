@@ -72,6 +72,7 @@ setup(
         entry_points='''
             [console_scripts]
             pho=pho.cli:cli_for_production
+            tmx-dot2cytoscape=pho.cli.dot2cytoscape:cli_for_production
             tmx-timestamp=pho.cli.timestamp:cli_for_production
         ''')
 
