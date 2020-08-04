@@ -2,7 +2,7 @@
   "name": "pho-gui",
   "version": "0.0.0",
   "description": "electron-framework-based GUI for pho (EXPERIMENTAL)",
-  "main": "main.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ."

@@ -29,3 +29,7 @@ maybe restructure fragment data model to have (only) children and next
 nagivate to adjacent fragments
 read-only any one fragment
 python-shell called from electron app
+generated app with our hand made changes wrapped in
+get the app working after the renames
+deal with package.json merging somehow
+do renames
