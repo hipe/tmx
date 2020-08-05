@@ -1,3 +1,36 @@
+# entity: EL8: attributes
+heading: How We Got Started With Our Electron GUI
+document_datetime: 2020-08-04 16:16:25-0400
+-- body
+
+From this youtube: (Build a Desktop App with Electron... But Should You?)[1]:
+
+```bash
+npx create-electron-app pho/pho-gui-NEXT
+```
+
+Above, we said "NEXT" because we didn't want to clobber our existing app
+that had this "python-shell"-integrated work in it, so we generate the new
+app in this way and merge it manually.
+
+Start our app:
+
+```bash
+npm start
+```
+
+Restart the app when you make changes:
+```bash
+rs
+```
+(from the terminal where the app is running)
+
+[1]: https://youtu.be/3yqDxhR2XxE
+-- body
+
+annotated entity revisions:
+- #born
+
 # entity: ELE: attributes
 heading: First Notes on the Electron Framework
 document_datetime: 2019-11-20 18:43:00-0400
