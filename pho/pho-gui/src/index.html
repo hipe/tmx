@@ -10,25 +10,32 @@
     <script defer src="render.js"></script>
   </head>
   <body>
-    <h1>⚡️ Electron Screen Recorder</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
 
-    <video></video>
+    <div class="columns">
 
-    <button id="startBtn" class="button is-primary">Start</button>
-    <button id="stopBtn" class="button is-warning">Stop</button>
+      <div class="column">
+    <h1>«Some App Title Here Maybe»</h1>
+      </div>
 
-    <hr />
+      <div class="column">
+    <button id="randomBtn" class="button is-primary">Get Randon Entity</button>
+      </div>
 
-    <button id="videoSelectBtn" class="button is-text">
-      Choose a Video Source
-    </button>
+      <div class="column">
+        <div class="debugging-div">
+    using:
+    - electron <script>document.write(process.versions.electron)</script>
+    - node <script>document.write(process.versions.node)</script>
+    - chrome <script>document.write(process.versions.chrome)</script>
+        </div>
+      </div>
+
+    </div>
 
   </body>
 </html>
 <!--
+# #history-A.2: remove screen recording tutorial code
 # #history-A.1: merge-in forge-generated app (very little change)
 # #born.
 -->

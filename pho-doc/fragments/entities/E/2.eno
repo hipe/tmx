@@ -11,7 +11,7 @@ We read thru *three* documentation bodies in pursuit of this, and it was
 all a disappointment. We'll narrate this in the order it happened:
 
 First we read thru the [website docs][1] covered in a different document
-fragemnt. It was disappointing:
+fragment. It was disappointing:
 
   - there's that one list of links that's partially redundant with that other
   - lots of low-level API and edge-case concerns, not good intro or tut

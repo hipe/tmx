@@ -4,6 +4,12 @@ body {
   max-width: 38rem;
   padding: 2rem;
 }
+
+.debugging-div {
+  white-space: pre;
+  font-family: monospace;
+  background-color: grey;
+}
 /*
  * #born (from generated)
  */
