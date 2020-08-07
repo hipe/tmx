@@ -1,9 +1,2 @@
-/.build
 /pho-gui/node_modules
-PhoGUI/NumpyConversion.swift
-PhoGUI/Python.swift
-PhoGUI/PythonLibrary+Symbols.swift
-PhoGUI/PythonLibrary.swift
-/PhoGUI.xcodeproj/project.xcworkspace/xcuserdata
-# very likely do this but keep an eye on it for a second:
-# /PhoGUI.xcodeproj/xcuserdata
+# #history-A.1: move swift stuff into own files
