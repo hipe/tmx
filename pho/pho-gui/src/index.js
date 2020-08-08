@@ -1,33 +1,8 @@
 'use strict';
 
 const { app, BrowserWindow } = require('electron');
-
-const { PythonShell } = require('python-shell');
-
 const path = require('path');
 
-const _options = {
-  args: ['aa', 'bb', 'cc'],
-  scriptPath: path.resolve(path.join(__dirname, '..')),
-  pythonPath: 'python3',  // ..
-  pythonOptions: ['-u'],  // stdin, stdout & stderr unbuffered
-  mode: 'text'
-};
-
-const pyshell = new PythonShell('../backend.py', _options);
-
-// pyshell.send('some user data')
-
-pyshell.on('message', (message) => {
-  console.log('receceived message: ' + message);
-})
-
-pyshell.end((err, code, signal) => {
-  if (err) throw err;
-  console.log('the exit code was: ' + code);
-  console.log('the exit signal was ' + signal);
-  console.log('finished with thing.');
-});
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -79,6 +54,7 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 /*
+# #history-A.2: python shell leaves this file
 # #history-A.1: merge-in electron-forge-generated starter app
 # #born.
 */

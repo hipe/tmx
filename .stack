@@ -21,5 +21,3 @@ kiss for create eno entity (and undo pho mock) (duplicate)
 pho mocked for create fragment
 pho mocked for delete fragment
 nagivate to adjacent fragments
-read-only any one fragment
-python-shell called from electron app

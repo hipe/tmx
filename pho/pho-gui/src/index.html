@@ -11,25 +11,129 @@
   </head>
   <body>
 
-    <div class="columns">
+    <div class="field">
+      <h1>«Some App Title Here Maybe»</h1>
+    </div>
 
-      <div class="column">
-    <h1>«Some App Title Here Maybe»</h1>
+    <div class="field">
+      <button id="randomBtn" class="button is-primary">Get Random Entity</button>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Parent</label>
       </div>
-
-      <div class="column">
-    <button id="randomBtn" class="button is-primary">Get Randon Entity</button>
-      </div>
-
-      <div class="column">
-        <div class="debugging-div">
-    using:
-    - electron <script>document.write(process.versions.electron)</script>
-    - node <script>document.write(process.versions.node)</script>
-    - chrome <script>document.write(process.versions.chrome)</script>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="parentInput" class="input" placeholder="Parent" readonly>
+          </p>
         </div>
       </div>
+    </div>
 
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Previous</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="previousInput" class="input" placeholder="Previous" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Identifier</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="identifierInput" class="input" placeholder="Identifier" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Heading</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="headingInput" class="input" placeholder="Heading" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Datetime</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="datetimeInput" class="input" placeholder="Document Datetime" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+
+      <label class="label">Body</label>
+
+      <textarea id="bodyTextarea" class="textarea" readonly rows="10" cols="79">
+Hello I am the text area.
+Another line/sentence.
+Third line.
+Fourth line.
+Fifth line.
+      </textarea>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Next</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="nextInput" class="input" placeholder="Next" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Children</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <input id="children_TEMP_input" class="input" placeholder="Children" readonly>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <button id="helloBtn" class="button is-primary">Say Hi to Pho</button>
+    </div>
+
+    <div class="field">
+      <div class="debugging-div">
+using:
+- electron <script>document.write(process.versions.electron)</script>
+- node <script>document.write(process.versions.node)</script>
+- chrome <script>document.write(process.versions.chrome)</script>
+      </div>
     </div>
 
   </body>
