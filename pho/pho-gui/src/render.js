@@ -62,11 +62,27 @@ const buttonStateThing = (btn) => {
       populateEntity(entity);
     };
 
-    const args = [buildCollectionPath()];
+    const args = [collPath];
     codec.requestJSON('retrieve_random_entity', args).then(onEntity);
   };
 
 })(document.getElementById('randomBtn'));
+
+
+const onClickReferenceLink = ev => {
+
+  const onEntity = (entity) => {
+    console.log('wahoo worked');
+    populateEntity(entity);
+  };
+
+  const iid = ev.target.innerText;
+  console.log('go daddy '+iid);
+
+  const args = [iid, collPath];
+  codec.requestJSON('retrieve_entity', args).then(onEntity);
+  return false;
+};
 
 
 (btn => {
@@ -102,29 +118,101 @@ const buttonStateThing = (btn) => {
 
 
 const populateEntity = ent => {
-  parentInput.value = ent.parent || '';
-  previousInput.value = ent.previous || '';
+
+  wrf(parentField, ent.parent);
+  wrf(previousField, ent.previous);
+  wrf(nextField, ent.next);
+  writeChildrenField(ent.children);
+
   identifierInput.value = ent.identifier || '';
   headingInput.value = ent.natural_key || ent.heading || '';
   datetimeInput.value = ent.document_datetime || '';
   bodyTextarea.value = ent.body || '';  // not innerText
-  nextInput.value = ent.next || '';
-
-  // one day we'll know enough to make this pretty
-  const cx = ent.children;
-  const sCx = cx ? cx.join(', ') : '';
-  children_TEMP_input.value = sCx;
 };
 
 
-const parentInput = document.getElementById('parentInput');
-const previousInput = document.getElementById('previousInput');
+const writeChildrenField = cx => {
+  if (cx) {
+    doWriteChildrenField(cx);
+  } else {
+    clearChildrenField();
+  }
+};
+
+
+const doWriteChildrenField = cx => {
+  const el = childrenField.children[1];
+  const hacky = cx.map(s => {return `<a>${s}</a>`;}).join(', ');
+  el.innerHTML = hacky;
+  Array.from(el.children).forEach(wireReferenceForClicking);
+  const style = childrenField.style;
+  if ('none' === style.display) {
+    style.display = 'flex';
+  }
+};
+
+
+const clearChildrenField = () => {
+  const style = childrenField.style;
+  if ('none' !== style.display) {
+    style.display = 'none';
+  }
+  const el = childrenField.children[1];
+  el.innerHTML = '';
+};
+
+
+const wrf = (field, value) => {
+  if (value) {
+    writeReferenceField(field, value);
+  } else {
+    hideReferenceField(field);
+  }
+};
+
+
+const writeReferenceField = (field, value) => {
+  const style = field.style;
+  anchorViaField(field).innerText = value;
+  if ('none' === style.display) {
+    style.display = 'flex';
+  }
+};
+
+
+const hideReferenceField = (field) => {
+  const style = field.style;
+  if ('none' === style.display) {
+    return;
+  }
+  style.display = 'none';
+  anchorViaField(field).innerText = '222';  // ick/meh
+};
+
+
+const anchorViaField = field => {
+  return field.children[1].children[0];  // not ok, but meh for now
+};
+
+
+const wireReferenceForClicking = a => {
+  a.onclick = onClickReferenceLink;
+};
+
+
+const parentField = document.getElementById('parentField');
+const previousField = document.getElementById('previousField');
 const identifierInput = document.getElementById('identifierInput');
 const headingInput = document.getElementById('headingInput');
 const datetimeInput = document.getElementById('datetimeInput');
 const bodyTextarea = document.getElementById('bodyTextarea');
-const nextInput = document.getElementById('nextInput');
-const children_TEMP_input = document.getElementById('children_TEMP_input');
+const nextField = document.getElementById('nextField');
+const childrenField = document.getElementById('childrenField');
+
+
+wireReferenceForClicking(anchorViaField(parentField));
+wireReferenceForClicking(anchorViaField(previousField));
+wireReferenceForClicking(anchorViaField(nextField));
 
 
 const codec = (() => {
@@ -213,9 +301,7 @@ const codec = (() => {
 })();
 
 
-const buildCollectionPath = () => {
-  return path.resolve(path.join(__dirname, '..', '..', _COLLECTION));
-};
+const collPath = path.resolve(path.join(__dirname, '..', '..', _COLLECTION));
 
 
 /*

@@ -61,6 +61,10 @@ class _Collection:  # #tespoint
 
     @_encode_identifier
     def retrieve_entity(self, iden, listener):
+        return self.retrieve_entity_via_identifier(iden, listener)
+
+    def retrieve_entity_via_identifier(self, iden, listener):
+        # de = document entity. to remain agnostic we result in dictionaries
         de = self._impl.retrieve_entity_as_storage_adapter_collection(
                 iden, listener)
         if de is None:

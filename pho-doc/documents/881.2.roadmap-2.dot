@@ -1,6 +1,6 @@
 digraph g {
 
-/* rankdir=BT cool when you're close to finished */
+rankdir=BT; /* the finish is at the top */
 
 10000[label="starting from\nnothing" style=filled]
 10000->15000
@@ -66,7 +66,7 @@ TO TAKE NOTES AND SEE THEM RENDERED"]
 37000->37750
 37000->37800
 37300[label="read-only\none fragment" style=filled]
-37500[label="navigate to\nnearby fragments"]
+37500[label="navigate to\nnearby fragments" style=filled]
 37700[label="edit existing"]
 37750[label="create new"]
 37800[label="delete fragment"]

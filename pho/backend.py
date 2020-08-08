@@ -20,23 +20,18 @@ def _API_for_production():
 
 def _API(sin, sout, serr, argv, enver):
 
-    bash_argv = list(reversed(argv))  # name is tribute to BASH_ARGV (see)
-
-    assert(len(bash_argv))  # assume program name is always first element
-
-    bash_argv.pop()  # we don't care about program name
-
-    if not len(bash_argv):
-        serr.write("expecting command name\n")
-        return 2
-
-    command_name = bash_argv.pop()
+    argp = _arg_parser(list(reversed(argv)), serr)
+    _, es = argp.parse_one_argument()
+    assert(not es)  # assume program name is always first element. discard
+    command_name, es = argp.parse_one_argument('command name')
+    if es:
+        return es
     dct = _command_function_via_name
     if command_name not in dct:
         serr.write(f'unknown command: "{command_name}"\n')
         return 3
 
-    es = dct[command_name](sin, sout, serr, bash_argv, enver)
+    es = dct[command_name](sin, sout, serr, argp, enver)
 
     if not isinstance(es, int):  # #[#022]
         raise _MyException(f'expected int had: {type(es)}')
@@ -58,19 +53,15 @@ command, _command_function_via_name = _build_command_decorator_and_state()
 
 
 @command
-def retrieve_random_entity(sin, sout, serr, bash_argv, enver):
-    coll_path, es = _parse_one_argument(bash_argv, 'collection path', serr)
+def retrieve_random_entity(sin, sout, serr, argp, enver):
+    args, es = argp.parse_all_args('collection path')
     if es:
         return es
-
-    mon = _monitor_via_stderr(serr)
-    listener = mon.listener
-
-    coll = _collection_via_path(coll_path, listener)
-
+    coll_path, = args
+    coll, mon = _collection_and_monitor(coll_path, serr)
     if coll is None:
         return mon.exitstatus
-
+    listener = mon.listener
     yikes = tuple(coll.to_identifier_stream(listener))
     leng = len(yikes)
 
@@ -85,19 +76,37 @@ def retrieve_random_entity(sin, sout, serr, bash_argv, enver):
     rng = Random(seed)
     serr.write(f'RNG seed: {seed}\n')
     iden = yikes[rng.randrange(0, leng)]
-    id_s = iden.to_string()
-    serr.write(f'entity: {id_s}\n')
-    ent = coll._impl.retrieve_entity_as_storage_adapter_collection(iden, listener)  # noqa: E501
-    dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+    serr.write(f'entity: {iden.to_string()}\n')
+    ent_dct = coll.retrieve_entity_via_identifier(iden, listener)
+    assert(ent_dct)
+    return _write_entity_as_JSON(sout, ent_dct, listener)
 
+
+@command
+def retrieve_entity(sin, sout, serr, argp, enver):
+    args, es = argp.parse_all_args('entity identifier', 'collection path')
+    if es:
+        return es
+    eid_s, coll_path = args
+    coll, mon = _collection_and_monitor(coll_path, serr)
+    if coll is None:
+        return mon.exitstatus
+    ent_dct = coll.retrieve_entity(eid_s, mon.listener)
+    if ent_dct is None:
+        return mon.exitstatus
+    return _write_entity_as_JSON(sout, ent_dct, mon.listener)
+
+
+def _write_entity_as_JSON(sout, ent_dct, listener):
+    eid_s = ent_dct['identifier_string']
+    dct = ent_dct['core_attributes']
     from pho.magnetics_.document_fragment_via_definition import \
         document_fragment_via_definition
-
-    document_fragment_via_definition(listener, id_s, dct)  # throws
-    dct['identifier'] = id_s
-
+    document_fragment_via_definition(listener, eid_s, dct)  # throws
+    dct['identifier'] = eid_s  # munge now that we ensured business fields
     import json
-    json.dump(dct, sout)
+    indent = 2  # set to None to put it all on one line. 2 for pretty (longer)
+    json.dump(dct, sout, indent=indent)
     sout.write("\n")
     return 0
 
@@ -129,19 +138,12 @@ def hello_to_pho(sin, sout, serr, bash_argv, enver):  # a.k.a "ping"
     return 0
 
 
-def _parse_one_argument(bash_argv, which, serr):
-
-    if not len(bash_argv):
-        serr.write(f"expecting {which}\n")
-        return None, 4
-
-    arg = bash_argv.pop()
-
-    if len(bash_argv):
-        serr.write("unexpected extra argument\n")
-        return None, 4
-
-    return arg, None
+def _collection_and_monitor(coll_path, serr):
+    mon = _monitor_via_stderr(serr)
+    coll = _collection_via_path(coll_path, mon.listener)
+    if coll is None:
+        return None, mon
+    return coll, mon
 
 
 def _collection_via_path(coll_path, listener):
@@ -149,10 +151,46 @@ def _collection_via_path(coll_path, listener):
     return collectionerer().collection_via_path(coll_path, listener)
 
 
-def _monitor_via_stderr(serr):
+def _arg_parser(bash_argv, serr):
+    # `bash_argv` is tribute to BASH_ARGV (see! it's reversed. it's a stack)
 
+    def parse_all_args(*formals):
+        args = []
+        for formal in formals:
+            arg, es = parse_one_argument(formal)
+            if es:
+                return None, es
+            args.append(arg)
+
+        if (es := assert_empty()):
+            return None, es
+
+        return tuple(args), None
+
+    def parse_one_argument(formal=None):
+        if len(bash_argv):
+            return bash_argv.pop(), None
+        serr.write(f"expecting {formal or 'argument'}\n")
+        return None, 2
+
+    def assert_empty():
+        if not len(bash_argv):
+            return
+        serr.write("unexpected extra argument\n")
+        return 2
+
+    _1 = parse_all_args  # not ok
+    _2 = parse_one_argument
+
+    class parser:  # class as namespace
+        parse_all_args = _1
+        parse_one_argument = _2
+    return parser
+
+
+def _monitor_via_stderr(serr):
     from script_lib.magnetics import error_monitor_via_stderr
-    return  error_monitor_via_stderr(serr)
+    return error_monitor_via_stderr(serr)
 
 
 class _prefixer:
@@ -190,6 +228,10 @@ class _prefixer:
         self._buffer.append(self._prefix)
         self._downstream_IO.write(big_string)
         return self._downstream_IO.flush()
+
+
+def xx():
+    raise _MyException('write me')
 
 
 class _MyException(RuntimeError):
