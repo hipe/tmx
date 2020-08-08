@@ -12,7 +12,7 @@ class Case162_MONO_CASE(_CommonCase):
     def test_100_lines_are_okay_probably(self):
         lines, _, _ = self.custom_end_state()
         self.assertEqual(lines[0].index('digraph g {'), 0)
-        self.assertIn(len(lines), range(17, 30))
+        self.assertIn(len(lines), range(16, 30))
 
     def test_150_lines_are_NOT_newline_terminated(self):
         lines, _, _ = self.custom_end_state()
@@ -31,14 +31,19 @@ class Case162_MONO_CASE(_CommonCase):
 
     @shared_subject
     def custom_end_state(self):
-
         directory = fixture_directory('collection-00500-intro')
 
-        from pho.magnetics_.graph_via_collection import (
-            output_lines_via_collection_path)
+        from pho.magnetics_.graph_via_collection import \
+            output_lines_via_big_index_
+
+        from pho import big_index_via_collection_, collection_via_path_
 
         def run(listener):
-            _itr = output_lines_via_collection_path(directory, listener)
+            coll = collection_via_path_(directory, listener)
+            assert(coll)
+            bi = big_index_via_collection_(coll, listener)
+            assert(bi)
+            _itr = output_lines_via_big_index_(bi, listener)
             return tuple(_itr)  # you have to do it in here to reach the emits
 
         from modality_agnostic.test_support import (

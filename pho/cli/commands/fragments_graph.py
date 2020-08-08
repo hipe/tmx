@@ -6,32 +6,95 @@ def CLI(sin, sout, serr, argv, enver=None):
 
 def _params():
     from pho.cli import CP_
+    yield '-c', '--collection-path=PATH', * CP_().descs
+    yield '-v', '--verify', 'Check the integrity of the fragment collection'
 
-    yield ('-c', '--collection-path=PATH', * CP_().descs)
+
+def return_exitstatus(orig_f):
+    def use_f(monitor, *rest):
+        x = orig_f(monitor, *rest)
+        if x is not None:
+            assert(isinstance(x, int))
+            return x
+        return monitor.exitstatus
+    use_f.__doc__ = orig_f.__doc__
+    return use_f
 
 
-def _do_CLI(monitor, sin, sout, serr, enver, collection_path):
+@return_exitstatus
+def _do_CLI(monitor, sin, sout, serr, enver, collection_path, do_veri):
     """Show every relationship between every fragment in the collection.
 
-    short_help='Output a graph-viz digraph of the whole collection.
+    Output a graph-viz digraph of the whole collection.
     """
 
-    listener = monitor.listener
+    listener = _build_CLI_enhanced_listener(monitor)
 
     if collection_path is None:
-        from pho.cli import CP_
-        collection_path = CP_().require_collection_path(enver, listener)
+        collection_path = _require_collection_path(enver, listener)
         if collection_path is None:
-            return monitor.exitstatus
+            return
 
-    from pho.magnetics_.graph_via_collection import \
-        output_lines_via_collection_path
+    import pho as lib
+    coll = lib.collection_via_path_(collection_path, listener)
+    if coll is None:
+        return
 
-    write = sout.write
-    for line in output_lines_via_collection_path(collection_path, listener):
-        write(f'{line}\n')  # _eol
+    big_index = lib.big_index_via_collection_(coll, listener)
+    if big_index is None:
+        return
 
-    return monitor.exitstatus
+    if do_veri:
+        return _express_verification(sout, serr, big_index)
+
+    # express graph
+    from pho.magnetics_.graph_via_collection import output_lines_via_big_index_
+    w = _line_writer(sout)
+    for line in output_lines_via_big_index_(big_index, listener):
+        w(line)
+
+
+def _express_verification(sout, serr, big_index):
+    if not len(big_index.fragment_of):
+        _line_writer(serr)("empty graph!")
+        return 1
+
+    ow = _line_writer(sout)
+    for line in _lines_for_express_verification(big_index):
+        ow(line)
+
+
+def _lines_for_express_verification(big_index):
+    _cpc = len(big_index.parent_of)
+    _cpn = len(big_index.previous_of)
+    _cto = len(big_index.fragment_of)
+    yield f'{_cpc} parent-child relationship(s) ok'
+    yield f'{_cpn} prev-next relationship(s) ok'
+    yield f'{_cto} fragment(s) ok'
+
+
+def _require_collection_path(enver, listener):
+    from pho.cli import CP_
+    return CP_().require_collection_path(enver, listener)
+
+
+def _build_CLI_enhanced_listener(monitor):  # #[#608.7]
+    def listener(severity, shape, category, *rest):
+        if 'expression' != shape:
+            return monitor.listener(severity, shape, category, *rest)
+        *mid, orig_lineser = rest
+        lines = list(orig_lineser())
+        lines[0] = f"{category.replace('_', ' ')}: {lines[0]}"
+        monitor.listener(severity, shape, category, *mid, lambda: lines)
+    return listener
+
+
+def _line_writer(io):
+    def write_line(line):
+        w(line)
+        w('\n')  # _eol
+    w = io.write
+    return write_line
 
 # #history-A.1 rewrite during cheap arg parse not click
 # #born.

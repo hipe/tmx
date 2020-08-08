@@ -1,9 +1,8 @@
 # entity: E2B: attributes
-heading: electron getting started guides
-document_datetime: 2020-01-13 02:03:00-0400
 previous: ELE
+heading: Electron getting started guides
+document_datetime: 2020-01-13 02:03:00-0400
 -- body
-
 # Overview: 3 bodies of documentation
 
 We tried to find one definitive intro/tutorial to electron.
@@ -118,6 +117,7 @@ High hopes for [this todo app][5]. Thank god that worked.
 [2]: https://github.com/electron/electron-quick-start
 [1]: https://www.electronjs.org/docs
 -- body
+next: EL8
 
 # document-meta
 -- string_as_comment

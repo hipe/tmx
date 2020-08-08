@@ -54,7 +54,7 @@ class error_monitor_via_stderr:
         payloader = em.release_payloader()
 
         if payloader is None:
-            _ = em.channel_tail[0].replace('_', ' ')  # ..
+            _ = em.channel_tail[0].replace('_', ' ')  # #[#608.7]
             write_line(f'{em.severity}: {_}')
             return
 

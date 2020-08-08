@@ -1,8 +1,8 @@
 # entity: EL8: attributes
+previous: E2B
 heading: How We Got Started With Our Electron GUI
 document_datetime: 2020-08-04 16:16:25-0400
 -- body
-
 From this youtube: (Build a Desktop App with Electron... But Should You?)[1]:
 
 ```bash
@@ -27,11 +27,11 @@ rs
 
 [1]: https://fireship.io/lessons/electron-screen-recorder-project-tutorial/
 -- body
-
-annotated entity revisions:
+annotated_entity_revisions:
 - #born
 
 # entity: ELE: attributes
+parent: PBC
 heading: First Notes on the Electron Framework
 document_datetime: 2019-11-20 18:43:00-0400
 -- body
@@ -44,8 +44,6 @@ document_datetime: 2019-11-20 18:43:00-0400
 (Random side note: their [website][2] is really responsive.)
 
 
-
-
 # electron flask cursory notes
 
 [Adil Addiya][4] ok. May 1, 2019.
@@ -55,8 +53,6 @@ document_datetime: 2019-11-20 18:43:00-0400
 "python-shell" is imported at 13:32.
 
 It gets interesting at 19:50, about using flask to make a long-running daemon.
-
-
 
 
 # Let's Get Busy: cover-to-cover
@@ -137,9 +133,7 @@ Then we did several small visual tests base on example code in
 the [python-shell documentation][7].
 
 
-
 Maybe later: [Building a deployable Python-Electron App][6]
-
 
 
 
@@ -151,6 +145,7 @@ Maybe later: [Building a deployable Python-Electron App][6]
 [2]: https://electronjs.org/
 [1]: https://en.wikipedia.org/wiki/Electron_(software_framework)
 -- body
+next: E2B
 
 # document-meta
 -- string_as_comment

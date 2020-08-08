@@ -1,6 +1,6 @@
 # entity: 8W2: attributes
-parent: AZC
-heading: references for the above
+previous: 48R
+heading: (references for the above)
 -- body
 Swift for TensorFlow's [Python interoperability][12] seems that it is
 perhaps a model solution to this problem, but it may not be packaged in a
@@ -58,7 +58,6 @@ This [shopify post][10] was essential in getting us to figure out how to
 pass the command line options to get it to look in different libs.
 
 
-
 [1]: https://github.com/ndevenish/Site-ndevenish/blob/master/_posts/2017-04-11-using-python-with-swift-3.markdown
 [2]: https://www.agnosticdev.com/blog-entry/swift-python/swift-and-python-interop-using-dynamic-member-lookup
 [3]: https://docs.python.org/3/c-api/index.html
@@ -72,11 +71,8 @@ pass the command line options to get it to look in different libs.
 [11]: https://jacobpan3g.github.io/2017/09/01/build-dylib-on-mac/
 [12]: https://www.tensorflow.org/swift/tutorials/python_interoperability
 [13]: https://github.com/pvieito/PythonKit
-
 -- body
-
-previous: 48R
-
+next: PBR
 # document-meta
 -- string_as_comment
 # #born.

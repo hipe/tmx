@@ -1,5 +1,5 @@
 # entity: 8W2: attributes
-parent: AZC
+previous: 48R
 heading: heading for FRAG: 8WZ
 -- body
 we love [Python interoperability][12] and we love it.
@@ -28,8 +28,8 @@ line 2
 [13]: url_for_python_kit_repo
 
 -- body
-
-previous: 48R
+children:
+- PBR
 
 # document-meta
 -- string_as_comment

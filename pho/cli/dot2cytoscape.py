@@ -23,7 +23,7 @@ class CLI:
                 assert('info' == severity)
 
             assert('expression' == shape)
-            pcs = [name.replace('_', ' '), ': ']
+            pcs = [name.replace('_', ' '), ': ']  # #[#608.7]
             itr = lineser()
             pcs.append(next(itr))
             pcs.append('\n')

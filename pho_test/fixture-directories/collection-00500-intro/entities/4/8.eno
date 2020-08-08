@@ -22,6 +22,7 @@ sec 2 para 2 line 2
 [1]: url_for_this_blog
 
 -- body
+next: 8W2
 
 # document-meta
 -- string_as_comment

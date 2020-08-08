@@ -47,6 +47,9 @@ let's see what it's like:
     clusters? (the illustration is deceiving. there is no stored ordering
     information in this regard.)
 
+    our answer will be doubly linked lists, where parent also specifies
+    its list of children (in order)
+
   - one idea we want to preserve is that of using a unified algorithm
     for "flattening" any node, so that the same rationale for baking a
     document goes into baking its sections and so on.
@@ -127,7 +130,7 @@ class _OrderedRun:
     def __then_do_something_crazy_for_children(self):
 
         ct = self._collection_traversal
-        prev_for = self._big_index.prev_for
+        prev_of = self._big_index.previous_of
 
         # for all the fragments that call this fragment a parent,..
 
@@ -152,7 +155,7 @@ class _OrderedRun:
             # parent-child, and we ASSUME that the node will be expressed that
             # way instead. (otherwise we cycle) yikes
 
-            if iid in prev_for:
+            if iid in prev_of:
                 continue
             use_child_iids.append(iid)
 
@@ -200,14 +203,9 @@ class _OrderedRun:
     def __then_add_immediate_next(self):
         # if a fragment points back to this fragment calling it "previous",..
 
-        a = self._big_index.nexts_for.get(self._local_head_IID, None)
-        if a is None:
+        my_next = self._big_index.next_of.get(self._local_head_IID)
+        if my_next is None:
             return _okay
-
-        if 1 != len(a):
-            return self.__when_mutliple(a)
-
-        my_next, = a
 
         iid_a = self._collection_traversal.ordered_IIDs_for(
                 my_next, 'the next fragment of that', self._listener)
@@ -256,11 +254,6 @@ class _OrderedRun:
                 f'each have exactly {frag_count} fragment(s). '
                 'no basis by which to decide order. use prev intead.')
 
-    def __when_mutliple(self, a):
-        _these = ', '.join(a)
-        _iid = self._local_head_IID
-        cover_me(f"{_iid} has multiple calling it previous: ({_these})")
-
     # -- end whiners
 
     @property
@@ -269,96 +262,288 @@ class _OrderedRun:
 
 
 def big_index_via_collection(collection, listener):
-    """writing this exactly as we are thinking of it...
 
-    """
+    ids_of_frags_with_no_parent_or_previous = []
+    unresolved_forward_references_of = {}
 
-    # THESE
-
-    frag_via_iid = {}
-    ids_of_frags_with_no_parent = []
+    parent_of = {}
     children_of = {}
-    nexts_for = {}
-    prev_for = {}
-    refs = []  # unresolved references
+    previous_of = {}
+    next_of = {}
 
-    # so..
+    frag_of = {}
 
-    from pho.magnetics_ import (
-            document_fragment_via_definition as frag_lib)
+    from modality_agnostic import ModalityAgnosticErrorMonitor
+    mon = ModalityAgnosticErrorMonitor(listener)
 
-    id_itr = collection.to_identifier_stream(listener)
-    for iid in id_itr:
+    # Layer One: check mutual exclusivities etc in each single fragment
+
+    _unsanititized_pass(
+            ids_of_frags_with_no_parent_or_previous,
+            unresolved_forward_references_of,
+            parent_of, children_of, previous_of, next_of, frag_of,
+            collection, mon)
+
+    if not mon.OK:
+        return
+
+    # Layer Two: unresolved references
+
+    if _complain_about_unresolved_forward_references(
+            listener, unresolved_forward_references_of, frag_of):
+        return
+
+    del unresolved_forward_references_of
+
+    # Layer Three: ensure double-linkedness
+
+    if _complain_about_bad_double_linkedness_prevs_vs_nexts(
+            listener, previous_of, next_of):
+        return
+
+    if _complain_about_bad_double_linkedness_parents_vs_children(
+            listener, parent_of, children_of):
+        return
+
+    return _BigIndex(
+            ids_of_frags_with_no_parent_or_previous,
+            parent_of, children_of, previous_of, next_of, frag_of)
+
+
+def _complain_about_bad_double_linkedness_parents_vs_children(
+        listener, parent_of, children_of):
+
+    did_complain = False
+
+    def child_doesnt_know_about_its_parent():
+        complain(
+            f"child '{child_iid_s}' must point back up to"
+            f" its parent '{parent_iid_s}'")
+
+    def child_has_wrong_parent_id():
+        complain(
+            f"child '{child_iid_s}'"
+            f" its parent is '{remote_parent_iid_s}'"
+            f" but it's in the list of '{parent_iid_s}' 's children")
+
+    def parent_doesnt_know_about_children():
+        inverted = {}
+        for child_iid_s, parent_iid_s in pool.items():
+            _touch_list(inverted, parent_iid_s).append(child_iid_s)
+        for parent_iid_s, cx in inverted.items():
+            if 1 == len(cx):
+                _ = f"its child '{cx[0]}'"
+            else:
+                _ = (f"'{s}'" for s in cx)
+                _ = ', '.join(_)
+                _ = f"these children: ({_})"
+            complain(f"'{parent_iid_s}' doesn\'t know about {_}")
+
+    def complain(msg):  # #has-a-copy-paste
+        listener('error', 'expression', 'double_linked_error', lambda: (msg,))
+
+    pool = {k: v for k, v in parent_of.items()}
+
+    for parent_iid_s, cx in children_of.items():
+        for child_iid_s in cx:
+            if child_iid_s in pool:
+                pool.pop(child_iid_s)
+            remote_parent_iid_s = parent_of.get(child_iid_s)
+            if parent_iid_s == remote_parent_iid_s:
+                continue
+            did_complain = True
+            if remote_parent_iid_s is None:
+                child_doesnt_know_about_its_parent()
+            else:
+                child_has_wrong_parent_id()
+
+    if len(pool):
+        did_complain = True
+        parent_doesnt_know_about_children()
+
+    return did_complain
+
+
+def _complain_about_bad_double_linkedness_prevs_vs_nexts(
+            listener, previous_of, next_of):
+
+    did_complain = False
+
+    def far_didnt_know():
+        complain(
+            f"'{curr_id}' has a previous of '{prev_id}'"
+            f" but '{prev_id}' has no next")
+
+    def mismatch():
+        complain(
+            f"'{curr_id}' has a previous of '{prev_id}'"
+            " but '{prev_id}' thinks its next is '{far_next_id}'")
+
+    def next_with_no_prev():
+        complain(
+            f"'{curr_id}' has a next of '{next_id}'"
+            f" but '{next_id}' has no previous")
+
+    def complain(msg):  # #has-a-copy-paste
+        listener('error', 'expression', 'double_linked_error', lambda: (msg,))
+
+    pool = {k: v for k, v in next_of.items()}
+
+    for curr_id, prev_id in previous_of.items():
+        far_next_id = next_of.get(prev_id)
+        if far_next_id is None:
+            did_complain = True
+            far_didnt_know()
+            continue
+        pool.pop(prev_id)
+        if far_next_id == curr_id:
+            continue
+        did_complain = True
+        mismatch()
+
+    for curr_id, next_id in pool.items():
+        did_complain = True
+        next_with_no_prev()
+
+    return did_complain
+
+
+def _complain_about_unresolved_forward_references(listener, unreslvd, frag_of):
+
+    def complain(iid_s, rels):
+        def lineser():
+            but = "but it's not defined anywhere."
+            if 1 == len(rels):
+                rel, = rels
+                _ = as_a_what_by_who(*rel)
+                yield f"'{iid_s}' is referenced {_} {but}"
+                return
+
+            yield f"'{iid_s}' is referenced {but}"
+            for rel in rels:
+                _ = as_a_what_by_who(*rel)
+                yield f"It's referenced {_}."
+
+        def as_a_what_by_who(curr_iid_s, relationship_type):  # #here2
+            return f"as a {relationship_type} by '{curr_iid_s}'"
+
+        listener('error', 'expression', 'unresolved_entity_reference', lineser)
+
+    did_complain = False
+    for iid_s, rels in unreslvd.items():
+        if iid_s in frag_of:
+            continue
+        complain(iid_s, rels)
+        did_complain = True
+    return did_complain
+
+
+def _unsanititized_pass(
+        ids_of_frags_with_no_parent_or_previous,
+        unresolved_forward_references_of,
+        parent_of, children_of, previous_of, next_of, frag_of,
+        collection, mon):
+
+    def maybe_see(dct, relationship_type):
+        def decorator(orig_of):
+            @if_not_none
+            def use_f(iid_s):
+                maybe_see_forward_reference(iid_s, relationship_type)
+                dct[curr_iid_s] = iid_s
+            return use_f
+        return decorator
+
+    def if_not_none(orig_f):
+        def use_f(x):
+            if x is None:
+                return
+            orig_f(x)
+        return use_f
+
+    @maybe_see(parent_of, 'parent')
+    def maybe_see_parent(iid_s):
+        pass
+
+    @maybe_see(previous_of, 'previous')
+    def maybe_see_previous(iid_s):
+        pass
+
+    @maybe_see(next_of, 'next')
+    def maybe_see_next(iid_s):
+        pass
+
+    @if_not_none
+    def maybe_see_children(children):
+        for iid_s in children:
+            maybe_see_forward_reference(iid_s, 'child')
+        children_of[curr_iid_s] = children
+
+    def maybe_see_forward_reference(iid_s, relationship_type):
+        if iid_s in frag_of:  # memory optimization, meh
+            return
+
+        a = unresolved_forward_references_of.get(iid_s)
+        if a is None:
+            a = []
+            unresolved_forward_references_of[iid_s] = a
+        a.append((curr_iid_s, relationship_type))  # :#here2
+
+    for frag in _unordered_fragments_via_collection(collection, mon.listener):
+
+        parent_iid_s = frag.parent_identifier_string
+        prev_iid_s = frag.previous_identifier_string
+        curr_iid_s = frag.identifier_string
+        children_iid_s = frag.children
+        next_iid_s = frag.next_identifier_string
+
+        if parent_iid_s is None and prev_iid_s is None:
+            ids_of_frags_with_no_parent_or_previous.append(curr_iid_s)
+
+        maybe_see_parent(parent_iid_s)
+        maybe_see_previous(prev_iid_s)
+        maybe_see_next(next_iid_s)
+        maybe_see_children(children_iid_s)
+
+        assert(curr_iid_s not in frag_of)
+        frag_of[curr_iid_s] = frag
+
+
+def _unordered_fragments_via_collection(collection, listener):
+    from pho.magnetics_ import document_fragment_via_definition as frag_lib
+    for iid in collection.to_identifier_stream(listener):
         iid_s = iid.to_string()
         dct = collection.retrieve_entity(iid_s, listener)
-
         if dct is None:
             cover_me(f'maybe this decode error thing in {repr(iid_s)}')
-
         frag = frag_lib.document_fragment_via_definition(listener, **dct)
         if frag is None:
             return
-
-        iid = frag.identifier_string
-        parent_id = frag.parent_identifier_string
-        prev_id = frag.previous_identifier_string
-
-        if parent_id is None:
-            if frag.heading is None:
-                cover_me('need headings for these')  # :[#883.2]
-            ids_of_frags_with_no_parent.append(iid)
-        else:
-            _touch_list(children_of, parent_id).append(iid)
-            refs.append(('parent_identifier_string', iid))
-
-        if prev_id is not None:
-            assert(iid not in prev_for)
-            prev_for[iid] = prev_id
-            _touch_list(nexts_for, prev_id).append(iid)
-            refs.append(('previous_identifier_string', iid))
-
-        frag_via_iid[iid] = frag
-
-    for (which, iid) in refs:
-        frag = frag_via_iid[iid]
-        remote_id = getattr(frag, which)
-        if remote_id not in frag_via_iid:
-            cover_me(f'{iid} has {which} that is noent: {remote_id}')
-
-    return _BigIndex(
-            ids_of_frags_with_no_parent,
-            children_of,
-            nexts_for,
-            prev_for,
-            frag_via_iid,
-            )
+        yield frag
 
 
 class _BigIndex:
 
     def __init__(
-            self,
-            ids_of_frags_with_no_parent,
-            children_of,
-            nexts_for,
-            prev_for,
-            frag_via_iid,
-            ):
+            self, ids_of_frags_with_no_parent_or_previous,
+            parent_of, children_of, previous_of, next_of, frag_of):
 
-        self.ids_of_frags_with_no_parent = ids_of_frags_with_no_parent
+        self.ids_of_frags_with_no_parent_or_previous = ids_of_frags_with_no_parent_or_previous  # noqa: E501
+        self.parent_of = parent_of
         self.children_of = children_of
-        self.nexts_for = nexts_for
-        self.prev_for = prev_for
-        self.frag_via_iid = frag_via_iid
+        self.previous_of = previous_of
+        self.next_of = next_of
+        self.fragment_of = frag_of
 
     def TO_DOCUMENT_STREAM(self, listener):
 
-        if 0 == len(self.ids_of_frags_with_no_parent):
+        these = self.ids_of_frags_with_no_parent_or_previous
+
+        if 0 == len(these):
             cover_me('either empty index or circular refs')
 
         ct = _CollectionTraversal(self)
 
-        for iid in self.ids_of_frags_with_no_parent:
+        for iid in these:
             doc = self._build_document(iid, ct, listener)
             if not doc:
                 cover_me('not doc')
@@ -366,7 +551,7 @@ class _BigIndex:
 
     def RETRIEVE_DOCUMENT(self, iid_s, listener):
 
-        dct = self.frag_via_iid
+        dct = self.fragment_of
         if iid_s not in dct:
             cover_me(f'fragment not found: {repr(iid_s)}')
 
@@ -392,9 +577,9 @@ class _BigIndex:
         if a is None:
             cover_me('it is as the prophecy foretold')
 
-        frag_via_iid = self.frag_via_iid
+        frag_of = self.fragment_of
 
-        _frags = tuple(frag_via_iid[iid] for iid in a)
+        _frags = tuple(frag_of[iid] for iid in a)
 
         from .document_via_fragments import Document_
 

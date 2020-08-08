@@ -55,11 +55,14 @@ def _do_CLI(
         if dry_run and not can_be_dry:
             return _whine_about_dry_run(listener)
 
-        from pho import big_index_and_collection_via_path
-        tup = big_index_and_collection_via_path(collection_path, listener)
-        if tup is None:
+        import pho as lib
+        coll = lib.collection_via_path_(collection_path, listener)
+        if coll is None:
             return
-        big_index, _ = tup
+
+        big_index = lib.big_index_via_collection_(coll, listener)
+        if big_index is None:
+            return
 
         # get money
 

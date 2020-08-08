@@ -1,5 +1,6 @@
 # entity: 48R: attributes
-heading: swift cocoa UI intro
+parent: PBC
+heading: swift Cocoa UI intro
 document_datetime: 2019-05-14 09:10:11-0400
 -- body
 Here are reading notes from [this older blog][1] from February, 2017; that
@@ -28,8 +29,8 @@ for about one minute.)
 
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
-
 -- body
+next: 8W2
 
 # document-meta
 -- string_as_comment

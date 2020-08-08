@@ -123,7 +123,7 @@ class _Emission:
         return len(self.channel_tail)
 
     def _prefix_via_channel_tail_(self):
-        _what_kind = self.channel_tail[0].replace('_', ' ')  # "input error"
+        _what_kind = self.channel_tail[0].replace('_', ' ')  # #[#608.7]
         return f'{_what_kind}:'
 
     def flush_some_message(self):

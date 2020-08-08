@@ -30,7 +30,7 @@ the related API that preceded this one.)
 |[#608.K]                   | #hole |
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
-|[#608.7]                   | #hole |
+|[#608.7]                   | #trak | expression shape: convert category into first line prefix
 |[#608.6]                   |       | sunsetted. for now this identifier is retired.
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | "mad parse" (whatever that is)

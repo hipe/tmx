@@ -1,5 +1,5 @@
 # entity: 38U: attributes
-> parent: 8W2
+parent: PBC
 natural_key: The bootstrapping problem
 document_datetime: 2019-05-20 04:15:35-0400
 -- body
@@ -31,7 +31,6 @@ We don't maintain a README.md YET for two reasons:
 
 * It sure would be great to generate it from fragments.
 * There is already a README.md in our sister node `pho-doc` (yes, a smell)
-
 -- body
 
 # document-meta

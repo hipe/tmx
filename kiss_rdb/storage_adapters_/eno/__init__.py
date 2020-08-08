@@ -96,11 +96,25 @@ def _read_only_entity(sect_el, ID, mon):
 
 def _attribute_keys_and_values(sect_el, mon):
 
+    def assert_key(use_key):
+        if rx.match(use_key):
+            return
+        msg = f"field key is not up to current spec - '{use_key}'"
+        raise AssertionError(msg)
+
     import re
     rx = re.compile('[a-z0-9_A-Z]+$')
 
     section = sect_el.to_section()  # #here3
     for el in section.elements():  # #here2
+
+        if el.yields_list():
+            use_key = el.string_key()
+            li = el.to_list()
+            values = li.required_values(None)
+            assert_key(use_key)
+            yield use_key, values
+            continue
 
         # change these to whatever whenever. they're just curb-checks
         assert(not el.yields_section())
@@ -113,9 +127,7 @@ def _attribute_keys_and_values(sect_el, mon):
 
         # we haven't formally specified this anywhere yet. just a sketch..
         use_key = field.string_key()
-        if not rx.match(use_key):
-            _msg = f"field key is not up to current spec - '{use_key}'"
-            raise AssertionError(_msg)  # courtesy
+        assert_key(use_key)
 
         yield use_key, field.required_string_value()
 

@@ -55,7 +55,7 @@ TO TAKE NOTES AND SEE THEM RENDERED"]
 35000->36000
 35000->36500
 35000->39000
-36000[label="imagine swift\n(the other roadmap)"]
+36000[label="imagine swift\n(the other roadmap)\n(cancelled)" style=filled]
 36000->40000
 36500[label="BEGIN STUDY OF\nELECTRON FRAMEWORK" style=filled]
 36500->37000
@@ -65,7 +65,7 @@ TO TAKE NOTES AND SEE THEM RENDERED"]
 37000->37700
 37000->37750
 37000->37800
-37300[label="read-only\none fragment"]
+37300[label="read-only\none fragment" style=filled]
 37500[label="navigate to\nnearby fragments"]
 37700[label="edit existing"]
 37750[label="create new"]

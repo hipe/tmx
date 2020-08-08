@@ -92,7 +92,8 @@ def help_lines_via(
     if desc_lineser is not None:
         yield
         itr = desc_lineser()
-        yield f'description: {next(itr)}'
+        first_line = next(itr)
+        yield f'description: {first_line}'
         for line in itr:
             yield line
 

@@ -239,7 +239,7 @@ class _CLI:
 
     def __line_via_these_REDUNDANT(self, error_category, error_case, reason):
         _ = (error_category, error_case)
-        _ = [None if s is None else s.replace('_', ' ') for s in _]
+        _ = [None if s is None else s.replace('_', ' ') for s in _]  # [#608.7]
         _.append(reason)
         _ = tuple(s for s in _ if s is not None)
         return ': '.join(_)

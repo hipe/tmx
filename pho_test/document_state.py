@@ -77,23 +77,23 @@ class _Section:
 
 def _frags_via_frag_itr(frag_itr):
 
-    from pho.magnetics_.document_fragment_via_definition import (
-            _DocumentFragment,
-            )
+    from pho.magnetics_.document_fragment_via_definition import \
+            document_fragment_via_definition
+
+    def listener(*e):
+        raise RuntimeError('where')
 
     for title_s, line_itr in frag_itr:
 
         _body = ''.join(_add_newline(s) for s in line_itr)
 
-        yield _DocumentFragment(
-                identifier_string=None,
-                heading=title_s,
-                heading_is_natural_key=None,
-                document_datetime=None,
-                body=_body,
-                parent=None,
-                previous=None,
-                )
+        dct = {'heading': title_s, 'body': _body}
+        if title_s is None:
+            dct['previous'] = 'HAK'
+
+        yield document_fragment_via_definition(
+                listener=listener, identifier_string=None,
+                core_attributes=dct)
 
 
 def _add_newline(s):

@@ -6,14 +6,7 @@ _max_rows_per_label = 3
 _max_cols_per_label = 9
 
 
-def output_lines_via_collection_path(path, listener):
-
-    from pho import big_index_and_collection_via_path
-    tup = big_index_and_collection_via_path(path, listener)
-    if tup is None:
-        return
-
-    o, _ = tup  # o = big index
+def output_lines_via_big_index_(o, listener):
 
     # begin
 
@@ -22,7 +15,7 @@ def output_lines_via_collection_path(path, listener):
 
     # previouses
 
-    for me, prev in o.prev_for.items():
+    for me, prev in o.previous_of.items():
         yield f'_{me}->_{prev}[label="prev"]'
 
     # parents
@@ -33,12 +26,13 @@ def output_lines_via_collection_path(path, listener):
 
     # no parents
 
-    for iid in o.ids_of_frags_with_no_parent:
-        yield f'_{iid}->"no parent"'
+    for iid in o.ids_of_frags_with_no_parent_or_previous:
+        yield f'_{iid}->"(no parent)"'
 
     # labels for nodes
 
-    for k, frag in o.frag_via_iid.items():
+    frag_of = o.fragment_of
+    for k, frag in frag_of.items():
 
         _encoded = _ENCODED_heading_for(frag)
         yield f'_{k}[label={_encoded}]'
@@ -52,7 +46,7 @@ def output_lines_via_collection_path(path, listener):
     yield '}'
 
     def f():
-        _num = len(o.frag_via_iid)
+        _num = len(frag_of)
         _message = f'graph reflects relationships among {_num} fragments.'
         return {'message': _message}
     listener('info', 'structure', 'summary', f)

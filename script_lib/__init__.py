@@ -90,19 +90,23 @@ def _deindent(item_itr, empty_item):
         return item
     peeked = []
 
+    leading_ws_rx = re.compile('^([ ]+)[^ ]')
+
     item = next(item_itr)  # .., don't cache the throwaway item
 
+    # if you requested to deindent a block of text but the first line is not bl
     if empty_item != item:
-        for _ in item_itr:
-            cover_me('where')
+        assert(not leading_ws_rx.match(item))
         yield item
+        for item in item_itr:
+            yield item
         return
 
     # find the margin (the first nonzero length one in the first N lines)
 
     for _ in range(0, 3):
         item = peek()  # ..
-        md = re.match('^([ ]+)[^ ]', item)
+        md = leading_ws_rx.match(item)
         if md is not None:
             break
 
