@@ -41,7 +41,7 @@ only in modeling interfaces for this purpose.
 |[#507.9]                   |       | [ modality agnostic error monitor ]
 |[#507.H]                   | #hole |
 |[#507.G]                   | #open | idiomize something for the test platform
-|[#507.F]                   | #open | integrate this with teardown so the memory is reclaimed
+|[#507.6]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #hole |
 |[#507.D]                   | #open | gross violation of python internals
 |[#507.C]                   | #open | remove this redundancy

@@ -53,16 +53,66 @@ command, _command_function_via_name = _build_command_decorator_and_state()
 
 
 @command
-def retrieve_random_entity(sin, sout, serr, argp, enver):
-    args, es = argp.parse_all_args('collection path')
+def update_notecard(sin, sout, serr, argp, enver):
+    ncs_path, es = argp.parse_one_argument('notecards path')
     if es:
         return es
-    coll_path, = args
-    coll, mon = _collection_and_monitor(coll_path, serr)
-    if coll is None:
+    ncid_s, es = argp.parse_one_argument('notecard identifier')
+    if es:
+        return es
+    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    if ncs is None:
+        return mon.exitstatus
+    # listener = mon.listener
+
+    moniker = '{create_attribute|update_attribute|delete_attribute}'
+    cuds = []
+    cud = []
+
+    while True:
+        which, es = argp.parse_one_argument(moniker)
+        if es:
+            return es
+        cud.append(which)
+        attr, es = argp.parse_one_argument('attribute name')
+        if es:
+            return es
+        cud.append(attr)
+        if which in ('update_attribute', 'create_attribute'):
+            value, es = argp.parse_one_argument('attribute value')
+            if es:
+                return es
+            f = _hand_written_attribute_parsers.get(attr)
+            if f is not None:
+                value, es = f(value, serr)
+                if es:
+                    return es
+            cud.append(value)
+        elif 'delete_attribute' != which:
+            serr.write(f'expecting {moniker} had "{which}"\n')
+            return 5
+        cuds.append(tuple(cud))
+        cud.clear()
+        if argp.is_empty():
+            break
+
+    wow = ncs.update_notecard(ncid_s, tuple(cuds), mon.listener)
+    if wow:
+        xx()
+    return mon.exitstatus
+
+
+@command
+def retrieve_random_notecard(sin, sout, serr, argp, enver):
+    args, es = argp.parse_all_args('notecards path')
+    if es:
+        return es
+    ncs_path, = args
+    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    if ncs is None:
         return mon.exitstatus
     listener = mon.listener
-    yikes = tuple(coll.to_identifier_stream(listener))
+    yikes = tuple(ncs.to_identifier_stream(listener))
     leng = len(yikes)
 
     if 0 == leng:
@@ -77,33 +127,29 @@ def retrieve_random_entity(sin, sout, serr, argp, enver):
     serr.write(f'RNG seed: {seed}\n')
     iden = yikes[rng.randrange(0, leng)]
     serr.write(f'entity: {iden.to_string()}\n')
-    ent_dct = coll.retrieve_entity_via_identifier(iden, listener)
-    assert(ent_dct)
-    return _write_entity_as_JSON(sout, ent_dct, listener)
+    nc = ncs.retrieve_notecard_via_identifier(iden, listener)
+    assert(nc)
+    return _write_entity_as_JSON(sout, nc, listener)
 
 
 @command
-def retrieve_entity(sin, sout, serr, argp, enver):
-    args, es = argp.parse_all_args('entity identifier', 'collection path')
+def retrieve_notecard(sin, sout, serr, argp, enver):
+    args, es = argp.parse_all_args('notecard identifier', 'notecards path')
     if es:
         return es
-    eid_s, coll_path = args
-    coll, mon = _collection_and_monitor(coll_path, serr)
-    if coll is None:
+    ncid_s, ncs_path = args
+    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    if ncs is None:
         return mon.exitstatus
-    ent_dct = coll.retrieve_entity(eid_s, mon.listener)
-    if ent_dct is None:
+    nc = ncs.retrieve_notecard(ncid_s, mon.listener)
+    if nc is None:
         return mon.exitstatus
-    return _write_entity_as_JSON(sout, ent_dct, mon.listener)
+    return _write_entity_as_JSON(sout, nc, mon.listener)
 
 
-def _write_entity_as_JSON(sout, ent_dct, listener):
-    eid_s = ent_dct['identifier_string']
-    dct = ent_dct['core_attributes']
-    from pho.magnetics_.document_fragment_via_definition import \
-        document_fragment_via_definition
-    document_fragment_via_definition(listener, eid_s, dct)  # throws
-    dct['identifier'] = eid_s  # munge now that we ensured business fields
+def _write_entity_as_JSON(sout, nc, listener):
+    dct = nc.to_core_attributes()
+    dct['identifier'] = nc.identifier_string
     import json
     indent = 2  # set to None to put it all on one line. 2 for pretty (longer)
     json.dump(dct, sout, indent=indent)
@@ -138,17 +184,30 @@ def hello_to_pho(sin, sout, serr, bash_argv, enver):  # a.k.a "ping"
     return 0
 
 
-def _collection_and_monitor(coll_path, serr):
+def _parse_children_value(string, serr):
+    import re
+    rxs = '[a-zA-Z0-9]+'  # lenient, long hair don't care
+    md = re.match(f'^{rxs}(?:,[ ]{rxs})*$', string)
+    if md:
+        return tuple(string.split(', ')), None
+    from pho import repr_
+    serr.write(f"expecting format: 'aa, bb, cc'{repr_(string)}\n")
+    return None, 5
+
+
+_hand_written_attribute_parsers = {'children': _parse_children_value}
+
+
+def _notecards_and_monitor(ncs_path, serr):
+    # many of our API actions need to resolve the collection as the first
+    # step and also crete a monitor, so there's this weird pairing
+
     mon = _monitor_via_stderr(serr)
-    coll = _collection_via_path(coll_path, mon.listener)
-    if coll is None:
+    from pho import notecards_via_path
+    ncs = notecards_via_path(ncs_path, mon.listener)
+    if ncs is None:
         return None, mon
-    return coll, mon
-
-
-def _collection_via_path(coll_path, listener):
-    from kiss_rdb import collectionerer
-    return collectionerer().collection_via_path(coll_path, listener)
+    return ncs, mon
 
 
 def _arg_parser(bash_argv, serr):
@@ -174,17 +233,22 @@ def _arg_parser(bash_argv, serr):
         return None, 2
 
     def assert_empty():
-        if not len(bash_argv):
+        if is_empty():
             return
         serr.write("unexpected extra argument\n")
         return 2
 
+    def is_empty():
+        return 0 == len(bash_argv)
+
     _1 = parse_all_args  # not ok
     _2 = parse_one_argument
+    _4 = is_empty
 
     class parser:  # class as namespace
         parse_all_args = _1
         parse_one_argument = _2
+        is_empty = _4
     return parser
 
 

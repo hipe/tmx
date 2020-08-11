@@ -1,5 +1,17 @@
 def document_fragment_via_definition(
-        listener, identifier_string, core_attributes):
+        identifier_string, core_attributes, listener):
+
+    dct = validate_and_normalize_core_attributes_(
+        identifier_string, core_attributes, listener)
+
+    if dct is None:
+        return
+
+    return _DocumentFragment(identifier_string=identifier_string, **dct)
+
+
+def validate_and_normalize_core_attributes_(
+        identifier_string, core_attributes, listener):
 
     # == validate against an allow-list (implicity for now) and default None's
 
@@ -46,8 +58,7 @@ def document_fragment_via_definition(
         return fail("body cannot be none (for now)")
 
     # == end hard-coded validations
-
-    return _DocumentFragment(identifier_string=identifier_string, **dct)
+    return dct
 
 
 def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
@@ -72,7 +83,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
     something that is assumed further downstream at #here1
     """
 
-    if children is not None:
+    if children is not None and not isinstance(children, tuple):
         assert(isinstance(children, list))
         children = tuple(children)
 
@@ -107,9 +118,32 @@ class _DocumentFragment:
         self.next_identifier_string = next
         self.annotated_entity_revisions = annotated_entity_revisions
 
+    def to_core_attributes(self):
+        def o(k, attr=None):
+            x = getattr(self, (attr or k))
+            if x is None:
+                return
+            dct[k] = x
+        dct = {}
+        o('parent', 'parent_identifier_string')
+        o('previous', 'previous_identifier_string')
+
+        if self.heading_is_natural_key:
+            dct['natural_key'] = self.heading
+        else:
+            o('heading')
+
+        o('document_datetime')
+        o('body')
+        o('children')
+        o('next', 'next_identifier_string')
+        o('annotated_entity_revisions')
+        return dct
+
 
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #pending-rename: "document fragment" to "notecard" (maybe)
 # #history-A.1: it becomes doubly-linked list
 # #abtracted

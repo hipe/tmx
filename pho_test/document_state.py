@@ -92,8 +92,7 @@ def _frags_via_frag_itr(frag_itr):
             dct['previous'] = 'HAK'
 
         yield document_fragment_via_definition(
-                listener=listener, identifier_string=None,
-                core_attributes=dct)
+                identifier_string=None, core_attributes=dct, listener=listener)
 
 
 def _add_newline(s):

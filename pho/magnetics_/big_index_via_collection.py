@@ -53,6 +53,12 @@ let's see what it's like:
   - one idea we want to preserve is that of using a unified algorithm
     for "flattening" any node, so that the same rationale for baking a
     document goes into baking its sections and so on.
+
+
+# On Data Integrity
+
+This doubles as a verification for the data integrity of the collection.
+There are known holes in our integrity check. See [#882.K].
 """
 
 
@@ -515,7 +521,8 @@ def _unordered_fragments_via_collection(collection, listener):
         dct = collection.retrieve_entity(iid_s, listener)
         if dct is None:
             cover_me(f'maybe this decode error thing in {repr(iid_s)}')
-        frag = frag_lib.document_fragment_via_definition(listener, **dct)
+        frag = frag_lib.document_fragment_via_definition(
+                **dct, listener=listener)
         if frag is None:
             return
         yield frag

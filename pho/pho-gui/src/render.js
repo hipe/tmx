@@ -63,7 +63,7 @@ const buttonStateThing = (btn) => {
     };
 
     const args = [collPath];
-    codec.requestJSON('retrieve_random_entity', args).then(onEntity);
+    codec.requestJSON('retrieve_random_notecard', args).then(onEntity);
   };
 
 })(document.getElementById('randomBtn'));
@@ -80,7 +80,7 @@ const onClickReferenceLink = ev => {
   console.log('go daddy '+iid);
 
   const args = [iid, collPath];
-  codec.requestJSON('retrieve_entity', args).then(onEntity);
+  codec.requestJSON('retrieve_notecard', args).then(onEntity);
   return false;
 };
 
