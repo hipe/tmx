@@ -13,9 +13,11 @@ class error_monitor_via_stderr:
     """
     # this is conceptually a sub-class of [#507.9] the generic error monitor
 
-    def __init__(self, stderr, interceptor=None):
+    def __init__(self, stderr, interceptor=None, default_error_exitstatus=1):
         self.exitstatus = 0
         self.OK = True
+        self._max_non_default_error_status_seen = 0
+        self._default_error_exitstatus = default_error_exitstatus
         self._interceptor = interceptor
         self._stderr = stderr
 
@@ -79,12 +81,31 @@ class error_monitor_via_stderr:
         # `monitor.OK`. as such, experimentally we're always gonna bump this
         # up from zero in these cases (Case3069DP)
 
-        self.see_exitstatus(1)  # bump it up from zero IFF zero
+        self.see_exitstatus(self._default_error_exitstatus)
 
     def see_exitstatus(self, new_errno):
-        if self.exitstatus < new_errno:
-            self.exitstatus = new_errno
-            self.OK = False  # might be multiple
+        if 0 == new_errno:
+            return
+
+        self.OK = False  # might be multiple
+
+        # generally, keep a running tally of what the highest error level
+        # you've seen is. (higher levels overwrite lower levels but the
+        # reverse is not true, so at the end you see the max error level.)
+
+        # but we give special treatment for the use of our default error
+        # level value because, ..
+
+        if self._default_error_exitstatus == new_errno:
+            if 0 == self.exitstatus:
+                self.exitstatus = new_errno
+            return
+
+        if self._max_non_default_error_status_seen >= new_errno:
+            return
+
+        self._max_non_default_error_status_seen = new_errno
+        self.exitstatus = new_errno
 
 
 def _line_writer_via_IO(io):  # (move this to wherever)

@@ -4,7 +4,7 @@ class UnitsOfWorkForEntity:
         self._prepared_edits = []
         self._business_collection = business_collection
         self.entity_identifier_string = eid
-        self._listener = listener
+        self.listener = listener
         self._entity_cache = {}
 
     def release_prepared_edits(self):
@@ -27,7 +27,7 @@ class UnitsOfWorkForEntity:
         ent = self._entity_cache.get(eid)
         if ent is not None:
             return ent
-        ent = self._business_collection.retrieve_notecard(eid, self._listener)
+        ent = self._business_collection.retrieve_notecard(eid, self.listener)
         if ent is None:
             return
         self._entity_cache[eid] = ent

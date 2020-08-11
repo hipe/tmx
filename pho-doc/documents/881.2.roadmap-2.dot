@@ -8,14 +8,14 @@ rankdir=BT; /* the finish is at the top */
 10000->20000
 15000[label="the very beginnings\nof eno kiss adaptation" style=filled]
 15000->25000
-17000[label="short streams\nnot long-running\nopen files"]
+17000[label="short streams\nnot long-running\nopen files" style=filled]
 17000->17333
 17000->17666
-17333[label="for new\neno work"]
+17333[label="for new\neno work" style=filled]
 17333->17500
-17666[label="retrofit for\nmarkdown"]
+17666[label="retrofit for\nmarkdown" style=filled]
 17666->17500
-17500[label="short streams\nnot long-running\nopen files"]
+17500[label="short streams\nnot long-running\nopen files" style=filled]
 17500->30000
 20000[label="the fragment\nmodel mocked" style=filled]
 20000->20333
@@ -46,7 +46,7 @@ rankdir=BT; /* the finish is at the top */
 31300->32500
 31500[label="delete a fragment\nfrom CLI (empty\nfiles not deleted)"]
 31500->32500
-31700[label="manage fragment\nassociations and content\nby hand"]
+31700[label="manage fragment\nassociations and content\nby hand" style=filled]
 31700->32500
 32500[label="massive acceptance\ntest:\ hand-migrate all old\ntoml fragments" style=filled]
 32500->35000

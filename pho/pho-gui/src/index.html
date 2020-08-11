@@ -24,7 +24,9 @@
         <label class="label">Parent</label>
       </div>
       <div class="field-body">
-        <a>OHAI</a>
+        <!-- #open [#882.L] -->
+        <span><a>OHAI</a></span>
+        <input class="input is-hidden">
       </div>
     </div>
 
@@ -33,7 +35,9 @@
         <label class="label">Previous</label>
       </div>
       <div class="field-body">
-        <a>OHAI</a>
+        <!-- #open [#882.L] -->
+        <span><a>OHAI</a></span>
+        <input class="input is-hidden">
       </div>
     </div>
 
@@ -94,7 +98,9 @@ Fifth line.
         <label class="label">Next</label>
       </div>
       <div class="field-body">
-        <a>OHAI</a>
+        <!-- #open [#882.L] -->
+        <span><a>OHAI</a></span>
+        <input class="input is-hidden">
       </div>
     </div>
 
@@ -103,10 +109,19 @@ Fifth line.
         <label class="label">Children</label>
       </div>
       <div class="field-body">
-        <a>OHAI A</a>, <a>OHAI B</a>, <a>OHAI B</a>
+        <!-- #open [#882.L] (this one is done by hand) -->
+        <span><a>OHAI A</a>, <a>OHAI B</a>, <a>OHAI B</a></span>
+        <input class="input is-hidden">
       </div>
     </div>
 
+    <div class="field">
+      <span id="closedLock">🔒</span>
+      <span id="openLock" class="is-hidden">🔓</span>
+      <button id="editBtn" class="button is-primary">Edit</button>
+      <button id="cancelBtn" class="button is-primary is-hidden">Cancel</button>
+      <button id="submitBtn" class="button is-primary is-hidden">Submit</button>
+    </div>
     <div class="field">
       <button id="helloBtn" class="button is-primary">Say Hi to Pho</button>
     </div>

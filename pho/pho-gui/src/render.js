@@ -9,6 +9,25 @@ const { PythonShell } = require('python-shell');
 const path = require('path');
 
 
+const formalFields = [
+  {key: "parent", isRef: true, element: ()=>{return parentField;}},
+  {key: "previous", isRef: true, element: ()=>{return previousField;}},
+  {key: "identifier", editable: false, element: ()=>{return identifierInput;}},
+  {key: "heading", element: ()=>{return headingInput;}},
+  {key: "document_datetime", editable: false, element: ()=>{return datetimeInput;}},
+  {key: "body", element: ()=>{return bodyTextarea;}},
+  {key: "next", isRef: true, element: ()=>{return nextField;}},
+  { key: "children",
+    isRef: true,
+    element: ()=>{return childrenField;},
+    receive: (x)=>{writeChildrenField(x);}
+  }
+];
+
+
+const o = (s) => { return document.getElementById(s); };
+
+
 // Buttons
 
 const buttonStateThing = (btn) => {
@@ -59,21 +78,20 @@ const buttonStateThing = (btn) => {
         return console.log("cancelled mid-call?");
       }
       changeToNotWorking()
-      populateEntity(entity);
+      receiveEntity(entity);
     };
 
     const args = [collPath];
     codec.requestJSON('retrieve_random_notecard', args).then(onEntity);
   };
-
-})(document.getElementById('randomBtn'));
+})(o('randomBtn'));
 
 
 const onClickReferenceLink = ev => {
 
   const onEntity = (entity) => {
     console.log('wahoo worked');
-    populateEntity(entity);
+    receiveEntity(entity);
   };
 
   const iid = ev.target.innerText;
@@ -83,6 +101,59 @@ const onClickReferenceLink = ev => {
   codec.requestJSON('retrieve_notecard', args).then(onEntity);
   return false;
 };
+
+
+(() => {
+  const closedLock = o('closedLock');
+  const openLock = o('openLock');
+  const editBtn = o('editBtn');
+  const cancelBtn = o('cancelBtn');
+  const submitBtn = o('submitBtn');
+
+  editBtn.onclick = e => {
+    if (globalState.isEditing) {  // strange
+      console.log("STRANGE: already editing");
+      return;
+    }
+    myChangeToEditing();
+  };
+
+  cancelBtn.onclick = e => {
+    if (!globalState.isEditing) {  // strange
+      console.log("STRANGE: cancel pressed when not editing");
+      return;
+    }
+    myChangeToNotEditing();
+  };
+
+  submitBtn.onclick = e => {
+    if (!globalState.isEditing) {  // strange
+      console.log("STRANGE: submit pressed when not editing");
+      return;
+    }
+    submit();
+  };
+
+  const myChangeToEditing = () => {
+    if (!changeToEditing()) {
+      return;
+    }
+    hide(closedLock);
+    show(openLock);
+    hide(editBtn);
+    show(cancelBtn);
+    show(submitBtn);
+  };
+
+  const myChangeToNotEditing = () => {
+    show(closedLock);
+    hide(openLock);
+    show(editBtn);
+    hide(cancelBtn);
+    hide(submitBtn);
+    changeToNotEditing();
+  };
+})();
 
 
 (btn => {
@@ -114,20 +185,187 @@ const onClickReferenceLink = ev => {
     codec.requestLines('hello_to_pho', ['aa', 'bb']).then(onLines);
   };
 
-})(document.getElementById('helloBtn'));
+})(o('helloBtn'));
 
 
-const populateEntity = ent => {
+/* ==== BEGIN submit */
 
-  wrf(parentField, ent.parent);
-  wrf(previousField, ent.previous);
-  wrf(nextField, ent.next);
-  writeChildrenField(ent.children);
+const submit = () => {
+  const ent = globalState.lastEntity;
+  const args = [collPath];
+  args.push(ent.identifier);
+  const countBefore = args.length;
 
-  identifierInput.value = ent.identifier || '';
-  headingInput.value = ent.natural_key || ent.heading || '';
-  datetimeInput.value = ent.document_datetime || '';
-  bodyTextarea.value = ent.body || '';  // not innerText
+  formalFields.forEach((formal) => {
+    if (!formalIsEditable(formal)) {
+      return;
+    }
+    const existingValue = ent[formal.key];
+    const requestedValue = requestedValueViaEditableFormal(formal);
+
+    const existingIsSomething = isSomething(existingValue);
+    const requestedIsSomething = isSomething(requestedValue);
+
+    if (existingIsSomething) {
+      if (requestedIsSomething) {
+        if (existingValue === requestedValue) {
+          /* hi. no change in value. do nothing. */
+        } else {
+          args.push('update_attribute', formal.key, requestedValue);
+        }
+      } else {
+        args.push('delete_attribute', formal.key);
+      }
+    } else if (requestedIsSomething) {
+      args.push('create_attribute', formal.key, requestedValue);
+    } else {
+      /* hi. it wasn't set before and it's not set now. do nothing. */
+    }
+  });
+
+  if (countBefore === args.length) {
+    console.log("OHAI: no change in form. not sumitting.");
+    return;
+  }
+
+  const onEntity = (entity) => {
+    if (globalState.isEditing) {
+      // this is a somewhat more arbitrary UI behavior choice:
+      // on successful submit, pop back out of edit mode
+      changeToNotEditing();
+    } else {
+      console.log("OOPS: received ajax response after edit session");
+    }
+    receiveEntity(entity);
+  };
+
+  const onReject = (wat) => {
+    console.log("go reject: " + wat);
+  };
+
+  codec.requestJSON('update_notecard', args).then(onEntity, onReject);
+};
+
+const requestedValueViaEditableFormal = (formal) => {
+  const el = formal.element();
+  if (formal.isRef) {
+    const input = inputViaReferenceField(el);
+    return input.value;
+  }
+  return el.value;
+};
+
+/* ==== END */
+
+
+const changeToEditing = () => {
+
+  if (globalState.isEditing) {
+    throw("where?");
+  }
+
+  if (!globalState.lastEntity) {
+    console.log("OOPS: no entity loaded yet so can't enter edit mode");
+    return
+  }
+
+  globalState.isEditing = true;
+
+  const ent = globalState.lastEntity;
+
+  formalFields.forEach((formal) => {
+    if (!formalIsEditable(formal)) {
+      return;
+    }
+
+    const value = ent[formal.key];
+
+    const el = formal.element()
+    if (formal.isRef) {
+
+      const span = spanViaReferenceField(el);
+      if (!span) {
+        console.log("SPAN NOT FOUND FOR " + formal.key);
+        return;
+      }
+
+      const input = inputViaReferenceField(el);
+      hide(span);
+      if (!input) {
+        console.log("INPUT NOT FOUND FOR " + formal.key);
+        return;
+      }
+
+      input.value = value || '';  // #here1
+      show(input);
+
+      if (!value) {  // #here2
+        showReferenceField(el);
+      }
+      return;
+    }
+    el.value = value || '';  // #here1
+    el.removeAttribute('readonly');
+  });
+  return true;
+};
+
+
+const changeToNotEditing = () => {
+
+  if (!globalState.isEditing) {
+    throw("where?");
+  }
+  globalState.isEditing = false;
+
+  const ent = globalState.lastEntity;
+
+  formalFields.forEach((formal) => {
+    if (!formalIsEditable(formal)) {
+      return;
+    }
+
+    const value = ent[formal.key];
+
+    const el = formal.element();
+
+    if (formal.isRef) {
+      if (!value) {  // #here2
+        hideReferenceField(el);
+      }
+
+      const span = spanViaReferenceField(el);
+      const input = inputViaReferenceField(el);
+      hide(input);
+      input.value = 'xxx';
+
+      show(span);  // is there ever a reason to set value?
+      return;
+    }
+    el.value = value || '';  // #here1
+    el.setAttribute('readonly', 'readonly');
+  });
+
+};
+
+
+const receiveEntity = ent => {
+  globalState.lastEntity = ent;
+
+  formalFields.forEach((formal) => {
+    const value = ent[formal.key];
+    const recv = formal.receive;
+    if (recv) {
+      recv(value);
+      return;
+    }
+    const el = formal.element()
+    if (formal.isRef) {
+      writeReferenceField(el, value);
+      return;
+    }
+    el.value = value || '';  // #here1
+  });
 };
 
 
@@ -141,7 +379,7 @@ const writeChildrenField = cx => {
 
 
 const doWriteChildrenField = cx => {
-  const el = childrenField.children[1];
+  const el = spanViaReferenceField(childrenField);
   const hacky = cx.map(s => {return `<a>${s}</a>`;}).join(', ');
   el.innerHTML = hacky;
   Array.from(el.children).forEach(wireReferenceForClicking);
@@ -157,23 +395,27 @@ const clearChildrenField = () => {
   if ('none' !== style.display) {
     style.display = 'none';
   }
-  const el = childrenField.children[1];
-  el.innerHTML = '';
+  spanViaReferenceField(childrenField).innerHTML = '';
 };
 
 
-const wrf = (field, value) => {
-  if (value) {
-    writeReferenceField(field, value);
+const writeReferenceField = (field, value) => {
+  if (value) {  // #here2
+    doWriteReferenceField(field, value);
   } else {
     hideReferenceField(field);
   }
 };
 
 
-const writeReferenceField = (field, value) => {
+const doWriteReferenceField = (field, value) => {
+  anchorViaReferenceField(field).innerText = value;
+  showReferenceField(field);
+}
+
+
+const showReferenceField = (field) => {
   const style = field.style;
-  anchorViaField(field).innerText = value;
   if ('none' === style.display) {
     style.display = 'flex';
   }
@@ -186,13 +428,31 @@ const hideReferenceField = (field) => {
     return;
   }
   style.display = 'none';
-  anchorViaField(field).innerText = '222';  // ick/meh
+  spanViaReferenceField(field).innerText = '222';  // ick/meh
 };
 
 
-const anchorViaField = field => {
-  return field.children[1].children[0];  // not ok, but meh for now
+// == BEGIN not okay. but meh for now. #open [#882.L]
+
+const anchorViaReferenceField = field => {
+  const span = spanViaReferenceField(field)
+  const anchor = span.children[0];
+  return anchor;
 };
+
+const inputViaReferenceField = field => {
+  const fieldBodyDiv = field.children[1];
+  const input = fieldBodyDiv.children[1];
+  return input;
+};
+
+const spanViaReferenceField = field => {
+  const fieldBodyDiv = field.children[1];
+  const span = fieldBodyDiv.children[0];
+  return span;
+};
+
+// == END
 
 
 const wireReferenceForClicking = a => {
@@ -200,19 +460,52 @@ const wireReferenceForClicking = a => {
 };
 
 
-const parentField = document.getElementById('parentField');
-const previousField = document.getElementById('previousField');
-const identifierInput = document.getElementById('identifierInput');
-const headingInput = document.getElementById('headingInput');
-const datetimeInput = document.getElementById('datetimeInput');
-const bodyTextarea = document.getElementById('bodyTextarea');
-const nextField = document.getElementById('nextField');
-const childrenField = document.getElementById('childrenField');
+const hide = (btn) => {
+  btn.classList.add('is-hidden');
+};
 
 
-wireReferenceForClicking(anchorViaField(parentField));
-wireReferenceForClicking(anchorViaField(previousField));
-wireReferenceForClicking(anchorViaField(nextField));
+const show = (btn) => {
+  btn.classList.remove('is-hidden');
+};
+
+
+const formalIsEditable = (formal) => {
+  const yes = formal.editable;
+  if (undefined === yes) {
+    return true;
+  }
+  return yes;
+}
+
+const isSomething = (mixed) => {
+  const typ = typeof(mixed);
+  switch (typ) {
+    case 'string':
+      return ('' !== mixed);  // nonzero length but "blank" is something f.n.
+    case 'undefined':
+      return false;
+    case 'object':
+      return (null !== mixed);
+    default:
+      console.log(`STRANGE: why do we have this type: "${typ}"`);
+      return true;
+  }
+};
+
+const parentField = o('parentField');
+const previousField = o('previousField');
+const identifierInput = o('identifierInput');
+const headingInput = o('headingInput');
+const datetimeInput = o('datetimeInput');
+const bodyTextarea = o('bodyTextarea');
+const nextField = o('nextField');
+const childrenField = o('childrenField');
+
+
+wireReferenceForClicking(anchorViaReferenceField(parentField));
+wireReferenceForClicking(anchorViaReferenceField(previousField));
+wireReferenceForClicking(anchorViaReferenceField(nextField));
 
 
 const codec = (() => {
@@ -275,6 +568,8 @@ const codec = (() => {
 
       pyshell.end((err, code, signal) => {
         if (err) {
+          console.log("FOR NOW not throwing, might be UI error: " +err);
+          return;
           return reject(err);
         }
         if (0 !== code) {
@@ -303,6 +598,8 @@ const codec = (() => {
 
 const collPath = path.resolve(path.join(__dirname, '..', '..', _COLLECTION));
 
+const globalState = {isEditing: false};
+document.GLOBAL_STATE = globalState;  // just for console debugging
 
 /*
  * #history-A.2: spike codec and random button

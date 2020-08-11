@@ -57,6 +57,9 @@ def _stateless_collection_implementation_via_directory(directory):
 
     class StatelessCollectionImplementation:  # #class-as-namespace
 
+        def BATCH_UPDATE(eid, edits, listener):
+            return _batch_update(eid, edits, directory, listener)
+
         def retrieve_entity_as_storage_adapter_collection(ID, listener):
             return _retrieve_entity(ID, directory, listener)
 
@@ -66,6 +69,16 @@ def _stateless_collection_implementation_via_directory(directory):
     return StatelessCollectionImplementation
 
 
+def _batch_update(eid, edits, directory, listener):
+    def lineser():
+        yield "just saying hello from eno backend"
+    listener('info', 'expression', 'ohai_hello', lineser)
+
+    iden = identifier_via_string_(eid, listener)
+
+    return _retrieve_entity(iden, directory, listener)
+
+
 def _retrieve_entity(ID, directory, listener):
 
     mon = _monitor_via_listener(listener)
@@ -73,6 +86,7 @@ def _retrieve_entity(ID, directory, listener):
     sect_el = _retrieve_entity_section_element(ID, directory, mon)
     if sect_el is None:
         return
+
     return _read_only_entity(sect_el, ID, mon)
 
 
@@ -171,9 +185,6 @@ def _traverse_IDs(directory, depth, listener):
 
     mon = _monitor_via_listener(listener)
     listener = mon.listener  # overwrite argument
-
-    from kiss_rdb.magnetics_.identifier_via_string import \
-        identifier_via_string_
 
     file_pps = _file_posix_paths_in_collection_directory(directory, depth)
     # ..
@@ -464,6 +475,12 @@ def _details(orig_function):
     def use_function():
         return {k: v for k, v in orig_function()}
     return use_function
+
+
+def identifier_via_string_(s, listener):
+    from kiss_rdb.magnetics_.identifier_via_string\
+            import identifier_via_string_
+    return identifier_via_string_(s, listener)
 
 
 def _monitor_via_listener(listener):

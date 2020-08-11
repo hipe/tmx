@@ -19,7 +19,6 @@ def _API_for_production():
 
 
 def _API(sin, sout, serr, argv, enver):
-
     argp = _arg_parser(list(reversed(argv)), serr)
     _, es = argp.parse_one_argument()
     assert(not es)  # assume program name is always first element. discard
@@ -96,10 +95,12 @@ def update_notecard(sin, sout, serr, argp, enver):
         if argp.is_empty():
             break
 
-    wow = ncs.update_notecard(ncid_s, tuple(cuds), mon.listener)
-    if wow:
-        xx()
-    return mon.exitstatus
+    nc = ncs.update_notecard(ncid_s, tuple(cuds), mon.listener)
+    if nc is None:
+        return mon.exitstatus
+
+    nc.heading = ''.join(('OHAI FROM PHO API BACKEND! ', nc.heading))
+    return _write_entity_as_JSON(sout, nc, mon.listener)
 
 
 @command
@@ -254,7 +255,7 @@ def _arg_parser(bash_argv, serr):
 
 def _monitor_via_stderr(serr):
     from script_lib.magnetics import error_monitor_via_stderr
-    return error_monitor_via_stderr(serr)
+    return error_monitor_via_stderr(serr, default_error_exitstatus=33)
 
 
 class _prefixer:

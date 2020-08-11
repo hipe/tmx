@@ -15,7 +15,6 @@ be able to add a new pho fragment to the (eno) collection
 be able to create a new eno collection
 remove this line and maybe explode remaining parts of roadmap [#881.2]
 kiss for update eno entity (and undo pho mock)
-pho mocked for update fragment
 kiss for delete eno entity (and undo pho mock)
 kiss for create eno entity (and undo pho mock) (duplicate)
 pho mocked for create fragment

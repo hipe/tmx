@@ -12,7 +12,14 @@ class _Notecards:  # #testpoint
 
     def update_notecard(self, ncid, cuds, listener):
         edit = self._prepare_edit(ncid, cuds, listener)
-        return self._send_the_edit_to_the_collection(edit, listener)
+        if edit is None:
+            return
+        ci = self._coll.COLLECTION_IMPLEMENTATION
+        de = ci.BATCH_UPDATE(ncid, edit, listener)
+        if de is None:
+            return
+        ent_dct = de.to_dictionary_two_deep_as_storage_adapter_entity()
+        return self._notecard_via_any_entity(ent_dct, listener)
 
     def _prepare_edit(self, ncid, cuds, listener):  # #testpoint
         from .magnetics_.edited_notecard_via_request_and_notecards \

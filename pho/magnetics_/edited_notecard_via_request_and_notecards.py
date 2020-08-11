@@ -281,10 +281,11 @@ class _UoW_Writer:
         self.stop(msg, _integrity)
 
     def stop(self, msg, cat=_argument_error):
-        self._uows.stop(msg, cat)
+        self.emit_error_expression_line(msg, cat)
+        raise _the_stop_exception
 
     def emit_error_expression_line(self, msg, cat=_argument_error):
-        self._uows.emit_error_expression_line(msg, cat)
+        self._uows.listener('error', 'expression', cat, lambda: (msg,))
 
     # -- Derived properties (& similiar)
 
