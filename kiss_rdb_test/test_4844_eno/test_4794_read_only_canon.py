@@ -142,7 +142,7 @@ class Case4809_non_empty_collection_found(CommonCase):
 
 @lazy
 def stateless_collection():
-    return _stateless_collection_via_directory(_main_dir())
+    return collection_via_collection_path_(_main_dir())
 
 
 @lazy
@@ -150,10 +150,9 @@ def _main_dir():
     return fixture_directory_for('050-canon-main')
 
 
-def _stateless_collection_via_directory(dir_path):
-    from kiss_rdb.storage_adapters_.eno import \
-            _stateless_collection_implementation_via_directory
-    return _stateless_collection_implementation_via_directory(dir_path)
+def collection_via_collection_path_(dir_path):
+    from kiss_rdb.storage_adapters_.eno import collection_via_collection_path_
+    return collection_via_collection_path_(dir_path)
 
 
 def _debugging_listener(*args):

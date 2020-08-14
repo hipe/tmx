@@ -22,7 +22,7 @@ const formalFields = [
     element: ()=>{return childrenField;},
     receive: (x)=>{writeChildrenField(x);}
   }
-];
+];  // [#882.M]
 
 
 const o = (s) => { return document.getElementById(s); };

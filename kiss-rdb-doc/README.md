@@ -49,6 +49,7 @@ woah boy.
 |[#873.J]                   | #open | debugging `print` statements for kiss-rdb commit
 |[#873.I]                   | #trak | ugly
 |[#873.H]                   | #wish | customizable functional pipelines (map, filter in any order etc)
+|[#873.G]                   | #prov | #provision: our use of eno for storage must be line-isomorphic
 |[#873.6]                   | #trak | would redis etc
 |[#873.5]                   | #trak | #provision: where sparseness is implemented - prune "empty" cels
 |[#873.D]                   | #trak | spots to change if we add this feature (see)

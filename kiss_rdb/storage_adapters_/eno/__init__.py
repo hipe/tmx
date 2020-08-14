@@ -17,6 +17,16 @@ def section_line(label, depth=1):
     return f'# {label}\n'
 
 
+def list_lines(var_name, tup):
+    assert(len(tup))
+    yield f'{var_name}:\n'
+    for item in tup:
+        assert(isinstance(item, str))
+        assert(len(item))  # or cover
+        assert('\n' not in item)  # idk, something like this
+        yield f'- {item}\n'
+
+
 def multiline_field_lines(var_name, lines, yes_trailing_newline=True):
     delim = f'-- {var_name}\n'  # _eol
     yield delim
@@ -49,50 +59,87 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
     if 'storage_schema' in dct:
         assert('32x32x32' == dct['storage_schema'])
 
-    return _stateless_collection_implementation_via_directory(
-            collection_identity.collection_path)
+    return collection_via_collection_path_(collection_identity.collection_path)
 
 
-def _stateless_collection_implementation_via_directory(directory):
+def collection_via_collection_path_(directory):
 
     class StatelessCollectionImplementation:  # #class-as-namespace
 
-        def BATCH_UPDATE(eid, edits, listener):
-            return _batch_update(eid, edits, directory, listener)
+        # -- the big collection API operations (or experimental similar)
 
-        def retrieve_entity_as_storage_adapter_collection(ID, listener):
-            return _retrieve_entity(ID, directory, listener)
+        def BATCH_UPDATE(eid, edits, order, listener):
+            from .blocks_via_path_ import \
+                    batch_update_EXPERIMENTAL_CAN_CORRUPT_ as batch_update_
+            return batch_update_(eid, edits, order, self, listener)
+
+        def retrieve_entity_as_storage_adapter_collection(iden, listener):
+            mon = _monitor_via_listener(listener)
+            path = self.path_via_identifier_(iden, listener)
+            if path is None:
+                return
+            sect_el = _retrieve_entity_section_element(
+                    iden, path, injection, self, mon)
+            if sect_el is None:
+                return
+            return self.read_only_entity_via_section_(sect_el, iden, mon)
 
         def to_identifier_stream_as_storage_adapter_collection(listener):
-            return _traverse_IDs(directory, 3, listener)
+            mon = self.monitor_via_listener_(listener)
+            listener = mon.listener  # overwrite argument
+            for path in self.to_file_paths_():
+                docu = self.eno_document_via_(path=path, listener=listener)
+                if docu is None:
+                    return
+                _ = self.entity_section_elements_via_document_(docu, path, mon)
+                for eid, __ in _:
+                    iden = self.identifier_via_string_(eid, listener)  # #here4
+                    if iden is None:
+                        return
+                    yield iden
 
-    return StatelessCollectionImplementation
+        # -- protected magnetics
 
+        read_only_entity_via_section_ = _read_only_entity
 
-def _batch_update(eid, edits, directory, listener):
-    def lineser():
-        yield "just saying hello from eno backend"
-    listener('info', 'expression', 'ohai_hello', lineser)
+        entity_section_elements_via_document_ = _entity_section_elements
 
-    iden = identifier_via_string_(eid, listener)
+        def eno_document_via_(listener=None, **body_of_text):
+            body_of_text = _body_of_text(**body_of_text)
+            return injection.eno_document_via_(
+                    listener=listener, body_of_text=body_of_text)
 
-    return _retrieve_entity(iden, directory, listener)
+        def path_via_identifier_(iden, listener):
+            return _path_via_identifier(iden, directory, listener)
 
+        identifier_via_string_ = _identifier_via_string
 
-def _retrieve_entity(ID, directory, listener):
+        body_of_text_via_ = _body_of_text
 
-    mon = _monitor_via_listener(listener)
+        monitor_via_listener_ = _monitor_via_listener
 
-    sect_el = _retrieve_entity_section_element(ID, directory, mon)
-    if sect_el is None:
-        return
+        # -- protected properties & similar
 
-    return _read_only_entity(sect_el, ID, mon)
+        def to_file_paths_():
+            _ = _file_posix_paths_in_collection_directory(directory, _THREE)
+            return (str(pp) for pp in _)
+
+    class injection:
+        def eno_document_via_(_, listener=None, **body_of_text):
+            return eno_document_via_(listener=listener, **body_of_text)
+
+        @property
+        def directory(_):
+            return directory
+
+    injection = injection()
+
+    return (self := StatelessCollectionImplementation)
 
 
 def _read_only_entity(sect_el, ID, mon):
-
-    dct = {k: v for k, v in _attribute_keys_and_values(sect_el, mon)}
+    section = sect_el.to_section()  # #here3
+    dct = {k: v for k, v in _attribute_keys_and_values(section, mon)}
     if not mon.OK:
         return
 
@@ -105,72 +152,82 @@ def _read_only_entity(sect_el, ID, mon):
         core_attributes_dictionary_as_storage_adapter_entity = dct
         identifier = ID
 
+        VENDOR_SECTION_ = section
+
     return ReadOnlyEntity
 
 
-def _attribute_keys_and_values(sect_el, mon):
+def _attribute_keys_and_values(section, mon):
+    for el in section.elements():  # #here2
+        use_key, value, _ = key_value_vendor_type_via_attribute_element_(el)
+        yield use_key, value
 
-    def assert_key(use_key):
-        if rx.match(use_key):
-            return
-        msg = f"field key is not up to current spec - '{use_key}'"
+
+def key_value_vendor_type_via_attribute_element_(el):
+    typ = el._instruction['type']
+    if el.yields_list():
+        key, value = _key_and_value_via_list_attribute_element(el)
+        value = tuple(value)  # ..
+    else:
+        key, value = _key_and_value_for_atomic_attribute_element(el)
+        if ('Field' != typ):
+            assert('Multiline Field Begin' == typ)
+
+    # this is not specified anywhere, it's just an experimental sketch
+    import re
+    if not re.match('[a-z0-9_A-Z]+$', key):
+        msg = f"field key is not up to current spec - '{key}'"
         raise AssertionError(msg)
 
-    import re
-    rx = re.compile('[a-z0-9_A-Z]+$')
+    return key, value, typ
 
-    section = sect_el.to_section()  # #here3
-    for el in section.elements():  # #here2
 
-        if el.yields_list():
-            use_key = el.string_key()
-            li = el.to_list()
-            values = li.required_values(None)
-            assert_key(use_key)
-            yield use_key, values
-            continue
+def _key_and_value_via_list_attribute_element(el):
+    return el.string_key(), el.to_list().required_values(None)
 
+
+def _key_and_value_for_atomic_attribute_element(el):
+    if True:
         # change these to whatever whenever. they're just curb-checks
         assert(not el.yields_section())
         assert(not el.yields_fieldset())
         assert(not el.yields_list())
         assert(not el.yields_empty())
         assert(el.yields_field())
-
         field = el.to_field()
-
-        # we haven't formally specified this anywhere yet. just a sketch..
-        use_key = field.string_key()
-        assert_key(use_key)
-
-        yield use_key, field.required_string_value()
+    return field.string_key(), field.required_string_value()
 
 
-def _retrieve_entity_section_element(ID, directory, mon):
+def _path_via_identifier(iden, directory, listener):
 
-    if 3 != ID.number_of_digits:  # ..
-        _when_identifier_is_wrong_depth(mon.listener, ID, 3, 'retrieve')
+    if _THREE != iden.number_of_digits:  # ..
+        _when_identifier_is_wrong_depth(listener, iden, _THREE, 'retrieve')
         return
 
     # == BEGIN duplicate logic (softly) from elsewhere
 
-    (*these, penult_digit, last_digit) = ID.native_digits
+    (*these, penult_digit, last_digit) = iden.native_digits
     _intermediate_dirs = tuple(o.character for o in these)
     _filename = f'{penult_digit.character}.eno'
     from os import path as os_path
     path = os_path.join(directory, _entites_fn, *_intermediate_dirs, _filename)
 
     # == END
+    return path
 
-    document, e = _eno_document_via_path(path, mon.listener)
-    if document is None:
+
+def _retrieve_entity_section_element(ID, path, injection, coll, mon):
+    try:
+        docu = injection.eno_document_via_(path=path)
+    except FileNotFoundError as e:
         _when_entity_not_found_because_no_file(mon.listener, e, path, ID)
         return
 
     target_ID_s = ID.to_string()
     count = 0
 
-    for ID_s, sect_el in _entity_section_elements(document, path, mon):
+    _ = coll.entity_section_elements_via_document_(docu, path, mon)
+    for ID_s, sect_el in _:
         if target_ID_s == ID_s:
             return sect_el
         count += 1
@@ -179,31 +236,6 @@ def _retrieve_entity_section_element(ID, directory, mon):
         return
 
     _when_section_not_found(mon.listener, count, target_ID_s, path)
-
-
-def _traverse_IDs(directory, depth, listener):
-
-    mon = _monitor_via_listener(listener)
-    listener = mon.listener  # overwrite argument
-
-    file_pps = _file_posix_paths_in_collection_directory(directory, depth)
-    # ..
-    for file_pp in file_pps:
-
-        path = str(file_pp)
-        document, e = _eno_document_via_path(path, mon.listener)
-        if document is None:
-            xx()
-            return
-
-        for ID_s, _sect_el in _entity_section_elements(document, path, mon):
-            ID = identifier_via_string_(ID_s, listener)  # #here4
-            if ID is None:
-                return
-            yield ID
-
-        if not mon.OK:
-            return  # if one file is bad, stop on the whole batch
 
 
 def _file_posix_paths_in_collection_directory(directory, depth):
@@ -374,19 +406,54 @@ def _section_elements(document, path, listener):
         return
 
 
-def _eno_document_via_path(path, listener):
-    # parse that eno or fail
-
-    try:
-        opened = open(path)
-    except FileNotFoundError as e:
-        return None, e
-
-    with opened as fh:  # ..
-        big_string = fh.read()
+def eno_document_via_(listener=None, **body_of_text):
+    body_of_text = _body_of_text(**body_of_text)
+    if listener:
+        try:
+            big_string = body_of_text.big_string
+        except FileNotFoundError as e:
+            xx(str(e))
+    else:
+        big_string = body_of_text.big_string
 
     from enolib import parse as enolib_parse
-    return enolib_parse(big_string), None  # ..
+    return enolib_parse(big_string)
+
+
+def _body_of_text(body_of_text=None, big_string=None, lines=None, path=None):
+    if body_of_text:
+        return body_of_text
+    return _BodyOfText(big_string, lines, path)
+
+
+class _BodyOfText:  # catch FileNotFound error
+
+    def __init__(self, big_string=None, lines=None, path=None):
+        self._big_string = big_string
+        self._lines = lines
+        self.path = path
+
+    @property
+    def big_string(self):
+        if self._big_string is None:
+            if self._lines is None:
+                with open(self.path) as fh:
+                    self._big_string = fh.read()
+            else:
+                self._big_string = ''.join(self._lines)
+
+        return self._big_string
+
+    @property
+    def lines(self):
+        if self._lines is None:
+            if self._big_string is None:
+                with open(self.path) as lines:
+                    self._lines = tuple(lines)
+            else:
+                import re
+                self._lines = tuple(re.split(r'(?<=\n)(?!\Z)', self._big_string))  # noqa: E501
+        return self._lines
 
 
 def _when_section_not_found(listener, count, target_ID_s, path):
@@ -477,7 +544,7 @@ def _details(orig_function):
     return use_function
 
 
-def identifier_via_string_(s, listener):
+def _identifier_via_string(s, listener):
     from kiss_rdb.magnetics_.identifier_via_string\
             import identifier_via_string_
     return identifier_via_string_(s, listener)
@@ -492,6 +559,7 @@ def xx():
     raise Exception('xx')
 
 
+_THREE = 3  # hardcoded depth for now
 _entites_fn = 'entities'
 
 

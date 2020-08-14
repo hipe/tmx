@@ -15,7 +15,12 @@ class _Notecards:  # #testpoint
         if edit is None:
             return
         ci = self._coll.COLLECTION_IMPLEMENTATION
-        de = ci.BATCH_UPDATE(ncid, edit, listener)
+
+        order = (  # somewhere else, or not #track [#882.M]
+          'parent', 'previous', 'natural_key', 'heading', 'document_datetime',
+          'body', 'children', 'next', 'annotated_entity_revisions')
+
+        de = ci.BATCH_UPDATE(ncid, edit, order, listener)
         if de is None:
             return
         ent_dct = de.to_dictionary_two_deep_as_storage_adapter_entity()
