@@ -62,16 +62,47 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
     return collection_via_collection_path_(collection_identity.collection_path)
 
 
+def stop_on_error(orig_f):  # #decorator #experimental
+    def use_f(*args):
+        def use_listener(severity, *rest):
+            listener(severity, *rest)
+            if 'error' == severity:
+                raise stop
+        *head, listener = args
+        stop = RuntimeError('no see')
+        try:
+            return orig_f(*head, use_listener)
+        except stop:
+            pass
+    return use_f
+
+
 def collection_via_collection_path_(directory):
 
     class StatelessCollectionImplementation:  # #class-as-namespace
 
         # -- the big collection API operations (or experimental similar)
 
-        def BATCH_UPDATE(eid, edits, order, listener):
+        @stop_on_error
+        def BATCH_UPDATE(eid, edits, order, stop):
+            # NOTE as you can see by the name, this interface is experimental
+            # but for now "update" means "update": you can't create or delete
+            # entities in a batch update (attributes yes but not entities).
+            # This decision seems to be a wholly a UI/API one and not technical
+
+            # However, from an implementation perspective it seems to make
+            # most sense to corral all collection edits through one entrypoint.
+
+            edits = tuple(('update_entity', *t) for t in edits)
+            iden = self.identifier_via_string_(eid, stop)
+            self._batch_edit(edits, order, stop)
+            return self.retrieve_entity_as_storage_adapter_collection(
+                    iden, stop)
+
+        def _batch_edit(edits, order, listener):
             from .blocks_via_path_ import \
-                    batch_update_EXPERIMENTAL_CAN_CORRUPT_ as batch_update_
-            return batch_update_(eid, edits, order, self, listener)
+                    batch_edit_EXPERIMENTAL_CAN_CORRUPT_ as batch_edit_
+            return batch_edit_(edits, order, self, listener)
 
         def retrieve_entity_as_storage_adapter_collection(iden, listener):
             mon = _monitor_via_listener(listener)
@@ -91,7 +122,7 @@ def collection_via_collection_path_(directory):
                 docu = self.eno_document_via_(path=path, listener=listener)
                 if docu is None:
                     return
-                _ = self.entity_section_elements_via_document_(docu, path, mon)
+                _ = self._entity_section_els_via_document(docu, path, mon)
                 for eid, __ in _:
                     iden = self.identifier_via_string_(eid, listener)  # #here4
                     if iden is None:
@@ -102,7 +133,18 @@ def collection_via_collection_path_(directory):
 
         read_only_entity_via_section_ = _read_only_entity
 
-        entity_section_elements_via_document_ = _entity_section_elements
+        def _entity_section_els_via_document(document, path, mon):
+            itr = self.document_sections_(document, path, mon)
+            for typ, eid, sect_el in itr:
+                if 'entity_section' == typ:
+                    yield eid, sect_el
+                    continue
+                break
+            assert('document_meta' == typ)
+            for _ in itr:
+                assert()
+
+        document_sections_ = _document_sections
 
         def eno_document_via_(listener=None, **body_of_text):
             body_of_text = _body_of_text(**body_of_text)
@@ -226,7 +268,7 @@ def _retrieve_entity_section_element(ID, path, injection, coll, mon):
     target_ID_s = ID.to_string()
     count = 0
 
-    _ = coll.entity_section_elements_via_document_(docu, path, mon)
+    _ = coll._entity_section_els_via_document(docu, path, mon)
     for ID_s, sect_el in _:
         if target_ID_s == ID_s:
             return sect_el
@@ -263,7 +305,7 @@ def _file_posix_paths_in_collection_directory(directory, depth):
             yield file_pp
 
 
-def _entity_section_elements(document, path, mon):
+def _document_sections(document, path, mon):
 
     state_machine = {
             'start': {
@@ -311,11 +353,12 @@ def _entity_section_elements(document, path, mon):
 
     def on_doc_meta():
         be_in_state('doc_meta')
+        yield_this_section_next()
 
     def yield_this_section_next():
         assert(not state.has_thing_to_yield)
         state.has_thing_to_yield = True
-        state.yield_me = ID_s, sect_el
+        state.yield_me = typ, ID_s, sect_el
 
     def be_in_state(typ):
         state.current_state = state_machine[typ]

@@ -29,7 +29,7 @@ rankdir=BT; /* the finish is at the top */
 25000->25700
 25300[label="retrieve" style=filled]
 25300->25900
-25500[label="delete"]
+25500[label="delete" style=filled]
 25500->25900
 25700[label="create\n(ID's yikes)"]
 25700->25900
