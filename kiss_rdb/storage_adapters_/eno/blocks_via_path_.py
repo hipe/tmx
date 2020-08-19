@@ -153,66 +153,115 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, mon, **body_of_text):
         return coll.identifier_via_string_(eid, mon.listener)
     stack = list(reversed([p(eid) for eid in edit_via_attr_via_eid.keys()]))
 
-    prev_entb = None
+    def create_entity():
+        value_via_dattr, = cud_stack
+        _ = tuple(_create_entity_lines(eid, value_via_dattr, order, stop))
+        return _pass_thru_block(_)
+
+    def cud_stacker():
+        return list(reversed(edit_via_attr_via_eid.pop(eid)))
+
     prev_doc_iden = None
 
-    for entb in _document_sections_via_BoT(body_of_text, coll, mon):
+    itr = _document_sections_via_BoT(body_of_text, coll, mon)
+    for entb in itr:
 
         if entb.is_pass_thru_block:
+            if entb.is_document_meta_section:
+                document_meta_section = entb
+                break
             yield entb
             continue
 
         doc_iden = entb.entity.identifier
+
+        # Stop if existing document is out of order
         if not (prev_doc_iden is None or prev_doc_iden < doc_iden):
             stop(_entity_order_in_doc, prev_doc_iden, doc_iden, body_of_text)
         prev_doc_iden = doc_iden
 
         # While there are any edits and they come before the cursor, insert
         while len(stack) and stack[-1] < doc_iden:
-            yield xx("special function for insert new entity")
-            stack.pop()
+            eid = stack.pop().to_string()
+            cud_stack = cud_stacker()
+            cud_type = cud_stack.pop()
+            assert('create_entity' == cud_type)
+            yield create_entity()
 
         # If no remaining edits, just pass thru
         if not len(stack):
             yield entb
-            prev_entb = entb
             continue
 
         # There is a remaining edit that is equal or greater
         if doc_iden < stack[-1]:
             # If the head edit comes after the current entity, keep searching
             yield entb
-            prev_entb = entb
             continue
 
         # Since the remaining edit wasn't before or after..
         request_iden = stack.pop()
         assert(doc_iden == request_iden)
-
-        request_eid = request_iden.to_string()
-
-        tup = edit_via_attr_via_eid.pop(request_eid)
-        cud_stack = list(reversed(tup))
-
+        eid = request_iden.to_string()
+        cud_stack = cud_stacker()
         cud_type = cud_stack.pop()
+
+        if 'update_entity' == cud_type:
+            update_params, = cud_stack
+            de = _updated_document_entity(entb, update_params, order, mon)
+            yield de
+            continue
+
         if 'delete_entity' == cud_type:
             # In a simple world, to delete an entity would simply means to
             # skip over it during pass-thru. But "slot A" makes it complicated
 
             assert(not len(cud_stack))
-            clines = _check_delete_entity_OK(prev_entb, entb, stop)
-            if clines is not None:
-                yield _pass_thru_block(clines)
+            _check_delete_entity_OK(entb, stop)
             continue
 
-        assert('update_entity' == cud_type)  # ..
-        update_params, = cud_stack
-        de = _updated_document_entity(entb, update_params, order, mon)
-        yield de
-        prev_entb = de
+        assert('create_entity' == cud_type)
+        stop(_create_collision, doc_iden, body_of_text)
 
-    if len(stack):
-        xx()  # assume these are creates. if updates or deletes, entity not
+    # Any remaining stack items must be "non-clingy", i.e. creates..
+
+    while len(stack):
+        request_iden = stack.pop()
+        eid = request_iden.to_string()
+        cud_stack = cud_stacker()
+        cud_type = cud_stack.pop()
+        assert('create_entity' == cud_type)
+        yield create_entity()
+
+    yield document_meta_section
+    for _ in itr:
+        assert()
+
+
+def _create_entity_lines(eid, value_via_dattr, order, stop):
+
+    from kiss_rdb.storage_adapters_.eno import section_line
+    yield section_line(f'entity: {eid}: attributes')
+
+    pool = set(value_via_dattr.keys())
+    for key in order:
+
+        if key not in value_via_dattr:
+            continue
+        pool.remove(key)  # ..
+
+        value = value_via_dattr[key]
+        assert(value is not None)  # ..
+
+        typ = _eno_type_via_value(value)
+        lines = _attribute_block_head_lines_via(typ, value, key)
+        for line in lines:
+            yield line
+
+    if len(pool):
+        stop(xx, "attribute names not in whitelist")
+
+    yield '\n'  # because [#873.K] there's always a trailing document-meta sect
 
 
 def _updated_document_entity(entb, edit_via_dattr, order, mon):
@@ -225,7 +274,7 @@ def _updated_document_entity(entb, edit_via_dattr, order, mon):
 
     identity_line = entb.identity_line
 
-    slot_B_lines = entb.slot_B_associated_lines
+    slot_B_lines = entb.slot_B_lines
 
     def to_lines():
         yield identity_line
@@ -233,15 +282,11 @@ def _updated_document_entity(entb, edit_via_dattr, order, mon):
             for line in ab.to_lines():
                 yield line
 
-    def attr_blockser():
-        return attribute_blocks
-
     return _entity_block_via(
         identity_liner=lambda: identity_line,
-        slot_B_associated_lineser=lambda: slot_B_lines,
-        to_attribute_block_stream=attr_blockser,
-        to_lines=to_lines,
-        entity=None)
+        slot_B_lineser=lambda: slot_B_lines,
+        attribute_blockser=lambda: attribute_blocks,
+        to_lines=to_lines)
 
 
 def _edited_attribute_blocks(entb, edit_via_dattr, order, mon):
@@ -263,7 +308,7 @@ def _edited_attribute_blocks(entb, edit_via_dattr, order, mon):
             edit_via_dattr, order_offset_via_dattr)
 
     seen = set()
-    for attrb in entb.to_attribute_block_stream():
+    for attrb in entb.attribute_blocks:
         dattr = attrb.key
 
         # Assert existing attribute name against allowlist and constituency
@@ -374,32 +419,21 @@ def _edited_attribute(attrb, new_value, stop):
         dattr, new_value, new_type, lambda: lines, lambda: clines, attrb.begin)
 
 
-# == BEGIN this messy comment stuff
+def _check_delete_entity_OK(entb, stop):
 
-def _check_delete_entity_OK(prev_entb, entb, stop):
-    from ._machine_edit_check import on_delete_check_above_entity, \
-            on_delete_check_this_entity
+    if (clines := entb.slot_A_lines) is not None:
+        name = 'slot_A_'
+    elif len(clines := entb.slot_B_lines):
+        name = 'slot_B_'
+    else:
+        # we want to check slot C but meh
+        name = None
 
-    def for_previous(o):
-        o.if_entity_has_entity_above()
-        o.and_if_entity_above_has_a_last_attribute()
-        o.if_the_attribute_has_no_extraneous_lines_after_it_this_is_fine()
-        o.if_the_attribute_has_nothing_but_blank_lines_this_is_fine()
-        o.if_it_finishes_with_blank_lines_its_fine()
-        o.this_is_not_okay_because_theres_a_touching_comment()
+    if name is None:
+        return
 
-    on_delete_check_above_entity(for_previous, prev_entb, stop)
-
-    def for_this(o):
-        o.if_the_entity_has_a_slot_B_comment_this_is_not_okay()
-        o.if_this_entity_has_a_last_attribute()
-        pointer[0] = o.if_has_this_one_kind_of_comment_not_okay()
-
-    pointer = [None]  # whoopsie
-    on_delete_check_this_entity(for_this, entb, stop)
-    return pointer[0]
-
-# == END
+    from . import _machine_edit_check as lib
+    stop(getattr(lib, name), clines, entb)
 
 
 def _check_edit_attribute_OK(attrb, stop):
@@ -578,17 +612,63 @@ def _document_sections_via_BoT(bot, coll, mon):
     itr = _add_line_ends(len(line_index.line_cache), itr)
     typ = None
 
+    lines_pointer = []
+
     for typ, eid, vendor_sect, beg, end in itr:
         if 'entity_section' != typ:
             break
         iden = coll.identifier_via_string_(eid, mon.listener)
         ent = coll.read_only_entity_via_section_(vendor_sect, iden, mon)
-        yield _existing_entity_block(beg, end, ent, line_index)
+        entb = _existing_entity_block(beg, end, ent, line_index)
+
+        # if the previous entity had some slot B or slot C comments, take them
+        if len(lines_pointer):
+            entb = entb.but_with(slot_A_lines=lines_pointer.pop())
+            assert(not len(lines_pointer))
+
+        # if this entity has lines that belong to the next entity, store them
+        matchdata = _matchdata_for_slot_A_of_next_section(entb)
+        if matchdata is not None:
+            entb, lines = _break_off_lines(entb, matchdata)
+            lines_pointer.append(lines)
+
+        yield entb
 
     assert('document_meta' == typ)
+
+    if len(lines_pointer):
+        xx()
+
     for _ in itr:
         assert()
-    yield _pass_thru_block(tuple(line_index.line_cache[beg:end]))
+
+    yield _document_meta_section(tuple(line_index.line_cache[beg:end]))
+
+
+def _break_off_lines(entb, matchdata):
+    from ._machine_edit_check import BREAK_OFF_LINES
+    return BREAK_OFF_LINES(entb, *matchdata)
+
+
+def _matchdata_for_slot_A_of_next_section(entb):
+
+    attr_blocks = entb.attribute_blocks
+    if len(attr_blocks):
+        clines = attr_blocks[-1].to_tail_anchored_comment_or_whitespace_lines()
+        clines = tuple(clines)
+    else:
+        clines = entb.slot_B_lines
+
+    if not len(clines):
+        return
+
+    from ._machine_edit_check import MATCH_DATA
+    break_here = MATCH_DATA(clines)
+    if break_here is None:
+        return
+
+    _ = 'break_attr_clines' if len(attr_blocks) else 'break_slot_B_clines'
+    return _, break_here, clines
 
 
 def _add_line_ends(num_lines, itr):
@@ -621,7 +701,7 @@ def _existing_entity_block(begin, end, ent, line_index):
     def identity_line():
         return line_index.line_cache[begin]
 
-    def slot_B_associated_lineser():
+    def slot_B_lineser():
         attrbs = state.attribute_blocks
         if len(attrbs):
             comments_end = attrbs[0].begin
@@ -629,12 +709,15 @@ def _existing_entity_block(begin, end, ent, line_index):
             comments_end = end
         return tuple(line_index.line_cache[(begin+1):comments_end])
 
-    def to_attribute_block_stream():
-        return iter(state.attribute_blocks)
-
     class State:
         def __init__(self):
+            self._slot_B_lines = None
             self._attr_blocks = None
+
+        def slot_B_lines(self):
+            if self._slot_B_lines is None:
+                self._slot_B_lines = slot_B_lineser()
+            return self._slot_B_lines
 
         @property
         def attribute_blocks(self):
@@ -647,8 +730,8 @@ def _existing_entity_block(begin, end, ent, line_index):
 
     return _entity_block_via(
         identity_liner=identity_line,
-        slot_B_associated_lineser=slot_B_associated_lineser,
-        to_attribute_block_stream=to_attribute_block_stream,
+        slot_B_lineser=state.slot_B_lines,
+        attribute_blockser=lambda: state.attribute_blocks,
         to_lines=to_lines,
         entity=ent)
 
@@ -674,25 +757,55 @@ def _to_attribute_block_stream(ent, end, line_index):
 # == Models (that are not ad-hoc)
 
 def _entity_block_via(
-        identity_liner, slot_B_associated_lineser,
-        to_attribute_block_stream, to_lines, entity):
+        identity_liner, slot_B_lineser,
+        attribute_blockser, to_lines, entity=None, slot_A_lines=None):
     _ent = entity
+    _slot_A_lines = slot_A_lines
 
     class entity_block:  # #class-as-namespace
+        def but_with(
+                self, slot_A_lines=None, slot_B_lines=None,
+                attribute_blocks=None):
+            o = {}
+            o['slot_A_lines'] = (slot_A_lines or _slot_A_lines)
+            o['identity_liner'] = identity_liner
+
+            y = slot_B_lines is None
+            o['slot_B_lineser'] = slot_B_lineser if y else lambda: slot_B_lines
+
+            y = attribute_blocks is None
+            o['attribute_blockser'] = attribute_blockser if y else lambda: attribute_blocks  # noqa: E501
+
+            o['to_lines'] = None  # never pass through the original this
+            o['entity'] = _ent
+            return _entity_block_via(**o)
+
         @property
         def identity_line(_):
             return identity_liner()
 
         @property
-        def slot_B_associated_lines(_):
-            return slot_B_associated_lineser()
+        def slot_B_lines(_):
+            return slot_B_lineser()
 
-        def to_attribute_block_stream(_):
-            return to_attribute_block_stream()
+        @property
+        def attribute_blocks(_):
+            return attribute_blockser()
 
-        def to_lines(_):
-            return to_lines()
+        def to_lines(self):
+            if to_lines is not None:
+                to_lines()
+            if slot_A_lines is not None:
+                for line in slot_A_lines:
+                    yield line
+            yield identity_liner()
+            for line in slot_B_lineser():
+                yield line
+            for attr in attribute_blockser():
+                for line in attr.to_lines():
+                    yield line
 
+        slot_A_lines = _slot_A_lines
         entity = _ent
         is_pass_thru_block = False
     return entity_block()
@@ -704,6 +817,12 @@ def _attribute_block_via(dattr, value, typ, head_lineser, tail_lineser, begin):
     _begin = begin
 
     class attribute_block:  # #class-as-namespace
+
+        def but_with(tail_anchored_comment_or_whitespace_lines):
+            def use_tail_lineser():
+                return tail_anchored_comment_or_whitespace_lines
+            return _attribute_block_via(
+                dattr, value, typ, head_lineser, use_tail_lineser, begin)
 
         def to_lines():
             for line in self.to_head_anchored_body_lines():
@@ -722,15 +841,27 @@ def _attribute_block_via(dattr, value, typ, head_lineser, tail_lineser, begin):
     return (self := attribute_block)
 
 
+class _document_meta_section:
+    # just like a pass thru block plus this one flag
+    def __init__(self, lines):
+        self._lines = lines
+
+    def to_lines(self):
+        return self._lines
+
+    is_pass_thru_block = True
+    is_document_meta_section = True
+
+
 def _pass_thru_block(lines):
-    class pass_thru_block:
+    class pass_thru_block:  # #class-as-namespace
         def to_lines():
             return lines
         is_pass_thru_block = True
     return pass_thru_block
 
 
-# == Error Case Messages
+# == Stops
 
 def _stopper_via_listener(listener):
     def stop(f, *args):
@@ -738,6 +869,10 @@ def _stopper_via_listener(listener):
         listener('error', 'expression', 'edit_request_error', lambda: lines)
         raise _stop
     return stop
+
+
+def _create_collision(iden, body_of_text):
+    yield(f"can't create entity '{iden.to_string()}', entity already exists")
 
 
 def _list_item_looks_strange(line, count, dattr):

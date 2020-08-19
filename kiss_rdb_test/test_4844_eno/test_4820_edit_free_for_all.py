@@ -62,7 +62,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case_XXXX_delete_attribute(CommonCase):
+class Case4805_delete_attribute(CommonCase):
 
     def test_100(self):
         self.expect_success()
@@ -79,7 +79,7 @@ class Case_XXXX_delete_attribute(CommonCase):
         yield 'flavor: red\n'
 
 
-class Case_XXXX_create(CommonCase):
+class Case4808_create(CommonCase):
 
     def test_100(self):
         self.expect_success()
@@ -99,7 +99,7 @@ class Case_XXXX_create(CommonCase):
         yield 'flavor: red\n'
 
 
-class Case_XXXX_update_attribute(CommonCase):
+class Case4811_update_attribute(CommonCase):
     # doesn't change order
 
     def test_100(self):
@@ -120,13 +120,14 @@ class Case_XXXX_update_attribute(CommonCase):
         yield 'height: whatever\n'
 
 
-class CaseXXXX_cant_delete_entity_because_touching_comments(CommonCase):
+class Case4814_cant_delete_entity_because_touching_comments(CommonCase):
 
     def test_100(self):
         (chan, lines), = self.build_end_emissions()
         line1, line2 = lines
-        self.assertIn("can't delete an entity because the entity above", line1)
-        self.assertIn('> comment about above', line2)
+        self.assertIn("Won't delete entity 'DEF' because", line1)
+        self.assertIn('comments in "slot A"', line1)
+        self.assertIn('> comment about below', line2)
 
     def given_edit(self):
         return {'DEF': ('delete_entity',)}, order
@@ -140,7 +141,7 @@ class CaseXXXX_cant_delete_entity_because_touching_comments(CommonCase):
         yield '# entity: DEF: attributes\n'
 
 
-class CaseXXXX_cant_delete_entity_because_slot_B(CommonCase):
+class Case4817_cant_delete_entity_because_slot_B(CommonCase):
 
     def test_100(self):
         (chan, lines), = self.build_end_emissions()
@@ -153,11 +154,10 @@ class CaseXXXX_cant_delete_entity_because_slot_B(CommonCase):
 
     def given_lines(self):
         yield ABC_line
-        yield '\n'
         yield '> literally any comment'
 
 
-class Case_XXXX_delete_entity_preserves_slot_A_comment(CommonCase):
+class Case4820_delete_entity_preserves_slot_A_comment(CommonCase):
 
     def test_100(self):
         self.expect_success()
@@ -186,6 +186,105 @@ class Case_XXXX_delete_entity_preserves_slot_A_comment(CommonCase):
         yield 'foo: bar G\n'
 
 
+class Case4823_create_when_collision(CommonCase):
+
+    def test_100(self):
+        (chan, lines), = self.build_end_emissions()
+        line, = lines
+        self.assertEqual(line, "can't create entity 'ABC', entity already exists")  # noqa: E501
+
+    def given_edit(self):
+        return {'ABC': ('create_entity', None)}, order
+
+    def given_lines(self):
+        yield ABC_line
+        yield '> nothing.\n'
+
+
+class Case4826_create_into_pseudo_empty(CommonCase):
+
+    def test_100(self):
+        self.expect_success()
+
+    def given_edit(self):
+        these = {'foo': 'bar'}
+        return {'ABC': ('create_entity', these)}, order
+
+    def expect_lines(self):
+        yield ABC_line
+        yield 'foo: bar\n'
+
+    def given_lines(self):
+        return ()
+
+
+class Case4829_create_insert_at_top(CommonCase):
+
+    def test_100(self):
+        self.expect_success()
+
+    def given_edit(self):
+        these = {'foo': 'bar'}
+        return {'ABC': ('create_entity', these)}, order
+
+    def expect_lines(self):
+        yield ABC_line
+        yield 'foo: bar\n'
+        yield '\n'
+        yield '# entity: ABD: attributes\n'
+
+    def given_lines(self):
+        yield '# entity: ABD: attributes\n'
+
+
+class Case4832_create_insert_in_middle(CommonCase):
+
+    def test_100(self):
+        self.expect_success()
+
+    def given_edit(self):
+        these = {'foo': 'bar'}
+        return {'ABC': ('create_entity', these)}, order
+
+    def expect_lines(self):
+        yield '# entity: ABA: attributes\n'
+        yield 'fiz: biz\n'
+        yield '> some comment with above\n'
+        yield '\n'
+        yield ABC_line
+        yield 'foo: bar\n'
+        yield '\n'
+        yield '> some comment with below\n'
+        yield '# entity: ABD: attributes\n'
+
+    def given_lines(self):
+        yield '# entity: ABA: attributes\n'
+        yield 'fiz: biz\n'
+        yield '> some comment with above\n'
+        yield '\n'
+        yield '> some comment with below\n'
+        yield '# entity: ABD: attributes\n'
+
+
+class Case4835_create_append_at_end(CommonCase):  # DO ME
+
+    def test_100(self):
+        self.expect_success()
+
+    def given_edit(self):
+        these = {'foo': 'bar'}
+        return {'ABC': ('create_entity', these)}, order
+
+    def expect_lines(self):
+        yield '# entity: ABA: attributes\n'
+        yield '\n'
+        yield ABC_line
+        yield 'foo: bar\n'
+
+    def given_lines(self):
+        yield '# entity: ABA: attributes\n'
+
+
 def collection_via_collection_path_(dir_path):
     from kiss_rdb.storage_adapters_.eno import collection_via_collection_path_
     return collection_via_collection_path_(dir_path)
@@ -195,7 +294,7 @@ ABC_line = '# entity: ABC: attributes\n'
 ugh = ('\n', '# document-meta\n')
 
 
-order = ('height', 'city_of_origin')
+order = ('height', 'city_of_origin', 'foo', 'biff')
 
 
 if __name__ == '__main__':

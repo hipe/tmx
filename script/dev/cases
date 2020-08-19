@@ -87,6 +87,6 @@ else
   print_what='$_'
 fi
 
-perl -ne "/^${match_what} Case([A-Z0-9][A-Za-z0-9]*)/ && print $print_what" "$file"
+perl -ne "/^${match_what} Case([A-Z0-9_][A-Za-z0-9]*)/ && print $print_what" "$file"
 
 # #born.
