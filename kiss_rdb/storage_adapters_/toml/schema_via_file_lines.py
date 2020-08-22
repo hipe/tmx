@@ -59,20 +59,18 @@ class _SchemaPather:
 
     def __init__(self, coll_path, schema):
 
-        import os.path as os_path
-
         storage_schema = schema._storage_schema
 
         if 1 == storage_schema.filetree_depth:
             is_single_file_schema = True
-            self._entities_file = os_path.join(coll_path, 'entities.toml')
+            self._entities_file = _os_path_join(coll_path, 'entities.toml')
             # #here4
         else:
             is_single_file_schema = False
-            self._entities_directory_path = os_path.join(coll_path, 'entities')
+            self._entities_directory_path = _os_path_join(
+                    coll_path, 'entities')
             # #here3
-
-            self._index_file = os_path.join(coll_path, '.entity-index.txt')
+            self._index_file_value = None
 
         self._check_depth = schema.check_depth
         self._is_single_file_schema = is_single_file_schema
@@ -91,6 +89,15 @@ class _SchemaPather:
             path = self._index_file
 
         return path, wrapper
+
+    @property
+    def _index_file(self):
+        if self._index_file_value is None:
+            from kiss_rdb.magnetics_.identifiers_via_index import \
+                    ENTITY_INDEX_FILENAME_
+            self._index_file_value = _os_path_join(
+                    self._dir_path, ENTITY_INDEX_FILENAME_)
+        return self._index_file_value
 
     def to_identifier_stream(self, listener):
 
@@ -329,6 +336,11 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
                 )
         return {'reason': _reason}  # ..
     listener('error', 'structure', 'entity_not_found', structer)
+
+
+def _os_path_join(*a):
+    from os.path import join
+    return join(*a)
 
 
 def cover_me(msg=None):  # #open [#876] cover me

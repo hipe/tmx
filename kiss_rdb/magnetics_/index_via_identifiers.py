@@ -299,7 +299,7 @@ def new_lines_via_delete_identifier_from_index__(
     return lines_of_index_via_identifiers(keep_iids, _depth)
 
 
-def new_lines_via_add_identifier_into_index__(identifier, iids, listener):
+def new_lines_via_add_identifier_into_index_(identifier, iids):
     # (we could save on compute by making this more tightly coupled with the
     # provisioning mechanism but yuck.)
 

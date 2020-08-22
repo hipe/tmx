@@ -16,7 +16,7 @@
 # HOWEVER, when it comes time to actually applying the change to the collection
 # is where things get more fragile and tricky. AS IT STANDS NOW, WE DO THIS
 # IN A NON-TRANSACTIONAL, NON-ATOMIC WAY WHERE WE MIGHT END UP CORRUPTING THE
-# COLLECTION BECAUSE WE DON'T HAVE SEVERAL IMAGINED SAFEGUARDS IN PLACE :#here6
+# COLLECTION BECAUSE WE DON'T HAVE SEVERAL IMAGINED SAFEGUARDS IN PLACE
 # We explain this possible scenario more below in our wishlist.
 #
 # This is done in the interest of getting to an MVP in only two years. But:
@@ -37,93 +37,13 @@
 # - semaphores!? concurrency yikes
 
 
-def batch_edit_EXPERIMENTAL_CAN_CORRUPT_(edits, order, coll, listener):
-    # WARNING see #here6
-
-    try:
-        return _do_batch_edit(edits, order, coll, listener)
-    except _Stop:
-        pass
-
-
-def _do_batch_edit(edits, order, coll, listener):
-
-    def patch_via(path, edit_via_attr_via_eid):
-        return _make_patch(edit_via_attr_via_eid, coll, order, mon, path=path)
-
-    mon = coll.monitor_via_listener_(listener)  # make once for each file ick/m
-    listener = mon.listener  # use this one instead always
-    file_uows = _file_units_of_work_via(edits, coll, listener)
-    patches = tuple(patch_via(path, edt) for path, edt in file_uows if mon.OK)
-    if not mon.OK:
-        return
-
-    from tempfile import NamedTemporaryFile
-
-    with NamedTemporaryFile('w+') as fp:
-        for lines in patches:
-            for line in lines:
-                fp.write(line)
-        fp.flush()
-        _apply_big_patchfile(fp.name, listener)
-    return True
-
-
-def _apply_big_patchfile(patchfile_path, listener):
-    def serr(msg):
-        if '\n' == msg[-1]:  # lines coming from the subprocess
-            msg = msg[0:-1]
-        listener('info', 'expression', 'from_patchfile', lambda: (msg,))
-
-    import subprocess as sp
-
-    opened = sp.Popen(
-            args=('patch', '--strip', '1', '--input', patchfile_path),
-            stdin=sp.DEVNULL,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE,
-            text=True,  # don't give me binary, give me utf-8 strings
-            )
-
-    with opened as proc:
-
-        stay = True
-        while stay:
-            stay = False
-            for line in proc.stdout:
-                serr(f"GOT THIS STDOUT LINE: {line}")
-                stay = True
-                break
-            for line in proc.stderr:
-                serr(f"GOT THIS STDERR LINE: {line}")
-                stay = True
-                break
-
-        proc.wait()  # not terminate. maybe timeout one day
-        es = proc.returncode
-
-    if 0 != es:
-        serr(f"EXITSTATUS: {repr(es)}\n")
-        raise _stop  # pray for etc
-
-
-def _make_patch(edit, coll, order, mon, **bot):
-    bot = coll.body_of_text_via_(**bot)
-    new_file_lines = _new_file_lines(edit, coll, order, mon, body_of_text=bot)
-    new_file_lines = tuple(new_file_lines)
-
-    _ = bot.path or 'some-imaginary-file.dot'
-    from difflib import unified_diff
-    return tuple(unified_diff(bot.lines, new_file_lines, f'a/{_}', f'b/{_}'))
-
-
-def _new_file_lines(edit, coll, order, mon, **body_of_text):
-    for block in _new_file_blocks(edit, coll, order, mon, **body_of_text):
+def new_file_lines__(file_edit, coll, order, emi, **body_of_text):
+    for block in _new_file_blocks(file_edit, coll, order, emi, **body_of_text):
         for line in block.to_lines():
             yield line
 
 
-def _new_file_blocks(edit_via_attr_via_eid, coll, order, mon, **body_of_text):
+def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  # noqa: E501 #testpoint
     # This is the center of the whole algorithm :#here5:
     #
     # We take a stream of existing entities and a stack of edits and output
@@ -145,17 +65,18 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, mon, **body_of_text):
     # This is where we update the entity.
     # Get the lines for the updated entity in a different function
 
-    stop = _stopper_via_listener(mon.listener)
+    stop = emi.stop
+    listener = emi.listener
 
     body_of_text = coll.body_of_text_via_(**body_of_text)
 
     def p(eid):
-        return coll.identifier_via_string_(eid, mon.listener)
+        return coll.identifier_via_string_(eid, listener)
     stack = list(reversed([p(eid) for eid in edit_via_attr_via_eid.keys()]))
 
     def create_entity():
-        value_via_dattr, = cud_stack
-        _ = tuple(_create_entity_lines(eid, value_via_dattr, order, stop))
+        value_via_dattr, = cud_stack  # (pray that #here6 formatted this)
+        _ = tuple(_create_entity_lines(eid, value_via_dattr, order, emi.stop))
         return _pass_thru_block(_)
 
     def cud_stacker():
@@ -163,7 +84,7 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, mon, **body_of_text):
 
     prev_doc_iden = None
 
-    itr = _document_sections_via_BoT(body_of_text, coll, mon)
+    itr = _document_sections_via_BoT(body_of_text, coll, emi.monitor)
     for entb in itr:
 
         if entb.is_pass_thru_block:
@@ -208,7 +129,7 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, mon, **body_of_text):
 
         if 'update_entity' == cud_type:
             update_params, = cud_stack
-            de = _updated_document_entity(entb, update_params, order, mon)
+            de = _updated_document_entity(entb, update_params, order, emi)
             yield de
             continue
 
@@ -264,12 +185,12 @@ def _create_entity_lines(eid, value_via_dattr, order, stop):
     yield '\n'  # because [#873.K] there's always a trailing document-meta sect
 
 
-def _updated_document_entity(entb, edit_via_dattr, order, mon):
+def _updated_document_entity(entb, edit_via_dattr, order, emi):
 
-    _ = _edited_attribute_blocks(entb, edit_via_dattr, order, mon)
+    _ = _edited_attribute_blocks(entb, edit_via_dattr, order, emi.stop)
     attribute_blocks = tuple(_)
 
-    if not mon.OK:
+    if not emi.monitor.OK:
         return
 
     identity_line = entb.identity_line
@@ -289,7 +210,7 @@ def _updated_document_entity(entb, edit_via_dattr, order, mon):
         to_lines=to_lines)
 
 
-def _edited_attribute_blocks(entb, edit_via_dattr, order, mon):
+def _edited_attribute_blocks(entb, edit_via_dattr, order, stop):
     # Elsewhere, we assert that existing entities occur in order in their file.
     # For attributes, however, there is no equivalent requirement.
     # (We should still require their constituential uniqueness, however.)
@@ -300,8 +221,6 @@ def _edited_attribute_blocks(entb, edit_via_dattr, order, mon):
     # next existing attribute is encountered, while the top of the stack has
     # an attribute that comes before the current existing attribute, emit it.
     # Emit any remaining creates at the end.
-
-    stop = _stopper_via_listener(mon.listener)
 
     order_offset_via_dattr = {order[i]: i for i in range(0, len(order))}
     creates, updates_and_deletes = _prepare_edit(
@@ -369,37 +288,58 @@ def _prepare_edit(edit_via_dattr, order_offset_via_dattr):  # asserts for now
     return creates, updates_and_deletes
 
 
-def _file_units_of_work_via(edits, coll, listener):
+def file_units_of_work_via__(entities_units_of_work, coll, emi):
+
+    for uow in entities_units_of_work:
+        # catch these early for now, while experimental #todo
+        assert(uow[0] in ('update_entity', 'create_entity'))
+
     file_units_of_work = []
     file_UoW_offset_via_path = {}
 
-    def add_attribute_edit(dct):
+    stop = emi.stop
+    listener = emi.listener
+
+    def collision_check(dct):
         if dattr in dct:
             curr = dct[dattr][0]  # #here3: hard-coded doo-hahs
             stop(_multiple_operations_on_one_attr, cud_type, dattr, curr, eid)
-        dct[dattr] = (cud_type, *rest)
 
-    def dictionary_via_eid(eid, dct):
-        res = dct.get(eid)
-        if res is None:
-            dct[eid] = (res := {})
-        return res
+    def dictionary_via_eid(dct):
+        pair = dct.get(eid)
+        if pair is None:
+            dct[eid] = (entity_cud_type, (ent_dct := {}))
+        else:
+            this_entity_cud_type, ent_dct = pair
+            assert(this_entity_cud_type == entity_cud_type)
+        return ent_dct
 
-    def dictionary_via_path(path):
+    def dictionary_via_path():
         i = file_UoW_offset_via_path.get(path)
         if i is None:
+            # if we haven't seen this path before (yet) and it's an ent create,
+            maybe_create = 'create_entity' == entity_cud_type
+            fuow = _FileUnitOfWork(maybe_create)
             file_UoW_offset_via_path[path] = (i := len(file_units_of_work))
-            file_units_of_work.append((path, {}))
-        return file_units_of_work[i][1]
+            file_units_of_work.append((path, fuow))
 
-    stop = _stopper_via_listener(listener)
+        return file_units_of_work[i][1].dictionary
 
-    for eid, cud_type, dattr, *rest in edits:
+    for entity_cud_type, eid, cud_type, dattr, *rest in entities_units_of_work:
+        assert(entity_cud_type in ('update_entity', 'create_entity'))
         _assert(iden := coll.identifier_via_string_(eid, listener))
         _assert(path := coll.path_via_identifier_(iden, listener))
-        dct = dictionary_via_path(path)
-        dct = dictionary_via_eid(eid, dct)
-        add_attribute_edit(dct)
+        dct = dictionary_via_path()
+        dct = dictionary_via_eid(dct)
+        collision_check(dct)
+        if 'update_entity' == entity_cud_type:
+            dct[dattr] = (cud_type, *rest)
+        elif 'create_entity' == entity_cud_type:
+            assert('create_attribute' == cud_type)
+            value, = rest
+            dct[dattr] = value  # #here6
+        else:
+            xx()
 
     return tuple(file_units_of_work)
 
@@ -605,6 +545,7 @@ def _line_index_via_lines(line_cache):
 # == Read Existing Blocks
 
 def _document_sections_via_BoT(bot, coll, mon):
+
     docu = coll.eno_document_via_(body_of_text=bot, listener=mon.listener)
     itr = coll.document_sections_(docu, bot.path, mon)
     itr = _add_line_starts(itr)
@@ -756,6 +697,13 @@ def _to_attribute_block_stream(ent, end, line_index):
 
 # == Models (that are not ad-hoc)
 
+class _FileUnitOfWork:
+
+    def __init__(self, yn):
+        self.maybe_create_file = yn
+        self.dictionary = {}
+
+
 def _entity_block_via(
         identity_liner, slot_B_lineser,
         attribute_blockser, to_lines, entity=None, slot_A_lines=None):
@@ -863,11 +811,35 @@ def _pass_thru_block(lines):
 
 # == Stops
 
+
+def emitter_via_monitor__(mon):  # #testpoint
+
+    class emitter:  # #class-as-namespace
+        def stop(_, *args):
+            _stopper_via_listener(mon.listener)(*args)
+
+        @property
+        def listener(_):
+            return mon.listener
+
+        @property
+        def OK(_):
+            return mon.OK
+
+        monitor = mon
+
+        @property
+        def stopper_exception_class(_):
+            return _Stop
+
+    return emitter()
+
+
 def _stopper_via_listener(listener):
     def stop(f, *args):
         lines = tuple(f(*args))  # meh
         listener('error', 'expression', 'edit_request_error', lambda: lines)
-        raise _stop
+        raise _Stop()
     return stop
 
 
@@ -910,14 +882,11 @@ def _multiple_operations_on_one_attr(cud_type, dattr, existing, eid):
 def _assert(x):
     if x:
         return
-    raise _stop
+    raise _Stop()
 
 
 class _Stop(RuntimeError):  # experiment
     pass
-
-
-_stop = _Stop()
 
 
 def xx(msg=None):
@@ -927,4 +896,5 @@ def xx(msg=None):
 class _OpenStruct:
     pass
 
+# #pending-rename privatitze name like the others
 # #birth

@@ -105,9 +105,12 @@ class collection_via_directory_and_schema:
             from kiss_rdb.magnetics_ import (
                 provision_ID_randomly_via_identifiers as _)
 
-            tup = _.PROVISION_NEW_IDENTIFIER(
+            def identifierser():
+                return indexy_file.to_identifier_stream(listener)
+
+            tup = _.provision_new_identifier_(
                     random_number_generator=self._random_number_generator,
-                    indexy_file=indexy_file,
+                    identifierser=identifierser,
                     identifier_depth=self._schema.identifier_number_of_digits,
                     listener=listener)
 
@@ -238,7 +241,6 @@ class collection_via_directory_and_schema:
         return path
 
     def _open_locked_mutable_indexy_file(self):
-
         path, wrapper = self._schema_pather.to_indexy_path_and_wrapper__()
         return self._filesystem.open_locked_file_in_wrapper(path, wrapper)
 
@@ -393,10 +395,9 @@ def _create_entity(
                 existing_file_lines=orig_lines,
                 listener=my_listener)
 
-    def rewrite_index_file(orig_lines, my_listener):
+    def rewrite_index_file(orig_lines, my_listener_NOT_USED):
         from kiss_rdb.magnetics_ import index_via_identifiers as _
-        return _.new_lines_via_add_identifier_into_index__(
-                identifier, iids, my_listener)
+        return _.new_lines_via_add_identifier_into_index_(identifier, iids)
 
     if indexy_file.is_of_single_file_schema:
         # it was at the end because we read it to provision the id.

@@ -1,11 +1,37 @@
 class UnitsOfWorkForEntity:
 
-    def __init__(self, eid, business_collection, listener):
+    def __init__(self, eid_tup, business_coll, listener):
+
         self._prepared_edits = []
-        self._business_collection = business_collection
-        self.entity_identifier_string = eid
+        self._business_collection = business_coll
         self.listener = listener
         self._entity_cache = {}
+
+        eid_type = (stack := list(reversed(eid_tup))).pop()
+        if 'existing_entity' == eid_type:
+            self.entity_identifier_string = stack.pop()
+            self.EID_reservation = None
+            self._EID_of_entity_being_created = None
+            assert(not len(stack))
+            return
+
+        assert('entity_to_create' == eid_type)
+        eid_reservation = stack.pop()
+        starter_attributes = stack.pop()
+        assert(not len(stack))
+        eid = eid_reservation.identifier_string
+        self.entity_identifier_string = eid
+        self._EID_of_entity_being_created = eid
+
+        core_attrs = {k: v for k, v in starter_attributes()}
+        ent = business_coll.entity_via_definition_(eid, core_attrs, listener)
+        assert(ent)
+        self._entity_cache[eid] = ent
+
+        for k, v in core_attrs.items():
+            self._will('create_entity', eid, 'create_attribute', k, v)
+
+        self.EID_reservation = eid_reservation
 
     def release_prepared_edits(self):
         x = self._prepared_edits
@@ -13,14 +39,24 @@ class UnitsOfWorkForEntity:
         return tuple(x)
 
     def will_set_in(self, entity, cud_type, dattr, attr, value):
+        eid = entity.identifier_string
         setattr(entity, attr, value)  # #here1
-        self._accept(entity.identifier_string, cud_type, dattr, value)
+        if self._EID_of_entity_being_created == eid:
+            # (this is a little awkward because it's grafted on to update but)
+            update_or_create = 'create_entity'
+        else:
+            update_or_create = 'update_entity'
+        self._will(update_or_create, eid, cud_type, dattr, value)
 
     def will_delete_in(self, entity, dattr, attr):
         setattr(entity, attr, None)  # #here1
-        self._accept(entity.identifier_string, 'delete_attribute', dattr)
+        eid = entity.identifier_string
+        self._will('update_entity', eid, 'delete_attribute', dattr)
 
-    def _accept(self, *tup):
+    def _will_update(self, *tup):
+        self._prepared_edits.append(('update_entity', *tup))
+
+    def _will(self, *tup):
         self._prepared_edits.append(tup)
 
     def retrieve(self, eid):

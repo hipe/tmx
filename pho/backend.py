@@ -62,7 +62,6 @@ def update_notecard(sin, sout, serr, argp, enver):
     ncs, mon = _notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
-    # listener = mon.listener
 
     moniker = '{create_attribute|update_attribute|delete_attribute}'
     cuds = []
@@ -99,7 +98,55 @@ def update_notecard(sin, sout, serr, argp, enver):
     if nc is None:
         return mon.exitstatus
 
-    nc.heading = ''.join(('OHAI FROM PHO API BACKEND! ', nc.heading))
+    nc.heading = ''.join(('OHAI FROM PHO API BACKEND! ', nc.heading))  # #todo
+    return _write_entity_as_JSON(sout, nc, mon.listener)
+
+
+@command
+def create_notecard(sin, sout, serr, argp, enver):
+
+    is_dry = False
+
+    while True:
+        arg, es = argp.parse_one_argument('option or notecards path')
+        if es:
+            return es
+        if not (len(arg) and '-' == arg[0]):
+            ncs_path = arg
+            break
+        if '-dry-run' == arg:
+            is_dry = True
+            continue
+        serr.write(f"not an option for 'create_notecard': '{arg}'\n")
+        return 5
+
+    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    if ncs is None:
+        return mon.exitstatus
+
+    dct = {}
+    seen = set()
+
+    while True:
+        attr, es = argp.parse_one_argument('attribute name')
+        if es:
+            return es
+        value, es = argp.parse_one_argument('attribute value')
+        if es:
+            return es
+        if attr in seen:
+            serr.write(f"multiple attribute values for '{attr}', limit 1\n")
+            return 5
+        seen.add(attr)
+        dct[attr] = value
+        if argp.is_empty():
+            break
+
+    nc = ncs.create_notecard(dct, mon.listener, is_dry=is_dry)
+    if nc is None:
+        return mon.exitstatus
+
+    nc.heading = ''.join(('OHAI FROM PHO API BACKEND! ', nc.heading))  # #todo
     return _write_entity_as_JSON(sout, nc, mon.listener)
 
 

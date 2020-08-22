@@ -151,8 +151,8 @@ def _main_dir():
 
 
 def collection_via_collection_path_(dir_path):
-    from kiss_rdb.storage_adapters_.eno import collection_via_collection_path_
-    return collection_via_collection_path_(dir_path)
+    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
+    return eno_collection_via_(dir_path)
 
 
 def _debugging_listener(*args):

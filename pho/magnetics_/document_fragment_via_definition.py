@@ -118,6 +118,12 @@ class _DocumentFragment:
         self.next_identifier_string = next
         self.annotated_entity_revisions = annotated_entity_revisions
 
+    def to_dictionary_two_deep_as_storage_adapter_entity(self):
+        core_attrs = self.to_core_attributes()
+        return {
+                'identifier_string': self.identifier_string,
+                'core_attributes': core_attrs}
+
     def to_core_attributes(self):
         def o(k, attr=None):
             x = getattr(self, (attr or k))

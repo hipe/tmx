@@ -59,50 +59,40 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
     if 'storage_schema' in dct:
         assert('32x32x32' == dct['storage_schema'])
 
-    return collection_via_collection_path_(collection_identity.collection_path)
+    return eno_collection_via_(
+            collection_identity.collection_path,
+            random_number_generator)
 
 
-def stop_on_error(orig_f):  # #decorator #experimental
-    def use_f(*args):
-        def use_listener(severity, *rest):
-            listener(severity, *rest)
-            if 'error' == severity:
-                raise stop
-        *head, listener = args
-        stop = RuntimeError('no see')
-        try:
-            return orig_f(*head, use_listener)
-        except stop:
-            pass
-    return use_f
-
-
-def collection_via_collection_path_(directory):
+def eno_collection_via_(directory, rng=None):  # #testpoint
 
     class StatelessCollectionImplementation:  # #class-as-namespace
 
         # -- the big collection API operations (or experimental similar)
 
-        @stop_on_error
-        def BATCH_UPDATE(eid, edits, order, stop):
-            # NOTE as you can see by the name, this interface is experimental
-            # but for now "update" means "update": you can't create or delete
-            # entities in a batch update (attributes yes but not entities).
-            # This decision seems to be a wholly a UI/API one and not technical
+        def BATCH_UPDATE(
+                EID_reservation, entities_units_of_work,
+                main_business_entity, is_dry, order, listener):
 
-            # However, from an implementation perspective it seems to make
-            # most sense to corral all collection edits through one entrypoint.
+            bpf = self._build_big_patchfile(
+                EID_reservation, entities_units_of_work, order, listener)
 
-            edits = tuple(('update_entity', *t) for t in edits)
-            iden = self.identifier_via_string_(eid, stop)
-            self._batch_edit(edits, order, stop)
-            return self.retrieve_entity_as_storage_adapter_collection(
-                    iden, stop)
+            if bpf is None:
+                return
+            if not bpf.APPLY_PATCHES(listener, is_dry=is_dry):
+                return
+            return main_business_entity
 
-        def _batch_edit(edits, order, listener):
-            from .blocks_via_path_ import \
-                    batch_edit_EXPERIMENTAL_CAN_CORRUPT_ as batch_edit_
-            return batch_edit_(edits, order, self, listener)
+        def _build_big_patchfile(eidr, entities_uows, order, listener):  # noqa: E501 #testpoint
+            from ._big_patchfile_via_entities_uows import build_big_patchfile__
+            return build_big_patchfile__(
+                    eidr, entities_uows, order, self, listener)
+
+        def RESERVE_NEW_ENTITY_IDENTIFIER(listener):
+            from kiss_rdb.magnetics_.provision_ID_randomly_via_identifiers \
+                import RESERVE_NEW_ENTITY_IDENTIFIER_
+            return RESERVE_NEW_ENTITY_IDENTIFIER_(
+                    directory, rng, _THREE, listener)
 
         def retrieve_entity_as_storage_adapter_collection(iden, listener):
             mon = _monitor_via_listener(listener)
@@ -598,8 +588,12 @@ def _monitor_via_listener(listener):
     return ModalityAgnosticErrorMonitor(listener)
 
 
-def xx():
-    raise Exception('xx')
+def xx(msg=None):
+    raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
+
+
+class _Stop(RuntimeError):
+    pass
 
 
 _THREE = 3  # hardcoded depth for now

@@ -11,8 +11,13 @@ def in_memory_collection(orig_f):
 class CommonCase(TestCase):
 
     def these(self):
-        stack = list(reversed(self.build_end_state().result_value))
-        return stack.pop, stack, self.assertSequenceEqual
+        def useAssertSequenceEqual(actual, expected):
+            assert(isinstance(expected, tuple))
+            use_expected = ('update_entity', *expected)
+            self.assertSequenceEqual(actual, use_expected)
+        pe = self.build_end_state().result_value
+        stack = list(reversed(pe.units_of_work))
+        return stack.pop, stack, useAssertSequenceEqual
 
     @property
     def end_state(self):
@@ -32,7 +37,8 @@ class CommonCase(TestCase):
         ncs = notecards_via_collection(self.collection())
 
         def perform(eid, cud_tups):
-            return ncs._prepare_edit(eid, cud_tups, listener)
+            entity_identifier_tup = ('existing_entity', eid)
+            return ncs._prepare_edit(entity_identifier_tup, cud_tups, listener)
 
         edits = self.perform(perform)
         return EndState(edits, tuple(emissions))
@@ -111,8 +117,10 @@ class Case328_delete_primitive(CommonCase):
 class Case331_update_primitive(CommonCase):
 
     def test_100_everything(self):
-        edit, = self.build_end_state().result_value
-        self.assertSequenceEqual(edit, ('QQ', 'update_attribute', 'body', 'wahoo'))  # noqa: E501
+        pe = self.build_end_state().result_value
+        edit, = pe.units_of_work
+        expect = ('update_entity', 'QQ', 'update_attribute', 'body', 'wahoo')
+        self.assertSequenceEqual(edit, expect)
 
     def perform(self, perform):
         cuds = []

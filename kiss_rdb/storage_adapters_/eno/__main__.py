@@ -76,8 +76,8 @@ def _do_crazy_CLI(sout, serr, argv):
         serr.write(f' had {repr(test_name)}\n')
         return 3
 
-    from kiss_rdb.storage_adapters_.eno import collection_via_collection_path_
-    coll = collection_via_collection_path_(coll_path)
+    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
+    coll = eno_collection_via_(coll_path, rng=None)
     return tests[test_name]()
 
 

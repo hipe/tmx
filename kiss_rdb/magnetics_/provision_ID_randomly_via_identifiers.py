@@ -69,20 +69,68 @@ file means we don't actually have to traverse the whole collection to
 provision a new identifier.)
 """
 
-# == BEGIN GLUE
+
+def RESERVE_NEW_ENTITY_IDENTIFIER_(directory, rng, depth, listener):
+    # experimental higher-level
+
+    from .identifiers_via_index import \
+        identifiers_via_lines_of_index, ENTITY_INDEX_FILENAME_
+    from os.path import join as _os_path_join
+
+    index_path = _os_path_join(directory, ENTITY_INDEX_FILENAME_)
+
+    with open(index_path) as lines:
+        lines_tup = tuple(lines)
+        identifers = identifiers_via_lines_of_index(lines_tup)
+        pair = provision_new_identifier_(
+                rng, lambda: identifers, depth, listener)
+
+    if pair is None:
+        return  # full
+
+    iden, all_existing_idens = pair
+
+    def eidr_to_dictionary():
+        return {
+            # 'identifier_string': eidr.identifier_string,
+            'to_index_file_new_lines': eidr_to_index_file_new_lines,
+            'index_file_existing_lines': lines_tup,
+            'index_file_path': index_path}
+
+    def eidr_to_index_file_new_lines():
+        from .index_via_identifiers import \
+            new_lines_via_add_identifier_into_index_
+        return new_lines_via_add_identifier_into_index_(
+            iden, all_existing_idens)
+
+    class identifier_reservation:  # #class-as-namespace
+
+        def to_dictionary(_):
+            return eidr_to_dictionary()
+
+        @property
+        def identifier_string(_):
+            return iden.to_string()
+
+        # index_file_existing_lines = lines_tup
+        # index_file_path = index_path
+
+    return identifier_reservation()
 
 
-def PROVISION_NEW_IDENTIFIER(
+def provision_new_identifier_(
         random_number_generator,
-        indexy_file,
+        identifierser,
         identifier_depth,
         listener):
 
     # convert the identifiers file into a big flat tuple of identifier objects
     # (we may be able to avoid this, but for now we don't care..)
 
-    _itr = indexy_file.to_identifier_stream(listener)
-    ALL_iids = tuple(_itr)
+    itr = identifierser()
+    if itr is None:
+        cover_me()
+    ALL_iids = tuple(itr)
 
     if not len(ALL_iids):
         cover_me('cover the case of provisioning into an empty collection')
@@ -101,9 +149,6 @@ def PROVISION_NEW_IDENTIFIER(
     _prov_IID = iid_via_int(_prov_int)
 
     return _prov_IID, ALL_iids
-
-
-# == END GLUE
 
 
 def provision_integer(provisioned_integers, capacity, random_number_generator):
@@ -217,4 +262,5 @@ def __sanitized_provisioned_integers(provisioned_integers, capacity):
 def cover_me(msg=None):  # #open [#876] cover me
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-A.1: "identifier reservation" is born
 # #born.

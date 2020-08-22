@@ -33,21 +33,23 @@ class CommonCase(unittest.TestCase):
                 lines = tuple(f())
             emissions.append((chan, lines))
 
+        from kiss_rdb.storage_adapters_.eno.blocks_via_path_ import \
+            _new_file_blocks, emitter_via_monitor__
+
         coll = collection_via_collection_path_('/dev/null')
         mon = coll.monitor_via_listener_(listener)
+        emi = emitter_via_monitor__(mon)
         edits, order = self.given_edit()
         lines = (*self.given_lines(), *ugh)
 
-        from kiss_rdb.storage_adapters_.eno.blocks_via_path_ import \
-            _new_file_blocks, _Stop
+        blks = _new_file_blocks(edits, coll, order, emi, lines=lines)
 
-        blks = _new_file_blocks(edits, coll, order, mon, lines=lines)
-
+        catch_this = emi.stopper_exception_class
         try:
             for block in blks:
                 for line in block.to_lines():
                     output_lines.append(line)
-        except _Stop:
+        except catch_this:
             return None, tuple(emissions)
 
         for i in reversed(range(0, len(ugh))):
@@ -286,8 +288,8 @@ class Case4835_create_append_at_end(CommonCase):  # DO ME
 
 
 def collection_via_collection_path_(dir_path):
-    from kiss_rdb.storage_adapters_.eno import collection_via_collection_path_
-    return collection_via_collection_path_(dir_path)
+    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
+    return eno_collection_via_(dir_path, rng=None)
 
 
 ABC_line = '# entity: ABC: attributes\n'

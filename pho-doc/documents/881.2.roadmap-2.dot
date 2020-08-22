@@ -17,13 +17,13 @@ rankdir=BT; /* the finish is at the top */
 17666->17500
 17500[label="short streams\nnot long-running\nopen files" style=filled]
 17500->30000
-20000[label="the fragment\nmodel mocked" style=filled]
+20000[label="the notecard\nmodel mocked" style=filled]
 20000->20333
 20333[label="assemble\na document" style=filled]
 20333->20666
 20666[label="assemble a document\ntree (visual confirm\nw/ hugo)" style=filled]
 20666->30000
-25000[label="several kiss\nAPI endpoints"]
+25000[label="several kiss\nAPI endpoints" style=filled]
 25000->25300
 25000->25500
 25000->25700
@@ -31,24 +31,24 @@ rankdir=BT; /* the finish is at the top */
 25300->25900
 25500[label="delete" style=filled]
 25500->25900
-25700[label="create\n(ID's yikes)"]
+25700[label="create\n(ID's yikes)" style=filled]
 25700->25900
-25900[label="several kiss\nAPI endpoints"]
+25900[label="several kiss\nAPI endpoints" style=filled]
 25900->30000
 25900->26000
 26000[label="near full canon\ncompliance (do\nthis later actually)"]
 26000->30000
-30000[label="a bunch of pho\nadapting to kiss\n(thin CLI at first)"]
+30000[label="a bunch of pho\nadapting to kiss\n(thin CLI-ish at first)"]
 30000->31300
 30000->31500
 30000->31700
-31300[label="create a new\nfragment from CLI"]
+31300[label="create a new\nnotecard from backend" style=filled]
 31300->32500
-31500[label="delete a fragment\nfrom CLI (empty\nfiles not deleted)"]
+31500[label="delete a notecard\nfrom backend (empty\nfiles not deleted)"]
 31500->32500
-31700[label="manage fragment\nassociations and content\nby hand" style=filled]
+31700[label="manage notecard\nassociations and content\nby hand" style=filled]
 31700->32500
-32500[label="massive acceptance\ntest:\ hand-migrate all old\ntoml fragments" style=filled]
+32500[label="massive acceptance\ntest:\ hand-migrate all old\ntoml notecards" style=filled]
 32500->35000
 35000[shape=rect label="NOW YOU HAVE THE ABILITY
 TO TAKE NOTES AND SEE THEM RENDERED"]
@@ -65,11 +65,11 @@ TO TAKE NOTES AND SEE THEM RENDERED"]
 37000->37700
 37000->37750
 37000->37800
-37300[label="read-only\none fragment" style=filled]
-37500[label="navigate to\nnearby fragments" style=filled]
+37300[label="read-only\none notecard" style=filled]
+37500[label="navigate to\nnearby notecards" style=filled]
 37700[label="edit existing"]
 37750[label="create new"]
-37800[label="delete fragment"]
+37800[label="delete notecard"]
 37300->38000
 37500->38000
 37700->38000

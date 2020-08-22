@@ -9,6 +9,11 @@ or even to cover such edges cases for now!
 import re
 
 
+ENTITY_INDEX_FILENAME_ = '.entity-index.txt'
+
+
+# == BEGIN CLI
+
 class _CLI:
     """see if index file parses ok. visual test."""
 
@@ -98,6 +103,9 @@ class _CLI:
             self._pn = self.os_path.basename(s)
         return self._pn
 
+# == END CLI
+
+
 
 def identifiers_via_lines_of_index(file_lines):
     return _StateMachineIsh(file_lines).execute()
@@ -155,7 +163,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
         md = _rx_for_matching_significant_line.match(first_line)
         margin, rest = md.groups()
         indent_depth = len(margin)
-        if indent_depth is 0:
+        if 0 == indent_depth:
             self.__enter_shallow_mode_permanantly()
             return self.process_line(rest)
         else:

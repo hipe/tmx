@@ -15,17 +15,25 @@ _EDIT_STUFF = {
 }
 
 
-def prepare_edit_(eid, cud_tups, ncs, listener):
+def prepare_edit_(eid_tup, cud_tups, ncs, listener):
     if (tup := _CUDs_via_CUD_tups(cud_tups, listener)) is None:
         return
-    if (uows := _derive_units_of_work(*tup, eid, ncs, listener)) is None:
+    if (uows := _derive_units_of_work(*tup, eid_tup, ncs, listener)) is None:
         return
     if uows is None:
         return
+
+    eid = uows.entity_identifier_string
     ent = uows.retrieve(eid)  # ..
     if not _revalidate(ent, listener):
         return
-    return uows.release_prepared_edits()
+
+    class prepared_edit:  # #class-as-namespace
+        units_of_work = uows.release_prepared_edits()
+        EID_reservation = uows.EID_reservation
+        main_business_entity = ent
+
+    return prepared_edit
 
 
 def _revalidate(ent, listener):
@@ -34,12 +42,33 @@ def _revalidate(ent, listener):
     ca = ent.to_core_attributes()
     dct = validate_and_normalize_core_attributes_(
             ent.identifier_string, ca, listener)
-    return not (dct is None)
+    return dct is not None
 
 
-def _derive_units_of_work(LLs, non_LLs, eid, ncs, listener):
+def _derive_units_of_work(LLs, non_LLs, eid_tup, ncs, listener):
+
+    stack = list(reversed(eid_tup))
+    ent_type = stack.pop()
+    if 'existing_entity' == ent_type:
+        assert(1 == len(stack))
+        use_eid_tup = eid_tup
+    else:
+        assert('please_create_entity' == ent_type)
+        assert(not len(stack))
+        eidr = ncs.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
+            .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+        if eidr is None:
+            return  # full
+
+        def starter_attributes():
+            yield 'heading', '«your heading here»'
+            yield 'body', '«your body here»'
+
+        use_eid_tup = ('entity_to_create', eidr, starter_attributes)
+
     from .units_of_work import UnitsOfWorkForEntity
-    uows = UnitsOfWorkForEntity(eid, ncs, listener)
+    uows = UnitsOfWorkForEntity(use_eid_tup, ncs, listener)
+
     try:
         for cud in LLs.values():
             _add_units_of_work_for_linked_list_edit(uows, cud)
@@ -49,6 +78,7 @@ def _derive_units_of_work(LLs, non_LLs, eid, ncs, listener):
 
     except _Stop:
         return
+
     return uows
 
 
@@ -63,7 +93,7 @@ def _add_unit_of_work_for_primitive_attribute(uows, cud):
 
 def _add_units_of_work(uows, use_attr, cud):
     f = _operations[f'{cud.verb}_{use_attr}'].operation_function
-    f(uows, uows.entity_identifier_string, cud)
+    f(uows, uows.entity_identifier_string, cud)  # #here4
 
 
 def _CUDs_via_CUD_tups(cud_tups, listener):
@@ -148,11 +178,12 @@ def _ensure_existing_remotes_point_back(o):  # #here2
 
 class _UoW_Writer:
 
-    def __init__(self, units_of_work, eid, cud):
+    def __init__(self, units_of_work, eid, cud):  # #here4
+        assert(isinstance(eid, str))  # #[#011]
         self.entity_identifier_string = eid
         self._CUD = cud
         self._uows = units_of_work
-        self.entity = self.retrieve(self.entity_identifier_string)
+        self.entity = self.retrieve(eid)
 
     def execute(self):
         self.main()
@@ -236,7 +267,7 @@ class _UoW_Writer:
 
     def begin(self, operation, eid, cud_tup):
         cud = _CUD_parser().CUD_via_tuple(cud_tup)
-        return operation.begin_operation(self._uows, eid, cud)
+        return operation._begin_operation(self._uows, eid, cud)
 
     # -- Resolve various entities
 
@@ -323,10 +354,18 @@ class _Parent_UoW_Writer(_UoW_Writer):
     def append_self_to_children_of_requested_parent(o):
         o.ensure_I_am_in_requested_parents_children_zero_times()
         exi_cx = o.requested_remote.children
-        req_cx = (*exi_cx, o.entity_identifier_string)
-        cud_tup = ('update_attribute', 'children', req_cx)
-        oo = o.begin(update_children, o.requested_value, cud_tup)
-        oo.will_update()
+        if exi_cx is None:
+            exi_cx = ()
+            req_cx = (o.entity_identifier_string,)
+            cud_tup = ('create_attribute', 'children', req_cx)
+            oo = o.begin(create_children, o.requested_value, cud_tup)
+            oo.will_create()
+        else:
+            assert(len(exi_cx))  # ..
+            req_cx = (*exi_cx, o.entity_identifier_string)
+            cud_tup = ('update_attribute', 'children', req_cx)
+            oo = o.begin(update_children, o.requested_value, cud_tup)
+            oo.will_update()
 
     def remove_self_from_children_of_existing_parent(o):
         o.ensure_I_am_in_existing_parents_children_exactly_once()
@@ -447,7 +486,7 @@ def _operation_extenter():
 
     def build_operation_function(cls):
         def operation_function(units_of_work, eid, cud):
-            cls(units_of_work, eid, cud).execute()
+            cls(units_of_work, eid, cud).execute()  # #here4
         return operation_function
 
     operations = {}
@@ -459,8 +498,9 @@ class _Operation:
         self.operation_function = f
         self.operation_class = c
 
-    def begin_operation(self, uows, eid, cud):
-        return self.operation_class(uows, eid, cud)
+    def _begin_operation(self, uows, eid, cud):
+        # (as it stands, this is only ever used for existing foreign keys..)
+        return self.operation_class(uows, eid, cud)  # #here4
 
 
 uow_writer, _operations = _operation_extenter()
