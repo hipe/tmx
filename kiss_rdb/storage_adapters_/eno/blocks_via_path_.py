@@ -72,7 +72,10 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  
 
     def p(eid):
         return coll.identifier_via_string_(eid, listener)
-    stack = list(reversed([p(eid) for eid in edit_via_attr_via_eid.keys()]))
+
+    idens = tuple(p(eid) for eid in edit_via_attr_via_eid.keys())
+    assert(emi.OK)
+    stack = list(reversed(sorted(idens)))
 
     def create_entity():
         value_via_dattr, = cud_stack  # (pray that #here6 formatted this)
@@ -349,7 +352,7 @@ def _edited_attribute(attrb, new_value, stop):
     existing_type = attrb.eno_type
     new_type = _eno_type_via_value(new_value)
     if existing_type != new_type:
-        stop(_type_mismatch(existing_type, new_type, dattr))
+        stop(_type_mismatch, existing_type, new_type, dattr)
 
     clines = _check_edit_attribute_OK(attrb, stop)
 
@@ -476,11 +479,35 @@ def _attribute_block_head_lines_via(eno_type, value, dattr):
     if 'Field' == eno_type:
         return (field_line(dattr, value),)
 
-    if 'Multiline Field Begin' == eno_type:
-        return tuple(multiline_field_lines(dattr, value))
+    if 'List' == eno_type:
+        return tuple(list_lines(dattr, value))
 
-    assert('List' == eno_type)
-    return tuple(list_lines(dattr, value))
+    assert('Multiline Field Begin' == eno_type)  # ..
+    assert(isinstance(value, str))  # #[#011]
+
+    # Break a big string up into lines, while preserving the newline characters
+    import re
+    lines = [md[0] for md in re.finditer('[^\n]*\n|[^\n]+', value)]  # [#610]
+
+    # See `man git-log` near terminator vs separator semantics. The form data
+    # we have coming in has newlines with separator sematics: a typical
+    # multiline block of text looks like "line 1\nline2".
+
+    # But according to the function we'll call below and everywhere else,
+    # we want to be using terminator semantics. So as-is, that last component
+    # is a malformed "line" because it's not terminated with a newline.
+
+    # We do this change later not earlier to save on the memory hit of making
+    # a copy of a big string just to add one character.
+
+    # Note this might have a lurking bug: what if the form data comes in as
+    # "line 1\nline 2\n" - it's likely this gets munged in to the below
+
+    if len(lines) and '\n' != lines[-1][-1]:
+        lines[-1] = ''.join((lines[-1], '\n'))
+
+    output_lines = multiline_field_lines(dattr, lines)
+    return tuple(output_lines)
 
 
 def _eno_type_via_value(value):

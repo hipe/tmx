@@ -14,8 +14,9 @@ class _Notecards:  # #testpoint
     def __init__(self, coll):
         self._coll = coll
 
-    def update_notecard(self, eid_tup, cuds, listener):
-        assert('existing_entity' == eid_tup[0])
+    def update_notecard(self, eid, cuds, listener):
+        assert(isinstance(eid, str))  # #[#011]
+        eid_tup = ('existing_entity', eid)
         return self._create_update_or_delete_notecard(eid_tup, cuds, listener)
 
     def create_notecard(self, dct, listener, is_dry):

@@ -6,10 +6,16 @@ const _PYTHON = 'python3';  // ..
 
 
 const { PythonShell } = require('python-shell');
-const path = require('path');
 
 
-const formalFields = [
+// ===== Fields =====
+
+const defineMainFormFields = () => {
+  // experimental formal fields definitions [#882.M]
+
+  const exports = {};
+
+  exports.fields = [
   {key: "parent", isRef: true, element: ()=>{return parentField;}},
   {key: "previous", isRef: true, element: ()=>{return previousField;}},
   {key: "identifier", editable: false, element: ()=>{return identifierInput;}},
@@ -17,191 +23,347 @@ const formalFields = [
   {key: "document_datetime", editable: false, element: ()=>{return datetimeInput;}},
   {key: "body", element: ()=>{return bodyTextarea;}},
   {key: "next", isRef: true, element: ()=>{return nextField;}},
-  { key: "children",
-    isRef: true,
-    element: ()=>{return childrenField;},
-    receive: (x)=>{writeChildrenField(x);}
-  }
-];  // [#882.M]
+  {key: "children", customExtend: fld => {extendChildrenField(fld, childrenField);}},
+  ];
 
+  const o = getElementById;
+  const parentField = o('parentField');
+  const previousField = o('previousField');
+  const identifierInput = o('identifierInput');
+  const headingInput = o('headingInput');
+  const datetimeInput = o('datetimeInput');
+  const bodyTextarea = o('bodyTextarea');
+  const nextField = o('nextField');
+  const childrenField = o('childrenField');
 
-const o = (s) => { return document.getElementById(s); };
+  exports.fields.forEach(field => {
+    extendField(field);
+  });
 
-
-// Buttons
-
-const buttonStateThing = (btn) => {
-  // maybe just for goofing around
-
-  const state = {};
-  state.isWorking = false;
-
-  const prevText = btn.innerText;
-
-  const changeToNotWorking = () => {
-    if (! state.isWorking ) {
-      throw "already not working";
-    }
-    state.isWorking = false;
-    btn.innerText = prevText;
-    btn.classList.remove('is-danger');
-  };
-
-  const changeToWorking = () => {
-    if (state.isWorking) {
-      throw "already working";
-    }
-    state.isWorking = true;
-    btn.innerText = 'Retrieving';
-    btn.classList.add('is-danger');
-  };
-
-  return [changeToWorking, changeToNotWorking, state];
+  return exports;
 };
 
 
-(btn => {
-  const [changeToWorking, changeToNotWorking, state] = buttonStateThing(btn);
+const extendField = field => {
 
-  btn.onclick = e => {
-    if (state.isWorking) {
-      return changeToNotWorking();
+  const cust = field.customExtend;
+  if (cust) { return cust(field); }
+
+  field.isEditable = () => { return isEditable; }
+
+  const yn = field.editable;
+  const isEditable = (undefined === yn) ? true : yn;
+
+  field.encodeValue = s => {return s};
+
+  if (isEditable) {
+    if (field.isRef) {
+      extendReferenceField(field);
+    } else {
+      extendCommonField(field);
     }
-    doClick();
+  } else {
+    extendPermanantlyReadOnlyField(field);
+  }
+};
+
+
+const extendChildrenField = (field, childrenField) => {
+
+  field.isEditable = () => { return true; };
+
+  field.ensureEditModeAnd = value => {
+    if ('edit' !== mode()) { changeToEditMode(); }
+    receiveValue(value);
   };
 
-  const doClick = () => {
-    changeToWorking();
+  field.ensureViewModeAnd = value => {
+    if ('view' !== mode()) { changeToViewMode(); }
+    receiveValue(value);
+  };
 
+  field.fieldValue = () => { return input.value; };
+
+  field.encodeValue = arr => {
+    if (!(arr && arr.length)) { return ''; }
+    return arr.join(', ');
+  }
+
+  const receiveValue = value => {
+    if (!(value && value.length)) { return receiveTheEmptyValue(); }
+
+    const yikesHTML = value.map(s => {return `<a>${s}</a>`;}).join(', ');
+    const yikesText = value.join(', ');
+
+    span.innerHTML = yikesHTML;
+    Array.from(span.children).forEach(a => {a.onclick = onClickReferenceLink;});
+
+    input.value = yikesText;
+
+    if (! wholeFieldIsVisible()) { makeWholeFieldVisible(); }
+  };
+
+  const receiveTheEmptyValue = () => {
+    if ('view' == mode() && wholeFieldIsVisible()) {makeWholeFieldInvisible();}
+    span.innerHTML = '';
+    input.value = '';
+    if ('edit' == mode() && ! wholeFieldIsVisible()) {makeWholeFieldVisible();}
+  };
+
+  const [makeWholeFieldInvisible, makeWholeFieldVisible, wholeFieldIsVisible] = vizInviz(childrenField);
+  const [input, span] = inputAndSpan(childrenField);
+  const [changeToEditMode, changeToViewMode, mode] = evMode(input, span);
+};
+
+
+const extendReferenceField = field => {
+
+  field.ensureEditModeAnd = value => {
+    if ('edit' !== mode()) { changeToEditMode(); }
+    receiveValue(value);
+  };
+
+  field.ensureViewModeAnd = value => {
+    if ('view' !== mode()) { changeToViewMode(); }
+    receiveValue(value);
+  };
+
+  const receiveValue = value => {
+    if (!value) { return receiveTheEmptyValue(); }
+
+    // Don't show empty reference fields when in view mode.
+    input.value = value;
+    anchor.innerText = value;
+    if (!wholeFieldIsVisible()) { makeWholeFieldVisible(); }
+  }
+
+  const receiveTheEmptyValue = () => {
+    if ('view' == mode() && wholeFieldIsVisible()) {makeWholeFieldInvisible();}
+    input.value = '';  // #here1
+    anchor.innerText = '';
+    if ('edit' == mode() && !wholeFieldIsVisible()) {makeWholeFieldVisible();}
+  }
+
+  field.fieldValue = () => { return input.value; };
+
+  const fieldEl = field.element();
+  const [makeWholeFieldInvisible, makeWholeFieldVisible, wholeFieldIsVisible] = vizInviz(fieldEl);
+  const [input, span] = inputAndSpan(fieldEl);
+  const [changeToEditMode, changeToViewMode, mode] = evMode(input, span);
+
+  const anchor = span.children[0];  // not okay #open [#882.L]
+  if ('A' !== anchor.nodeName) {
+    throw("anchor not found for " + field.key);
+  }
+
+  anchor.onclick = onClickReferenceLink;
+};
+
+
+const vizInviz = field => {
+
+  const makeWholeFieldInvisible = () => { field.style.display = 'none'; };
+
+  const makeWholeFieldVisible = () => { field.style.display = 'flex'; };
+
+  const wholeFieldIsVisible = () => {return ('none' !== field.style.display);};
+
+  return [makeWholeFieldInvisible, makeWholeFieldVisible, wholeFieldIsVisible];
+};
+
+
+const evMode = (input, span) => {
+
+  const changeToEditMode = () => {
+    hide(span);
+    show(input);
+    state.mode = 'edit';
+  };
+
+  const changeToViewMode = () => {
+    show(span);
+    hide(input);
+    state.mode = 'view';
+  };
+
+  const mode = () => {
+    return state.mode;
+  };
+
+  const state = {'mode': 'view'};
+
+  return [changeToEditMode, changeToViewMode, mode];
+};
+
+
+const inputAndSpan = fieldEl => {  // not okay #open [#882.L]
+
+  const fieldBodyDiv = fieldEl.children[1];
+
+  const input = fieldBodyDiv.children[1];
+  if ('INPUT' !== input.nodeName) {
+    throw("input not found for " + field.key);
+  }
+
+  const span = fieldBodyDiv.children[0];
+  if ('SPAN' !== span.nodeName) {
+    throw("span not found for " + field.key);
+  }
+
+  return [input, span];
+};
+
+
+const extendCommonField = field => {
+
+  field.ensureEditModeAnd = value => {
+    if ('edit' !== mode()) { changeToEditMode(); }
+    receiveValue(value);
+  };
+
+  field.ensureViewModeAnd = value => {
+    if ('view' !== mode()) { changeToViewMode(); }
+    receiveValue(value);
+  };
+
+  const changeToEditMode = () => {
+    input.removeAttribute('readonly');
+  };
+
+  const changeToViewMode = () => {
+    input.setAttribute('readonly', 'readonly');
+  };
+
+  const mode = () => {
+    return input.hasAttribute('readonly') ? 'view' : 'edit';
+  };
+
+  const receiveValue = value => {
+    input.value = value || '';  // #here1
+  };
+
+  field.fieldValue = () => {
+    return input.value;
+  };
+
+  const input = field.element();
+};
+
+
+const extendPermanantlyReadOnlyField = field => {
+  field.ensureViewModeAnd = value => {
+    input.value = value || '';
+  };
+  const input = field.element();
+};
+
+
+// ===== Buttons =====
+
+const defineTheGetRandomEntityButton = (o, btn) => {
+  o.mainAction(() => {
     const onEntity = (entity) => {
-      if (! state.isWorking) {
-        return console.log("cancelled mid-call?");
-      }
-      changeToNotWorking()
-      receiveEntity(entity);
+      mainForm.ensureViewModeAndReceiveEntity(entity);
+      o.doneWorking();
     };
-
     const args = [collPath];
     codec.requestJSON('retrieve_random_notecard', args).then(onEntity);
-  };
-})(o('randomBtn'));
-
-
-const onClickReferenceLink = ev => {
-
-  const onEntity = (entity) => {
-    console.log('wahoo worked');
-    receiveEntity(entity);
-  };
-
-  const iid = ev.target.innerText;
-  console.log('go daddy '+iid);
-
-  const args = [iid, collPath];
-  codec.requestJSON('retrieve_notecard', args).then(onEntity);
-  return false;
+  });
+  o.textWhileWorking('Retrieving…');
 };
 
 
-(() => {
-  const closedLock = o('closedLock');
-  const openLock = o('openLock');
-  const editBtn = o('editBtn');
-  const cancelBtn = o('cancelBtn');
-  const submitBtn = o('submitBtn');
+const defineTheEditButton = (o, btn) => {
+  o.mainAction(() => {
+    mainForm.ensureState('EDITING');
+  });
+  o.isSynchronous();
+};
 
-  editBtn.onclick = e => {
-    if (globalState.isEditing) {  // strange
-      console.log("STRANGE: already editing");
-      return;
-    }
-    myChangeToEditing();
+
+const defineTheCancelEditingButton = (o, btn) => {
+  o.mainAction(() => {
+    // #todo: this resets the form to a pristine state. but where?
+    mainForm.ensureState('READ_ONLY');
+  });
+  o.isSynchronous();
+};
+
+
+const defineTheSubmitButton = (o, btn) => {
+  o.mainAction(() => {
+    const ent = mainForm.requireCurrentEntity(()=>{return 'submit';});
+    if (!ent) { o.doneWorking(); return; }
+    const args = _buildArgsForSubmit(ent);
+    if (!args) { o.doneWorking(); return; }  // maybe no change in form
+
+    const onEntity = (entity) => {
+      // this is a somewhat more arbitrary UI behavior choice:
+      // on successful submit, pop back out of edit mode
+      mainForm.ensureViewModeAndReceiveEntity(entity);
+      o.doneWorking();
+    };
+    const onReject = (wat) => {
+      log("got reject: " + wat);
+    };
+    log("sending update_notecard " + args.join(' '));
+    codec.requestJSON('update_notecard', args).then(onEntity, onReject);
+  });
+  o.textWhileWorking('Processing…');
+};
+
+
+const onClickReferenceLink = (() => {
+  // we could wire this like buttons and lock out concurrent clicks 1 day #todo
+  const mainAction = ev => {
+
+    const eid = ev.target.innerText;
+    log('go daddy ' + eid);
+
+    const onEntity = ent => {
+      log('wahoo worked');
+      mainForm.ensureViewModeAndReceiveEntity(ent);
+    };
+
+    const args = [eid, collPath];
+    codec.requestJSON('retrieve_notecard', args).then(onEntity);
+    return false;
   };
 
-  cancelBtn.onclick = e => {
-    if (!globalState.isEditing) {  // strange
-      console.log("STRANGE: cancel pressed when not editing");
-      return;
-    }
-    myChangeToNotEditing();
-  };
-
-  submitBtn.onclick = e => {
-    if (!globalState.isEditing) {  // strange
-      console.log("STRANGE: submit pressed when not editing");
-      return;
-    }
-    submit();
-  };
-
-  const myChangeToEditing = () => {
-    if (!changeToEditing()) {
-      return;
-    }
-    hide(closedLock);
-    show(openLock);
-    hide(editBtn);
-    show(cancelBtn);
-    show(submitBtn);
-  };
-
-  const myChangeToNotEditing = () => {
-    show(closedLock);
-    hide(openLock);
-    show(editBtn);
-    hide(cancelBtn);
-    hide(submitBtn);
-    changeToNotEditing();
-  };
+  return mainAction;
 })();
 
 
-(btn => {
-  const [changeToWorking, changeToNotWorking, state] = buttonStateThing(btn);
-
-  btn.onclick = e => {
-    if (state.isWorking) {
-      return changeToNotWorking();
-    }
-    doClick();
-  };
-
-  const doClick = () => {
-    changeToWorking();
-
+const defineTheSayHelloToPhoButton = (o, btn) => {
+  o.mainAction(() => {
     const onLines = (lines) => {
-      if (! state.isWorking) {
-        return console.log("cancelled mid-call?");
-      }
-      changeToNotWorking()
-      console.log('wahoo done! here is lines:');
+      log('wahoo done! here is lines:');
       let lineno = 0
       lines.forEach(line => {
         lineno += 1;
-        console.log(`line ${lineno}: ${line}`);
+        log(`line ${lineno}: ${line}`);
       });
+      o.doneWorking();
     };
-
     codec.requestLines('hello_to_pho', ['aa', 'bb']).then(onLines);
-  };
+  });
+  o.textWhileWorking('Saying Hello…');
+};
 
-})(o('helloBtn'));
 
+// ===== Longer Button Stuff =====
 
-/* ==== BEGIN submit */
+const _buildArgsForSubmit = (ent) => {
 
-const submit = () => {
-  const ent = globalState.lastEntity;
   const args = [collPath];
   args.push(ent.identifier);
   const countBefore = args.length;
 
-  formalFields.forEach((formal) => {
-    if (!formalIsEditable(formal)) {
-      return;
-    }
-    const existingValue = ent[formal.key];
-    const requestedValue = requestedValueViaEditableFormal(formal);
+  mainFormFields.forEach((field) => {
+    if (!field.isEditable()) { return; }
+
+    const existingValue = field.encodeValue(ent[field.key]);
+    const requestedValue = field.fieldValue();
 
     const existingIsSomething = isSomething(existingValue);
     const requestedIsSomething = isSomething(requestedValue);
@@ -211,254 +373,215 @@ const submit = () => {
         if (existingValue === requestedValue) {
           /* hi. no change in value. do nothing. */
         } else {
-          args.push('update_attribute', formal.key, requestedValue);
+          args.push('update_attribute', field.key, requestedValue);
         }
       } else {
-        args.push('delete_attribute', formal.key);
+        args.push('delete_attribute', field.key);
       }
     } else if (requestedIsSomething) {
-      args.push('create_attribute', formal.key, requestedValue);
+      args.push('create_attribute', field.key, requestedValue);
     } else {
       /* hi. it wasn't set before and it's not set now. do nothing. */
     }
   });
 
   if (countBefore === args.length) {
-    console.log("OHAI: no change in form. not sumitting.");
+    log("OHAI: no change in form. not sumitting.");
     return;
   }
 
-  const onEntity = (entity) => {
-    if (globalState.isEditing) {
-      // this is a somewhat more arbitrary UI behavior choice:
-      // on successful submit, pop back out of edit mode
-      changeToNotEditing();
-    } else {
-      console.log("OOPS: received ajax response after edit session");
-    }
-    receiveEntity(entity);
+  return args;
+};
+
+
+// ===== Define the Main Form Controller (2-state state machine) =====
+
+const defineMainForm = () => {
+
+  const exports = {};
+
+
+  // -- stuff about the current entity
+
+  exports.ensureViewModeAndReceiveEntity = ent => {
+    // it won't let you change state without having an entity set.
+    // be sure you are in read-only mode before you repopulate the form.
+    state.currentEntity = ent;
+    exports.ensureState('READ_ONLY');
+    _repopulateForm(ent);
   };
 
-  const onReject = (wat) => {
-    console.log("go reject: " + wat);
+  exports.requireCurrentEntity = verbPhraser => {
+    const ent = state.currentEntity;
+    if (!ent) {
+      log("OOPS: can't " + verbPhraser() + " because no entity loaded yet.");
+      return;
+    }
+    return ent;
   };
 
-  codec.requestJSON('update_notecard', args).then(onEntity, onReject);
-};
 
-const requestedValueViaEditableFormal = (formal) => {
-  const el = formal.element();
-  if (formal.isRef) {
-    const input = inputViaReferenceField(el);
-    return input.value;
-  }
-  return el.value;
-};
+  // -- stuff about the current form state (there are only 2 modes)
 
-/* ==== END */
-
-
-const changeToEditing = () => {
-
-  if (globalState.isEditing) {
-    throw("where?");
-  }
-
-  if (!globalState.lastEntity) {
-    console.log("OOPS: no entity loaded yet so can't enter edit mode");
-    return
-  }
-
-  globalState.isEditing = true;
-
-  const ent = globalState.lastEntity;
-
-  formalFields.forEach((formal) => {
-    if (!formalIsEditable(formal)) {
+  exports.ensureState = stateName => {
+    if (state.stateName === stateName) {
       return;
     }
-
-    const value = ent[formal.key];
-
-    const el = formal.element()
-    if (formal.isRef) {
-
-      const span = spanViaReferenceField(el);
-      if (!span) {
-        console.log("SPAN NOT FOUND FOR " + formal.key);
-        return;
-      }
-
-      const input = inputViaReferenceField(el);
-      hide(span);
-      if (!input) {
-        console.log("INPUT NOT FOUND FOR " + formal.key);
-        return;
-      }
-
-      input.value = value || '';  // #here1
-      show(input);
-
-      if (!value) {  // #here2
-        showReferenceField(el);
-      }
-      return;
+    if ('READ_ONLY' === stateName) {
+      return changeToReadOnlyState();
     }
-    el.value = value || '';  // #here1
-    el.removeAttribute('readonly');
+    if ('EDITING' === stateName) {
+      return changeToEditing();
+    }
+    throw("not a state: '"+stateName+"'");
+  };
+
+  const changeToEditing = () => {
+    withCurrentEntityChangeToThisState('EDITING', _doChangeToEditing);
+  };
+
+  const changeToReadOnlyState = () => {
+    withCurrentEntityChangeToThisState('READ_ONLY', _doChangeToNotEditing);
+  };
+
+  const withCurrentEntityChangeToThisState = (stateName, callMe) => {
+    const ent = exports.requireCurrentEntity(()=>{return "change to '"+stateName+"'";});
+    if (!ent) { return; }
+    state.stateName = stateName;
+    callMe(ent);
+  };
+
+  const state = {
+    'currentEntity': null,
+    'stateName': null,
+  };
+
+  return exports;
+};
+
+
+const _doChangeToEditing = currentEntity => {
+  mainFormFields.forEach(formal => {
+    if (!formal.isEditable()) { return; }
+    const value = currentEntity[formal.key];
+    formal.ensureEditModeAnd(value);
   });
-  return true;
+  mainFormButtons.changeToEditing();
 };
 
 
-const changeToNotEditing = () => {
-
-  if (!globalState.isEditing) {
-    throw("where?");
-  }
-  globalState.isEditing = false;
-
-  const ent = globalState.lastEntity;
-
-  formalFields.forEach((formal) => {
-    if (!formalIsEditable(formal)) {
-      return;
-    }
-
-    const value = ent[formal.key];
-
-    const el = formal.element();
-
-    if (formal.isRef) {
-      if (!value) {  // #here2
-        hideReferenceField(el);
-      }
-
-      const span = spanViaReferenceField(el);
-      const input = inputViaReferenceField(el);
-      hide(input);
-      input.value = 'xxx';
-
-      show(span);  // is there ever a reason to set value?
-      return;
-    }
-    el.value = value || '';  // #here1
-    el.setAttribute('readonly', 'readonly');
+const _doChangeToNotEditing = currentEntity => {
+  mainFormFields.forEach(formal => {
+    if (!formal.isEditable()) { return; }
+    const value = currentEntity[formal.key];
+    formal.ensureViewModeAnd(value);
   });
-
+  mainFormButtons.changeToNotEditing();
 };
 
 
-const receiveEntity = ent => {
-  globalState.lastEntity = ent;
-
-  formalFields.forEach((formal) => {
+const _repopulateForm = ent => {
+  mainFormFields.forEach(formal => {
     const value = ent[formal.key];
-    const recv = formal.receive;
-    if (recv) {
-      recv(value);
-      return;
-    }
-    const el = formal.element()
-    if (formal.isRef) {
-      writeReferenceField(el, value);
-      return;
-    }
-    el.value = value || '';  // #here1
+    formal.ensureViewModeAnd(value);
   });
 };
 
 
-const writeChildrenField = cx => {
-  if (cx) {
-    doWriteChildrenField(cx);
-  } else {
-    clearChildrenField();
-  }
+// ===== Define the Main Form Button Controller  =====
+
+const defineMainFormButtons = () => {
+  /* NOTE the exports of this "controller" are intended to be called only from
+   * the main form controller (and only in one place each for each function).
+   * We put them inside a scope to keep the button variable from cluttering
+   * up the global namespace. We put them in a separate controller from the
+   * main form controller to keep them from cluttering up that controller.
+   */
+
+  const exports = {};
+
+  exports.changeToEditing = () => {
+    hide(closedLock);
+    show(openLock);
+    hide(editBtn);
+    show(cancelBtn);
+    show(submitBtn);
+  };
+
+  exports.changeToNotEditing = () => {
+    show(closedLock);
+    hide(openLock);
+    show(editBtn);
+    hide(cancelBtn);
+    hide(submitBtn);
+  };
+
+  const o = getElementById;
+  const closedLock = o('closedLock');
+  const openLock = o('openLock');
+  const editBtn = o('editBtn');
+  const cancelBtn = o('cancelBtn');
+  const submitBtn = o('submitBtn');
+
+  wireButton(defineTheEditButton, editBtn);
+  wireButton(defineTheCancelEditingButton, cancelBtn);
+  wireButton(defineTheSubmitButton, submitBtn);
+
+  wireButton(defineTheGetRandomEntityButton, 'randomBtn');
+  wireButton(defineTheSayHelloToPhoButton, 'helloBtn');
+
+  return exports;
 };
 
 
-const doWriteChildrenField = cx => {
-  const el = spanViaReferenceField(childrenField);
-  const hacky = cx.map(s => {return `<a>${s}</a>`;}).join(', ');
-  el.innerHTML = hacky;
-  Array.from(el.children).forEach(wireReferenceForClicking);
-  const style = childrenField.style;
-  if ('none' === style.display) {
-    style.display = 'flex';
+// ===== Experimental Button Toolkit (just a sketch) =====
+
+const wireButton = (definition, btn) => {
+  if ('string' === typeof(btn)) {
+    btn = getElementById(btn);
   }
-};
+  const yikesName = btn.getAttribute('id');
+  const relay = {};
+  relay.mainAction = mainAction => {
+    state.mainAction = mainAction;
+  };
+  relay.textWhileWorking = text => {
+    state.textWhileWorking = text;
+    state.isSynchronous = false;
+  };
+  relay.isSynchronous = () => {
+    state.isSynchronous = true;
+  };
+  const state = {'isWorking': false};
+  definition(relay);
+  btn.onclick = e => {
+    if (state.isSynchronous) {
+      return state.mainAction();
+    }
+    if (state.isWorking) {
+      log("'" + yikesName + "' is working. cancelling (not really)…");
+      relay.doneWorking();
+      return;
+    }
+    state.nonWorkingText = btn.innerText;
+    // btn.classList.add('is-loading'); cool but you need a timeout #here2
+    btn.innerText = state.textWhileWorking;
+    state.isWorking = true;
+    state.mainAction();
+  };
 
-
-const clearChildrenField = () => {
-  const style = childrenField.style;
-  if ('none' !== style.display) {
-    style.display = 'none';
-  }
-  spanViaReferenceField(childrenField).innerHTML = '';
-};
-
-
-const writeReferenceField = (field, value) => {
-  if (value) {  // #here2
-    doWriteReferenceField(field, value);
-  } else {
-    hideReferenceField(field);
-  }
-};
-
-
-const doWriteReferenceField = (field, value) => {
-  anchorViaReferenceField(field).innerText = value;
-  showReferenceField(field);
+  relay.doneWorking = () => {
+    if (!state.isWorking) {
+      return;
+    }
+    // btn.classList.remove('is-loading');  #here2
+    btn.innerText = state.nonWorkingText;
+    state.isWorking = false;
+  };
 }
 
 
-const showReferenceField = (field) => {
-  const style = field.style;
-  if ('none' === style.display) {
-    style.display = 'flex';
-  }
-};
-
-
-const hideReferenceField = (field) => {
-  const style = field.style;
-  if ('none' === style.display) {
-    return;
-  }
-  style.display = 'none';
-  spanViaReferenceField(field).innerText = '222';  // ick/meh
-};
-
-
-// == BEGIN not okay. but meh for now. #open [#882.L]
-
-const anchorViaReferenceField = field => {
-  const span = spanViaReferenceField(field)
-  const anchor = span.children[0];
-  return anchor;
-};
-
-const inputViaReferenceField = field => {
-  const fieldBodyDiv = field.children[1];
-  const input = fieldBodyDiv.children[1];
-  return input;
-};
-
-const spanViaReferenceField = field => {
-  const fieldBodyDiv = field.children[1];
-  const span = fieldBodyDiv.children[0];
-  return span;
-};
-
-// == END
-
-
-const wireReferenceForClicking = a => {
-  a.onclick = onClickReferenceLink;
-};
-
+// ===== Support for Elements  =====
 
 const hide = (btn) => {
   btn.classList.add('is-hidden');
@@ -470,13 +593,8 @@ const show = (btn) => {
 };
 
 
-const formalIsEditable = (formal) => {
-  const yes = formal.editable;
-  if (undefined === yes) {
-    return true;
-  }
-  return yes;
-}
+
+// ===== Support for Form Processing ====
 
 const isSomething = (mixed) => {
   const typ = typeof(mixed);
@@ -488,27 +606,26 @@ const isSomething = (mixed) => {
     case 'object':
       return (null !== mixed);
     default:
-      console.log(`STRANGE: why do we have this type: "${typ}"`);
+      log(`STRANGE: why do we have this type: "${typ}"`);
       return true;
   }
 };
 
-const parentField = o('parentField');
-const previousField = o('previousField');
-const identifierInput = o('identifierInput');
-const headingInput = o('headingInput');
-const datetimeInput = o('datetimeInput');
-const bodyTextarea = o('bodyTextarea');
-const nextField = o('nextField');
-const childrenField = o('childrenField');
+
+// ===== Flush Forward-Declarations =====
+
+const getElementById = s => { return document.getElementById(s); };
+const log = msg => { console.log(msg); };
 
 
-wireReferenceForClicking(anchorViaReferenceField(parentField));
-wireReferenceForClicking(anchorViaReferenceField(previousField));
-wireReferenceForClicking(anchorViaReferenceField(nextField));
+const mainForm = defineMainForm();
+const mainFormButtons = defineMainFormButtons();
+const mainFormFields = defineMainFormFields().fields;
 
 
-const codec = (() => {
+// ===== Codec =====
+
+const defineCodec = () => {
 
   const exp = {};
 
@@ -520,17 +637,17 @@ const codec = (() => {
     return requestLines(buildShell(commandName, args || []));
   };
 
-  const requestJSON = (pyshell) => {
+  const requestJSON = pyshell => {
     return new Promise((resolve, reject) => {
       requestLines(pyshell).then(lines => {
         const bigString = lines.join('');
-        console.log(`big string: ${bigString}`);
+        log(`big string: (${bigString.length} characters)`);
         resolve(JSON.parse(bigString));
       });
     });
   };
 
-  const requestLines = (pyshell) => {
+  const requestLines = pyshell => {
 
     return new Promise((resolve, reject) => {
 
@@ -539,7 +656,7 @@ const codec = (() => {
 
       // pyshell.send('some user data')
 
-      pyshell.on('message', (message) => {
+      pyshell.on('message', message => {
 
         if (! message) {
           return reject("empty message");
@@ -554,7 +671,7 @@ const codec = (() => {
         const type = message.slice(0, idx);
 
         if ('stderr' === type) {
-          return console.log(message);  // or tail
+          return log(message);  // or tail
         }
 
         if ('stdout' !== type) {
@@ -562,13 +679,13 @@ const codec = (() => {
         }
 
         const tail = message.slice(idx + 2);  // be careful
-        // console.log(`receceived stdout payload: ${tail}`);
+        // log(`receceived stdout payload: ${tail}`);
         stdouts.push(tail);
       });
 
       pyshell.end((err, code, signal) => {
         if (err) {
-          console.log("FOR NOW not throwing, might be UI error: " +err);
+          log("FOR NOW not throwing, might be UI error: " +err);
           return;
           return reject(err);
         }
@@ -582,26 +699,47 @@ const codec = (() => {
 
   const buildShell = (commandName, args) => {
     const options = {args: [commandName, ...args], ...commonOptions};
-    return new PythonShell(_BACKEND, options);
+    return new PythonShell(paths.backendPath, options);
   };
 
   const commonOptions = {
-    scriptPath: path.resolve(path.join(__dirname, '..', '..')),
+    scriptPath: paths.monoRepoDir,
     pythonPath: _PYTHON,
     pythonOptions: ['-u'],  // stdin, stdout & stderr unbuffered
     mode: 'text',
+    cwd: paths.monoRepoDir,  // big flex: be in same directory as during dev
   };
 
   return exp;
-})();
+};
 
 
-const collPath = path.resolve(path.join(__dirname, '..', '..', _COLLECTION));
+const definePaths = () => {
+  const exports = {};
+  const path = require('path');
 
-const globalState = {isEditing: false};
-document.GLOBAL_STATE = globalState;  // just for console debugging
+  const srcDir = path.resolve(__dirname);
+  const phoGuiDir = path.join(srcDir, '..');  // npm start run from here
+  const projectDir = path.join(phoGuiDir, '..');
+  const monoRepoDir = path.join(projectDir, '..');  // we develop from here
+
+  const projRelpath = projectDir.substring(monoRepoDir.length+path.sep.length);
+
+  exports.monoRepoDir = monoRepoDir;  // when we call to backend, cd to here
+  exports.backendPath = path.join(projRelpath, _BACKEND);
+  exports.collectionPath = path.join('no-see', _COLLECTION);  // fragile af
+
+  return exports;
+};
+
+
+const paths = definePaths();
+const collPath = paths.collectionPath;
+
+const codec = defineCodec();
 
 /*
+ * #history-A.3: overhaul for better compartmentalization with this one pattern
  * #history-A.2: spike codec and random button
  * #history-A.1: remove screen recording tutorial code
  * #born (from tutorial)

@@ -131,6 +131,14 @@ def _APPLY_PATCHES(patches, listener, is_dry):
                 fp.write(line)
         fp.flush()
         ok = _apply_big_patchfile(fp.name, listener, is_dry)
+        if not ok:
+            fp.seek(0)
+            dst = 'z/_LAST_PATCH_.diff'
+            with open(dst, 'w+') as dst_fp:  # from shutil import copyfile meh
+                for line in fp:
+                    dst_fp.write(line)
+            msg = f"(wrote this copy of patchfile for debugging: {dst})"
+            listener('info', 'expression', 'wrote', lambda: (msg,))
     return ok
 
 

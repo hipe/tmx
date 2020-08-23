@@ -8,6 +8,7 @@
 #   - but we otherwise structure it similarly to a CLI:
 #   - for now we want to be able to invoke it from the terminal for convenience
 #   - watch for not duplicating effort with the actual CLI
+#     (edit to above: who needs a CLI with an API like this?)
 #   - be prepared to pivot this to a long-running e.g. flask
 
 
@@ -80,6 +81,9 @@ def update_notecard(sin, sout, serr, argp, enver):
             value, es = argp.parse_one_argument('attribute value')
             if es:
                 return es
+            value, es = _unescape(value, serr)
+            if es:
+                return es
             f = _hand_written_attribute_parsers.get(attr)
             if f is not None:
                 value, es = f(value, serr)
@@ -134,6 +138,7 @@ def create_notecard(sin, sout, serr, argp, enver):
         value, es = argp.parse_one_argument('attribute value')
         if es:
             return es
+        value = _unescape(value)
         if attr in seen:
             serr.write(f"multiple attribute values for '{attr}', limit 1\n")
             return 5
@@ -206,7 +211,7 @@ def _write_entity_as_JSON(sout, nc, listener):
 
 
 @command
-def hello_to_pho(sin, sout, serr, bash_argv, enver):  # a.k.a "ping"
+def hello_to_pho(sin, sout, serr, argp, enver):  # a.k.a "ping"
 
     from pho import HELLO_FROM_PHO
     from time import sleep
@@ -214,17 +219,19 @@ def hello_to_pho(sin, sout, serr, bash_argv, enver):  # a.k.a "ping"
     sout.write(HELLO_FROM_PHO)
     sout.write('\n')
 
-    if not len(bash_argv):
+    if argp.is_empty():
         serr.write('No arguments\n')
         return 4
 
-    arg = bash_argv.pop()
+    arg, es = argp.parse_one_argument('arg')
+    if es:
+        return es
     sout.write(f'First argument: {arg}\n')
     count = 1
 
-    while len(bash_argv):
+    while not argp.is_empty():
         count += 1
-        arg = bash_argv.pop()
+        arg, _ = argp.parse_one_argument('arg')
         length_of_time_to_sleep = 0.718 if count % 2 else 1.180
         sleep(length_of_time_to_sleep)
         sout.write(f'Argument number {count}: {arg}\n')
@@ -298,6 +305,42 @@ def _arg_parser(bash_argv, serr):
         parse_one_argument = _2
         is_empty = _4
     return parser
+
+
+# == BEGIN open [#882.N] it is not us that should be doing unescaping
+
+def _unescape(value, serr):  # we can't find documentation on who's doing this
+    if '\\' not in value:
+        return value, None
+    errcode_hack = []
+    _wow = _yikes(value, errcode_hack, serr)
+    big_string = ''.join(_wow)
+    if len(errcode_hack):
+        errcode, = errcode_hack
+        return None, errcode
+    return big_string, None
+
+
+def _yikes(big_string, errcode_hack, serr):
+    import re
+    begin = 0
+    itr = re.finditer(r'\\(.?)', big_string)
+    for md in itr:
+        match_begin, match_end = md.span()
+        if begin < match_begin:
+            yield big_string[begin:match_begin]
+        begin = match_end
+        char = md[1]
+        if 'n' == char:
+            yield "\n"
+            continue
+        serr.write(f'no support for this escape sequence rignt now: "\\{char}"\n')  # noqa: E501
+        errcode_hack.append(441)
+        return
+    if begin < len(big_string):
+        yield big_string[begin:]
+
+# == END
 
 
 def _monitor_via_stderr(serr):

@@ -109,7 +109,7 @@ class Case4811_update_attribute(CommonCase):
 
     def given_edit(self):
         edit = {'city_of_origin': ('update_attribute', 'Stewartsville')}
-        return {'ABC': ('update_entity', edit)}, order  # noqa: E501
+        return {'ABC': ('update_entity', edit)}, order
 
     def expect_lines(self):
         yield ABC_line
@@ -120,6 +120,32 @@ class Case4811_update_attribute(CommonCase):
         yield ABC_line
         yield 'city_of_origin: wherever\n'
         yield 'height: whatever\n'
+
+
+class Case4812_update_multiline(CommonCase):
+
+    def test_100(self):
+        self.expect_success()
+
+    def given_edit(self):
+        edit = {'body_hello': ('update_attribute', "new line 1\nnew line 2")}
+        return {'ABC': ('update_entity', edit)}, ('body_hello',)
+
+    def expect_lines(self):
+        yield ABC_line
+        yield '-- body_hello\n'
+        yield 'new line 1\n'
+        yield 'new line 2\n'
+        yield '\n'  # this is gonna be a thing now, everywhere
+        yield '-- body_hello\n'
+
+    def given_lines(self):
+        yield ABC_line
+        yield '-- body_hello\n'
+        yield 'orig line 1\n'
+        yield 'orig line 2\n'
+        yield 'orig line 3\n'
+        yield '-- body_hello\n'
 
 
 class Case4814_cant_delete_entity_because_touching_comments(CommonCase):
