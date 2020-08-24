@@ -133,7 +133,7 @@ def provision_new_identifier_(
     ALL_iids = tuple(itr)
 
     if not len(ALL_iids):
-        cover_me('cover the case of provisioning into an empty collection')
+        pass  # #cover-me (tested visually lol)
 
     # get the decoder function from the depth
 

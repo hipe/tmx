@@ -44,6 +44,11 @@ def field_line(var_name, string_value):
 # == END
 
 
+def CREATE_COLLECTION(collection_path, listener, is_dry):
+    from ._create_collection import CreateCollection
+    return CreateCollection().execute(collection_path, listener, is_dry)
+
+
 def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
         schema_file_scanner, collection_identity,
         random_number_generator, filesystem, listener):
@@ -69,6 +74,37 @@ def eno_collection_via_(directory, rng=None):  # #testpoint
     class StatelessCollectionImplementation:  # #class-as-namespace
 
         # -- the big collection API operations (or experimental similar)
+
+        def create_entity_as_storage_adapter_collection(attr_vals, listener):
+            # (not used by our main application client but here for developmen)
+            eidr = self.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+            if eidr is None:
+                return  # maybe full
+
+            euow = []
+            eid = eidr.identifier_string
+            for k, v in attr_vals.items():
+                euow.append(('create_entity', eid, 'create_attribute', k, v))
+
+            eidr = eidr.to_dictionary()
+            order = tuple(attr_vals.keys())
+            ok = self.BATCH_UPDATE(eidr, euow, True, False, order, listener)
+            if not ok:
+                return
+
+            def _to_line_stream():
+                ent = {'identifier_string': eid, 'core_attributes': attr_vals}
+                import json
+                big_s = json.dumps(ent, indent=2)
+                import re
+                lines = [md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s)]
+                lines[-1] = f"{lines[-1]}\n"
+                return tuple(lines)
+
+            class doc_ent:  # #class-as-namespace
+                def to_line_stream():
+                    return _to_line_stream()
+            return doc_ent
 
         def BATCH_UPDATE(
                 EID_reservation, entities_units_of_work,
@@ -286,9 +322,11 @@ def _file_posix_paths_in_collection_directory(directory, depth):
     dirs = sorted_entries_of(entities_dir_pp)
 
     if not len(dirs):
-        xx()  # empty entities dir. does it really need its own case?
+        pass  # #cover-me (tested visually lol)
 
     assert(3 == depth)
+
+    # empty dirs ok
 
     for dir_pp in dirs:
         for file_pp in sorted_entries_of(dir_pp):

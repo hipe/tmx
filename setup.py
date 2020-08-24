@@ -26,7 +26,7 @@ install this with:
 
 Current status (#history-A.6):
 
-The objective is only to get #here2 this endpoint installed (which we achieve).
+The objective is only to get the pho endpoint installed (which we achieve).
 
 Some time between now and before the changeover to poetry, things changed such
 this setupfile "broke" because it specifies multiple egg (names). This might
@@ -74,43 +74,14 @@ setup(
             pho=pho.cli:cli_for_production
             tmx-dot2cytoscape=pho.cli.dot2cytoscape:cli_for_production
             tmx-timestamp=pho.cli.timestamp:cli_for_production
-        ''')
-
-
-exit(0)  # added at at #history-A.6. see #here2
-
-
-setup(
-        name='z_kiss_rdb',  # see #here1 above
-        version='0.0',
-        install_requires=[
-            'Click',
-        ],
-        entry_points='''
-            [console_scripts]
             kss=kiss_rdb.cli:cli_for_production
-        ''')
-
-
-setup(
-        name='z_data_pipes',  # see #here1 above
-        version='0.0',
-        entry_points='''
-            [console_scripts]
             dp-sync=data_pipes.cli.sync:cli_for_production
-        ''')
-
-
-setup(
-        name='z_game_server',  # see #here1 above
-        version='0.0',
-        entry_points='''
-            [console_scripts]
             DTF_game_server=game_server:cli_for_production
             DTF_game_server_adapter=game_server.cli.game_server_adapter:cli_for_production
             DTF_game_server_server=game_server.cli.game_server_server:cli_for_production
         ''')
 
+# #history-A.7: schlurped all old endpoints into one egg
 # #history-A.6
 # #history-A.5
 # #history-A.4

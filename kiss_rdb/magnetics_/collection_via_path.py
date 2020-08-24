@@ -499,6 +499,12 @@ class _StorageAdapter:  # move this to its own file if it gets big
                 stdin, monitor)
         return _wrap_collection(_)
 
+    def CREATE_COLLECTION(self, collection_path, listener, is_dry):
+        coll = self.module.CREATE_COLLECTION(collection_path, listener, is_dry)
+        if coll is None:
+            return
+        return _wrap_collection(coll)
+
     is_loaded = True
 
 

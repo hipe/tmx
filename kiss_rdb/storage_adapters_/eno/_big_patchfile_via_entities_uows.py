@@ -123,14 +123,89 @@ def _patch_unit_of_work(before_lines, after_lines, path_tail, do_create):
 
 
 def _APPLY_PATCHES(patches, listener, is_dry):
-    from tempfile import NamedTemporaryFile
-
-    with NamedTemporaryFile('w+') as fp:
+    def lineser():
         for patch in patches:
             for line in patch.diff_lines:
-                fp.write(line)
+                yield line
+    return _apply_big_patchfile_via_lines(lineser(), listener, is_dry)
+
+
+def APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_(
+        raw_lines, var_vals, dirname, listener, is_dry):  # noqa: E501
+    full_direcs = []
+    lines = _lines_and_full_direcs_via_template(full_direcs.append, raw_lines, var_vals)  # noqa: E501
+    ok = _apply_big_patchfile_via_lines(lines, listener, is_dry, dirname)
+    if not ok:
+        return
+    for direc_name, direc_value in full_direcs:
+        assert('ERASE_THIS_FILE_AFTER_APPLYING_THE_PATCH' == direc_name)
+        if True:
+            from os import path as os_path, remove as os_remove
+            remove_me = os_path.join(dirname, direc_value)
+            os_remove(remove_me)
+    return ok
+
+
+def _lines_and_full_direcs_via_template(recv_full_direc, raw_lines, var_vals):
+    direcs = []
+    detemplatize_line = _line_detemplatizer_via(var_vals)
+    recv_direc = direcs.append
+    import re
+    curr_path_re = re.compile(r'^\+\+\+ b/(.+)')
+    last_path = None
+    for raw_line in raw_lines:
+        line = detemplatize_line(recv_direc, raw_line)
+        yield line  # look
+        md = curr_path_re.match(line)
+        if md is not None:
+            last_path = md[1]
+        if not len(direcs):
+            continue
+        direc, = direcs  # (while it works)
+        direcs.clear()
+        assert('ERASE_THIS_FILE_AFTER_APPLYING_THE_PATCH' == direc)
+        if True:
+            assert(last_path)
+            recv_full_direc((direc, last_path))
+            continue
+
+
+def _line_detemplatizer_via(var_values):
+    def detemplatize_line(receive_directive, line):
+        return ''.join(line_pieces(receive_directive, line))
+
+    def line_pieces(receive_directive, line):
+        begin = 0
+        itr = re.finditer(r'<(?P<direc_name>[A-Z]+): (?P<direc_value>[A-Z_]+)>', line)  # noqa: E501
+        for md in itr:
+            match_begin, match_end = md.span()
+            if begin < match_begin:
+                yield line[begin:match_begin]
+            begin = match_end
+            direc_name, direc_value = md.groups()
+            if 'VAR' == direc_name:
+                yield var_values[direc_value]
+                continue
+            assert('DIRECTIVE' == direc_name)
+            if True:
+                receive_directive(direc_value)
+                yield direc_value
+
+        if begin < len(line):
+            yield line[begin:]
+
+    import re
+    return detemplatize_line
+
+
+def _apply_big_patchfile_via_lines(lines, listener, is_dry, cwd=None):
+    # (used for here and used by neighbor for creating collections!)
+    from tempfile import NamedTemporaryFile
+    with NamedTemporaryFile('w+') as fp:
+        for line in lines:
+            fp.write(line)
         fp.flush()
-        ok = _apply_big_patchfile(fp.name, listener, is_dry)
+        ok = _apply_big_patchfile(fp.name, listener, is_dry, cwd)
         if not ok:
             fp.seek(0)
             dst = 'z/_LAST_PATCH_.diff'
@@ -142,7 +217,7 @@ def _APPLY_PATCHES(patches, listener, is_dry):
     return ok
 
 
-def _apply_big_patchfile(patchfile_path, listener, is_dry):
+def _apply_big_patchfile(patchfile_path, listener, is_dry, cwd):
 
     def serr(msg):
         if '\n' == msg[-1]:  # lines coming from the subprocess
@@ -165,6 +240,7 @@ def _apply_big_patchfile(patchfile_path, listener, is_dry):
             stdout=sp.PIPE,
             stderr=sp.PIPE,
             text=True,  # don't give me binary, give me utf-8 strings
+            cwd=cwd,  # might be None
             )
 
     with opened as proc:

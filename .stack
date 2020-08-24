@@ -12,7 +12,6 @@ flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
 be able to add a new pho fragment to the (eno) collection
-be able to create a new eno collection
 remove this line and maybe explode remaining parts of roadmap [#881.2]
 kiss for delete eno entity (and undo pho mock)
 pho mocked for create fragment

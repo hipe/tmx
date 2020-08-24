@@ -188,9 +188,8 @@ def create(ctx, collection, value):
         return mon.errno
     # end
 
-    _cuds = {name_s: val_s for name_s, val_s in value}  # ..
-
-    doc_ent = coll.create_entity(_cuds, listener)
+    attr_values = {name_s: val_s for name_s, val_s in value}  # ..
+    doc_ent = coll.create_entity(attr_values, listener)
 
     # exact same thing as 2 others #here3
 
@@ -406,6 +405,29 @@ def filter_by_tags(ctx, collection, query):
 # -- commands concerned with CRUD of collections themselves (and adjacent)
 
 _same_help = "(or will try to infer from file extension if present)"
+
+
+@cli.command()
+@click.option('--dry-run', '-n', is_flag=True, help="(dry run)")
+@click.argument('adapter-name')
+@click.argument('collection-path')
+@click.pass_context
+def create_collection(ctx, adapter_name, collection_path, dry_run):
+    """Create a new collection given the storage adapter type. EXPERIMENTAL
+    """
+
+    listener = ctx.obj.build_monitor().listener
+    from kiss_rdb import collectionerer
+    collrr = collectionerer()
+    sa = collrr.storage_adapter_via_format_name(adapter_name, listener)
+    if sa is None:
+        return
+    coll = sa.CREATE_COLLECTION(collection_path, listener, dry_run)
+    if coll is None:
+        return
+    import sys
+    serr, = (getattr(sys, x) for x in ('stderr',))
+    serr.write(f"created collection: {collection_path}\n")
 
 
 @cli.command()

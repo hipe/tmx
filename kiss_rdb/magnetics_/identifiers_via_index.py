@@ -106,7 +106,6 @@ class _CLI:
 # == END CLI
 
 
-
 def identifiers_via_lines_of_index(file_lines):
     return _StateMachineIsh(file_lines).execute()
 
@@ -128,8 +127,10 @@ class _StateMachineIsh():  # #[#008.2] a state machine
         self.file_lines = x
 
     def execute(self):
+        self.lines = iter(self.file_lines)
+        del self.file_lines
 
-        for line in self.file_lines:
+        for line in self.lines:
             self.process_line(line)
             if self.ready:
                 for x in self.release_items():
@@ -159,6 +160,15 @@ class _StateMachineIsh():  # #[#008.2] a state machine
     def process_first_line(self, first_line):
         # the first line of an index file is significant because from it we
         # can infer the identifier depth we will use for the rest of the file
+
+        if '\n' == first_line:
+            # empty file:
+            for line in self.lines:
+                assert()
+            self.ready = False
+            self.is_at_stopping_point = True
+            self.process_line = None
+            return
 
         md = _rx_for_matching_significant_line.match(first_line)
         margin, rest = md.groups()
