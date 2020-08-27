@@ -75,22 +75,32 @@ def eno_collection_via_(directory, rng=None):  # #testpoint
 
         # -- the big collection API operations (or experimental similar)
 
-        def create_entity_as_storage_adapter_collection(attr_vals, listener):
+        def create_entity_as_storage_adapter_collection(
+                attr_vals, listener, is_dry=False):
             # (not used by our main application client but here for developmen)
+
+            bpf = self._big_patchfile_for_create_entity(attr_vals, listener)
+            if bpf is None:
+                return
+            return bpf.APPLY_PATCHES(listener, is_dry=is_dry)
+
+        def _big_patchfile_for_create_entity(attr_vals, listener):
+
+            # Reserve the new entity identifier
             eidr = self.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
             if eidr is None:
                 return  # maybe full
 
-            euow = []
+            # Flatten the creation dictionary into CUD units of work
+            def p(k, v):
+                return ('create_entity', eid, 'create_attribute', k, v)
             eid = eidr.identifier_string
-            for k, v in attr_vals.items():
-                euow.append(('create_entity', eid, 'create_attribute', k, v))
+            euow = tuple(p(k, v) for k, v in attr_vals.items())
 
-            eidr = eidr.to_dictionary()
-            order = tuple(attr_vals.keys())
-            ok = self.BATCH_UPDATE(eidr, euow, True, False, order, listener)
-            if not ok:
-                return
+            # Define the result document entity (just what is needed)
+            class doc_ent:  # #class-as-namespace
+                def to_line_stream():
+                    return _to_line_stream()
 
             def _to_line_stream():
                 ent = {'identifier_string': eid, 'core_attributes': attr_vals}
@@ -101,34 +111,32 @@ def eno_collection_via_(directory, rng=None):  # #testpoint
                 lines[-1] = f"{lines[-1]}\n"
                 return tuple(lines)
 
-            class doc_ent:  # #class-as-namespace
-                def to_line_stream():
-                    return _to_line_stream()
-            return doc_ent
+            # Prepare small args and call
+            eidr = eidr.to_dictionary()
+            order = tuple(attr_vals.keys())
 
-        def BATCH_UPDATE(
-                EID_reservation, entities_units_of_work,
-                main_business_entity, is_dry, order, listener):
+            return self.BIG_PATCHFILE_FOR_BATCH_UPDATE(
+                    eidr, euow, lambda: doc_ent, order, listener)
 
-            bpf = self._build_big_patchfile(
-                EID_reservation, entities_units_of_work, order, listener)
-
-            if bpf is None:
-                return
-            if not bpf.APPLY_PATCHES(listener, is_dry=is_dry):
-                return
-            return main_business_entity
-
-        def _build_big_patchfile(eidr, entities_uows, order, listener):  # noqa: E501 #testpoint
+        def BIG_PATCHFILE_FOR_BATCH_UPDATE(  # #testpoint (incl. param names)
+                index_file_change, entities_units_of_work,
+                result_document_entityer, order, listener):
             from ._big_patchfile_via_entities_uows import build_big_patchfile__
             return build_big_patchfile__(
-                    eidr, entities_uows, order, self, listener)
+                index_file_change, entities_units_of_work,
+                result_document_entityer, self, order, listener)
 
         def RESERVE_NEW_ENTITY_IDENTIFIER(listener):
             from kiss_rdb.magnetics_.provision_ID_randomly_via_identifiers \
                 import RESERVE_NEW_ENTITY_IDENTIFIER_
             return RESERVE_NEW_ENTITY_IDENTIFIER_(
                     directory, rng, _THREE, listener)
+
+        def REMOVE_IDENTIFIER_FROM_INDEX(eid, listener):
+            from kiss_rdb.magnetics_.provision_ID_randomly_via_identifiers \
+                import REMOVE_IDENTIFIER_FROM_INDEX_
+            return REMOVE_IDENTIFIER_FROM_INDEX_(
+                    eid, directory, _THREE, listener)
 
         def retrieve_entity_as_storage_adapter_collection(iden, listener):
             mon = _monitor_via_listener(listener)
@@ -191,6 +199,8 @@ def eno_collection_via_(directory, rng=None):  # #testpoint
         def to_file_paths_():
             _ = _file_posix_paths_in_collection_directory(directory, _THREE)
             return (str(pp) for pp in _)
+
+        number_of_digits_ = 3  # _THREE
 
     class injection:
         def eno_document_via_(_, listener=None, **body_of_text):

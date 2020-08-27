@@ -28,6 +28,10 @@ def _API(sin, sout, serr, argv, enver):
         return es
     dct = _command_function_via_name
     if command_name not in dct:
+        if '-list' == command_name:
+            for key in dct.keys():
+                sout.write(f'{key}\n')
+            return 0
         serr.write(f'unknown command: "{command_name}"\n')
         return 3
 
@@ -57,6 +61,14 @@ def update_notecard(sin, sout, serr, argp, enver):
     ncs_path, es = argp.parse_one_argument('notecards path')
     if es:
         return es
+
+    is_dry = False
+    if _dry_run_flag == ncs_path:
+        is_dry = True
+        ncs_path, es = argp.parse_one_argument('notecards path')
+        if es:
+            return es
+
     ncid_s, es = argp.parse_one_argument('notecard identifier')
     if es:
         return es
@@ -98,7 +110,7 @@ def update_notecard(sin, sout, serr, argp, enver):
         if argp.is_empty():
             break
 
-    nc = ncs.update_notecard(ncid_s, tuple(cuds), mon.listener)
+    nc = ncs.update_notecard(ncid_s, tuple(cuds), mon.listener, is_dry=is_dry)
     if nc is None:
         return mon.exitstatus
 
@@ -118,7 +130,7 @@ def create_notecard(sin, sout, serr, argp, enver):
         if not (len(arg) and '-' == arg[0]):
             ncs_path = arg
             break
-        if '-dry-run' == arg:
+        if _dry_run_flag == arg:
             is_dry = True
             continue
         serr.write(f"not an option for 'create_notecard': '{arg}'\n")
@@ -138,7 +150,9 @@ def create_notecard(sin, sout, serr, argp, enver):
         value, es = argp.parse_one_argument('attribute value')
         if es:
             return es
-        value = _unescape(value)
+        value, es = _unescape(value, serr)
+        if es:
+            return es
         if attr in seen:
             serr.write(f"multiple attribute values for '{attr}', limit 1\n")
             return 5
@@ -148,6 +162,36 @@ def create_notecard(sin, sout, serr, argp, enver):
             break
 
     nc = ncs.create_notecard(dct, mon.listener, is_dry=is_dry)
+    if nc is None:
+        return mon.exitstatus
+
+    nc.heading = ''.join(('OHAI FROM PHO API BACKEND! ', nc.heading))  # #todo
+    return _write_entity_as_JSON(sout, nc, mon.listener)
+
+
+@command
+def delete_notecard(sin, sout, serr, argp, enver):
+    ncs_path, es = argp.parse_one_argument('notecards path')
+    if es:
+        return es
+
+    is_dry = False
+    if _dry_run_flag == ncs_path:
+        is_dry = True
+
+        ncs_path, es = argp.parse_one_argument('notecards path')
+        if es:
+            return es
+
+    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    if ncs is None:
+        return mon.exitstatus
+
+    ncid_s, es = argp.parse_one_argument('notecard identifier')
+    if es:
+        return es
+
+    nc = ncs.delete_notecard(ncid_s, mon.listener, is_dry=is_dry)
     if nc is None:
         return mon.exitstatus
 
@@ -391,6 +435,9 @@ def xx():
 
 class _MyException(RuntimeError):
     pass
+
+
+_dry_run_flag = '-dry-run'
 
 
 if '__main__' == __name__:

@@ -35,6 +35,7 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.23]                  | #trak | parsing unified diff files the old way and the new way
 |[#873.V]                   | #open | google sheets: learn & document this one thing
 |[#873.21]                  | #API  | #provision: use underscores (not dashes or spaces) in eno document field names
 |[#873.20]                  |       | places where we relied on toml types and lost them, also wish for type schema

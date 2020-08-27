@@ -321,8 +321,11 @@ def _AST_via_input_lines(lines, listener):  # #testpoint
     def debug_lines():
         yield f'{lineno}: {input_line[0:-1]}'
 
-    lib = _grammar_lib()
-    topmost_symbol, p = lib.WIP_TOPMOST_PARSER_VIA_GRAMMAR(_define_grammar)
+    from script_lib.magnetics.parser_via_grammar import \
+        WIP_PARSER_BUILDER_VIA_DEFINITION as parser_builder_via, THESE_LINES
+
+    parser_builder = parser_builder_via(_define_grammar)
+    p = parser_builder()
 
     lineno = 0
     itr = iter(lines)
@@ -346,8 +349,8 @@ def _AST_via_input_lines(lines, listener):  # #testpoint
             continue
 
         if 'stop' == direc_name:
-            _express_expecting_from_top(
-                    listener, input_line, lineno, topmost_symbol, p)
+            lines = THESE_LINES(input_line, lineno, p)
+            listener('error', 'expression', 'expecting', lambda: lines)
             return
 
         if 'done' == direc_name:
@@ -362,26 +365,6 @@ def _AST_via_input_lines(lines, listener):  # #testpoint
         xx()  # had more lines than we expected
 
     return ast
-
-
-def _express_expecting_from_top(listener, line, lineno, topmost_symbol, p):
-
-    phrase = p.phrase_for_expecting(topmost_symbol)
-    lines_via_words = _grammar_lib().lines_via_words
-
-    def lines():
-        for s in lines_via_words(words(), 60):
-            yield s
-        yield line
-
-    def words():
-        for w in phrase.to_words():
-            yield w
-        yield 'at'
-        yield 'line'
-        yield f"{lineno}:"
-
-    listener('error', 'expression', 'expecting', lines)
 
 
 def _define_grammar(g):
@@ -481,11 +464,6 @@ def _define_grammar(g):
     define('close_digraph_line', regex('^}$'))
 
     define('blank_line', regex('^$'))
-
-
-def _grammar_lib():
-    from script_lib.magnetics import parser_via_grammar
-    return parser_via_grammar
 
 
 def xx():

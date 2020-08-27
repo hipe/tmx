@@ -1,7 +1,7 @@
 # it's tempting to put this in the model for the fella but we do so much
 # with double-linked lists and other stuff that we do it here
 
-_EDIT_STUFF = {
+_FORMALS = {  # [#822.M]
     'parent': {'editable': True, 'LL': True},
     'previous': {'editable': True, 'LL': True},
     'identifier': {'reason': 'identifiers are appointed to you'},
@@ -15,59 +15,58 @@ _EDIT_STUFF = {
 }
 
 
-def prepare_edit_(eid_tup, cud_tups, ncs, listener):
-    if (tup := _CUDs_via_CUD_tups(cud_tups, listener)) is None:
-        return
-    if (uows := _derive_units_of_work(*tup, eid_tup, ncs, listener)) is None:
-        return
-    if uows is None:
-        return
+def prepare_edit_(eid_tup, mixed, busi_coll, listener):
+    ifc, do_revalidate = (None, False)  # ifc = index file change
+    additionally = None
 
-    eid = uows.entity_identifier_string
-    ent = uows.retrieve(eid)  # ..
-    if not _revalidate(ent, listener):
-        return
+    ent_cud_type, *rest = eid_tup
 
-    class prepared_edit:  # #class-as-namespace
-        units_of_work = uows.release_prepared_edits()
-        EID_reservation = uows.EID_reservation
-        main_business_entity = ent
+    # If update or delete, retrieve the entity being updated or deleted
+    if ent_cud_type in ('update_entity', 'delete_entity'):
+        eid, = rest
+        bent = busi_coll.retrieve_notecard(eid, listener)
+        if bent is None:
+            return
+        attr_cud_tups = mixed
+        del(mixed)
 
-    return prepared_edit
+    # If update, things are mostly straightforward
+    if 'update_entity' == ent_cud_type:
+        do_revalidate = True
 
+    # If create, do a bunch of special work
+    elif 'create_entity' == ent_cud_type:
+        assert(not len(rest))
+        these = _prepare_for_create(mixed, busi_coll, listener)
+        if these is None:
+            return
+        ifc, bent, attr_cud_tups = these
+        do_revalidate = True
 
-def _revalidate(ent, listener):
-    from .document_fragment_via_definition import \
-            validate_and_normalize_core_attributes_
-    ca = ent.to_core_attributes()
-    dct = validate_and_normalize_core_attributes_(
-            ent.identifier_string, ca, listener)
-    return dct is not None
-
-
-def _derive_units_of_work(LLs, non_LLs, eid_tup, ncs, listener):
-
-    stack = list(reversed(eid_tup))
-    ent_type = stack.pop()
-    if 'existing_entity' == ent_type:
-        assert(1 == len(stack))
-        use_eid_tup = eid_tup
+    # If delete, update any pointbacks in other entities accordingly
     else:
-        assert('please_create_entity' == ent_type)
-        assert(not len(stack))
-        eidr = ncs.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
-            .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
-        if eidr is None:
-            return  # full
+        assert('delete_entity' == ent_cud_type)
 
-        def starter_attributes():
-            yield 'heading', '«your heading here»'
-            yield 'body', '«your body here»'
+        # Deleting the entity itself is straightforward (just skip the section)
+        # but update the remotes by adding explicit edit_attribute entries
+        # (so it's handled the same as an update entity)
 
-        use_eid_tup = ('entity_to_create', eidr, starter_attributes)
+        assert(not len(attr_cud_tups))
+        these = _prepare_for_delete(bent, busi_coll, listener)
+        if these is None:
+            return
+        ifc, attr_cud_tups = these
+
+        def additionally(uows):
+            # in case there were no foreign keys that got deleted above, touch
+            uows.will_delete_entity(eid)  # 'delete_entity'
+
+    if (two := _partition_attribute_CUD_tups(attr_cud_tups, listener)) is None:
+        return
+    LLs, non_LLs = two
 
     from .units_of_work import UnitsOfWorkForEntity
-    uows = UnitsOfWorkForEntity(use_eid_tup, ncs, listener)
+    uows = UnitsOfWorkForEntity(ent_cud_type, bent, busi_coll, listener)
 
     try:
         for cud in LLs.values():
@@ -79,7 +78,98 @@ def _derive_units_of_work(LLs, non_LLs, eid_tup, ncs, listener):
     except _Stop:
         return
 
-    return uows
+    if additionally:
+        additionally(uows)
+
+    if do_revalidate and not _revalidate(bent, listener):
+        return
+
+    class prepared_edit:  # #class-as-namespace
+        index_file_change = ifc
+        units_of_work = uows.release_prepared_edits()
+        main_business_entity = bent
+
+    return prepared_edit
+
+
+def _prepare_for_create(mixed, busi_coll, listener):
+
+    # Reserve a new entity identifier for the entity to create
+    eidr = busi_coll.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
+        .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+    if eidr is None:
+        return  # full
+    eid = eidr.identifier_string
+
+    # We can't construct a business entity without the minimum core
+    # attributes, which we use hardcoded default values for here for now.
+
+    # For those default values that don't get overwritten by request
+    # values, make sure these too get written to storage.
+
+    # We accomplish this by merging the request values over the default
+    # values here, which can have the effect of default values redundantly
+    # getting written to the business object, which is fine.
+
+    def starter_attributes():
+        yield 'heading', '«your heading here»'
+        yield 'body', '«your body here»'
+
+    req_values = {k: v for k, v in mixed.items()}
+    del(mixed)
+    min_core_attrs = {}
+    for k, v in starter_attributes():
+        if k not in req_values:
+            req_values[k] = v
+        min_core_attrs[k] = v
+
+    # Build a business object for the entity we are creating
+    bent = busi_coll.entity_via_definition_(eid, min_core_attrs, listener)
+
+    # THE WORST make it not set again because of the check #here5
+    for k in min_core_attrs.keys():
+        setattr(bent, k, None)
+
+    # Flatten the request values
+    attr_cud_tups = tuple(('create_attribute', k, v) for k, v in req_values.items())  # noqa: E501
+
+    return eidr, bent, attr_cud_tups
+
+
+def _prepare_for_delete(bent, busi_coll, listener):
+
+    # Make the patch to remove the identifier from the index
+    ifc = busi_coll.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
+        .REMOVE_IDENTIFIER_FROM_INDEX(bent.identifier_string, listener)
+    if ifc is None:
+        return  # full
+
+    def yes(k, attr):
+        # Disregard this field if the formal argument is not a foreign key
+        if not attr.get('LL'):
+            return
+        # Disregard this field if its value is not set
+        if attribute_values.get(k) is None:
+            return
+        return True
+
+    attribute_values = bent.to_core_attributes()
+
+    def do(k):
+        return ('delete_attribute', k)
+
+    attr_cud_tups = tuple(do(k) for k, fa in _FORMALS.items() if yes(k, fa))
+
+    return ifc, attr_cud_tups
+
+
+def _revalidate(ent, listener):
+    from .document_fragment_via_definition import \
+            validate_and_normalize_core_attributes_
+    ca = ent.to_core_attributes()
+    dct = validate_and_normalize_core_attributes_(
+            ent.identifier_string, ca, listener)
+    return dct is not None
 
 
 def _add_units_of_work_for_linked_list_edit(uows, cud):
@@ -96,11 +186,11 @@ def _add_units_of_work(uows, use_attr, cud):
     f(uows, uows.entity_identifier_string, cud)  # #here4
 
 
-def _CUDs_via_CUD_tups(cud_tups, listener):
+def _partition_attribute_CUD_tups(attr_cud_tups, listener):
     LLs = {}
     non_LLs = {}
     cp = _CUD_parser()
-    for cud_tup in cud_tups:
+    for cud_tup in attr_cud_tups:
         cud = cp.parse_CUD(cud_tup)
         if cud is None:
             continue  # big flex
@@ -196,16 +286,16 @@ class _UoW_Writer:
     def will_create(o):
         o._will_set('create_attribute')
 
-    def _will_set(o, cud_type):
+    def _will_set(o, attr_cud_type):
         dattr, attr = o.dattr_attr()
         rv = o.requested_value
-        o.will_set_in(o.entity, cud_type, dattr, attr, rv)
+        o.will_set_in(o.entity, attr_cud_type, dattr, attr, rv)
 
     def will_delete(o):
         o.will_delete_in(o.entity, *o.dattr_attr())
 
-    def will_set_in(o, entity, cud_type, dattr, attr, value):
-        o._uows.will_set_in(entity, cud_type, dattr, attr, value)
+    def will_set_in(o, entity, attr_cud_type, dattr, attr, value):
+        o._uows.will_set_in(entity, attr_cud_type, dattr, attr, value)
 
     def will_delete_in(o, entity, dattr, attr):
         o._uows.will_delete_in(entity, dattr, attr)
@@ -678,7 +768,11 @@ class update_primitive(_UoW_Writer):
         o.will_update()
 
 
-# create_primitive: is there really no real life use case?
+@uow_writer
+class create_primitive(_UoW_Writer):
+    def main(o):
+        o.ensure_not_set()  # #here5
+        o.will_create()
 
 
 @uow_writer
@@ -690,7 +784,7 @@ class delete_primitive(_UoW_Writer):
 
 def _CUD_parser():
     from .units_of_work import CUD_parser_via_formal_entity
-    return CUD_parser_via_formal_entity(_EDIT_STUFF)
+    return CUD_parser_via_formal_entity(_FORMALS)
 
 
 def repr_(value):

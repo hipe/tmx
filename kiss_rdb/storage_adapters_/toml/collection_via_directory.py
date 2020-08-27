@@ -325,7 +325,7 @@ def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
 
     def rewrite_index_file(orig_lines, my_listener):
         from kiss_rdb.magnetics_ import index_via_identifiers as _
-        return _.new_lines_via_delete_identifier_from_index__(
+        return _.new_lines_via_delete_identifier_from_index_(
                 orig_lines, identifier, my_listener)
 
     with fs.FILE_REWRITE_TRANSACTION(listener) as trans:

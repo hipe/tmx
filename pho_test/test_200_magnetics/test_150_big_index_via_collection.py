@@ -1,5 +1,5 @@
 from pho_test.common_initial_state import (
-        fixture_directory,
+        collection_one,
         throwing_listenerer)
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
@@ -16,7 +16,7 @@ _CommonCase = unittest.TestCase
 class Case153_basics(_CommonCase):
 
     def test_100_collection_builds(self):
-        self.assertIsNotNone(_collection_one())
+        self.assertIsNotNone(collection_one())
 
     def test_200_big_index_builds(self):
         self.assertIsNotNone(_big_index_one())
@@ -203,15 +203,8 @@ class _CustomIndex:
 def _big_index_one():
     listener = throwing_listenerer()
     from pho.magnetics_ import big_index_via_collection as lib
-    _coll = _collection_one()
+    _coll = collection_one()
     return lib.big_index_via_collection(_coll, listener)
-
-
-@lazy
-def _collection_one():
-    _dir = fixture_directory('collection-00500-intro')
-    from kiss_rdb import collectionerer
-    return collectionerer().collection_via_path(_dir)
 
 
 if __name__ == '__main__':

@@ -45,6 +45,7 @@ the related API that preceded this one.)
 |[#607.C]                   | #hole |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
+|[#606]                     |       | [the unified diff parser]
 |[#605]                     |       | [ expect STD's ]
 |[#604.2]                   | #open | known limitation of our arg parsing
 |[#603]                     |       | [the help screen parser] |

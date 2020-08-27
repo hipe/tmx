@@ -266,15 +266,15 @@ def _parse_parse(tox, keep_going):
     return states, sequence_grammar, sub_expressions
 
 
-def WIP_TOPMOST_PARSER_VIA_GRAMMAR(define_grammar):
+def WIP_PARSER_BUILDER_VIA_DEFINITION(define_grammar):
     # this returns a "parser" that requires the client to know about our
     # internal parser workings (directives). It should probably not stay
     # exposed like this but for reasons, during development it is.
 
-    return _BuildTopmostParser(define_grammar).execute()
+    return _BuildTopmostParserBuilder(define_grammar).execute()
 
 
-class _BuildTopmostParser:
+class _BuildTopmostParserBuilder:
 
     def __init__(self, defintion):
         self._forward_reference_names = set()
@@ -319,7 +319,11 @@ class _BuildTopmostParser:
             parser_builders[k] = symbol_defs[k].build_parser_builder(parser_builders)  # noqa: E501
 
         topmost_symbol = symbol_names[0]
-        return topmost_symbol, parser_builders[topmost_symbol](topmost_symbol)
+
+        def build_parser():
+            return parser_builders[topmost_symbol](topmost_symbol)
+
+        return build_parser
 
 
 def _build_sequence_parser_builder(components, pbs):
@@ -339,7 +343,7 @@ def _build_sequence_parser_builder(components, pbs):
     class SequenceParser:
 
         def __init__(self, name):
-            self._NAME = name
+            self.symbol_name = name
             self._parsers = [None for _ in full_range]
             self._did_thing = [False for _ in full_range]
             self._ = [0, 0]
@@ -372,16 +376,80 @@ def _build_sequence_parser_builder(components, pbs):
 
             return self._when_found(direc, parser, comp, offset)
 
-        def _when_not_found(self):
+        def receive_EOF(self):  # EXPERIMENTAL very very rough right now
             if has_required:
                 if offset_of_last_required < self._[0]:
-                    # if you didn't find a match for this token but you have
-                    # passed your last required component,
-                    return 'done_but_rewind', self._releast_AST_er()  # #here1
+                    xx()
                 else:
-                    return  # #here2
+                    pass
             else:
                 xx()
+
+            beg, end = self._
+            swath_size = end - beg
+            if 1 != swath_size:
+                xx()
+            pp = self._parsers[beg]
+
+            if pp._do_recurse_EOF:
+
+                AST_er = pp.receive_EOF()
+                assert(AST_er)
+                cc = components[i]
+
+                direc = self._when_child_done(AST_er, pp, cc, beg)
+                assert('stay' == direc[0])  # or wwhatever
+
+            return self._release_AST_er()
+
+        def _when_not_found(self):
+            # If you didn't find a match for this token but you have passed
+            # your last required component, then you can produce a complete
+            # AST but you have to tell your parent to rewind one and try again
+
+            def ok():
+                return 'done_but_rewind', self._release_AST_er()  # #here1
+
+            beg, end = self._
+            if offset_of_last_required < beg:
+                # The offset of the last required is before the swath
+                return ok()
+
+            if end <= offset_of_last_required:
+                # The offset of the last required is after the swath
+                return  # #here2
+
+            # The offset of the last required is in the swath
+
+            if 1 != (end - beg):
+                # for starters, let's just focus on one component
+                xx()
+
+            assert(offset_of_last_required == beg)
+
+            # The swath is pointing directly at the last required component.
+            # It may be that the component is plural and we have met its
+            # requirement already by immediatly previous token(s).
+            # HOW WE TEST FOR THIS IS VERY BAD RIGHT NOW
+
+            comp = components[beg]
+            if not comp.do_keep:
+                # we didn't do thing (todo, clarify this lol)
+                if not self._did_thing[beg]:
+                    return  # #here2 (covered)
+                xx('cover me - what does it mean to have done the thing')
+
+            k = comp.symbol_name
+            if k not in self._AST:
+                # The comp can match multiple (and is required) but no matches
+                return  # #here2
+
+            # The component can match multiple and has matched at least once
+            if comp.has_custom_min_max:
+                xx()  # more complicated, but not by much
+
+            assert(len(self._AST[k]))
+            return ok()  # whew!
 
         def _when_found(self, direc, parser, comp, offset):
             direc_name, direc_data = direc
@@ -464,7 +532,7 @@ def _build_sequence_parser_builder(components, pbs):
 
                 # if the component was the last in the world
                 if length == next_offset:
-                    return 'done', self._releast_AST_er()
+                    return 'done', self._release_AST_er()
 
                 assert(comp.must_match)
 
@@ -485,7 +553,7 @@ def _build_sequence_parser_builder(components, pbs):
                 assert(k not in self._AST)  # else an 'as' option
                 self._AST[k] = child_AST
 
-        def _releast_AST_er(self):
+        def _release_AST_er(self):
             del self._
 
             def AST_er():
@@ -495,7 +563,7 @@ def _build_sequence_parser_builder(components, pbs):
             return AST_er
 
         def cleared_parser(self):
-            return self.__class__(self._NAME)
+            return self.__class__(self.symbol_name)
 
         def phrase_for_expecting(self, symbol_name):
             return _PhraseViaPhrases(*self._phrases_for_expecting(symbol_name))
@@ -533,6 +601,8 @@ def _build_sequence_parser_builder(components, pbs):
                 if c.must_match:
                     break
 
+        _do_recurse_EOF = True
+
     return SequenceParser
 
 
@@ -540,7 +610,7 @@ class _SequenceNonterminal:
 
     def __init__(self, component_tuples, g):
         def o(tup):
-            c = _SequenceComponent(*tup)
+            c = _SequenceComponent(tup)
             g.see_symbol_name(c.symbol_name)
             return c
         self._components = tuple(o(tup) for tup in component_tuples)
@@ -551,14 +621,11 @@ class _SequenceNonterminal:
 
 class _SequenceComponent:
 
-    def __init__(self, arity, symbol_name, *rest):
-        self.do_keep = False
-        if len(rest):
-            # one day an 'as' feller
-            keep, = rest
-            assert('keep' == keep)
-            self.do_keep = True
+    def __init__(self, tup):
+        stack = list(reversed(tup))
+        arity = stack.pop()
 
+        self.has_custom_min_max = False
         if 'zero_or_one' == arity:
             can_be_zero = True
             can_be_many = False
@@ -568,10 +635,32 @@ class _SequenceComponent:
         elif 'one' == arity:
             can_be_zero = False
             can_be_many = False
-        else:
-            assert('one_or_more' == arity)
+        elif 'one_or_more' == arity:
             can_be_zero = False
             can_be_many = True
+        else:
+            assert('between' == arity)
+            assert(isinstance(min := stack.pop(), int))
+            assert('and' == stack.pop())
+            assert(isinstance(max := stack.pop(), int))
+            assert(-1 < min)
+            assert(-1 < max)
+            assert(min < max)
+            can_be_zero = 0 == min
+            can_be_many = True
+            self.has_custom_min_max = True
+            self.min = min
+            self.max = max
+
+        symbol_name = stack.pop()
+
+        self.do_keep = False
+        if len(stack):
+            token = stack.pop()
+            # one day an 'as' feller
+            assert('keep' == token)
+            self.do_keep = True
+            assert(not len(stack))
 
         self.must_match = not can_be_zero
         self.can_be_many = can_be_many
@@ -593,7 +682,7 @@ def _build_alternation_parser_builder(symbol_names, parser_builders):
     class AlternationParser:
 
         def __init__(self, name):
-            self._NAME = name
+            self.symbol_name = name
             self._is_collapsed = False
 
         def parse_line(self, line):
@@ -658,7 +747,7 @@ def _build_alternation_parser_builder(symbol_names, parser_builders):
             yield _PhraseViaWords(')')
 
         def cleared_parser(self):
-            return self.__class__(self._NAME)
+            return self.__class__(self.symbol_name)
 
     def each_phrase():
         for symbol_name in symbol_names:
@@ -699,6 +788,8 @@ def _build_regex_parser(rx):
 
         def phrase_for_expecting(self, symbol_name):
             return _PhraseViaWords(f"'{symbol_name}'", f"(/{rx.pattern}/)")
+
+        _do_recurse_EOF = False
 
     return RegexParser()
 
@@ -781,6 +872,25 @@ class TokenScanner:  # #[#008.4] a scanner
 
 # -- whiners
 
+def THESE_LINES(line, lineno, p):
+
+    phrase = p.phrase_for_expecting(p.symbol_name)
+
+    def lines():
+        for s in lines_via_words(words(), 60):
+            yield s
+        yield line
+
+    def words():
+        for w in phrase.to_words():
+            yield w
+        yield 'at'
+        yield 'line'
+        yield f"{lineno}:"
+
+    return lines()
+
+
 def _when_missing_required(listener, offset_in_grammar):
     def structer():
         return {'offset_in_grammar': offset_in_grammar}
@@ -804,9 +914,14 @@ def _when_extra_input(listener, token_scanner):
     listener('error', 'structure', 'parse_error', 'extra_input', structer)
 
 
-def _when_unrecognized_input(listener, token_scanner, transitions):
+def _when_unrecognized_input(listener, tox, transitions):
     def stcter():
-        raise Exception('cover me')  # [#676] cover me
+        # you can hit this if you leave an empty string as a placeholder
+        # in your parameter description spot. [#676] cover me
+        _ = ''
+        if tox.pos:
+            _ = f' (after {repr(tox.tokens[tox.pos - 1])})'
+        return {'reason': f"don't know how to parse {repr(tox.peek)}{_}"}
     listener('error', 'structure', 'parse_error', 'unrecognized_input', stcter)
 
 

@@ -137,10 +137,20 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  
             continue
 
         if 'delete_entity' == cud_type:
-            # In a simple world, to delete an entity would simply means to
-            # skip over it during pass-thru. But "slot A" makes it complicated
+            # To implement delete, all we need to do is skip the output of
+            # the entity-section (and don't forget the index file)
 
-            assert(not len(cud_stack))
+            # (This was more complicated when we had a dangling slot-A)
+
+            # This is annoying: currently, we might have explicit deletes of
+            # specific fields (while also deleting the whole entity) because
+            # we needed to trigger updates in the pointbacks
+
+            if len(cud_stack):
+                attr_cud_via_dattr, = cud_stack
+                for k, tup in attr_cud_via_dattr.items():
+                    attr_cud_type, = tup
+                    assert('delete_attribute' == attr_cud_type)
             _check_delete_entity_OK(entb, stop)
             continue
 
@@ -240,7 +250,7 @@ def _edited_attribute_blocks(entb, edit_via_dattr, order, stop):
 
         # Emit every attribute to be inserted while it goes before current
         while len(creates) and order_offset_via_dattr[creates[-1][0]] < where:
-            yield _new_attribute_block(* creates.pop())  # repeats #here4
+            yield _new_attribute_block(* creates.pop())  # #here4
 
         # Is there an edit for this attribute?
         edit = updates_and_deletes.pop(dattr, None)
@@ -267,7 +277,7 @@ def _edited_attribute_blocks(entb, edit_via_dattr, order, stop):
 
     # Any inserts that didn't get triggered by above
     while len(creates):
-        yield _new_attribute_block(* creates.pop())  # repeats #here4
+        yield _new_attribute_block(* creates.pop())  # #here4
 
 
 def _prepare_edit(edit_via_dattr, order_offset_via_dattr):  # asserts for now
@@ -292,10 +302,7 @@ def _prepare_edit(edit_via_dattr, order_offset_via_dattr):  # asserts for now
 
 
 def file_units_of_work_via__(entities_units_of_work, coll, emi):
-
-    for uow in entities_units_of_work:
-        # catch these early for now, while experimental #todo
-        assert(uow[0] in ('update_entity', 'create_entity'))
+    # (we assert the beginning term of each uow below)
 
     file_units_of_work = []
     file_UoW_offset_via_path = {}
@@ -303,10 +310,12 @@ def file_units_of_work_via__(entities_units_of_work, coll, emi):
     stop = emi.stop
     listener = emi.listener
 
-    def collision_check(dct):
-        if dattr in dct:
-            curr = dct[dattr][0]  # #here3: hard-coded doo-hahs
-            stop(_multiple_operations_on_one_attr, cud_type, dattr, curr, eid)
+    def safe_add(mixed):
+        if dattr not in dct:
+            dct[dattr] = mixed
+            return
+        curr = dct[dattr][0]  # #here3: hard-coded doo-hahs
+        stop(_multiple_operations_on_one_attr, entity_cud_type, dattr, curr, eid)  # noqa: E501
 
     def dictionary_via_eid(dct):
         pair = dct.get(eid)
@@ -328,21 +337,35 @@ def file_units_of_work_via__(entities_units_of_work, coll, emi):
 
         return file_units_of_work[i][1].dictionary
 
-    for entity_cud_type, eid, cud_type, dattr, *rest in entities_units_of_work:
-        assert(entity_cud_type in ('update_entity', 'create_entity'))
+    for entity_cud_type, eid, *rest in entities_units_of_work:
+
         _assert(iden := coll.identifier_via_string_(eid, listener))
         _assert(path := coll.path_via_identifier_(iden, listener))
         dct = dictionary_via_path()
-        dct = dictionary_via_eid(dct)
-        collision_check(dct)
+        dct = dictionary_via_eid(dct)  # #here7
+
         if 'update_entity' == entity_cud_type:
-            dct[dattr] = (cud_type, *rest)
+            attr_cud_type, *rest = rest
+            if attr_cud_type in ('update_attribute', 'create_attribute'):
+                dattr, value = rest
+                safe_add((attr_cud_type, value))  # #here4
+            else:
+                assert('delete_attribute' == attr_cud_type)
+                dattr, = rest
+                safe_add((attr_cud_type,))  # #here4
+
         elif 'create_entity' == entity_cud_type:
-            assert('create_attribute' == cud_type)
-            value, = rest
-            dct[dattr] = value  # #here6
+            attr_cud_type, dattr, value = rest
+            assert('create_attribute' == attr_cud_type)
+            safe_add(value)  # #here6
         else:
-            xx()
+            assert('delete_entity' == entity_cud_type)
+            if len(rest):
+                attr_cud_type, dattr = rest
+                assert('delete_attribute' == attr_cud_type)
+                dct[dattr] = ('delete_attribute',)
+            else:
+                pass  # at #here7 we made {'ABC': ('delete_entity', {})}
 
     return tuple(file_units_of_work)
 

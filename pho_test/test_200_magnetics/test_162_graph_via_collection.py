@@ -1,4 +1,4 @@
-from pho_test.common_initial_state import fixture_directory
+from pho_test.common_initial_state import collection_one
 from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject)
 import unittest
@@ -31,17 +31,15 @@ class Case162_MONO_CASE(_CommonCase):
 
     @shared_subject
     def custom_end_state(self):
-        directory = fixture_directory('collection-00500-intro')
-
         from pho.magnetics_.graph_via_collection import \
             output_lines_via_big_index_
 
-        from pho import big_index_via_collection_, collection_via_path_
+        from pho import big_index_via_collection_
+
+        busi_coll = collection_one()
 
         def run(listener):
-            coll = collection_via_path_(directory, listener)
-            assert(coll)
-            bi = big_index_via_collection_(coll, listener)
+            bi = big_index_via_collection_(busi_coll, listener)
             assert(bi)
             _itr = output_lines_via_big_index_(bi, listener)
             return tuple(_itr)  # you have to do it in here to reach the emits

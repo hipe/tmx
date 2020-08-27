@@ -33,11 +33,12 @@ class CommonCase(TestCase):
         return end_state
 
     def build_end_state(self):
+        from pho_test.common_initial_state import listener_and_emissions
         listener, emissions = listener_and_emissions()
         ncs = notecards_via_collection(self.collection())
 
         def perform(eid, cud_tups):
-            entity_identifier_tup = ('existing_entity', eid)
+            entity_identifier_tup = ('update_entity', eid)
             return ncs._prepare_edit(entity_identifier_tup, cud_tups, listener)
 
         edits = self.perform(perform)
@@ -442,25 +443,6 @@ class in_memory_collection_via_entity_dictionaries:
         listener('error', 'structure', 'entity_not_found', structer)
 
 # == TO here
-
-
-def listener_and_emissions():
-    def listener(sev, shape, cat, payloader):
-        chan = (sev, shape, cat)
-        if 'expression' == shape:
-            lines = tuple(payloader())
-        else:
-            assert('structure' == shape)
-            lines = (payloader()['reason'],)
-        emissions.append(Emission(chan, lines))
-    emissions = []
-    return listener, emissions
-
-
-class Emission:
-    def __init__(self, cha, li):
-        self.channel = cha
-        self.lines = li
 
 
 def paragraphs_via_lines(lines):

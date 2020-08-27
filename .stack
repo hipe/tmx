@@ -13,6 +13,6 @@ flush pending renames
 there are todo's
 be able to add a new pho fragment to the (eno) collection
 remove this line and maybe explode remaining parts of roadmap [#881.2]
-kiss for delete eno entity (and undo pho mock)
 pho mocked for create fragment
 pho mocked for delete fragment
+cover pho backend create entity

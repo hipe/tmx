@@ -34,8 +34,8 @@ class _CommonCase(unittest.TestCase):
 
         depth, identifiers = self._depth_and_identifiers()
 
-        _actual_itr = _subject_module().lines_of_index_via_identifiers(
-                identifiers, depth)
+        _actual_itr = _subject_module()._lines_of_index_via_identifiers(
+                identifiers, depth, listener=None)
 
         if False:  # debugging
             from sys import stdout

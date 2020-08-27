@@ -201,7 +201,6 @@ def three_via_depth_(depth):
 
 
 def identifier_via_string_(id_s, listener):
-
     digits = []
 
     s_a = tuple(id_s)

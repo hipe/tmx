@@ -73,12 +73,8 @@ provision a new identifier.)
 def RESERVE_NEW_ENTITY_IDENTIFIER_(directory, rng, depth, listener):
     # experimental higher-level
 
-    from .identifiers_via_index import \
-        identifiers_via_lines_of_index, ENTITY_INDEX_FILENAME_
-    from os.path import join as _os_path_join
-
-    index_path = _os_path_join(directory, ENTITY_INDEX_FILENAME_)
-
+    index_path = _index_path_for_directory(directory)
+    from .identifiers_via_index import identifiers_via_lines_of_index
     with open(index_path) as lines:
         lines_tup = tuple(lines)
         identifers = identifiers_via_lines_of_index(lines_tup)
@@ -90,32 +86,68 @@ def RESERVE_NEW_ENTITY_IDENTIFIER_(directory, rng, depth, listener):
 
     iden, all_existing_idens = pair
 
-    def eidr_to_dictionary():
-        return {
-            # 'identifier_string': eidr.identifier_string,
-            'to_index_file_new_lines': eidr_to_index_file_new_lines,
-            'index_file_existing_lines': lines_tup,
-            'index_file_path': index_path}
-
     def eidr_to_index_file_new_lines():
         from .index_via_identifiers import \
             new_lines_via_add_identifier_into_index_
         return new_lines_via_add_identifier_into_index_(
             iden, all_existing_idens)
 
+    return _index_file_patch(
+            eidr_to_index_file_new_lines, lines_tup, index_path, iden)
+
+
+def REMOVE_IDENTIFIER_FROM_INDEX_(eid, directory, depth, listener):
+    # (covered by pho for now)
+
+    from .identifier_via_string import identifier_via_string_
+    iden = identifier_via_string_(eid, listener)
+
+    # Read all lines of the index file into memory
+    index_path = _index_path_for_directory(directory)
+    with open(index_path) as lines:
+        orig_lines = tuple(lines)
+
+    from .index_via_identifiers import \
+        new_lines_via_delete_identifier_from_index_
+
+    itr = new_lines_via_delete_identifier_from_index_(
+            orig_lines, iden, listener)
+    if itr is None:
+        return
+
+    return _index_file_patch(
+            lambda: itr, orig_lines, index_path, iden)
+
+
+def _index_file_patch(
+        to_index_file_new_lines, existing_lines, index_file_path, iden):
+
+    def to_dictionary():
+        return {
+            # 'identifier_string': iden.to_string(),
+            'to_index_file_new_lines': to_index_file_new_lines,
+            'index_file_existing_lines': existing_lines,
+            'index_file_path': index_file_path}
+
     class identifier_reservation:  # #class-as-namespace
 
         def to_dictionary(_):
-            return eidr_to_dictionary()
+            return to_dictionary()
 
         @property
         def identifier_string(_):
             return iden.to_string()
 
-        # index_file_existing_lines = lines_tup
-        # index_file_path = index_path
+        # index_file_existing_lines = existing_lines
+        # index_file_path = index_file_path
 
     return identifier_reservation()
+
+
+def _index_path_for_directory(directory):
+    from .identifiers_via_index import ENTITY_INDEX_FILENAME_
+    from os.path import join as _os_path_join
+    return _os_path_join(directory, ENTITY_INDEX_FILENAME_)
 
 
 def provision_new_identifier_(

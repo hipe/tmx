@@ -1,19 +1,18 @@
 _PATCH_EXE_NAME = 'patch'
 
 
-def build_big_patchfile__(eidr, entities_uows, order, coll, listener):
+def build_big_patchfile__(ifc, ent_uows, reser, coll, order, listener):
     from .blocks_via_path_ import emitter_via_monitor__
     emi = emitter_via_monitor__(coll.monitor_via_listener_(listener))
     catch_this = emi.stopper_exception_class
     try:
-        return _build_big_patchfile(eidr, entities_uows, coll, order, emi)
+        return _build_big_patchfile(ifc, ent_uows, reser, coll, order, emi)
     except catch_this:
         pass
 
 
-def _build_big_patchfile(eidr, entities_uows, coll, order, emi):
+def _build_big_patchfile(ifc, entities_uows, reser, coll, order, emi):
     from .blocks_via_path_ import file_units_of_work_via__
-
     file_uows = file_units_of_work_via__(entities_uows, coll, emi)
 
     # ==
@@ -34,12 +33,12 @@ def _build_big_patchfile(eidr, entities_uows, coll, order, emi):
     relativize_path.memo = None
     # ==
 
-    if eidr and isabs(path := eidr['index_file_path']):
-        use = {k: v for k, v in eidr.items()}
+    if ifc and isabs(path := ifc['index_file_path']):
+        use = {k: v for k, v in ifc.items()}
         use['index_file_path'] = relativize_path(path)
-        eidr = use
+        ifc = use
 
-    this_patch = _patch_file_for_index_file(**eidr) if eidr else None
+    ifc_patch = _patch_file_for_index_file(**ifc) if ifc else None
 
     def patch_via(path, file_uow):
         if isabs(path):
@@ -50,13 +49,13 @@ def _build_big_patchfile(eidr, entities_uows, coll, order, emi):
     if not emi.OK:
         return
 
-    if this_patch is not None:
-        tup = (this_patch, *tup)
+    if ifc_patch is not None:
+        tup = (ifc_patch, *tup)
 
     class big_patchfile:  # #class-as-namespace
 
         def APPLY_PATCHES(listener, is_dry=False):
-            return _APPLY_PATCHES(tup, listener, is_dry=is_dry)
+            return _APPLY_PATCHES(tup, reser, listener, is_dry=is_dry)
 
         patches = tup
 
@@ -122,19 +121,19 @@ def _patch_unit_of_work(before_lines, after_lines, path_tail, do_create):
     return patch_unit_of_work
 
 
-def _APPLY_PATCHES(patches, listener, is_dry):
+def _APPLY_PATCHES(patches, reser, listener, is_dry):
     def lineser():
         for patch in patches:
             for line in patch.diff_lines:
                 yield line
-    return _apply_big_patchfile_via_lines(lineser(), listener, is_dry)
+    return _apply_big_patchfile_via_lines(lineser(), reser, listener, is_dry)
 
 
 def APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_(
         raw_lines, var_vals, dirname, listener, is_dry):  # noqa: E501
     full_direcs = []
     lines = _lines_and_full_direcs_via_template(full_direcs.append, raw_lines, var_vals)  # noqa: E501
-    ok = _apply_big_patchfile_via_lines(lines, listener, is_dry, dirname)
+    ok = _apply_big_patchfile_via_lines(lines, lambda: True, listener, is_dry, dirname)  # noqa: E501
     if not ok:
         return
     for direc_name, direc_value in full_direcs:
@@ -198,7 +197,7 @@ def _line_detemplatizer_via(var_values):
     return detemplatize_line
 
 
-def _apply_big_patchfile_via_lines(lines, listener, is_dry, cwd=None):
+def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
     # (used for here and used by neighbor for creating collections!)
     from tempfile import NamedTemporaryFile
     with NamedTemporaryFile('w+') as fp:
@@ -214,7 +213,8 @@ def _apply_big_patchfile_via_lines(lines, listener, is_dry, cwd=None):
                     dst_fp.write(line)
             msg = f"(wrote this copy of patchfile for debugging: {dst})"
             listener('info', 'expression', 'wrote', lambda: (msg,))
-    return ok
+    if ok:
+        return reser()
 
 
 def _apply_big_patchfile(patchfile_path, listener, is_dry, cwd):

@@ -51,12 +51,13 @@ class CommonCase(unittest.TestCase):
         o('create_entity', 'VLF', 'create_attribute', 'parent', '2HJ')
 
         o = {}
-        o['eidr'] = eidr
-        o['entities_uows'] = tuple(ents_uows)
+        o['index_file_change'] = eidr
+        o['entities_units_of_work'] = tuple(ents_uows)
+        o['result_document_entityer'] = lambda: True
         o['order'] = ('parent', 'heading', 'body', 'children')
         o['listener'] = listener
 
-        bpf = coll._build_big_patchfile(**o)
+        bpf = coll.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
         return bpf, tuple(emissions)
 
     do_debug = True
@@ -97,6 +98,12 @@ def against(offset):
 
 
 class Case4850_SOMETHING(CommonCase):
+    # The way we test patch files below is an immediate predecessor to the
+    # [#606] unified diff parser, which may be better suited to the task,
+    # and at any rate is a purpose-built module that would free up this test
+    # file from the implementation for this. However, for the time being we
+    # are leaving :[#873.23] this old way intact, in part out of laziness and
+    # in part because the below is so fun to read.
 
     @against(1)
     def test_100_patch_to_create_file_looks_right(self):

@@ -38,13 +38,13 @@ rankdir=BT; /* the finish is at the top */
 25900->26000
 26000[label="near full canon\ncompliance (do\nthis later actually)"]
 26000->30000
-30000[label="a bunch of pho\nadapting to kiss\n(thin CLI-ish at first)"]
+30000[label="a bunch of pho\nadapting to kiss\n(thin CLI-ish at first)" style=filled]
 30000->31300
 30000->31500
 30000->31700
 31300[label="create a new\nnotecard from backend" style=filled]
 31300->32500
-31500[label="delete a notecard\nfrom backend (empty\nfiles not deleted)"]
+31500[label="delete a notecard\nfrom backend (empty\nfiles not deleted)" style=filled]
 31500->32500
 31700[label="manage notecard\nassociations and content\nby hand" style=filled]
 31700->32500

@@ -161,14 +161,48 @@ class _CLI:
         self.os_path = os_path
 
     def execute(self):
-        errno = self._parse_args()
+        command_name, errno = self.parse_command_name()
         if errno is not None:
             return errno
+        return getattr(self, f"execute__{command_name}__")()
+
+    def execute__generate__(self):
+        stack = self._arg_stack
+        do_usage, do_help, do_invite, exitstatus = (True, False, True, 444)
+
+        if len(stack):
+            arg = stack.pop()
+            if _looks_like_help_flag(arg):
+                do_help, do_invite, exitstatus = (True, False, 0)
+            elif '-' == arg[0]:
+                self.stderr.write(f"unrecognized option {repr(arg)}\n")
+            elif len(stack):
+                self.stderr.write(f"unexpected argument: {repr(stack[-1])}\n")
+            else:
+                coll_path = arg
+                do_usage, do_invite, do_help, exitstatus = (0, 0, 0, None)
+        else:
+            self.stderr.write("expecting COLLECTION_PATH\n")
+
+        def say_pn():
+            return f"{self.program_name} generate"
+
+        if do_usage:
+            self.stderr.write(f"usage: {say_pn()} {{COLLECTION_PATH}}\n")
+
+        if do_help:
+            self.stderr.write("description: output to STDOUT the should-be lines of an index file\n")  # noqa: E501
+
+        if do_invite:
+            self.stderr.write(f"use '{say_pn()} -h' for help\n")
+
+        if exitstatus is not None:
+            return exitstatus
+
+        # having done all the above, cheap_arg_parse might be in order
 
         listener = self.build_listener()
 
-        coll_path = self._argument
-        del(self._argument)
         # coll_path = self.os_path.abspath(coll_path)
 
         # resolve collection
@@ -177,47 +211,44 @@ class _CLI:
         if coll is None:
             return
 
-        from kiss_rdb.magnetics_ import (
-                index_via_identifiers as index_lib)
+        sa_coll = coll._impl
 
-        schm = coll._impl._schema
+        _ids = sa_coll.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
 
-        _pather = schm.build_pather_(coll_path)
-
-        _ids = _pather.to_identifier_stream(listener)
-
-        _lines = index_lib.lines_of_index_via_identifiers(
-                _ids, schm.number_of_digits)
+        _lines = _lines_of_index_via_identifiers(
+                _ids, sa_coll.number_of_digits_, listener)
 
         for line in _lines:
             self.stdout.write(line)
 
         return 0
 
-    def _parse_args(self):
-        length = len(self._arg_stack)
+    def parse_command_name(self):
+        command_names = ('generate',)
 
-        if 0 == length:
-            self.stderr.write('missing argument.\n')
-            return self.express_usage_and_invite()
+        def say_exp():
+            return ''.join(('Expecting {',  '|'.join(command_names), '}'))
 
-        last_tok = self._arg_stack[-1]
-        if '-' == last_tok[0]:
-            import re
-            if re.match('^--?h(?:e(?:lp?)?)?$', last_tok):
+        stack = self._arg_stack
+        if not len(stack):
+            self.stderr.write(say_exp())
+            self.stderr.write('\n')
+            return None, self.express_usage_and_invite()
+
+        arg = stack.pop()
+        if '-' == arg[0]:
+            if _looks_like_help_flag(arg):
                 self.stderr.write(f'description: {(_CLI.__doc__)}\n\n')
-                self.express_usage()
-                return 0
+                return None, self.express_usage()
 
-            self.stderr.write(f'unrecognized option: {last_tok}\n')
-            return self.express_usage_and_invite()
+            self.stderr.write(f'unrecognized option: {arg}\n')
+            return None, self.express_usage_and_invite()
 
-        if 1 < length:
-            self.stderr.write(f'too many args (need 1 had {length}).\n')
-            return self.express_usage_and_invite()
+        if arg in command_names:
+            return arg, None
 
-        self._argument, = self._arg_stack
-        del(self._arg_stack)
+        self.stderr.write(f"unrecognized command {repr(arg)}. {say_exp()}\n")
+        return None, self.express_invite()
 
     def build_listener(self):
         # build a "error case expressor" (listener) that is similar in spirit
@@ -246,12 +277,17 @@ class _CLI:
 
     def express_usage_and_invite(self):
         self.express_usage()
-        self.stderr.write(f"see '{self.program_name()} -h'\n")
+        return self.express_invite()
+
+    def express_invite(self):
+        self.stderr.write(f"see '{self.program_name} -h'\n")
         return 400  # generic "application error"
 
     def express_usage(self):
-        self.stderr.write(f'usage: {self.program_name()} COLLECTION_PATH\n')
+        self.stderr.write(f'usage: {self.program_name} {{generate}} [..]\n')
+        return 0
 
+    @property
     def program_name(self):
         if self._pn is None:
             s = self._long_program_name
@@ -259,9 +295,14 @@ class _CLI:
         return self._pn
 
 
-def new_lines_via_delete_identifier_from_index__(
-        orig_lines, identifier, listener):
+def _looks_like_help_flag(arg):
+    import re
+    return re.match('^--?h(?:e(?:lp?)?)?$', arg)
 
+
+# ==
+
+def new_lines_via_delete_identifier_from_index_(orig_lines, iden, listener):
     """(although the index file is written tree-like, we search for
     the item to delete in an inefficient way, because we don't care
     about the efficiency of deletes right now.)
@@ -269,34 +310,37 @@ def new_lines_via_delete_identifier_from_index__(
     (this function is in this file because it was light.)
     """
 
-    from . import identifiers_via_index as _
-    itr = _.identifiers_via_lines_of_index(orig_lines)
-    keep_iids = []
+    from .identifiers_via_index import identifiers_via_lines_of_index
+
+    # Put all the identifiers into memory :(
+    idens = tuple(identifiers_via_lines_of_index(orig_lines))
+
+    # Find the offset of the target identifier
+    offset = -1
     did_find = False
-    count_for_debug = 0
+    for curr_iden in idens:
+        offset += 1
+        if curr_iden < iden:
+            continue
 
-    # find the IID you want to delete (traversal search yikes!)
-
-    for this_iid in itr:
-        if identifier == this_iid:  # #here4
+        if curr_iden == iden:  # #here4
             did_find = True
             break
-        count_for_debug += 1
-        keep_iids.append(this_iid)
+
+        assert(iden < curr_iden)
+        break
 
     if not did_find:
-        cover_me(_say_integrity_error(identifier, count_for_debug))
+        msg = _say_entity_not_found(iden.to_string(), len(idens))
+        listener('error', 'expression', 'entity_not_found', lambda: (msg,))
+        return
 
-    # pass-thru any remaining IID's after the one you found
+    # Read all the would-be lines of the new index file in to memory
+    new_idens = (*idens[0:offset], *idens[offset+1:])
 
-    for this_iid in itr:
-        keep_iids.append(this_iid)
-
-    # death if there wasn't at least one :(
-
-    _depth = this_iid.number_of_digits
-
-    return lines_of_index_via_identifiers(keep_iids, _depth)
+    # Put the new list of identifiers in to memory
+    depth = iden.number_of_digits
+    return _lines_of_index_via_identifiers(new_idens, depth, listener)
 
 
 def new_lines_via_add_identifier_into_index_(identifier, iids):
@@ -310,10 +354,10 @@ def new_lines_via_add_identifier_into_index_(identifier, iids):
 
     _depth = identifier.number_of_digits
 
-    return lines_of_index_via_identifiers(sorted(unsorted()), _depth)
+    return _lines_of_index_via_identifiers(sorted(unsorted()), _depth, None)
 
 
-def lines_of_index_via_identifiers(identifiers, depth):
+def _lines_of_index_via_identifiers(identifiers, depth, listener):  # noqa: E501 #testpoint
 
     if 2 < depth:
         return __lines_of_index_via_identifiers_when_deeper(identifiers, depth)
@@ -497,10 +541,8 @@ def _build_rack_flusher(rack, produce_head_character):
 
 # == whiners & related
 
-def _say_integrity_error(identifier, count_for_debug):
-    return (
-        f'integrity error: did not find {identifier.to_string()}'
-        f' in {count_for_debug}')
+def _say_entity_not_found(eid, idens_count):
+    return f"entity '{eid}' not found (in {idens_count}) entities)"
 
 
 # ==

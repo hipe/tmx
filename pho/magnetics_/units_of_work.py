@@ -1,44 +1,30 @@
 class UnitsOfWorkForEntity:
+    # Implement the DSL that field operations are defined with.
+    # This assists in preparing edits that involve foreign keys (doubly-linked
+    # lists or one-to-many double-links) so it's centric to a central entity.
 
-    def __init__(self, eid_tup, business_coll, listener):
-
+    def __init__(self, ent_cud_type, bent, business_coll, listener):
         self._prepared_edits = []
         self._business_collection = business_coll
         self.listener = listener
         self._entity_cache = {}
 
-        eid_type = (stack := list(reversed(eid_tup))).pop()
-        if 'existing_entity' == eid_type:
-            self.entity_identifier_string = stack.pop()
-            self.EID_reservation = None
-            self._EID_of_entity_being_created = None
-            assert(not len(stack))
-            return
-
-        assert('entity_to_create' == eid_type)
-        eid_reservation = stack.pop()
-        starter_attributes = stack.pop()
-        assert(not len(stack))
-        eid = eid_reservation.identifier_string
+        eid = bent.identifier_string
+        self._EID_of_entity_being_created = None
+        self._EID_of_entity_being_deleted = None
+        if 'create_entity' == ent_cud_type:
+            self._EID_of_entity_being_created = eid
+        elif 'delete_entity' == ent_cud_type:
+            self._EID_of_entity_being_deleted = eid
+        self._entity_cache[eid] = bent
         self.entity_identifier_string = eid
-        self._EID_of_entity_being_created = eid
-
-        core_attrs = {k: v for k, v in starter_attributes()}
-        ent = business_coll.entity_via_definition_(eid, core_attrs, listener)
-        assert(ent)
-        self._entity_cache[eid] = ent
-
-        for k, v in core_attrs.items():
-            self._will('create_entity', eid, 'create_attribute', k, v)
-
-        self.EID_reservation = eid_reservation
 
     def release_prepared_edits(self):
         x = self._prepared_edits
         del self._prepared_edits
         return tuple(x)
 
-    def will_set_in(self, entity, cud_type, dattr, attr, value):
+    def will_set_in(self, entity, attr_cud_type, dattr, attr, value):
         eid = entity.identifier_string
         setattr(entity, attr, value)  # #here1
         if self._EID_of_entity_being_created == eid:
@@ -46,15 +32,23 @@ class UnitsOfWorkForEntity:
             update_or_create = 'create_entity'
         else:
             update_or_create = 'update_entity'
-        self._will(update_or_create, eid, cud_type, dattr, value)
+        self._will(update_or_create, eid, attr_cud_type, dattr, value)
 
     def will_delete_in(self, entity, dattr, attr):
         setattr(entity, attr, None)  # #here1
         eid = entity.identifier_string
-        self._will('update_entity', eid, 'delete_attribute', dattr)
+        if self._EID_of_entity_being_deleted == eid:
+            # (same as above)
+            update_or_delete = 'delete_entity'  # hacky
+        else:
+            update_or_delete = 'update_entity'
+        self._will(update_or_delete, eid, 'delete_attribute', dattr)
 
     def _will_update(self, *tup):
         self._prepared_edits.append(('update_entity', *tup))
+
+    def will_delete_entity(self, eid):  # ASSUMES eid is valid
+        self._will('delete_entity', eid)
 
     def _will(self, *tup):
         self._prepared_edits.append(tup)
