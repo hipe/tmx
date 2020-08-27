@@ -19,6 +19,23 @@ def __do_wicked_memoizer(f, attr, builder_method_name):
     return use_f
 
 
+def dangerous_memoize_in_child_classes_2(orig_f):
+    # #open [#507.J] this is different from the above because with this way
+    # you can't have the child classes use their own builder..
+
+    k = orig_f.__name__
+
+    def use_f(tc):
+        o = tc.__class__
+        if not hasattr(o, '_modality_agnostic_memoization_'):
+            setattr(o, '_modality_agnostic_memoization_', {})
+        memo = o._modality_agnostic_memoization_
+        if k not in memo:
+            memo[k] = orig_f(tc)
+        return memo[k]
+    return use_f
+
+
 def memoize_into(attr):
     def decorator(f):
         def use_f(self):

@@ -38,6 +38,7 @@ only in modeling interfaces for this purpose.
 |[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
 |[#508]                     |       | [ this lightweight listening library ]
+![#507.J]                   | #open | unify this new memoizer into the old one
 |[#507.9]                   |       | [ modality agnostic error monitor ]
 |[#507.H]                   | #hole |
 |[#507.G]                   | #open | idiomize something for the test platform

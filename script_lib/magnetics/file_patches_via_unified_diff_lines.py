@@ -162,6 +162,15 @@ class _Hunk:
         assert(not len(ast))
         self._is_raw = True
 
+    def these_lines(self, *tokens):
+        """Given args like ('context', '(', 'remove', 'add', ')', 'context'),
+
+        both assert this run pattern over the whole hunk and return the
+        corresponding lines from the captured subexpression expressed by
+        the parenthesis"""
+
+        return _these_lines(self.runs, tokens)
+
     def to_remove_lines_runs(self):
         return self._to_runs('remove_lines')
 
@@ -209,15 +218,109 @@ def _partition(items, category_function, flush_chunk):
     yield flush_chunk(previous_category, tuple(item_cache))
 
 
+# == Complicated Reading
+
+def _these_lines(runs, tokens):
+    # this is like a specialized unittest.assertSequenceEqual that also
+    # captures a subexpression in the runs. (see __doc__ of caller)
+
+    captured_runs = []
+
+    expected_pattern, run_offset_of_open_parenthesis, \
+        run_offset_of_close_parenthesis = _parse_for_these_lines(tokens)
+
+    actual_stack = list(reversed(runs))
+    expected_stack = list(reversed(expected_pattern))
+
+    is_before_capturing, is_capturing, is_after_capturing = (True, False, 0)
+
+    offset = -1  # be careful
+    while len(actual_stack):
+        offset += 1
+
+        # Assert expectations
+
+        actual = actual_stack.pop()
+        if not len(expected_stack):
+            xx("unexpected extra run(s)")
+        expected = expected_stack.pop()
+        if expected != actual.category_name:
+            xx(f"had '{actual.category_name}' expected {expected} at {offset}")
+
+        # Maybe capture
+
+        if is_before_capturing:
+            if offset < run_offset_of_open_parenthesis:
+                continue
+            assert(run_offset_of_open_parenthesis == offset)
+            is_before_capturing = False
+            is_capturing = True
+
+        if is_capturing:
+            if run_offset_of_close_parenthesis == offset:
+                is_capturing = False
+                is_after_capturing = True
+                continue
+            assert(offset < run_offset_of_close_parenthesis)
+            captured_runs.append(actual)
+            continue
+
+        assert(is_after_capturing)
+
+    if len(expected_stack):
+        xx("missing expected run(s)")
+
+    leng = run_offset_of_close_parenthesis - run_offset_of_open_parenthesis
+    assert(leng == len(captured_runs))
+
+    def lines():
+        for run in captured_runs:
+            for line in run.lines:
+                yield line
+
+    return tuple(lines())
+
+
+def _parse_for_these_lines(tokens):
+    run_offset = 0
+    run_offset_of_open_parenthesis = None
+    run_offset_of_close_parenthesis = None
+
+    expected_pattern = []
+
+    for token in tokens:
+        if token in ('context', 'remove', 'add'):
+            run_offset += 1
+            expected_pattern.append(f'{token}_lines')
+            continue
+        if '(' == token:
+            assert(run_offset_of_open_parenthesis is None)
+            run_offset_of_open_parenthesis = run_offset
+            continue
+        assert(')' == token)
+        assert(run_offset_of_close_parenthesis is None)
+        run_offset_of_close_parenthesis = run_offset
+
+    assert(run_offset_of_open_parenthesis is not None)
+    assert(run_offset_of_close_parenthesis is not None)
+    assert(run_offset_of_open_parenthesis < run_offset_of_close_parenthesis)
+    # the above implicitly asserts a nonzero amount of run category references
+
+    return tuple(expected_pattern), \
+        run_offset_of_open_parenthesis, run_offset_of_close_parenthesis
+
+
+_run_category_via_character = \
+        {' ': 'context_lines', '-': 'remove_lines', '+': 'add_lines'}
+
+
 class _Run:
     def __init__(self, char, lines):
         self.category_name = _run_category_via_character[char]
         self.lines = lines
 
 
-_run_category_via_character = \
-        {' ': 'context_lines', '-': 'remove_lines', '+': 'add_lines'}
-
+# == Parsing
 
 def _parse_file_patch(lines):
 

@@ -21,7 +21,7 @@ def lazy(f):  # #[#510.8]
 @lazy
 def business_collection_one():
     def rng(pool_size):
-        raise xxx()
+        return 11584  # DC6 with two behind it?
     from pho import _Notecards, collection_via_path_
     directory = fixture_directory_one()
     coll = collection_via_path_(directory, lambda *_: xx(), rng)
@@ -88,7 +88,7 @@ def xx(msg=None):
     raise xxx(msg)
 
 
-def xxx(msg):
+def xxx(msg=None):
     use_msg = ''.join(('oops / write me', * ((': ', msg) if msg else ())))
     return RuntimeError(use_msg)
 
