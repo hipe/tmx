@@ -11,8 +11,3 @@ have full on eno
 flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
-be able to add a new pho fragment to the (eno) collection
-remove this line and maybe explode remaining parts of roadmap [#881.2]
-pho mocked for create fragment
-pho mocked for delete fragment
-cover pho backend create entity

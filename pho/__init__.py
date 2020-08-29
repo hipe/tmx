@@ -72,17 +72,12 @@ class _Notecards:  # #testpoint
 
         ifc_dct = (ifc := edit.index_file_change) and ifc.to_dictionary()
 
-        def result_document_entityer():
-            xx('why do we do it this way')
-            ent_dct = bent.to_dictionary_two_deep_as_storage_adapter_entity()
-            return self._notecard_via_any_entity(ent_dct, listener)
-
         bent = edit.main_business_entity  # fail earlier if this isn't here
 
         return ci.BIG_PATCHFILE_FOR_BATCH_UPDATE(
             index_file_change=ifc_dct,
             entities_units_of_work=edit.units_of_work,
-            result_document_entityer=result_document_entityer,
+            result_document_entityer=lambda: bent,
             order=order, listener=listener)
 
     def _prepare_edit(self, eid_tup, mixed, listener):  # #testpoint

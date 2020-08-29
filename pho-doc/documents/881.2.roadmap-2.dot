@@ -68,7 +68,7 @@ TO TAKE NOTES AND SEE THEM RENDERED"]
 37300[label="read-only\none notecard" style=filled]
 37500[label="navigate to\nnearby notecards" style=filled]
 37700[label="edit existing" style=filled]
-37750[label="create new"]
+37750[label="create notecard" style=filled]
 37800[label="delete notecard"]
 37300->38000
 37500->38000

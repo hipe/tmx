@@ -15,7 +15,7 @@ const defineMainFormFields = () => {
 
   const exports = {};
 
-  exports.fields = [
+  const fields = [
   {key: "parent", isRef: true, element: ()=>{return parentField;}},
   {key: "previous", isRef: true, element: ()=>{return previousField;}},
   {key: "identifier", editable: false, element: ()=>{return identifierInput;}},
@@ -25,6 +25,34 @@ const defineMainFormFields = () => {
   {key: "next", isRef: true, element: ()=>{return nextField;}},
   {key: "children", customExtend: fld => {extendChildrenField(fld, childrenField);}},
   ];
+
+  exports.enterCreating = () => {
+    viaName.parent.enterViewing();  // #here3
+    hide(previousField);
+    hide(identifierInput);
+    hide(datetimeInput);
+  };
+
+  exports.exitCreating = () => {
+    viaName.parent.enterEditing();  // #here3
+    show(previousField);
+    show(identifierInput);
+    show(datetimeInput);
+  };
+
+  exports.enterUpdating = () => {
+    eachField(field => {
+      if (!field.isEditable()) { return; }
+      field.enterEditing();
+    });
+  };
+
+  exports.enterViewing = () => {
+    eachField(field => {
+      if (!field.isEditable()) { return; }
+      field.enterViewing();
+    });
+  };
 
   const o = getElementById;
   const parentField = o('parentField');
@@ -36,10 +64,14 @@ const defineMainFormFields = () => {
   const nextField = o('nextField');
   const childrenField = o('childrenField');
 
-  exports.fields.forEach(field => {
+  const eachField = f => { fields.forEach(f); };
+  const viaName = {};
+  eachField(field => {
+    viaName[field.key] = field;
     extendField(field);
   });
 
+  exports.forEachField = eachField;
   return exports;
 };
 
@@ -72,16 +104,6 @@ const extendChildrenField = (field, childrenField) => {
 
   field.isEditable = () => { return true; };
 
-  field.ensureEditModeAnd = value => {
-    if ('edit' !== mode()) { changeToEditMode(); }
-    receiveValue(value);
-  };
-
-  field.ensureViewModeAnd = value => {
-    if ('view' !== mode()) { changeToViewMode(); }
-    receiveValue(value);
-  };
-
   field.fieldValue = () => { return input.value; };
 
   field.encodeValue = arr => {
@@ -89,7 +111,7 @@ const extendChildrenField = (field, childrenField) => {
     return arr.join(', ');
   }
 
-  const receiveValue = value => {
+  field.receiveValue = value => {
     if (!(value && value.length)) { return receiveTheEmptyValue(); }
 
     const yikesHTML = value.map(s => {return `<a>${s}</a>`;}).join(', ');
@@ -112,26 +134,20 @@ const extendChildrenField = (field, childrenField) => {
 
   const [makeWholeFieldInvisible, makeWholeFieldVisible, wholeFieldIsVisible] = vizInviz(childrenField);
   const [input, span] = inputAndSpan(childrenField);
-  const [changeToEditMode, changeToViewMode, mode] = evMode(input, span);
+  const [enterEditing, enterViewing, mode] = evMode(input, span);
+
+  field.enterEditing = enterEditing;
+  field.enterViewing = enterViewing;
 };
 
 
 const extendReferenceField = field => {
 
-  field.ensureEditModeAnd = value => {
-    if ('edit' !== mode()) { changeToEditMode(); }
-    receiveValue(value);
-  };
+  // throughout all the exposures below, implement this:
+  // Don't show empty reference fields when in view mode.
 
-  field.ensureViewModeAnd = value => {
-    if ('view' !== mode()) { changeToViewMode(); }
-    receiveValue(value);
-  };
-
-  const receiveValue = value => {
+  field.receiveValue = value => {
     if (!value) { return receiveTheEmptyValue(); }
-
-    // Don't show empty reference fields when in view mode.
     input.value = value;
     anchor.innerText = value;
     if (!wholeFieldIsVisible()) { makeWholeFieldVisible(); }
@@ -144,12 +160,24 @@ const extendReferenceField = field => {
     if ('edit' == mode() && !wholeFieldIsVisible()) {makeWholeFieldVisible();}
   }
 
+  field.enterEditing = () => {  // #here3
+    enterEditing();  // hide the span; show the input
+    if (!wholeFieldIsVisible()) { makeWholeFieldVisible(); }
+  };
+
+  field.enterViewing = () => {  // #here3
+    if ('' == input.value && wholeFieldIsVisible()) {  // #here1
+      makeWholeFieldInvisible();
+    }
+    enterViewing();  // hide the input; show the span
+  };
+
   field.fieldValue = () => { return input.value; };
 
   const fieldEl = field.element();
   const [makeWholeFieldInvisible, makeWholeFieldVisible, wholeFieldIsVisible] = vizInviz(fieldEl);
   const [input, span] = inputAndSpan(fieldEl);
-  const [changeToEditMode, changeToViewMode, mode] = evMode(input, span);
+  const [enterEditing, enterViewing, mode] = evMode(input, span);
 
   const anchor = span.children[0];  // not okay #open [#882.L]
   if ('A' !== anchor.nodeName) {
@@ -174,13 +202,13 @@ const vizInviz = field => {
 
 const evMode = (input, span) => {
 
-  const changeToEditMode = () => {
+  const enterEditing = () => {
     hide(span);
     show(input);
     state.mode = 'edit';
   };
 
-  const changeToViewMode = () => {
+  const enterViewing = () => {
     show(span);
     hide(input);
     state.mode = 'view';
@@ -192,7 +220,7 @@ const evMode = (input, span) => {
 
   const state = {'mode': 'view'};
 
-  return [changeToEditMode, changeToViewMode, mode];
+  return [enterEditing, enterViewing, mode];
 };
 
 
@@ -216,21 +244,11 @@ const inputAndSpan = fieldEl => {  // not okay #open [#882.L]
 
 const extendCommonField = field => {
 
-  field.ensureEditModeAnd = value => {
-    if ('edit' !== mode()) { changeToEditMode(); }
-    receiveValue(value);
-  };
-
-  field.ensureViewModeAnd = value => {
-    if ('view' !== mode()) { changeToViewMode(); }
-    receiveValue(value);
-  };
-
-  const changeToEditMode = () => {
+  field.enterEditing = () => {
     input.removeAttribute('readonly');
   };
 
-  const changeToViewMode = () => {
+  field.enterViewing = () => {
     input.setAttribute('readonly', 'readonly');
   };
 
@@ -238,7 +256,7 @@ const extendCommonField = field => {
     return input.hasAttribute('readonly') ? 'view' : 'edit';
   };
 
-  const receiveValue = value => {
+  field.receiveValue = value => {
     input.value = value || '';  // #here1
   };
 
@@ -251,7 +269,7 @@ const extendCommonField = field => {
 
 
 const extendPermanantlyReadOnlyField = field => {
-  field.ensureViewModeAnd = value => {
+  field.receiveValue = value => {
     input.value = value || '';
   };
   const input = field.element();
@@ -263,7 +281,7 @@ const extendPermanantlyReadOnlyField = field => {
 const defineTheGetRandomEntityButton = (o, btn) => {
   o.mainAction(() => {
     const onEntity = (entity) => {
-      mainForm.ensureViewModeAndReceiveEntity(entity);
+      mainForm.ensureStateWith('VIEWING', entity);
       o.doneWorking();
     };
     const args = [collPath];
@@ -273,9 +291,17 @@ const defineTheGetRandomEntityButton = (o, btn) => {
 };
 
 
+const defineTheAddChildButton = (o, btn) => {
+  o.mainAction(() => {
+    mainForm.transitionFromTo('UPDATING', 'CREATING');
+  });
+  o.isSynchronous();
+};
+
+
 const defineTheEditButton = (o, btn) => {
   o.mainAction(() => {
-    mainForm.ensureState('EDITING');
+    mainForm.transitionFromTo('VIEWING', 'UPDATING');
   });
   o.isSynchronous();
 };
@@ -283,8 +309,17 @@ const defineTheEditButton = (o, btn) => {
 
 const defineTheCancelEditingButton = (o, btn) => {
   o.mainAction(() => {
-    // #todo: this resets the form to a pristine state. but where?
-    mainForm.ensureState('READ_ONLY');
+    const two = mainForm.formEntityAndState();
+    if (!two) { return; }
+    const [_, stateName] = two;
+    switch (stateName) {
+      case 'UPDATING':
+        // #todo: this resets the form to a pristine state. but where?
+        return mainForm.transitionFromTo('UPDATING', 'VIEWING');
+      case 'CREATING':
+        return mainForm.transitionFromTo('CREATING', 'UPDATING');
+    }
+    oops("don't know how to cancel from " + stateName);
   });
   o.isSynchronous();
 };
@@ -292,22 +327,34 @@ const defineTheCancelEditingButton = (o, btn) => {
 
 const defineTheSubmitButton = (o, btn) => {
   o.mainAction(() => {
-    const ent = mainForm.requireCurrentEntity(()=>{return 'submit';});
-    if (!ent) { o.doneWorking(); return; }
-    const args = _buildArgsForSubmit(ent);
+    const two = mainForm.formEntityAndState();
+    if (!two) { o.doneWorking(); return; }
+    const [ent, stateName] = two;
+    let which, args;
+    switch (stateName) {
+      case 'CREATING':
+        args = _buildArgsForCreate(ent);
+        which = 'create_notecard';
+        break;
+      case 'UPDATING':
+        args = _buildArgsForUpdate(ent);
+        which = 'update_notecard';
+        break;
+    }
     if (!args) { o.doneWorking(); return; }  // maybe no change in form
 
     const onEntity = (entity) => {
       // this is a somewhat more arbitrary UI behavior choice:
       // on successful submit, pop back out of edit mode
-      mainForm.ensureViewModeAndReceiveEntity(entity);
+      mainForm.ensureStateWith('VIEWING', entity);
       o.doneWorking();
     };
     const onReject = (wat) => {
       log("got reject: " + wat);
     };
-    log("sending update_notecard " + args.join(' '));
-    codec.requestJSON('update_notecard', args).then(onEntity, onReject);
+
+    log("sending " + which + " " + args.join(' '));
+    codec.requestJSON(which, args).then(onEntity, onReject);
   });
   o.textWhileWorking('Processing…');
 };
@@ -322,7 +369,7 @@ const onClickReferenceLink = (() => {
 
     const onEntity = ent => {
       log('wahoo worked');
-      mainForm.ensureViewModeAndReceiveEntity(ent);
+      mainForm.ensureStateWith('VIEWING', ent);
     };
 
     const args = [eid, collPath];
@@ -353,13 +400,13 @@ const defineTheSayHelloToPhoButton = (o, btn) => {
 
 // ===== Longer Button Stuff =====
 
-const _buildArgsForSubmit = (ent) => {
+const _buildArgsForUpdate = (ent) => {
 
   const args = [collPath];
   args.push(ent.identifier);
   const countBefore = args.length;
 
-  mainFormFields.forEach((field) => {
+  mainFormFields.forEachField(field => {
     if (!field.isEditable()) { return; }
 
     const existingValue = field.encodeValue(ent[field.key]);
@@ -394,98 +441,251 @@ const _buildArgsForSubmit = (ent) => {
 };
 
 
-// ===== Define the Main Form Controller (2-state state machine) =====
+const _buildArgsForCreate = (ent) => {  // painful
+
+  const args = [collPath];
+  const countBefore = args.length;
+
+  let parentField;
+
+  mainFormFields.forEachField(field => {
+    if (!field.isEditable()) { return; }
+    if ('parent' === field.key) { parentField = field; return; }
+
+    const existingValue = field.encodeValue(ent[field.key]);
+    const requestedValue = field.fieldValue();
+
+    const existingIsSomething = isSomething(existingValue);
+    const requestedIsSomething = isSomething(requestedValue);
+
+    if (existingIsSomething) {
+      if (requestedIsSomething) {
+        if (existingValue === requestedValue) {
+          // no change in value suggests that the default text is unchagned
+        } else {
+          // change in value means they changed the default text, right?
+          args.push(field.key, requestedValue);
+        }
+      } else {
+        // maybe the user deleted the default text and made it blank
+      }
+    } else if (requestedIsSomething) {
+      // something from nothing is normal
+      args.push(field.key, requestedValue);
+    } else {
+      // hi. it wasn't set before and it's not set now. do nothing.
+    }
+  });
+
+  if (ent.parent != parentField.fieldValue()) {
+    oops("for now, can't change parent in add child form"); return;
+  }
+
+  if (countBefore === args.length) {
+    log("OHAI: no change in add child form. not sumitting."); return;
+  }
+
+  args.push('parent', ent.parent);
+
+  return args;
+};
+
+
+// ===== Define the Main Form Controller (4-state state machine) =====
 
 const defineMainForm = () => {
 
   const exports = {};
 
-
-  // -- stuff about the current entity
-
-  exports.ensureViewModeAndReceiveEntity = ent => {
-    // it won't let you change state without having an entity set.
-    // be sure you are in read-only mode before you repopulate the form.
-    state.currentEntity = ent;
-    exports.ensureState('READ_ONLY');
-    _repopulateForm(ent);
-  };
-
-  exports.requireCurrentEntity = verbPhraser => {
-    const ent = state.currentEntity;
-    if (!ent) {
-      log("OOPS: can't " + verbPhraser() + " because no entity loaded yet.");
-      return;
+  exports.ensureStateWith = (to, ent) => {
+    let tf;  // annoying that it won't let me use const 2x below wat do #todo
+    if (state.name === to) {
+      tf = functionForWith();
+    } else {
+      tf = functionForTransitionToWith(to);
     }
-    return ent;
+    if (!tf) { return; }
+    changeState(to, tf)(ent);
   };
 
+  exports.transitionFromTo = (from, to) => {
+    const tf = functionForTransitionTo(to);
+    if (!tf) { return; }
+    changeState(to, tf)();
+  };
 
-  // -- stuff about the current form state (there are only 2 modes)
+  const changeState = (to, fn) => {
+    const head = (state.name === to) ? state.name : (state.name + '->' + to);
+    log(head + ' ' + fn);
+    state.name = to;
+    return functions[fn];
+  };
 
-  exports.ensureState = stateName => {
-    if (state.stateName === stateName) {
-      return;
+  exports.formEntityAndState = () => {
+    switch (state.name) {
+      case 'UPDATING':
+        return [state.parentEntity, state.name];
+      case 'CREATING':
+        return [state.childEntity, state.name];
     }
-    if ('READ_ONLY' === stateName) {
-      return changeToReadOnlyState();
-    }
-    if ('EDITING' === stateName) {
-      return changeToEditing();
-    }
-    throw("not a state: '"+stateName+"'");
+    oops("can't get form entity from " + state.name);
   };
 
-  const changeToEditing = () => {
-    withCurrentEntityChangeToThisState('EDITING', _doChangeToEditing);
+  const transitions = {  // commit comment at #history-A.4 expounds
+    'BEGINNING': {
+      'transitionTo': {
+        'VIEWING': { 'with': 'enterViewingForTheFirstTime' },
+      },
+    },
+    'VIEWING': {
+      'transitionTo': {
+        'UPDATING': { 'without': 'changeFromViewingToUpdating' },
+      },
+      'receiveNewEntity': 'receiveNewEntityWhileInViewingMode',
+    },
+    'UPDATING': {
+      'transitionTo': {
+        'VIEWING': {
+          'without': 'changeFromUpdatingToViewingBecauseCancel',
+          'with': 'changeFromUpdatingToViewingBecauseSuccess',
+        },
+        'CREATING': { 'without': 'changeFromUpdatingToCreating' },
+      },
+    },
+    'CREATING': {
+      'transitionTo': {
+        'UPDATING': { 'without': 'changeFromCreatingToUpdating' },
+        'VIEWING': { 'with': 'changeFromCreatingToViewing' },
+      }
+    },
   };
 
-  const changeToReadOnlyState = () => {
-    withCurrentEntityChangeToThisState('READ_ONLY', _doChangeToNotEditing);
+  const functionForTransitionToWith = to => {
+    const tn = transitionNode(to);
+    if (!tn) { return; }
+    const w = tn.with;
+    if (!w) { return oops("can't go from "+state.name+" to "+to+" w/ arg"); }
+    return w;
   };
 
-  const withCurrentEntityChangeToThisState = (stateName, callMe) => {
-    const ent = exports.requireCurrentEntity(()=>{return "change to '"+stateName+"'";});
-    if (!ent) { return; }
-    state.stateName = stateName;
-    callMe(ent);
+  const functionForTransitionTo = to => {
+    const tn = transitionNode(to);
+    if (!tn) { return; }
+    const wo = tn.without;
+    if (!wo) { return oops("can't go from "+state.name+" to "+to+" w/o arg"); }
+    return wo;
   };
+
+  const transitionNode = to => {
+    const node = transitions[state.name].transitionTo[to];
+    if (!node) { return oops("can't transition from "+state.name+" to "+to); }
+    return node;
+  };
+
+  const functionForWith = () => {
+    const fn = transitions[state.name].receiveNewEntity;
+    if (!fn) { return oops('' + state.name + 'has no receiveNewEntity'); }
+    return fn;
+  };
+
+  const o = {};
+
+  o['changeFromCreatingToViewing'] = ent => {
+    exitCreating();
+    enterViewing()
+    receive(ent);
+  };
+
+  o['changeFromCreatingToUpdating'] = () => {
+    exitCreating()
+    repopulate(state.parentEntity);
+  };
+
+  o['changeFromUpdatingToCreating'] = () => {
+    const childEntity = buildHandWrittenEntityForCreating(state.parentEntity);
+    state.childEntity = childEntity;
+    clearForm();
+    mainFormFields.enterCreating();
+    mainFormButtons.enterCreating();
+    repopulate(childEntity);
+  };
+
+  o['changeFromUpdatingToViewingBecauseSuccess'] = ent => {
+    clearForm();
+    enterViewing();
+    receive(ent);
+  };
+
+  o['changeFromUpdatingToViewingBecauseCancel'] = () => {
+    enterViewing();
+  };
+
+  o['changeFromViewingToUpdating'] = () => {
+    enterEditing();
+  };
+
+  o['enterViewingForTheFirstTime'] = ent => {
+    receive(ent);
+  };
+
+  o['receiveNewEntityWhileInViewingMode'] = ent => {
+    receive(ent);
+  };
+
+  const functions = o;
+
+  const exitCreating = () => {
+    state.childEntity = null;
+    clearForm();
+    mainFormFields.exitCreating();
+    mainFormButtons.exitCreating();
+  };
+
+  const enterEditing = () => {
+    mainFormFields.enterUpdating();
+    mainFormButtons.enterUpdating();
+  };
+
+  const enterViewing = () => {
+    mainFormFields.enterViewing();
+    mainFormButtons.enterViewing();
+  };
+
+  const clearForm = () => {
+    eachField(field => {
+      field.receiveValue(null);
+    });
+  };
+
+  const receive = ent => {
+    state.parentEntity = ent;
+    repopulate(ent);
+  };
+
+  const repopulate = ent => {
+    eachField(field => {
+      field.receiveValue(ent[field.key]);
+    });
+  };
+
+  const eachField = f => { mainFormFields.forEachField(f); };
 
   const state = {
-    'currentEntity': null,
-    'stateName': null,
+    'name': 'BEGINNING',
   };
 
   return exports;
 };
 
 
-const _doChangeToEditing = currentEntity => {
-  mainFormFields.forEach(formal => {
-    if (!formal.isEditable()) { return; }
-    const value = currentEntity[formal.key];
-    formal.ensureEditModeAnd(value);
-  });
-  mainFormButtons.changeToEditing();
+const buildHandWrittenEntityForCreating = parentEntity => {
+  return {
+    'parent': parentEntity.identifier,
+    'heading': '«your heading here»',
+    'body': "«your body here»\n«line 2»\n",
+  };
 };
 
-
-const _doChangeToNotEditing = currentEntity => {
-  mainFormFields.forEach(formal => {
-    if (!formal.isEditable()) { return; }
-    const value = currentEntity[formal.key];
-    formal.ensureViewModeAnd(value);
-  });
-  mainFormButtons.changeToNotEditing();
-};
-
-
-const _repopulateForm = ent => {
-  mainFormFields.forEach(formal => {
-    const value = ent[formal.key];
-    formal.ensureViewModeAnd(value);
-  });
-};
 
 
 // ===== Define the Main Form Button Controller  =====
@@ -500,19 +700,29 @@ const defineMainFormButtons = () => {
 
   const exports = {};
 
-  exports.changeToEditing = () => {
+  exports.enterCreating = () => {
+    hide(addChildBtn);
+  };
+
+  exports.exitCreating = () => {
+    show(addChildBtn);
+  };
+
+  exports.enterUpdating = () => {
     hide(closedLock);
     show(openLock);
     hide(editBtn);
     show(cancelBtn);
+    show(addChildBtn);
     show(submitBtn);
   };
 
-  exports.changeToNotEditing = () => {
+  exports.enterViewing = () => {
     show(closedLock);
     hide(openLock);
     show(editBtn);
     hide(cancelBtn);
+    hide(addChildBtn);
     hide(submitBtn);
   };
 
@@ -521,10 +731,12 @@ const defineMainFormButtons = () => {
   const openLock = o('openLock');
   const editBtn = o('editBtn');
   const cancelBtn = o('cancelBtn');
+  const addChildBtn = o('addChildBtn');
   const submitBtn = o('submitBtn');
 
   wireButton(defineTheEditButton, editBtn);
   wireButton(defineTheCancelEditingButton, cancelBtn);
+  wireButton(defineTheAddChildButton, addChildBtn);
   wireButton(defineTheSubmitButton, submitBtn);
 
   wireButton(defineTheGetRandomEntityButton, 'randomBtn');
@@ -615,12 +827,13 @@ const isSomething = (mixed) => {
 // ===== Flush Forward-Declarations =====
 
 const getElementById = s => { return document.getElementById(s); };
+const oops = msg => { log("OOPS: " + msg); };
 const log = msg => { console.log(msg); };
 
 
 const mainForm = defineMainForm();
 const mainFormButtons = defineMainFormButtons();
-const mainFormFields = defineMainFormFields().fields;
+const mainFormFields = defineMainFormFields();
 
 
 // ===== Codec =====
@@ -739,6 +952,7 @@ const collPath = paths.collectionPath;
 const codec = defineCodec();
 
 /*
+ * #history-A.4: enter more complex state machine
  * #history-A.3: overhaul for better compartmentalization with this one pattern
  * #history-A.2: spike codec and random button
  * #history-A.1: remove screen recording tutorial code
