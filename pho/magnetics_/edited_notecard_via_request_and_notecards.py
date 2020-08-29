@@ -164,7 +164,7 @@ def _prepare_for_delete(bent, busi_coll, listener):
 
 
 def _revalidate(ent, listener):
-    from .document_fragment_via_definition import \
+    from .notecard_via_definition import \
             validate_and_normalize_core_attributes_
     ca = ent.to_core_attributes()
     dct = validate_and_normalize_core_attributes_(

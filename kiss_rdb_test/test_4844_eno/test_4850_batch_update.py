@@ -125,8 +125,8 @@ class Case4850_SOMETHING(CommonCase):
 
     @against(0)
     def test_300_patch_for_index_file_looks_right(self):
-        yield 'search', r'\.entity-index\.txt$'
-        yield 'search', r'\.entity-index\.txt$'
+        yield 'search', r'\.identifiers\.txt$'
+        yield 'search', r'\.identifiers\.txt$'
         yield 'skip_to_last_this_many', 2
         yield 'equal', '+ Z\n'
         yield 'equal', '+Z (                                                              Z)\n'  # noqa: E501

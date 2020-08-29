@@ -50,9 +50,7 @@ _do_CLI.__doc__ = _doc
 
 
 def initial_normal_nodes_via_stream(dcts):
-
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import markdown_link_via  # noqa: E501
-
+    from kiss_rdb.storage_adapters.markdown import markdown_link_via
     for dct in dcts:
         if '_is_branch_node' in dct:
             yield dct

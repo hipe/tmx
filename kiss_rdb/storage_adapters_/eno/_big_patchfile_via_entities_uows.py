@@ -2,7 +2,7 @@ _PATCH_EXE_NAME = 'patch'
 
 
 def build_big_patchfile__(ifc, ent_uows, reser, coll, order, listener):
-    from .blocks_via_path_ import emitter_via_monitor__
+    from ._blocks_via_path import emitter_via_monitor__
     emi = emitter_via_monitor__(coll.monitor_via_listener_(listener))
     catch_this = emi.stopper_exception_class
     try:
@@ -12,7 +12,7 @@ def build_big_patchfile__(ifc, ent_uows, reser, coll, order, listener):
 
 
 def _build_big_patchfile(ifc, entities_uows, reser, coll, order, emi):
-    from .blocks_via_path_ import file_units_of_work_via__
+    from ._blocks_via_path import file_units_of_work_via__
     file_uows = file_units_of_work_via__(entities_uows, coll, emi)
 
     # ==
@@ -71,7 +71,7 @@ def _patch_file_for_index_file(
 
 
 def _make_patch(fuow, coll, order, emi, **bot):
-    from .blocks_via_path_ import new_file_lines__
+    from ._blocks_via_path import new_file_lines__
 
     body_of_text_via_ = coll.body_of_text_via_
     bot = body_of_text_via_(**bot)

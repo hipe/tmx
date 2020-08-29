@@ -83,7 +83,7 @@ def _do_crazy_CLI(sout, serr, argv):
 
 def _the_main_experiment(sout, serr, coll):
 
-    from kiss_rdb.storage_adapters_.eno.blocks_via_path_ import \
+    from kiss_rdb.storage_adapters_.eno._blocks_via_path import \
         _existing_entity_blocks_via_BoT
 
     mon = coll.monitor_via_listener_(_listener_via_IO(serr))

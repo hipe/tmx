@@ -1,7 +1,7 @@
 """this is all an experiment. the idea is that with the "big index"
 
 (built below), we can "flatten" our whole collection into an ordered
-series of fragments demarcated (dynamically) into documents. for larger
+series of notecards demarcated (dynamically) into documents. for larger
 and larger collections we could hypothetically recurse this approach
 outward to other familiar idioms like chapters, parts (part I, part II
 etc), books, small libraries with ad-hoc categories, etc.
@@ -13,8 +13,8 @@ like the guides on tldp.org.
 
 let's see what it's like:
 
-  - for now, every fragment that doesn't specify a `parent`, let's
-    make that fragment become the head fragment for a document. this is
+  - for now, every notecard that doesn't specify a `parent`, let's
+    make that notecard become the head notecard for a document. this is
     currently the sole means by which we demarcate the boundaries between
     documents (but in the future we'd like to change this, in two ways).
     (this is now the provision :[#883.4] discussed more below at #here1.)
@@ -25,7 +25,7 @@ let's see what it's like:
   - currently the relationships we support (`parent` and `previous`)
     suggest a tree with ordered nodes. we need to specify something more
     formal eventually, but for now we'll assert a graph that doesn't cycle:
-    each fragment can be in one and only one document, and ..
+    each notecard can be in one and only one document, and ..
 
     one possibility is that this:         represents this:
 
@@ -95,7 +95,7 @@ class _OrderedRun:
 
     def __init__(self, iid, relationship, coll_trav, listener):
 
-        self._ordered_fragment_IIDs = []
+        self._ordered_notecard_IIDs = []
 
         self._local_head_IID = iid
         self._relationship = relationship
@@ -110,17 +110,17 @@ class _OrderedRun:
         if not _ok:
             return
 
-        # the body copy of the fragment itself comes before its associates
+        # the body copy of the notecard itself comes before its associates
 
-        self._ordered_fragment_IIDs.append(self._local_head_IID)
+        self._ordered_notecard_IIDs.append(self._local_head_IID)
 
-        # if there is a fragment that says it comes immediately after us..
+        # if there is a notecard that says it comes immediately after us..
 
         _ok = self.__then_add_immediate_next()
         if not _ok:
             return
 
-        # for all the fragments that call this fragment a parent,..
+        # for all the notecards that call this notecard a parent,..
 
         _ok = self.__then_do_something_crazy_for_children()
         if not _ok:
@@ -129,8 +129,8 @@ class _OrderedRun:
         # finish
 
         self._collection_traversal.stack.pop()
-        res = tuple(self._ordered_fragment_IIDs)
-        del self._ordered_fragment_IIDs
+        res = tuple(self._ordered_notecard_IIDs)
+        del self._ordered_notecard_IIDs
         return res
 
     def __then_do_something_crazy_for_children(self):
@@ -138,7 +138,7 @@ class _OrderedRun:
         ct = self._collection_traversal
         prev_of = self._big_index.previous_of
 
-        # for all the fragments that call this fragment a parent,..
+        # for all the notecards that call this notecard a parent,..
 
         child_iids = self._big_index.children_of.get(
                 self._local_head_IID, None)
@@ -202,24 +202,24 @@ class _OrderedRun:
 
             _iid, = frags_that_have_this_frag_count
             for iid in frags_via_frag[_iid]:
-                self._ordered_fragment_IIDs.append(iid)
+                self._ordered_notecard_IIDs.append(iid)
 
         return _okay
 
     def __then_add_immediate_next(self):
-        # if a fragment points back to this fragment calling it "previous",..
+        # if a notecard points back to this notecard calling it "previous",..
 
         my_next = self._big_index.next_of.get(self._local_head_IID)
         if my_next is None:
             return _okay
 
         iid_a = self._collection_traversal.ordered_IIDs_for(
-                my_next, 'the next fragment of that', self._listener)
+                my_next, 'the next notecard of that', self._listener)
 
         if iid_a is None:
             return
 
-        out = self._ordered_fragment_IIDs
+        out = self._ordered_notecard_IIDs
 
         for iid in iid_a:
             out.append(iid)
@@ -257,7 +257,7 @@ class _OrderedRun:
         _these = ', '.join(frags_that_have_this_frag_count)
         cover_me(
                 f'the children of {_iid} ({_these}) '
-                f'each have exactly {frag_count} fragment(s). '
+                f'each have exactly {frag_count} notecard(s). '
                 'no basis by which to decide order. use prev intead.')
 
     # -- end whiners
@@ -282,7 +282,7 @@ def big_index_via_collection(collection, listener):
     from modality_agnostic import ModalityAgnosticErrorMonitor
     mon = ModalityAgnosticErrorMonitor(listener)
 
-    # Layer One: check mutual exclusivities etc in each single fragment
+    # Layer One: check mutual exclusivities etc in each single notecard
 
     _unsanititized_pass(
             ids_of_frags_with_no_parent_or_previous,
@@ -494,7 +494,7 @@ def _unsanititized_pass(
             unresolved_forward_references_of[iid_s] = a
         a.append((curr_iid_s, relationship_type))  # :#here2
 
-    for frag in _unordered_fragments_via_collection(collection, mon.listener):
+    for frag in _unordered_notecards_via_collection(collection, mon.listener):
 
         parent_iid_s = frag.parent_identifier_string
         prev_iid_s = frag.previous_identifier_string
@@ -514,18 +514,17 @@ def _unsanititized_pass(
         frag_of[curr_iid_s] = frag
 
 
-def _unordered_fragments_via_collection(collection, listener):
-    from pho.magnetics_ import document_fragment_via_definition as frag_lib
+def _unordered_notecards_via_collection(collection, listener):
+    from pho.magnetics_.notecard_via_definition import notecard_via_definition
     for iid in collection.to_identifier_stream(listener):
         iid_s = iid.to_string()
         dct = collection.retrieve_entity(iid_s, listener)
         if dct is None:
             cover_me(f'maybe this decode error thing in {repr(iid_s)}')
-        frag = frag_lib.document_fragment_via_definition(
-                **dct, listener=listener)
-        if frag is None:
+        nc = notecard_via_definition(**dct, listener=listener)
+        if nc is None:
             return
-        yield frag
+        yield nc
 
 
 class _BigIndex:
@@ -539,7 +538,7 @@ class _BigIndex:
         self.children_of = children_of
         self.previous_of = previous_of
         self.next_of = next_of
-        self.fragment_of = frag_of
+        self.notecard_of = frag_of
 
     def TO_DOCUMENT_STREAM(self, listener):
 
@@ -558,15 +557,15 @@ class _BigIndex:
 
     def RETRIEVE_DOCUMENT(self, iid_s, listener):
 
-        dct = self.fragment_of
+        dct = self.notecard_of
         if iid_s not in dct:
-            cover_me(f'fragment not found: {repr(iid_s)}')
+            cover_me(f'notecard not found: {repr(iid_s)}')
 
         frag = dct[iid_s]
         parend_iid_s = frag.parent_identifier_string
         if parend_iid_s is not None:
             _reason = (
-                    f'fragment {repr(iid_s)} is not a document head'
+                    f'notecard {repr(iid_s)} is not a document head'
                     f' because has parent {repr(parend_iid_s)}'
                     )
             cover_me(_reason)
@@ -580,15 +579,15 @@ class _BigIndex:
         # the main thing of eveything
 
         a = collection_traversal.ordered_IIDs_for(
-                iid_s, 'document head fragment', listener)
+                iid_s, 'document head notecard', listener)
         if a is None:
             cover_me('it is as the prophecy foretold')
 
-        frag_of = self.fragment_of
+        frag_of = self.notecard_of
 
         _frags = tuple(frag_of[iid] for iid in a)
 
-        from .document_via_fragments import Document_
+        from .document_via_notecards import Document_
 
         return Document_(_frags)
 

@@ -398,7 +398,7 @@ def filter_by_tags(ctx, collection, query):
     because there's no easy way for us to blit all of it here and there's a lot
     """
 
-    from .filter_by_tags_ import filter_by_tags  # this-CLI-specific library
+    from ._filter_by_tags import filter_by_tags  # this-CLI-specific library
     return filter_by_tags(ctx, collection, query)
 
 

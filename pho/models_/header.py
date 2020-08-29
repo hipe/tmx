@@ -2,21 +2,21 @@ import re
 
 
 def decide_how_to_express_heading(
-        is_head_fragment, frag_heading):
+        is_head_notecard, frag_heading):
 
-    if is_head_fragment:
-        # all head fragments have headings [#883.2], expressed elsewhere
+    if is_head_notecard:
+        # all head notecards have headings [#883.2], expressed elsewhere
         assert(frag_heading is not None)
         add_header_depth = _normal_header_depth_to_add
         header = None
 
     elif frag_heading is None:
-        # non-head fragment with no heading (Case121)
+        # non-head notecard with no heading (Case121)
         add_header_depth = _normal_header_depth_to_add
         header = None
 
     else:
-        # non-head fragment with YES heading (Case115)
+        # non-head notecard with YES heading (Case115)
         add_header_depth = _normal_header_depth_to_add + 1
         _use_header_text = f'{frag_heading}\n'
         header = _Header(add_header_depth, _use_header_text)

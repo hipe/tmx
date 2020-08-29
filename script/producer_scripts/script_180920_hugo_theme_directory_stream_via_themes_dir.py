@@ -4,7 +4,7 @@
 
 theme in the collection, taking into account the deny list (OR NOT)..
 """
-# This producer script is one of several covered by (Case100SA).
+# This producer script is one of several covered by (Case4975NC).
 
 import re
 

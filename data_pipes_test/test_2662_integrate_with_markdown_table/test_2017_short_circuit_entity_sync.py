@@ -158,8 +158,8 @@ class Case2019DP_omg_syncing(ProducerCaseMethods, _CommonCase):
         return self.build_YIKES_SYNC_()
 
     def producer_script(self):
-        from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-                markdown_link_via, simple_key_via_normal_key)
+        from kiss_rdb.storage_adapters.markdown import \
+                markdown_link_via, simple_key_via_normal_key
         from kiss_rdb import normal_field_name_via_string
 
         def stream_for_sync_via_stream(dcts):
@@ -213,8 +213,8 @@ def _production_producer_script():
 
 def near_keyerer_common(key_via_native, schema, listener):  # pure pass-thru
 
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            simplified_key_via_markdown_link_er)
+    from kiss_rdb.storage_adapters.markdown import \
+            simplified_key_via_markdown_link_er
 
     # (reminder: function takes a row_DOM and returns a sync_key)
 

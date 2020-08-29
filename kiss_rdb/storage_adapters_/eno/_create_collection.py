@@ -86,10 +86,10 @@ class _Stop(RuntimeError):
 
 # == PATCH_STARTS_HERE
 """
-diff --git a/<VAR: COLLECTION_DIR>/.entity-index.txt b/<VAR: COLLECTION_DIR>/.entity-index.txt
+diff --git a/<VAR: COLLECTION_DIR>/.identifiers.txt b/<VAR: COLLECTION_DIR>/.identifiers.txt
 new file mode 100644
 --- /dev/null
-+++ b/<VAR: COLLECTION_DIR>/.entity-index.txt
++++ b/<VAR: COLLECTION_DIR>/.identifiers.txt
 @@ -0,0 +1 @@
 +
 diff --git a/<VAR: COLLECTION_DIR>/entities/erase-me.txt b/<VAR: COLLECTION_DIR>/entities/erase-me.txt

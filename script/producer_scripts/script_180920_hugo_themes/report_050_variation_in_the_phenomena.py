@@ -24,7 +24,7 @@ also:
   - this fellow rolls up the less interesting case of those phenomena
     that have only one variation.
 """
-# This producer script is one of several covered by (Case200SA).
+# This producer script is one of several covered by (Case5025NC).
 
 
 class Report:

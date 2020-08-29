@@ -10,10 +10,10 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-# Case153-Case161
+# Case1530-Case1610
 
 
-class Case153_basics(_CommonCase):
+class Case1530_basics(_CommonCase):
 
     def test_100_collection_builds(self):
         self.assertIsNotNone(collection_one())
@@ -22,18 +22,18 @@ class Case153_basics(_CommonCase):
         self.assertIsNotNone(_big_index_one())
 
 
-class Case154_whole_document_tree_from_first_collection(_CommonCase):
+class Case1540_whole_document_tree_from_first_collection(_CommonCase):
 
     def test_100_some_lines_were_made(self):
         num = self._custom_index().total_line_count
         self.assertLess(100, num)
         self.assertLess(num, 120)
 
-    def test_220_every_fragment_heading_was_expressed_somehow(self):
+    def test_220_every_notecard_heading_was_expressed_somehow(self):
         _actual = len(self._lines_that_expressed_headings())
         self.assertEqual(_actual, 6)
 
-    def test_240_these_7_fragments_produced_only_4_documents(self):
+    def test_240_these_7_notecards_produced_only_4_documents(self):
         _lines = self._lines_that_expressed_headings()
 
         count = 0
@@ -49,7 +49,7 @@ class Case154_whole_document_tree_from_first_collection(_CommonCase):
 
     @shared_subject
     def _lines_that_expressed_headings(self):
-        return self._custom_index().lines_that_express_the_fragment_heading
+        return self._custom_index().lines_that_express_the_notecard_heading
 
     @shared_subject
     def _custom_index(self):
@@ -60,7 +60,7 @@ _this_range = range(59, 60)
 # #history-A.1 bumped max by 1 because of unknown change
 
 
-class Case158_generate_one_document(_CommonCase):
+class Case1580_generate_one_document(_CommonCase):
 
     def test_100_wrote_the_lines_probably(self):
         self.assertIn(len(self['writes']), _this_range)
@@ -109,12 +109,12 @@ class Case158_generate_one_document(_CommonCase):
         _big_index = _big_index_one()
 
         def run(listener):
-            from pho.magnetics_.document_tree_via_fragment import (
-                    document_tree_via_fragment)
+            from pho.magnetics_.document_tree_via_notecard import (
+                    document_tree_via_notecard)
 
-            return document_tree_via_fragment(
+            return document_tree_via_notecard(
                     out_tuple=('open_output_filehandle', spy),
-                    fragment_IID_string='48R',
+                    notecard_IID_string='48R',
                     big_index=_big_index,
                     be_recursive=False,
                     force_is_present=False,
@@ -146,7 +146,7 @@ def custom_index_via_big_index(big_index):
 
         from modality_agnostic.memoization import Counter
         total_line_counter = Counter()
-        lines_that_express_the_fragment_heading = []
+        lines_that_express_the_notecard_heading = []
         lines_that_define_bookmarks = []
 
         def echo(line):
@@ -160,7 +160,7 @@ def custom_index_via_big_index(big_index):
                 return
 
             if 'FRAG' in line:
-                lines_that_express_the_fragment_heading.append(line)
+                lines_that_express_the_notecard_heading.append(line)
             elif '[' == line[0]:
                 lines_that_define_bookmarks.append(line)
 
@@ -187,7 +187,7 @@ def custom_index_via_big_index(big_index):
 
         return _CustomIndex(
                 total_line_counter.value,
-                lines_that_express_the_fragment_heading,
+                lines_that_express_the_notecard_heading,
                 lines_that_define_bookmarks,
                 )
 
@@ -195,7 +195,7 @@ def custom_index_via_big_index(big_index):
 class _CustomIndex:
     def __init__(self, _1, _2, _3):
         self.total_line_count = _1
-        self.lines_that_express_the_fragment_heading = _2
+        self.lines_that_express_the_notecard_heading = _2
         self.lines_that_define_bookmarks = _3
 
 

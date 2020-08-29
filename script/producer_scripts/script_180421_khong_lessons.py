@@ -30,7 +30,7 @@ _use_key = 'href'  # internally (in function) which component to use for ID
 
 def stream_for_sync_via_stream(dcts):
 
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
+    from kiss_rdb.storage_adapters.markdown import (
             markdown_link_via,
             url_via_href_via_domain as url_via_href,
             label_via_string_via_max_width)

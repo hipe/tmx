@@ -45,6 +45,5 @@ def command_modules():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: to case number
 # #history-A.1: full rewrite
 # #born.

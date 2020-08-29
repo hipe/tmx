@@ -42,5 +42,4 @@ def _subject_magnetic():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: to case number
 # #born.

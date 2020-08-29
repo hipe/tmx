@@ -29,8 +29,7 @@ stream_for_sync_is_alphabetized_by_key_for_sync = True
 
 
 def stream_for_sync_via_stream(dcts):
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            markdown_link_via)
+    from kiss_rdb.storage_adapters.markdown import markdown_link_via
     left = len(_url)
     for dct in dcts:
         url = dct['url']

@@ -11,27 +11,27 @@ def _params():
 
     yield ('-r', '--recursive',
            'TEMPORARY/EXPERIMENTAL attempts to generate *all* documents "in"',
-           'the collection. <fragment-ID> (required) is ignored.')
+           'the collection. <notecard-ID> (required) is ignored.')
 
     yield '-F', '--force', 'Must be provided to overwrite existing file(s)'
 
     yield '-n', '--dry-run', "Don't actually write the output file(s)"
 
-    yield 'fragment-id', 'The head fragment of the document to generate.'
+    yield 'notecard-id', 'The head notecard of the document to generate.'
 
     yield ('out-path',
            'The directory into which to write the files',
-           '(whose filenames are derived from the head fragment headings).',
+           '(whose filenames are derived from the head notecard headings).',
            'Use "-" to write to STDOUT (IN PROGRESS).')
 
 
 def _do_CLI(
         monitor, sin, sout, serr, enver,
-        collection_path, recursive, force, dry_run, fragment_id, out_path):
+        collection_path, recursive, force, dry_run, notecard_id, out_path):
 
     """Generate a document or documents.
 
-    Generate a document or documents from the fragments in the collection.
+    Generate a document or documents from the notecards in the collection.
     """
 
     # simple normalizations (partly because #wish [#608.13] `<arg-like-this>?`)
@@ -39,8 +39,8 @@ def _do_CLI(
     if out_path in ('-', ''):
         out_path = None
 
-    if fragment_id == '':
-        fragment_id = None
+    if notecard_id == '':
+        notecard_id = None
 
     listener = monitor.listener
 
@@ -66,11 +66,11 @@ def _do_CLI(
 
         # get money
 
-        from pho.magnetics_.document_tree_via_fragment import \
-            document_tree_via_fragment
-        _ok = document_tree_via_fragment(
+        from pho.magnetics_.document_tree_via_notecard import \
+            document_tree_via_notecard
+        _ok = document_tree_via_notecard(
                 out_tuple=(out_type, out_value),
-                fragment_IID_string=fragment_id,
+                notecard_IID_string=notecard_id,
                 big_index=big_index,
                 be_recursive=recursive,
                 force_is_present=force,
@@ -83,11 +83,11 @@ def _do_CLI(
 
         can_be_dry = True
 
-        # a rule table with three inputs: (recursve, fragment_id, out_path)
+        # a rule table with three inputs: (recursve, notecard_id, out_path)
 
         if recursive:
-            if fragment_id is not None:
-                # for recursive, you can't pass a fragment ID
+            if notecard_id is not None:
+                # for recursive, you can't pass a notecard ID
                 return error('is_recursive', 'has_frag_id')
 
             if out_path is None:
@@ -97,8 +97,8 @@ def _do_CLI(
             # write recursively to directory
             return can_be_dry, 'output_directory_path', out_path
 
-        if fragment_id is None:
-            # for single document, you must pass fragment ID
+        if notecard_id is None:
+            # for single document, you must pass notecard ID
             return error('is_recursive', 'has_frag_id')
 
         if out_path is None:
@@ -112,7 +112,7 @@ def _do_CLI(
 
     def error(focus_one, focus_two):
         o = {'is_recursive': lambda: recursive,
-             'has_frag_id': lambda: fragment_id is not None,
+             'has_frag_id': lambda: notecard_id is not None,
              'has_out_path': lambda: out_path is not None}
         kwargs = {k: o.pop(k)() for k in (focus_one, focus_two)}
         k, = o.keys()
@@ -144,7 +144,7 @@ def _whine_big_flex(listener, kwargs):
 
 def __whine_big_flex_pieces(is_recursive, has_frag_id, has_out_path):
 
-    these = ((has_frag_id, '«fragment-ID»', 'a'),
+    these = ((has_frag_id, '«notecard-ID»', 'a'),
              (has_out_path, '«out-path» on the filesystem', 'an'))
 
     # eliminate the None's from our expression

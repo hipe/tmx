@@ -946,5 +946,4 @@ def xx(msg=None):
 class _OpenStruct:
     pass
 
-# #pending-rename privatitze name like the others
 # #birth

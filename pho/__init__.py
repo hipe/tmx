@@ -100,8 +100,7 @@ class _Notecards:  # #testpoint
         return self.entity_via_definition_(nid_s, core_attributes, listener)
 
     def entity_via_definition_(self, nid_s, core_attributes, listener):
-        from .magnetics_.document_fragment_via_definition import \
-            document_fragment_via_definition as notecard_via_definition
+        from .magnetics_.notecard_via_definition import notecard_via_definition
         return notecard_via_definition(nid_s, core_attributes, listener)
 
     def to_identifier_stream(self, listener):

@@ -37,8 +37,7 @@ def flush_JSON_stream_into(sout, serr, itr):
 
 
 def the_function_called_markdown_link_via():
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-        markdown_link_via)
+    from kiss_rdb.storage_adapters.markdown import markdown_link_via
     return markdown_link_via
 
 
@@ -48,8 +47,7 @@ def the_function_called_normal_field_name_via_string():
 
 
 def the_function_called_simple_key_via_normal_key():
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            simple_key_via_normal_key)
+    from kiss_rdb.storage_adapters.markdown import simple_key_via_normal_key
     return simple_key_via_normal_key
 
 
@@ -98,7 +96,7 @@ class open_dictionary_stream_via:  # #[#459.3] class as context manager
         else:
             rs = soup.find_all(* first_selector)
             le = len(rs)
-            if le is 1:
+            if 1 == le:
                 arg_to_2nd_selector = rs[0]
             else:
                 def msg():

@@ -1,5 +1,4 @@
-def document_fragment_via_definition(
-        identifier_string, core_attributes, listener):
+def notecard_via_definition(identifier_string, core_attributes, listener):
 
     dct = validate_and_normalize_core_attributes_(
         identifier_string, core_attributes, listener)
@@ -7,7 +6,7 @@ def document_fragment_via_definition(
     if dct is None:
         return
 
-    return _DocumentFragment(identifier_string=identifier_string, **dct)
+    return _Notecard(identifier_string=identifier_string, **dct)
 
 
 def validate_and_normalize_core_attributes_(
@@ -47,7 +46,7 @@ def validate_and_normalize_core_attributes_(
 
     # conditional requirement: :[#883.2]
     if not (has_parent_or_previous or has_heading or has_natty_key):
-        return fail('fragments with no parent or previous must have heading')
+        return fail('notecards with no parent or previous must have heading')
 
     # mutual exclusivity: can't have both parent and previous
     if has_parent and has_previous:
@@ -100,7 +99,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
             }
 
 
-class _DocumentFragment:
+class _Notecard:
 
     def __init__(
             self, parent, previous, identifier_string,
@@ -150,6 +149,5 @@ class _DocumentFragment:
 def cover_me(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
-# #pending-rename: "document fragment" to "notecard" (maybe)
 # #history-A.1: it becomes doubly-linked list
 # #abtracted

@@ -42,7 +42,7 @@ measured by a report, synonymity is a more subjective determination:
 we have to look at the set of all deep phenomena and ask who among them are
 "like" the others..
 """
-# This producer script is one of several covered by (Case200SA).
+# This producer script is one of several covered by (Case5025NC).
 
 
 import re

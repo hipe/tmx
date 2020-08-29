@@ -1,12 +1,10 @@
-from sakin_agac_test.common_initial_state import (
-        fixture_directory_for)
 import unittest
 
 
 _CommonCase = unittest.TestCase
 
 
-class Case200SA(_CommonCase):
+class Case5025NC(_CommonCase):
 
     def test_010_HI(self):
 
@@ -45,7 +43,8 @@ def _subject_module():
 
 
 def _themes_dir_A():
-    return fixture_directory_for('0190-a-few-hugo-themes')
+    from pho_test.common_initial_state import fixture_directory
+    return fixture_directory('hugo-themes', '0190-a-few-themes')
 
 
 if __name__ == '__main__':

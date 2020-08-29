@@ -9,7 +9,7 @@ or even to cover such edges cases for now!
 import re
 
 
-ENTITY_INDEX_FILENAME_ = '.entity-index.txt'
+ENTITY_INDEX_FILENAME_ = '.identifiers.txt'
 
 
 # == BEGIN CLI

@@ -7,7 +7,7 @@ alternative.
 
 secondarily we want to see the phenomena ordered from most popular to least.
 """
-# This producer script is one of several covered by (Case200SA).
+# This producer script is one of several covered by (Case5025NC).
 
 
 import re

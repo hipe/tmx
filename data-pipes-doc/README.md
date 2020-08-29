@@ -3,6 +3,13 @@ title: "data pipes README"
 date: 2019-07-09T10:20:00-04:00
 ---
 
+## brief discussion
+
+For now, see `man rs`. ¯\_(ツ)_/¯
+
+
+
+
 ## document nodes
 
 (NOTE: our identifier numberspace is [#432]-[#499].)

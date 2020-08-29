@@ -85,6 +85,5 @@ def subject_module():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: to middle case number, probably to foz via function
 # #history-A.1: full rewrite
 # #born.

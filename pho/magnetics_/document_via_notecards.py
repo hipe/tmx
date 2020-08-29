@@ -1,9 +1,9 @@
 """
-a document is ~somehow~ composed of 1 or more fragments. (how those fragments
+a document is ~somehow~ composed of 1 or more notecards. (how those notecards
 
 came to be "flattened" into this one document is out of our scope here.)
 
-Each fragment has zero or one heading, and then in its body string (lines)
+Each notecard has zero or one heading, and then in its body string (lines)
 any arbitrary subset of those lines can be a "header" (alla markdown) line
 of any arbitrary "depth" (number of contiguous octothorps anchored to the
 beginning of the string).
@@ -15,10 +15,10 @@ and in-body headers so that they coalesce to make a document that looks
 
 In detail:
 
-  - Every fragment's (any) heading (when present) will express as either
+  - Every notecard's (any) heading (when present) will express as either
     a heading (line) or the document title.
 
-  - For those fragments whose body copy has headers, their most significant
+  - For those notecards whose body copy has headers, their most significant
     depth is one as stored. (I.e., write headers `# like this` normally.)
 
   - It seems from our current output target that headers of depth one are
@@ -30,12 +30,12 @@ In detail:
   - As such, normally a body copy header of depth 1 gets "demoted" to have
     a depth of 2 and so on (at expression).
 
-  - The "head fragment" (first one) in a document will always have a heading,
+  - The "head notecard" (first one) in a document will always have a heading,
     and that heading will always be expressed as the document title (and so
     not as a header line).
 
-  - IFF a non-head fragment has a heading, that heading will express as a
-    header. This further demotes any body copy headers in that fragment
+  - IFF a non-head notecard has a heading, that heading will express as a
+    header. This further demotes any body copy headers in that notecard
     by one more level of depth (at expression).
 """
 
@@ -44,24 +44,24 @@ import re
 
 class Document_:
 
-    def __init__(self, fragments):
-        self._fragments = fragments
+    def __init__(self, notecards):
+        self._notecards = notecards
 
     @property
     def document_title(self):
-        return self.head_fragment.heading  # guaranteed per [#883.2]
+        return self.head_notecard.heading  # guaranteed per [#883.2]
 
     @property
     def document_datetime(self):
-        return self.head_fragment.document_datetime
+        return self.head_notecard.document_datetime
 
     @property
-    def head_fragment_identifier_string(self):
-        return self.head_fragment.identifier_string
+    def head_notecard_identifier_string(self):
+        return self.head_notecard.identifier_string
 
     @property
-    def head_fragment(self):
-        return self._fragments[0]
+    def head_notecard(self):
+        return self._notecards[0]
 
     def TO_LINES(self, listener):
         ast_itr = self._to_line_ASTs(listener)
@@ -70,29 +70,29 @@ class Document_:
                 yield line
 
     def _to_line_ASTs(self, listener):  # #testpoint
-        idoc = _indexed_document_via(self._fragments, listener)
+        idoc = _indexed_document_via(self._notecards, listener)
         if idoc is None:
             cover_me('make sure you use a monitor')
             return
         return _to_document_line_ASTs(idoc, listener)
 
 
-def _indexed_document_via(fragments, listener):
+def _indexed_document_via(notecards, listener):
 
     idoc = _IndexedDocument()
-    see = idoc.see_indexed_fragment
+    see = idoc.see_indexed_notecard
 
-    frag_iter = iter(fragments)
+    frag_iter = iter(notecards)
 
-    frag = next(frag_iter)  # assume at least one fragment per document
+    frag = next(frag_iter)  # assume at least one notecard per document
 
-    ifr = _IndexedFragment(True, frag, listener)
+    ifr = _IndexedNotecard(True, frag, listener)
     if not ifr.OK:
         return
     see(ifr)
 
     for frag in frag_iter:
-        ifr = _IndexedFragment(False, frag, listener)
+        ifr = _IndexedNotecard(False, frag, listener)
         if not ifr.OK:
             return
         see(ifr)
@@ -104,7 +104,7 @@ def _to_document_line_ASTs(idoc, listener):
 
     is_first = True
 
-    for ifr in idoc.indexed_fragments:
+    for ifr in idoc.indexed_notecards:
         if is_first:
             is_first = False
         else:
@@ -142,9 +142,9 @@ class _IndexedDocument:
         self.final_footnote_url_via_identifier = {}
         self.final_footnote_order = []
 
-        self.indexed_fragments = []
+        self.indexed_notecards = []
 
-    def see_indexed_fragment(self, ifr):
+    def see_indexed_notecard(self, ifr):
         for ast in ifr.footnote_definitions:
             url = ast.url_probably
             if url not in self.final_footnote_identifier_via_url:
@@ -153,12 +153,12 @@ class _IndexedDocument:
                 self.final_footnote_identifier_via_url[url] = use_id
                 self.final_footnote_url_via_identifier[use_id] = url
                 self.final_footnote_order.append(use_id)
-        self.indexed_fragments.append(ifr)
+        self.indexed_notecards.append(ifr)
 
 
-class _IndexedFragment:
+class _IndexedNotecard:
 
-    def __init__(self, is_head_fragment, frag, listener):
+    def __init__(self, is_head_notecard, frag, listener):
         """.#wish [#882.F] without proper markdown parsing, this hurts to
 
         read and seems vulerable to missed matches and false-positives.
@@ -178,7 +178,7 @@ class _IndexedFragment:
 
         from pho.models_ import header
         add_header_depth, hdr = header.decide_how_to_express_heading(
-                is_head_fragment, frag.heading)
+                is_head_notecard, frag.heading)
 
         if hdr is not None:
             self._add_AST(hdr)
@@ -281,7 +281,7 @@ class _IndexedFragment:
         if not self._end_of_stream_is_OK_here:
             cover_me('unclosed multli-line code block?')
 
-        self.fragment_identifier_string = frag.identifier_string
+        self.notecard_identifier_string = frag.identifier_string
         del self._listener
 
     def __add_footnote_definition_AST(self, ast):
@@ -345,16 +345,16 @@ def _AST_via_liner(parse_context, listener):
 
 class _ParseContext:
     # experiment for better error messages
-    # at #here2 we pop lines off the end of the fragment, but:
+    # at #here2 we pop lines off the end of the notecard, but:
     # that shouldn't effect our line offsets (which count from beginnning)
 
     def __init__(self, iid_s):
         self.lineno = 0
-        self.fragment_identifier_string = iid_s
+        self.notecard_identifier_string = iid_s
 
     def say_at_where(self):
         return (
-            f'in {repr(self.fragment_identifier_string)}.body'
+            f'in {repr(self.notecard_identifier_string)}.body'
             f' (line {self.lineno})'
             )
 

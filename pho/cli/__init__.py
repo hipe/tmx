@@ -8,7 +8,7 @@ def cli_for_production():
 
 def _CLI(sin, sout, serr, argv, enver):
     def line_contents():
-        yield 'experiments in generating documents from "fragments"'
+        yield 'experiments in generating documents from "notecards"'
     from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
     return cheap_arg_parse_branch(
             sin, sout, serr, argv, _big_flex(), line_contents, enver)
@@ -35,7 +35,7 @@ def _build_memoized_thing():
 
         @property
         def descs(_):
-            yield 'The path to the directory with the fragments '
+            yield 'The path to the directory with the notecards '
             yield '(the directory that contains the `entities` directory)'
             yield f'(or set the env var {coll_path_env_var_name})'
 

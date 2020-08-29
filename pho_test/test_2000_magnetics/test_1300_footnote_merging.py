@@ -7,17 +7,17 @@ class _CommonCase(unittest.TestCase):
 
     def to_document_line_ASTs(self):
 
-        _frags = self.given_fragments()
-        _state = doc_state_lib.document_state_via_fragments(_frags)
+        _frags = self.given_notecards()
+        _state = doc_state_lib.document_state_via_notecards(_frags)
 
         for sect in _state.sections:
             for ast in sect.body_line_ASTs:
                 yield ast
 
 
-# (120-139)
+# (1200-1390)
 
-class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
+class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
 
     def test_100_footnote_defs_have_IDs_in_order_w_respect_to_each_other(self):
         def f(ast):
@@ -86,7 +86,7 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
     def line_ASTs(self):
         return tuple(self.to_document_line_ASTs())
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'el título', (
                 "as youths, we enjoyed [McDonald's][99]",
                 'and also the',
@@ -97,7 +97,7 @@ class Case122_footnotes_in_just_one_fragment_will_get_normalized(_CommonCase):
                 )
 
 
-class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
+class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
 
     def test_100_only_3_footnotes_down_from_4(self):
         def f(act, exp):
@@ -157,7 +157,7 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
         self.assertEqual(len(sections), 3)
         return sections
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'el título de frag 1', (
                 'meet me at the [paris][uno]',
                 'meet me at the [copenhagen][dos]',
@@ -172,7 +172,7 @@ class Case125_footnotes_are_normalized_across_fragments(_CommonCase):
                 )
 
 
-class Case133_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
+class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
 
     def test_100_look_at_this_crazy_thing(self):
         _actual = tuple(ast.symbol_name for ast in self.a())
@@ -206,7 +206,7 @@ class Case133_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
     def a(self):
         return tuple(self.to_document_line_ASTs())
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'el título', (
                 "here's how: ",
                 '```bash',

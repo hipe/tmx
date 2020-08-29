@@ -2,9 +2,9 @@ import os
 import re
 
 
-def document_tree_via_fragment(
+def document_tree_via_notecard(
         out_tuple,
-        fragment_IID_string,
+        notecard_IID_string,
         big_index,
         be_recursive,
         force_is_present,
@@ -22,7 +22,7 @@ def document_tree_via_fragment(
                 big_index, listener)
     else:
         return _when_single_file(
-                fw, *out_tuple, fragment_IID_string,
+                fw, *out_tuple, notecard_IID_string,
                 big_index, listener)
 
 
@@ -69,10 +69,10 @@ def _when_recursive(fw, out_dir, big_index, listener):
 
 
 def _when_single_file(
-        fw, out_type, out_value, fragment_IID_string,
+        fw, out_type, out_value, notecard_IID_string,
         big_index, listener):
 
-    doc = big_index.RETRIEVE_DOCUMENT(fragment_IID_string, listener)
+    doc = big_index.RETRIEVE_DOCUMENT(notecard_IID_string, listener)
     if doc is None:
         return
 
@@ -160,7 +160,7 @@ def _facets_for_publishing_via_doc(doc, listener):
 
     Here you see some validations effecting the validation of
     publishing-platform-specific required fields. We do not make these
-    validations at the input phase (i.e when fragments are created/edited)
+    validations at the input phase (i.e when notecards are created/edited)
     because these requirements
     are more a concern of the particular publishing platform we happen to
     be targeting.
@@ -238,13 +238,13 @@ class _FacetsForPublishing:
 
         def _pieces_for_filename():
             yield 'GENERATED'
-            yield doc.head_fragment_identifier_string
+            yield doc.head_notecard_identifier_string
             if len(_):
                 yield _
 
         self.frontmatter_title = (
                 f'{document_title} '
-                f'({doc.head_fragment_identifier_string})'
+                f'({doc.head_notecard_identifier_string})'
                 )
 
         # Finally, append the file extension
@@ -276,8 +276,8 @@ class _FacetsForPublishing:
 
 def _whine_about_datetime(listener, doc):
     def payloader():
-        _ = doc.head_fragment_identifier_string
-        _ = f'head fragment {repr(_)} must have `document_datetime`' \
+        _ = doc.head_notecard_identifier_string
+        _ = f'head notecard {repr(_)} must have `document_datetime`' \
             ' (this is liable to change eventually)'
         return {'reason_tail': _}
     listener('error', 'structure', 'missing_required_attribute', payloader)

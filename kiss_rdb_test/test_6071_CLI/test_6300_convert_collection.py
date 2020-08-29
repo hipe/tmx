@@ -1,5 +1,3 @@
-from sakin_agac_test.common_initial_state import (
-        executable_fixture)
 from modality_agnostic.memoization import (
         dangerous_memoize_in_child_classes,
         dangerous_memoize as shared_subject, lazy)
@@ -348,7 +346,12 @@ class Case060_one_arg_which_is_token(_CommonCase):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
-        return (executable_fixture('exe_140_khong_micro.py'),
+        from os.path import dirname, join
+        test_dir = dirname(dirname(__file__))
+        tail = 'exe_140_khong_micro.py'
+        data_provider = join(test_dir, 'fixture_executables', tail)
+
+        return (data_provider,
                 '-', '--to-format', 'markdown-table')
 
 
@@ -373,7 +376,7 @@ def _this_one_lib():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-A.3: moved here from another subproject
 # #history-A.2 implementation moved to kiss (convert collection)
-# #pending-rename: to somewhere in kiss, for testing the command named #here1
 # #history-A.1: when interfolding became the main algorithm, order changed
 # #born.

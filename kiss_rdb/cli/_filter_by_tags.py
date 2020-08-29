@@ -103,5 +103,4 @@ def __summarize_search_stats(o):  # deleted coverage at #history-A.3
     else:
         yield o(f'{matched} match(es) of {total} item(s) seen')
 
-# #pending-rename: might as well change to _foo_bar from foo_bar_
 # #re-housed #abstracted

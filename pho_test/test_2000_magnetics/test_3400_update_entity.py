@@ -56,7 +56,7 @@ class EndState:
 evil = '_OMG_'  # back hacky memory hack [#507.6]
 
 
-class Case325_POORLY_FORMED_REQUEST(CommonCase):
+class Case3250_POORLY_FORMED_REQUEST(CommonCase):
 
     def test_100_strange_CUD_type(self):
         self.end_state['unrecognized CUD']
@@ -102,7 +102,7 @@ def collection_minimal():
         'core_attributes': {**reqs}}
 
 
-class Case328_delete_primitive(CommonCase):
+class Case3280_delete_primitive(CommonCase):
 
     def test_100_everything(self):
         line, = self.build_end_state().emissions[0].lines
@@ -115,7 +115,7 @@ class Case328_delete_primitive(CommonCase):
         return collection_minimal()
 
 
-class Case331_update_primitive(CommonCase):
+class Case3310_update_primitive(CommonCase):
 
     def test_100_everything(self):
         pe = self.build_end_state().result_value
@@ -165,7 +165,7 @@ def collection_LL1():
         'core_attributes': {'previous': 'II', **reqs}}
 
 
-class Case334_create_a_prext(CommonCase):
+class Case3340_create_a_prext(CommonCase):
     #
     #   AA <-> BB <-> CC <-> DD        GG <-> HH <-> II <-> JJ
     #
@@ -187,7 +187,7 @@ class Case334_create_a_prext(CommonCase):
         return collection_LL1()
 
 
-class Case337_two_cut_one_splice_a_linked_list(CommonCase):
+class Case3370_two_cut_one_splice_a_linked_list(CommonCase):
     #
     #   AA <-> BB <-> CC <-> DD        GG <-> HH <-> II <-> JJ
     #
@@ -220,7 +220,7 @@ def collection_tiktok():
         'core_attributes': {'parent': 'bytedance', **reqs}}
 
 
-class Case340_delete_parent(CommonCase):
+class Case3400_delete_parent(CommonCase):
     #
     #        bytedance
     #             |
@@ -246,7 +246,7 @@ class Case340_delete_parent(CommonCase):
         return collection_tiktok()
 
 
-class Case343_create_parent(CommonCase):
+class Case3430_create_parent(CommonCase):
     #
     #               AAA         BBB
     #             /    \       /   \
@@ -273,7 +273,7 @@ class Case343_create_parent(CommonCase):
         return collection_fellas()
 
 
-class Case346_update_parent(CommonCase):
+class Case3460_update_parent(CommonCase):
     #
     #               AAA         BBB
     #             /    \       /   \
@@ -331,7 +331,7 @@ def collection_fellas():
         'core_attributes': {'parent': 'BBB', **reqs}}
 
 
-class Case349_delete_children(CommonCase):
+class Case3490_delete_children(CommonCase):
     #
     #               AAA         BBB
     #             /    \       /   \
@@ -356,7 +356,7 @@ class Case349_delete_children(CommonCase):
         return collection_fellas()
 
 
-class Case352_edit_children(CommonCase):
+class Case3520_edit_children(CommonCase):
     #
     #               AAA         BBB
     #             /    \       /   \
@@ -384,7 +384,7 @@ class Case352_edit_children(CommonCase):
         return collection_fellas()
 
 
-class Case355_create_children(CommonCase):
+class Case3550_create_children(CommonCase):
     #
     #               AAA         BBB
     #             /    \       /   \

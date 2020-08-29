@@ -9,7 +9,7 @@ arrangements could be made to make this more machine readable but currently
 it is not very much so for practical purposes (with each JSON-like record
 occupying possibly more than one line).
 """
-# This producer script is one of several covered by (Case100SA).
+# This producer script is one of several covered by (Case4975NC).
 
 from os import path as os_path
 

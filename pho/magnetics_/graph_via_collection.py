@@ -31,7 +31,7 @@ def output_lines_via_big_index_(o, listener):
 
     # labels for nodes
 
-    frag_of = o.fragment_of
+    frag_of = o.notecard_of
     for k, frag in frag_of.items():
 
         _encoded = _ENCODED_heading_for(frag)
@@ -40,14 +40,14 @@ def output_lines_via_big_index_(o, listener):
     # done
 
     yield (
-            'label="\\n(generated) fragment relationships\\n'
+            'label="\\n(generated) notecard relationships\\n'
             'in your whole collection"'
             )
     yield '}'
 
     def f():
         _num = len(frag_of)
-        _message = f'graph reflects relationships among {_num} fragments.'
+        _message = f'graph reflects relationships among {_num} notecards.'
         return {'message': _message}
     listener('info', 'structure', 'summary', f)
 

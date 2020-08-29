@@ -7,7 +7,7 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-class Case162_MONO_CASE(_CommonCase):
+class Case1620_MONO_CASE(_CommonCase):
 
     def test_100_lines_are_okay_probably(self):
         lines, _, _ = self.custom_end_state()
@@ -25,7 +25,7 @@ class Case162_MONO_CASE(_CommonCase):
         sct = payloader_BE_CAREFUL_HOT()
         import re
         md = re.match(
-                r'^graph reflects relationships among (\d+) fragments\.$',
+                r'^graph reflects relationships among (\d+) notecards\.$',
                 sct['message'])
         self.assertIn(int(md[1]), range(6, 10))
 

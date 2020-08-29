@@ -1,6 +1,6 @@
 'use strict';
 
-const _COLLECTION = '../pho-doc/fragments';  // ..
+const _COLLECTION = '../pho-doc/notecards';  // ..
 const _BACKEND = 'backend.py';
 const _PYTHON = 'python3';  // ..
 

@@ -1,4 +1,6 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3
+
+# we used to do "-W error::Warning::0" but it was broken at #history-A.2
 
 
 def stream_for_sync_via_stream(dcts):
@@ -31,5 +33,7 @@ if __name__ == '__main__':
     from data_pipes_test.fixture_executables.exe_150_json_stream_via_bernstein_html import exit_code_via_path  # noqa: E501
     exit(exit_code_via_path(__file__))
 
+
+# #history-A.2: moved from another subproject to here
 # #history-A.1: no more sync-side entity mapping
 # #born.

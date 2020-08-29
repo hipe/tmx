@@ -7,7 +7,7 @@ def CLI(sin, sout, serr, argv, enver=None):
 def _params():
     from pho.cli import CP_
     yield '-c', '--collection-path=PATH', * CP_().descs
-    yield '-v', '--verify', 'Check the integrity of the fragment collection'
+    yield '-v', '--verify', 'Check the integrity of the notecard collection'
 
 
 def return_exitstatus(orig_f):
@@ -23,7 +23,7 @@ def return_exitstatus(orig_f):
 
 @return_exitstatus
 def _do_CLI(monitor, sin, sout, serr, enver, collection_path, do_veri):
-    """Show every relationship between every fragment in the collection.
+    """Show every relationship between every notecard in the collection.
 
     Output a graph-viz digraph of the whole collection.
     """
@@ -55,7 +55,7 @@ def _do_CLI(monitor, sin, sout, serr, enver, collection_path, do_veri):
 
 
 def _express_verification(sout, serr, big_index):
-    if not len(big_index.fragment_of):
+    if not len(big_index.notecard_of):
         _line_writer(serr)("empty graph!")
         return 1
 
@@ -67,10 +67,10 @@ def _express_verification(sout, serr, big_index):
 def _lines_for_express_verification(big_index):
     _cpc = len(big_index.parent_of)
     _cpn = len(big_index.previous_of)
-    _cto = len(big_index.fragment_of)
+    _cto = len(big_index.notecard_of)
     yield f'{_cpc} parent-child relationship(s) ok'
     yield f'{_cpn} prev-next relationship(s) ok'
-    yield f'{_cto} fragment(s) ok'
+    yield f'{_cto} notecard(s) ok'
 
 
 def _require_collection_path(enver, listener):

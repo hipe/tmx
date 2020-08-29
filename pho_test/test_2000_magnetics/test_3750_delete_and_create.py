@@ -56,7 +56,7 @@ class CommonCase(TestCase):
         return bpf
 
 
-class Case375_delete_entity(CommonCase):
+class Case3750_delete_entity(CommonCase):
 
     def test_100_the_index_patch_takes_out_the_two_lines(self):
         hunk, = self.the_first_patch.file_patch.hunks  # one hunk
@@ -87,7 +87,7 @@ class Case375_delete_entity(CommonCase):
         return busi_coll._big_patchfile_for_delete('8W2', listener)
 
 
-class Case410_create_entity(CommonCase):
+class Case4100_create_entity(CommonCase):
 
     def test_100_update_the_entity_file(self):
         hunk, = self.the_first_patch.file_patch.hunks  # one hunk

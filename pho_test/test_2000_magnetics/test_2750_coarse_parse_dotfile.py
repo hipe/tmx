@@ -5,7 +5,7 @@ import unittest
 CommonCase = unittest.TestCase
 
 
-class Case275_AST(CommonCase):
+class Case2750_AST(CommonCase):
 
     def test_100_builds(self):
         self.assertIsNotNone(self.AST)

@@ -23,7 +23,7 @@ hard-coded lists at least one of which we need to know.
 there are alternatives to what we do here..
 
 """
-# This producer script is one of several covered by (Case100SA).
+# This producer script is one of several covered by (Case4975NC).
 
 
 import re

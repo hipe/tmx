@@ -1,7 +1,7 @@
-def document_state_via_fragments(frag_itr):
-    from pho.magnetics_.document_via_fragments import Document_
-    _fragments = tuple(_frags_via_frag_itr(frag_itr))
-    _doc = Document_(_fragments)
+def document_state_via_notecards(frag_itr):
+    from pho.magnetics_.document_via_notecards import Document_
+    _notecards = tuple(_frags_via_frag_itr(frag_itr))
+    _doc = Document_(_notecards)
     return _DocumentState(_doc)
 
 
@@ -77,8 +77,8 @@ class _Section:
 
 def _frags_via_frag_itr(frag_itr):
 
-    from pho.magnetics_.document_fragment_via_definition import \
-            document_fragment_via_definition
+    from pho.magnetics_.notecard_via_definition import \
+            notecard_via_definition
 
     def listener(*e):
         raise RuntimeError('where')
@@ -91,7 +91,7 @@ def _frags_via_frag_itr(frag_itr):
         if title_s is None:
             dct['previous'] = 'HAK'
 
-        yield document_fragment_via_definition(
+        yield notecard_via_definition(
                 identifier_string=None, core_attributes=dct, listener=listener)
 
 

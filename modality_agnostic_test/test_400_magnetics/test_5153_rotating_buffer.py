@@ -179,5 +179,4 @@ def _subject_module():
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: to case number
 # #abstracted

@@ -7,15 +7,15 @@ import unittest
 class _CommonCase(unittest.TestCase):
 
     def build_state(self):
-        return doc_state_lib.document_state_via_fragments(
-                self.given_fragments())
+        return doc_state_lib.document_state_via_notecards(
+                self.given_notecards())
 
 
-# (110-119)
+# (1100-1190)
 
-class Case112_one_fragment_with_heading_and_leading_header(_CommonCase):
+class Case1120_one_notecard_with_heading_and_leading_header(_CommonCase):
 
-    def test_100_heading_of_first_fragment_becomes_doc_title(self):
+    def test_100_heading_of_first_notecard_becomes_doc_title(self):
         self.assertEqual(self.state.document_title, 'dogs are great')
 
     def test_200_header_gets_pushed_down_one_level(self):  # provision [#883.3]
@@ -29,13 +29,13 @@ class Case112_one_fragment_with_heading_and_leading_header(_CommonCase):
     def state(self):
         return self.build_state()
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'dogs are great', ('#ha ha', 'so good', '#h3', 'yup')
 
 
-class Case115_nonfirst_fragment_headings(_CommonCase):
+class Case1150_nonfirst_notecard_headings(_CommonCase):
 
-    def test_100_turn_nonfirst_fragment_heading_into_header(self):
+    def test_100_turn_nonfirst_notecard_heading_into_header(self):
         self.assertEqual(self._this_header().text, 'dogs are cool\n')
 
     def test_200_this_header_becomes_the_common_depth(self):
@@ -49,12 +49,12 @@ class Case115_nonfirst_fragment_headings(_CommonCase):
     def state(self):
         return self.build_state()
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'dogs', ('#h', 'xx1')
         yield 'dogs are cool', ('xx3',)
 
 
-class Case118_nonfirst_fragments_with_heading_and_headers(_CommonCase):
+class Case1180_nonfirst_notecards_with_heading_and_headers(_CommonCase):
 
     def test_100_headers_are_bumped_down_a_level_EVERYTHING(self):
         state = self.build_state()
@@ -71,12 +71,12 @@ class Case118_nonfirst_fragments_with_heading_and_headers(_CommonCase):
         assert(hdr.text == 'loved dog #2\n')
         self.assertEqual(hdr.depth, 3)
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'dogs', ('#h', 'xx1')
         yield 'dogs are cool', ('#loved dog #1', 'abc', '#loved dog #2', 'xx')
 
 
-class Case121_nonfirst_fragments_with_NO_heading_YES_headers(_CommonCase):
+class Case1210_nonfirst_notecards_with_NO_heading_YES_headers(_CommonCase):
 
     def test_100_headers_are_NOT_bumped_down_a_level_EVERYTHING(self):
         state = self.build_state()
@@ -89,7 +89,7 @@ class Case121_nonfirst_fragments_with_NO_heading_YES_headers(_CommonCase):
         assert(hdr.text == 'loved dog #2\n')
         self.assertEqual(hdr.depth, 2)
 
-    def given_fragments(self):
+    def given_notecards(self):
         yield 'dogs', ('#h', 'xx1')
         yield None, ('#loved dog #1', 'abc', '#loved dog #2', 'xx')
 

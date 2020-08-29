@@ -1,10 +1,10 @@
 import re
 
 
-# ifr = _IndexedFragment
+# inc = _IndexedNotecard
 # idoc = _IndexedDocument
 
-def dereference_footnotes__(mixed_children, lineno, ifr, idoc, listener):
+def dereference_footnotes__(mixed_children, lineno, inc, idoc, listener):
     """an ad-hoc specialty function that is the main workhorse for merging
 
     footnotes. assert that the mixed children of the structured line have
@@ -18,7 +18,7 @@ def dereference_footnotes__(mixed_children, lineno, ifr, idoc, listener):
     a = []
 
     mixed_itr = iter(mixed_children)
-    dct = ifr.footnote_url_via_local_identifier
+    dct = inc.footnote_url_via_local_identifier
 
     def add_string(s):
         assert(isinstance(s, str))  # #[#022]
@@ -33,7 +33,7 @@ def dereference_footnotes__(mixed_children, lineno, ifr, idoc, listener):
         local_id = ast.local_identifier
         if local_id not in dct:
             __whine_about_bad_footnote_ref(
-                    listener, local_id, lineno, ifr, idoc)
+                    listener, local_id, lineno, inc, idoc)
             return
         _url = dct[local_id]
         _final_id = idoc.final_footnote_identifier_via_url[_url]
@@ -149,11 +149,11 @@ footnote_definition_via = _GlobalFootnoteDefinition
 
 # == whiners
 
-def __whine_about_bad_footnote_ref(listener, local_id, lineno, ifr, idoc):
+def __whine_about_bad_footnote_ref(listener, local_id, lineno, inc, idoc):
 
-    _iid = ifr.fragment_identifier_string
+    _iid = inc.notecard_identifier_string
 
-    a = tuple(fnd.identifier_string for fnd in ifr.footnote_definitions)
+    a = tuple(fnd.identifier_string for fnd in inc.footnote_definitions)
 
     if len(a):
         _these = ', '.join(a)

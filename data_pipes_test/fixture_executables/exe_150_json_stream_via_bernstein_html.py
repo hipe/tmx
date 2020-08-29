@@ -90,8 +90,8 @@ stream_for_sync_is_alphabetized_by_key_for_sync = False
 
 
 def stream_for_sync_via_stream(dcts):  # #copy-pasted from prod #history-A.1
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            simplified_key_via_markdown_link_er)
+    from kiss_rdb.storage_adapters.markdown import \
+            simplified_key_via_markdown_link_er
     key_via = simplified_key_via_markdown_link_er()
 
     for dct in dcts:
@@ -153,8 +153,7 @@ def _this_typical_humkey_via_td():
         # ..
         return markdown_link_via(_string_via_el(a_tag), url)
 
-    from kiss_rdb.storage_adapters_.markdown_table.LEGACY_markdown_document_via_json_stream import (  # noqa: E501
-            markdown_link_via)
+    from kiss_rdb.storage_adapters.markdown import markdown_link_via
 
     return f
 

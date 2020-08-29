@@ -418,7 +418,6 @@ def _cel_via_er():
     return AttributeCell_
 
 # #history-A.3: full rewrite (unification, multi-table, state machine)
-# #pending-rename: maybe to "via dictionaries"
 # #history-A.2: move out of scripts directory. no longer an excutable.
 # #history-A.1: (can be temporary) used to use putser_via_IO
 # #history-A.1: big refactor, sunsetted file of origin

@@ -33,7 +33,7 @@ class CommonCase(unittest.TestCase):
                 lines = tuple(f())
             emissions.append((chan, lines))
 
-        from kiss_rdb.storage_adapters_.eno.blocks_via_path_ import \
+        from kiss_rdb.storage_adapters_.eno._blocks_via_path import \
             _new_file_blocks, emitter_via_monitor__
 
         coll = collection_via_collection_path_('/dev/null')

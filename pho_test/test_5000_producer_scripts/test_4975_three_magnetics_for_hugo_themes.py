@@ -1,5 +1,3 @@
-from sakin_agac_test.common_initial_state import (
-        fixture_directory_for)
 from modality_agnostic.memoization import lazy
 import unittest
 
@@ -7,10 +5,10 @@ import unittest
 _CommonCase = unittest.TestCase
 
 
-# Case100SA is used to reference this whole file
+# Case4975NC is used to reference this whole file
 
 
-class Case140_magenetic_one(_CommonCase):
+class Case4970_magenetic_one(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_one())
@@ -44,7 +42,7 @@ class Case140_magenetic_one(_CommonCase):
         return _product_of_magnet_one()
 
 
-class Case150_magenetic_two(_CommonCase):
+class Case4974_magenetic_two(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_two())
@@ -78,7 +76,7 @@ class Case150_magenetic_two(_CommonCase):
         return _product_of_magnet_two()
 
 
-class Case160_magnetic_three(_CommonCase):
+class Case4980_magnetic_three(_CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_three())
@@ -137,7 +135,8 @@ def _product_of_magnet_one():
 
 @lazy
 def _themes_dir_A():
-    return fixture_directory_for('0190-a-few-hugo-themes')
+    from pho_test.common_initial_state import fixture_directory
+    return fixture_directory('hugo-themes', '0190-a-few-themes')
 
 
 def _subject_module_three():

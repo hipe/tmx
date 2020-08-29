@@ -11,7 +11,7 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
 def COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(stdout):
-    from .magnetics_.markdown_via_json_stream import (
+    from .magnetics_.markdown_via_dictionaries import (
             COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE)
     return COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(stdout)
 

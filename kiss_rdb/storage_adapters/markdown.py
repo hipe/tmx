@@ -60,7 +60,6 @@ def markdown_link_via(label, url):
     return f'[{label}]({url})'  # (you could get bit)..
 
 
-# #pending-rename: we are thinking kiss_rdb/storage_adapters/markdown.py
 # #history-A.3: no more executable script
 # #history-A.2: no more sync-side entity-mapping
 # #history-A.1: MD table generation overhaul & becomes library when gets covg

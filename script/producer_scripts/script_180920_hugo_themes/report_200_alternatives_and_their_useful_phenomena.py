@@ -4,7 +4,7 @@
 for each alternative, show a list of its phenomena, having subtracted out
 those phenomena we aren't interested in because they're singletons. YAY!
 """
-# This producer script is one of several covered by (Case200SA).
+# This producer script is one of several covered by (Case5025NC).
 
 
 def stream_for_sync_via_stream(dcts):

@@ -68,8 +68,8 @@ def fixture_directory_one():
     return fixture_directory('collection-00500-intro')
 
 
-def fixture_directory(stem):
-    return os_path.join(fixture_directories_directory(), stem)
+def fixture_directory(*tail):
+    return os_path.join(fixture_directories_directory(), *tail)
 
 
 @lazy
