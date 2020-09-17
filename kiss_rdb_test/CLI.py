@@ -263,7 +263,6 @@ _no_WR = _write_receiver_via_function(_expecting_no_writes)
 
 def _invoke_CLI(given_stdin, given_args, injections_dictionary):
     from kiss_rdb.cli import cli
-    from kiss_rdb import ModalityAdaptationInjections_
 
     """:[#867.U] "why we inject": There are two aspects of testing that would
     be difficult or impossible without exposing these points of dependency
@@ -283,38 +282,33 @@ def _invoke_CLI(given_stdin, given_args, injections_dictionary):
     # might want it to be exposed way upstream to override in vendor like
     # we do for sout & serr. (we don't currently for 2 reasons)
 
-    if injections_dictionary is None:
-        use_RNG = None
-        use_FSer = None
-        filesystem_finish = None
-    else:
+    rng, opn, here = None, None, __file__
+    filesystem_finish = None
+    if injections_dictionary is not None:
         random_number, FS = __flatten_these(**injections_dictionary)
-        use_RNG = __rng_via(random_number)
+        rng = _rng_via(random_number)
         use_FSer, filesystem_finish = __these_two_via_filesystem(FS)
-
-    if use_RNG is None and use_FSer is None and given_stdin is None:
-        injections_obj = None
-    else:
-        if use_FSer is None:
-            use_FSer = lambda: None
-
-        injections_obj = ModalityAdaptationInjections_(
-                random_number_generator=use_RNG,
-                filesystemer=use_FSer,
-                stdin=given_stdin)
+        opn = _hacked_open_function(use_FSer) if use_FSer else None
 
     _exit_code = cli.main(
                 args=given_args,
                 prog_name='ohai-mami',
                 standalone_mode=False,  # see.
                 complete_var='___hope_this_env_var_is_never_set',
-                obj=injections_obj,
-            )
+                obj={'stdin': given_stdin, 'rng': rng, 'opn': opn, 'hi': here})
 
     return filesystem_finish, _exit_code
 
 
-def __rng_via(random_number):
+def _hacked_open_function(use_FSer):
+    def opn(path):
+        return fs.open_file_for_reading(path)
+    fs = use_FSer()
+    opn.THE_WORST_HACK_EVER_FILESYSTEM_ = fs
+    return opn
+
+
+def _rng_via(random_number):
     if random_number is None:
         return
 

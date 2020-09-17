@@ -127,11 +127,10 @@ class Case1409_collection_not_found(CommonCase):
         self.assertIsNotNone(collectioner())
 
     def test_100_channel(self):
-        self.emits_error_category(
-                'collection_not_found', 'no_such_file_or_directory')
+        self.emits_error_category(*error_category_for_no_schema_file())
 
     def test_200_reason(self):
-        self.emits_reason("No such file or directory: 'this-path/is-no-ent'")
+        self.emits_reason(message_about_no_schema_for(self.given_path()))
 
     def given_path(self):
         return 'this-path/is-no-ent'
@@ -155,14 +154,13 @@ class Case1410_has_strange_extension(CommonCase):
 
 
 class Case1411_has_no_extension_and_is_not_directory(CommonCase):
+    # (this used to be more detailed before #history.B-1 but not is better)
 
     def test_100_channel(self):
-        self.emits_error_case('file_has_no_extname')
+        self.emits_error_category(*error_category_for_no_schema_file())
 
     def test_200_reason(self):
-        self.emits_reason(
-            "cannot infer storage adapter from file with no extension - "
-            "abc/xyz")
+        self.emits_reason(message_about_no_schema_for('abc/xyz'))
 
     def given_fake_filesystem(self):
         return build_fake_filesystem(('file', 'abc/xyz'))
@@ -344,7 +342,7 @@ class Case1422_directory_based_money(CommonCase):
     def test_100_full_round_trip_works(self):
         ae = self.assertEqual
         es = self.build_end_state()
-        assert(es['channel'] is None)
+        self.assertFalse(es['did_emit'])
         rv = es['result_value']
         rv = unwrap_collection(rv)
         ae(rv['message for the test'], 'hello from storage adapter 1')
@@ -387,6 +385,18 @@ class Case1423_single_file_based_money(CommonCase):
         return build_fake_filesystem(('file', 'abc/xyz.xtc'))
 
 
+# == Support Test Assertions
+
+def error_category_for_no_schema_file():
+    return 'cannot_load_collection', 'no_schema_file'
+
+
+def message_about_no_schema_for(coll_path):
+    return f"No such file or directory: '{coll_path}/schema.rec'"
+
+
+# == Support Test Setup
+
 @lazy
 def collectioner():
     from kiss_rdb.magnetics_.collection_via_path import (
@@ -413,4 +423,5 @@ same_schema_path = 'abc/xyz/schema.rec'
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1
 # #born.

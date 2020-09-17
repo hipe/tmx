@@ -82,7 +82,7 @@ class Case1429_splay(CommonCase):
         self._result_is_none()
 
     def test_200_splays(self):
-        _exp = "no choo chi for 'zanga_tanga'. (there's 'ha_hu', 'he_hu'…)"
+        _exp = "no choo chi named 'zanga_tanga'. (there's 'ha_hu', 'he_hu'…)"
         self._said_this(_exp)
 
     @shared_subject

@@ -87,13 +87,9 @@ class build_fake_filesystem:
                 2, f"No such file or directory: '{path}'", path)
 
     def _lookup(self, path):
-        found = False
         for rec in self._tups:
             if path == rec[1]:
-                found = True
-                break
-        if found:
-            return rec
+                return rec
 
     @property
     def first_path(self):
@@ -102,9 +98,10 @@ class build_fake_filesystem:
 
 # == model-ishes
 
-class _FakeFile:
-    # we have PretendFile as a (at writing) sibling, but this makes 1 change
+class _FakeFile:  # :[#877.C]
+    # basically [#877.B] pretend file but takes iterator, and modified
     # so that the object passed into the block has the `path` property
+    # We want an excuse to unify the two.
 
     def __init__(self, lines, path):
         self._lines = lines

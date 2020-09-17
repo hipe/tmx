@@ -49,7 +49,7 @@ class CommonCase(unittest.TestCase):
         return ref.value  # freeform metadata
 
     def _run_expecting_input_error(self, shape, receive_payloader):
-        def receive_emission(chan, payloader):
+        def recv_emission(chan, payloader):
             assert(not memo.count)
             memo.count += 1
             self.assertEqual(chan, ('error', shape, 'input_error'))
@@ -58,7 +58,7 @@ class CommonCase(unittest.TestCase):
         class memo:  # #class-as-namespace
             count = 0
 
-        listener = em.L_VIA(receive_emission)
+        listener = em.listener_via_receive_channel_and_payloader(recv_emission)
 
         itr = self._run_non_validating_ID_traversal(listener)
 

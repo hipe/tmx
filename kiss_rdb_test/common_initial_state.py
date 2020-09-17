@@ -27,15 +27,6 @@ def lazy(f):  # #[#510.8]
 
 # ==
 
-
-class StubCollectionIdentity:
-    def __init__(self, collection_path):
-        self.collection_path = collection_path
-
-
-# ==
-
-
 def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
     import kiss_rdb.storage_adapters_.toml.entities_via_collection as ents_lib
     _tb = ents_lib.table_block_via_lines_and_table_start_line_object_(
@@ -49,12 +40,14 @@ def TSLO_via(identifier_string, meta_or_attributes):
 
 
 def pretend_file_via_path_and_big_string(path, big_string):
-    return PretendFile(unindent(big_string), path)
+    return pretend_file_via_path_and_lines(path, unindent(big_string))
 
 
-class PretendFile:  # (LIKE [#510.12] pass-thru etc but plus a `path` param)
+class pretend_file_via_path_and_lines:  # :[#877.B]
+    # (LIKE [#510.12] pass-thru etc but plus a `path` param)
+    # if you find yourself wishing it had a path property, unify with [#877.C]
 
-    def __init__(self, lines, path):
+    def __init__(self, path, lines):
         self._lines = lines
         self.path = path
 
@@ -65,6 +58,11 @@ class PretendFile:  # (LIKE [#510.12] pass-thru etc but plus a `path` param)
 
     def __exit__(self, typ, err, stack):
         pass
+
+    def release_lines__(self):
+        rv = self._lines
+        del self._lines
+        return rv
 
 
 def unindent_with_dot_hack(big_s):
@@ -97,9 +95,11 @@ def unindent(big_string):
 
 
 def debugging_listener():
-    from modality_agnostic.test_support import structured_emission as se_lib
-    return se_lib.debugging_listener()
+    import modality_agnostic.test_support.common as em
+    return em.debugging_listener()
 
+
+# == Load Fixtures
 
 def publicly_shared_fixture_file(which):
     assert(_this == which)

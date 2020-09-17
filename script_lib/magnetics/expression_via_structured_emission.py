@@ -280,7 +280,7 @@ def __reduce_redundancy(slots):
     _first_word = re.match('[^ :]+', slots['C'])[0]
     _first_word_of_last_human = slots['A'][-1][0]
     if _first_word_of_last_human == _first_word.lower():
-        # covered at: ('collection_not_found', 'no_such_file_or_directory')
+        # covered at: ('cannot_load_collection', 'no_such_file_or_directory')
         slots['A'].pop()  # #here2
 
 

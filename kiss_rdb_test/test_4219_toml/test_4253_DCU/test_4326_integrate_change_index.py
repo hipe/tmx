@@ -46,11 +46,13 @@ class CommonCase(unittest.TestCase):
     # -- used when preparing end states
 
     def build_common_components_for_failed_delete(self, id_s):
-        coll = self.subject_collection()
+        coll = self.given_collection()
         run = run_for(coll, 'delete', id_s)
-        chan, payloader = _se_lib().one_and_none(self, run)
+        listener, emissions = em().listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(run(listener))
+        emi, = emissions
         return three_components_via_channel_and_payloader(
-                self, chan, payloader)
+                self, emi.channel, emi.payloader)
 
     def flush_filesystem_recordings(self):
         coll = self.end_state['collection']
@@ -66,7 +68,7 @@ class CommonCase(unittest.TestCase):
 
     identifier_via_primitive = storage_adapter_canon.identifier_via_string
 
-    do_debug = True
+    do_debug = False
 
 
 # (Case4334) is a "collection not found" case
@@ -532,10 +534,11 @@ class Case4336_create_into_existing_file(CommonCase):
         efr = self.entity_file_rewrite()
         self.assertEqual(_last_3_of_path(efr.path), 'entities/2/H.toml')
 
+        # (below values used to be primitives but becamse strings #history-B.1)
         expect = tuple(_unindent("""
         [item.2HG.attributes]
-        thing_2 = -2.718
-        thing_B = false
+        thing_2 = "-2.718"
+        thing_B = "false"
         [item.2HJ.attributes]
         """))
 
@@ -720,9 +723,8 @@ def _build_collection_expecting_common_number_of_rewrites():
 
 
 def _build_collection(dir_path, **injections):
-    collection_identity = StubCollectionIdentity(dir_path)
     return _subject_module().collection_via_directory_and_schema(
-            collection_identity=collection_identity,
+            collection_directory=dir_path,
             collection_schema=_always_same_schema(),
             **injections)
 
@@ -775,9 +777,9 @@ def _no_listener(*chan, payloader):
 
 # ==
 
-def _se_lib():
-    from modality_agnostic.test_support import structured_emission as se_lib
-    return se_lib
+def em():
+    import modality_agnostic.test_support.common as module
+    return module
 
 
 # ==
@@ -785,5 +787,6 @@ def _se_lib():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1
 # #history-A.1
 # #born.

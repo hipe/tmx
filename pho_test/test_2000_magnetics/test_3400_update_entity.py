@@ -78,7 +78,7 @@ class Case3250_POORLY_FORMED_REQUEST(CommonCase):
         dct = {}
         assert(end_state.result_value is None)
         em, = end_state.emissions
-        for para in paragraphs_via_lines(em.lines):
+        for para in paragraphs_via_lines(em.to_messages()):
             k = first_N_words(2, para[0])
             dct[k] = para
         return dct
@@ -107,7 +107,7 @@ def collection_minimal():
 class Case3280_delete_primitive(CommonCase):
 
     def test_100_everything(self):
-        line, = self.build_end_state().emissions[0].lines
+        line, = self.build_end_state().emissions[0].to_messages()
         self.assertIn('body cannot be none', line)
 
     def perform(self, perform):
