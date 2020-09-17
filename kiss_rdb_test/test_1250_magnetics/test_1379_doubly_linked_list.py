@@ -35,8 +35,8 @@ def _common_shared_state(m):  # #decorator
 
 
 def lazify_method_non_dangerously(build_value, m):  # [#510.6]
-    self = _State()
-    self._is_first_call = True
+    class self:  # #class-as-namespace
+        _is_first_call = True
 
     def use_method(ignore_test_context):
         if self._is_first_call:
@@ -44,10 +44,6 @@ def lazify_method_non_dangerously(build_value, m):  # [#510.6]
             self._value = build_value()
         return self._value
     return use_method
-
-
-class _State:  # #[#510.2]
-    pass
 
 
 class Case1367_empty(CommonCase):

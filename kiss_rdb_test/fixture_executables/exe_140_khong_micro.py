@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-# we used to do "-W error::Warning::0" but it was broken at #history-A.2
+#!/usr/bin/env python3 -W default::Warning::0
 
 
 def stream_for_sync_via_stream(dcts):

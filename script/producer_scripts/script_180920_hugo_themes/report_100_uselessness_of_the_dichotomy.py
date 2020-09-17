@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 """
 first, we'll develop the question of whether there's a practical discernable

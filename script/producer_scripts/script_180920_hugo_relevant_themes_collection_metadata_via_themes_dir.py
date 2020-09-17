@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 """hackily parse the bash script that hugo uses to generate the site.
 

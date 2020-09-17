@@ -15,8 +15,10 @@ def filesystem_expecting_no_rewrites():
 
 def build_filesystem_expecting_num_file_rewrites(expected_num):
 
-    self = _ThisState()
-    self._records = []
+    class my_state:  # #class-as-namespace
+        _records = []
+
+    self = my_state
 
     def INJECTED_FELLOW(from_fh, to_fh):
 
@@ -42,10 +44,6 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
         return res
 
     return _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish)
-
-
-class _ThisState:  # #[#510.2]
-    pass
 
 
 def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):

@@ -155,10 +155,9 @@ then in your 'main' terminal:
 
 ## <a name=aliases></a>(these aliases)
 
-    # alias py='python3 -W error::Warning::0'
+    alias py='python3 -W error::Warning::0'
     # (gotta let warnings thru at #history-A.2, for tatsu)
 
-    alias py=python3
     alias pud='py -m unittest discover'
 
 

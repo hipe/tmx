@@ -40,8 +40,8 @@ class Case0810DP_khong(unittest.TestCase):
         def store_previous_initially():
             state.store_previous = store_previous_normally
 
-        state = _BlankState()
-        state.store_previous = store_previous_initially
+        class state:  # #class-as-namespace
+            store_previous = store_previous_initially
 
         def store_previous_normally():
             sections.append(section)
@@ -71,9 +71,6 @@ class Case0810DP_khong(unittest.TestCase):
 
         return _State(tuple(emissions), tuple(sections))
 
-
-class _BlankState:  # #[#510.2]
-    pass
 
 
 def _subject_module():

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 
 raise Exception("worked at #history-A.3 - comment out if you're feeling lucky")

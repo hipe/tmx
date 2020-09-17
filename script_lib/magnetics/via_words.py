@@ -198,7 +198,10 @@ class _FixedShapeWordWrap:
 
         # --
 
-        state = _FixedShapeWordWrapState()
+        class my_state:  # #class-as-namespace
+            pass
+
+        state = my_state
         state.current_width = 0
         state.offset_of_the_row_we_are_on = -1
         state.shape_is_filled = False
@@ -268,10 +271,6 @@ class _FixedShapeWordWrap:
                 if state.shape_is_filled:
                     self._do_ellipsify = True  # (Case3745)
                     break
-
-
-class _FixedShapeWordWrapState:  # [#510.2]
-    pass
 
 
 class _StructuredLine:

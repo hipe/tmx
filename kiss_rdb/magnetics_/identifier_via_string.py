@@ -20,7 +20,9 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         from os import path as os_path
         return os_path.basename(long_program_name)
 
-    self = _State_For_CLI()
+    class self:  # #class-as-namespace
+        pass
+
     _fun_experiment_for_memoizer(self, 'pn', '_pn', build_program_name)
     pn = self.pn
 
@@ -125,10 +127,6 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
         return 0
 
     assert(False)  # placehold future sub-actions
-
-
-class _State_For_CLI:  # #[#510.2]
-    pass
 
 
 def three_via_depth_(depth):
@@ -257,13 +255,17 @@ class Identifier_:
     def number_of_digits(self):
         return len(self.native_digits)
 
+    has_depth_ = True
+
 
 def integer_via_identifier_er__():
     # because we supposedly have arbitrary depth...
 
     from functools import reduce
-    self = _StateForIntegerVia()
-    self._num_powers = 1
+
+    class self:  # #class-as-namespace
+        _num_powers = 1
+
     powers = [1]
 
     def CALCULATE_MORE_POWERS(depth):
@@ -283,10 +285,6 @@ def integer_via_identifier_er__():
         return reduce(lambda m, x: m + x, (add_me(i) for i in range(0, depth)))
 
     return int_via_iden
-
-
-class _StateForIntegerVia:  # #[#510.2]
-    pass
 
 
 def native_digit_via_character_(s, listener):

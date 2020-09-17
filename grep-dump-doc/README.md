@@ -113,7 +113,8 @@ have [activated our virtualenv](#venv-etc) as described above.
 we use these <a name='aliases'>aliases</a>
 (these lines are in our `~/.zshrc`, basically):
 
-    alias py='python3 -W error::Warning::0'
+    # alias py='python3 -W default::Warning::0'  at 3.8.0 this is annoying
+    alias py=python3
     alias pud='py -m unittest discover'
 
 to run one test file:

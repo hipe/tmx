@@ -138,8 +138,9 @@ def lines_via_big_string_(big_s):  # (ANOTHER copy-paste of [#610].)
 
 def _escape_line(md, itr, line_no, listener):
 
-    self = _ThisState()
-    self.cursor = 0
+    class self:  # #class-as-namespace
+        cursor = 0
+
     pieces = []
     line = md.string
 
@@ -182,10 +183,6 @@ def _escape_line(md, itr, line_no, listener):
         pieces.append(line[self.cursor:length])  # #here1
 
     return ''.join(pieces)
-
-
-class _ThisState:  # #[#510.2]
-    pass
 
 
 # == whiners

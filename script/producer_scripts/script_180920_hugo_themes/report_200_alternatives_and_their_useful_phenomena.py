@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 """
 for each alternative, show a list of its phenomena, having subtracted out

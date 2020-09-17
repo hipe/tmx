@@ -67,7 +67,7 @@ run the whole test suite
 (we use virtualenv and), we use these aliases. (note there is a dependency
 in the aliases but it is not circular.)
 
-    alias py='python3 -W error::Warning::0'
+    alias py='python3 -W default::Warning::0'
     alias pud='py -m unittest discover'
 
 

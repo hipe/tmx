@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 """
 stream of a pretty dump of every dictionary from every toml fellow.
@@ -92,7 +92,7 @@ def _make_toml_parser(listener):  # #testpoint
 
     def parse_try_again(e, toml_path):
         if 'could not convert string to float' not in str(e):
-            cover_me('what is the problem here')
+            xx('what is the problem here')
         with open(toml_path) as fh:
             big_s = fh.read()
 
@@ -121,8 +121,8 @@ class _ExceptFirstTime:
             self._yes = True
 
 
-def cover_me(s):
-    raise Exception(f'cover me - {s}')
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 
 def woot(*_):

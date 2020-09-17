@@ -77,8 +77,10 @@ def __option_line_challenge_mode(line_s):
         _my_tuple = __my_named_tuple_for_above()
         return _my_tuple(**out)
 
-    self = _ThisState()
-    self.cursor = 0
+    class my_state:  # #class-as-namespace
+        cursor = 0
+
+    self = my_state
 
     def __parse_any_args():
         if self.cursor is not len(haystack_s):
@@ -160,10 +162,6 @@ def __option_line_challenge_mode(line_s):
     haystack_s, desc_first_line = _match_obj.groups()
 
     return __main()
-
-
-class _ThisState:  # #[#510.2]
-    pass
 
 
 @lazy

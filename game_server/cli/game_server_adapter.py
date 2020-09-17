@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 
 def cli_for_production():
@@ -12,8 +12,10 @@ def cli_for_production():
 
 def __run_adapter_forever():
 
-    self = _State()
-    self._timeout_float = 0.5
+    class my_state:  # #class-as-namespace
+        _timeout_float = 0.5
+
+    self = my_state
 
     def __main():
         while True:
@@ -81,10 +83,6 @@ def __run_adapter_forever():
         sck.connect(('0.0.0.0', port))
         sock = sck  # ick/meh
         __main()
-
-
-class _State:  # #[#510.2]
-    pass
 
 
 class _NormalInput:
