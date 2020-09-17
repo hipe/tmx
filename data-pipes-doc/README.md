@@ -5,7 +5,7 @@ date: 2019-07-09T10:20:00-04:00
 
 ## brief discussion
 
-For now, see `man rs`. ¯\_(ツ)_/¯
+For now, see `man rs`. `¯\_(ツ)_/¯`
 
 
 
@@ -16,7 +16,6 @@ For now, see `man rs`. ¯\_(ツ)_/¯
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
-|                  [#476]   | #open | catch-all to track every `cover_me`
 |                  [#463]   |       | functional pipelines (2 files)
 |                 [#459.17] | #trak | producer script moudules that aren't modules
 |                  [#459.P] | #open | tmpfile is hardcoded

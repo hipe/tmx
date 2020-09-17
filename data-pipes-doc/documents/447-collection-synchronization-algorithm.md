@@ -324,7 +324,7 @@ which is great. this is way out of scope for pseudocode 😁)
 
     for each item from the collection stream,
 
-      get its natural key ("name").
+      get its key for synchronizing ("name").
 
       if this item already exists by name in the index,
         this is a synchronization failure. stop everything [:e1].
@@ -350,7 +350,7 @@ of code. neat.
 
     for each item from the original collection stream,
 
-      get its natural key ("name").
+      get its sync key ("name").
 
       does this item exist (by name) in the index?
 

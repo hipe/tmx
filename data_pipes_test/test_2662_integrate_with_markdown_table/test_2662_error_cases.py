@@ -31,8 +31,12 @@ class CommonCase(unittest.TestCase):
 
     def expect_emissions(self):
         # (by default, we expect no emissions)
-        return iter(())
+        return ()
 
+    def given_near_format_name(_):
+        pass  # infer it from path name unless specified in the case
+
+    do_debug = False
 
 
 class Case2557DP_strange_format_adapter_name(CommonCase):
@@ -71,6 +75,8 @@ class Case2557DP_strange_format_adapter_name(CommonCase):
         return {'producer_script_path': 'no see DP ps path (Case2557DP)',
                 'near_collection': 'no see DP near coll (Case2557DP)'}
 
+    def given_near_format_name(_):
+        return 'zig-zag'
 
 
 class Case2559_strange_file_extension(CommonCase):
@@ -106,6 +112,8 @@ class Case2559_strange_file_extension(CommonCase):
         return {'producer_script_path': 'no see DP ps path (Case2559)',
                 'near_collection': near_path}
 
+    def given_near_format_name(_):
+        pass  # induce from path
 
 
 class Case2660DP_no_functions(CommonCase):
@@ -155,10 +163,10 @@ class Case2662DP_near_file_not_found(CommonCase):
         _em = self._emission('first_error')
         self.assertSequenceEqual(
                 _em.channel[2:],
-                ('collection_not_found', 'no_such_file_or_directory'))
+                ('cannot_load_collection', 'no_such_file_or_directory'))
 
     def test_200_message(self):
-        sct = self._emission('first_error').flush_payloader()
+        sct = self._emission('first_error').payloader()
         self.assertEqual(sct['errno'], 2)
         self.assertEqual(sct['reason'], 'No such file or directory')
         self.assertIn('0000-no-such-file', sct['filename'])
@@ -188,15 +196,8 @@ class Case2664DP_duplicate_key(CommonCase):
         exp = (
                 '|col A|col B|\n',
                 '|:--|--:|\n',
-                '|thing A|x|\n',
-                '|qux    | |\n',
-                )
-        self.assertSequenceEqual(_act, _exp)
-
-    def test_200_said_this_thing(self):
-        _act = self._emission('erx').to_string()
-        _exp = "duplicate key in far traversal: 'qux'"
-        self.assertEqual(_act, _exp)
+                '|thing A|x|\n')
+        self.assertSequenceEqual(act, exp)
 
     @shared_subject
     def end_state(self):

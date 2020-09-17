@@ -318,7 +318,7 @@ class _CrazyDiffParse:  # #open you should use [#606] instead
             (1, r'^@@ -\d+,\d+ \+\d+,\d+ @@$'),
             (1, r'^\+\+\+ (.)(.+)', 'after_path'),
             (1, r'^--- (.)(.+)', 'before_path'),
-            (1, r'^diff '),
+            # (1, r'^diff '),
         ]
         self._current_memo_is_plural = None
         self._current_memo_matches = None
@@ -412,7 +412,11 @@ class _Symbol:
         self.name = name
 
     def this_satisfies_the_minimum(self, num):
-        return self._range.start <= num
+        return self.minimum <= num
+
+    @property
+    def minimum(self):
+        return self._range.start
 
     def this_is_the_end(self, num):
         return self._range.stop == num

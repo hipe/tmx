@@ -26,6 +26,9 @@ class CommonCase(unittest.TestCase):
 
         self.assertSequenceEqual(of(act_dct), of(exp_dct))
 
+    def given_near_format_name(_):
+        return 'markdown-table'
+
 
 # Case2013DP  # is used to refer to the whole test file
 
@@ -179,7 +182,7 @@ class Case2019DP_omg_syncing(ProducerCaseMethods, CommonCase):
 def _this_markdown_fellow():
     yield '| Add-On | Tags | Notes |\n'
     yield '|:--|:--|:--|\n'
-    yield '| (example) | #example  | #example  |\n'
+    yield '|(example)| #example  | #example  |\n'
     yield '|[Ably](fix this url)| keep B1 | keep C1 |\n'
     yield _same_ablzton_live
     yield _same_ack_foundry

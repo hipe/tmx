@@ -37,60 +37,60 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
 
     def build_output_lines(self):
 
-        from kiss_rdb.magnetics_.collection_via_path import _Collection
+        # Make the "from" collection (around the dictionaries)
+        dct_tup = _these_dictionaries()
+        from_coll = fake_producer_script_via_dictionary_tuple(dct_tup)
 
-        # make the from collection (around the dictionaries)
+        # Make the "to" collection (around a fake stdout)
+        fake_sout, lines = fake_STDOUT_and_lines_for(self)
 
-        _d_a = _these_dictionaries()
+        from kiss_rdb import collectionerer
+        collectioner = collectionerer()
 
-        class FakeProducerScript:  # #class-as-namespace
-            # [#459.17] producer script fake modules (see nearby other)
-
-            def initial_normal_nodes_via_stream(dcts):
-                return dcts
-
-            def open_traversal_stream(listener):
-                from data_pipes import ThePassThruContextManager
-                return ThePassThruContextManager(_d_a)
-
-        from data_pipes.format_adapters.producer_script import \
-            _collection_implementation_via_module
-        _impl = _collection_implementation_via_module(FakeProducerScript)
-
-        _from_coll = _Collection(_impl)
-
-        # make the to collection (around a fake stdout)
-
-        if self.do_debug:
-            from sys import stderr
-            stderr.write('\n')  # meh _eol
-
-            def recv_write(s):
-                stderr.write(f'DEBUG STDOUT: {s}')
-        else:
-            lines = []
-            recv_write = lines.append
-
-        from modality_agnostic import write_only_IO_proxy
-        _fake_stdout = write_only_IO_proxy(recv_write)
-
-        from kiss_rdb.storage_adapters_.markdown_table import \
-            COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE
-        _impl = COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(_fake_stdout)
-
-        _to_coll = _Collection(_impl)
+        to_coll = collectioner.collection_via_path(
+                fake_sout, format_name='markdown-table')
 
         # get busy
 
-        class FakeMonitor:  # #class-as-namespace
+        class mon:  # #class-as-namespace
             listener = None
             OK = True
 
-        _from_coll.convert_collection_into((), _to_coll, FakeMonitor)
+        from_args = ()
+
+        # == FROM this used to be a single function before #history-B.1
+        #    but we were losing a taste for collection wrappers
+        from_ci, to_ci = (o._impl for o in (from_coll, to_coll))  # ..
+        dcts = from_ci.multi_depth_value_dictionaries_as_storage_adapter(from_args, mon)  # noqa: E501
+        with to_ci.open_pass_thru_receiver_as_storage_adapter(mon) as recv:
+            for dct in dcts:
+                recv(dct)
+                if not mon.OK:
+                    break
+        # == TO
 
         return tuple(lines)
 
     do_debug = False
+
+
+def fake_producer_script_via_dictionary_tuple(dct_tup):
+
+    class fake_producer_script:  # #class-as-namespace
+        # [#459.17] producer script fake modules (see nearby other)
+
+        def multi_depth_value_dictionary_stream_via_traversal_stream(dcts):
+            return dcts
+
+        def open_traversal_stream(listener):
+            return passthru_context_manager(dct_tup)
+
+    from data_pipes.format_adapters.producer_script import \
+        _collection_implementation_via_module
+
+    ci = _collection_implementation_via_module(fake_producer_script)
+    from kiss_rdb.magnetics_.collection_via_path import _Collection  # ..
+    return _Collection(ci)
 
 
 class Case1747_does_scrape_work(CommonCase):
@@ -103,20 +103,16 @@ class Case1747_does_scrape_work(CommonCase):
         self.assertEqual(dct['label'], 'Overview')
 
     def test_030_these_fellows_are_terminal_items(self):
-        _exp = (
-                'Overview',
+        _exp = ('Overview',
                 'Get Started Overview',
-                'Quick Start',
-                )
-        self.assertSequenceEqual(self._custom_index()[1], _exp)
+                'Quick Start')
+        self.assertSequenceEqual(self.custom_index[1], _exp)
 
     def test_040_these_fellows_are_the_branch_names(self):
-        _exp = (
-                'About Hugo',
+        _exp = ('About Hugo',
                 'Getting Started',
-                'Maintenance',
-                )
-        self.assertSequenceEqual(self._custom_index()[0], _exp)
+                'Maintenance')
+        self.assertSequenceEqual(self.custom_index[0], _exp)
 
     def test_050_pseudo_real_scrape_looks_like_our_raw_dump(self):
         _real = self.end_dicts
@@ -231,11 +227,28 @@ def _yield_these_dictionaries():
     yield {'_is_branch_node': True, 'label': 'Maintenance', 'url': o('/maintenance/')}  # noqa: E501
 
 
+def fake_STDOUT_and_lines_for(tc):
+    lines = []
+
+    if tc.do_debug:
+        def recv_write(line):
+            stderr.write(f'DEBUG STDOUT: {line}')
+            lines.append(line)
+        from sys import stderr
+        stderr.write('\n')  # meh
+    else:
+        recv_write = lines.append
+
+    from modality_agnostic import write_only_IO_proxy
+    return write_only_IO_proxy(recv_write, on_OK_exit=lambda: None), lines
+
+
 _url = 'https://gohugo.io'
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1
 # #history-A.1 big spike of ad-hocs
 # #born.

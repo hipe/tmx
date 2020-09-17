@@ -241,7 +241,7 @@ class Case0275_bigger_example_of_disorder(CommonCase):
 
 
 def _subject_module():
-    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
+    import data_pipes.magnetics.flat_map_via_far_collection as _  # noqa: E501
     return _
 
 

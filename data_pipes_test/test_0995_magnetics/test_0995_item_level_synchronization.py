@@ -48,18 +48,45 @@ class Case0995_hello(unittest.TestCase):
 
 
 def _my_sync(orig, new):  # #here1
+    value_dct = {k: v for k, v in _pairs_from_my_sync(orig, new)}
+    return _MyBusinessObject(**value_dct)
 
-    _normal_far_st = new._to_normal_stream()
-    _normal_near_st = orig._to_normal_stream()
 
-    import data_pipes.magnetics.synchronized_stream_via_far_stream_and_near_stream as _  # noqa: E501
-    sync_st = _.stream_of_mixed_via_sync(
-        normal_far_stream=_normal_far_st,
-        normal_near_stream=_normal_near_st,
-        item_via_collision=_item_via_collision,
-        )
-    _these = [x for x in sync_st]
-    return _MyBusinessObject(**{k: v for (k, v) in _these})
+def _pairs_from_my_sync(orig, new):
+
+    far_pairs = new._to_normal_stream()
+    near_pairs = orig._to_normal_stream()
+
+    flat_map = subject_function()(far_pairs)
+
+    # First, send each near item into the flat map and follow its directives
+    for near_key, near_value in near_pairs:
+        directives = flat_map.receive_item(near_key)
+        for directive in directives:
+            typ = (stack := list(reversed(directive))).pop()
+            if 'pass_through' == typ:
+                yield near_key, near_value
+                continue
+            if 'insert_item' == typ:
+                value, key = stack
+                yield key, value
+                continue
+            if 'merge_with_item' == typ:
+                far_value, = stack
+                yield _item_via_collision(near_key, far_value, near_key, near_value)  # noqa: E501
+                continue
+            assert 'error' == typ
+            assert()
+
+    # Then, ask the flat map to give you any remaining items to insert
+    for directive in flat_map.receive_end():
+        typ = (stack := list(reversed(directive))).pop()
+        if 'insert_item' == typ:
+            value, key = stack
+            yield key, value
+            continue
+        assert 'error' == typ
+        assert()
 
 
 def _item_via_collision(far_key, far_value, near_key, near_value):
@@ -77,7 +104,7 @@ def _item_via_collision(far_key, far_value, near_key, near_value):
     return (near_key, _merged_value)
 
 
-class _resolve_collision:  # :#here3
+class _resolve_collision:  # :#here3 #class-as-namespace
 
     def first_name(new_x, orig_x):
         return new_x  # allow name change
@@ -112,6 +139,12 @@ class _MyBusinessObject:
             x = getattr(bo, k)
             if x is not None:
                 yield (k, x)
+
+
+def subject_function():
+    from data_pipes.magnetics.flat_map_via_far_collection import \
+            flat_map_via_producer_script as function
+    return function
 
 
 if __name__ == '__main__':

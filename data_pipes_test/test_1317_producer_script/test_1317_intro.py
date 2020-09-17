@@ -145,7 +145,7 @@ class Case1315_file_not_found(CommonCase):
         self.assertRaisesRegex(ModuleNotFoundError, rxs, run)
 
     def expect_emissions(self):
-        return iter(())
+        return ()
 
     def given(self):
         return {'producer_script_path': 'script/no_such_script_one.py',
@@ -157,14 +157,15 @@ class Case1315_file_not_found(CommonCase):
 
 class Case1319DP_bad_natural_key(CommonCase):
 
-    def test_100_raises_this_happenstance_exception(self):
-        def f():
-            self._build_end_state()
-        _rx = r"^'choo cha'$"  # it asks for a prototype for this field
-        self.assertRaisesRegex(KeyError, _rx, f)
+    def test_100_emits(self):
+        emi = self.build_end_state().actual_emission_index['this_emi']
+        msg, = emi.to_messages()
+        exp = ('cannot_create', 'unrecgonized_attributes')
+        self.assertSequenceEqual(emi.channel[2:], exp)
+        self.assertIn("'choo cha'", msg)
 
     def expect_emissions(self):
-        return iter(())
+        yield 'error', '?+', 'as', 'this_emi'
 
     def given(self):
         return {'producer_script_path': _chimi_churri_far_path(),
@@ -177,13 +178,14 @@ class Case1320DP_extra_cel(CommonCase):
     """
 
     def test_100_raises_this_happenstance_exception(self):
-        def f():
-            self._build_end_state()
-        _rx = r"'ziff_davis'"
-        self.assertRaisesRegex(KeyError, _rx, f)
+        emi = self.build_end_state().actual_emission_index['this_emi']
+        msg, = emi.to_messages()
+        exp = ('cannot_create', 'unrecgonized_attributes')
+        self.assertSequenceEqual(emi.channel[2:], exp)
+        self.assertIn("'ziff_davis'", msg)
 
     def expect_emissions(self):
-        return iter(())
+        yield 'error', '?+', 'as', 'this_emi'
 
     def given(self):
         _ = executable_fixture('exe_110_extra_cel.py')

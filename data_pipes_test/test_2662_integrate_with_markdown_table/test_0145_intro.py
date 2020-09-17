@@ -1,59 +1,119 @@
-from kiss_rdb_test.common_initial_state import (
-        publicly_shared_fixture_file)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from kiss_rdb_test.common_initial_state import publicly_shared_fixture_file
+from modality_agnostic.test_support.common import \
+        throwing_listener, dangerous_memoize as shared_subject
+import modality_agnostic.test_support.common as em
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+# == Test Case Precursors
+
+def custom_dangerous_memoize(orig_f):  # #[#507.10] child class memoizer
+    def use_f(tc):
+        if not tc.do_memoize:
+            return orig_f(tc)
+        cls = tc.__class__
+        attr = '_DP_evil_'
+        if not hasattr(cls, attr):
+            setattr(cls, attr, {})
+        dangerous = getattr(cls, attr)
+        k = orig_f.__name__
+        if k not in dangerous:
+            dangerous[k] = orig_f(tc)
+        return dangerous[k]
+    return property(use_f)
+
+
+class CommonCase(unittest.TestCase):
+
+    # -- assist in test assertions
 
     def _schema_lines_OK(self):
-        self._etc('table_schema_line_one_of_two', 1)
-        self._etc('table_schema_line_two_of_two', 1)
+        self.run_length('table_schema_line_ONE_of_two', 1)
+        self.run_length('table_schema_line_TWO_of_two', 1)
 
     def _head_lines_this_many(self, num):
-        self._etc('head_line', num)
+        self.run_length('head_line', num)
 
     def _tail_lines_this_many(self, num):
-        self._etc('tail_line', num)
+        self.run_length('other_line', num)
 
     def _main_lines_this_many(self, num):
-        self._etc('business_object_row', num)
+        self.run_length('business_row_AST', num)
 
     def _items(self):
-        return self._interesting_section().items
+        return self.business_run().items
 
-    def _etc(self, typ, num):
-        _d = self._sections_index()
-        _act = _d[typ].count
-        self.assertEqual(_act, num)
+    def run_length(self, typ, num):
+        actual = self.runs_index[typ].count
+        self.assertEqual(actual, num)
 
-    def _this_one_business_object_row(self):
-        return self._interesting_section().items[1]
+    def this_one_business_object_row(self):
+        return self.business_run().items[1]
 
-    def _interesting_section(self):
-        return self._sections_index()['business_object_row']
+    def business_run(self):
+        return self.runs_index['business_row_AST']
+
+    # -- build end state
+
+    @custom_dangerous_memoize
+    def runs_index(self):
+        return runs_index_via(self.runs)
+
+    @custom_dangerous_memoize
+    def runs(self):
+        return self.common_run(throwing_listener)
+
+    def build_runs_expecting_emissions(self):
+        li, done = em.listener_and_done_via(self.expecting_emissions(), self)
+        tup = self.common_run(li)
+        assert len(tup)  # or not
+        emis_dct = done()
+        ks = tuple(emis_dct.keys())
+        k, = ks
+        return emis_dct[k],
+
+    def common_run(self, li):
+        sorted_far_dcts = self.given_far_dictionaries()
+        mixed_near = self.given_markdown()
+        two_keyerers = self.given_two_keyerers()
+        runs = runs_via_sync_via(sorted_far_dcts, mixed_near, two_keyerers, li)
+        return tuple(runs)
+
+    # -- defaults to build end state
+
+    def given_markdown(_):
+        return common_markdown_file
+
+    def given_two_keyerers(_):
+        pass
+
+    do_memoize = True  # #OCD
+    do_debug = False
 
 
-class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(_CommonCase):  # noqa: E501
+# == Test Cases
 
-    def test_010_loads(self):
-        self.assertIsNotNone(_subject_module())
+class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCase):  # noqa: E501
 
     def test_020_it_just_throws_a_key_error(self):
-        e = None
-        try:
-            _case_010_section_list()
-        except KeyError as e_:
-            e = e_
-        self.assertEqual(str(e), "'chalupa fupa'")
+        emi, = self.build_runs_expecting_emissions()
+        msg, = emi.to_messages()
+        exp = "Unrecognized attributes ('chalupa fupa', 'propecia alameda')"
+        self.assertIn(exp, msg)
+
+    def expecting_emissions(_):
+        yield 'error', '?+', 'as', 'this_emi'
+
+    def given_far_dictionaries(_):
+        return case_010_far_dictionaries()
+
+    do_memoize = False
 
 
-class Case0130DP_adds_only(_CommonCase):
+class Case0130DP_adds_only(CommonCase):
 
     def test_002_does_not_fail(self):
-        self.assertIsNotNone(self._section_list())
+        self.assertIsNotNone(self.runs)
 
     def test_020_head_lines_count(self):
         self._head_lines_this_many(3)
@@ -68,8 +128,8 @@ class Case0130DP_adds_only(_CommonCase):
 
         items = self._items()
 
-        _line_one = items[0].to_line()
-        _line_two = items[-1].to_line()
+        _line_one = line_via_row(items[0])
+        _line_two = line_via_row(items[-1])
 
         self.assertEqual(_line_one, "|one|two|three|\n")
         self.assertEqual(_line_two, "| four | five | six\n")
@@ -87,13 +147,12 @@ class Case0130DP_adds_only(_CommonCase):
 
         items = self._items()
         row = items[1]
-        cel0 = row.cell_at_offset(0)
-        cel1 = row.cell_at_offset(1)
-        cel2 = row.cell_at_offset(2)
 
-        self.assertEqual(cel0.content_string(), '3A')
-        self.assertEqual(cel1.to_string(), '|   ')
-        self.assertEqual(cel2.to_string(), '|choo choo')
+        pcs = split_row_line(row)
+
+        self.assertEqual(pcs[0], '|3A')  # "one" in example row
+        self.assertEqual(pcs[1], '|   ')  # "two" in example row
+        self.assertEqual(pcs[2], '|choo choo')  # "three" in example row
 
         self.assertEqual(row.has_endcap, True)
 
@@ -104,173 +163,189 @@ class Case0130DP_adds_only(_CommonCase):
     def test_070_tail_lines_count(self):
         self._tail_lines_this_many(4)
 
-    @shared_subject
-    def _sections_index(self):
-        return _sections_index_via(self._section_list())
-
-    def _section_list(self):
-        return _case_100_section_list()
+    def given_far_dictionaries(_):
+        return case_100_far_dictionaries()
 
 
-class Case0140DP_MERGE(_CommonCase):
+class Case0140DP_MERGE(CommonCase):
 
     def test_010_does_not_fail(self):
-        self.assertIsNotNone(self._section_list())
+        self.assertIsNotNone(self.runs)
 
     def test_020_the_after_content_is_right(self):
         items = self._items()
         self.assertEqual(len(items), 2)
         row = items[1]
-        t = tuple(row.cell_at_offset(i).content_string() for i in range(0, 3))
+
+        t = value_strings(row)
 
         self.assertEqual(t[0], 'four')
         self.assertEqual(t[1], '5')
         self.assertEqual(t[2], 'six')
         self.assertEqual(row.has_endcap, False)
+
         # avoid testing alignments here, but:
-        # self.assertEqual(_after_line, '| four |  5| six\n')
+        self.assertEqual(line_via_row(row), '|four|  5| six\n')
         # this touches on alignment not specified (Case2481KR)
 
-    @shared_subject
-    def _sections_index(self):
-        return _sections_index_via(self._section_list())
-
-    def _section_list(self):
-        return _case_200_section_list()
+    def given_far_dictionaries(_):
+        return case_200_far_dictionaries()
 
 
-class Case0150DP_in_this_case_mono_value_does_NOT_update(_CommonCase):
-    # short-circuit out of entity sync because reasons [#458.7]
-    # (note that intentionally weird formatting is maintained)
+class Case0150DP_what_if_no_business_attrs_besides_ID(CommonCase):
+    # Even though there is nothing to do, this sync happens [#458.7]
 
-    def test_100(self):
-        _sects = self._sections_index()
-        _act_line = _sects['business_object_row'].items[1].to_line()
-        self.assertEqual(_act_line, '|   zub | x2\n')  # not the example format
+    def test_100_whoopsie_the_changed_cell_takes_on_the_EG_styling(self):
+        runs = self.runs_index
+        act_line = line_via_row(runs['business_row_AST'].items[1])
+        self.assertEqual(act_line, '| zub   | x2\n')  # not the example format
 
-    @shared_subject
-    def _sections_index(self):
-        _entity_dictionaries = ({'col_a': 'zub'},)
-        _near = (
-                '|Col A|Col B|\n',
+    def given_far_dictionaries(_):
+        yield {'col_A': 'zub'}
+
+    def given_markdown(_):
+        return ('|Col A|Col B|\n',
                 '|-----|-----|\n',
-                '|  zib  |   x1   |\n',
-                '|   zub | x2\n',
-                )
-        return _sections_index_via(_section_list_via(
-                _entity_dictionaries, _near))
+                '| zib   |   x1   |\n',
+                '|   zub | x2\n')
+
+    do_memoize = False
 
 
-class Case0160DP_custom_keyer_for_syncing(_CommonCase):
+class Case0160DP_custom_keyers(CommonCase):
+
+    def test_050_we_used_to_pass_near_keyerer_as_string(self):
+        # #history-B.1
+        near_use_to_look_like_this = common_near_keyerer_as_string()
+        near_keyerer = value_via_module_path(near_use_to_look_like_this)
+        # loading the selfsame file as a module isn't working the nice way
+        use_loaded = near_keyerer.__name__
+        use_expected = Chimmy_Chamosa_001_near.__name__
+        self.assertEqual(use_loaded, use_expected)
 
     def test_100_the_NOT_updated_business_cel_stays_as_is(self):
-        self.assertEqual(self._cel_strings()[2], '| six')
+        self.assertEqual(self.end_cel_strings[2], '| six\n')
 
     def test_200_the_YES_updated_business_cel_has_the_example_width(self):
         # (Case2479KR) (align left) is also exhibited
-        self.assertEqual(self._cel_strings()[1], '|  5')
+        self.assertEqual(self.end_cel_strings[1], '|  5')
 
     def test_300_crucially_the_natural_key_IS_updated(self):
-        self.assertEqual(self._cel_strings()[0], '|  FOUR  ')
+        self.assertEqual(self.end_cel_strings[0], '|  FOUR  ')
 
     @shared_subject
-    def _cel_strings(self):
-        _row = self._this_one_business_object_row()
-        return tuple(_row.cell_at_offset(i).to_string() for i in range(0, 3))
+    def end_cel_strings(self):
+        row = self.this_one_business_object_row()
+        tup = split_row_line(row)
+        assert 3 == len(tup)
+        return tup
 
-    @shared_subject
-    def _sections_index(self):
-        _entity_dictionaries = (
-                {
+    def given_far_dictionaries(_):
+        yield {
                     'field_name_one': '  FOUR  ',
                     'field_2': '5',
-                },
-                )
-        return _sections_index_via(_section_list_via(
-                _entity_dictionaries, _same_markdown_file,
-                near_keyerer=_same_near_keyerer()))
+        }
+
+    def given_two_keyerers(_):
+        return common_two_keyerers()
 
 
-class Case0170DP_in_this_case_mono_value_does_YES_update(_CommonCase):
+class Case0170DP_in_this_case_mono_value_does_YES_update(CommonCase):
     # [#458.7] when natural keys are different, take the far value
 
-    def test_100(self):
-        """
-        The example row is untouched.
+    def test_100_the_cell_with_no_attribute_in_far_stream_is_untouched(self):
+        self.assertEqual(self.row_pieces[1], '| x2\n')
 
-        The second row is the row of interest. For its first cel:
-        There was a match given the sync keys (both are "zub"), but the
-        natural keys are different ("ZuB" vs "zUb"). The far value clobbers
-        the near value and formatting from the example row is applied.
+    def test_200_identifier_cell_has_surface_value_of_far_string(self):
+        vs = value_string_via_piece(self.row_pieces[0])
+        self.assertEqual(vs, 'zUb')  # instead of ZuB
 
-        It's doing the crazy, now un-desired behavior of ASCII-formatting
-        cel values to match the alignment specified in the format line
-        (which defaults to align-left) and using the ASCII fixed-width of
-        the example cel (maybe??) (Case2481KR).
-
-        for the second result cel:
-        NOTE because a column B field wasn't in the far record, that cel
-        did not get updated with the example record formatting for that cel.
-        """
-
-        _row = self._this_one_business_object_row()
-        self.assertEqual(_row.to_line(), '|zUb   | x2\n')
+    def test_300_takes_formatting_from_example_row(self):
+        fi = formatting_imprint_via_piece(self.row_pieces[0])
+        self.assertEqual(fi, '| xxx  ')
 
     @shared_subject
-    def _sections_index(self):
-        _entity_dictionaries = ({'col_a': 'zUb'},)
-        _near = (
-                '|Col A|Col B|\n',
+    def row_pieces(self):
+        row = self.this_one_business_object_row()
+        return split_row_line(row)
+
+    def given_far_dictionaries(_):
+        yield {'col_A': 'zUb'}
+
+    def given_markdown(_):
+        return ('|Col A|Col B|\n',
                 '|-----|-----|\n',
                 '| zib  |   x1   |\n',
-                '|      ZuB   | x2\n',
-                )
-        return _sections_index_via(_section_list_via(
-                _entity_dictionaries, _near,
-                near_keyerer=_same_near_keyerer()))
+                '|      ZuB   | x2\n')
+
+    def given_two_keyerers(_):
+        return common_two_keyerers()
 
 
-def _case_010_section_list():
-    _entity_dictionaries = (
-                {
+# == Inline Test Fixtures
+
+def case_010_far_dictionaries():
+    yield {
                     'field_name_one': 'adonga zebronga',
                     'chalupa fupa': 'zack braff',
                     'propecia alameda': 'ohai kauaii',
-                },
-                )
-    return _section_list_via(_entity_dictionaries, _same_markdown_file)
+    }
 
 
-@lazy
-def _case_100_section_list():
-    _entity_dictionaries = (
-                {
+def case_100_far_dictionaries():
+    yield {
                     'field_name_one': '3A',
                     'cha_cha': 'choo choo',
-                },
-                )
-    return _section_list_via(_entity_dictionaries, _same_markdown_file)
+    }
 
 
-@lazy
-def _case_200_section_list():
-    _entity_dictionaries = (
-                {
+def case_200_far_dictionaries():
+    yield {
                     'field_name_one': 'four',
                     'field_2': '5',
-                },
-                )
-    return _section_list_via(_entity_dictionaries, _same_markdown_file)
+    }
 
 
-_same_markdown_file = '0100-hello.md'
+common_markdown_file = '0100-hello.md'
 
 
-def _sections_index_via(section_list):
+# == Test Assertion Support
+
+def value_string_via_piece(pc):
+    end = len(pc) - 1
+    if '\n' == pc[end - 1]:
+        end -= 1
+    return pc[1:end].strip()
+
+
+def formatting_imprint_via_piece(pc):
+    import re
+    md = re.match(r'^(\|[ ]*)[^ ](?:.*[^ ])?([ ]*\n?)\Z', pc)
+    left_pad_plus, right_pad_plus = md.groups()
+    return f"{left_pad_plus}xxx{right_pad_plus}"
+
+
+def split_row_line(row):
+    import re
+    return re.split(r'(?<=.)(?=\|)', line_via_row(row))  # #[#873.24]
+
+
+def value_strings(row):
+    rang = range(0, row.cell_count)
+    return tuple(row.cell_at_offset(i).value_string for i in rang)
+
+
+def line_via_row(row):
+    return row.to_line()
+
+
+# == End State Support (would be better in its own module)
+
+def runs_index_via(runs):
     """in a separate pass, ensure that sections (runs) don't repeat"""
 
     dct = {}
-    for section in section_list:
+    for section in runs:
         typ = section.type
         if typ in dct:
             raise Exception('collision')
@@ -278,155 +353,112 @@ def _sections_index_via(section_list):
     return dct
 
 
-def _section_list_via(sorted_far_dcts, mixed_near, near_keyerer=None):
-    # :[#459.2]: an exemplary implementation of sync
+def runs_via_sync_via(sorted_far_dcts, mixed_near, two_keyerers, listn):
     # (rewritten at #history-A.4 to be less crazy)
 
-    assert(isinstance(sorted_far_dcts, tuple))  # #[#022]
+    # Chunk the sexps by their type
+    sxs = new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listn)
+    itr = chunks_via(sxs, type_of=lambda s: s[0])
+    chunks = tuple(itr)
 
-    from modality_agnostic import listening
-    listener = listening.throwing_listener
+    # Get rid of these special sexps that don't have payloads
+    begin = 1 if 'beginning_of_file' == chunks[0][0] else 0
+    end = -1 if 'end_of_file' == chunks[-1][0] else 0
+    use_chunks = (chunks[i] for i in range(begin, len(chunks)+end))
 
-    # --
+    # Produce only the payloads, not the whole sexps, in each chunk
+    return (TypeRun(ty, tuple(sx[1] for sx in sxs)) for ty, sxs in use_chunks)
 
-    dcts = iter(sorted_far_dcts)
-    first_dct = next(dcts)  # ..
 
-    if True:
-        key = next(iter(first_dct.keys()))
+def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
+    # (at #history-B.1 got rid of redundant impl of [#459.2] sync)
 
-        def far_key_via(dct):
-            return _simplify_and_add_guillemets(dct[key])
+    # fsfs = far stream for sync
 
-        def stream_for_sync_via_stream():  # (not exactly this but like this)
-            yield (far_key_via(first_dct), first_dct)
-            for dct in dcts:
-                yield (far_key_via(dct), dct)
+    custom_near, fsfs = god_help_me(sorted_far_dcts, two_keyerers)
 
-        normal_far_stream = stream_for_sync_via_stream()
+    # Resolve the "Flat Map" injection from the "stream for sync" (from etc)
+    assert hasattr(sorted_far_dcts, '__next__')  # does it look like an iterat
+    sorted_far_dcts = tuple(sorted_far_dcts)
 
-    # --
+    from data_pipes_test.sync_support import flat_map_via
+    flat_map = flat_map_via(fsfs)
 
+    # Resolve the sync agent
+    ci = collection_impl_via(mixed_near)
+    sa = ci.SYNC_AGENT_FOR_DATA_PIPES()
+
+    return sa.NEW_SEXPS_VIA(
+            flat_map, near_keyerer=custom_near, listener=listener)
+
+
+def god_help_me(sorted_far_dcts, two_keyerers):
+
+    sorted_far_dcts = tuple(sorted_far_dcts)
+
+    if len(sorted_far_dcts):
+        leftmost_key = next(iter(sorted_far_dcts[0].keys()))
+
+    fsfs = tuple((item[leftmost_key], item) for item in sorted_far_dcts)
+
+    near_keyerer = None
+    if two_keyerers:
+        near_keyerer, far_keyer = two_keyerers
+        fsfs = tuple((far_keyer(k, item), item) for k, item in fsfs)
+
+    return near_keyerer, fsfs
+
+
+def collection_impl_via(mixed_near):
     if isinstance(mixed_near, str):
-        near_path_or_lines = publicly_shared_fixture_file(mixed_near)
+        path = publicly_shared_fixture_file(mixed_near)
+        opn = None
     else:
-        assert(isinstance(mixed_near, tuple))
-        assert(isinstance(mixed_near[0], str))
-        near_path_or_lines = mixed_near
+        assert isinstance(mixed_near, tuple)
+        assert isinstance(mixed_near[0], str)
 
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_.tagged_native_item_stream_via_line_stream import (  # noqa: E501
-        OPEN_TAGGED_DOC_LINE_ITEM_STREAM)
+        def opn(my_path):
+            assert my_path == path
+            return passthru_context_manager(iter(mixed_near))
 
-    opened_near = OPEN_TAGGED_DOC_LINE_ITEM_STREAM(near_path_or_lines, listener)  # noqa: E501
-
-    # --
-
-    if near_keyerer is None:
-        near_keyerer = Chimmy_Chamosa_001_near
-    else:
-        assert(isinstance(near_keyerer, str))
-        from data_pipes.magnetics import function_via_function_identifier
-        near_keyerer = function_via_function_identifier(near_keyerer, listener)
-        assert(near_keyerer)
-
-    # --
-
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_.synchronized_stream_via_far_stream_and_near_stream import (  # noqa: E501
-        OPEN_NEWSTREAM_VIA)
-
-    from data_pipes.magnetics.result_via_tagged_stream_and_processor import (
-            result_via_tagged_stream_and_processor as section_list_via)
-    # at writing this is the only place we call this ^
-
-    with opened_near as document_section_ASTs:
-        opened_new = OPEN_NEWSTREAM_VIA(
-                normal_far_stream=normal_far_stream,
-                near_tagged_items=document_section_ASTs,
-                near_keyerer=near_keyerer,
-                listener=listener)
-        # ..
-        with opened_new as AST_nodes:
-            _pcsr = _MyCustomProcessor()
-            _section_list = section_list_via(AST_nodes, _pcsr)
-
-    return _section_list
+        from data_pipes_test.common_initial_state import \
+            passthru_context_manager
+        path = 'my-fake-path'
+    from kiss_rdb.storage_adapters_.markdown_table import \
+        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as create_CI
+    return create_CI(path, throwing_listener, opn=opn)
 
 
-class _MyCustomProcessor:
+def value_via_module_path(module_path):  # moved here at #history-B.1
+    """
+    module path:
+        identifier ::= path_esque '.' function_name
+        path_esque ::= path_part ( '.' path_part )*
+        path_part ::= /^[a-z][a-z0-9_]*$
+        function_name ::= /^[a-zA-Z][a-zA-Z0-9_]*$/
+    """
 
-    def __init__(self):
-        self._sections = []
+    word = '[a-zA-Z][a-zA-Z0-9_]*'  # added uppercase at a historical point
+    import re
+    rx = re.compile(r'^(%s(?:\.%s)*)\.([a-zA-Z][a-zA-Z0-9_]*)$' % (word, word))
+    md = rx.match(module_path)  # ..
+    path_esque, value_name = md.groups()
 
-    def move_from__BEGIN__to__head_line(self):
-        self._init_section_items()
-
-    def head_line(self, x):
-        self._same(x)
-
-    def move_from__BEGIN__to__table_schema_line_one_of_two(self):
-        self._init_section_items()
-        self._move('head_line')
-
-    def move_from__head_line__to__table_schema_line_one_of_two(self):
-        self._move('head_line')
-
-    def table_schema_line_one_of_two(self, x):
-        self._same(x)
-
-    def move_from__table_schema_line_one_of_two__to__table_schema_line_two_of_two(self):  # noqa: E501
-        self._move('table_schema_line_one_of_two')
-
-    def table_schema_line_two_of_two(self, x):
-        self._same(x)
-
-    def move_from__table_schema_line_two_of_two__to__business_object_row(self):
-        self._move('table_schema_line_two_of_two')
-
-    def business_object_row(self, x):
-        self._same(x)
-
-    def move_from__business_object_row__to__tail_line(self):
-        self._move('business_object_row')
-
-    def tail_line(self, x):
-        self._same(x)
-
-    def move_from__business_object_row__to__END(self):
-        self._close_section('business_object_row')
-        return self._close()
-
-    def move_from__tail_line__to__END(self):
-        self._close_section('tail_line')
-        return self._close()
-
-    def _close(self):
-        sections = self._sections
-        del self._sections
-        return tuple(sections)
-
-    # --
-
-    def _move(self, typ):
-        self._close_section(typ)
-        self._init_section_items()
-
-    def _init_section_items(self):
-        self._current_section_items = []
-
-    def _close_section(self, typ):
-        items = self._current_section_items
-        del self._current_section_items
-        _section = _Section(typ, items)
-        self._sections.append(_section)
-
-    def _same(self, x):
-        self._current_section_items.append(x)
+    from importlib import import_module
+    mod = import_module(path_esque)  # ..
+    return getattr(mod, value_name)  # ..
 
 
-@lazy
-def _same_near_keyerer():
+def common_two_keyerers():
+    def far_keyer(sync_key, item):
+        return simplify_and_add_guillemets(sync_key)
+
+    return common_near_keyerer(), far_keyer
+
+
+def common_near_keyerer_as_string():
     # really nasty, but OK while it works: load this selfsame test file
-    # *as* a moudule, to see if we can reach the function using this identifier
+    # *as* a module, to see if we can reach the function using this identifier
 
     from os import path as os_path
     o = __file__.split(os_path.sep)
@@ -434,36 +466,69 @@ def _same_near_keyerer():
     return f'{_mod_name}.Chimmy_Chamosa_001_near'  # (in this file)
 
 
+def common_near_keyerer():
+    return Chimmy_Chamosa_001_near
+
+
 def Chimmy_Chamosa_001_near(key_via_row_DOM_normally, complete_schema, listen):
     """at #history-A.3 this changed, symmetry broke"""
 
     def key_via_row_DOM(row_DOM):
         _k = key_via_row_DOM_normally(row_DOM)
-        return _simplify_and_add_guillemets(_k)
+        return simplify_and_add_guillemets(_k)
 
     return key_via_row_DOM
 
 
-def _simplify_and_add_guillemets(k):
+def simplify_and_add_guillemets(k):
     return f'«{k.strip().upper()}»'
 
 
-class _Section:
+class TypeRun:
     def __init__(self, typ, items):
         self.count = len(items)
         self.type = typ
         self.items = items
 
 
-def _subject_module():
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        synchronized_stream_via_far_stream_and_near_stream as mod)
-    return mod
+# == Chunking (experimental, should abstract to DP)
+
+def _identity(x):
+    return x
+
+
+def chunks_via(items, type_of, payload_of=_identity):  # close to #[#508.2]
+    def flush(typ):
+        tup = tuple(cache)
+        cache.clear()
+        return typ, tup
+    cache = []
+    is_changed = build_change_detector()
+    for item in items:
+        if is_changed(type_of(item)) and len(cache):
+            yield flush(is_changed.previous_type)
+        cache.append(payload_of(item))
+    if len(cache):
+        yield flush(is_changed.current_type)
+
+
+class build_change_detector:  # #[#508.2] chunker #todo make this the one
+
+    def __init__(self, initial_type=None):
+        self.current_type = initial_type
+
+    def __call__(self, typ):  # is_changed
+        if self.current_type == typ:
+            return False
+        self.previous_type = self.current_type
+        self.current_type = typ
+        return True
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1
 # #history-A.4: no more sync-side item-mapping
 # #history-A.3: broke symmetry between near and far keyerer
 # #history-A.2: default algorithm changed to interfolding and row order changed

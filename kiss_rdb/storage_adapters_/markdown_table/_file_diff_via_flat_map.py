@@ -1,299 +1,331 @@
-"""several [#457] central conceits of this whole project happen here:
+def sync_agent_(all_sexpser, coll_path):
+    all_sexpser = _experiment_2(all_sexpser)
 
-this is where we read the lines of a markdown document, and pass a certain
-subslice of those lines over to our synchronization algorithm. the output
-of the main function in this module is the new lines of the markdown document
-(sort of) after the synchronization has been applied.
+    def _diff_lines_via(*sync_args):
+        # Read original sexps (then lines) in to memory
+        flat_map, *rst, listener = sync_args
+        orig_sx_itr = all_sexpser(listener)
+        orig_sxs, count, sanity = [], 0, 274  # ~ num lines in longest README
+        for sx in orig_sx_itr:
+            if count == sanity:
+                xx("is there memory saved by doing diff on the filesystem?")
+            count += 1
+            orig_sxs.append(sx)
+        orig_sxs = tuple(orig_sxs)
+        orig_lines = tuple(_lines_via_sexps(orig_sxs))
 
-(that's central conceit [#457.B] "markdown as datastore". also it's
-[#457.C] synchronization.)
+        # Read new sexps (then lines) in to memory
+        new_sxs = _new_sexps(iter(orig_sxs), flat_map, *rst, listener)
+        new_lines = tuple(_lines_via_sexps(new_sxs))
 
-by "sort of" we mean this: the result of the function is actually a stream
-of tuples, where each first element of each tuple is a "category" (type) of
-element (roughly corresponding to the names of the states in our [#875.2]
-parser state machine), and each second element is mixed (but either a line
-or a `to_string()`-able).
-
-we intend for this to be "modality agnostic" - this module does not "know"
-whether it's running under a CLI or elsewhere.
-
-we thought that you would want a [#411] tagged stream processor to produce
-your result; but in fact we do something simpler.
-"""
-
-from data_pipes.magnetics import (
-        synchronized_stream_via_far_stream_and_near_stream as _top_sync)
-from modality_agnostic import streamlib
-import contextlib
-
-
-next_or_none = streamlib.next_or_none
-
-
-def _could_end_at_any_time(f):
-    """custom decorator. this file only.
-
-    the markdown document can end at any time (see [#875.2] markdown state m.
-    """
-
-    def g(self):
-        tup = next_or_none(self._near_tagged_stream)
-        if tup is None:
-            self._close()
+        # Make the Diff!
+        if orig_lines == new_lines:
+            xx('no change, no diff to make')
+        from os.path import isabs
+        if isabs(coll_path):
+            from kiss_rdb import build_path_relativizer_ as build
+            path_tail = build()(coll_path)
         else:
-            return f(self, tup)
-    return g
+            path_tail = coll_path  # relative only in tests mebbe (Case2644)
+        pathA, pathB = f'a/{path_tail}', f'b/{path_tail}'
+        from difflib import unified_diff
+        return unified_diff(orig_lines, new_lines, pathA, pathB)
 
-
-@contextlib.contextmanager
-def OPEN_NEWSTREAM_VIA(**kwargs):
-    """
-    (currently our use of context managers is a bit #history-A.1 gung-ho.
-    we don't entirely know what we are doing (except #pattern [#419.Z.1]
-    nesting context managers) so this particular case may be a case where
-    it isn't useful even hypothetically; and in either case it isn't used
-    as a context manager practically.)
-    """
-
-    yield _Newstream_via(**kwargs).execute()
-
-
-class _Newstream_via:
-    """be LIKE #[#458.Z.3] a context manager class in the typical pattern,
-
-    whose element are..
-    our (tagged maybe) output lines (in some whatever parse tree format)
-
-    whereby:
-
-      - like any processor, we expect to traverse through a particular state
-        graph; in this case [#875.2] our model of the markdown document.
-        (the method has a name in all caps IFF it corresponds to a state.)
-
-      - when we get to the target markdown table, we do a crazy thing to pass
-        the rows of the markdown table (as business object rows) to the
-        synchronizer.
-
-      - when we 'return' from the synchronization (by having exhausted it),
-        we've got to transition somehow back into our own stream, to output
-        the remaining lines of the markdown document.
-
-    relevant state-specific concerns will be discussed below.
-    """
-
-    def __init__(
-            self,
-            normal_far_stream,
-            near_tagged_items,
-            near_keyerer,
-            listener,
-            ):
-
-        # --
-        self._normal_far_stream = normal_far_stream
-        self._near_tagged_stream = near_tagged_items
-        self._near_keyerer = near_keyerer
-        self._listener = self.__build_attached_listener(listener)
-        # --
-        self._state = 'HEAD_LINES'
-        self._mutex = None
-
-    def execute(self):  # (would be __enter__())
-        del(self._mutex)
-        while self._OK:
-            tup = self._next_or_none()
-            if tup is None:
-                break
-            yield tup
-
-    @_could_end_at_any_time
-    def HEAD_LINES(self, tup):
-        typ = tup[0]
-        if 'head_line' == typ:
+    def _new_lines_via(*sync_args):
+        try:
+            for line in _lines_via_sexps(_new_sexps_via(*sync_args)):
+                yield line
+        except _Stop:
             pass
-        elif 'table_schema_line_one_of_two' == typ:
-            # NOTE we don't even take the liner, we don't care
-            self._move_to('SECOND_TABLE_LINE')
-        else:
-            cover_me('unexpected tagged item')
-        return tup
 
-    @_could_end_at_any_time
-    def SECOND_TABLE_LINE(self, tup):
+    def _new_sexps_via(flat_map, near_keyerer, listener):
+        orig_sxs = all_sexpser(listener)
+        return _new_sexps(orig_sxs, flat_map, near_keyerer, listener)
 
-        typ = tup[0]
-        if 'table_schema_line_two_of_two' == typ:
-            _custom_hybrid = tup[1]
-            self._complete_schema = _custom_hybrid.complete_schema
-            if self._OK:
-                self._move_to('_TRANSITION_TO_CRAZY_TOWN')
-            else:
-                self._close()
-        else:
-            cover_me('unexpected tagged item')
-        return tup
+    class sync_agent:  # #class-as-namespace
+        SYNC_AGENT_CAN_PRODUCE_DIFF_LINES = True
+        DIFF_LINES_VIA = _experiment_1(_diff_lines_via)  # (Case2641) (2/2)
+        NEW_LINES_VIA = _new_lines_via
+        NEW_SEXPS_VIA = _experiment_3(_new_sexps_via)
 
-    def _TRANSITION_TO_CRAZY_TOWN(self):  # (for doc, see outsources below)
+    return sync_agent
 
-        near_st = self.__build_near_ad_hoc_item_stream()
 
-        from .stream_for_sync_via import NATIVIZER_ETC_VIA
-        o = NATIVIZER_ETC_VIA(  # see
-                near_stream=near_st,
-                complete_schema=self._complete_schema,
-                listener=self._listener)
-        if o is None:
-            cover_me('neato - we never failed building the nativizer before')
-            return
+def _lines_via_sexps(new_sexps):
+    def normal(sexp):
+        return sexp[1]
 
-        native_via_item = o.near_item_via_normal_item_dictionary
-        self.__proto_row = o.prototype_row
-        example_row = o.example_row
-        del(o)
+    stack = [
+        ('end_of_file', None),
+        ('table_schema_line_ONE_of_two', xx),
+        ('other_line', normal),
+        ('business_row_AST', lambda sexp: sexp[1].to_line()),
+        ('table_schema_line_TWO_of_two', normal),
+        ('table_schema_line_ONE_of_two', normal),
+        ('head_line', normal),
+        ('beginning_of_file', None)]
 
-        def native_via_key_and_item(far_key, far_item):
-            return native_via_item(far_item)  # (Case1320DP)
+    from . import action_stack_popper_
+    popper = action_stack_popper_(stack, lambda fra: fra[1:])
 
-        pair_via_near = self.__procure_pair_via_near()
-        if pair_via_near is None:
-            return
+    for sx in new_sexps:
+        frame = popper(sx[0])
+        if frame:
+            func, = frame
+            skip = func is None
+        if skip:
+            continue
+        yield func(sx)
 
-        _normal_near_st = (pair_via_near(row_DOM) for row_DOM in near_st)
 
-        _far_st = pop_property(self, '_normal_far_stream')
-        _big_deal_stream = _top_sync.stream_of_mixed_via_sync(
-                normal_far_stream=_far_st,
-                normal_near_stream=_normal_near_st,
-                item_via_collision=self._item_via_collision,
-                nativizer=native_via_key_and_item,
-                listener=self._listener)
+def _new_sexps(itr, flat_map, near_keyerer, listener):
+    # Output zero or more head lines (lines before the table)
+    # #todo this was written before action stacks and could be cleaned up
 
-        self._next_big_deal_row = streamlib.next_or_noner(_big_deal_stream)
+    use_eg_row, actual_eg_row = None, None
+    sexps_after_table_on_deck = []
 
-        self._move_to('OBJECT_ROWS')
-        return ('business_object_row', example_row)
+    sx = next(itr)
+    assert 'beginning_of_file' == sx[0]
+    yield sx
 
-    def _item_via_collision(self, far_key, far_dct, near_key, near_row_DOM):
-        # near and far sync keys are equal so entity-sync (probably).
-        # these arguments in this order is #provision [#458.6].
+    after_table = {'other_line', 'end_of_file'}
 
-        length = len(far_dct)
-        assert(length)
-
-        do_short_circuit = False
-        if 1 == length:
-            # short circuit certain cases, implementing [#458.7]
-            far_nat_key = next(iter(far_dct.values()))
-            near_nat_key_s = near_row_DOM.cell_at_offset(0).content_string()
-
-            assert(isinstance(far_nat_key, str))  # have fun when not
-
-            if near_nat_key_s == far_nat_key:
-                # keep formatting when far dct len 1 and keys same (Case0150DP)
-                do_short_circuit = True
-            else:
-                pass  # sync because different (Case0170DP) (Case2019DP)
-        else:
-            pass  # multiple elements in far dict (Case0140DP)
-
-        if do_short_circuit:
-            return near_row_DOM
-
-        return self.__proto_row.new_row_via_far_pairs_and_near_row_DOM__(
-                far_dct.items(), near_row_DOM)
-
-    def __build_near_ad_hoc_item_stream(self):
-
-        hit_the_end = True
-        for tup in self._near_tagged_stream:
-            typ, row_DOM = tup
-            if 'business_object_row' == typ:
-                yield row_DOM
-            else:
-                hit_the_end = False
-                self._TUP_ON_DECK = tup
+    for tsl1_sx in itr:
+        if 'head_line' == tsl1_sx[0]:
+            yield tsl1_sx
+            continue
+        yield tsl1_sx  # table_schema_line_ONE_of_two
+        for tsl2_sx in itr:
+            yield tsl2_sx  # table_schema_line_TWO_of_two
+            cs = tsl2_sx[2]  # yikes
+            _2 = (getattr(cs, k) for k in ('field_name_keys', 'table_cstack_'))
+            if (d := flat_map.receive_field_name_keys(*_2)) is not None:
+                assert 'error' == d[0][0]  # #here3
+                listener(*d[0])
+                return
+            for eg_row_sx in itr:
+                if (typ := eg_row_sx[0]) in after_table:
+                    sexps_after_table_on_deck.append(eg_row_sx)
+                    use_eg_row = cs.rows_[0]  # undocumented
+                    break
+                assert 'business_row_AST' == typ
+                use_eg_row = (actual_eg_row := eg_row_sx[1])
                 break
+            break
+        break
 
-        """(we don't know why but you don't need to and must not close
-        yourself even when you hit the end of the whole document here.
-        (Case050SA)
-        """
+    if use_eg_row is None:
+        xx("can't sync without example row")
 
-        self._did_hit_the_end_here = hit_the_end
+    # Always output the example row manually, keeping it always topmost
+    if actual_eg_row:
+        yield 'business_row_AST', actual_eg_row
 
-    def __procure_pair_via_near(self):
+    near_key_for = _build_near_keyer(near_keyerer, cs)  # ..
 
-        def key_via_row_DOM_normally(row_DOM):
-            # for now KISS and #provision [#458.I.2] (leftmost is guy)
-            return row_DOM.cell_at_offset(0).content_string()
+    process_directives_during, process_directives_at_end = \
+        _build_directives_processer(use_eg_row, cs, listener)
 
-        f_f = pop_property(self, '_near_keyerer')
-        if f_f is None:
-            use_key_via_row_DOM = key_via_row_DOM_normally
-        else:
-            # (Case0160DP)
-            use_key_via_row_DOM = f_f(
-                    key_via_row_DOM_normally,
-                    self._complete_schema,
-                    self._listener)
+    # Traverse over zero or more table lines, doing sync stuff
+    for sx in itr:
+        if (typ := sx[0]) in after_table:
+            sexps_after_table_on_deck.append(sx)
+            break
+        assert 'business_row_AST' == sx[0]
+        ent = sx[1]
+        near_key = near_key_for(ent)
+        if near_key is None:
+            yield sx  # pass thru table rows with a blank identifier cell or et
+            continue
 
-            if use_key_via_row_DOM is None:
-                return  # bruh
+        directives = flat_map.receive_item(near_key)
+        for sx in process_directives_during(directives, sx):
+            yield sx
 
-        def pair_via_near(row_DOM):
-            k = use_key_via_row_DOM(row_DOM)
-            if k is None:
-                cover_me("no gigo, let's catch this early")
-            return (k, row_DOM)
+    # After finishing your own table, ask flat map for any remaining items
+    for sx in process_directives_at_end(flat_map.receive_end()):
+        yield sx
 
-        return pair_via_near
+    # Any of these that we cached
+    for sx in sexps_after_table_on_deck:
+        yield sx
 
-    def OBJECT_ROWS(self):
-        x = self._next_big_deal_row()
-        if x is None:
-            if self._OK:
-                if self._did_hit_the_end_here:
-                    pass  # (Case1322DP)
+    # Flush any remaining file
+    for sx in itr:
+        yield sx
+
+
+def _build_directives_processer(eg_row, cs, listener):
+    def process_directives_during(directives, sx):
+        for directive in directives:
+            if 'pass_through' == (typ := directive[0]):
+                yield sx
+                continue
+            if 'insert_item' == typ:
+                yield sexp_for_insert_item(directive)
+                continue
+            if typ in ('merge_with_item', 'update_item'):
+                exi_row, counts = sx[1], None
+                if 'update_item' == typ:
+                    assert isinstance(edit := directive[1], tuple)
+                    exi_dct = exi_row.core_attributes_dictionary_as_storage_adapter_entity  # noqa: E501
+                    dct, counts = _dct_via_edit(edit, exi_dct, cs, listener)
                 else:
-                    self._move_to('TAIL_LINES')
-                    return pop_property(self, '_TUP_ON_DECK')
-            else:
-                return ('markdown_table_unable_to_be_synced_against_', None)
-        else:
-            return ('business_object_row', x)
+                    assert 'merge_with_item' == typ
+                    assert isinstance(dct := directive[1], dict)
+                row = updated_row_via(dct.items(), exi_row, listener)
+                if 2 < len(directive):
+                    directive[2](row)
+                if counts:  # #here5
+                    eid = sx[1].nonblank_identifier_primitive
+                    _emit_edited(listener, counts, eid, 'updated')
+                yield 'business_row_AST', row
+                continue
+            if 'give_me_the_AST_please' == typ:
+                directive[1](sx[1])
+                continue
+            assert 'error' == typ
+            listener(*directive)
+            raise _Stop()  # (Case2664DP)
 
-    @_could_end_at_any_time
-    def TAIL_LINES(self, tup):
-        return tup
+    def process_directives_at_end(directives):
+        for directive in directives:
+            typ = directive[0]
+            if 'insert_item' == typ:
+                yield sexp_for_insert_item(directive)
+                continue
+            assert 'error' == typ
+            listener(*directive)
+            raise _Stop()  # (Case2641) (1/2)
 
-    def _next_or_none(self):
-        return getattr(self, self._state)()
+    def sexp_for_insert_item(directive):
+        assert isinstance(dct := directive[1], dict)
+        row = new_row_via(dct.items(), listener)
+        if 2 < len(directive):
+            directive[2](row)
+        return 'business_row_AST', row
 
-    def _close(self):
-        del(self._near_tagged_stream)
-        del(self._state)
+    from ._prototype_row_via_example_row_and_complete_schema import \
+        BUILD_CREATE_AND_UPDATE_FUNCTIONS_ as build_funcs
 
-    def _move_to(self, s):
-        self._state = s
+    new_row_via, updated_row_via = build_funcs(eg_row, cs)
+    new_row_via = _experiment_2(new_row_via)
+    updated_row_via = _experiment_2(updated_row_via)
 
-    def __build_attached_listener(self, orig_listener):
-        def f(typ, *a):
-            if 'error' == typ:
-                self._OK = False  # #here1
-            orig_listener(typ, *a)
-        self._OK = True
-        return f
-
-
-def pop_property(obj, attr):
-    x = getattr(obj, attr)
-    delattr(obj, attr)
-    return x
+    return process_directives_during, process_directives_at_end
 
 
-def cover_me(s):  # #open [#876] cover me
-    raise Exception(f'cover me: {s}')
+def _dct_via_edit(edit, exi_dct, cs, listener):
 
+    # Put the directives in an attr-keyed dim pool while checking for clobber
+    pool = {}
+    for typ, attr, *val in edit:
+        if attr in pool:
+            xx("multiple directives for attribute")
+        pool[attr] = (typ, *val)
+
+    # Go thru the formal fields in formal order. Skip if no pool
+    # component. For each remaining, confirm and do the following
+    #
+    #    update  must be present      put in product dict
+    #    create  must be not present  put in product dict
+    #    delete  must be present      ..try putting None in product dict??
+    these_via_type = {
+        'update_attribute': (True, lambda k, x: update_arg_dct(k, x), 0),
+        'create_attribute': (False, lambda k, x: update_arg_dct(k, x), 1),
+        'delete_attribute': (True, lambda k: update_arg_dct(k, None), 2)}
+
+    def update_arg_dct(k, x):
+        arg_dct[k] = x
+
+    arg_dct, counts = {}, ([], [], [])
+
+    for k in cs.field_name_keys:  # unnecessarily check leftmost field
+        if (attr_direc := pool.get(k)) is None:
+            continue
+        typ, *args = attr_direc
+        yn, call_me, offset = these_via_type[typ]
+        counts[offset].append(None)  # #open [#874.5]
+        if yn:
+            if k not in exi_dct:
+                def deets():
+                    return {'reason': f"'{k}' has no existing value"}
+                listener('error', 'structure', 'cannot_update', deets)
+                raise _Stop()  # (Case2713)
+        elif k in exi_dct:
+            xx(f"can't '{typ}' '{k}' because was already present")
+        call_me(k, *args)
+        pool.pop(k)
+
+    # Any that remain are extra keys
+    if len(pool):
+        xx("unrecognized field(s): ({', '.join(pool.keys()})")
+
+    # Update the row with the product dict
+    return arg_dct, counts
+
+
+def _build_near_keyer(near_keyerer, complete_schema):  # (Case0160DP has hist.)
+
+    def near_keyer_normally(ent):
+        # might be #provision [#871.1] (leftmost is guy) but we don't know
+        # might be None! it's not a validation failure to have blank cell here
+        return ent.nonblank_identifier_primitive
+
+    if near_keyerer is None:
+        return near_keyer_normally
+
+    return near_keyerer(near_keyer_normally, complete_schema, None)
+
+
+# == Low-Level Support
+
+def _experiment_3(orig_f):
+    def use_f(*a, **kw):
+        itr = orig_f(*a, **kw)
+        try:
+            for item in itr:
+                yield item
+        except _Stop:
+            pass
+    return use_f
+
+
+def _experiment_2(orig_f):
+    def use_f(*a):
+        x = orig_f(*a)
+        if x is None:
+            raise _Stop()
+        return x
+    return use_f
+
+
+def _experiment_1(orig_f):
+    def use_f(*a):
+        try:
+            return orig_f(*a)
+        except _Stop:
+            pass
+    return use_f
+
+
+class _Stop(RuntimeError):
+    pass
+
+
+# == Delegations
+
+def _emit_edited(listener, UCDs, eid, preterite):
+    from kiss_rdb.magnetics_.CUD_attributes_request_via_tuples \
+        import emit_edited_ as emit
+    emit(listener, UCDs, eid, preterite)
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+
+# #history-B.1 blind rewrite
 # #history-A.2: big refactor, go gung-ho with context managers. extracted.
 # #history-A.1: add experimental feature "sync keyerser"
 # #born.

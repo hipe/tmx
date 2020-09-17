@@ -113,70 +113,64 @@ full producer script API, so.. (:#here2)
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_identity, random_number_generator, filesystem, listener):
+        collection_path, listener=None, opn=None, rng=None):
 
-    mod = producer_script_module_via_path(
-            collection_identity.collection_path, listener)
+    if hasattr(collection_path, 'fileno'):
+        fh = collection_path
+        assert 'r' == fh.mode[0]
+        assert 0 == fh.fileno()
+        return _collection_implementation_via_read_only_stream(fh, listener)
+
+    assert not opn
+
+    mod = producer_script_module_via_path(collection_path, listener)
     if mod is None:
         return
     return _collection_implementation_via_module(mod)
 
 
-def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, _monitor_):
+def _collection_implementation_via_read_only_stream(stdin, _monitor):
 
-    class CollectionImplementationViaOpenUpstream:
+    class collection_impl_via_read_only_stream:  # #class-as-namespace
 
-        def OPEN_INITIAL_NORMAL_NODES_AS_STORAGE_ADAPTER(self, args, _monitor):
-            assert(0 == len(args))
+        def multi_depth_value_dictionaries_as_storage_adapter(from_args, mon):
+            assert 0 == len(from_args)
             from json import loads
-            _itr = (loads(s) for s in stdin)
-            from data_pipes import ThePassThruContextManager
-            return ThePassThruContextManager(_itr)
+            for line in stdin:
+                yield loads(line)
 
-    return CollectionImplementationViaOpenUpstream()
+    return collection_impl_via_read_only_stream
 
 
-def _collection_implementation_via_module(module):  # #testpoint
+def _collection_implementation_via_module(mod):  # #testpoint
 
-    class CollectionImplementationViaModule:
+    def _multi_depth_dcts(from_args, mon):
+        if 1 < len(from_args):
+            raise Exception('cover me - multiple pass-thru args')
 
-        def OPEN_INITIAL_NORMAL_NODES_AS_STORAGE_ADAPTER(self, args, mon):
+        opened = mod.open_traversal_stream(mon.listener, *from_args)
+        with opened as orig_dcts:
 
-            if 1 < len(args):
-                raise Exception('cover me - multiple pass-thru args')
+            m = 'multi_depth_value_dictionary_stream_via_traversal_stream'
+            if hasattr(mod, m):  # see #here2
+                out_dcts = getattr(mod, m)(orig_dcts)
+            else:
+                # as a default, use the same function as for when
+                # syncing but discard the sync key.
 
-            class ContextManagerForNormalNodes:
+                key_and_dcts = mod.stream_for_sync_via_stream(orig_dcts)
+                out_dcts = (key_and_dct[1] for key_and_dct in key_and_dcts)
+            for dct in out_dcts:
+                yield dct
 
-                def __enter__(self):
+    class collection_impl_via_module:  # #class-as-namespace
+        multi_depth_value_dictionaries_as_storage_adapter = _multi_depth_dcts
 
-                    opened = module.open_traversal_stream(mon.listener, *args)
-                    self._close_me = opened
-                    dcts = opened.__enter__()
-
-                    # this is optional for the producer script (see #here2)
-
-                    if hasattr(module, 'initial_normal_nodes_via_stream'):
-                        return module.initial_normal_nodes_via_stream(dcts)
-
-                    # as a default, we use the same function as for when
-                    # syncing but we discard the sync key.
-
-                    _these = module.stream_for_sync_via_stream(dcts)
-                    return (dct for _ignore_sync_key, dct in _these)
-
-                def __exit__(self, typ, e, stack):
-                    close_me = self._close_me
-                    if close_me is None:
-                        return
-                    self._close_me = None
-                    return close_me.__exit__(typ, e, stack)
-
-            return ContextManagerForNormalNodes()
-
-    return CollectionImplementationViaModule()
+    return collection_impl_via_module
 
 
 def producer_script_module_via_path(script_path, listener):
+    assert isinstance(script_path, str)  # #[#022]
 
     from os import path as os_path
     import re

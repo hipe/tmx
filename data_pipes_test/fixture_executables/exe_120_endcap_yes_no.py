@@ -3,7 +3,7 @@
 
 def stream_for_sync_via_stream(dcts):
     for dct in dcts:
-        yield (dct['col_a'], dct)
+        yield (dct['col_A'], dct)
 
 
 near_keyerer = None  # #open [#458.N] producer script shouldn't have knowledge
@@ -16,7 +16,7 @@ class open_traversal_stream:
         pass
 
     def __enter__(self):
-        yield {'col_a': 'thing B', 'col_b': 'y'}  # (Case1322DP)
+        yield {'col_A': 'thing B', 'col_B': 'y'}  # (Case1322DP)
 
     def __exit__(*_):
         return False  # no, don't trap exceptions

@@ -76,33 +76,39 @@ def open_traversal_stream(listener, markdown_path=None):
 
     class ContextManager:
         def __enter__(self):
-            _cm = _open_raw_traversal_stream(listener, markdown_path, True)
-            with _cm as itr:
-                _field_names = next(itr)
-
-                dict_via = _dict_via_cels_via(_field_names)
+            self._em = None
+            cm = _open_raw_traversal_stream(listener, markdown_path, True)
+            self._em = cm
+            with cm as itr:
+                field_names = next(itr)
+                dict_via = _dict_via_cels_via(field_names)
 
                 for dct in itr:
-                    yield dict_via(dct.values())
+                    vals = []  # was prettier before #history-B.1 but meh
+                    for k in field_names:
+                        if k not in dct:
+                            break
+                        vals.append(dct[k])
+                    yield dict_via(vals)
 
         def __exit__(self, *_3):
-            pass
+            if self._em:
+                return self._em.__exit__(self, *_3)
 
     return ContextManager()
 
 
 def _dict_via_cels_via(far_field_names):
     _split_th_version = updated_and_version_via_string
-    from data_pipes.magnetics import dictionary_via_cels_via_definition
-    return dictionary_via_cels_via_definition(
+    from data_pipes.magnetics import dictionary_via_cells_via_definition
+    return dictionary_via_cells_via_definition(
         unsanitized_far_field_names=far_field_names,
         special_field_instructions={
             'name': ('string_via_cel', lambda s: s),
             'parses': ('rename_to', 'grammar'),
             'updated': ('split_to', ('updated', 'version'), _split_th_version),
             },
-        string_via_cel=lambda s: s,
-        )
+        string_via_cel=lambda s: s)
 
 
 class _open_raw_traversal_stream:  # #[#459.3] class as context manager
@@ -114,49 +120,57 @@ class _open_raw_traversal_stream:  # #[#459.3] class as context manager
         self._listener = listener
 
     def __enter__(self):
+        self._close_this = None
         from script_lib import CACHED_DOCUMENT_VIA_TWO
         doc = CACHED_DOCUMENT_VIA_TWO(
                 self._markdown_path, self._raw_url, 'markdown', self._listener)
         # ..
-        lines = open(doc.cache_path)
-        self._close_this = lines
-        return _main(lines, self._do_field_names, self._listener)
+        opened = open(doc.cache_path)
+        self._close_this = opened
+        return _main(opened, self._do_field_names, self._listener)
 
     def __exit__(self, *_3):
-        ct = self._close_this
-        del self._close_this
-        if True:  # ..
-            ct.close()
-        return False  # never swallow an exception
+        if not self._close_this:
+            return
+        return self._close_this.__exit__(*_3)
 
 
-def _main(lines, do_field_names, listener):
+def _main(opened, do_field_names, listener):
     # FOR NOW, VIOLATE THINGS
 
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_.markdown_table_scanner_via_lines import (  # noqa: E501
-            MarkdownTableScanner)
+    from kiss_rdb.storage_adapters_.markdown_table \
+        import COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
 
-    scn = MarkdownTableScanner(
-            lines, do_parse_example_row=False, listener=listener)
+    def opn(path):
+        assert hello == path
+        return opened
 
-    while not scn.is_empty:
-        if 'head_line' == scn.peeked_AST_symbol:
-            scn.advance()
-            continue
-        break
+    hello = '/dev/null/hello-from-producer-script'
+    ci = func(hello, listener, opn)
 
-    assert('table_schema_from_two_lines' == scn.peeked_AST_symbol)
+    action_stack = [
+        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
+        ('table_schema_line_ONE_of_two', xx),
+        ('other_line', lambda o: o.turn_yield_off()),
+        ('business_row_AST',),
+        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
+        ('table_schema_line_ONE_of_two',),
+        ('head_line',),
+        ('beginning_of_file',)]
+
+    sxs = ci.sexps_via_stack(action_stack, listener)
+    sx = next(sxs)
+    assert 'table_schema_line_TWO_of_two' == sx[0]
+    complete_schema = sx[2]
+    ks = complete_schema.field_name_keys
     if do_field_names:
-        yield scn.peeked_AST.complete_schema.schema_field_names
-
-    while True:
-        scn.advance()
-        if scn.is_empty:
-            break
-        if not 'business_object_row' == scn.peeked_AST_symbol:
-            assert('tail_line' == scn.peeked_AST_symbol)
-            break
-        yield scn.peeked_AST
+        yield ks
+    for sx in sxs:
+        typ, ast = sx
+        assert 'business_row_AST' == typ
+        dct = ast.core_attributes_dictionary_as_storage_adapter_entity
+        dct['name'] = ast.nonblank_identifier_primitive  # yikes
+        yield dct
 
 
 def updated_and_version_via_string(s):  # #testpoint (sort of)
@@ -232,6 +246,7 @@ if __name__ == '__main__':
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-B.1
 # #history-A.4: rewrite: no more sync-side stream mapping
 # #history-A.3: key simplifier found to be not covered and left broken
 # #history-A.1: birth of the expression "collection meta-record"
