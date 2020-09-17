@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):

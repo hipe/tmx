@@ -9,7 +9,7 @@ this takes as input a "one big string" and puts as output something like
 our custom, native AST.
 """
 
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 def doc_pairs_via_string_LIGHTWEIGHT(input_string):

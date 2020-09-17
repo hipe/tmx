@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 def fixed_shape_word_wrapperer(row_max_widths, ellipsis_string=None):

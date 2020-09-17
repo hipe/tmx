@@ -31,7 +31,3 @@ TatSu==5.5.0
 toml==0.10.1
 uritemplate==3.0.1
 urllib3==1.25.9
-z-data-pipes==0.0
-z-game-server==0.0
-z-kiss-rdb==0.0
-z-pho==0.0

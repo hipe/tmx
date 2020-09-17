@@ -15,7 +15,7 @@
 👉 So this is :[#867.K] the main internal API for doing vendor stuff, but
    we use this same tag to mark the (at writing) one other place we have too.
 """
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 # == injection for locking and mutating index

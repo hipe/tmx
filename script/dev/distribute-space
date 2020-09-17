@@ -8,11 +8,11 @@ def _help():
     from os.path import basename as bn
     me = bn(argv[0])
     yield f'usage: cat some.table | {me} BEGIN END'
-    yield f'synopsis: distribute available space proportionally'
+    yield 'synopsis: distribute available space proportionally'
     yield f'example: echo "thing-A 3\\nthing-B 4" | {me} 4063 4375'
 
 
-if len(argv) is not 3 or stdin.isatty():
+if 3 != len(argv) or stdin.isatty():
     for s in _help():
         stderr.write(f'{s}\n')
     exit(1)

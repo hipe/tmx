@@ -108,7 +108,7 @@ parameter); but don't do that.
 :[#502]
 """
 
-from modality_agnostic.memoization import dangerous_memoize
+from modality_agnostic import dangerous_memoize
 
 
 # == BEGIN [#008.12] function reflection

@@ -1,6 +1,6 @@
 from kiss_rdb_test.common_initial_state import functions_for
 from kiss_rdb_test import storage_adapter_canon
-from modality_agnostic.memoization import \
+from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes, lazy
 import unittest
 

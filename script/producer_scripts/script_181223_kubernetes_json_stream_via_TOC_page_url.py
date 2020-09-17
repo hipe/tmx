@@ -49,7 +49,7 @@ def _do_CLI(monitor, stdin, stdout, stderr, url):
 _do_CLI.__doc__ = _doc
 
 
-def initial_normal_nodes_via_stream(dcts):
+def multi_depth_value_dictionary_stream_via_traversal_stream(dct):
     from kiss_rdb.storage_adapters.markdown import markdown_link_via
     for dct in dcts:
         if '_is_branch_node' in dct:

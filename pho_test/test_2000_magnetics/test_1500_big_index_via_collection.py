@@ -138,7 +138,7 @@ def custom_index_via_big_index(big_index):
         doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
         is_first = True
 
-        from modality_agnostic.memoization import Counter
+        from modality_agnostic.test_support.common import Counter
         total_line_counter = Counter()
         lines_that_express_the_notecard_heading = []
         lines_that_define_bookmarks = []

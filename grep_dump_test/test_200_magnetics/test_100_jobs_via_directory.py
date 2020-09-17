@@ -221,7 +221,7 @@ class Case020_Locking(CommonCase):
         class memo:  # #class-as-namespace
             count = 0
 
-        listener = em.L_VIA(recv)
+        listener = em.listener_via_receive_channel_and_payloader(recv)
         e = None
 
         with _clean_jobs_dir() as jobs_path:

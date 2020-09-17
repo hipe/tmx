@@ -40,19 +40,19 @@ def __run_adapter_forever():
         _print('blocking for FIRST read')
         while True:
             recvd_bytes = sock.recv(1024)
-            if len(recvd_bytes) is 0:
+            if not len(recvd_bytes):
                 _print('received zero length')
                 break
             _print('received: ', repr(recvd_bytes))
             avail, _, _ = select.select(rlist, (), (), self._timeout_float)
-            if len(avail) is 0:
+            if not len(avail):
                 _print('nothing was ready')
                 break
             _print('something should be ready now')
 
     def __parse_input():
         s = input('any string (float to change timeout, "done" for done): ')
-        if len(s) is 0:
+        if not len(s):
             _print('sending the empty string causes problems. try another')
             return _REDO
         else:

@@ -1,5 +1,5 @@
 from kiss_rdb_test.common_initial_state import functions_for
-from modality_agnostic.memoization import \
+from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject
 import unittest
 

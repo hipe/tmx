@@ -8,7 +8,7 @@ this one grammar - there can be other such modules for other grammars).
 also, see #here2 which explains how we isolate w/ re: to AST.
 """
 
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 def RUMSKALLA(serr, query_s):

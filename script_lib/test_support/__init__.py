@@ -37,7 +37,7 @@ def lines_and_spy_io_for_test_context(tc, dbg_msg_head):  # #:[#605.1]
     # (abstracted at #history-A.1)
 
 
-class _UNINDENT_SINGLETON:
+class _build_unindent:
     # experiment in OCD in how we implement this, all just not to load re
 
     def __init__(self):
@@ -79,7 +79,7 @@ class _UNINDENT_SINGLETON:
             cursor = md.end()
 
 
-unindent = _UNINDENT_SINGLETON()
+unindent = _build_unindent()
 
 # #history-A.1
 # #abstracted.

@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 class _BusinessSchema:

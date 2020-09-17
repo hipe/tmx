@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import memoize_into
+from modality_agnostic.test_support.common import memoize_into
 import os.path as os_path
 
 

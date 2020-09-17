@@ -34,9 +34,8 @@ class Case2435_camel_case(CommonCase):
     _this = _split_like_so
 
     def _go_subject(self, big_s):
-        from kiss_rdb import _memoized
-        f = _memoized.namer.split_on_camel_case
-        return tuple(s for s in f(big_s))
+        from kiss_rdb import _field_name_functions as these
+        return tuple(these()._split_on_camel_case(big_s))
 
 
 class Case2436_normalize_freeform_strings(CommonCase):  # #midpoint
@@ -46,6 +45,9 @@ class Case2436_normalize_freeform_strings(CommonCase):  # #midpoint
 
     def test_020(self):
         self._this("Mom's spaghetti!!!", 'moms_spaghetti')
+
+    def test_030(self):
+        self._this("I-Dislike-COVID19", 'I_dislike_COVID19')
 
     _this = _be_like_so
 
@@ -74,10 +76,15 @@ def _stowaway_subject_function():
     return normal_field_name_via_string
 
 
-def _subject_module():
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        schema_index_via_schema_row as mod)
-    return mod
+@lazy
+def subject_function():
+    def entities_via_lines_and_listener(lines, listener):
+        pfile = msa.pretend_file_via_path_and_lines(__file__, lines)
+        ci = msa.collection_implementation_via_pretend_file(pfile)
+        return ci.to_entity_stream_as_storage_adapter_collection(listener)
+
+    import kiss_rdb_test.markdown_storage_adapter as msa
+    return entities_via_lines_and_listener
 
 
 if __name__ == '__main__':

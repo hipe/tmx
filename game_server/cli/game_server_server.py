@@ -4,7 +4,7 @@ def _do_work_for_client_socket(client_sock):
             while True:
                 print('recv..')
                 recvd_bytes = client_sock.recv(8)
-                if len(recvd_bytes) is 0:
+                if not len(recvd_bytes):
                     print('no data - break.')
                     break
 

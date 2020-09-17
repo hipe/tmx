@@ -32,11 +32,11 @@ def CLI_function_via_command_module(command_module):
     def do_CLI(mon, sin, sout, serr, *actuals):
 
         leng = len(formals)
-        assert(len(actuals) == leng)
+        assert len(actuals) == leng
         kwargs = {formals[i][0]: actuals[i] for i in range(0, leng)}
 
         if param_index is not None:
-            assert(0 == len(param_index.parameters_that_start_with_underscores))  # noqa: E501
+            assert 0 == len(param_index.parameters_that_start_with_underscores)
 
         if hasattr(mixed_command, 'execute'):  # not `callable`
             x = mixed_command(**kwargs).execute()
@@ -73,13 +73,13 @@ def __infer_formals(mixed_command):
 
     for name, param in signature(mixed_command).parameters.items():
 
-        assert('_' != name[0])  # we used to do a thing
+        assert '_' != name[0]  # we used to do a thing
 
         annotation = param.annotation
         default = param.default
 
-        assert(annotation is signature_nothing)  # this would be "cool"
-        assert(default is signature_nothing)  # this would be "cool"
+        assert annotation is signature_nothing  # this would be "cool"
+        assert default is signature_nothing  # this would be "cool"
 
         # [#607.J] crappy desc bug below
         use_description = f"xx (no desc for '{name.replace('_', '-')}')"
@@ -117,24 +117,24 @@ def __second_pass(use_optionals, use_positionals, use_globby):
         mini = r.start
         maxi = r.stop
 
-        assert(mini is not None)  # we never go to negative unbounded
+        assert mini is not None  # we never go to negative unbounded
 
-        if mini is 0:
-            if maxi is 0:
+        if 0 == mini:
+            if 0 == maxi:
                 yield (f'--{slug()}', *desc_lines())  # flag
-            elif maxi is 1:
+            elif 1 == maxi:
                 yield (f'--{slug()}={meta_var()}', *desc_lines())  # option
             else:
-                assert(maxi is None)  # optional list
+                assert maxi is None  # optional list
                 yield (f'--{slug()}={meta_var()}*', *desc_lines())
         else:
-            assert(mini is 1)
-            if maxi is 1:
+            assert 1 == mini
+            if 1 == maxi:
                 # min 1 max 1 is normally a positional argument, but #here1
 
                 yield (f'--{slug()}={meta_var()}!', *desc_lines())
             else:
-                assert(maxi is None)  # assume unbounded. (max 0 never w min 1)
+                assert maxi is None  # assume unbounded. (max 0 never w min 1
                 # this would have been the globby but the slot is taken
 
                 yield (f'--{slug()}={meta_var()}+', *desc_lines())
@@ -146,8 +146,8 @@ def __second_pass(use_optionals, use_positionals, use_globby):
         r = formal_param.argument_arity_range
         mini = r.start
         maxi = r.stop
-        assert(mini is 1)
-        assert(maxi is 1)
+        assert 1 == mini
+        assert 1 == maxi
         yield (slug(), *desc_lines())
 
     if use_globby is not None:
@@ -155,13 +155,13 @@ def __second_pass(use_optionals, use_positionals, use_globby):
         r = formal_param.argument_arity_range
         mini = r.start
         maxi = r.stop
-        assert(maxi is None)
+        assert maxi is None
 
-        if mini is 1:
+        if 1 == mini:
             # add required list (globby)
             yield (f'{slug()}+', *desc_lines())
         else:
-            assert(mini is 0)
+            assert 0 == mini
             # add optional list (globby)
             yield (f'{slug()}*', *desc_lines())
 
@@ -181,20 +181,20 @@ def __first_pass(formal_parameters):
         r = formal_param.argument_arity_range
         mini = r.start
         maxi = r.stop
-        if mini is 0:
-            if maxi is 0:
+        if 0 == mini:
+            if 0 == maxi:
                 optionals_of_several_kinds.append(item)
-            elif maxi is 1:
+            elif 1 == maxi:
                 optionals_of_several_kinds.append(item)
             else:
-                assert(maxi is None)
+                assert maxi is None
                 listy_parameters.append(item)
         else:
-            assert(1 == mini)
-            if maxi is 1:
+            assert 1 == mini
+            if 1 == maxi:
                 regular_positional_arguments.append(item)
             else:
-                assert(maxi is None)
+                assert maxi is None
                 listy_parameters.append(item)
 
     # heuristic: more than three is too many positionals. convert to optionals
@@ -235,7 +235,7 @@ def _desc_lines_via_description_value(mixed):
             return tuple(mixed(STYLER_))  # ..
         return tuple(mixed())
 
-    assert(mixed is None)
+    assert mixed is None
     return ()
 
 

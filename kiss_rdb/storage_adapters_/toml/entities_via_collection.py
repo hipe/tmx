@@ -26,8 +26,8 @@ def table_block_via_lines_and_table_start_line_object_(
 
     # == BEGIN massive a hacks to alter parse state to be as if mid-parse
 
-    self = _ThisState()
-    self._actions = None
+    class self:  # #class-as-namespace
+        _actions = None
 
     def actionser(ps):  # the actions object isn't normally accessible
         self._actions = blk_lib.ActionsForCoarseBlockParse_(ps)
@@ -52,10 +52,6 @@ def table_block_via_lines_and_table_start_line_object_(
         assert(False)  # assert that that's the end of the stream
 
     return table_block
-
-
-class _ThisState:  # [#510.2]
-    pass
 
 
 def identifiers_via__(paths_function, id_via_string, listener):

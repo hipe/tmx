@@ -8,6 +8,8 @@ base actions perhaps not needed for that one actions
 codename WASD
 learn enough SDK to make WASD
 have full on eno
-flush pending renames
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
+the default report is top 10 open issues, VCS chronological order
+you have to be able to parse identifiers and compare them
+GIT VCS adapter: git blame (index)

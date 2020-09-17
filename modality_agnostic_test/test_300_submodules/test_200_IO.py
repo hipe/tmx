@@ -7,7 +7,7 @@ both the cases and the SUT may be up to 1.5 years older.
 
 from modality_agnostic_test.common_initial_state import (
         BooleanReference)
-from modality_agnostic.memoization import (
+from modality_agnostic.test_support.common import (
         Counter,
         dangerous_memoize as shared_subject)
 import unittest

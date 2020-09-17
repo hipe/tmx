@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import lazy
+from modality_agnostic.test_support.common import lazy
 
 
 @lazy

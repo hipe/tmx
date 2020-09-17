@@ -44,6 +44,8 @@ however as is hinted at in one place below, there may be a way that we
 can dynamically decompose..
 """
 
+from modality_agnostic.test_support.common import \
+        lazify_method_safely
 import unittest
 
 
@@ -51,7 +53,7 @@ class CommonCase(unittest.TestCase):
 
     def _number_of_cels_is(self, d):
         _row = self.case().row
-        self.assertEqual(_row.cels_count, d)
+        self.assertEqual(_row.cell_count, d)
 
     def _has_endcap_yes_or_no(self, yn):
         _row = self.case().row
@@ -61,28 +63,29 @@ class CommonCase(unittest.TestCase):
     def _recomposes(self):
         case = self.case()
         _expected = case.original_string
-        _actual = case.row.to_string()
+        _actual = case.row.to_line()
         self.assertEqual(_expected, _actual)
 
-    def _cel(self, offset):
+    def _cell(self, offset):
         case = self.case()
         return case.row.cell_at_offset(offset)
+
+    do_debug = False
 
 
 def given_input_string(f):  # #decorator #[#510.6]
     def build_value():
         return _CaseState(f(None))
-    from modality_agnostic.memoization import lazify_method_safely
     return lazify_method_safely(build_value)
 
 
 class Case2397_some_failures(CommonCase):
 
     def test_010_loads(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_function())
 
     def test_020_pipe_at_beginning_is_required(self):
-        _msg = _failure_message_via_line(self, '😂')
+        _msg = _failure_message_via_line(self, '😂\n')
         self.assertEqual("expecting '|' had '😂' at beginning of line", _msg)
 
     def test_030_newline_at_ending_is_required(self):
@@ -99,7 +102,7 @@ class Case2401_one_cel_with_nothing_YES_ENDCAP(CommonCase):
         self._recomposes()
 
     def test_030_first_content_fellow_says_out(self):
-        self.assertEqual(self._cel(0).content_string(), '')
+        self.assertEqual(self._cell(0).value_string, '')
 
     def test_040_row_says_YES_endcap(self):
         self._has_endcap_yes_or_no(True)
@@ -137,7 +140,7 @@ class Case2409_minimal_no_endcap(CommonCase):
         self._recomposes()
 
     def test_030_first_content_fellow_says_out(self):
-        self.assertEqual(self._cel(0).content_string(), 'x')
+        self.assertEqual(self._cell(0).value_string, 'x')
 
     def test_040_row_says_NO_endcap(self):
         self._has_endcap_yes_or_no(False)
@@ -156,7 +159,7 @@ class Case2413_typical_guy(CommonCase):
         self._recomposes()
 
     def test_030_a_content_fellow(self):
-        self.assertEqual(self._cel(0).content_string(), r'<a name=123></a>[\[#123\]]')  # noqa: E501
+        self.assertEqual(self._cell(0).value_string, r'<a name=123></a>[\[#123\]]')  # noqa: E501
 
     def test_040_row_says_NO_endcap(self):
         self._has_endcap_yes_or_no(False)
@@ -166,30 +169,32 @@ class Case2413_typical_guy(CommonCase):
         return (r'|<a name=123></a>[\[#123\]] |       | using the TO_DO stack' + '\n')  # noqa: E501
 
 
+# == Assertion Support
+
 def _failure_message_via_line(tc, upstream_s):
-    from modality_agnostic.test_support.structured_emission import (
-            listener_and_emissioner_for)
-    listener, emissioner = listener_and_emissioner_for(tc)
-    x = _subject_module()(
-            upstream_line=upstream_s,
-            listener=listener)
+    import modality_agnostic.test_support.common as em
+    listener, emissions = em.listener_and_emissions_for(tc, limit=1)
+    x = subject_function()(line=upstream_s, listener=listener)
     assert(x is None)
-    chan, payloader = emissioner()
-    assert(chan == ('error', 'expression'))
-    line1, = payloader()
+    emi, = emissions
+    assert(emi.channel == ('error', 'expression'))
+    line1, = emi.payloader()
     return line1
 
 
+# == Ad-Hoc Models
+
 class _CaseState:
     def __init__(self, s):
-        self.row = _subject_module()(s, listener=None)
+        self.row = subject_function()(s, listener=None)
         self.original_string = s
 
 
-def _subject_module():
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        row_as_editable_line_via_line as mod)
-    return mod
+# == These
+
+def subject_function():
+    from kiss_rdb_test.markdown_storage_adapter import row_AST_via_line
+    return row_AST_via_line
 
 
 if __name__ == '__main__':

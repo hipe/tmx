@@ -117,12 +117,12 @@ class Report:
         num_tags_overall = num_tags_only + num_both
 
         count_this = False
-        if num_features_overall is 0:
-            if num_tags_overall is 0:
+        if 0 == num_features_overall:
+            if 0 == num_tags_overall:
                 self._skipped_because_no_assocs_at_all.append(alternative)
             else:
                 self._skipped_because_didnt_have_both.append(alternative)
-        elif num_tags_overall is 0:
+        elif 0 == num_tags_overall:
             self._skipped_because_didnt_have_both.append(alternative)
         else:
             count_this = True

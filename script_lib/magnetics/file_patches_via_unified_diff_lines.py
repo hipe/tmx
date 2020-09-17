@@ -174,6 +174,9 @@ class _Hunk:
     def to_remove_lines_runs(self):
         return self._to_runs('remove_lines')
 
+    def to_add_lines_runs(self):
+        return self._to_runs('add_lines')
+
     def _to_runs(self, cat):
         for run in self.runs:
             if cat == run.category_name:

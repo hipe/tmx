@@ -340,17 +340,16 @@ _int_via_digit_char = {_digits[i]: i for i in range(0, _num_digits)}
 # == whiners
 
 def __whine_about_bad_digit(s, listener):
-    def f():  # (Case4282)
-        _reason = (
+    def structurer():  # (Case4282)
+        reason = (
                 f'invalid character {repr(s)} in identifier - '
-                'identifier digits must be [0-9A-Z] minus 0, 1, O and I.'
-                )
-        return {'reason': _reason}
-    _emit_input_error_structure(f, listener)
+                'identifier digits must be [0-9A-Z] minus 0, 1, O and I.')
+        return {'reason': reason}
+    _emit_input_error_structure(structurer, listener)
 
 
-def _emit_input_error_structure(f, listener):
-    listener('error', 'structure', 'input_error', f)
+def _emit_input_error_structure(structurer, listener):
+    listener('error', 'structure', 'input_error', structurer)
 
 
 # ==

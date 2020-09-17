@@ -23,11 +23,10 @@ the related API that preceded this one.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
-|[#676]                     | #open | track `cover_me`
 |[#610]                     |       | line stream via big string
 |[#608.13]                  | #wish | argument arity `<like-this>?`
 |[#608.L]                   |       | [ cheap arg parse ]
-|[#608.K]                   | #hole |
+|[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
 |[#608.7]                   | #trak | expression shape: convert category into first line prefix
@@ -45,7 +44,7 @@ the related API that preceded this one.)
 |[#607.C]                   | #hole |
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
-|[#606]                     |       | [the unified diff parser]
+|[#606]                     | #open | [the unified diff parser]
 |[#605]                     |       | [ expect STD's ]
 |[#604.2]                   | #open | known limitation of our arg parsing
 |[#603]                     |       | [the help screen parser] |

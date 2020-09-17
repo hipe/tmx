@@ -3,9 +3,6 @@ import unittest
 
 class CommonCase(unittest.TestCase):
 
-    # @dangerous_memoize_in_child_classes('_ES', 'build_end_state')
-    # def end_state(self):
-
     def expect_success(self):
         act = self.build_end_lines()
         self.assertIsNotNone(act)

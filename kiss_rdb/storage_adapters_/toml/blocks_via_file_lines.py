@@ -11,7 +11,7 @@ from .identifiers_via_file_lines import (
         BaseActions_,
         table_start_line_via_line_,
         nothing, stop, okay)
-from modality_agnostic.memoization import lazy
+from modality_agnostic import lazy
 
 
 @lazy

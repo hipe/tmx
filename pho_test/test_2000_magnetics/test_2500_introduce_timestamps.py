@@ -1,4 +1,4 @@
-from modality_agnostic.memoization import \
+from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import unittest
 

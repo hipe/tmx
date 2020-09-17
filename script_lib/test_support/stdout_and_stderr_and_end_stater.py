@@ -253,17 +253,28 @@ class FAKE_STDIN:  # 1x
     def __iter__(self):
         return iter(self._lines)
 
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
 
-class MINIMAL_NON_INTERACTIVE_IO:  # as namespace only
+    mode = 'r'
+
+
+class MINIMAL_NON_INTERACTIVE_IO:  # #class-as-namespace
 
     def isatty():
         return False
 
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
 
-class MINIMAL_INTERACTIVE_IO:  # as namespace only
+
+class MINIMAL_INTERACTIVE_IO:  # #class-as-namespace
 
     def isatty():
         return True
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
 
 
 def _write_only_IO_proxy(f):

@@ -28,6 +28,9 @@ def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
 _use_key = 'href'  # internally (in function) which component to use for ID
 
 
+stream_for_sync_is_alphabetized_by_key_for_sync = False
+
+
 def stream_for_sync_via_stream(dcts):
 
     from kiss_rdb.storage_adapters.markdown import (
@@ -46,6 +49,9 @@ def stream_for_sync_via_stream(dcts):
         _url = url_via_href(href)
         _lesson = markdown_link_via(_use_label, _url)
         yield (href, {'lesson': _lesson})
+
+
+near_keyerer = None  # #open [#458.N] producer script shouldn't have knowledge
 
 
 def open_traversal_stream(listener, html_document_path=None):
@@ -239,8 +245,8 @@ def _all_these_functions(listener):
                 yield {'header_level': 1, 'header_content': html_encoded}
             elif 'div' == s:
                 uni = these & {*el['class']}
-                if 0 is len(uni):
-                    cover_me('maybe check out this strange div')
+                if not len(uni):
+                    xx('maybe check out this strange div')
             elif s in ignore_these:
                 # oops there was lots of stuff #cover-me
                 pass

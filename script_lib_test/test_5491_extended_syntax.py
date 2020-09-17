@@ -41,7 +41,7 @@ class ExtendedSyntaxCase(unittest.TestCase):
 
         assert(opts_args is None)
         assert(not mon.OK)
-        assert(mon.exitstatus is not 0)
+        assert 0 != mon.exitstatus
 
         return tuple(lines)
 

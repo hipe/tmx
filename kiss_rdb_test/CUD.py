@@ -6,7 +6,7 @@
 """
 
 from modality_agnostic import listening
-from modality_agnostic.memoization import lazy
+from modality_agnostic.test_support.common import lazy
 
 
 _throwing_listener = listening.throwing_listener

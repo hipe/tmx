@@ -1,4 +1,4 @@
-import modality_agnostic.memoization as helper
+import modality_agnostic.test_support.common as helper
 import unittest
 
 
