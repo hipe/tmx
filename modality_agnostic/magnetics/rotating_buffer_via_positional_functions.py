@@ -1,3 +1,240 @@
+def piece_rows_via_jumble(itr):  # #testpoint ~(Case5180)-(Case5192)
+    # Mainly, make the construction of emission messages prettier by freeing
+    # them from the low-level logic of conditional spaces and punctuation
+
+    def main():
+        while scn.more:
+            parse_next_piece()
+            if global_state.has_sentence:
+                yield flush_piece_row()
+        run_any_on_pops_while_flushing_stack()
+        if (row := flush_final_piece_row()):
+            yield row
+
+    # == State Machine
+
+    def start_state():
+        yield if_capitalized, push_sentence_state_the_first_time
+        yield base_case, whine_about_not_capitalized
+
+    def base_state():
+        yield if_lowercase, push_hacked_parenthesis_state
+        yield if_capitalized, push_sentence_state
+        yield base_case, whine_about_not_capitalized
+
+    def sentence_state():
+        yield if_capitalized, pop_push_between_sentences
+        yield if_lowercase, add_space_and_token
+        yield if_quote, push_quote_state
+        yield if_colon, handle_colon_with_some_hacking
+        yield if_sentence_ending_punct, pop_sentence_state
+        yield base_case, add_space_and_token
+
+    def hacked_parenthesis_state():  # in survival mode right now. needs stack
+        yield if_lowercase, add_space_and_token
+        yield if_colon, handle_colon_with_some_hacking
+        yield if_capitalized, pop_out_of_hacked_parenthesis_state
+        yield base_case, add_space_and_token
+
+    def quote_state():
+        yield if_end_quote, handle_end_quote
+        yield base_case, add_space_and_token
+
+    # == Actions
+
+    def push_sentence_state_the_first_time():
+        assert 1 == len(stack)
+        stack.pop()
+        stack_push(base_state)
+        stack_push(sentence_state)
+        add_piece(scn.advance())
+
+    def pop_push_between_sentences():
+        assert 2 == len(stack)  # or not
+        stack_pop()
+        stack_push(sentence_state)
+        if pieces[-1][-1] not in sentence_ending_punc_char:
+            add_piece('.')  # the trick of not perioding the last sentence
+        prepare_for_flush()
+        add_piece(scn.advance())
+
+    def push_sentence_state():
+        prepare_for_flush()
+        add_piece(scn.advance())
+
+    def pop_sentence_state():
+        add_piece(scn.advance())  # the punctuation
+        prepare_for_flush()
+        stack_pop()
+
+    def push_quote_state():
+        stack_push(quote_state)
+        (frame := top_frame()).which_quote = scn.peek
+        add_pieces(' ', scn.advance())
+        frame.do_add_space = False
+
+    def handle_end_quote():
+        add_pieces(scn.advance())
+        stack_pop()
+
+    def handle_colon_with_some_hacking():
+        path = pieces[-1]
+        add_piece(scn.advance())  # the colon
+        if re.search(r'\.[a-z0-9]{2,3}$', path) and isinstance(scn.peek, int):
+            top_frame().do_add_space = False
+            scn.peek = str(scn.peek)  # watch the world burn
+
+    def push_hacked_parenthesis_state():
+        stack_push(hacked_parenthesis_state, close_parenthesis_on_pop)
+        add_pieces('(', scn.advance())
+
+    def close_parenthesis_on_pop():
+        add_piece(')')  # ..
+
+    def pop_out_of_hacked_parenthesis_state():
+        xx()  # needs coverage. not in target case
+
+    def add_space_and_token():
+        maybe_add_space()
+        add_piece(scn.advance())
+
+    def whine_about_not_capitalized():
+        xx()
+
+    # == Support for Actions
+
+    def maybe_add_space():
+        if not (frame := top_frame()).do_add_space:
+            frame.do_add_space = True
+            return
+        add_space()
+
+    def add_space():
+        add_piece(' ')
+
+    def prepare_for_flush():
+        assert not global_state.has_sentence
+        global_state.has_sentence = True
+        global_state.flush_me = tuple(pieces)
+        pieces.clear()
+
+    def add_pieces(*pcs):
+        for pc in pcs:
+            add_piece(pc)
+
+    def add_piece(pc):
+        pieces.append(pc)
+
+    pieces = []
+
+    # == Matchers
+
+    def if_capitalized():
+        return re.match('^[A-Z][a-z]', scn.peek)
+
+    def if_lowercase():
+        return re.match('^[a-z]{2}', scn.peek)  # ..
+
+    def if_quote():
+        return scn.peek in ('"', "'")
+
+    def if_end_quote():
+        return top_frame().which_quote == scn.peek
+
+    def if_colon():
+        return ':' == scn.peek[0]
+
+    def if_sentence_ending_punct():
+        return scn.peek in sentence_ending_punc_char
+
+    def base_case():
+        return True
+
+    # == Support for Matchers and Actions
+
+    sentence_ending_punc_char = ('.', '?', '!')
+
+    # == Parse Loop
+
+    def parse_next_piece():
+        for matcher, action in top_frame().cases_function():
+            if matcher():
+                action()
+                return
+        xx("write your case statements to have always a base case")
+
+    def flush_piece_row():
+        global_state.has_sentence = False
+        rv = global_state.flush_me
+        del global_state.flush_me
+        return rv
+
+    def flush_final_piece_row():
+        if len(pieces):
+            rv = tuple(pieces)
+            pieces.clear()
+            return rv
+
+    class global_state:
+        has_sentence = False
+
+    scn = _scanner_via_iterator(_pieces_via_jumble(itr))
+
+    # == Stack
+
+    def stack_push(func, on_pop=None):
+        stack.append(Frame(func, on_pop))
+
+    def stack_pop():
+        assert 1 < len(stack)  # don't ever pop the base frame
+        stack.pop()
+
+    def run_any_on_pops_while_flushing_stack():
+        while len(stack):
+            if (on_pop := top_frame().on_pop):
+                on_pop()
+            stack.pop()
+
+    def top_frame():
+        return stack[-1]
+
+    class Frame:
+        def __init__(self, func, on_pop=None):
+            self.cases_function = func
+            self.do_add_space = True
+            self.on_pop = on_pop
+
+    stack = [Frame(start_state)]
+
+    # ==
+
+    import re
+    return main()
+
+
+def _pieces_via_jumble(itr):
+    return (s for row in itr for s in (row if isinstance(row, tuple) else (row,)))  # noqa: E501
+
+
+def _scanner_via_iterator(itr):
+    def _advance():
+        rv = scn.peek
+        for nrv in itr:
+            scn.peek = nrv
+            return rv
+        scn.more, scn.empty = False, True
+        del scn.advance
+        del scn.peek
+        return rv
+
+    class scn:
+        advance = _advance
+        more, empty, peek = True, False, None
+
+    _advance()
+    return scn
+
+
 """
 DISCUSSION:
 
@@ -281,6 +518,10 @@ spatialize_with_2_items_of_lookahead = rotating_bufferer(
         _SecondToLastItem,
         _LastItem,
         lambda: _EMPTY_SINGLETON)
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 # #history-A.2: re-integrate some linguistic functions to use rotating buffer
 # #history-A.1: introduce rotating buffer

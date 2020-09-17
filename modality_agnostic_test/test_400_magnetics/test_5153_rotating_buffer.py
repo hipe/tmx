@@ -152,6 +152,87 @@ class Case5177_oxford_join_hand_written_unit_test(unittest.TestCase):
         self.assertEqual(_actual, expected_string)
 
 
+class JumbleCase(unittest.TestCase):
+
+    def expect_lines(self, *expected_lines):
+        actual_lines = (''.join(row) for row in self.build_actual_rows())
+        actual_lines = tuple(actual_lines)
+        self.assertSequenceEqual(actual_lines, expected_lines)
+
+    def expect_table(self, *expected):
+        expected_stack = list(reversed(expected))
+        for actual_pieces in self.build_actual_rows():
+            expected_pieces = expected_stack.pop()
+            self.assertSequenceEqual(expected_pieces, actual_pieces)
+        self.assertEqual(len(expected_stack), 0)
+
+    def build_actual_rows(self):
+        return _subject_module().piece_rows_via_jumble(self.given_jumble())
+
+
+class Case5180_jumble_titlecased_token_starts_a_new_sentence(JumbleCase):
+
+    def test_100(self):
+        self.expect_table(('One', ' ', 'love', '.'), ('One heart',))
+
+    def given_jumble(self):
+        yield 'One', 'love'
+        yield 'One heart'  # NOTE this is a string not a tuple. this is to spec
+
+
+class Case5181_jumble_colon_normally_adds_space_after(JumbleCase):
+
+    def test_100(self):
+        self.expect_table(('Look', ':', ' ', 'neato', ' ', 'skeeto'))
+
+    def given_jumble(self):
+        yield 'Look', ':', 'neato', 'skeeto'
+
+
+class Case5182_jumble_colon_is_hacked_for_path_colon_lineno(JumbleCase):
+
+    def test_100(self):
+        self.expect_table(('Ohai some-file.pz', ':', '182'))
+
+    def given_jumble(self):
+        yield 'Ohai some-file.pz', ':', 182
+
+
+class Case5185_jumble_quotes_hug_the_content(JumbleCase):
+
+    def test_100(self):
+        self.expect_lines('She said my room looked "somewhat clean".', 'Wow')
+
+    def given_jumble(self):
+        yield 'She said my room looked', '"', 'somewhat', 'clean', '"', 'Wow'
+
+
+class Case5188_jumble_experimental_parenthesis_hack(JumbleCase):
+
+    def test_100(self):
+        self.expect_lines("When will 2020 end?", "(if ever)")
+
+    def given_jumble(self):
+        yield "When will 2020 end", "?", "if", "ever"
+
+
+class Case5192_jumble_target_case(JumbleCase):
+
+    def test_100(self):
+        self.expect_lines(
+            "Unrecognized attribute: 'thing_C'.",
+            'This field does not appear in "table uno".',
+            "Did you mean 'thing_B', 'thing_2' or 'hi_G'?",
+            "(in some-file/123-abc.mx:345)")
+
+    def given_jumble(self):
+        yield 'Unrecognized attribute', ": 'thing_C'"
+        yield 'This', 'field', 'does', 'not appear in'
+        yield '"', 'table uno', '"'
+        yield 'Did you mean', "'thing_B', 'thing_2' or 'hi_G'", '?'
+        yield 'in', 'some-file/123-abc.mx', ':', 345
+
+
 @lazy
 def wrapper_two():
     return _subject_module().rotating_bufferer(
