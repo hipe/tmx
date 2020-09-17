@@ -116,7 +116,6 @@ class Case5739_strange_arg(CommonCase):
     def given_args(self):
         return ('foo-fah-fee',)
 
-    do_debug = True
 
 class Case5756_strange_option(CommonCase):
 

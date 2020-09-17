@@ -13,6 +13,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case7010_bad_range(CommonCase, ScaryCommonCase):

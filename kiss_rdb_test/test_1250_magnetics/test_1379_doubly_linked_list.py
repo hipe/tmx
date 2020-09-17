@@ -28,6 +28,7 @@ class CommonCase(unittest.TestCase):
 
 def _common_shared_state(m):  # #decorator
     def build_value():
+        if True:
             dll = _subject_module().build_new_doubly_linked_list()
             m(None, dll)  # don't pass self since we don't have to
             return dll

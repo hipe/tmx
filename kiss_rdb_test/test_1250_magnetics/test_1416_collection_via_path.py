@@ -83,27 +83,42 @@ class CommonCase(unittest.TestCase):
         pass  # see the decorator
 
     def build_end_state(self):
-        def run(listener):
-            return _collectioner().collection_via_path(
-                    collection_path=path, filesystem=fs, listener=listener)
-        fs = self.given_fake_filesystem()
+        # The arguments to the SUT function: 1) coll path 2) listener 3) opn
 
+        # Prepare the path argument
         # rather than memoize the filesystem for every case just for the
         # one case that does this one thing, we do this
 
+        fs = self.given_fake_filesystem()
+        assert fs
         if hasattr(self, 'given_path'):
             path = self.given_path()
         else:
             path = fs.first_path
 
-        chan, pay, rv = channel_and_payloader_and_result_via_run(self, run)
+        # Prepare the listener argument
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+
+        # Prepare the `opn` argument
+        def opn(path_arg):
+            # (path_arg is never coll path it's schema file path under path)
+            return fs.open_file_for_reading(path_arg)
+
+        # Execute
+        rv = collectioner().collection_via_path(path, listener, opn)
+
+        # Finish by assembling the result structure
         dct = {'result_value': rv}
-        if chan is None:
-            dct['channel'] = None
-        else:
-            dct['channel'] = chan
+        if len(emissions):
+            dct['did_emit'] = True
+            emi, = emissions
+            dct['channel'], pay = emi.channel, emi.payloader
             dct['payload'] = pay()
+        else:
+            dct['did_emit'] = False
         return dct
+
+    do_debug = False
 
 
 class Case1409_collection_not_found(CommonCase):

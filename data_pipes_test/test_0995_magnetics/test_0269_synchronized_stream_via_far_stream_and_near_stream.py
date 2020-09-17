@@ -16,6 +16,7 @@ class CommonCase(SyncCase_):
     def preserve_freeform_order(self):
         return False
 
+    do_debug = False
 
 
 class Case0262_none_down_on_to_none_produces_none(CommonCase):

@@ -17,6 +17,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 # Case6020 is below

@@ -112,9 +112,11 @@ class CommonCase(unittest.TestCase):
                 self.run_retrieve, *chan)
 
     def emission_payload_via_run_expecting_channel(self, run, *chan):  # #c/p
-        actual_channel, structurer = se_lib.one_and_none(self, run)
-        self.assertSequenceEqual(actual_channel, chan)
-        return structurer()
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(run(listener))
+        emi, = emissions
+        self.assertSequenceEqual(emi.channel, chan)
+        return emi.payloader()
 
     def run_retrieve(self, listener):
         _id_s = self.given_identifier()
@@ -123,6 +125,7 @@ class CommonCase(unittest.TestCase):
         return _subject_module().entity_via_identifier_and_file_lines(
                 _id_s, _all_lines, listener)
 
+    do_debug = False
 
 
 class Case4116_simplified_typical_retrieve_in_mid(CommonCase):
@@ -223,6 +226,7 @@ class Case4120_at_head(CommonCase):
     def body_block_index(self):
         return self.build_body_block_index()
 
+    @property
     def entity(self):
         return self.retrieve_expecting_success()
 

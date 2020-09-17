@@ -1,3 +1,175 @@
+# == Emissions Testing (simple)
+
+def listener_and_done_via(expected_emissions, tc=None):
+    recvrs = []
+    if tc:
+        recvrs.append(_emission_receiver_for_debugging(tc))
+    recv_emi, done = _expectation_stack(expected_emissions, tc)
+    recvrs.append(recv_emi)
+    listener = _listener_via_receivers(recvrs)
+    return listener, done
+
+
+def listener_and_emissions_for(tc, limit=None):
+    emissions, recvrs = [], []
+    if tc:
+        recvrs.append(_emission_receiver_for_debugging(tc))
+    if limit is not None:
+        recvrs.append(_emission_receiver_via_limit(limit, tc))
+    recvrs.append(emissions.append)
+    listener = _listener_via_receivers(recvrs)
+    return listener, emissions
+
+
+def _emission_receiver_via_limit(limit, tc=None):
+    def expected_emissions():
+        for _ in range(0, limit):
+            yield ('?+',)  # match any channel (assert that channel >= 1 cmp)
+    assert(-1 < limit and limit < 4)  # just sanity check based on real world
+    recv_emi, _ = _expectation_stack(expected_emissions(), tc)
+    return recv_emi
+
+
+def _build_expectation_stack_function():  # :[#509]
+
+    def build_expectation_stack(expected_emissions, tc=None):
+
+        stack = list(reversed(tuple(expected_emissions)))
+        orig_stack_height = len(stack)
+
+        def receive_emission(emi):
+            if not len(stack):
+                msg = repr(emi._to_debugging_tuple())
+                fail(''.join((f'expecting no{more()} emissions, had: ', msg)))
+            chan_exp_typ, exp_chan, store_as_name = parse_expect(stack.pop())
+            if 'channel_head' == chan_exp_typ:
+                tc.assertSequenceEqual(emi.channel[0:len(exp_chan)], exp_chan)
+                tc.assertLess(len(exp_chan), len(emi.channel))  # because ?+
+            else:
+                assert('exact_match_entire_channel' == chan_exp_typ)
+                tc.assertSequenceEqual(emi.channel, exp_chan)
+            if not store_as_name:
+                return
+            assert(store_as_name not in stored)
+            stored[store_as_name] = emi
+
+        def more():
+            return ' more' if orig_stack_height else ' more'
+
+        def done():
+            if len(stack):
+                moniker = repr(stack[-1])
+                xx(f"was expecting such an emission next: {moniker}")
+            return stored
+
+        stored = {}
+
+        def fail(msg):
+            if tc:
+                tc.fail(msg)
+            raise RuntimeError(msg)
+
+        return receive_emission, done
+
+    def parse_expect(horizontal_tuple):
+        channel_expectation_type = None
+        expected_channel = []
+        store_as_name = None
+        horizontal_stack = list(reversed(horizontal_tuple))
+        while len(horizontal_stack):
+            token = horizontal_stack.pop()
+            if token not in keywords:
+                expected_channel.append(token)
+                continue
+            if '?+' == token:
+                channel_expectation_type = 'channel_head'
+                if not len(horizontal_stack):
+                    break
+                token = horizontal_stack.pop()
+            assert('as' == token)
+            store_as_name = horizontal_stack.pop()
+            assert not len(horizontal_stack)
+            break
+        if channel_expectation_type is None:
+            channel_expectation_type = 'exact_match_entire_channel'
+        return channel_expectation_type, tuple(expected_channel), store_as_name
+
+    keywords = {'?+', 'as'}
+    return build_expectation_stack
+
+
+_expectation_stack = _build_expectation_stack_function()
+
+
+def listener_via_receive_channel_and_payloader(receive_channel_and_payloader):
+    def receive_emission(emi):
+        receive_channel_and_payloader(emi.channel, emi.payloader)
+    return _listener_via_receivers((receive_emission,))
+
+
+def _emission_receiver_for_debugging(tc):
+    def receive_emission(emi):
+        if not tc.do_debug:
+            return
+
+        # BEGIN super hacky: break out of in-progress unittest txt block if nec
+        if hasattr((cls := tc.__class__), '_MA_DEBUG_EMI_'):
+            nl = ''
+        else:
+            setattr(cls, '_MA_DEBUG_EMI_', None)
+            nl = '\n'
+        # END
+        _echo_emi_for_debugging(stderr, emi, nl)
+    tc.do_debug  # fail early if this isn't implemented
+    from sys import stderr
+    return receive_emission
+
+
+def debugging_listener():
+    def receive_emission(emi):
+        _echo_emi_for_debugging(stderr, emi)
+    from sys import stderr
+    return _listener_via_receivers((receive_emission,))
+
+
+def _echo_emi_for_debugging(stderr, emi, nl='\n'):
+    pcs = (nl, 'DEBUG EMI: ', repr(emi._to_debugging_tuple()), '\n')
+    stderr.write(''.join(pcs))
+
+
+def throwing_listener(*emission):
+    tup = _Emission(emission[:-1], emission[-1])._to_debugging_tuple()
+    raise RuntimeError(f"unexpected {repr(tup)}")
+
+
+def _listener_via_receivers(emission_receivers):
+    def listener(*emission):
+        *chan, payloader = emission
+        emi = _Emission(tuple(chan), payloader)
+        for receive_emission in emission_receivers:
+            receive_emission(emi)
+    return listener
+
+
+class _Emission:
+
+    def __init__(self, channel, payloader):
+        self.channel = channel
+        self.payloader = payloader
+
+    def _to_debugging_tuple(self):
+        lines = self.to_messages()
+        return (*self.channel, *lines)
+
+    def to_messages(self):
+        if 'expression' == (shape := self.channel[1]):
+            return tuple(self.payloader())
+        assert('structure' == shape)
+        return (self.payloader()['reason'],)
+
+
+# == Memoizers
+
 def dangerous_memoize_in_child_classes(attr, builder_method_name):
     """decorator takes two parameters: an attribute to set the value in
 
@@ -16,11 +188,11 @@ def __do_wicked_memoizer(f, attr, builder_method_name):
         if not hasattr(o, attr):
             setattr(o, attr, getattr(tc, builder_method_name)())
         return getattr(o, attr)
-    return use_f
+    return property(use_f)
 
 
 def dangerous_memoize_in_child_classes_2(orig_f):
-    # #open [#507.J] this is different from the above because with this way
+    # #open [#507.10] this is different from the above because with this way
     # you can't have the child classes use their own builder..
 
     k = orig_f.__name__
@@ -46,24 +218,21 @@ def memoize_into(attr):
     return decorator
 
 
-def dangerous_memoize(m):
+def dangerous_memoize(orig_f):  # #decorator
     # we want to implement this with a class like we do elsewhere for some
     # [#510.6] custom memoizy decorators, bu it breaks weirdly like at
     # [#510.7.2] (grep dump test)
-    def build_value(test_context_first_time):
-        return m(test_context_first_time)
-    return __lazify_method_dangerously(build_value)
 
+    def use_f(self_maybe_ignored):
+        if state.is_first_call:
+            state.is_first_call = False
+            state.memoized_value = orig_f(self_maybe_ignored)
+        return state.memoized_value
 
-def __lazify_method_dangerously(build_value):
-    def use_method(invocation_context):
-        if self._is_first_call:
-            self._is_first_call = False
-            self._value = build_value(invocation_context)
-        return self._value
-    self = _BlankState()
-    self._is_first_call = True
-    return use_method
+    class state:  # #class-as-namespace
+        is_first_call = True
+
+    return property(use_f)  # wrapped as property because of how it's used
 
 
 def lazify_method_safely(build_value):  # 1x
@@ -88,7 +257,7 @@ class lazy:  # #[#510.8]
         return self._value
 
 
-class Counter:
+class Counter:  # #[#510.13]
     def __init__(self):
         self.value = 0
 
@@ -96,18 +265,11 @@ class Counter:
         self.value += 1
 
 
-class OneShotMutex:
-    def __init__(self):
-        self._is_first_call = True
+def xx(msg=None):
+    use_msg = ''.join(('cover me/write me', *((': ', msg) if msg else ())))
+    raise RuntimeError(use_msg)
 
-    def shoot(self):
-        assert(self._is_first_call)
-        self._is_first_call = False
-
-
-class _BlankState:  # #[#510.2]
-    pass
-
+# #history-B.1: absorb two emission testing modules
 # #history-A.6: get rid of all nonlocal
 # #history-A.5: experimental memoizing into a class attribute
 # #history-A.4: fun bit of trivia, things were even uglier before nonlocal

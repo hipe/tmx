@@ -14,6 +14,7 @@ import unittest
 class CommonCase(SyncCase_):
     def preserve_freeform_order(self):
         return True
+    do_debug = False
 
 
 class Case0747_none_down_on_to_none_produces_none(CommonCase):

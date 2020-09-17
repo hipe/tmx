@@ -48,11 +48,14 @@ class CommonCase(TestCase):
     @property
     @dangerous_memoize_in_child_classes_2
     def big_patchfile(self):
-        listener, emissions = listener_and_emissions()
+        import modality_agnostic.test_support.common as em
+        listener, emissions = em.listener_and_emissions_for(self)
         busi_coll = business_collection_one()  # ..
         bpf = self.given_work_that_produces_big_patchfile(busi_coll, listener)
         assert(not len(emissions))
         return bpf
+
+    do_debug = False
 
 
 class Case3750_delete_entity(CommonCase):

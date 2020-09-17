@@ -27,13 +27,16 @@ class CommonCase(unittest.TestCase):
         _coll = self._collection()
         _needle = self._needle_function()
 
-        msgs, listener = minimal_listener_spy()
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+
         _x = _subject_module().key_and_entity_via_collection(
                 collection_implementation=_coll,
                 needle_function=_needle,
                 listener=listener,
                 **kwargs)
 
+        emi, = emissions
+        msgs = tuple(emi.payloader())
         return (_x, msgs)
 
     def _execute_while_not_listening(self, **kwargs):
@@ -46,6 +49,8 @@ class CommonCase(unittest.TestCase):
                 needle_function=_needle,
                 listener=None,
                 **kwargs)
+
+    do_debug = False
 
 
 class Case1428_anything_against_none(CommonCase):

@@ -85,14 +85,9 @@ class Case1855DP_hello(unittest.TestCase):
 
         seen_attribute_keys = {}
         entity_dcts = []
-        emissions = []
 
-        from modality_agnostic.test_support.listener_via_expectations import (
-                # for_DEBUGGING,
-                listener_via_emission_receiver)
-
-        # listener = for_DEBUGGING (works)
-        listener = listener_via_emission_receiver(emissions.append)
+        import modality_agnostic.test_support.common as em
+        listener, _emissions = em.listener_and_emissions_for(self, limit=None)
 
         _ = _subject_module().open_traversal_stream(
                 listener=listener,
@@ -106,12 +101,11 @@ class Case1855DP_hello(unittest.TestCase):
 
         # (we can't assine lvars to lvalues of the same name in a class)
         seen_attribute_keys_ = tuple(sorted(seen_attribute_keys.keys()))
-        emissions_ = tuple(emissions)  # can't re-assign to same name inside
 
         class State:  # #class-as-namespace
             seen_attribute_keys = seen_attribute_keys_
             business_objects = tuple(entity_dcts)
-            emissions = emissions_
+            emissions = tuple(_emissions)
 
         return State
     do_debug = False

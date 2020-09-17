@@ -26,16 +26,11 @@ class Case0810DP_khong(unittest.TestCase):
         self.assertEqual(msg, exp)
 
     @shared_subject
-    def _shared_state(self):
-        emissions = []
+    def end_state(self):
+        import modality_agnostic.test_support.common as em
+        use_listener, emissions = em.listener_and_emissions_for(self, limit=None)
+
         sections = []
-
-        from modality_agnostic.test_support.listener_via_expectations import (
-                # for_DEBUGGING,
-                listener_via_emission_receiver)
-
-        # use_listener = for_DEBUGGING (works)
-        use_listener = listener_via_emission_receiver(emissions.append)
 
         def store_previous_initially():
             state.store_previous = store_previous_normally
@@ -71,6 +66,7 @@ class Case0810DP_khong(unittest.TestCase):
 
         return _State(tuple(emissions), tuple(sections))
 
+    do_debug = False
 
 
 def _subject_module():

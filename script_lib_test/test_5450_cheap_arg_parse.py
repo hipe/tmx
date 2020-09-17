@@ -4,6 +4,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case5414_AST(CommonCase):
@@ -92,11 +93,11 @@ class ParseyCase(CommonCase):
         return channel, structurer
 
     def expect_failure(self):
-        from modality_agnostic.test_support.structured_emission import (
-                one_and_none)
-        channel, payloader = one_and_none(self, self.my_run)
-        # meh .. in progress
-        return channel, payloader
+        import modality_agnostic.test_support.common as em
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(self.my_run(listener))
+        emi, = emissions
+        return emi.channel, emi.payloader
 
     # -- success assertion and set-up
 

@@ -24,6 +24,7 @@ only in modeling interfaces for this purpose.
 |---------------------------|:-----:|-
 |[#511.4]                   |       | the previous but plus styler
 |[#511.3]                   |       | provision: expression with yield
+|[#510.13]                  |       | track counters
 |[#510.12]                  |       | find the pass-thru context manager
 |[#510.11]                  |       | find the empty context manager
 |[#510.10]                  |       | track "module via path"
@@ -35,17 +36,16 @@ only in modeling interfaces for this purpose.
 |[#510.4]                   |       | track custom memoizers
 |[#510.3]                   |       | track custom states
 |[#510.2]                   |       | track blank states
-|[#509.2]                   |       | [one thing in it]
 |[#509]                     |       | [listener via expectations]
-|[#508]                     |       | [ this lightweight listening library ]
-![#507.J]                   | #open | unify this new memoizer into the old one
+|[#508.2]                   | #trak | track chunker
+|[#507.10]                  | #open | at least 3 memoizers are similar
 |[#507.9]                   |       | [ modality agnostic error monitor ]
 |[#507.H]                   | #hole |
 |[#507.G]                   | #open | idiomize something for the test platform
 |[#507.6]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #hole |
 |[#507.D]                   | #open | gross violation of python internals
-|[#507.C]                   | #open | remove this redundancy
+|[#507.C]                   | #hole |
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |

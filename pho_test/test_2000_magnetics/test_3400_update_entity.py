@@ -33,8 +33,8 @@ class CommonCase(TestCase):
         return end_state
 
     def build_end_state(self):
-        from pho_test.common_initial_state import listener_and_emissions
-        listener, emissions = listener_and_emissions()
+        import modality_agnostic.test_support.common as em
+        listener, emissions = em.listener_and_emissions_for(self)
         ncs = notecards_via_collection(self.collection())
 
         def perform(eid, cud_tups):
@@ -43,6 +43,8 @@ class CommonCase(TestCase):
 
         edits = self.perform(perform)
         return EndState(edits, tuple(emissions))
+
+    do_debug = False
 
 
 class EndState:

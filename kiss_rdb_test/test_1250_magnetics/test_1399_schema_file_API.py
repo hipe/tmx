@@ -74,14 +74,17 @@ class CommonCase(unittest.TestCase):
         pass
 
     def build_end_state(self):
-        chan, pay, rv = channel_and_payloader_and_result_via_run(
-                self, self.given_run)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        rv = self.given_run(listener)
         dct = {}
-        if chan is None:
-            dct['channel'] = None
-        else:
+        if len(emissions):
+            dct['did_emit'] = True
+            emi, = emissions
+            chan, pay = emi.channel, emi.payloader
             dct['channel'] = chan
             dct['payload'] = pay()
+        else:
+            dct['did_emit'] = False
         dct['result_value'] = rv
         return dct
 
@@ -96,6 +99,8 @@ class CommonCase(unittest.TestCase):
         fake_file = fs.open_file_for_reading(fs.first_path)
         from kiss_rdb.storage_adapters_.rec import ErsatzScanner
         return ErsatzScanner(fake_file)
+
+    do_debug = False
 
 
 class Case1395_literally_empty_file(CommonCase):

@@ -7,6 +7,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case5049_without(CommonCase, ScaryCommonCase):

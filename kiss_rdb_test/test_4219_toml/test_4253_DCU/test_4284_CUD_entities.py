@@ -89,6 +89,8 @@ class CommonCase(unittest.TestCase):
         lines, future = two
         return lines  # ignore the future
 
+    do_debug = False
+
 
 _empty_dict_OCD = {}
 

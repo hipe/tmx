@@ -6,6 +6,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case1293_works(CommonCase):
@@ -47,9 +48,10 @@ class Case1299_fails(CommonCase):
                     data_source_key_via_template_variable_name=lambda x: f'Q{x}',  # noqa: E501
                     listener=listener)
 
-        chan, payloader = se_lib.one_and_none(self, run)
-        _lines = payloader()
-        return (chan, _lines)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(run(listener))
+        emi, = emissions
+        return emi.channel, tuple(emi.payloader())
 
 
 def _subject_function():

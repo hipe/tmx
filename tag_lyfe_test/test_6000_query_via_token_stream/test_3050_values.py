@@ -39,6 +39,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case3030_two_deep(CommonCase, ScaryCommonCase):

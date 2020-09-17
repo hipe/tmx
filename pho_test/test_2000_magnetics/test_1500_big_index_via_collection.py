@@ -5,6 +5,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 # Case1530-Case1610
@@ -117,12 +118,11 @@ class Case1580_generate_one_document(CommonCase):
                     is_dry_run=False,
                     listener=listener)
 
-        from modality_agnostic.test_support import (
-                structured_emission as se_lib)
+        import modality_agnostic.test_support.common as em
 
-        listener, emissioner = se_lib.listener_and_emissioner_for(self)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
         x = run(listener)
-        chan, payloader = emissioner()
+        emi, = emissions
 
         return {'result_value': x,
                 'writes': writes,

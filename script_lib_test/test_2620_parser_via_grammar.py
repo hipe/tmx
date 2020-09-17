@@ -13,15 +13,12 @@ class CommonCase(unittest.TestCase):
     # -- create end state
 
     def run_expecting_failure(self, error_case_name):
-        # ..
-        from modality_agnostic.test_support.structured_emission import (
-                one_and_none)
-
-        def run(listener):
-            return self._do_run(listener, self.given_tokens())
-
-        channel, payloader = one_and_none(self, run)
-        # ..
+        import modality_agnostic.test_support.common as em
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        x = self._do_run(listener, self.given_tokens())
+        self.assertIsNone(x)
+        emi, = emissions
+        channel, payloader = (emi.channel, emi.payloader)
         expect = ('error', 'structure', 'parse_error', error_case_name)
         self.assertSequenceEqual(expect, channel)
         return channel, payloader
@@ -38,6 +35,8 @@ class CommonCase(unittest.TestCase):
         _scn = subject_module().TokenScanner(tokens)
         _grammar = self.given_grammar()
         return _grammar.parse(_scn, listener)
+
+    do_debug = False
 
 
 class against_grammar_A(CommonCase):

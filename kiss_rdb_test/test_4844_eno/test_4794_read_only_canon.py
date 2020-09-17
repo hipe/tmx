@@ -157,8 +157,8 @@ def collection_via_collection_path_(dir_path):
 
 
 def _debugging_listener(*args):
-    from modality_agnostic.test_support import structured_emission
-    structured_emission.debugging_listener()(*args)
+    import modality_agnostic.test_support.common as em
+    em.debugging_listener()(*args)
 
 
 fixture_directory_for = functions_for('eno').fixture_directory_for

@@ -106,11 +106,9 @@ def _build_tag_subtree(tag_emblems):
 class _EndState:
 
     def __init__(self, tc):
+        listener, emissions = em.listener_and_emissions_for(tc, limit=1)
 
-        em_a = []
         tox = tc.given_tokens()
-        # listener = for_DEBUGGING
-        listener = listener_via_emission_receiver(em_a.append)
 
         from tag_lyfe.magnetics import query_via_token_stream as mag
 
@@ -126,9 +124,9 @@ class _EndState:
 
         x = unsani.sanitize(listener)
 
-        if len(em_a):
-            em, = em_a  # ..
-            self.first_emission_messages = tuple(em.to_raw_lines())
+        if len(emissions):
+            emi, = emissions
+            self.first_emission_messages = tuple(emi.payloader())
         else:
             self.first_emission_messages = None
 

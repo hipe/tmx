@@ -24,6 +24,7 @@ class CommonCase(unittest.TestCase):
     def _la_la(self, left, right):
         return f"can't change from '{left}' to '{right}' at the same level (use parens)"  # noqa: E501
 
+    do_debug = False
 
 
 class Case2047_cant_switch_from_AND_to_OR(CommonCase, ScaryCommonCase):

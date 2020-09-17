@@ -36,10 +36,11 @@ def emission_payload_expecting_error_given_run(tc, which):
 
 
 def _emission_payload_for(tc, run, which):
-    actual_channel, payloader = _se_lib().one_and_none(tc, run)
-    # ☝️ [#867.R] provision: None not False
-    tc.assertSequenceEqual(actual_channel, ('error', 'structure', which))
-    return payloader()
+    listener, emissions = em().listener_and_emissions_for(tc, limit=1)
+    tc.assertIsNone(run(listener))  # None not False (provision [#867.R])
+    emi, = emissions
+    tc.assertSequenceEqual(emi.channel, ('error', 'structure', which))
+    return emi.payloader()
 
 
 def run_given_edit_tuples(tc):
@@ -55,7 +56,7 @@ def _run_given_edit_tuples_and_MDE(tc, mde):
 
 
 def filesystem_recordings_of(tc, verb, *args):
-    coll = tc.subject_collection()
+    coll = tc.given_collection()
     run = run_for(coll, verb, *args)
     result_value = run(_throwing_listener)
     # result value will vary depending on the edit. seems strange to toss it
@@ -159,7 +160,7 @@ def build_filesystem_expecting_num_file_rewrites(expected_num):
 
 
 def _DEBUGGING_LISTENER():
-    return _se_lib().debugging_listener()
+    return em().debugging_listener()
 
 
 def _unindent(big_string):
@@ -179,8 +180,8 @@ def _fs_lib():
     return _
 
 
-def _se_lib():
-    from modality_agnostic.test_support import structured_emission as _
+def em():
+    import modality_agnostic.test_support.common as _
     return _
 
 # ==

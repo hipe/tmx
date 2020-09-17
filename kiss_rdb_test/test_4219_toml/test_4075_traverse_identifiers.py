@@ -49,23 +49,27 @@ class CommonCase(unittest.TestCase):
         return ref.value  # freeform metadata
 
     def _run_expecting_input_error(self, shape, receive_payloader):
-
         def receive_emission(chan, payloader):
+            assert(not memo.count)
+            memo.count += 1
             self.assertEqual(chan, ('error', shape, 'input_error'))
             receive_payloader(payloader)
 
-        listener, ran = se_lib.one_and_done(self, receive_emission)
+        class memo:  # #class-as-namespace
+            count = 0
+
+        listener = em.L_VIA(receive_emission)
 
         itr = self._run_non_validating_ID_traversal(listener)
 
         for x in itr:
             self.fail()
 
-        ran()
+        assert(memo.count)
 
     def run_non_validating_ID_traversal_expecting_success(self):
 
-        listener = se_lib.debugging_listener() if False else None
+        listener = em.debugging_listener() if False else None
         # set the above to true if it's failing and trying to emit, to debug
         itr = self._run_non_validating_ID_traversal(listener)
         x_a = []

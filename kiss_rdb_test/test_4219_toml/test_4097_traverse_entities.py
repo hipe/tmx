@@ -24,13 +24,13 @@ class CommonCase(unittest.TestCase):
         return item_count, sct
 
     def _item_count_and_only_emission(self):
-        listener, emissioner = se_lib.listener_and_emissioner_for(self)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
         itr = self._iterator_via_run(listener)
         item_count = 0
         for _ in itr:
             item_count += 1
-        chan, emit = emissioner()
-        return item_count, chan, emit
+        emi, = emissions
+        return item_count, emi.channel, emi.payloader
 
     def the_rest(self):
         return self.head_block_and_rest[1]
@@ -49,6 +49,8 @@ class CommonCase(unittest.TestCase):
     def _iterator_via_run(self, listener):
         _given_lines = self.given_lines()
         return block_stream_via_file_lines(_given_lines, listener)
+
+    do_debug = False
 
 
 class Case4094_simplified_typical(CommonCase):

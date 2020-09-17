@@ -30,6 +30,7 @@ class CommonCase(unittest.TestCase):
         return emission_payload_expecting_error_given_edit_tuples(
                 self, 'input_error')
 
+    do_debug = False
 
 
 class Case4257_simplifed_typical(CommonCase):

@@ -60,8 +60,6 @@ class CommonCase(unittest.TestCase):
         bpf = coll.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
         return bpf, tuple(emissions)
 
-    do_debug = True
-
 
 def against(offset):
     def decorator(orig_f):

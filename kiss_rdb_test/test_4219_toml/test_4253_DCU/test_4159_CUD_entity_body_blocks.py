@@ -85,11 +85,11 @@ class CommonCase(unittest.TestCase):
         return _doc_entity_via_lines(_given, listener)
 
     def failure_triple_given_run(self):
-        listener, emissioner = se_lib.listener_and_emissioner_for(self)
-        _given = self.given_lines()
-        x = _doc_entity_via_lines(_given, listener)
-        chan, emit = emissioner()
-        return (x, chan, emit)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        given_lines = self.given_lines()
+        x = _doc_entity_via_lines(given_lines, listener)
+        emi, = emissions
+        return (x, emi.channel, emi.payloader)
 
     def expect_lines_before_edit(self):
         _big_s = self.expect_these_lines_before_edit()
@@ -118,6 +118,7 @@ class CommonCase(unittest.TestCase):
     def expect_builds(self):
         self.assertIsNotNone(self.subject)
 
+    do_debug = False
 
 
 # == 000's: INTRO, BASICS

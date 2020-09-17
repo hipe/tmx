@@ -1,4 +1,10 @@
-class listening:  # (as namespace only)
+def emission_details_via_file_not_found_error(file_not_found):
+    return {'reason': file_not_found.strerror,  # compare str()
+            'filename': file_not_found.filename,
+            'errno': file_not_found.errno}
+
+
+class listening:  # #class-as-namespace
 
     def emitter_via_listener(listener):
         # at #history-B.1 removed all but one client
@@ -28,7 +34,7 @@ class listening:  # (as namespace only)
 
     def emission_via_args(args):
         error_or_info, *rest = args
-        _i = ('error', 'info', 'debug').index(error_or_info)
+        _i = ('error', 'notice', 'info', 'debug').index(error_or_info)
         return (_InfoEmission if _i else _ErrorEmission)(*rest)
 
     def reason_via_error_emission(shape, error_category, *rest):
@@ -209,15 +215,7 @@ class write_only_IO_proxy:
     """
 
     def __init__(self, write, on_OK_exit=None, flush=None):
-
-        # become also a context manager that follows the common pattern IFF:
-        if on_OK_exit is not None:
-            def f(typ, value, traceback):
-                if typ is not None:
-                    cover_me("proxy doesn't support handling exceptions (yet)")
-                on_OK_exit()  # return values meh
-            self._exit = f
-            self._enter = lambda: self
+        self._on_OK_exit = on_OK_exit
 
         def use_write(s):
             write(s)
@@ -229,13 +227,24 @@ class write_only_IO_proxy:
             self.flush = flush  # #used-by: kiss-rdb-test
 
     def __enter__(self):
-        return self._enter()
+        return self
 
-    def __exit__(self, typ, err, stack):
-        return self._exit(typ, err, stack)
+    def __exit__(self, typ, value, traceback):
+        if not self._on_OK_exit:
+            return
+        if typ is not None:
+            return
+        f = self._on_OK_exit
+        self._on_OK_exit = None
+        f()
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 1
+
+    mode = 'w'  # KR
 
 
-class streamlib:  # (as namespace only)
+class streamlib:  # #class-as-namespace
 
     def next_or_noner(itr):
         def f():
@@ -255,14 +264,38 @@ def pop_property(self, var):
     return x
 
 
-def cover_me(s):
-    raise _PlatformException('cover me: {}'.format(s))
+# == Memoizers and related
+
+class OneShotMutex:
+    def __init__(self):
+        self._is_first_call = True
+
+    def shoot(self):
+        assert(self._is_first_call)
+        self._is_first_call = False
 
 
-_PlatformException = Exception
+def dangerous_memoize(orig_f):  # #decorator
+    def use_f(volatile_self):
+        if len(meh):
+            return meh[0]
+        meh.append(orig_f(volatile_self))  # imagine passing none
+        return meh[0]
+    meh = []
+    return use_f
 
 
-class Exception(Exception):
+def lazy(orig_f):  # #decorator, #[#510.8]
+    def use_f():
+        if len(meh):
+            return meh[0]
+        meh.append(orig_f())
+        return meh[0]
+    meh = []
+    return use_f
+
+
+class Exception(RuntimeError):
     pass
 
 

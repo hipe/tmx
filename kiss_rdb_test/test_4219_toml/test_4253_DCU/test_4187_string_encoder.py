@@ -73,9 +73,12 @@ class CommonCase(unittest.TestCase):
         return res
 
     def expect_input_error_structure(self):
-        chan, structer = se_lib.one_and_none(self, self.execute)
+        listener, emissions = ts.listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(self.execute(listener))
+        emi, = emissions
+        chan = emi.channel
         self.assertSequenceEqual(chan, ('error', 'structure', 'input_error'))
-        return structer()
+        return emi.payloader()
 
     def build_encoding_plan_expecting_success(self):
         x = self.execute()
@@ -86,6 +89,7 @@ class CommonCase(unittest.TestCase):
         _big_s = self.given_big_string()
         return _common_subject().encode(_big_s, listener)
 
+    do_debug = False
 
 
 class Case4181_basics(CommonCase):

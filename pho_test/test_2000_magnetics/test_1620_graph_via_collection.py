@@ -41,14 +41,15 @@ class Case1620_MONO_CASE(unittest.TestCase):
             _itr = output_lines_via_big_index_(bi, listener)
             return tuple(_itr)  # you have to do it in here to reach the emits
 
-        from modality_agnostic.test_support import (
-                structured_emission as se_lib)
+        import modality_agnostic.test_support.common as em
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
 
-        listener, payloader = se_lib.listener_and_emissioner_for(self)
         lines = run(listener)
-        chan, payloader_BE_CAREFUL_HOT = payloader()
+        emi, = emissions
 
-        return lines, payloader_BE_CAREFUL_HOT, chan
+        return lines, emi.payloader, emi.channel
+
+    do_debug = False
 
 
 if __name__ == '__main__':

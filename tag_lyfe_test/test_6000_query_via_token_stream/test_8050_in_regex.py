@@ -11,6 +11,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 # Case8020 is #here1
