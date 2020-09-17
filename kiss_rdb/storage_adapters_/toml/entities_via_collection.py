@@ -140,7 +140,7 @@ def __whine_about_not_exists(listener, pp):
         _ = pp.as_posix()
         yield f'collection does not exist because no such directory - {_}'
 
-    listener('error', 'expression', 'collection_not_found', msg)  # noqa: E501
+    listener('error', 'expression', 'cannot_load_collection', msg)  # noqa: E501
 
 
 def xx(msg=None):

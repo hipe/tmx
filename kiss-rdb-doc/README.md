@@ -27,14 +27,19 @@ woah boy.
 ## (the identifier registry)
 
 |Id                         | Main Tag | Content |
-|---------------------------|:-----:|---|
+|---------------------------|:------|---|
 |[#880-899]                 |       | narrow allocation for "pho" for now
-|[#876]                     | #open | catch-all to track every `cover_me`
+|[#877.C]                   |       | [other pretend file]
+|[#877.B]                   |       | [pretend file]
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
+|[#874.5]                   | #open | clean up the interface to this emitter
 |[#874.4]                   |       | multi-tablism  (see also #multi-tablism)
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
+|[#873.Z]                   | #prov | rather than file seek(0) etc, better to read line-by-line, no rewind
+|[#873.Y]                   | #todo | this tempfile logic is repeated
+|[#873.24]                  | #trak | this one md line parser
 |[#873.23]                  | #trak | parsing unified diff files the old way and the new way
 |[#873.V]                   | #open | google sheets: learn & document this one thing
 |[#873.21]                  | #API  | #provision: use underscores (not dashes or spaces) in eno document field names
@@ -42,7 +47,7 @@ woah boy.
 |[#873.S]                   | #trak | eno has fixed storage schema for now
 |[#873.R]                   | #open | unify error monitor
 |[#873.Q]                   | #open | #related-to: [#873.P] unify how we render markdown
-|[#873.P]                   | #open | unify all markdown parsing so it's stream-based and not random access
+|[#873.P]                   | #open | XXX unify all markdown parsing so it's stream-based and not random access
 |[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
 |[#873.M]                   |       | integrating external format adapters (storage adapters)
@@ -61,7 +66,8 @@ woah boy.
 |[#873]                     |       | internal tracking (extended)
 |[#872.B]                   | #edit | edit documentation
 |[#872]                     |       | multi-line strings: the document
-|[#871]                     |       | this one thing (see inline)
+|[#871.1]                   | #prov | markdown provision: leftmost is identifier
+|[#871]                     |       | numberspace: markdown provisions overflow
 |[#870]                     |       | "backend roadmap again"
 |[#869]                     |       | near term end game
 |[#868]                     |       | test number allocation
@@ -83,7 +89,7 @@ woah boy.
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
-|[#867.E]                   | #watc | abstract something about edit
+|[#867.E]                   | #prov | markdown provision: example row always
 |[#867.D]                   | #open | these datetime forms not supported in python toml
 |[#867.C]                   | #open | known error cases yet to cover (not comprehensive)
 |[#867.B]                   | #watc | API for getters?
@@ -100,7 +106,8 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
-|[#857]                     |       | backend roadmap
+|[#857.2]                   |       | sentences via jumble
+|[#857.1]                   |       | backend roadmap
 |[#856]                     |       | example data model
 |[#855]                     |       | not really SQL
 |[#854]                     |       | plugin architecture

@@ -245,11 +245,76 @@ def _sentence_phrases_for_missings(verb, tups):
         if 1 == len(sns):
             mid = repr(sns[0])
         else:
-            _ = ', '.join(sns)  # no quotes here just because
-            mid = f"({_})"
+            mid = ''.join(('(', ', '.join(sns), ')'))  # no quotes here just b.
         sp_a.append(f"can't {verb} because {mid} not found in entity")
 
     return sp_a
+
+
+def emit_edited_(*a):
+    # eg.: "updated 'XFG' (created 3, updated 2 and deleted 1 attribute)"
+    # e.g: "created 'XFG' with 2 attributes"
+    # (moved here at #history-B.1 from a cousin file) (Case2716) (Case2682)
+
+    if not hasattr(f := emit_edited_, 'memo'):
+        f.memo = _build_emit_edited()  # #[#510.6] custom memoizy decorator
+    return f.memo(*a)
+
+
+def _build_emit_edited():
+    def emit_edited(listener, UCDs, eid, created_or_updated_or_deleted):
+        def structurer():
+            detail = detail_via(*(len(tup) for tup in UCDs))
+            msg = f"{created_or_updated_or_deleted} '{eid}' {detail}"
+            return {'message': msg, 'reason': msg}  # ick/meh
+        assert isinstance(eid, str)  # [#022]
+        dct = lookup[created_or_updated_or_deleted]  # (Case4232)
+        detail_via, category = (dct[k] for k in ('detail', 'categ'))
+        listener('info', 'structure', category, structurer)
+
+    def detail_when_updated(uc, cc, dc):
+        hack = list(this_hacky_list(uc, cc, dc))
+        if not len(hack):
+            return '(did nothing)'
+        s = S(hack.pop())  # #here1
+        head = _oxford_AND(iter(hack))
+        return f'({head} attribute{s})'
+
+    def detail_when_created(uc, cd, dc):
+        return dwcod(cd, uc, dc)
+
+    def detail_when_deleted(uc, cd, dc):
+        return dwcod(dc, uc, cd)
+
+    def dwcod(leng, other1, other2):
+        assert 0 == other1 + other2
+        s = S(leng)
+        return f'with {leng} attribute{s}'
+
+    def this_hacky_list(uc, cc, dc):
+        # created 1, updated 1 and deleted 1 attribute
+        args = cc, uc, dc  # this order (Case6226)
+        verb_pt = 'created', 'updated', 'deleted'  # parallel with above
+        last_len = None  # also used as "seen" so be careful
+        for i in range(0, 3):
+            leng = args[i]
+            if not leng:
+                continue
+            yield ' '.join((verb_pt[i], str(leng)))  # created 2, deleted 3
+            last_len = leng
+        if last_len is None:
+            return
+        yield last_len  # #here1
+
+    def S(leng):
+        return '' if 1 == leng else 's'
+
+    lookup = {
+        'updated': {'detail': detail_when_updated, 'categ': 'updated_entity'},
+        'created': {'detail': detail_when_created, 'categ': 'created_entity'},
+        'deleted': {'detail': detail_when_deleted, 'categ': 'deleted_entity'}}
+
+    return emit_edited
 
 
 def _emit_request_error_via_reason(msg, listener):
@@ -268,4 +333,5 @@ def _oxford_AND(itr):
 _not_ok = False
 _okay = True
 
+# #history-B.1
 # #born.

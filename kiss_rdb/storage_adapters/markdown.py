@@ -19,8 +19,9 @@ def simplified_key_via_markdown_link_er():  # #html2markdown
         md = markdown_link_rx.search(markdown_link_string)
         if md is None:
             assert(False)  # failed to parse markdown link
-        _norm_key = normal_via_str(md.group(1))
-        return simple_key_via_normal_key(_norm_key)
+        norm_key = normal_via_str(md.group(1))
+        norm_key = norm_key.lower()  # became necessary at #history-A.4
+        return simple_key_via_normal_key(norm_key)
 
     import re
     markdown_link_rx = re.compile(r'^\[([^]]+)\]\([^\)]*\)$')
@@ -60,6 +61,7 @@ def markdown_link_via(label, url):
     return f'[{label}]({url})'  # (you could get bit)..
 
 
+# #history-A.4
 # #history-A.3: no more executable script
 # #history-A.2: no more sync-side entity-mapping
 # #history-A.1: MD table generation overhaul & becomes library when gets covg

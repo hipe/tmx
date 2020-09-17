@@ -281,8 +281,11 @@ _close_brace_and_end_of_line = o('close brace and end of line', r'\]\n$')
 del(o)
 
 
-def _input_error(listener, **kwargs):
-    listener('error', 'structure', 'input_error', lambda: kwargs)
+def _input_error(listener, **dct):
+    if 'reason' not in dct:
+        expecting = dct['expecting']  # ..
+        dct['reason'] = f"expecting: '{expecting}'"
+    listener('error', 'structure', 'input_error', lambda: dct)
 
 
 # -- below is derived directly from the [#863] state transition graph

@@ -6,24 +6,23 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_identity,
-        random_number_generator,
-        filesystem,
-        listener):
+        collection_path, listener=None, opn=None, rng=None):
 
-    assert(collection_identity.adapter_variant is None)
-    collection_identity.adapter_key  # hi.
-    collection_path = collection_identity.collection_path
-    del collection_identity
+    if hasattr(collection_path, 'fileno'):
+        fh = collection_path
+        assert 'r' == fh.mode[0]
+        assert 0 == fh.fileno()
+        return _collection_implementation_via_read_only_stream(fh, listener)
 
-    def when_path(args, monitor):
+    def when_path(args, monitor):  # #here1
+        xx('where')
         assert(0 == len(args))
 
         class ContextManagerWhenPath:
 
             def __enter__(self):
                 self._close_me = None
-                opened = filesystem.open_file_for_reading(collection_path)
+                opened = (opn or open)(collection_path)
                 self._close_me = opened
                 return _traverse_via_upstream(opened, monitor.listener)
 
@@ -35,11 +34,11 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
 
         return ContextManagerWhenPath()
 
-    return CollectionImplementation(when_path)
+    return _CollectionImplementation(when_path)
 
 
-def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, _monitor):
-    def when_IO(args, monitor):
+def _collection_implementation_via_read_only_stream(stdin, _monitor):
+    def when_IO(args, monitor):  # #here1
         assert(0 == len(args))
 
         class ContextManagerWhenSTDIN:
@@ -49,13 +48,13 @@ def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, _monitor):
             def __exit__(self, *_3):
                 pass
         return ContextManagerWhenSTDIN()
-    return CollectionImplementation(when_IO)
+    return _CollectionImplementation(when_IO)
 
 
-class CollectionImplementation:
+class _CollectionImplementation:
 
     def __init__(self, f):
-        self.OPEN_INITIAL_NORMAL_NODES_AS_STORAGE_ADAPTER = f
+        self.multi_depth_value_dictionaries_as_storage_adapter = f
 
 
 def _traverse_via_upstream(opened, listener):

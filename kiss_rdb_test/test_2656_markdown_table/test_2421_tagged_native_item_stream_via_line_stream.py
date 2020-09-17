@@ -31,10 +31,10 @@ class CommonCase(unittest.TestCase):
 
     def _expect_this_many_head_and_tail_lines(self, hl, tl):
         self._expect_this_many('head_line', hl)
-        self._expect_this_many('tail_line', tl)
+        self._expect_this_many('other_line', tl)
 
     def _expect_this_many_rows(self, n):
-        self._expect_this_many('business_object_row', n)
+        self._expect_this_many('business_row_AST', n)
 
     def _expect_this_many(self, k, n):
         _act = self.snapshot().COUNT_VIA_STATE[k]
@@ -51,6 +51,8 @@ def lazyer(snapshotter):  # [#510.6] experiment
         # build the memoized value (once) by passing 1 function into another
         def build_snapshot():
             return snapshotter(test_context_method)
+
+        from modality_agnostic.test_support.common import lazy
         lazy_valuer = lazy(build_snapshot)
 
         return memoized_snapshot
@@ -59,14 +61,18 @@ def lazyer(snapshotter):  # [#510.6] experiment
 
 @lazyer
 def failure_snapshot(f):
+    if True:
         fixture_file = f(None)
-        a, listener = minimal_listener_spy()
+        listener, emissions = em.listener_and_emissions_for(None)
         tuples = _common_execute(fixture_file, listener)
-        return _Snapshot(tuples, a)
+        emi, = emissions
+        msgs = emi.to_messages()
+        return _Snapshot(tuples, msgs)
 
 
 @lazyer
 def success_snapshot(f):  # local decorator
+    if True:
         fixture_file = f(None)
         tuples = _common_execute(fixture_file, 'listener03')
         return _Snapshot(tuples)
@@ -113,15 +119,10 @@ class Case2422_minimal_working(CommonCase):
 
 
 def _common_execute(fixture_file, listener):
-
-    _magnetic = _subject_module().OPEN_TAGGED_DOC_LINE_ITEM_STREAM
-    _path = fixture_path(fixture_file)
-    _cm = _magnetic(upstream_path=_path, listener=listener)
-    tuples = []
-    with _cm as itr:
-        for tup in itr:
-            tuples.append(tup)
-    return tuple(tuples)
+    tagged_row_ASTs_or_lines_via = subject_function()
+    path = fixture_path(fixture_file)
+    with open(path) as lines:
+        return tuple(tagged_row_ASTs_or_lines_via(lines, listener))
 
 
 class _Snapshot:
@@ -146,7 +147,10 @@ def _calculate_state_statistics(wat, tuples):
     infallible.
     """
 
-    self = _BlankState()
+    class statistics:  # #class-as-namespace
+        pass
+    self = statistics
+
     self._change_state = None
     self._current_count = None
     self._current_state = None
@@ -188,23 +192,18 @@ def _calculate_state_statistics(wat, tuples):
     wat.COUNT_VIA_STATE = {k: v for (k, v) in result_tuples}
 
 
-class _BlankState:  # #[#510.2]
-    pass
-
-
 _all_possible_transitions = (
         'head_line',
-        'table_schema_line_one_of_two',
-        'table_schema_line_two_of_two',
-        'business_object_row',
-        'tail_line',
-        )
+        'table_schema_line_ONE_of_two',
+        'table_schema_line_TWO_of_two',
+        'business_row_AST',
+        'other_line')
 
 
-def _subject_module():
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        tagged_native_item_stream_via_line_stream as mod)
-    return mod
+def subject_function():
+    from kiss_rdb_test.markdown_storage_adapter import \
+            tagged_row_ASTs_or_lines_via_lines as function
+    return function
 
 
 if __name__ == '__main__':

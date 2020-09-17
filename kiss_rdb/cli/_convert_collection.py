@@ -5,162 +5,108 @@ _to_arg_moniker = 'TO_COLLECTION'
 _to_format_flag = '--to-format'
 
 
-class ConvertCollection:
+def convert_collection(
+        cf, from_format, from_args, from_collection,
+        to_format, to_collection):
 
-    def __init__(
-            self, cf, from_format, from_args, from_collection,
-            to_format, to_collection):
+    # shouldn't need RNG ever - don't we want to transfer the same ID's in?
 
-        self.from_collection = from_collection
-        self.from_args = from_args
-        self.from_format = from_format
-
-        self.to_collection = to_collection
-        self.to_format = to_format
-
-        # shouldn't need RNG ever - don't we want to transfer the same ID's in?
-
-        dct = cf.release_these_injections('filesystem', 'stdin')
-        self._filesystem = dct['filesystem']
-        self._stdin = dct['stdin'] or cf.stdin  # meh
-
-        self._meta_collection = cf.collectioner
-        self._monitor = cf.build_monitor()
-        self._echo_error = cf.echo_error_line
-        self._stdout = cf.stdout
-
-    def execute(self):
-        x = self._main()
-        if x is None:
-            return 9876
-        assert(isinstance(x, int))
-        return x
-
-    def _main(self):
-        if not self.__validate():
-            return
-        from_coll = self.__procure_from()
-        if from_coll is None:
-            return
-        to_coll = self.__procure_to()
-        if to_coll is None:
-            return
-
-        mon = self._monitor
-        from_coll.convert_collection_into(self.from_args, to_coll, mon)
+    def main():
+        maybe_dash_is_used_as_FROM()
+        maybe_dash_is_used_as_TO()
+        make_sure_STDIN_interactivity_looks_right()
+        from_coll = resolve_from_collection()
+        to_coll = resolve_to_collection()
+        dcts = from_coll.multi_depth_value_dictionaries_as_storage_adapter(from_args, mon)  # noqa: E501
+        with to_coll.open_pass_thru_receiver_as_storage_adapter(mon) as recv:
+            for dct in dcts:
+                recv(dct)
+                if not mon.OK:
+                    raise RuntimeError("cover me: in-loop failure")
         return mon.exitstatus
 
-    def __procure_to(self):
-        if self._to_is_STDOUT:
-            return self._to_SA.collection_for_pass_thru_write__(self._stdout)
-        return self.__coll_when_not_STDOUT()
+    def resolve_to_collection():
+        return when_STDOUT() if self.TO_is_STDOUT else when_not_STDOUT()
 
-    def __procure_from(self):
-        if self._from_is_STDIN:
-            return self._from_SA.collection_via_open_read_only__(
-                    self._stdin, self._monitor)
-        return self.__coll_when_not_STDIN()
+    def resolve_from_collection():
+        return when_STDIN() if self.FROM_is_STDIN else when_not_STDIN()
 
-    def __coll_when_not_STDIN(self):
-        return self._meta_collection.collection_via_path(
-                collection_path=self.from_collection,
-                listener=self._monitor.listener,
-                adapter_variant=None,  # ..
-                format_name=self.from_format,
-                filesystem=self._filesystem)
+    def when_STDOUT():
+        return self.to_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
+            stdout, mon)
 
-    def __validate(self):
-        if not self.__resolve_from_storage_adapter_if_provided():
+    def when_STDIN():
+        return self.from_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
+            stdin, mon)
+
+    def when_not_STDOUT():
+        return meta_collection.collection_via_path(
+            to_collection, tl, format_name=to_format)._impl
+
+    def when_not_STDIN():
+        return meta_collection.collection_via_path(
+            from_collection, tl, format_name=from_format)._impl
+
+    def make_sure_STDIN_interactivity_looks_right():
+        if self.FROM_is_STDIN:
+            if not stdin.isatty():
+                return
+            error(f"when {_from_arg_moniker} is '-' STDIN must be a pipe")
+        if stdin.isatty():
             return
-        if not self.__resolve_to_storage_adapter_if_provided():
+        error(f"STDIN cannot be a pipe unless {_from_arg_moniker} is '-'")
+
+    def maybe_dash_is_used_as_FROM():
+        dash_ham('FROM_is_STDIN', 'from_SA', _from_arg_moniker,
+                 _from_format_flag, from_collection, from_format)
+
+    def maybe_dash_is_used_as_TO():
+        dash_ham('TO_is_STDOUT', 'to_SA', _to_arg_moniker,
+                 _to_format_flag, to_collection, to_format)
+
+    def dash_ham(yn_attr, sa_attr, arg_moniker, format_flag, coll_path, fmt):
+        memo(yn_attr, yn := '-' == coll_path)
+        if not yn:
             return
-        if not self.__see_dash_used_as_from_collection_path():
-            return
-        if not self.__see_dash_use_as_to_collection_path():
-            return
-        if not self.__make_sure_STDIN_interactivity_looks_right():
-            return
-        return True
+        if fmt is None:
+            error(f"{arg_moniker} of '-' requires '{format_flag}'")
+        memo(sa_attr, meta_collection.storage_adapter_via_format_name(fmt, tl))
 
-    # --
+    # == Listeners and related
 
-    def __make_sure_STDIN_interactivity_looks_right(self):
-        is_a_tty = self._stdin.isatty()
-        if self._from_is_STDIN:
-            if not is_a_tty:
-                return _okay
-            return self._echo_error(
-                    f"when {_from_arg_moniker} is '-' STDIN must be a pipe")
+    def tl(sev, *rest):
+        mon.listener(sev, *rest)
+        if 'error' == sev:
+            raise stop()
 
-        # from not from STDIN
-        del self._stdin
-        if is_a_tty:
-            return _okay
+    mon = cf.build_monitor()
 
-        return self._echo_error(
-                f"STDIN cannot be a pipe unless {_from_arg_moniker} is '-'")
+    def error(msg):
+        cf.echo_error_line(msg)
+        raise stop()
 
-    # --
+    class stop(RuntimeError):
+        pass
 
-    def __see_dash_used_as_from_collection_path(self):
-        ok, self._from_is_STDIN = self.see_dash(
-                _from_arg_moniker, self.from_collection,
-                _from_format_flag, self._from_SA)
+    # == Our `self` and writing to it
 
-        if ok and self._from_is_STDIN:
-            del self.from_collection
+    def memo(attr, mixed):
+        setattr(self, attr, mixed)
 
-        return ok
+    class self:  # #class-as-namespace
+        pass
 
-    def __see_dash_use_as_to_collection_path(self):
-        ok, self._to_is_STDOUT = self.see_dash(
-                _to_arg_moniker, self.to_collection,
-                _to_format_flag, self._to_SA)
+    # == Smalls and go!
 
-        if ok and self._to_is_STDOUT:
-            del self.to_collection
-
-        return ok
-
-    def see_dash(self, arg_moniker, coll_path, format_flag, sa):
-
-        if '-' != coll_path:
-            return _okay, False
-
-        if sa is not None:
-            return _okay, True
-
-        self._echo_error(f"{arg_moniker} of '-' requires '{format_flag}'")
-        return _not_okay, None
-
-    # --
-
-    def __resolve_from_storage_adapter_if_provided(self):
-        ok, self._from_SA = self.resolve_storage_adapter(self.from_format)
-        return ok
-
-    def __resolve_to_storage_adapter_if_provided(self):
-        ok, self._to_SA = self.resolve_storage_adapter(self.to_format)
-        return ok
-
-    def resolve_storage_adapter(self, format_name):
-        # if a storage adapter format name was specified, resovle it into
-        # a storage adapter (or fail). if none was passed, pass
-
-        if format_name is None:
-            return _okay, None
-        sa = self._meta_collection.storage_adapter_via_format_name(
-                format_name, self._monitor.listener)
-        if sa is None:
-            return _not_okay, None
-        return _okay, sa
+    dct = cf.release_these_injections('stdin')
+    stdin = dct.get('stdin') or cf.stdin  # meh
+    stdout = cf.stdout
+    meta_collection = cf.collectioner
+    try:
+        return main()
+    except stop:
+        return 9876
 
 
-def xx():
-    raise Exception('write me')
-
-
-_not_okay = False
-_okay = True
-
+# #history-B.1: rewrote
 # #born.

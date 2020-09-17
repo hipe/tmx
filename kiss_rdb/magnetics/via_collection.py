@@ -9,11 +9,62 @@ for the function we used to call "procure".
 """
 
 
+# == Oxfords (some are decorators so this whole section is at top)
+
+def _lazy_load_function_from(module_name):  # #decorator, #[#510.6]
+    def decorator(orig_f):
+        def use_f(*a):
+            from importlib import import_module
+            return getattr(import_module(module_name), attr)(*a)
+        attr = orig_f.__name__
+        return use_f
+    return decorator
+
+
+_ = 'modality_agnostic.magnetics.rotating_buffer_via_positional_functions'
+
+
+@_lazy_load_function_from(_)
+def piece_rows_via_jumble():
+    pass
+
+
+@_lazy_load_function_from(_)
+def oxford_AND():
+    pass
+
+
+@_lazy_load_function_from(_)
+def oxford_OR():
+    pass
+
+
+@_lazy_load_function_from(_)
+def oxford_join():
+    pass
+
+
+def keys_join(pcs):  # #experimental
+    if 1 == len(pcs):
+        return ''.join((': ', *keys_map(pcs)))
+    return ''.join(('(', ', '.join(keys_map(pcs)), ')'))
+
+
+def keys_map(pcs):
+    return (f"'{pc}'" for pc in pcs)
+
+
+def paragraph_via_jumble(itr):
+    return ' '.join(s for row in itr for s in row)  # this will blow up later
+
+
+# == Dig
+
 def DIGGY_DIG(top_object, dig_path, say_collection, listener):
     # this is EXPERIMENTAL until we decide if top fellow should be
     # a collection and not an object..
 
-    current_item = __collection_implementation_via_object(top_object)
+    current_item = _collection_implementation_via_object(top_object)
 
     dig_path = tuple(dig_path)  # we need that length
     final = len(dig_path) - 1
@@ -21,11 +72,12 @@ def DIGGY_DIG(top_object, dig_path, say_collection, listener):
 
     for dig_step_tuple in dig_path:
 
-        if 2 == len(dig_step_tuple):
-            dig_step_key, dig_step_desc = dig_step_tuple
-            kwargs = _empty_hash
+        stack = list(reversed(dig_step_tuple))
+        dig_step_key, dig_step_desc = stack.pop(), stack.pop()
+        if len(stack):
+            kwargs, = stack
         else:
-            dig_step_key, dig_step_desc, kwargs = dig_step_tuple
+            kwargs = _empty_hash
 
         key_and_item = key_and_entity_via_collection(
             collection_implementation=current_item,
@@ -59,6 +111,8 @@ def _subfeatures_via_item_default_function(natural_key, _item):
     return iter((natural_key,))
 
 
+# == Key and Entity via Collection (can do fuzzy, e.g for CLI tab completion)
+
 def key_and_entity_via_collection(
             collection_implementation,
             needle_function,
@@ -91,16 +145,12 @@ def key_and_entity_via_collection(
             collection_implementation=collection_implementation,
             needle_function=needle_function,
             subfeatures_via_item=subfeatures_via_item,
-            ui_tuple=_ui_tuple,
-            )
+            ui_tuple=_ui_tuple)
 
 
 def _procure_when_splay(
-        collection_implementation,
-        needle_function,
-        subfeatures_via_item,
-        ui_tuple,
-        ):
+        collection_implementation, needle_function,
+        subfeatures_via_item, ui_tuple):
 
     matching_pairs = []  # every natural-key/native object pair that you match
     negative_memory = []  # every feature value that you don't match
@@ -108,27 +158,27 @@ def _procure_when_splay(
 
     feature_does_match = _normalize_needle_function(needle_function)
 
-    for natural_key in collection_implementation.to_identifier_stream_as_storage_adapter_collection():  # noqa: E501
+    ci = collection_implementation
+    eids = ci.to_identifier_primitive_stream_as_storage_adapter_collection()
 
-        native_object = collection_implementation.retrieve_entity_as_storage_adapter_collection(natural_key)  # noqa: E501 ..
-
-        _features = subfeatures_via_item(natural_key, native_object)
+    for eid in eids:
+        x = ci.retrieve_entity_via_primitive_as_storage_adapter_collection(eid)
+        _features = subfeatures_via_item(eid, x)
 
         for feat_x in _features:
             _yes = feature_does_match(feat_x)
             if _yes:
-                matching_pairs.append((natural_key, native_object))
+                matching_pairs.append((eid, x))
                 positive_memory.append(feat_x)
                 break  # once one subfeature matches, don't check the rest
             negative_memory.append(feat_x)
 
     num = len(matching_pairs)
-    if 0 is num:
-        _when_not_found(needle_function, ui_tuple, negative_memory)
-    elif 1 is num:
+    if 0 == num:
+        return _when_not_found(needle_function, ui_tuple, negative_memory)
+    if 1 == num:
         return matching_pairs[0]
-    else:
-        return _when_ambiguous(needle_function, ui_tuple, positive_memory)
+    return _when_ambiguous(needle_function, ui_tuple, positive_memory)
 
 
 def _procure_when_no_splay(
@@ -198,7 +248,7 @@ def _when_ambiguous(say_needle, item_noun_phrase, say_coll, err, posi_mem):
     f = placeholder_for_say_subfeature
 
     _these = (f(x) for x in posi_mem)
-    _this_or_this = _oxford_join(_these, ' or ')
+    _this_or_this = oxford_OR(_these)
 
     err('{} was ambiguous. did you mean {}?', say_needle(), _this_or_this)
 
@@ -236,11 +286,11 @@ _when_not_found_table = {
         (0, 0, 0): "not found",
         (0, 0, 1): "{needle} not found",
         (0, 1, 0): "{widget} not found",
-        (0, 1, 1): "no {widget} for {needle}",  # {widget} {needle} not found
+        (0, 1, 1): "no {widget} named {needle}",  # {widget} {needle} not found
         (1, 0, 0): "not found in {haystack}",
         (1, 0, 1): "{needle} not found in {haystack}",
         (1, 1, 0): "{widget} not found in {haystack}",
-        (1, 1, 1): "{haystack} has no {widget} for {needle}",
+        (1, 1, 1): "{haystack} has no {widget} named {needle}",
         }
 
 
@@ -267,7 +317,7 @@ def __splay_memory(neg_mem):
 
     f = placeholder_for_say_subfeature
     _these = (f(x) for x in display)
-    _use_f = _ellipsis_join if max_exceeded else _oxford_join
+    _use_f = _ellipsis_join if max_exceeded else oxford_join
     _this_and_this = _use_f(_these)
     return "(there's %s)" % _this_and_this
 
@@ -295,7 +345,7 @@ def _say(say_x):
         return say_x  # or more "type safety" than this mabye ..
 
 
-class __collection_implementation_via_object:  # 1x
+def _collection_implementation_via_object(obj):
     """the collection adaptation for arbitarary objects
 
     the idea is that you're using an arbitarary object as the collection,
@@ -303,17 +353,23 @@ class __collection_implementation_via_object:  # 1x
     .#open [#873.L] modernize this API
     """
 
-    def __init__(self, obj):
-        self._object = obj
+    class collection_implementation:  # #class-as-namespace
+        # (got rid of `get` (soft dereference) at #history-A.4)
 
-    # (got rid of `get` (soft dereference) at #history-A.4)
+        def retrieve_entity_via_primitive_as_storage_adapter_collection(eid):
+            if hasattr(obj, eid):
+                return getattr(obj, eid)
+            # needs listener support #cover-me [#876]
+            desc = repr(obj) if isinstance(obj, type) else repr(obj.__class__)
+            raise RuntimeError(f"no '{eid}' in {desc}")
 
-    def retrieve_entity_as_storage_adapter_collection(self, natural_key):  # ..
-        if hasattr(self._object, natural_key):
-            return getattr(self._object, natural_key)
-        else:
-            raise Exception('cover me')  # [#876]
+        def to_identifier_primitive_stream_as_storage_adapter_collection():
+            return (k for k in dir(obj) if '_' != k[0])  # 👀
 
+    return collection_implementation
+
+
+# == Collection Implementation via Pairs (CACHED)
 
 class collection_implementation_via_pairs_cached:
     """the collection adaptation for streams of pairs.
@@ -378,10 +434,10 @@ class collection_implementation_via_pairs_cached:
 
     # (got rid of `get` at #history-A.4)
 
-    def retrieve_entity_as_storage_adapter_collection(self, natural_key):
-        return self._state._dereference(natural_key)
+    def retrieve_entity_via_primitive_as_storage_adapter_collection(self, key):
+        return self._state._dereference(key)
 
-    def to_identifier_stream_as_storage_adapter_collection(self):  # ..
+    def to_identifier_primitive_stream_as_storage_adapter_collection(self):
         return self._state._iter()
 
     def _receive_new_state(self, x):
@@ -533,6 +589,8 @@ class _ClosedState:
 placeholder_for_say_subfeature = repr
 
 
+# == Assorted Small Collection Implementations
+
 class CACHING_COLLECTION_VIA_COLLECTION:  # 1x
 
     def __init__(self, impl):
@@ -569,14 +627,7 @@ class collection_via_DICTIONARY:
         return self._dictionary.keys()
 
 
-# support for hackish EN expression
-
-
-def _oxford_join(itr, interesting_sep=' and ', boring_sep=', '):
-    from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-            oxford_join)
-    return oxford_join(itr, interesting_sep, boring_sep)
-
+# == Support
 
 def _ellipsis_join(itr, ellipsis='…', sep=', '):
     """this is the un-sexy counterpart to "oxford join" above.

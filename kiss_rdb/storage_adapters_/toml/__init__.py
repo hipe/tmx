@@ -10,6 +10,11 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
     if schema is None:
         return
 
+    if opn:
+        fs = opn.THE_WORST_HACK_EVER_FILESYSTEM_
+    else:
+        fs = None
+
     from .collection_via_directory import collection_via_directory_and_schema
     return collection_via_directory_and_schema(
             collection_directory=collection_path, collection_schema=schema,

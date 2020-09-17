@@ -15,25 +15,18 @@ class _CommonFunctions:
         del(self._injections)
         if o is None:
             return _empty_mapping
-        else:
-            return o.RELEASE_THESE(names)
+        assert(isinstance(o, dict))
+        return {k: o[k] for k in names}
 
     def collection_via_unsanitized_argument(
-            self, collection_argument,
-            listener,
-            **injections,
-            ):
-
+            self, coll_path, listener, opn=None, rng=None):
         # can't assume hub any more (#history-A.3)
         s = self.unsanitized_collections_hub
-        if s is None:
-            coll_path = collection_argument
-        else:
+        if s is not None:
             import os.path as os_path
-            coll_path = os_path.join(s, collection_argument)
-
+            coll_path = os_path.join(s, coll_path)
         return self.collectioner.collection_via_path(
-                coll_path, listener, **injections)
+                coll_path, listener, opn, rng)
 
     @property
     def collectioner(self):
@@ -97,12 +90,19 @@ def cli_for_production():
     """
 
     def commit_file_rewrite(from_fh, to_fh):  # to fail is to corrupt
+        raise RuntimeError('nuke')
         import os
         os.rename(from_fh.name, to_fh.name)  # madman
         with open(from_fh.name, 'w+'):  # DOUBLE MADMAN - touch the temp
             pass  # file you just moved. (the tmp libary needs it to be there)
 
+    def opn(path, *rest):  # opn = alternative open
+        print("DOING ORDINARY OPEN")  # #todo
+        assert(not len(rest))
+        return open(path)
+
     def filesystem():
+        raise RuntimeError('nuke')  # #todo
         import kiss_rdb.magnetics_.filesystem as fs
         return fs.Filesystem_EXPERIMENTAL(
                 commit_file_rewrite=commit_file_rewrite)
@@ -134,13 +134,9 @@ def cli_for_production():
     # == END
 
     from sys import stdin
-
-    from kiss_rdb import ModalityAdaptationInjections_
-    _inj = ModalityAdaptationInjections_(
-            stdin=stdin,
-            random_number_generator=rng, filesystemer=filesystem)
+    _inj = {'stdin': stdin, 'rng': rng, 'opn': opn}
     _ = cli.main(obj=_inj)
-    cover_me(f'do you ever see this? {_}')
+    xx(f'do you ever see this? {_}')
     return 0
 
 
@@ -151,16 +147,7 @@ def cli_for_production():
         help=f'The doo-hah with the foo-fah (env: {_coll_hub_env_var}).')
 @click.pass_context
 def cli(ctx, collections_hub):
-    ctx.obj = _CommonFunctions(collections_hub, ctx.obj)  # NASTY see below
-
-    """DISCUSSION #[#867.U]
-
-    our only way to inject anything into our CLI is thru this cryptic 'obj'
-    attribute. the semantics of this get overloaded, because we need to
-    exploit it for two purposes: one, it's how we get arbitrary config into
-    our CLI at all, and two, it's how our specific actions can access this
-    and the rest. more at the ModalityAdaptationInjections_ class elsewhere.
-    """
+    ctx.obj = _CommonFunctions(collections_hub, ctx.obj)
 
 
 # == BEGIN commands
@@ -182,7 +169,7 @@ def create(ctx, collection, value):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    _inj = cf.release_these_injections('random_number_generator', 'filesystem')
+    _inj = cf.release_these_injections('rng', 'opn')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
         return mon.errno
@@ -232,7 +219,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    _inj = cf.release_these_injections('filesystem')
+    _inj = cf.release_these_injections('opn')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
         return mon.errno
@@ -285,8 +272,8 @@ def get(ctx, collection, internal_identifier):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    _inj = cf.release_these_injections('filesystem')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    # _inj = cf.release_these_injections('opn')
+    coll = cf.collection_via_unsanitized_argument(collection, listener)
     if coll is None:
         return mon.errno
     # end
@@ -318,7 +305,7 @@ def delete(ctx, collection, internal_identifier):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    _inj = cf.release_these_injections('random_number_generator', 'filesystem')
+    _inj = cf.release_these_injections('rng', 'opn')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
         return mon.errno
@@ -359,7 +346,7 @@ def traverse(ctx, collection):
     cf = ctx.obj  # "cf" = common functions
     mon = cf.build_monitor()
     listener = mon.listener
-    _inj = cf.release_these_injections('filesystem')
+    _inj = cf.release_these_injections('opn')
     coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
     if coll is None:
         return mon.errno
@@ -456,11 +443,11 @@ def convert_collection(
     only writes to STDOUT.
     """
 
-    from ._convert_collection import ConvertCollection
-    return ConvertCollection(
+    from ._convert_collection import convert_collection
+    return convert_collection(
             ctx.obj, from_format, from_arg, from_collection,
             to_format, to_collection
-    ).execute()
+    )
 
 
 # == END commands
@@ -565,14 +552,16 @@ def _echo_error(line):
     click.echo(line, err=True)
 
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
+def xx(msg=None):
+    use_msg = ''.join(('cover/write me', *((': ', msg) if msg else ())))
+    raise RuntimeError(use_msg)
 
 
 _failure_exit_code_bad_request = 400  # Bad Request lol ##here1
 success_exit_code_ = 0
 
 
+# #history-B.1
 # #history-A.3: no more "require hub" decorator
 # #history-A.2 as referenced
 # #history-A.1: make first production-only injections for CLI

@@ -83,7 +83,10 @@ def apply_CUD_attributes_request_to_MDE___(mde, req, eenc, listener, C_or_U):
     # At this point, success is guaranteed (Case4234).
 
     _UCDs = (updates, creates, deletes)
-    _express_edit(listener, _UCDs, mde.identifier, created_or_updated)
+    from kiss_rdb.magnetics_.CUD_attributes_request_via_tuples \
+        import emit_edited_ as func
+    eid = mde.identifier.to_string()
+    func(listener, _UCDs, eid, created_or_updated)
 
     if mutate_orig:
         return True
@@ -455,11 +458,9 @@ def __build_offset_via_gist(body_blocks, listener):
 
 
 def _emit_comment_proximity_problems(problems, listener):
-
-    from modality_agnostic.magnetics import (
-            rotating_buffer_via_positional_functions as en)
-
     sp_a = []
+    import kiss_rdb.magnetics.via_collection as ox
+
     for cmpo, (above, on, below) in problems:
         bc_join = []
         if above or below:
@@ -468,12 +469,12 @@ def _emit_comment_proximity_problems(problems, listener):
                 and_join.append('above')
             if below:
                 and_join.append('below')
-            _ = en.oxford_AND(iter(and_join))
+            _ = ox.oxford_AND(iter(and_join))
             bc_join.append(f'line touches comment line {_}')
         if on:
             bc_join.append('it has comment')
 
-        _ = en.oxford_join(iter(bc_join), ' and because ')
+        _ = ox.oxford_join(iter(bc_join), ' and because ')
         _verb_lexeme = _verb_lexeme_via_key[cmpo.edit_component_key]
         _ = (f'cannot {_verb_lexeme} '
              f'{repr(cmpo.attribute_name.name_string)} '
@@ -771,12 +772,6 @@ def _emit_request_error_via_reason(msg, listener):
 
 def _emit_request_error(listener, structurer):  # one of several
     listener('error', 'structure', 'request_error', structurer)
-
-
-def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
-    # [#867.E] one day abstract this out to a better location
-    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
-    express_edit_(listener, UCDs, identifier, verb_preterite)
 
 
 # ==

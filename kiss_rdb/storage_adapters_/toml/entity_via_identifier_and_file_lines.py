@@ -417,20 +417,7 @@ def __check_name_sets(dct, body_blocks, listener):
     extra_by_vendor = by_vendor - by_coarse
 
     if len(extra_by_coarse):
-        cover_me('this became detached and uncoverable')  # (see 2 lines below)
-
-        def f():
-            cover_me("this used to be covered but now is not")  # #history-A.4
-
-            from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-                    oxford_AND)
-
-            _ = oxford_AND(repr(s) for s in extra_by_coarse)
-            s = '' if 1 == len(extra_by_coarse) else 's'
-            _reason = f'toml not simple enough: {_} attribute{s} snuck through'
-            return {'reason': _reason}
-        _emit_input_error_via_structurer(f, listener)
-        return not_ok
+        xx("see #history-A.4 or before if you ever cover this")
 
     if len(extra_by_vendor):
         xx()

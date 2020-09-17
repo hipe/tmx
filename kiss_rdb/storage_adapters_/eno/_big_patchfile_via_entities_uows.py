@@ -15,22 +15,10 @@ def _build_big_patchfile(ifc, entities_uows, reser, coll, order, emi):
     from ._blocks_via_path import file_units_of_work_via__
     file_uows = file_units_of_work_via__(entities_uows, coll, emi)
 
-    # ==
+    from kiss_rdb import build_path_relativizer_ as build
+    relativize_path = build()
     from os.path import isabs
 
-    def relativize_path(path):
-        if (memo := relativize_path.memo) is None:
-            from os import getcwd, path as os_path
-            head = os_path.join(getcwd(), '')
-            leng = len(head)
-            relativize_path.memo = (head, leng)
-        else:
-            head, leng = memo
-        assert(head == path[0:leng])  # ..
-        tail = path[leng:]
-        assert(not isabs(tail))
-        return tail
-    relativize_path.memo = None
     # ==
 
     if ifc and isabs(path := ifc['index_file_path']):
@@ -200,7 +188,7 @@ def _line_detemplatizer_via(var_values):
 def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
     # (used for here and used by neighbor for creating collections!)
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile('w+') as fp:
+    with NamedTemporaryFile('w+') as fp:  # #[#873.Y]
         for line in lines:
             fp.write(line)
         fp.flush()
@@ -208,7 +196,7 @@ def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
         if not ok:
             fp.seek(0)
             dst = 'z/_LAST_PATCH_.diff'
-            with open(dst, 'w+') as dst_fp:  # from shutil import copyfile meh
+            with open(dst, 'w') as dst_fp:  # from shutil import copyfile meh
                 for line in fp:
                     dst_fp.write(line)
             msg = f"(wrote this copy of patchfile for debugging: {dst})"

@@ -23,9 +23,8 @@ class collection_via_directory_and_schema:
             self._filesystem = filesystem
 
         self._schema_pather = collection_schema.build_pather_(
-                collection_identity.collection_path)
+                collection_directory)
 
-        self.collection_identity = collection_identity
         self._schema = collection_schema
 
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):

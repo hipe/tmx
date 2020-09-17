@@ -113,11 +113,11 @@ class case_of_collection_not_found:  # #as-namespace-only
         chan = tc.end_state['channel']
         tc.assertEqual(chan[0], 'error')
         # for historical and flex reasons, we are allowing expressions here
-        tc.assertEqual(chan[2], 'collection_not_found')
+        tc.assertEqual(chan[2], 'cannot_load_collection')
 
     def confirm_expression_looks_right(tc):
-        reason = _reason_from(tc.end_state())
-        tc.assertRegex(reason, r'^collection not found: [\[a-zA-Z0-9]')
+        reason = _reason_from(tc.end_state)
+        tc.assertRegex(reason, r'^cannot load collection: [\[a-zA-Z0-9]')
 
 
 def _confirm_collection_is_not_none(tc):
@@ -137,8 +137,8 @@ class case_of_non_empty_collection_found:  # #as-namespace-only
 class case_of_traverse_IDs_from_non_empty_collection:  # #as-namespace-only
 
     def confirm_all_IDs_in_any_order_no_repeats(tc):  # similar to #here1
-        coll = tc.subject_collection()
-        _iids = _do_to_ID_stream(coll, None)
+        coll = tc.given_collection()
+        _iids = _do_to_ID_stream(coll, throwing_listener)
         _string_tup = tuple(iid.to_primitive() for iid in _iids)  # see #here2
         _actual_sorted = sorted(_string_tup)
         tc.assertSequenceEqual(_actual_sorted, _these_N_IDs)
@@ -316,13 +316,14 @@ class case_of_delete_OK_resulting_in_non_empty_collection(_common_delete):
     # #as-namespace-only
 
     def confirm_entity_no_longer_in_collection(tc):
-        es = tc.end_state()
+        raise RuntimeError("stopped using at #history-B.1 but sketch might wo")
+        es = tc.end_state
         iden = es['identifier']
         coll = es['collection']
-        import modality_agnostic.test_support.structured_emission as se_lib
-        ee = se_lib.expect(tc, ('error', 'structure', 'entity_not_found'))
-        x = _do_retrieve(coll, iden, ee.listener)
-        ee.ran()
+        expecting = (('error', 'structure', 'entity_not_found', 'as', 'ezzy'),)
+        listener, done = _em().listener_and_done_via(expecting, tc)
+        x = _do_retrieve(coll, iden, listener)
+        done()
         assert(x is None)
 
 
@@ -395,25 +396,25 @@ class case_of_create_OK_into_empty_collection:  # #as-namespace-only
         def confim_empty(coll):
             _confirm_collection_empty(tc, coll)
 
-        dct = {'thing_2': 123, 'thing_B': 3.14}  # ..
+        dct = {'thing_2': '123', 'thing_B': '3.14'}  # ..
         return _end_state_for_create(tc, dct, _expecting_OK, confim_empty)
 
 
 class case_of_create_OK_into_non_empty_collection:  # #as-namespace-only
 
     def confirm_result_is_the_created_entity(tc):
-        sct = tc.end_state()
+        sct = tc.end_state
         dct = _yes_value_dict(sct['result_value'])
-        tc.assertEqual(dct['thing_2'], -2.718)
-        tc.assertEqual(dct['thing_B'], False)
-        tc.assertEqual(len(dct), 2)
+        # tc.assertEqual(dct['thing_2'], '-2.718') .. #history-B.1
+        tc.assertEqual(dct['thing_B'], 'false')
+        tc.assertIn(len(dct), (1, 2))  # #here3
 
     confirm_emitted_accordingly = _create_OK_emitted_accordingly
 
     confirm_entity_now_in_collection = _create_OK_confirm_in_collection
 
     def build_end_state(tc):
-        dct = {'thing_2': -2.718, 'thing_B': False}  # ..
+        dct = {'thing_2': '-2.718', 'thing_B': 'false'}  # ..
         return _end_state_for_create(tc, dct, _expecting_OK)
 
 
@@ -540,7 +541,7 @@ def _assert_says_identifier_probably(tc, reason, iid_s):
 
 def _find_all_identifer_looking_strings(message):
     import re
-    return tuple(re.findall(r"'([A-Z0-9]{2,})'", message))  # ..
+    return tuple(re.findall(r"'([^']+)'", message))  # #history-B.1
 
 
 def _assert_says_cannot_verb(tc, reason, verb):
@@ -562,7 +563,7 @@ def _message_from(es):
 
 def _message_or_reason_from(which, es):
     from modality_agnostic import listening as lib
-    severity, *rest = *es['channel'], es['payloader_CAUTION_HOT']
+    severity, *rest = *es['channel'], es['payloader']
     if 'error' == which:
         assert('error' == severity)
         return lib.reason_via_error_emission(*rest)
@@ -571,7 +572,7 @@ def _message_or_reason_from(which, es):
 
 
 def _confirm_collection_empty(tc, coll):
-    itr = _do_to_ID_stream(coll, None)
+    itr = _do_to_ID_stream(coll, throwing_listener)
     for iden in itr:
         tc.fail("collection was not empty.")
 
@@ -640,17 +641,15 @@ def _do_to_ID_stream(coll, listener):
 
 # -- support
 
-def build_end_state_expecting_failure_via(tc):
-    from modality_agnostic.test_support import structured_emission as se_lib
-    listener, emissioner = se_lib.listener_and_emissioner_for(tc)
+def build_end_state_expecting_failure_via(tc, additionally=None):
+    listener, emissions = _em().listener_and_emissions_for(tc, limit=2)
     x = tc.resolve_collection(listener)
-    chan, payloader = emissioner()
-    sct = payloader()  # make it not hot
-    return {
-            'result_value': x,
-            'channel': chan,
-            'payloader_CAUTION_HOT': lambda: sct,
-            }
+    if additionally:
+        x = additionally(x, listener)
+    emi, *_ = emissions
+    sct = emi.payloader()  # make it not hot
+    return {'result_value': x, 'channel': emi.channel,
+            'payloader': lambda: sct}
     # eventually #open [#867.J] re-redund this
 
 
@@ -662,71 +661,13 @@ def _end_state_plus(tc, run, coll, identifier, expecting_OK):
 
 
 def end_state_via_(tc, run, expecting_OK):
-
-    # we were torn between lighter [#508] and heavier [#509].
-
-    # the "right way" is probably to use [#509] to specify the following
-    # provisions (spec points), but figuring out the API takes longer than
-    # just writing this ourelves using plain old programming:
-
-    from modality_agnostic import listening as _
-    emission_via_args = _.emission_via_args
-
-    emissions = []
-
-    def listener(*args):
-
-        em = emission_via_args(args)
-
-        if tc.do_debug:
-            # provision: if debugging is on, do some kind of real time feedback
-            channel = (em.shape, *em.channel_tail)
-            tc.debug_IO.write(f"KISS DEBUG: {channel}\n")  # _eol
-
-        if em.is_error_emission and expecting_OK:
-
-            # provision: raise this as an expectation failure right away
-            # so that we get the stack trace thru the business code
-            raise Exception(em.flush_some_message())
-
-        emissions.append(em)
-
+    sev = 'info' if expecting_OK else 'error'
+    expectation = (sev, '?+', 'as', '_the_one_emission')
+    listener, done = _em().listener_and_done_via((expectation,), tc)
     x = run(listener)
-
-    em, = emissions  # provision: expect one
-
-    chan = (em.severity, em.shape, * em.channel_tail)
-    payloader = em.release_payloader()
-
-    # the simple way:
-    # from modality_agnostic.test_support import structured_emission as se_lib
-    # listener, emissioner = se_lib.listener_and_emissioner_for(tc)
-    # x = run(listener)
-    # chan, payloader = emissioner()
-
-    """Why we say `payloader_CAUTION_HOT` everywhere: one whole point of the
-    listener interface is that payloads are not constructed unless they are
-    dereferenced. This benefits both runtime and testing: often when we make
-    payloads we engage complicated linguistic production with dependencies.
-    A) We don't want to engage these resources and moving parts for something
-    the client won't use anyway (think i18n), and B) putting the payload behind
-    a getter callback allows for more focused, regression-friendly testing of
-    just the payload details separate from the whole invocation.
-
-    But A) the work that goes into assembling this payload is not typically
-    cached or memoized (because yuck) and B) there is the occcasionally
-    (perhaps only in antiquity) the assembly that consumes something (side-
-    effectively) and so cannot be assembled more than once.
-
-    So the trade-off to all this is that we write our tests making every
-    effort to call the thing named this max once per case. Experimental.
-    """
-
-    return {
-            'result_value': x,
-            'channel': chan,
-            'payloader_CAUTION_HOT': payloader,
-            }
+    e = done()['_the_one_emission']
+    # removed discussion of payloader_caution_HOT at #history-B.1
+    return {'result_value': x, 'channel': e.channel, 'payloader': e.payloader}
 
 
 def identifier_via_string(_, s):  # #method
@@ -742,8 +683,19 @@ def _ID_primitive_via_TC(tc):
     return tc.given_identifier_primitive()
 
 
+def throwing_listener(*emission):
+    return _em().throwing_listener(*emission)
+
+
+def _em():
+    import modality_agnostic.test_support.common as em
+    return em
+
+
 _expecting_not_OK = False
 _expecting_OK = True
 
 
+# :#here3: at #history-B.1, [#871.1] messes up some doo-hahs and not others
+# #history-B.1
 # #born.

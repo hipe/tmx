@@ -246,8 +246,11 @@ class _LinesAsBlock:
 
 def _express_joy_at_having_deleted(listener, table_block):
     _ = tuple(table_block.to_body_block_stream_as_table_block_())
-    _wee = tuple(None for o in _ if o.is_attribute_block)
-    _express_edit(listener, ((), (), _wee), table_block.identifier, 'deleted')
+    heh = tuple(None for o in _ if o.is_attribute_block)
+    eid = table_block.identifier.to_string()
+    from kiss_rdb.magnetics_.CUD_attributes_request_via_tuples \
+        import emit_edited_ as emit
+    emit(listener, ((), (), heh), eid, 'deleted')
 
 
 def _whine_about_entity_not_found(id_s, listener):
@@ -255,12 +258,6 @@ def _whine_about_entity_not_found(id_s, listener):
         _reason = f'entity {repr(id_s)} is not in file'
         return {'reason': _reason}
     listener('error', 'structure', 'input_error', structurer)
-
-
-def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
-    # [#867.E] one day abstract this out to a better location
-    from kiss_rdb.storage_adapters_.markdown_table import express_edit_
-    express_edit_(listener, UCDs, identifier, verb_preterite)
 
 
 # == trivial & wrappers

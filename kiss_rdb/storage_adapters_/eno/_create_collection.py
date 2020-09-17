@@ -45,7 +45,8 @@ def _work(dirname, coll_dir, listener, is_dry):
     from ._big_patchfile_via_entities_uows import \
         APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_
     raw_lines = _these_special_lines_raw()
-    var_values = {'COLLECTION_DIR': coll_dir}
+    from kiss_rdb import SCHEMA_FILE_ENTRY_ as schema_rec
+    var_values = {'COLLECTION_DIR': coll_dir, 'SCHEMA_ENTRY': schema_rec}
     return APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_(
             raw_lines, var_values, dirname, listener, is_dry)
 
@@ -99,10 +100,10 @@ new file mode 100644
 @@ -0,0 +1 @@
 +<DIRECTIVE: ERASE_THIS_FILE_AFTER_APPLYING_THE_PATCH>
 +
-diff --git a/<VAR: COLLECTION_DIR>/schema.rec b/<VAR: COLLECTION_DIR>/schema.rec
+diff --git a/<VAR: COLLECTION_DIR>/<VAR: SCHEMA_ENTRY> b/<VAR: COLLECTION_DIR>/<VAR: SCHEMA_ENTRY>
 new file mode 100644
 --- /dev/null
-+++ b/<VAR: COLLECTION_DIR>/schema.rec
++++ b/<VAR: COLLECTION_DIR>/<VAR: SCHEMA_ENTRY>
 @@ -0,0 +1,4 @@
 +storage_adapter: eno
 +storage_schema: 32x32x32

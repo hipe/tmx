@@ -123,7 +123,7 @@ class Case5501_strange_arg_might_splay(CommonCase):
 
     def test_020_expresses_reasons(self):
         self.assertEqual(self.head_and_tail[0],
-                         "no sub-command for 'strange-commando'")
+                         "no sub-command named 'strange-commando'")
 
     def test_030_express_splay(self):
         self.assertEqual(self.head_and_tail[1],
