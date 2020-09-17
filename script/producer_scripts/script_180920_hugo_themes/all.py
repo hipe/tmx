@@ -225,10 +225,10 @@ class _ReportDispatcher:
 
         if self._tappers_count:
             for doner in self._doners:
-                cover_me('copy paste above lol')
+                xx('copy paste above lol')
         # --
         for rcvr in self._subscribed_to_phenomenon_variation:
-            cover_me('copy paste above lol')
+            xx('copy paste above lol')
 
 
 # -- indexing
@@ -318,7 +318,7 @@ def __build_phenomena_keyser(surface_phenomena_index, listener):
         if which in dct:
             mixed = dct[which]
             if isinstance(mixed, str):
-                None if 'nothing yet' == mixed else cover_me('cry')
+                None if 'nothing yet' == mixed else xx('cry')
             else:
                 assert(isinstance(mixed, list))
                 for phenomenon_surface_s in mixed:
@@ -446,7 +446,7 @@ def _report_paths():
         es = proc.returncode
 
     if es is not None:  # `find` doesn't give us a code even when args are bad
-        cover_me(f'exitstatus: {es}')
+        xx(f'exitstatus: {es}')
 
 
 def _module_via_path(report_path):  # #[#510.10] module via path
@@ -465,7 +465,7 @@ def __stem_via_path(report_path):
 # -- lowest level/common
 
 
-def cover_me(msg):
+def xx(msg):
     raise Exception(f'cover me: {msg}')
 
 

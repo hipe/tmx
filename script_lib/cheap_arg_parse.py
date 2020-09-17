@@ -833,10 +833,6 @@ _either_or = f'(?:{_lowcase}|{_upcase})'
 _long_name_rxs = f'{_either_or}(?:-{_either_or})*'
 
 
-def cover_me(msg):
-    raise Exception(f"cover me: {msg}")
-
-
 class FormalParametersSyntaxError(Exception):
     pass
 

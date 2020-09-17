@@ -106,8 +106,8 @@ class CLI_Test_Case_Methods:
                 print(f'HAD NUM RECORDINGS: {len(a)}')
 
         for line in o.lines:
-            cover_me('hi')
-        cover_me('hey')
+            xx('hi')
+        xx('hey')
 
     def MY_BIG_FLEX(
             self,
@@ -214,7 +214,7 @@ def BIG_FLEX(
             yield ce('UsageError')
             yield SystemExit
         else:
-            cover_me(f'uncoded for exception category: {s}')
+            xx(f'uncoded for exception category: {s}')
 
     def ce(s):  # ce="click exception"
         import click.exceptions as _
@@ -448,7 +448,7 @@ def _sys():
     return _
 
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

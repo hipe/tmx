@@ -234,10 +234,6 @@ def _my_exception(msg):  # #copy-pasted
     return MyException(msg)
 
 
-def cover_me(s):
-    raise Exception('cover me - {}'.format(s))
-
-
 _eol = '\n'
 
 # #born.

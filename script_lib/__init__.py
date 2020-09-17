@@ -186,10 +186,10 @@ class filesystem_functions:  # as namespace
     open = open  # simply, *our* open is the *real* open
 
     def open(*x):
-        cover_me('not used')  # [#676] cover me
+        xx('not used')
 
 
-def cover_me(s):
+def xx(s):
     raise _exe('cover me: {}'.format(s))
 
 

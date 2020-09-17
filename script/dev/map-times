@@ -146,14 +146,6 @@ class _record_via_matchdata:
 
 # --
 
-def cover_me(msg=None):
-    raise Exception(_msg(msg, 'cover me'))
-
-
-def _msg(body, header):
-    return header if body is None else f'{header}: {body}'
-
-
 if '__main__' == __name__:
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))

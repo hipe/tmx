@@ -627,10 +627,6 @@ common_args_head = functions_for('toml').common_args_head
 
 # == general
 
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
-
 _common_collection = '050-rumspringa'
 _IID = 'INTERNAL_IDENTIFIER'
 

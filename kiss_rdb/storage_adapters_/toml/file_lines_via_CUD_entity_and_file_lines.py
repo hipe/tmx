@@ -179,7 +179,7 @@ def new_lines_via_create_and_existing_lines(
         if de.identifier_string < identifier_string:
             yield de
         elif de.identifier_string == identifier_string:
-            cover_me('erroneous monk - this has a case')
+            xx('erroneous monk - this has a case')
         else:
             # NOTE this means we have found a first document entity that
             # has an identifier string that is greater. we use this below!
@@ -230,7 +230,7 @@ def __check_order(block_itr, listener):
             yield de
             continue
 
-        cover_me('original doohah out of order')  # #open #[#867.C]
+        xx('original doohah out of order')  # #open #[#867.C]
 
 
 class _LinesAsBlock:
@@ -278,7 +278,7 @@ def __block_stream_via_file_lines(existing_file_lines, listener):
 
 # ==
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #history-A.4: futures, decorator

@@ -99,11 +99,11 @@ def identifiers_via__(paths_function, id_via_string, listener):
             yield id_obj
         elif prev_id_s == this_id_s:  # maybe when future feature 1
             if prev_table_type == this_table_type:
-                cover_me('invalid input')
+                xx('invalid input')
             else:
-                cover_me('check that table type is right order then skip')
+                xx('check that table type is right order then skip')
         else:
-            cover_me('out of order')
+            xx('out of order')
 
 
 def _table_start_line_stream_via_dir_path(paths_function, monitor):
@@ -143,9 +143,8 @@ def __whine_about_not_exists(listener, pp):
     listener('error', 'expression', 'collection_not_found', msg)  # noqa: E501
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
 
 # #history-A.1: become home to place that parses single table body from lines
 # #born.

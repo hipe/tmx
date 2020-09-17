@@ -99,12 +99,12 @@ def _build_semi_encoder(listener, o):
 
         if hasattr(typ, 'utcfromtimestamp'):
             # wickedly infer type (class) without adding a dependency
-            cover_me('datetime probably, no problem')
+            xx('datetime probably, no problem')
 
         if mixed is None:
-            cover_me("we don't want None, under provision 1")
+            xx("we don't want None, under provision 1")
 
-        cover_me(f'wat do about this type - {typ}')
+        xx(f'wat do about this type - {typ}')
 
     return semi_encode
 
@@ -154,7 +154,7 @@ def _emit_input_error(listener, structurer):  # one of several
 
 # ==
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

@@ -305,10 +305,6 @@ def _subject_module():
     return _
 
 
-def cover_me():
-    raise Exception('cover me')
-
-
 if __name__ == '__main__':
     unittest.main()
 

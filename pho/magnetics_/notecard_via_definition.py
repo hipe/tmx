@@ -145,9 +145,5 @@ class _Notecard:
         o('annotated_entity_revisions')
         return dct
 
-
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
 # #history-A.1: it becomes doubly-linked list
 # #abtracted

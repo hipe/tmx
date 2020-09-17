@@ -72,7 +72,7 @@ class Document_:
     def _to_line_ASTs(self, listener):  # #testpoint
         idoc = _indexed_document_via(self._notecards, listener)
         if idoc is None:
-            cover_me('make sure you use a monitor')
+            xx('make sure you use a monitor')
             return
         return _to_document_line_ASTs(idoc, listener)
 
@@ -118,7 +118,7 @@ def _to_document_line_ASTs(idoc, listener):
             if 'structured content line' == ast.symbol_name:
                 ast = ast.dereference_footnotes__(lineno, ifr, idoc, listener)
                 if ast is None:
-                    cover_me('make sure you have a monitor')
+                    xx('make sure you have a monitor')
                     return
             yield ast
 
@@ -244,7 +244,7 @@ class _IndexedNotecard:
                 return _okay
 
             if 'local footnote definition' == typ:
-                cover_me("FOR NOW footnote definition must be anchored at end")
+                xx("FOR NOW footnote definition must be anchored at end")
                 return _okay
 
             assert(False)
@@ -274,12 +274,12 @@ class _IndexedNotecard:
             parse_context.lineno += 1
             _ok = self._process_line(line)
             if not _ok:
-                cover_me('then what')
+                xx('then what')
                 self.OK = False
                 return
 
         if not self._end_of_stream_is_OK_here:
-            cover_me('unclosed multli-line code block?')
+            xx('unclosed multli-line code block?')
 
         self.notecard_identifier_string = frag.identifier_string
         del self._listener
@@ -289,7 +289,7 @@ class _IndexedNotecard:
         fid = ast.identifier_string
 
         if fid in self.footnote_url_via_local_identifier:
-            cover_me(f"footnote re-defined: {repr(fid)}")
+            xx(f"footnote re-defined: {repr(fid)}")
 
         self.footnote_url_via_local_identifier[fid] = ast.url_probably
         self._footnote_definitions_in_reverse.append(ast)
@@ -374,7 +374,7 @@ def _lines_via_big_string(big_s):  # (copy-paste of [#610].)
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
 
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

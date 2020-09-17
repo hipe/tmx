@@ -148,7 +148,7 @@ def _second_selector(soup, listener):
             actual = dct['header_content']
             if expected != actual:
                 _tmpl = "new section or order change? expected '%s' (had '%s')"
-                cover_me(_tmpl % (expected, actual))
+                xx(_tmpl % (expected, actual))
             do_thing = yes_no
         elif do_thing:  # counter to OCD
             seen_set.update({dct[_use_key]})
@@ -160,7 +160,7 @@ def _second_selector(soup, listener):
     hdr = next(itr)
     hdr['header_level']  # assert t's in in
     if 'Python tutorial' != hdr['header_content']:
-        cover_me()
+        xx()
 
     count = 0
     for dct in itr:
@@ -168,7 +168,7 @@ def _second_selector(soup, listener):
         if key in seen_set:
             count += 1
         else:
-            cover_me('yikes - div one was not a subset')
+            xx('yikes - div one was not a subset')
 
     def f():
         yield f'(first was subset of second ({count:d} were same))'
@@ -216,10 +216,10 @@ def _all_these_functions(listener):
     def shear(el, how_many, which_one, name):
         these = _filter('*', el)  # no strings
         if len(these) != how_many:
-            cover_me('more than %d (%d)' % (how_many, len(these)))
+            xx('more than %d (%d)' % (how_many, len(these)))
         this = these[which_one]
         if name != this.name:
-            cover_me("name no '%s' (%s)" % (name, this.name))
+            xx("name no '%s' (%s)" % (name, this.name))
         return this
 
     def json_objects_via(this_div):
@@ -245,7 +245,7 @@ def _all_these_functions(listener):
                 # oops there was lots of stuff #cover-me
                 pass
             else:
-                cover_me("page structured changed - wasn't expecting '%s'" % s)
+                xx("page structured changed - wasn't expecting '%s'" % s)
 
         def f():
             yield f"(number of <br>'s: {count})"
@@ -280,7 +280,7 @@ def _ps_lib():
     return x
 
 
-def cover_me(s):
+def xx(s):
     raise Exception('cover me' if s is None else f'cover me: {s}')
 
 

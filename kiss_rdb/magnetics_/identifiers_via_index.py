@@ -141,7 +141,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
                 yield x
 
         if not self.is_at_stopping_point:
-            cover_me('was not at stopping point')
+            xx('was not at stopping point')
 
     def process_subsequent_line_at_branch_point(self, line):
         # the state with the most indeterminancy we ever have is here: after
@@ -200,10 +200,10 @@ class _StateMachineIsh():  # #[#008.2] a state machine
         margin, rest = md.groups()
         indent_depth = len(margin)
         if not indent_depth:
-            cover_me('expected non-rack-line after rack-line to have indent')
+            xx('expected non-rack-line after rack-line to have indent')
 
         if self.max_indent_depth < indent_depth:
-            cover_me('indented line is too far indented, exceeds identifier depth')  # noqa: E501
+            xx('indented line is too far indented, exceeds identifier depth')  # noqa: E501
 
         self.process_indented_line(indent_depth, rest)
 
@@ -218,7 +218,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
             expected_indent_depth = self.at_indent_depth - 1
             assert(expected_indent_depth)
             if expected_indent_depth != indent_depth:
-                cover_me(f'expected level of indent {expected_indent_depth} had {indent_depth}')  # noqa: E501
+                xx(f'expected level of indent {expected_indent_depth} had {indent_depth}')  # noqa: E501
             self.at_indent_depth = indent_depth
 
         nd = self.native_digit_via_character(rest, None)  # #no-listener
@@ -285,7 +285,7 @@ class _StateMachineIsh():  # #[#008.2] a state machine
     def _assert_rack_line(self, line):
         md = _rx_for_matching_rack_line.match(line)
         if md is None:
-            cover_me('failed to parse rack line')
+            xx('failed to parse rack line')
         return md
 
     def process_rack_line(self, md):
@@ -374,7 +374,7 @@ def _iid_lib():
     return _
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

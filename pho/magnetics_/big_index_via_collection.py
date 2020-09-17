@@ -243,7 +243,7 @@ class _OrderedRun:
 
     def __when_circular_reference(self):
         _msg = ''.join(self.__pieces_for_when_circular())
-        cover_me(_msg)
+        xx(_msg)
 
     def __pieces_for_when_circular(self):
         for relationship, iid in self._collection_traversal.stack:
@@ -255,7 +255,7 @@ class _OrderedRun:
     def __when_hack_failed(self, frag_count, frags_that_have_this_frag_count):
         _iid = self._local_head_IID
         _these = ', '.join(frags_that_have_this_frag_count)
-        cover_me(
+        xx(
                 f'the children of {_iid} ({_these}) '
                 f'each have exactly {frag_count} notecard(s). '
                 'no basis by which to decide order. use prev intead.')
@@ -520,7 +520,7 @@ def _unordered_notecards_via_collection(collection, listener):
         iid_s = iid.to_string()
         dct = collection.retrieve_entity(iid_s, listener)
         if dct is None:
-            cover_me(f'maybe this decode error thing in {repr(iid_s)}')
+            xx(f'maybe this decode error thing in {repr(iid_s)}')
         nc = notecard_via_definition(**dct, listener=listener)
         if nc is None:
             return
@@ -545,21 +545,21 @@ class _BigIndex:
         these = self.ids_of_frags_with_no_parent_or_previous
 
         if 0 == len(these):
-            cover_me('either empty index or circular refs')
+            xx('either empty index or circular refs')
 
         ct = _CollectionTraversal(self)
 
         for iid in these:
             doc = self._build_document(iid, ct, listener)
             if not doc:
-                cover_me('not doc')
+                xx('not doc')
             yield doc
 
     def RETRIEVE_DOCUMENT(self, iid_s, listener):
 
         dct = self.notecard_of
         if iid_s not in dct:
-            cover_me(f'notecard not found: {repr(iid_s)}')
+            xx(f'notecard not found: {repr(iid_s)}')
 
         frag = dct[iid_s]
         parend_iid_s = frag.parent_identifier_string
@@ -579,7 +579,7 @@ class _BigIndex:
         a = collection_traversal.ordered_IIDs_for(
                 iid_s, 'document head notecard', listener)
         if a is None:
-            cover_me('it is as the prophecy foretold')
+            xx('it is as the prophecy foretold')
 
         frag_of = self.notecard_of
 
@@ -598,7 +598,7 @@ def _touch_list(dct, key):  # there's got to be a better idiom
     return a
 
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

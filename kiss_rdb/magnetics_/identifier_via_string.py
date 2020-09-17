@@ -93,7 +93,7 @@ def _CLI(sin, sout, serr, argv):  # :[#867.S]
             for line in payloader():
                 serr.write(f'{line}\n')
         else:
-            cover_me()
+            xx()
 
     if int_via_id == func:
         ln = len(stack)
@@ -205,7 +205,7 @@ def identifier_via_string_(id_s, listener):
 
     s_a = tuple(id_s)
     if not len(s_a):
-        cover_me('might let this slip thru - needs coverage tho')
+        xx('might let this slip thru - needs coverage tho')
 
     for s in s_a:
         nd = native_digit_via_character_(s, listener)
@@ -357,7 +357,7 @@ def _emit_input_error_structure(f, listener):
 
 # ==
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

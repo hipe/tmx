@@ -119,7 +119,7 @@ class _MadParseBashScript:  # the [#608.4] "mad parse" pattern
 
     def finish(self, themes_dir):
         if not self._can_finish:
-            cover_me("cannot finish - didn't reach end")
+            xx("cannot finish - didn't reach end")
 
         # (we don't have a listener but we could)
         _1 = _tuple_via(self._deny_list_parenthesized_list)
@@ -168,12 +168,12 @@ def _normalize_find_command(cmd):
     find_bash = re.match(r'(.+) \| xargs -n1 basename$', cmd)[1]
     _ = _bash_interpolation_expression
     if _ not in find_bash:
-        cover_me(f'{_} not in find command - {find_bash}')
+        xx(f'{_} not in find command - {find_bash}')
     return find_bash
 
 
-def cover_me(s):
-    raise Exception(f'cover me - {s}')
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 
 _bash_interpolation_expression = '${themesDir}'

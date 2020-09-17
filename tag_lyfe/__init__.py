@@ -72,12 +72,4 @@ def pop_property(self, var):
     delattr(self, var)
     return x
 
-
-def cover_me(s):
-    raise _PlatformException('cover me: {}'.format(s))
-
-
-_PlatformException = Exception
-
-
 # #born.

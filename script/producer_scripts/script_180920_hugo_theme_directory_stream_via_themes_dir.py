@@ -112,7 +112,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
 
         a = list(cmd)
         idx = -4
-        None if '*.git' == a[idx] else cover_me('vendor code changed')
+        None if '*.git' == a[idx] else xx('vendor code changed')
         a[idx] = '*.git*'
         cmd = a
         # == END
@@ -156,7 +156,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
 
             es = proc.returncode
             if es is not None:
-                cover_me(f'wee we got an exitstatus: {es!r}')
+                xx(f'wee we got an exitstatus: {es!r}')
 
     def __build_find_command(self):
         return _crazy_interpolate(
@@ -176,7 +176,7 @@ def _crazy_interpolate(tmpl, var, value):  # meh
     md = re.search(r'[^-a-zA-Z_0-9/]', value)
     if md is not None:
         _ = md[0]
-        cover_me(f'path contains chars ({_}!r) we are afraid of: {value!r}')
+        xx(f'path contains chars ({_}!r) we are afraid of: {value!r}')
 
     # NOTE - it is ESSENTIAL that we get this right. it's a TERRIFYING
     # security risk if somehow we manage to etc.
@@ -213,7 +213,7 @@ def __do_the_crazy_thing(command_part):
         cursor = md.end()
 
 
-def cover_me(s):
+def xx(s):
     raise Exception(f'cover me - {s}')
 
 

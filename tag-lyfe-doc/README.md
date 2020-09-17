@@ -87,7 +87,6 @@ consumed by arbitrary other processes.
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-----------------------------------------|
 |                 (example) | #eg   | #example blah blah
-|                  [#776]   | #open | track all `cover_me`
 |                   #709.D  | #open | integrate queries and tagging to use same grammar (#when)
 |                   #709.C  | #open | maybe don't walk (#when)
 |                   #709.B  | #open | generic small seams (#when)

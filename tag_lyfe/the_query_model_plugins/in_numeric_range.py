@@ -40,7 +40,7 @@ class _InRangeFunction:
         def f(tagging):
             sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
             if sub_tagging is None:
-                cover_me('no such sub tagging')
+                xx('no such sub tagging')
             elif sub_tagging.is_deep:  # then it has a value (child)
                 sub_sub_tagging = sub_tagging.child
                 needle = sub_sub_tagging.tag_stem
@@ -61,7 +61,7 @@ class _InRangeFunction:
                     else:
                         pass  # too high (Case7040)
             else:
-                cover_me('tagging has no value')
+                xx('tagging has no value')
 
         self._test = f
         self._begin = beg
@@ -85,5 +85,9 @@ class EasyNumber:
     def __init__(self, number, string):
         self._number = number
         self._string = string
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 # #born.

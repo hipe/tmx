@@ -278,7 +278,7 @@ def _paths_functions():
         """
 
         if not entities_file_pp.exists():
-            cover_me('the language will need to change a little for this')
+            xx('the language will need to change a little for this')
             when_no_entries(entities_file_pp)
             return
 
@@ -339,7 +339,7 @@ def _os_path_join(*a):
     return join(*a)
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #history-A.2 toml is no longer used to parse schema files

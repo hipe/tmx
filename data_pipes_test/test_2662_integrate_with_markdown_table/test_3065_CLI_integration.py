@@ -349,9 +349,10 @@ class _CrazyDiffParse:  # #open you should use [#606] instead
                     self._advance()
                     return self._do_receive(False, s)
                 else:
-                    cover_me()
+                    xx()
             else:
-                cover_me()
+                mini = sym.minimum
+                xx(f"needed at least {mini} of '{sym.name}', had {num}")
         else:
             num += 1
             self._current_count_of_matched_items = num
@@ -369,7 +370,7 @@ class _CrazyDiffParse:  # #open you should use [#606] instead
 
             if sym.this_is_the_end(num):
                 if 0 == len(self._stack):
-                    cover_me()
+                    xx()
                     del(self._current_symbol)
                 else:
                     self._advance()
@@ -417,10 +418,6 @@ class _Symbol:
         return self._range.stop == num
 
 
-def cover_me():
-    raise Exception('cover me')
-
-
 def _help_screen_lib():
     import script_lib.test_support.expect_help_screen as lib
     return lib
@@ -439,6 +436,10 @@ def _expect_STDs():
 def _subject_script():
     import data_pipes.cli.sync as mod
     return mod
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 
 if __name__ == '__main__':

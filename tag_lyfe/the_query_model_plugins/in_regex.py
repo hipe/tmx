@@ -85,7 +85,7 @@ class _InRegexFunction:
         def f(tagging):
             sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
             if sub_tagging is None:
-                cover_me('no such sub tagging')
+                xx('no such sub tagging')
             elif sub_tagging.is_deep:  # then it has a value (child)
                 sub_sub_tagging = sub_tagging.child
                 needle = sub_sub_tagging.tag_stem
@@ -95,7 +95,7 @@ class _InRegexFunction:
                 else:
                     return True
             else:
-                cover_me('tagging has no value')  # #cp
+                xx('tagging has no value')  # #cp
 
         self._test = f
         self._regex_string = rx_string
@@ -108,5 +108,9 @@ class _InRegexFunction:
 
     def to_string(self):
         return f'/{self._regex_string}/'
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 # #born.

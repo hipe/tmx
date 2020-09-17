@@ -460,7 +460,7 @@ def _block_via_line(line, mde, listener):
     if '#' == line[0]:  # #[#867.F]
         return blk_lib.AppendableDiscretionaryBlock_(line)
     else:
-        cover_me()
+        xx()
 
 
 @lazy
@@ -474,7 +474,7 @@ def _body_line_gen(mde):
             yield line
 
 
-def cover_me():
+def xx():
     raise Exception('cover me')
 
 

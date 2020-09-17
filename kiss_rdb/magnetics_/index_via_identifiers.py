@@ -364,7 +364,7 @@ def _lines_of_index_via_identifiers(identifiers, depth, listener):  # noqa: E501
     elif 2 == depth:
         return __lines_of_index_via_identifiers_when_shallo(identifiers, depth)
     else:
-        cover_me("no - we don't make indexes for numberspaces this small")
+        xx("no - we don't make indexes for numberspaces this small")
 
 
 def __lines_of_index_via_identifiers_when_deeper(identifiers, depth):
@@ -500,7 +500,7 @@ def __lines_of_index_via_identifiers_when_shallo(identifiers, depth):
         elif rubric_int == curr_rubric_int:
             rack[tail_nd.integer] = tail_nd
         else:
-            cover_me('out of order (not all out of orders are detected!)')
+            xx('out of order (not all out of orders are detected!)')
 
     if had_at_least_one_identifier:
         yield flush_rack()
@@ -547,7 +547,7 @@ def _say_entity_not_found(eid, idens_count):
 
 # ==
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

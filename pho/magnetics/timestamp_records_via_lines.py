@@ -106,7 +106,7 @@ def reference_and_normal_entities_to_sync_(
 
     scn = _ScannerViaIterator(local_normals_iterator)
     if scn.is_empty:
-        cover_me("logfile empty? nothing to sync?")
+        xx("logfile empty? nothing to sync?")
 
     def is_equal():
         if find_this_date_s != local_normal.date_string:
@@ -129,10 +129,10 @@ def reference_and_normal_entities_to_sync_(
             break
 
     if not found_reference_entity:
-        cover_me(f"remote entity not found anywhere in {scn.lineno} lines")
+        xx(f"remote entity not found anywhere in {scn.lineno} lines")
 
     if scn.is_empty:
-        cover_me("apparently there are no new entities to push")
+        xx("apparently there are no new entities to push")
 
     push_these = []
     while not scn.is_empty:
@@ -147,7 +147,7 @@ def _normal_topmost_entity(remote_records_iterator, listener):
 
     scn = _ScannerViaIterator(remote_records_iterator)
     if scn.is_empty:
-        cover_me()
+        xx()
 
     date_s, time_s, msg = scn.shift()
 
@@ -189,7 +189,7 @@ def _normal_topmost_entity(remote_records_iterator, listener):
 
     if not len(use_date_s_pointer):
         assert scn.is_empty
-        cover_me(f'no date found in {scn.lineno} records')
+        xx(f'no date found in {scn.lineno} records')
 
     use_date_s, = use_date_s_pointer
 
@@ -370,12 +370,8 @@ class _ScannerViaIterator:  # #[#008.4] a scanner
         del self._iterator
 
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise RuntimeError(f'cover me{": " + msg if msg else ""}')
-
-
-def xxx():
-    raise RuntimeError("do me")
 
 
 class _MyException(RuntimeError):

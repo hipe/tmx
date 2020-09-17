@@ -51,7 +51,7 @@ def _when_recursive(fw, out_dir, big_index, listener):
 
         filename = facets.filename
         if filename in seen:
-            cover_me((
+            xx((
                 f'multiple documents share the same generated fileanme: '
                 f'{filename}'
                 ))
@@ -106,7 +106,7 @@ class _FileWriter:
     def express_summary_into(
             self, listener, count_files_attempted, count_files_written):
         def f():
-            _message = (
+            msg = (
                     f'wrote {count_files_written}'
                     f' of {count_files_attempted} files'
                     f' ({self.count_lines_written} lines,'
@@ -256,7 +256,7 @@ class _FacetsForPublishing:
 
         s = self.frontmatter_title
         if re.match('["\n]', s):
-            cover_me('titles with quotes or newlines')
+            xx('titles with quotes or newlines')
             escaped_title = s.replace('"', '\\"')  # newline tho
         else:
             escaped_title = s
@@ -287,7 +287,7 @@ def _whine_about_no_clobber(listener, out_path):
     listener('error', 'structure', 'cannot_overwrite_file', payloader)
 
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #born.

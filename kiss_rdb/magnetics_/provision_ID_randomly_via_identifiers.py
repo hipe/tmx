@@ -161,7 +161,7 @@ def provision_new_identifier_(
 
     itr = identifierser()
     if itr is None:
-        cover_me()
+        xx()
     ALL_iids = tuple(itr)
 
     if not len(ALL_iids):
@@ -277,21 +277,21 @@ def __sanitized_provisioned_integers(provisioned_integers, capacity):
 
     for i in itr:
         if previous_int >= i:
-            cover_me("provisioned integer stream is not in order")
+            xx("provisioned integer stream is not in order")
         previous_int = i
         a.append(i)
 
     if len(a):
         if 0 > a[0]:
-            cover_me("lowest integer is too low")
+            xx("lowest integer is too low")
 
         if capacity <= a[-1]:
-            cover_me("highest integer is too high")
+            xx("highest integer is too high")
 
     return a
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #history-A.1: "identifier reservation" is born

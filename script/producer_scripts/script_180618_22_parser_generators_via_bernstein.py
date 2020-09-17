@@ -224,6 +224,10 @@ def _ps_lib():
     return x
 
 
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+
+
 if __name__ == '__main__':
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))

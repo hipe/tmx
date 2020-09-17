@@ -433,7 +433,7 @@ def __check_name_sets(dct, body_blocks, listener):
         return not_ok
 
     if len(extra_by_vendor):
-        cover_me()
+        xx()
 
     return okay
 
@@ -547,7 +547,7 @@ def _emit_input_error_via_structurer(f, listener):
     listener('error', 'structure', 'input_error', f)
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

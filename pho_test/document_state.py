@@ -101,8 +101,4 @@ def _add_newline(s):
     assert(0 == len(s) or '\n' != s[-1])
     return f'{s}\n'
 
-
-def cover_me(msg=None):
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
-
 # #born.

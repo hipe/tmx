@@ -114,7 +114,7 @@ class collection_via_directory_and_schema:
                     listener=listener)
 
             if tup is None:
-                cover_me('maybe numberspace is full for current schema')
+                xx('maybe numberspace is full for current schema')
                 return
             iid, iids = tup
 
@@ -197,7 +197,7 @@ class collection_via_directory_and_schema:
         ents_dir = self._schema_pather._entities_directory_path
         ft_depth = self._schema._storage_schema.filetree_depth
         if ft_depth < 2:
-            cover_me('you madman')
+            xx('you madman')
         elif ft_depth == 2:
             assert(ents_dir == parent_dir)
             os.mkdir(parent_dir)
@@ -206,7 +206,7 @@ class collection_via_directory_and_schema:
                 os.mkdir(ents_dir)  # madman #cover-me
             os.mkdir(parent_dir)
         else:
-            cover_me('eek you want mkdir -p')
+            xx('eek you want mkdir -p')
 
     def retrieve_entity_as_storage_adapter_collection(self, iden, listener):
         """NOTICE
@@ -367,7 +367,7 @@ def _create_entity(
                 pass  # because transaction OK, no cleanup to do (Case4303)
             else:
                 # ==
-                cover_me('NEVER BEEN COVERED - LEAVING BLANK FILE! (readme)')
+                xx('NEVER BEEN COVERED - LEAVING BLANK FILE! (readme)')
                 """(Case4260): the whole purpose of "cleanup functions" is to
                 enable us to handle the case of when we have created a new
                 entities file and the transaction fails. as it turns out, this
@@ -507,7 +507,7 @@ def _pass_thru_context_manager(x):
     return ThePassThruContextManager(x)
 
 
-def cover_me(msg=None):  # #open [#876] cover me
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 

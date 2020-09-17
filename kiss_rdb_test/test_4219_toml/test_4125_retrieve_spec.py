@@ -584,11 +584,6 @@ def _subject_module():
     return _
 
 
-def cover_me(msg=None):
-    _ = '' if msg is None else f': {msg}'
-    raise Exception(f'cover me{_}')
-
-
 _no_listener = None
 
 
