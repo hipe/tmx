@@ -19,13 +19,14 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _la_la(self, left, right):
         return f"can't change from '{left}' to '{right}' at the same level (use parens)"  # noqa: E501
 
 
-class Case2047_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
+
+class Case2047_cant_switch_from_AND_to_OR(CommonCase, ScaryCommonCase):
 
     def test_050_hi(self):
         self.assertIsNotNone(_subject_magnetic())
@@ -43,7 +44,7 @@ class Case2047_cant_switch_from_AND_to_OR(_CommonCase, ScaryCommonCase):
         return self.point_at_word('or')
 
 
-class Case2048_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
+class Case2048_cant_switch_from_OR_to_AND(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#one', 'or', '#two', 'and', '#three', 'xx')
@@ -58,7 +59,7 @@ class Case2048_cant_switch_from_OR_to_AND(_CommonCase, ScaryCommonCase):
         return self.point_at_word('and')
 
 
-class Case2050_minimal_OR(_CommonCase, ScaryCommonCase):  # #midpoint
+class Case2050_minimal_OR(CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#one', 'or', '#two')
@@ -76,7 +77,7 @@ class Case2050_minimal_OR(_CommonCase, ScaryCommonCase):  # #midpoint
         self.matches_against(('#two',))
 
 
-class Case2052_minimal_AND(_CommonCase, ScaryCommonCase):  # #midpoint
+class Case2052_minimal_AND(CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#one', 'and', '#two')
@@ -97,7 +98,7 @@ class Case2052_minimal_AND(_CommonCase, ScaryCommonCase):  # #midpoint
         self.matches_against(('#one', '#tres', '#two'))
 
 
-class Case2053_lone_tag(_CommonCase, ScaryCommonCase):
+class Case2053_lone_tag(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#one',)

@@ -98,10 +98,10 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
 class Case1747_does_scrape_work(CommonCase):
 
     def test_010_scrape_works(self):
-        self.assertGreaterEqual(len(self._dicts()), 2)  # meh whatever
+        self.assertGreaterEqual(len(self.end_dicts), 2)  # meh whatever
 
     def test_020_an_entity_dictionary_looks_like_this(self):
-        dct = self._dicts()[1]
+        dct = self.end_dicts[1]
         self.assertEqual(dct['label'], 'Overview')
 
     def test_030_these_fellows_are_terminal_items(self):
@@ -121,17 +121,17 @@ class Case1747_does_scrape_work(CommonCase):
         self.assertSequenceEqual(self._custom_index()[0], _exp)
 
     def test_050_pseudo_real_scrape_looks_like_our_raw_dump(self):
-        _real = self._dicts()
+        _real = self.end_dicts
         _exp = _these_dictionaries()
         self.assertSequenceEqual(_real, _exp)
 
     @shared_subject
-    def _custom_index(self):
+    def custom_index(self):
 
         branch_labels = []
         item_labels = []
 
-        for dct in self._dicts():
+        for dct in self.end_dicts:
             if '_is_branch_node' in dct:
                 branch_labels.append(dct['label'])
             else:
@@ -140,10 +140,10 @@ class Case1747_does_scrape_work(CommonCase):
         return branch_labels, item_labels
 
     @shared_subject
-    def _dicts(self):
+    def end_dicts(self):
         return self.build_dictionaries_tuple_from_traversal_()
 
-    def producer_script(self):
+    def given_producer_script(self):
         return 'script/producer_scripts/script_180815_hugo_docs.py'
 
     def cached_document_path(self):
@@ -202,17 +202,14 @@ class Case1749DP_generate(CommonCase):
 
     # == FROM use dangerous_memoize_in_child_classes if etc
 
-    @property
     @shared_subject
     def tables(self):
         return tuple(table_via_lines(tu) for tu in self.bespoke_sections[1:-1])
 
-    @property
     @shared_subject
     def bespoke_sections(self):
         return tuple(self.build_bespoke_sections())
 
-    @property
     @shared_subject
     def output_lines(self):
         return self.build_output_lines()

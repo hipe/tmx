@@ -4,10 +4,10 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-_CommonCase = unittest.TestCase
+CommonCase = unittest.TestCase
 
 
-class Case8313_the_only_case(_CommonCase):
+class Case8313_the_only_case(CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_magnetic())
@@ -20,7 +20,6 @@ class Case8313_the_only_case(_CommonCase):
         _act = set(name for name, mod in self._items)
         self.assertEqual(_exp, _act)
 
-    @property
     @shared_subject
     def _items(self):
         _gen = _subject_magnetic()(_this_one_module())

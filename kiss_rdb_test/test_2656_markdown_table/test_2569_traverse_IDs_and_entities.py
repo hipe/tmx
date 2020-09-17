@@ -17,30 +17,30 @@ import unittest
 canon = storage_adapter_canon.produce_agent()
 
 
-_CommonCase = unittest.TestCase
+CommonCase = unittest.TestCase
 
 
-class Case2557_traverse_whole_collection_as_IDs(_CommonCase):
+class Case2557_traverse_whole_collection_as_IDs(CommonCase):
 
     def test_100_all_IDs_are_there_in_any_order_none_repeated(self):
         _ = canon.case_of_traverse_IDs_from_non_empty_collection
         _.confirm_all_IDs_in_any_order_no_repeats(self)
 
-    def subject_collection(self):
-        return _build_same_collection_anew_BUT_FOR_IDs()
+    def given_collection(self):
+        return build_same_collection_anew_BUT_FOR_IDs()
 
 
-class Case2558_traverse_empty_collection_as_IDs(_CommonCase):
+class Case2558_traverse_empty_collection_as_IDs(CommonCase):
 
     def test_100_results_in_empty_stream(self):
         _ = canon.case_of_traverse_IDs_from_empty_collection
         _.confirm_results_in_empty_stream(self)
 
-    def subject_collection(self):
-        return _build_empty_collection()
+    def given_collection(self):
+        return build_empty_collection()
 
 
-class Case2587_traverse_whole_collection_as_entities(_CommonCase):
+class Case2587_traverse_whole_collection_as_entities(CommonCase):
 
     def test_100_all_IDs_are_there_in_any_order_none_repeated(self):
         _traverse_ents().confirm_all_IDs_in_any_order_no_repeats(self)
@@ -58,16 +58,16 @@ class Case2587_traverse_whole_collection_as_entities(_CommonCase):
     def given_identifier_string(self):
         return 'B9H'
 
-    def subject_collection(self):
-        return _build_same_collection_anew_BUT_FOR_FIELDS()
+    def given_collection(self):
+        return build_same_collection_anew_BUT_FOR_FIELDS()
 
 
 def _traverse_ents():
     return canon.case_of_traverse_all_entities
 
 
-def _build_same_collection_anew_BUT_FOR_FIELDS():
-    return _build_collection_via_path_and_big_string(
+def build_same_collection_anew_BUT_FOR_FIELDS():
+    return build_collection_via_path_and_big_string(
         'pretend-file/2536-for-ID-traversal.md',
         """
         | i De nTi Fier zz | thing 1  | thing-2 | Thing_A |thing-B|
@@ -85,8 +85,8 @@ def _build_same_collection_anew_BUT_FOR_FIELDS():
     # hi-G hi-J
 
 
-def _build_same_collection_anew_BUT_FOR_IDs():
-    return _build_collection_via_path_and_big_string(
+def build_same_collection_anew_BUT_FOR_IDs():
+    return build_collection_via_path_and_big_string(
         'pretend-file/2536-for-ID-traversal.md',
         """
         xx
@@ -104,9 +104,8 @@ def _build_same_collection_anew_BUT_FOR_IDs():
         """)
 
 
-def _build_empty_collection():
-
-    return _build_collection_via_path_and_big_string(
+def build_empty_collection():
+    return build_collection_via_path_and_big_string(
         'pretend-file/2519-empty-collection.md',  # #copy-paste
         """
         hello
@@ -120,11 +119,10 @@ def _build_empty_collection():
         """)
 
 
-def _build_collection_via_path_and_big_string(path, big_string):
-    pfile = pretend_file_via_path_and_big_string(path, big_string)
-    from kiss_rdb.storage_adapters_ import markdown_table as lib
-    _coll_ID = StubCollectionIdentity(pfile.path)
-    return lib._resolve_collection_via_file(pfile, _coll_ID, None)
+def build_collection_via_path_and_big_string(path, big_string):
+    import kiss_rdb_test.markdown_storage_adapter as msa
+    pfile = msa.pretend_file_via_path_and_big_string(path, big_string)
+    return msa.collection_implementation_via_pretend_file(pfile)
 
 
 if __name__ == '__main__':

@@ -62,7 +62,7 @@ app.config.from_object(_Config)
 
 def __build_jobser():  # (next to where we build app above)
 
-    def _listener(*a):
+    def listener(*a):
         chan = a[0:-1]
         msg = a[-1]
         if 'info' != chan[0]:

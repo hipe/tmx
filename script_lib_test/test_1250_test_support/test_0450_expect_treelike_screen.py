@@ -15,8 +15,7 @@ class _NormalLinerCase(unittest.TestCase):
     # -- assertion
 
     def _this_many_lines(self, num):
-        _s_a = self.lines()
-        self.assertEqual(num, len(_s_a))
+        self.assertEqual(num, len(self.lines))
 
 
 class Case0437_empty_string(_NormalLinerCase):
@@ -38,7 +37,7 @@ class Case0440_one_string_no_newline(_NormalLinerCase):
         self.assertIsNotNone(_subject_module())
 
     def test_020_one_line__content_OK(self):
-        self.assertSequenceEqual(self.lines(), ('foo',))
+        self.assertSequenceEqual(self.lines, ('foo',))
 
     @shared_subject
     def lines(self):
@@ -48,7 +47,7 @@ class Case0440_one_string_no_newline(_NormalLinerCase):
 class Case0443_one_string_yes_newline(_NormalLinerCase):
 
     def test_010_one_line__content_OK(self):
-        self.assertSequenceEqual(self.lines(), ('foo\n',))
+        self.assertSequenceEqual(self.lines, ('foo\n',))
 
     @shared_subject
     def lines(self):
@@ -58,14 +57,14 @@ class Case0443_one_string_yes_newline(_NormalLinerCase):
 class Case0446_blank_lines_inside(_NormalLinerCase):
 
     def test_010_three_lines__content_OK(self):
-        self.assertSequenceEqual(self.lines(), ('foo\n', '\n', 'bar\n'))
+        self.assertSequenceEqual(self.lines, ('foo\n', '\n', 'bar\n'))
 
     @shared_subject
     def lines(self):
         return line_tuple_via_big_string("foo\n\nbar\n")
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _assertStyledContentString(self, exp_s, terminal):
         _act_s = self._styled_content_string(terminal)
@@ -87,7 +86,7 @@ class _CommonCase(unittest.TestCase):
         return t.children
 
 
-class Case0449_scanner_via_iterator(_CommonCase):
+class Case0449_scanner_via_iterator(CommonCase):
 
     def test_020_empty_knows_it_is_empty(self):
         _scn = self._build_empty()
@@ -128,7 +127,7 @@ class Case0449_scanner_via_iterator(_CommonCase):
 # Case0450  # #midpoint
 
 
-class Case0452_nonplural_inputs(_CommonCase):
+class Case0452_nonplural_inputs(CommonCase):
 
     def test_010_zero_lines(self):
         _x = _tree_via_lines(_empty_iterator())
@@ -143,7 +142,6 @@ class Case0452_nonplural_inputs(_CommonCase):
         _ch = self._nth_child(0, t)
         self._assertStyledContentString('ohai only line', _ch)
 
-    @property
     @shared_subject
     def _tree(self):
         _doc_s = """
@@ -152,7 +150,7 @@ class Case0452_nonplural_inputs(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case0455_these_errors(_CommonCase):
+class Case0455_these_errors(CommonCase):
 
     def test_010_a_blank_line_with_extra_whitespace(self):
         self._expect_this_one_error_from_this_one_line(
@@ -175,7 +173,7 @@ class Case0455_these_errors(_CommonCase):
         self.assertEqual(exp_s, str(e))
 
 
-class Case0458_two_lines_no_indent(_CommonCase):
+class Case0458_two_lines_no_indent(CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
@@ -186,7 +184,6 @@ class Case0458_two_lines_no_indent(_CommonCase):
         _act = [self._styled_content_string(x) for x in self._children_of(t)]
         self.assertSequenceEqual(_act, ('one', 'two'))
 
-    @property
     @shared_subject
     def _tree(self):
         _doc_s = """
@@ -196,7 +193,7 @@ class Case0458_two_lines_no_indent(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case0461_introduce_less_indent(_CommonCase):
+class Case0461_introduce_less_indent(CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
@@ -211,7 +208,6 @@ class Case0461_introduce_less_indent(_CommonCase):
         """)
         self.assertSequenceEqual(actual, expected)
 
-    @property
     @shared_subject
     def _tree(self):
         _doc_s = """
@@ -223,7 +219,7 @@ class Case0461_introduce_less_indent(_CommonCase):
         return _tree_via_docstring(_doc_s)
 
 
-class Case0464_first_target_case(_CommonCase):
+class Case0464_first_target_case(CommonCase):
 
     def test_010_tree_builds(self):
         self.assertIsNotNone(self._tree)
@@ -250,7 +246,6 @@ class Case0464_first_target_case(_CommonCase):
         """)
         self.assertSequenceEqual(actual, expected)
 
-    @property
     @shared_subject
     def _tree(self):
         _doc_s = """

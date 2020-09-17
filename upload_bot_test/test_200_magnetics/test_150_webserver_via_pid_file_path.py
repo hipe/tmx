@@ -26,7 +26,7 @@ class _TestCase(unittest.TestCase):
         self._um(-1, _exp)
 
     def _um(self, i, msg):
-        _exp = self._tuple().messages[i]
+        _exp = self.end_tuple.messages[i]
         self.assertEqual(_exp, msg)
 
 
@@ -39,7 +39,7 @@ class Case100_yes_yes(_TestCase):
         self._says_server_is_running(1234)
 
     @shared_subject
-    def _tuple(self):
+    def end_tuple(self):
         return _against(
                 is_there_PID_file=True,
                 is_the_process_running=True,
@@ -73,7 +73,7 @@ class Case300_yes_no(_TestCase):
         self._says_server_is_running(4567)
 
     @shared_subject
-    def _tuple(self):
+    def end_tuple(self):
         return _against(
                 is_there_PID_file=True,
                 is_the_process_running=False
@@ -110,7 +110,7 @@ def _against(
             listener=listener,
             )
 
-    return _Tuple(msgs)
+    return _EndTuple(msgs)
 
 
 def _my_start_server(recv_pid, listener):
@@ -120,7 +120,7 @@ def _my_start_server(recv_pid, listener):
     recv_pid(4567)
 
 
-class _Tuple:
+class _EndTuple:
     def __init__(self, msgs):
         self.messages = msgs
 

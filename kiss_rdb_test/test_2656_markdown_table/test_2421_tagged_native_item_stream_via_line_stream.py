@@ -10,7 +10,7 @@ import unittest
 fixture_path = functions_for('markdown').fixture_path
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _fails(self):
         self._expect_did_succeed(False)
@@ -76,10 +76,10 @@ def success_snapshot(f):  # local decorator
         return _Snapshot(tuples)
 
 
-class Case2420_fail_too_many_rows(_CommonCase):
+class Case2420_fail_too_many_rows(CommonCase):
 
     def test_005_loads(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_function())
 
     def test_010_fails(self):
         self._fails()
@@ -97,7 +97,7 @@ class Case2420_fail_too_many_rows(_CommonCase):
 # Case2421  #midpoint
 
 
-class Case2422_minimal_working(_CommonCase):
+class Case2422_minimal_working(CommonCase):
 
     def test_010_succeeds(self):
         self._succeeds()

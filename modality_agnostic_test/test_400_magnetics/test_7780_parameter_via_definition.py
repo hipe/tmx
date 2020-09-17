@@ -6,15 +6,14 @@ from modality_agnostic.memoization import (
         dangerous_memoize as shared_subject,
         lazy)
 
-
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     @property
     def argument_arity_range_(self):
         return self.parameter_.argument_arity_range
 
 
-class Case7755_default_argument_arity(_CommonCase):
+class Case7755_default_argument_arity(CommonCase):
 
     def test_010_magnetic_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -35,7 +34,7 @@ class Case7755_default_argument_arity(_CommonCase):
         return _the_totally_empty_parameter()
 
 
-class Case7765_flag_argument_arity_intro(_CommonCase):
+class Case7765_flag_argument_arity_intro(CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -45,13 +44,12 @@ class Case7765_flag_argument_arity_intro(_CommonCase):
         self.assertEqual(0, r.start)
         self.assertEqual(0, r.stop)
 
-    @property
     @shared_subject
     def parameter_(self):
         return _build_parameter_via_argument_arity_string('FLAG')
 
 
-class Case7775_list_argument_arity(_CommonCase):
+class Case7775_list_argument_arity(CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -61,13 +59,12 @@ class Case7775_list_argument_arity(_CommonCase):
         self.assertEqual(0, r.start)
         self.assertEqual(None, r.stop)
 
-    @property
     @shared_subject
     def parameter_(self):
         return _build_parameter_via_argument_arity_string('OPTIONAL_LIST')
 
 
-class Case7785_default_value_everything(_CommonCase):
+class Case7785_default_value_everything(CommonCase):
 
     def test_010_by_default_the_default_value_is_none(self):
         _x = _default_value_of_this(_the_totally_empty_parameter())
@@ -80,7 +77,6 @@ class Case7785_default_value_everything(_CommonCase):
         _x = _default_value_of_this(self.parameter_)
         self.assertEqual(123, _x)
 
-    @property
     @shared_subject
     def parameter_(self):
         return define(
@@ -92,7 +88,7 @@ def _default_value_of_this(para):
     return para.default_value
 
 
-class Case7795_desc_no_style(_CommonCase):
+class Case7795_desc_no_style(CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -102,7 +98,6 @@ class Case7795_desc_no_style(_CommonCase):
         _exp = ['line 1', 'line 2']
         self.assertEqual(_exp, _act)
 
-    @property
     @shared_subject
     def parameter_(self):
         def f(o):
@@ -111,7 +106,7 @@ class Case7795_desc_no_style(_CommonCase):
         return _build_parameter_with_this_description(f)
 
 
-class Case7805_desc_yes_style(_CommonCase):
+class Case7805_desc_yes_style(CommonCase):
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -121,7 +116,6 @@ class Case7805_desc_yes_style(_CommonCase):
         _exp = ['line one', 'line *2*']
         self.assertEqual(_exp, _act)
 
-    @property
     @shared_subject
     def parameter_(self):
         def f(o, style):

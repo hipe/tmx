@@ -27,7 +27,7 @@ class CLI_Test_Case_Methods:
         serr_lines = []
         which_lines = {'sout': sout_lines, 'serr': serr_lines}
 
-        qualified_lines_itr = self.end_state().lines
+        qualified_lines_itr = self.end_state.lines
 
         which, line = next(qualified_lines_itr)
         curr_lines = which_lines[which]
@@ -65,10 +65,10 @@ class CLI_Test_Case_Methods:
         self.expect_exit_code(400)
 
     def expect_exit_code_is_the_success_exit_code(self):
-        self.assertEqual(self.end_state().exit_code, _success_exit_code)
+        self.assertEqual(self.end_state.exit_code, _success_exit_code)
 
     def expect_exit_code(self, which):
-        self.assertEqual(self.end_state().exit_code, which)
+        self.assertEqual(self.end_state.exit_code, which)
 
     # -- end state builder
 

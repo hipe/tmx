@@ -22,12 +22,12 @@ canon = storage_adapter_canon.produce_agent()
 
 def common_component(f):  # decorator
     def use_f(tc):
-        return getattr(tc.end_components(), component_name)
+        return getattr(tc.end_components, component_name)
     component_name = f.__name__
     return use_f
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     @property
     @common_component
@@ -45,10 +45,10 @@ class _CommonCase(unittest.TestCase):
         pass
 
     def entity_file_rewrite(self):
-        return self.recorded_file_rewrites()[0]  # (per [#867.Q], is first)
+        return self.recorded_file_rewrites[0]  # (per [#867.Q], is first)
 
     def index_file_rewrite(self):
-        return self.recorded_file_rewrites()[1]  # (per [#867.Q], is second)
+        return self.recorded_file_rewrites[1]  # (per [#867.Q], is second)
 
     # -- used when preparing end states
 
@@ -60,7 +60,7 @@ class _CommonCase(unittest.TestCase):
                 self, chan, payloader)
 
     def flush_filesystem_recordings(self):
-        coll = self.end_state()['collection']
+        coll = self.end_state['collection']
         return coll._filesystem.FINISH_AS_HACKY_SPY()
 
     def listener(self):
@@ -79,12 +79,12 @@ class _CommonCase(unittest.TestCase):
 # (Case4334) is a "collection not found" case
 
 
-class Case4315_collection_can_be_built_with_noent_dir(_CommonCase):
+class Case4315_collection_can_be_built_with_noent_dir(CommonCase):
 
     def test_100(self):
         self._canon_case.confirm_collection_is_not_none(self)
 
-    def subject_collection(self):
+    def given_collection(self):
         return _collection_with_noent_dir()
 
     @property
@@ -95,7 +95,7 @@ class Case4315_collection_can_be_built_with_noent_dir(_CommonCase):
 # Case4316 non-empty collection found
 
 
-class Case4317_identifier_with_invalid_chars(_CommonCase):
+class Case4317_identifier_with_invalid_chars(CommonCase):
 
     def test_100_channel(self):
         self.assertEqual(self.error_category, 'input_error')
@@ -113,11 +113,11 @@ class Case4317_identifier_with_invalid_chars(_CommonCase):
     def end_components(self):
         return self.build_common_components_for_failed_delete('AbC')
 
-    def subject_collection(self):
+    def given_collection(self):
         return _wrapped_collection_with_NO_filesystem()
 
 
-class Case4318_identifier_too_short_or_long(_CommonCase):
+class Case4318_identifier_too_short_or_long(CommonCase):
 
     def test_100_result_is_none(self):
         self._canon_case.confirm_result_is_none(self)
@@ -132,7 +132,7 @@ class Case4318_identifier_too_short_or_long(_CommonCase):
     def given_identifier_string(self):
         return 'AB23'
 
-    def subject_collection(self):
+    def given_collection(self):
         return _collection_with_NO_filesystem()
 
     @property
@@ -140,7 +140,7 @@ class Case4318_identifier_too_short_or_long(_CommonCase):
         return canon.case_of_entity_not_found_because_identifier_too_deep
 
 
-class Case4319_some_top_directory_not_found(_CommonCase):
+class Case4319_some_top_directory_not_found(CommonCase):
 
     def test_100_channel(self):
         self.assertEqual(self.error_category, 'entity_not_found')
@@ -159,11 +159,11 @@ class Case4319_some_top_directory_not_found(_CommonCase):
     def end_components(self):
         return self.build_common_components_for_failed_delete('ABC')
 
-    def subject_collection(self):
+    def given_collection(self):
         return wrap_collection(_collection_with_noent_dir())
 
 
-class Case4320_delete_but_file_not_found(_CommonCase):
+class Case4320_delete_but_file_not_found(CommonCase):
 
     def test_050_channel(self):
         self.assertEqual(self.error_category, 'entity_not_found')
@@ -184,9 +184,9 @@ class Case4320_delete_but_file_not_found(_CommonCase):
 
     @shared_subject
     def end_components(self):
-        es = self.end_state()
+        es = self.end_state
         return three_components_via_channel_and_payloader(
-                self, es['channel'], es['payloader_CAUTION_HOT'])
+                self, es['channel'], es['payloader'])
 
     @shared_subject
     def end_state(self):
@@ -195,7 +195,7 @@ class Case4320_delete_but_file_not_found(_CommonCase):
     def given_identifier_string(self):
         return 'B42'
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=None)
@@ -205,7 +205,7 @@ class Case4320_delete_but_file_not_found(_CommonCase):
         return canon.case_of_delete_but_entity_not_found
 
 
-class Case4322_entity_not_found(_CommonCase):
+class Case4322_entity_not_found(CommonCase):
 
     def test_100_result_is_none(self):
         self._canon_case.confirm_result_is_none(self)
@@ -214,7 +214,7 @@ class Case4322_entity_not_found(_CommonCase):
         self._canon_case.confirm_emitted_accordingly(self)
 
     def test_600_message_sadly_has_no_context_yet(self):
-        sct = self.end_state()['payloader_CAUTION_HOT']()
+        sct = self.end_state['payloader']()
         self.assertEqual(sct['reason'], "'B7J' not in file")
 
     def test_700_no_files_rewritten(self):
@@ -228,7 +228,7 @@ class Case4322_entity_not_found(_CommonCase):
     def given_identifier_string(self):
         return 'B7J'
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=filesystem_expecting_no_rewrites())
@@ -243,13 +243,15 @@ class Case4322_entity_not_found(_CommonCase):
 # Case4325 - not found because no file
 
 
-class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
+class Case4326_retrieve_no_ent_in_file(CommonCase):  # #midpoint
 
     def test_100_emits_error_structure(self):
         coll = _wrapped_collection_with_NO_filesystem()
         run = run_for(coll, 'retrieve', 'B9F')
-        _, payloader = _se_lib().one_and_none(self, run)
-        sct = payloader()
+        listener, emissions = em().listener_and_emissions_for(self, limit=1)
+        self.assertIsNone(run(listener))
+        emi, = emissions
+        sct = emi.payloader()
 
         # ~(Case4116-Case4134) cover the detailed components from this.
         # this is just sort of a "curb-check" contact point integration check
@@ -258,18 +260,19 @@ class Case4326_retrieve_no_ent_in_file(_CommonCase):  # #midpoint
         self.assertEqual(sct['identifier_string'], 'B9F')
 
 
-class Case4327_retrieve_OK(_CommonCase):
+class Case4327_retrieve_OK(CommonCase):
 
     def test_100_entity_is_retrieved_and_looks_ok(self):
         self._canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
+    @property
     def end_state(self):  # NOTE  not memoized
         return self._canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'B9H'
 
-    def subject_collection(self):
+    def given_collection(self):
         return _collection_with_NO_filesystem()
 
     @property
@@ -280,7 +283,7 @@ class Case4327_retrieve_OK(_CommonCase):
 # #hole
 
 
-class Case4329_delete_OK(_CommonCase):
+class Case4329_delete_OK(CommonCase):
 
     def test_100_result_is_the_deleted_entity(self):
         self._canon_case.confirm_result_is_the_deleted_entity(self)
@@ -299,7 +302,7 @@ class Case4329_delete_OK(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_100_would_have_succeeded(self):  # we didn't really write a file
-        self.recorded_file_rewrites()
+        self.recorded_file_rewrites
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
@@ -332,7 +335,7 @@ class Case4329_delete_OK(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state_for_delete(self, 'B7F')
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection_expecting_common_number_of_rewrites()
 
     @property
@@ -340,10 +343,10 @@ class Case4329_delete_OK(_CommonCase):
         return canon.case_of_delete_OK_resulting_in_non_empty_collection
 
 
-class Case4330_delete_that_leaves_file_empty(_CommonCase):
+class Case4330_delete_that_leaves_file_empty(CommonCase):
 
     def test_100_would_have_succeeded(self):
-        self.recorded_file_rewrites()
+        self.recorded_file_rewrites
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
@@ -367,7 +370,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
     def recorded_file_rewrites(self):
         return filesystem_recordings_of(self, 'delete', 'B8H')
 
-    def subject_collection(self):
+    def given_collection(self):
         _ = _build_collection_expecting_common_number_of_rewrites()
         return wrap_collection(_)
 
@@ -375,7 +378,7 @@ class Case4330_delete_that_leaves_file_empty(_CommonCase):
 # Case4331: delete when index file is left empty! (delete the last entity)
 
 
-class Case4332_update_OK(_CommonCase):
+class Case4332_update_OK(CommonCase):
     """
     at #history-A.1 we had to un-cover this issue, but re-cover it by creating
     "thing_C" instead of "thing_2" (numbers come before letters lexically)
@@ -450,7 +453,7 @@ class Case4332_update_OK(_CommonCase):
     def given_identifier_string(self):
         return 'B9H'
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=build_filesystem_expecting_num_file_rewrites(1))
@@ -460,7 +463,7 @@ class Case4332_update_OK(_CommonCase):
         return canon.case_of_update_OK
 
 
-class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):  # noqa: E501
+class Case4334_simplified_typical_traversal_when_no_collection_dir(CommonCase):  # noqa: E501
 
     def test_100_result_is_none(self):
         self._canon_case.confirm_result_is_none(self)
@@ -485,7 +488,7 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
     @shared_subject
     def end_components(self):
         # build the whole message again, meh
-        _payloader = self.end_state()['payloader_CAUTION_HOT']
+        _payloader = self.end_state['payloader']
         message, = tuple(_payloader())  # assert only one line
         return _TwoComponents(* two_strings_via_message(message))
 
@@ -495,10 +498,10 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
             _itr = coll.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
             for _ in _itr:
                 self.fail()
-        coll = self.subject_collection()
+        coll = self.given_collection()
         return canon.end_state_via_(self, run, expecting_OK=False)
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection(
                 dir_path=_dir_path_of_no_ent(),
                 filesystem=None)
@@ -508,20 +511,20 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(_CommonCase):
         return canon.case_of_collection_not_found
 
 
-class Case4335_traverse_IDs_ok(_CommonCase):
+class Case4335_traverse_IDs_ok(CommonCase):
     # "simplified typical traversal"
 
     def test_100_everything(self):
         _ = canon.case_of_traverse_IDs_from_non_empty_collection
         _.confirm_all_IDs_in_any_order_no_repeats(self)
 
-    def subject_collection(self):
+    def given_collection(self):
         return _build_collection(
                 dir_path=_dir_path_most_common(),
                 filesystem=None)
 
 
-class Case4336_create_into_existing_file(_CommonCase):
+class Case4336_create_into_existing_file(CommonCase):
 
     def test_100_result_is_created_entity(self):
         self._canon_case.confirm_result_is_the_created_entity(self)
@@ -567,7 +570,7 @@ class Case4336_create_into_existing_file(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
-    def subject_collection(self):
+    def given_collection(self):
 
         random_number_generator = _random_number_generator_for(494)
         # "2HG" as int per [#867.S] CLI
@@ -601,12 +604,12 @@ as far as creating the new entities file.
 """
 
 
-class Case4338_create_into_noent_file(_CommonCase):
+class Case4338_create_into_noent_file(CommonCase):
     """Case4338 Create into noent file - cleanup to this is NASTY
     """
 
     def test_100_succeeds(self):
-        self.recorded_file_rewrites()
+        self.recorded_file_rewrites
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
@@ -643,7 +646,7 @@ class Case4338_create_into_noent_file(_CommonCase):
 
         return res
 
-    def subject_collection(self):
+    def given_collection(self):
         random_number_generator = _random_number_generator_for(512)  # 2J2 but
 
         return wrap_collection(_build_collection(

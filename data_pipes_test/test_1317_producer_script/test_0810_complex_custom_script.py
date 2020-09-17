@@ -4,10 +4,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
-
-
-class Case0810DP_khong(_CommonCase):
+class Case0810DP_khong(unittest.TestCase):
     # this exists only to assert that we don't break this complicated
     # production producer script
 
@@ -15,18 +12,18 @@ class Case0810DP_khong(_CommonCase):
         self.assertIsNotNone(_subject_module())
 
     def test_020_three_sections(self):
-        _act = len(self._shared_state().sections)
+        _act = len(self.end_state.sections)
         self.assertEqual(_act, 3)
 
     def test_030_this_many_objects_in_each_section(self):
-        _act = [len(x.item_strings) for x in self._shared_state().sections]
+        _act = [len(x.item_strings) for x in self.end_state.sections]
         self.assertSequenceEqual(_act, (3, 3, 3))
 
     def test_040_said_seen_N_of_same(self):
-        _ohai = self._shared_state().emissions
-        _act = _ohai[3].to_string()
-        _exp = '(first was subset of second (3 were same))'
-        self.assertEqual(_act, _exp)
+        emissions = self.end_state.emissions
+        msg, = emissions[3].to_messages()
+        exp = '(first was subset of second (3 were same))'
+        self.assertEqual(msg, exp)
 
     @shared_subject
     def _shared_state(self):

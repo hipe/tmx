@@ -4,23 +4,20 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
-
-
-class Case1620_MONO_CASE(_CommonCase):
+class Case1620_MONO_CASE(unittest.TestCase):
 
     def test_100_lines_are_okay_probably(self):
-        lines, _, _ = self.custom_end_state()
+        lines, _, _ = self.custom_end_state
         self.assertEqual(lines[0].index('digraph g {'), 0)
         self.assertIn(len(lines), range(16, 30))
 
     def test_150_lines_are_NOT_newline_terminated(self):
-        lines, _, _ = self.custom_end_state()
+        lines, _, _ = self.custom_end_state
         self.assertEqual(lines[0], 'digraph g {')
         self.assertEqual(lines[-1], '}')
 
     def test_200_emits_a_summary(self):
-        _, payloader_BE_CAREFUL_HOT, chan = self.custom_end_state()
+        _, payloader_BE_CAREFUL_HOT, chan = self.custom_end_state
         self.assertSequenceEqual(chan, ('info', 'structure', 'summary'))
         sct = payloader_BE_CAREFUL_HOT()
         import re

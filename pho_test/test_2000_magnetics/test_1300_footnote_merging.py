@@ -3,7 +3,7 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def to_document_line_ASTs(self):
 
@@ -17,13 +17,13 @@ class _CommonCase(unittest.TestCase):
 
 # (1200-1390)
 
-class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
+class Case1220_footnotes_in_just_one_notecard_will_get_normalized(CommonCase):
 
     def test_100_footnote_defs_have_IDs_in_order_w_respect_to_each_other(self):
         def f(ast):
             self.assertEqual(ast.symbol_name, 'footnote definition')
             return int(ast.identifier_string)
-        a = self._the_last_N_line_ASTs()
+        a = self.the_last_N_line_ASTs
         int_itr = (f(ast) for ast in a)
         prev_int = next(int_itr)
         for integer in int_itr:
@@ -38,12 +38,12 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
         def f(ast):
             md = rx.match(ast.url_probably)
             return md[1]
-        _actual = tuple(f(ast) for ast in self._the_last_N_line_ASTs())
+        _actual = tuple(f(ast) for ast in self.the_last_N_line_ASTs)
 
         self.assertSequenceEqual(_actual, ('bking', 'here', 'mcdo'))
 
     def test_300_footnote_defs_now_start_at_number_one(self):
-        _ast = self._the_last_N_line_ASTs()[0]
+        _ast = self.the_last_N_line_ASTs[0]
         self.assertEqual(_ast.identifier_string, '1')
 
     def test_400_the_body_copy_now_uses_the_new_IDs_and_they_are_correct(self):
@@ -53,7 +53,7 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
             self.assertEqual(ast.label_text, s)
             self.assertEqual(ast.identifier_string, s_)
 
-        first, second, third = self.line_ASTs()[0:3]
+        first, second, third = self.line_ASTs[0:3]
 
         self.assertEqual(second.symbol_name, 'content line')
         self.assertEqual(second.line, 'and also the\n')
@@ -74,13 +74,13 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
 
     def test_500_footnote_defs_now_have_some_blank_lines_in_between(self):
         my_set = set()
-        for ast in self.line_ASTs()[-5:-3]:
+        for ast in self.line_ASTs[-5:-3]:
             my_set.add(ast.symbol_name)
         self.assertSequenceEqual(tuple(my_set), ('empty line',))
 
     @shared_subject
-    def _the_last_N_line_ASTs(self):
-        return self.line_ASTs()[-3:]
+    def the_last_N_line_ASTs(self):
+        return self.line_ASTs[-3:]
 
     @shared_subject
     def line_ASTs(self):
@@ -97,7 +97,7 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(_CommonCase):
                 )
 
 
-class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
+class Case1250_footnotes_are_normalized_across_notecards(CommonCase):
 
     def test_100_only_3_footnotes_down_from_4(self):
         def f(act, exp):
@@ -106,7 +106,7 @@ class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
             self.assertEqual(act.identifier_string, id_s)
             self.assertEqual(act.url_probably, url)
 
-        a1, a2, a3 = self._custom_three()[2]
+        a1, a2, a3 = self.custom_three[2]
 
         e1 = ('footnote definition', '1', 'url_for_paris\n')
         e2 = ('footnote definition', '2', 'url_for_cph\n')
@@ -127,7 +127,7 @@ class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
             self.assertEqual(o.label_text, tx)
             self.assertEqual(o.identifier_string, id_s)
 
-        ((a1, a2), (a3, a4)) = self._custom_three()[0:-1]
+        ((a1, a2), (a3, a4)) = self.custom_three[0:-1]
 
         e1 = ('meet me at the ', ('footnote reference', 'paris', '1'))
         e2 = ('meet me at the ', ('footnote reference', 'copenhagen', '2'))
@@ -141,7 +141,7 @@ class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
         f(a4, e4)
 
     @shared_subject
-    def _custom_three(self):
+    def custom_three(self):
         itr = self.to_document_line_ASTs()
         sections = []
         cache = []
@@ -172,11 +172,11 @@ class Case1250_footnotes_are_normalized_across_notecards(_CommonCase):
                 )
 
 
-class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
+class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
 
     def test_100_look_at_this_crazy_thing(self):
-        _actual = tuple(ast.symbol_name for ast in self.a())
-        _expected = (
+        act = tuple(ast.symbol_name for ast in self.end_array)
+        exp = (
                 'content line',
                 'fenced code block',
                 'structured content line',
@@ -196,14 +196,14 @@ class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_but_this_other_fellow_is_actually_a_footnote_reference(self):
-        ast = self.a()[2]
+        ast = self.end_array[2]
         _1, _2, _3 = ast.mixed_children
         _exp = ('see ', ('footnote reference', 'mami', '1'))
         _act = (_1, (_2.symbol_name, _2.label_text, _2.identifier_string))
         self.assertSequenceEqual(_act, _exp)
 
     @shared_subject
-    def a(self):
+    def end_array(self):
         return tuple(self.to_document_line_ASTs())
 
     def given_notecards(self):

@@ -24,7 +24,7 @@ class CommonCase(unittest.TestCase):
 
     def _in_usage_expect_interesting_tail(self, tail_s):
         import re
-        _s = self._section_index()['usage'].head_line.styled_content_string
+        _s = self._section_index['usage'].head_line.styled_content_string
         _match = re.search('^usage: ohai-mumo my-command (.+)$', _s)
         _act = _match[1]
         self.assertEqual(tail_s, _act)
@@ -34,7 +34,7 @@ class CommonCase(unittest.TestCase):
         self._same_expect(oai, s_a)
 
     def _in_details_expect_positionals(self, *s_a):
-        _act = self._section_index()
+        _act = self._section_index
         _pai = EHS().positional_args_index_via_section_index(_act)
         self._same_expect(_pai, s_a)
 
@@ -44,19 +44,19 @@ class CommonCase(unittest.TestCase):
         self.assertEqual(_exp, _act)
 
     def _help_screen_renders(self):
-        _lines = self.end_state_lines()
+        _lines = self.end_state_lines
         self.assertIsNot(0, len(_lines[0]))
 
     # -- builders
 
     def _build_optional_args_index(self):
-        _act = self._section_index()
+        _act = self._section_index
         oai = EHS().optional_args_index_via_section_index(_act)
         del oai['--help']  # tacit assertion that it exists, as well as norm
         return oai
 
     def build_section_index(self):
-        _ = self.end_state_lines()
+        _ = self.end_state_lines
         return EHS().section_index_via_unsanitized_strings_(_)
 
     @dangerous_memoize_in_child_classes('_END_STATE_LINES', 'build_lines')
@@ -163,7 +163,6 @@ class Case5850_category_2_optional_field_NOTE(CommonCase):
     def test_030_usage_tail_is_this(self):
         self._in_usage_expect_interesting_tail('[--opto-fieldo=FIELDO]')
 
-    @property
     @shared_subject
     def _this_one_parsed_option_detail(self):
         _oai = self._build_optional_args_index()
@@ -172,7 +171,7 @@ class Case5850_category_2_optional_field_NOTE(CommonCase):
     @shared_subject
     def _optional_args_index(self):
         return self._build_optional_args_index()
-        _act = self._section_index()
+        _act = self._section_index
         oai = EHS().optional_args_index_via_section_index(_act)
         del oai['--help']  # tacit assertion that it exists, as well as norm
 

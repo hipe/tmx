@@ -17,7 +17,7 @@ class CommonCase(unittest.TestCase):
     def build_end_state(self):
         return self.canon_case.build_end_state(self)
 
-    def subject_collection(self):
+    def given_collection(self):
         return stateless_collection()
 
     identifier_via_primitive = storage_adapter_canon.identifier_via_string
@@ -29,6 +29,7 @@ class Case4788_retrieve_OK(CommonCase):
     def test_100_entity_is_retrieved_and_looks_ok(self):
         self.canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
+    @property
     def end_state(self):  # NOTE  not memoized
         return self.canon_case.build_end_state(self)
 
@@ -59,7 +60,7 @@ class Case4797_entity_not_found_because_identifier_too_deep(CommonCase):
         self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_message_(self):
-        sct = self.end_state()['payloader_CAUTION_HOT']()
+        sct = self.end_state['payloader']()
         _expect = "can't retrieve because identifier '23YZ' "\
                   "has wrong number of digits (needed 3, had 4)"
         self.assertEqual(sct['reason_tail'], _expect)
@@ -81,7 +82,7 @@ class Case4800_entity_not_found_because_no_file(CommonCase):
         self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_message_(self):
-        sct = self.end_state()['payloader_CAUTION_HOT']()
+        sct = self.end_state['payloader']()
         _expect = "'CAN' (No such file or directory)"  # message is e.strerror
         self.assertEqual(sct['reason_tail'], _expect)
 
@@ -102,7 +103,7 @@ class Case4803_entity_not_found_in_file(CommonCase):
         self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_message_(self):
-        sct = self.end_state()['payloader_CAUTION_HOT']()
+        sct = self.end_state['payloader']()
         _expect = "'B7J' (3 entities in file)"  # entity not found:
         self.assertEqual(sct['reason_tail'], _expect)
 
@@ -129,7 +130,7 @@ class Case4809_non_empty_collection_found(CommonCase):
     def test_100_result_is_not_none(self):
         canon.case_of_non_empty_collection_found.confirm_collection_is_not_none(self)  # noqa: E501
 
-    def subject_collection(self):
+    def given_collection(self):
         listener = _debugging_listener
         # listener = None
 

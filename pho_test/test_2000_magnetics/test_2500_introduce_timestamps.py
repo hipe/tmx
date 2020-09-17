@@ -99,7 +99,6 @@ class Case260_normal_entities_for_sync(CommonCase):
 
         sequence_equal_recursive(self, tuple(x), expected)
 
-    @property
     @shared_subject
     def result(self):
         lines = (

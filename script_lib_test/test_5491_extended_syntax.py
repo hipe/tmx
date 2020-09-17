@@ -51,7 +51,6 @@ class ExtendedSyntaxCase(unittest.TestCase):
         opts_args, mon = _parse_CLI_args(serr, argv, CLI)
         return opts_args, mon
 
-    @property
     @dangerous_memoize_in_child_classes('_CLI', 'build_CLI')
     def the_CLI(self):
         pass

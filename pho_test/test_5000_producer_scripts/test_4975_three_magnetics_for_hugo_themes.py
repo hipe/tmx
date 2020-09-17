@@ -2,13 +2,13 @@ from modality_agnostic.memoization import lazy
 import unittest
 
 
-_CommonCase = unittest.TestCase
+CommonCase = unittest.TestCase
 
 
 # Case4975NC is used to reference this whole file
 
 
-class Case4970_magenetic_one(_CommonCase):
+class Case4970_magenetic_one(CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_one())
@@ -42,7 +42,7 @@ class Case4970_magenetic_one(_CommonCase):
         return _product_of_magnet_one()
 
 
-class Case4974_magenetic_two(_CommonCase):
+class Case4974_magenetic_two(CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_two())
@@ -76,7 +76,7 @@ class Case4974_magenetic_two(_CommonCase):
         return _product_of_magnet_two()
 
 
-class Case4980_magnetic_three(_CommonCase):
+class Case4980_magnetic_three(CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module_three())
@@ -158,7 +158,7 @@ def _subject_module_one():
 
 
 def Counter():
-    from modality_agnostic.memoization import Counter
+    from modality_agnostic.test_support.common import Counter
     return Counter()
 
 

@@ -38,7 +38,6 @@ class Case010_Main(unittest.TestCase):
 
         return [line_via_lines(lines) for lines in _d[channel]]
 
-    @property
     @shared_subject
     def _long_story(self):
         """NOTE - convoluted setup..

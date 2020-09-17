@@ -6,10 +6,10 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
-class Case5049_without(_CommonCase, ScaryCommonCase):
+class Case5049_without(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'without', 'value', 'xx')
@@ -30,7 +30,7 @@ class Case5049_without(_CommonCase, ScaryCommonCase):
 # Case5050  # #midpoint
 
 
-class Case5051_with(_CommonCase, ScaryCommonCase):
+class Case5051_with(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'with', 'value', 'xx')

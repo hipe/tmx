@@ -12,10 +12,10 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
-class Case7010_bad_range(_CommonCase, ScaryCommonCase):
+class Case7010_bad_range(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '13..12')
@@ -33,7 +33,7 @@ class Case7010_bad_range(_CommonCase, ScaryCommonCase):
 # Case7020 is below
 
 
-class Case7030_good_range(_CommonCase, ScaryCommonCase):
+class Case7030_good_range(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '12..14', 'xx')
@@ -69,7 +69,7 @@ class Case7030_good_range(_CommonCase, ScaryCommonCase):
 # Case7040 is above
 
 
-class Case7050_float(_CommonCase, ScaryCommonCase):
+class Case7050_float(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '12.5..13.7')

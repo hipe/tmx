@@ -4,7 +4,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):  # #[#459.F]
+class CommonCase(unittest.TestCase):  # #[#459.F]
 
     # -- assertions & assistance
 
@@ -21,7 +21,7 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
         self.assertEqual(self._validated_exitstatus(), 0)
 
     def _validated_exitstatus(self):
-        _es = self.end_state()
+        _es = self.end_state
         es = _es.exitstatus
         self.assertIsInstance(es, int)
         return es
@@ -47,16 +47,15 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
         return self._lines('stderr')
 
     def _lines(self, stdout_or_stderr):
-        return self.end_state().first_line_run(stdout_or_stderr).lines
+        return self.end_state.first_line_run(stdout_or_stderr).lines
 
-    @property
     @dangerous_memoize_in_child_classes('_OFL', 'build_outputted_file_lines')
     def outputted_file_lines():
         pass
 
     def build_outputted_file_lines(self):
 
-        itr = iter(self.end_state().first_line_run('stdout').lines)
+        itr = iter(self.end_state.first_line_run('stdout').lines)
         line = next(itr)
         head_lines = []
         if '---' == line[0:3]:
@@ -131,7 +130,7 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
         else:
             assert(False)
 
-        _use_stdin = self.stdin()
+        _use_stdin = self.given_stdin()
 
         _use_argv_tail = ('convert-collection', *self.argv_tail())  # :#here1
 
@@ -189,13 +188,13 @@ class _CommonCase(unittest.TestCase):  # #[#459.F]
     do_debug = False
 
 
-class Case010_help(_CommonCase):
+class Case010_help(CommonCase):
 
     def test_100_succeeds(self):
         self.succeeds()
 
     def test_200_content(self):
-        lines = self.end_state().first_line_run('stdout').lines  # click
+        lines = self.end_state.first_line_run('stdout').lines  # click
         self.assertIn('Usage: ', lines[0])
         self.assertAlmostEqual(len(lines), 18, delta=2)
 
@@ -203,14 +202,14 @@ class Case010_help(_CommonCase):
     def end_state(self):
         return self.build_end_state('stdout')  # because click
 
-    def stdin(self):
+    def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
 
     def argv_tail(self):
         return ('--help',)
 
 
-class Case020_no_args(_CommonCase):
+class Case020_no_args(CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -227,14 +226,14 @@ class Case020_no_args(_CommonCase):
     def end_state(self):
         return self.build_end_state('click_exception')
 
-    def stdin(self):
+    def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
 
     def argv_tail(self):
         return ()
 
 
-class Case030_args_and_stdin(_CommonCase):
+class Case030_args_and_stdin(CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -254,14 +253,14 @@ class Case030_args_and_stdin(_CommonCase):
     def end_state(self):
         return self.build_end_state('stderr')
 
-    def stdin(self):
+    def given_stdin(self):
         return self.stdin_that_is_NOT_interactive()
 
     def argv_tail(self):
         return ('no-see-1', 'no-see-2')
 
 
-class Case040_too_many_args(_CommonCase):
+class Case040_too_many_args(CommonCase):
 
     def test_100_fails(self):
         self.fails()
@@ -279,14 +278,14 @@ class Case040_too_many_args(_CommonCase):
     def end_state(self):
         return self.build_end_state('click_exception')
 
-    def stdin(self):
+    def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case050SA_one_arg_which_is_stdin(_CommonCase):  # #midpoint
+class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
         self.succeeds()
@@ -311,7 +310,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):  # #midpoint
     def end_state(self):
         return self.build_end_state('stdout')
 
-    def stdin(self):
+    def given_stdin(self):
         return _this_one_lib().FAKE_STDIN(
                 # '{ "header_level": 1 }\n',  # #history-A.2
                 '{ "lesson": "[choo chah](foo fa)" }\n',
@@ -323,7 +322,7 @@ class Case050SA_one_arg_which_is_stdin(_CommonCase):  # #midpoint
                 '-', '--to-format', 'markdown-table')
 
 
-class Case060_one_arg_which_is_token(_CommonCase):
+class Case060_one_arg_which_is_token(CommonCase):
 
     # (at #history-A.2 (the big upgrade when we put this under kiss instead
     # of a standalone script) it would have been nice to exercise the option
@@ -342,7 +341,7 @@ class Case060_one_arg_which_is_token(_CommonCase):
     def end_state(self):
         return self.build_end_state('stdout')
 
-    def stdin(self):
+    def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):

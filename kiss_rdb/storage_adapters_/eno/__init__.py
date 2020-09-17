@@ -50,8 +50,7 @@ def CREATE_COLLECTION(collection_path, listener, is_dry):
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-        schema_file_scanner, collection_identity,
-        random_number_generator, filesystem, listener):
+        schema_file_scanner, collection_path, listener, rng=None, opn=None):
 
     # #open [#873.S] at birth of this storage adapter, we are hard-coding it
     # to support only one storage schema. but when the day comes, abstract
@@ -64,12 +63,10 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
     if 'storage_schema' in dct:
         assert('32x32x32' == dct['storage_schema'])
 
-    return eno_collection_via_(
-            collection_identity.collection_path,
-            random_number_generator)
+    return eno_collection_via_(collection_path, rng, opn)
 
 
-def eno_collection_via_(directory, rng=None):  # #testpoint
+def eno_collection_via_(directory, rng=None, opn=None):  # #testpoint
 
     class StatelessCollectionImplementation:  # #class-as-namespace
 

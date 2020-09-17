@@ -33,7 +33,7 @@ def exception_tuple(f):  # (abstraction candidate)
         if e is not None:
             return (str(e),)
 
-    return dangerous_memoize(g)
+    return shared_subject(g)
 
 
 class Case100_Hi(_TestCase):
@@ -55,7 +55,6 @@ class Case200_X_missing(_TestCase):
                     ]))
         self.expect_exception_message(_exp)
 
-    @property
     @exception_tuple
     def exception_tuple(self):
         _d = {
@@ -71,13 +70,11 @@ class Case300_X_fail_format(_TestCase):
         self.raises_expected_exception()
 
     def test_020_expect_this_message(self):
-        _exp = (
+        exp = (
                 "'thing_A' must match ^A{4}$ (had: 'xx')."
-                " 'thing_B' must match ^B{5}$ (had: 'qq')"
-                )
-        self.expect_exception_message(_exp)
+                " 'thing_B' must match ^B{5}$ (had: 'qq')")
+        self.expect_exception_message(exp)
 
-    @property
     @exception_tuple
     def exception_tuple(self):
         _d = {
@@ -90,21 +87,20 @@ class Case300_X_fail_format(_TestCase):
 class Case400_win(_TestCase):
 
     def test_010_read_values_individually(self):
-        o = self._collection
+        o = self.end_collection
         self.assertEqual(o.thing_A, 'AAAA')
         self.assertEqual(o.thing_B, 'BBBBB')
 
     def test_020_can_iterate_in_this_manner(self):
         these = []
-        col = self._collection
+        col = self.end_collection
         for k in col:
             these.append((k, col[k]))
         _exp = [('thing_A', 'AAAA'), ('thing_B', 'BBBBB')]
         self.assertEqual(_exp, these)
 
-    @property
     @shared_subject
-    def _collection(self):
+    def end_collection(self):
         _d = {
                 'thing_A': 'AAAA',
                 'thing_B': 'BBBBB',

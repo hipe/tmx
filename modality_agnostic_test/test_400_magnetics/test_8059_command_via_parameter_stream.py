@@ -8,7 +8,6 @@ class CommonCase(unittest.TestCase):
     def function_index_builds(self):
         self.assertIsNotNone(self.function_index)
 
-    @property
     @dangerous_memoize_in_child_classes('_OP', 'build_only_parameter')
     def only_parameter(self):
         pass
@@ -19,7 +18,6 @@ class CommonCase(unittest.TestCase):
         assert(isinstance(name, str))
         return param
 
-    @property
     @dangerous_memoize_in_child_classes('_FI', 'build_function_index')
     def function_index(self):
         pass

@@ -12,16 +12,16 @@ def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
     return tests
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _said_this(self, msg):
-        _tup = self._result_state()
+        _tup = self.end_state
         msgs = _tup[1]
         self.assertEqual(len(msgs), 1)
         self.assertEqual(msgs[0], msg)
 
     def _result_is_none(self):
-        _tup = self._result_state()
+        _tup = self.end_state
         self.assertIsNone(_tup[0])
 
     def _execute_while_listening(self, **kwargs):
@@ -51,7 +51,7 @@ class _CommonCase(unittest.TestCase):
                 **kwargs)
 
 
-class Case1428_anything_against_none(_CommonCase):
+class Case1428_anything_against_none(CommonCase):
 
     def test_050_subject_module_loads(self):
         # (currently redudant and pointless because of doctest integ but meh.)
@@ -64,7 +64,7 @@ class Case1428_anything_against_none(_CommonCase):
         self._said_this("'zingo_bango' not found. (there's nothing)")
 
     @shared_subject
-    def _result_state(self):
+    def end_state(self):
         return self._execute_while_listening()
 
     def _needle_function(self):
@@ -74,7 +74,7 @@ class Case1428_anything_against_none(_CommonCase):
         return _the_empty_collection()
 
 
-class Case1429_splay(_CommonCase):
+class Case1429_splay(CommonCase):
 
     def test_100_result_is_none(self):
         self._result_is_none()
@@ -84,7 +84,7 @@ class Case1429_splay(_CommonCase):
         self._said_this(_exp)
 
     @shared_subject
-    def _result_state(self):
+    def end_state(self):
         return self._execute_while_listening(
                 item_noun_phrase=lambda: 'choo chi',
                 )
@@ -96,7 +96,7 @@ class Case1429_splay(_CommonCase):
         return _collection_B()
 
 
-class Case1431_ambiguous(_CommonCase):
+class Case1431_ambiguous(CommonCase):
 
     def test_100_result_is_none(self):
         self._result_is_none()
@@ -106,7 +106,7 @@ class Case1431_ambiguous(_CommonCase):
         self._said_this(_exp)
 
     @shared_subject
-    def _result_state(self):
+    def end_state(self):
         return self._execute_while_listening(
                 say_collection='bazonga',
                 subfeatures_via_item=lambda k, item: item[2],  # #here1
@@ -125,21 +125,21 @@ class Case1431_ambiguous(_CommonCase):
         return _collection_C()
 
 
-class Case1432_succeed(_CommonCase):
+class Case1432_succeed(CommonCase):
 
     def test_100_result_is_not_none(self):
-        self.assertIsNotNone(self._result())
+        self.assertIsNotNone(self.end_state)
 
     def test_200_first_element_of_tuple_is_entity_natural_key(self):
-        _k = self._result()[0]
+        _k = self.end_state[0]
         self.assertEqual(_k, 'red_ranger')
 
     def test_300_second_element_is_item(self):
-        _x = self._result()[1]
+        _x = self.end_state[1]
         self.assertEqual(_x[1], 'zizi')
 
     @shared_subject
-    def _result(self):
+    def end_state(self):
         return self._execute_while_not_listening(
                 say_collection='bazonga',
                 subfeatures_via_item=lambda k, item: item[2],  # #here1

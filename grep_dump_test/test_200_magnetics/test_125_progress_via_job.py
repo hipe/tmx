@@ -50,7 +50,7 @@ class _TestCase(unittest.TestCase):
                 'zero_or_more_new_line_item_descriptions')
 
     def _response_component(self, key_s):
-        _x = self.response()
+        _x = self.response
         return _x[key_s]
 
     # -- set up
@@ -170,7 +170,7 @@ class Case503_AgainstUnfinishedFileWithThreeItems_AfterThreeItems(_TestCase):
 
     def test_030_response_has_empty_array_of_line_items__and_detail(self):
         self.response_has_empty_array_of_line_items()
-        x = self.response()
+        x = self.response
         self.assertEqual(3, x['last_known_number_of_line_items'])
         self.assertEqual(3, x['your_last_known_number_of_line_items'])
 

@@ -46,7 +46,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # -- assertions against end state
 
@@ -55,7 +55,7 @@ class _CommonCase(unittest.TestCase):
 
     def emits_error_category(self, ec, *error_case):  # C/P, modified
         self._sneak_in_confirmation_of_no_result_value()
-        chan = self.end_state()['channel']
+        chan = self.end_state['channel']
         expect = ('error', 'structure', ec, *error_case)
         self.assertSequenceEqual(chan, expect)
 
@@ -63,15 +63,15 @@ class _CommonCase(unittest.TestCase):
         self.emits_component('reason', reason)
 
     def emits_component(self, key, expected_value):
-        dct = self.end_state()['payload']
+        dct = self.end_state['payload']
         self.assertEqual(dct[key], expected_value)
 
     def _sneak_in_confirmation_of_no_result_value(self):
-        es = self.end_state()
+        es = self.end_state
         self.assertIsNone(es['result_value'])  # NOTE sneak this in somehwere
 
     def emits_error_context(self, **expect_dct):
-        dct = self.end_state()['payload']
+        dct = self.end_state['payload']
         for k, v in expect_dct.items():
             _actual = dct[k]  # ..
             self.assertEqual(_actual, v)
@@ -107,10 +107,10 @@ class _CommonCase(unittest.TestCase):
         return dct
 
 
-class Case1409_collection_not_found(_CommonCase):
+class Case1409_collection_not_found(CommonCase):
 
     def test_050_sanity_regressionpoint(self):
-        self.assertIsNotNone(_collectioner())
+        self.assertIsNotNone(collectioner())
 
     def test_100_channel(self):
         self.emits_error_category(
@@ -126,7 +126,7 @@ class Case1409_collection_not_found(_CommonCase):
         return build_fake_filesystem()  # the only one bwe
 
 
-class Case1410_has_strange_extension(_CommonCase):
+class Case1410_has_strange_extension(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('unrecognized_extname')
@@ -140,7 +140,7 @@ class Case1410_has_strange_extension(_CommonCase):
         return build_fake_filesystem(('file', 'abc/xyz.fizzy'))
 
 
-class Case1411_has_no_extension_and_is_not_directory(_CommonCase):
+class Case1411_has_no_extension_and_is_not_directory(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('file_has_no_extname')
@@ -154,7 +154,7 @@ class Case1411_has_no_extension_and_is_not_directory(_CommonCase):
         return build_fake_filesystem(('file', 'abc/xyz'))
 
 
-class Case1413_is_directory_but_no_schema_file(_CommonCase):
+class Case1413_is_directory_but_no_schema_file(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('no_schema_file')
@@ -166,7 +166,7 @@ class Case1413_is_directory_but_no_schema_file(_CommonCase):
         return build_fake_filesystem(('directory', 'abc/xyz'))
 
 
-class Case1414_schema_file_invalid(_CommonCase):
+class Case1414_schema_file_invalid(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_category('input_error')
@@ -193,7 +193,7 @@ class Case1414_schema_file_invalid(_CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class _LiterallyOrActually(_CommonCase):
+class _LiterallyOrActually(CommonCase):
 
     def whines_specifically_for(self, adverb):
 
@@ -236,7 +236,7 @@ class Case1417_schema_file_effectively_empty(_LiterallyOrActually):
         yield '#'
 
 
-class Case1418_schema_does_not_indicate_SA_in_first_field(_CommonCase):
+class Case1418_schema_does_not_indicate_SA_in_first_field(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('unexpected_first_field_of_schema_file')
@@ -261,13 +261,13 @@ class Case1418_schema_does_not_indicate_SA_in_first_field(_CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class Case1419_has_schema_that_indicates_SA_but_unknown_SA(_CommonCase):
+class Case1419_has_schema_that_indicates_SA_but_unknown_SA(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('unknown_storage_adapter')
 
     def test_200_custom_stuff_for_long_reason(self):
-        _reason = self.end_state()['payload']['reason']
+        _reason = self.end_state['payload']['reason']
         line1, li2 = _reason.split('. ')
         self.assertEqual(line1, "unknown storage adapter 'xx yy'")
         self.assertEqual(
@@ -293,13 +293,13 @@ class Case1419_has_schema_that_indicates_SA_but_unknown_SA(_CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class Case1421_schema_indicates_SA_thats_single_file_only(_CommonCase):
+class Case1421_schema_indicates_SA_thats_single_file_only(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_case('storage_adapter_is_not_directory_based')
 
     def test_200_custom_stuff_for_long_reason(self):
-        _reason = self.end_state()['payload']['reason']
+        _reason = self.end_state['payload']['reason']
         import re
         head, mid, ta = re.split(r'[.,][ ]', _reason)
         ae = self.assertEqual
@@ -325,7 +325,7 @@ class Case1421_schema_indicates_SA_thats_single_file_only(_CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class Case1422_directory_based_money(_CommonCase):
+class Case1422_directory_based_money(CommonCase):
 
     def test_100_full_round_trip_works(self):
         ae = self.assertEqual
@@ -355,16 +355,16 @@ class Case1422_directory_based_money(_CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class Case1423_single_file_based_money(_CommonCase):
+class Case1423_single_file_based_money(CommonCase):
 
     def test_100_the_SA_can_emit(self):
-        es = self.end_state()
+        es = self.end_state
         self.assertSequenceEqual(
                 es['channel'], ('info', 'structure', 'hi_from_SA_2'))
         self.assertEqual(es['payload']['message'], 'SA2')
 
     def test_200_the_SA_can_result(self):
-        _rv = self.end_state()['result_value']
+        _rv = self.end_state['result_value']
         _rv = unwrap_collection(_rv)
         self.assertEqual(_rv, (
             "hello from storo adapto 2. you know you want this - abc/xyz.xtc"))
@@ -374,7 +374,7 @@ class Case1423_single_file_based_money(_CommonCase):
 
 
 @lazy
-def _collectioner():
+def collectioner():
     from kiss_rdb.magnetics_.collection_via_path import (
             collectioner_via_storage_adapters_module)
 

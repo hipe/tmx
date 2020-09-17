@@ -8,37 +8,42 @@ from modality_agnostic.test_support.structured_emission import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # -- assertion support
 
     def _outputs_no_lines(self):
-        _lines = self._end_state().outputted_lines
+        _lines = self.end_state.outputted_lines
         self.assertEqual(len(_lines), 0)
 
-    def _emission(self, name):
-        return self._end_state().actual_emission_index.actual_emission_via_name(name)  # noqa: E501
+    def emission_named(self, name):
+        return self.end_state.actual_emission_index[name]
 
     def _fail_against(self, s):
-        listener, emissioner = listener_and_emission_objecter_for(self)
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
         coll = _build_collection(s, _yes_cheat, listener)
         assert(coll is None)
-        em = emissioner()
-        msgs = em.to_raw_lines()
+        emi, = emissions
+        msgs = tuple(emi.payloader())
         msg, = msgs  # assertion
         return msg
 
-    _build_end_state = build_end_state_commonly
+    def given_near_format_name(_):
+        pass
+
+    build_end_state = build_end_state_of_sync
+
+    do_debug = False
 
 
-class Case1302_this_path_fails_because_absolute_path_too_crazy(_CommonCase):
+class Case1302_this_path_fails_because_absolute_path_too_crazy(CommonCase):
 
     def test_100_fails(self):
         _msg = self._fail_against('/egads/ohai.py')
         self.assertRegex(_msg, r'\babsolute path outside of ecosystem\b')
 
 
-class Case1305_this_one_file_fails_because_invalid_chars_in_name(_CommonCase):
+class Case1305_this_one_file_fails_because_invalid_chars_in_name(CommonCase):
 
     def test_100_fails(self):
         _path = executable_fixture('no-ent.py')
@@ -46,18 +51,18 @@ class Case1305_this_one_file_fails_because_invalid_chars_in_name(_CommonCase):
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
 
-class Case1308_here_is_a_low_level_doo_hah(_CommonCase):
+class Case1308_here_is_a_low_level_doo_hah(CommonCase):
     # at #history-A.2 imported this from a whole other dedicated file
 
     def test_100_runs(self):
-        self.assertIsNotNone(self._state())
+        self.assertIsNotNone(self.end_state)
 
     def test_200_skipped_the_header_record(self):
-        _ = [pair[0] for pair in self._state()]
+        _ = [pair[0] for pair in self.end_state]
         self.assertEqual(_, ['four', 'seven'])
 
     @shared_subject
-    def _state(self):
+    def end_state(self):
         flat = []
 
         listener = None  # or throwing listener
@@ -110,18 +115,18 @@ class Case1311_RUMSKALLA:
         self.assertEqual(key_for_sync, 'foo fa')
 
 
-class Case1314DP_filenames_must_look_a_way(_CommonCase):
+class Case1314DP_filenames_must_look_a_way(CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
 
     def test_110_says(self):
-        _ = self._emission('first_error').to_string()
-        self.assertRegex(_, r"^character we don't like \('-'\) in path stem: ")
+        m, = self.emission_named('first_error').to_messages()
+        self.assertRegex(m, r"^character we don't like \('-'\) in path stem: ")
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', 'expression', 'as', 'first_error'
@@ -134,13 +139,13 @@ class Case1314DP_filenames_must_look_a_way(_CommonCase):
                 }
 
 
-class Case1315_file_not_found(_CommonCase):
+class Case1315_file_not_found(CommonCase):
 
-    def test_100_raises_this_happenstance_exception(self):
-        def f():
-            self._build_end_state()
-        _rx = r"^No module named 'script.no_such_script_one'"
-        self.assertRaisesRegex(ModuleNotFoundError, _rx, f)
+    def test_100_throws_happenstance_exception(self):
+        def run():
+            self.build_end_state()
+        rxs = r"^No module named 'script.no_such_script_one'"
+        self.assertRaisesRegex(ModuleNotFoundError, rxs, run)
 
     def expect_emissions(self):
         return iter(())
@@ -155,7 +160,7 @@ class Case1315_file_not_found(_CommonCase):
 # Case1317 was "no metadata row", archived #history-A.1
 
 
-class Case1319DP_bad_natural_key(_CommonCase):
+class Case1319DP_bad_natural_key(CommonCase):
 
     def test_100_raises_this_happenstance_exception(self):
         def f():
@@ -173,7 +178,7 @@ class Case1319DP_bad_natural_key(_CommonCase):
                 }
 
 
-class Case1320DP_extra_cel(_CommonCase):
+class Case1320DP_extra_cel(CommonCase):
     """(may be partially or wholly redundant with (Case0110DP))
     (may be #overloaded. is first coverage of an oblique thing.)
     """
@@ -195,16 +200,16 @@ class Case1320DP_extra_cel(_CommonCase):
                 }
 
 
-class Case1322DP_RUM(_CommonCase):
+class Case1322DP_RUM(CommonCase):
 
     def test_100_RUM(self):
-        _ = self._build_end_state()
+        _ = self.build_end_state()
         act = _.outputted_lines
         self.assertEqual(len(act), 5)
         self.assertEqual(act[-2], '|thing B|y\n')
 
     def expect_emissions(self):
-        return iter(())
+        return ()
 
     def given(self):
         return {

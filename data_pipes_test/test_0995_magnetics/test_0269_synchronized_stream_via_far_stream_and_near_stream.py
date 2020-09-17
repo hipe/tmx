@@ -12,12 +12,13 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(SyncCase_):
+class CommonCase(SyncCase_):
     def preserve_freeform_order(self):
         return False
 
 
-class Case0262_none_down_on_to_none_produces_none(_CommonCase):
+
+class Case0262_none_down_on_to_none_produces_none(CommonCase):
     # NOTE at writing, this is the only case with external references
 
     def test_010_magnetic_loads(self):
@@ -33,7 +34,7 @@ class Case0262_none_down_on_to_none_produces_none(_CommonCase):
         return ()
 
 
-class Case0264_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
+class Case0264_none_down_to_one_out_of_order_is_not_OK(CommonCase):
     # disorder in the near traversal is a problem even
 
     def test_100_this_error(self):
@@ -47,7 +48,7 @@ class Case0264_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
         self.expect_these_('z')
 
     @shared_subject
-    def end_state_(self):
+    def end_state(self):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
@@ -57,7 +58,7 @@ class Case0264_none_down_to_one_out_of_order_is_not_OK(_CommonCase):
         return ('z', 'q', 'y')
 
 
-class Case0265_none_down_on_to_some_is_unsurprising(_CommonCase):
+class Case0265_none_down_on_to_some_is_unsurprising(CommonCase):
 
     def test(self):
         self.expect_these_('a', 'b', 'c')
@@ -69,7 +70,7 @@ class Case0265_none_down_on_to_some_is_unsurprising(_CommonCase):
         return ('a', 'b', 'c')
 
 
-class Case0267_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
+class Case0267_some_down_on_to_none_out_of_order_not_OK(CommonCase):
     # disorder in the far traversal is not OK even if it's just in the rundown.
 
     def test_100_this_error(self):
@@ -83,7 +84,7 @@ class Case0267_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
         self.expect_these_('m', 'v')
 
     @shared_subject
-    def end_state_(self):
+    def end_state(self):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
@@ -93,7 +94,7 @@ class Case0267_some_down_on_to_none_out_of_order_not_OK(_CommonCase):
         return ()
 
 
-class Case0268_some_down_on_to_none_is_unsurprising(_CommonCase):
+class Case0268_some_down_on_to_none_is_unsurprising(CommonCase):
 
     def test(self):
         self.expect_these_('d', 'e', 'f')
@@ -105,7 +106,7 @@ class Case0268_some_down_on_to_none_is_unsurprising(_CommonCase):
         return ()
 
 
-class Case0270_duplicate_key_near(_CommonCase):
+class Case0270_duplicate_key_near(CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'duplicate_key')
@@ -115,7 +116,7 @@ class Case0270_duplicate_key_near(_CommonCase):
         self.this_error_message_(_exp)
 
     @shared_subject
-    def end_state_(self):
+    def end_state(self):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
@@ -132,7 +133,7 @@ class Case0270_duplicate_key_near(_CommonCase):
                 )
 
 
-class Case0271_weird_order_is_bad_in_far_here(_CommonCase):
+class Case0271_weird_order_is_bad_in_far_here(CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')
@@ -142,7 +143,7 @@ class Case0271_weird_order_is_bad_in_far_here(_CommonCase):
         self.this_error_message_(_exp)
 
     @shared_subject
-    def end_state_(self):
+    def end_state(self):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
@@ -157,7 +158,7 @@ class Case0271_weird_order_is_bad_in_far_here(_CommonCase):
                 )
 
 
-class Case0273_interleave_no_collision_both_sides_already_sorted(_CommonCase):
+class Case0273_interleave_no_collision_both_sides_already_sorted(CommonCase):
 
     def test(self):
         self.expect_these_(
@@ -184,7 +185,7 @@ class Case0273_interleave_no_collision_both_sides_already_sorted(_CommonCase):
                 )
 
 
-class Case0274_some_down_on_to_some_yes_collisions(_CommonCase):
+class Case0274_some_down_on_to_some_yes_collisions(CommonCase):
     # item-level merge
 
     def test(self):
@@ -214,7 +215,7 @@ class Case0274_some_down_on_to_some_yes_collisions(_CommonCase):
                 )
 
 
-class Case0275_bigger_example_of_disorder(_CommonCase):
+class Case0275_bigger_example_of_disorder(CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'disorder')
@@ -238,7 +239,7 @@ class Case0275_bigger_example_of_disorder(_CommonCase):
                 )
 
     @shared_subject
-    def end_state_(self):
+    def end_state(self):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):

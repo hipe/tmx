@@ -4,7 +4,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def build_state(self):
         return doc_state_lib.document_state_via_notecards(
@@ -13,27 +13,26 @@ class _CommonCase(unittest.TestCase):
 
 # (1100-1190)
 
-class Case1120_one_notecard_with_heading_and_leading_header(_CommonCase):
+class Case1120_one_notecard_with_heading_and_leading_header(CommonCase):
 
     def test_100_heading_of_first_notecard_becomes_doc_title(self):
-        self.assertEqual(self.state.document_title, 'dogs are great')
+        self.assertEqual(self.end_state.document_title, 'dogs are great')
 
     def test_200_header_gets_pushed_down_one_level(self):  # provision [#883.3]
-        self.assertEqual(self.state.first_section.header.depth, 2)
+        self.assertEqual(self.end_state.first_section.header.depth, 2)
 
     def test_300_header_gets_pushed_down_for_subsequent_section(self):
-        self.assertEqual(self.state.section_at(1).header.depth, 2)
+        self.assertEqual(self.end_state.section_at(1).header.depth, 2)
 
-    @property
     @shared_subject
-    def state(self):
+    def end_state(self):
         return self.build_state()
 
     def given_notecards(self):
         yield 'dogs are great', ('#ha ha', 'so good', '#h3', 'yup')
 
 
-class Case1150_nonfirst_notecard_headings(_CommonCase):
+class Case1150_nonfirst_notecard_headings(CommonCase):
 
     def test_100_turn_nonfirst_notecard_heading_into_header(self):
         self.assertEqual(self._this_header().text, 'dogs are cool\n')
@@ -42,11 +41,10 @@ class Case1150_nonfirst_notecard_headings(_CommonCase):
         self.assertEqual(self._this_header().depth, 2)
 
     def _this_header(self):
-        return self.state.section_at(1).header
+        return self.end_state.section_at(1).header
 
-    @property
     @shared_subject
-    def state(self):
+    def end_state(self):
         return self.build_state()
 
     def given_notecards(self):
@@ -54,7 +52,7 @@ class Case1150_nonfirst_notecard_headings(_CommonCase):
         yield 'dogs are cool', ('xx3',)
 
 
-class Case1180_nonfirst_notecards_with_heading_and_headers(_CommonCase):
+class Case1180_nonfirst_notecards_with_heading_and_headers(CommonCase):
 
     def test_100_headers_are_bumped_down_a_level_EVERYTHING(self):
         state = self.build_state()
@@ -76,7 +74,7 @@ class Case1180_nonfirst_notecards_with_heading_and_headers(_CommonCase):
         yield 'dogs are cool', ('#loved dog #1', 'abc', '#loved dog #2', 'xx')
 
 
-class Case1210_nonfirst_notecards_with_NO_heading_YES_headers(_CommonCase):
+class Case1210_nonfirst_notecards_with_NO_heading_YES_headers(CommonCase):
 
     def test_100_headers_are_NOT_bumped_down_a_level_EVERYTHING(self):
         state = self.build_state()

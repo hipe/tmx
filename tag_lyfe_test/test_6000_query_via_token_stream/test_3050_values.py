@@ -38,10 +38,10 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
-class Case3030_two_deep(_CommonCase, ScaryCommonCase):
+class Case3030_two_deep(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo:bar', 'xx')
@@ -68,7 +68,7 @@ class Case3030_two_deep(_CommonCase, ScaryCommonCase):
         self.matches_against(('#foo:bar:baz',))
 
 
-class Case3032_three_deep(_CommonCase, ScaryCommonCase):
+class Case3032_three_deep(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo:bar:baz', 'xx')

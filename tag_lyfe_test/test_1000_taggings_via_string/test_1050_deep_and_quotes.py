@@ -10,16 +10,16 @@ from tag_lyfe_test.tagging import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _name_component(self):
         return self._the_tagging().root_node.child._name_component
 
     def _the_tagging(self):
-        return self.end_state()[0].tagging
+        return self.end_state[0].tagging
 
 
-class Case1020_minimal_name_value(_CommonCase, _ThisCase):
+class Case1020_minimal_name_value(CommonCase, ThisCase):
 
     def given_string(self):
         return '#foo:bar'
@@ -28,7 +28,7 @@ class Case1020_minimal_name_value(_CommonCase, _ThisCase):
         self.expect_shadow('TTTTTTTT')
 
 
-class Case1030_oh_boy_quotes(_CommonCase, _ThisCase):
+class Case1030_oh_boy_quotes(CommonCase, ThisCase):
 
     def given_string(self):
         return 'foo:(#bar:"wow" neat)'
@@ -45,7 +45,7 @@ class Case1030_oh_boy_quotes(_CommonCase, _ThisCase):
         self.expect_shadow('sssssTTTTTTTTTTssssss')
 
 
-class Case1040_double_quotes_can_escape_and_be_parent(_CommonCase, _ThisCase):
+class Case1040_double_quotes_can_escape_and_be_parent(CommonCase, ThisCase):
 
     def given_string(self):
         return '#foo:"mom\'s spaghetti: i \\"love\\" it":77'

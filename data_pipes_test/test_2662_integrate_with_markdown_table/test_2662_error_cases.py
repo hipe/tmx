@@ -10,34 +10,34 @@ import unittest
 from os import path as os_path
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # -- assertion support
 
     def _outputs_no_lines(self):
-        self.assertEqual(len(self._end_state().outputted_lines), 0)
+        self.assertEqual(len(self.end_state.outputted_lines), 0)
 
     def _build_two_sentences_commonly(self):
-        _em = self._emission('first_error')
-        _hi = _em.to_string()
-        return _hi.split('. ')  # copy-paste of modality-specific
+        msg, = self._emission('first_error').to_messages()
+        return msg.split('. ')  # copy-paste of modality-specific
 
     def _channel_tail_component(self):
         return self._emission('first_error').channel[-1]
 
     def _emission(self, name):
-        return self._end_state().actual_emission_index.actual_emission_via_name(name)  # noqa: E501
+        return self.end_state.actual_emission_index[name]
 
     # -- build state hook-ins & other support
 
-    _build_end_state = build_end_state_commonly
+    build_end_state = build_end_state_of_sync
 
     def expect_emissions(self):
         # (by default, we expect no emissions)
         return iter(())
 
 
-class Case2557_strange_format_adapter_name(_CommonCase):
+
+class Case2557DP_strange_format_adapter_name(CommonCase):
     """(this is the other end of getting us "over the wall" - this has
 
     two copy-pasted tests that appear the same in the modality-specific
@@ -51,20 +51,20 @@ class Case2557_strange_format_adapter_name(_CommonCase):
         self.assertEqual(self._channel_tail_component(), 'unrecognized_format_name')  # noqa: E501
 
     def test_200_says_not_found(self):  # COPY-PASTED
-        _ = self._two_sentences()[0]
+        _ = self.two_sentences[0]
         self.assertEqual(_, "unrecognized format name 'zig-zag'")
 
     def test_300_says_did_you_mean(self):  # COPY-PASTED
-        _ = self._two_sentences()[1]  # #here (next line)
+        _ = self.two_sentences[1]  # #here (next line)
         self.assertRegex(_, r"\bknown format name\(s\): \('[a-z_]+', '")
 
     @shared_subject
-    def _two_sentences(self):
+    def two_sentences(self):
         return self._build_two_sentences_commonly()
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
@@ -77,7 +77,7 @@ class Case2557_strange_format_adapter_name(_CommonCase):
                 }
 
 
-class Case2559_strange_file_extension(_CommonCase):
+class Case2559_strange_file_extension(CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
@@ -86,20 +86,20 @@ class Case2559_strange_file_extension(_CommonCase):
         self.assertEqual(self._channel_tail_component(), 'unrecognized_extname')  # noqa: E501
 
     def test_200_says_not_found(self):
-        _ = self._two_sentences()[0]
-        self.assertEqual(_, "unrecognized extension '.zongo'")  # noqa: E501
+        _ = self.two_sentences[0]
+        self.assertEqual(_, "unrecognized extension '.zongo'")
 
     def test_300_says_did_you_mean(self):
-        _ = self._two_sentences()[1]  # #here (next line)
+        _ = self.two_sentences[1]  # #here (next line)
         self.assertRegex(_, r"\bknown extension\(s\): \('\.[a-z]+', '")
 
     @shared_subject
-    def _two_sentences(self):
+    def two_sentences(self):
         return self._build_two_sentences_commonly()
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
@@ -112,7 +112,7 @@ class Case2559_strange_file_extension(_CommonCase):
                 }
 
 
-class Case2660DP_no_functions(_CommonCase):
+class Case2660DP_no_functions(CommonCase):
     # The point of this case changed once at #history-A.1 and then once again
     # at #history-A.2. Currently its only purpose is to cover what happens
     # when the collection implementation doesn't have the requisite [#873.12]
@@ -122,22 +122,22 @@ class Case2660DP_no_functions(_CommonCase):
         self._outputs_no_lines()
 
     def test_200_says_not_found(self):
-        _ = self._two_sentences()[0]
-        _rx = r"^the 'rec' format adapter .+ has no modality functions for 'CLI'"  # noqa: E501
-        self.assertRegex(_, _rx)
+        act = self.two_sentences[0]
+        rxs = r"^the 'rec' fo.+ has no .+ 'SYNC_AGENT_FOR_DATA_PIPES'"
+        self.assertRegex(act, rxs)
 
     def test_300_says_did_you_mean(self):
-        _ = self._two_sentences()[1]
-        self.assertIn("there's 'choo_cha_foo_fah'", _)
+        act = self.two_sentences[1]
+        self.assertIn("there's 'collection_path'", act)
 
     @shared_subject
-    def _two_sentences(self):
-        _ = self._emission('first_error').to_string()
-        return _.split('. ')
+    def two_sentences(self):
+        msg, = self._emission('first_error').to_messages()
+        return msg.split('. ')
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', 'expression', 'as', 'first_error'
@@ -153,7 +153,7 @@ class Case2660DP_no_functions(_CommonCase):
                 }
 
 
-class Case2662DP_near_file_not_found(_CommonCase):
+class Case2662DP_near_file_not_found(CommonCase):
 
     # this is the first code to rustle up a lot of stuff
 
@@ -170,8 +170,8 @@ class Case2662DP_near_file_not_found(_CommonCase):
         self.assertIn('0000-no-such-file', sct['filename'])
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
@@ -183,11 +183,16 @@ class Case2662DP_near_file_not_found(_CommonCase):
                 }
 
 
-class Case2664DP_duplicate_key(_CommonCase):
+class Case2664DP_duplicate_key(CommonCase):
 
-    def test_100_gets_as_far_as_the_schema_lines_and_a_couple_recs_WHY(self):
-        _act = self._end_state().outputted_lines
-        _exp = (
+    def test_100_says_this_thing(self):
+        actual, = self._emission('erx').to_messages()
+        expected = "duplicate key in far traversal: 'qux'"
+        self.assertEqual(actual, expected)
+
+    def test_200_gets_as_far_as_the_example_line(self):
+        act = self.end_state.outputted_lines
+        exp = (
                 '|col A|col B|\n',
                 '|:--|--:|\n',
                 '|thing A|x|\n',
@@ -201,11 +206,11 @@ class Case2664DP_duplicate_key(_CommonCase):
         self.assertEqual(_act, _exp)
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def expect_emissions(self):
-        yield ('error', 'expression', 'duplicate_key', 'as', 'erx')
+        yield 'error', 'expression', 'duplicate_key', 'as', 'erx'
 
     def given(self):
         _dictionaries = (
@@ -216,7 +221,7 @@ class Case2664DP_duplicate_key(_CommonCase):
         _producer_script = FakeProducerScript(
                 stream_for_sync_is_alphabetized_by_key_for_sync=False,
                 stream_for_sync_via_stream=sync_stream_using_column_A,
-                dictionaries=_dictionaries,
+                dictionaries=dictionaries,
                 near_keyerer=near_keyerer_minimal)
         return {
                 'producer_script_path': _producer_script,
@@ -224,7 +229,7 @@ class Case2664DP_duplicate_key(_CommonCase):
         }
 
 
-class Case2665DP_preserve_endcappiness_here(_CommonCase):
+class Case2665DP_preserve_endcappiness_here(CommonCase):
     """this is the proof of bugfix - we want that a row that didn't
     have an endcap before, DOESN'T have an endcap after (even though
     the last cel's value changed.
@@ -249,8 +254,8 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
         self.assertSequenceEqual(_act, _exp)
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def given(self):
         _dictionaries = (
@@ -268,7 +273,7 @@ class Case2665DP_preserve_endcappiness_here(_CommonCase):
                 }
 
 
-class Case2667DP_ADD_end_cappiness_here(_CommonCase):
+class Case2667DP_ADD_end_cappiness_here(CommonCase):
     """this is kind of an edge case as a corollary of the above thing,
     and it reveals something about the idea of "endcap" - here, the
     endcap gets added because we are lengthening the number of cels.
@@ -278,23 +283,22 @@ class Case2667DP_ADD_end_cappiness_here(_CommonCase):
     """
 
     def test_100_win(self):
-        _act = self._end_state().outputted_lines[2:]
-        _exp = (
-                _same_row_1,
+        act = self.end_state.outputted_lines[2:]
+        exp = (
+                same_row_1,
                 '|thing B| thing one\n',  # exactly as in file
-                '|thing C|yerp|\n',  # note yes encap
-                )
-        self.assertSequenceEqual(_act, _exp)
+                '|thing C|yerp|\n')  # note yes encap
+        self.assertSequenceEqual(act, exp)
 
     @shared_subject
-    def _end_state(self):
-        return self._build_end_state()
+    def end_state(self):
+        return self.build_end_state()
 
     def given(self):
         _dictionaries = (
                 {'col_a': 'thing C', 'col_b': 'yerp'},
                 )
-        _producer_script = FakeProducerScript(
+        producer_script = FakeProducerScript(
                 stream_for_sync_via_stream=sync_stream_using_column_A,
                 stream_for_sync_is_alphabetized_by_key_for_sync=False,
                 dictionaries=_dictionaries,
@@ -306,17 +310,17 @@ class Case2667DP_ADD_end_cappiness_here(_CommonCase):
                 }
 
 
-_same_row_1 = '|thing A|x|\n'
+same_row_1 = '|thing A|x|\n'
 
 
 def sync_stream_using_column_A(dcts):
     for dct in dcts:
-        yield (dct['col_a'], dct)
+        yield (dct['col_A'], dct)
 
 
 def near_keyerer_minimal(key_via_native, schema, listener):
     def near_keyer(native):
-        return native.cell_at_offset(0).content_string()
+        return native.cell_at_offset(0).value_string
     return near_keyer
 
 

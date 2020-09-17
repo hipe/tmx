@@ -10,13 +10,13 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
+class CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
 
     def expect_requires_these_particular_arguments(self, *expect_these):
 
         # #here1
         import re
-        _line = self.command_help_screen().usage_line
+        _line = self.command_help_screen.usage_line
         md = re.match(r'^Usage: ohai-mami ([-a-z]+) \[OPTIONS\] (.+)$', _line)
         first, *actual_these = md[2].split(' ')
 
@@ -27,7 +27,7 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
         self.assertSequenceEqual(actual_these, expect_these)
 
     def expect_this_string_in_first_line_of_description(self, s):
-        _line = self.command_help_screen().first_description_line
+        _line = self.command_help_screen.first_description_line
         self.assertIn(s, _line)
 
     def build_command_help_screen_subtree(self):
@@ -90,7 +90,7 @@ class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
     """
 
 
-class Case5723_no_args(_CommonCase):
+class Case5723_no_args(CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -99,17 +99,17 @@ class Case5723_no_args(_CommonCase):
         return ()
 
 
-class Case5739_strange_arg(_CommonCase):
+class Case5739_strange_arg(CommonCase):
 
     def test_100_throws_a_usage_error(self):
-        self.assertEqual(self._exe().exit_code, 2)  # meh
+        self.assertEqual(self.end_exception.exit_code, 2)  # meh
 
     def test_200_whines_with_this_message(self):
-        _msg = self._exe().message
+        _msg = self.end_exception.message
         self.assertEqual(_msg, "No such command 'foo-fah-fee'.")
 
     @shared_subject
-    def _exe(self):
+    def end_exception(self):
         o = self.build_end_state('stdout', 'usage_error')
         lines = tuple(o.lines)  # #here3
         self.assertEqual(len(lines), 0)
@@ -120,8 +120,7 @@ class Case5739_strange_arg(_CommonCase):
 
     do_debug = True
 
-
-class Case5756_strange_option(_CommonCase):
+class Case5756_strange_option(CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -130,7 +129,7 @@ class Case5756_strange_option(_CommonCase):
         return ('--cho-monculous')
 
 
-class Case5772_toplevel_help_in_general(_CommonCase):
+class Case5772_toplevel_help_in_general(CommonCase):
 
     def test_100_exit_code_is_whatever(self):
         self.assertEqual(_CASE_A().exit_code, _success_exit_code)
@@ -166,7 +165,7 @@ class Case5772_toplevel_help_in_general(_CommonCase):
         self.assertIn('collections-hub', cx[0].styled_content_string)
 
 
-class Case5778_toplevel_help_plus_argument(_CommonCase):
+class Case5778_toplevel_help_plus_argument(CommonCase):
 
     def test_100_just_prints_entire_help_screen(self):
         self.apparently_just_prints_entire_help_screen()
@@ -180,7 +179,7 @@ class Case5778_toplevel_help_plus_argument(_CommonCase):
 # Case5853_create_hub_help
 
 
-class Case5902_traverse_help(_CommonCase):
+class Case5902_traverse_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -204,16 +203,17 @@ class Case5902_traverse_help(_CommonCase):
 """
 
 
-class Case5918_traverse_fail(_CommonCase):
+class Case5918_traverse_fail(CommonCase):
 
     def test_100_generic_failure_exit_status(self):
         self.expect_exit_code(2)  # FileNotFoundError.errno
 
     def test_200_message_lines(self):
-        _actual, = self.end_state().lines
+        _actual, = self.end_state.lines
         reason, path = _actual.split(' - ')
-        self.assertEqual(reason, 'collection not found: No such file or directory')  # noqa: E501
-        self.assertEqual(path, 'qq/pp\n')
+        exp = 'cannot load collection: No such file or directory'
+        self.assertEqual(reason, exp)
+        self.assertEqual(path[0:5], 'qq/pp')
 
     @shared_subject
     def end_state(self):
@@ -226,13 +226,13 @@ class Case5918_traverse_fail(_CommonCase):
         return real_filesystem_read_only()
 
 
-class Case5934_traverse(_CommonCase):
+class Case5934_traverse(CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_lines_look_like_internal_identifiers(self):
-        lines = tuple(self.end_state().lines)
+        lines = tuple(self.end_state.lines)
         self.assertIn(len(lines), range(7, 10))
         import re
         rx = re.compile('^[A-Z0-9]{3}\n$')
@@ -250,7 +250,7 @@ class Case5934_traverse(_CommonCase):
         return real_filesystem_read_only()
 
 
-class Case5950_select_help(_CommonCase):
+class Case5950_select_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -267,7 +267,7 @@ class Case5950_select_help(_CommonCase):
         return ('select', '--help')
 
 
-class Case5999_get_help(_CommonCase):
+class Case5999_get_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -284,13 +284,13 @@ class Case5999_get_help(_CommonCase):
         return ('get', '--help')
 
 
-class Case6064_get_fail(_CommonCase):
+class Case6064_get_fail(CommonCase):
 
     def test_100_exit_code_is_404_lol(self):
-        self.assertEqual(self.end_state().exit_code, 404)
+        self.assertEqual(self.end_state.exit_code, 404)
 
     def test_200_says_only_not_found__with_ID(self):
-        line, = self.end_state().lines
+        line, = self.end_state.lines
         self.assertEqual(line, (
             "entity not found: not found: 'B9F' not found\n"))  # #wish
 
@@ -305,13 +305,13 @@ class Case6064_get_fail(_CommonCase):
         return real_filesystem_read_only()
 
 
-class Case6080_get(_CommonCase):
+class Case6080_get(CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_lines_wow(self):
-        lines = self.end_state().lines
+        lines = self.end_state.lines
         _actual_big_string = ''.join(lines)  # correct an issue todo
         _actual_lines = tuple(_lines_via_big_string_as_is(_actual_big_string))
 
@@ -339,7 +339,7 @@ class Case6080_get(_CommonCase):
         return real_filesystem_read_only()
 
 
-class Case6096_create_help(_CommonCase):
+class Case6096_create_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments()
@@ -356,13 +356,13 @@ class Case6096_create_help(_CommonCase):
         return ('create', '--help')
 
 
-class Case6113_create_fail(_CommonCase):
+class Case6113_create_fail(CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
         self.expect_exit_code_for_bad_request()
 
     def test_200_reason(self):
-        line, = self.end_state().lines
+        line, = self.end_state.lines
         self.assertEqual(line, 'request was empty\n')
 
     @shared_subject
@@ -376,7 +376,7 @@ class Case6113_create_fail(_CommonCase):
         return real_filesystem_read_only()
 
 
-class Case6129_create(_CommonCase):
+class Case6129_create(CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
@@ -407,7 +407,7 @@ class Case6129_create(_CommonCase):
         :#HERE3
         """
 
-        _actual = self.common_entity_screen().stdout_lines
+        _actual = self.common_entity_screen.stdout_lines
 
         _expected = tuple(unindent("""
         [item.2H3.attributes]
@@ -418,7 +418,7 @@ class Case6129_create(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line, line2 = self.common_entity_screen().stderr_lines_one_and_two
+        line, line2 = self.common_entity_screen.stderr_lines_one_and_two
         self.assertEqual(line, "created '2H3' with 2 attributes\n")
         self.assertIsNone(line2)
 
@@ -441,7 +441,7 @@ class Case6129_create(_CommonCase):
         return 481  # kiss ID 2H3 is base 10 481
 
 
-class Case6145_delete_help(_CommonCase):
+class Case6145_delete_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -461,14 +461,14 @@ class Case6145_delete_help(_CommonCase):
 # Case6161 - delete fail
 
 
-class Case6177_delete(_CommonCase):
+class Case6177_delete(CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_stdout_is_deleted_lines(self):
 
-        _actual = self.common_entity_screen().stdout_lines
+        _actual = self.common_entity_screen.stdout_lines
 
         _expected = tuple(unindent("""
         [item.B7G.attributes]
@@ -479,7 +479,7 @@ class Case6177_delete(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line1, line = self.common_entity_screen().stderr_lines_one_and_two
+        line1, line = self.common_entity_screen.stderr_lines_one_and_two
         self.assertEqual(line1.index("deleted 'B7G' with "), 0)
         self.assertEqual(line, 'deleted:\n')
 
@@ -499,7 +499,7 @@ class Case6177_delete(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(2)
 
 
-class Case6194_update_help(_CommonCase):
+class Case6194_update_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments(_IID)
@@ -516,14 +516,14 @@ class Case6194_update_help(_CommonCase):
         return ('update', '--help')
 
 
-class Case6226_update(_CommonCase):
+class Case6226_update(CommonCase):
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_stdout_is_updated_lines_CAPTURE_WS_ISSUE(self):
 
-        _actual = self.common_entity_screen().stdout_lines
+        _actual = self.common_entity_screen.stdout_lines
 
         _expected = tuple(unindent("""
         [item.B7F.attributes]
@@ -536,7 +536,7 @@ class Case6226_update(_CommonCase):
         self.assertSequenceEqual(_actual, _expected)
 
     def test_300_stderr_line_is_decorative(self):
-        line, line2 = self.common_entity_screen().stderr_lines_one_and_two
+        line, line2 = self.common_entity_screen.stderr_lines_one_and_two
         exp = "updated 'B7F' (created 2, updated 1 and deleted 1 attribute)\n"
         self.assertEqual(line, exp)
         self.assertIsNone(line2)
@@ -562,7 +562,7 @@ class Case6226_update(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(1)
 
 
-class Case6242_search_help(_CommonCase):
+class Case6242_search_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         self.expect_requires_these_particular_arguments('[QUERY]...')
@@ -614,8 +614,8 @@ class _StructTreeAndExitCode:
 @lazy
 def real_filesystem_read_only():
     # push this up whenever - use the real filesystem but the same testy hook
-    from kiss_rdb import real_filesystem_read_only_
-    fs = real_filesystem_read_only_()  # not really necessary
+    from kiss_rdb import real_filesystem_read_only__ as fser
+    fs = fser()  # not really necessary
     otr = fs.__class__(commit_file_rewrite=None)
     otr.FINISH_AS_HACKY_SPY = lambda: None
     return otr

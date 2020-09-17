@@ -16,14 +16,14 @@ class _Case:
     build_end_state = _build_end_state
 
     def expect_these_stats(self, tc, **expected_dct):
-        _actual = tc.end_state()['stats']
+        _actual = tc.end_state['stats']
         tc.assertEqual(_actual, expected_dct)
 
 
 class _CaseOfSimplifiedTypical(_Case):
 
     def expect_these_two_entities(self, tc):
-        these = tc.end_state()['result_list']
+        these = tc.end_state['result_list']
         tc.assertEqual(len(these), 2)
         _actual = tuple(ent.identifier_string for ent in these)
         tc.assertSequenceEqual(_actual, ('ENA', 'ENC'))
@@ -47,7 +47,7 @@ case_of_one_column_match_two_out_of_three = _CaseOfSimplifiedTypical()
 class _CaseOfEmptyCollection(_Case):
 
     def expect_no_entities(self, tc):
-        these = tc.end_state()['result_list']
+        these = tc.end_state['result_list']
         tc.assertEqual(len(these), 0)
 
     def expect_the_appropriate_statistics(self, tc):

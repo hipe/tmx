@@ -6,7 +6,7 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # (at #tombstone-A.1 we removed the "expression" counterparts.)
 
@@ -20,17 +20,17 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(o['expecting_any_of'], _)
 
     def line_number_but_not_position(self, lineno):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertFalse('position' in o)
         self.assertEqual(o['lineno'], lineno)
 
     def line_number_and_position(self, lineno, position):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['lineno'], lineno)
         self.assertEqual(o['position'], position)
 
     def some_line_number_and_line(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertIsNotNone(o['lineno'])
         self.assertIsNotNone(o['line'])
 
@@ -41,7 +41,7 @@ class _CommonCase(unittest.TestCase):
         self.assertTrue(self._did_reach_EOS())
 
     def _did_reach_EOS(self):
-        return self.emitted_elements()['did_reach_end_of_stream']
+        return self.emitted_elements['did_reach_end_of_stream']
 
     def run_expecting_structured_input_error(self):
         def recv_payloader(payloader):
@@ -83,7 +83,7 @@ class _CommonCase(unittest.TestCase):
         raise Exception('ha ha')
 
 
-class Case4070_truly_blank_file_produces_empty_stream(_CommonCase):
+class Case4070_truly_blank_file_produces_empty_stream(CommonCase):
     """
     (language production for "no lines in input" in #tombstone-A.1)
     """
@@ -96,7 +96,7 @@ class Case4070_truly_blank_file_produces_empty_stream(_CommonCase):
         return ()
 
 
-class Case4071_effectively_empty_file_produces_empty_stream(_CommonCase):
+class Case4071_effectively_empty_file_produces_empty_stream(CommonCase):
 
     # lost a message production at #tombstone-A.1:
     # 'file has no sections (so no entities)'
@@ -109,7 +109,7 @@ class Case4071_effectively_empty_file_produces_empty_stream(_CommonCase):
         return ('# comment line\n', '# comment line 2\n')
 
 
-class Case4072_an_ordinary_looking_line(_CommonCase):
+class Case4072_an_ordinary_looking_line(CommonCase):
 
     def test_100_you_can_see_that_EOS_was_NOT_reached(self):
         self.you_can_see_that_EOS_was_NOT_reached()
@@ -119,7 +119,7 @@ class Case4072_an_ordinary_looking_line(_CommonCase):
 
     def test_300_line_number_and_line_but_NOT_position(self):
         self.line_number_but_not_position(3)
-        self.assertEqual(self.emitted_elements()['line'], 'Huh ZAH!\n')
+        self.assertEqual(self.emitted_elements['line'], 'Huh ZAH!\n')
 
     @shared_subject
     def emitted_elements(self):
@@ -129,10 +129,10 @@ class Case4072_an_ordinary_looking_line(_CommonCase):
         return ('# comment line\n', '\n', 'Huh ZAH!\n')
 
 
-class Case4073_not_quite_section_line(_CommonCase):
+class Case4073_not_quite_section_line(CommonCase):
 
     def test_100_says_this_one_ad_hoc_description_of_expecting(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['expecting'], 'close brace and end of line')
 
     def test_200_you_can_see_that_EOS_was_NOT_reached(self):
@@ -148,7 +148,7 @@ class Case4073_not_quite_section_line(_CommonCase):
 
         from kiss_rdb.magnetics.string_scanner_via_string import (
                 two_lines_of_ascii_art_via_position_and_line)
-        _all_these = self.emitted_elements()
+        _all_these = self.emitted_elements
         _two = _two_via_these(**_all_these)
         _itr = two_lines_of_ascii_art_via_position_and_line(**_two)
         last_lines = list(_itr)
@@ -176,18 +176,18 @@ def _two_via_these(
     return {'position': position, 'line': line}
 
 
-class Case4074_section_but_no_dots(_CommonCase):
+class Case4074_section_but_no_dots(CommonCase):
 
     def test_100_our_first_structured_emisson(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['expecting'], 'keyword "item"')
 
     def test_200_points_right_at_the_first_letter(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['position'], 1)
 
     def test_300_correct_line_number_and_line(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['lineno'], 1)
         self.assertEqual(o['line'], '[woot]\n')
 
@@ -202,14 +202,14 @@ class Case4074_section_but_no_dots(_CommonCase):
 # Case4075  # #midpoint
 
 
-class Case4076_wrong_keyword_for_third_component(_CommonCase):
+class Case4076_wrong_keyword_for_third_component(CommonCase):
 
     def test_100_expecting(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['expecting'], 'keyword "attributes" or "meta"')
 
     def test_200_points_right_at_the_first_letter_of_the_keyword(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         pos = o['position']
         self.assertEqual(pos, 11)
         self.assertEqual(o['line'][pos:pos+4], 'attr')
@@ -225,14 +225,14 @@ class Case4076_wrong_keyword_for_third_component(_CommonCase):
         return ('[item.0O1L.attribute]\n',)
 
 
-class Case4077_too_many_components(_CommonCase):
+class Case4077_too_many_components(CommonCase):
 
     def test_100_structured_emission(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         self.assertEqual(o['expecting'], "']'")
 
     def test_200_points_right_at_the_exta_dot(self):
-        o = self.emitted_elements()
+        o = self.emitted_elements
         pos = o['position']
         self.assertEqual(pos, 21)
         self.assertEqual(o['line'][pos], '.')
@@ -248,7 +248,7 @@ class Case4077_too_many_components(_CommonCase):
         return ('[item.0O1L.attributes.huzzah]\n',)
 
 
-class Case4078_non_validated_ID_traversal_one(_CommonCase):
+class Case4078_non_validated_ID_traversal_one(CommonCase):
 
     def test_100_everything(self):
         _ = self.run_non_validating_ID_traversal_expecting_success()
@@ -258,7 +258,7 @@ class Case4078_non_validated_ID_traversal_one(_CommonCase):
         return ('[item.0O1L.attributes]\n',)
 
 
-class Case4079_non_validated_ID_traversal_two(_CommonCase):
+class Case4079_non_validated_ID_traversal_two(CommonCase):
 
     # this is invalid (meta must come before attributes for the same thing)
     # but the point is we aren't validating that at this level.
@@ -271,7 +271,7 @@ class Case4079_non_validated_ID_traversal_two(_CommonCase):
         return ('[item.B.attributes]\n', '[item.B.meta]\n')
 
 
-class Case4080_first_touch_of_multi_line(_CommonCase):  # #mutli-line-case
+class Case4080_first_touch_of_multi_line(CommonCase):  # #mutli-line-case
 
     def test_100_EVERYTHING(self):
         _actual = self.run_non_validating_ID_traversal_expecting_success()

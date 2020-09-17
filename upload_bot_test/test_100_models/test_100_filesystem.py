@@ -21,11 +21,11 @@ _TestCase = unittest.TestCase
 
 
 def same_test_for_mock(x=None):
-    return _same_test_for('_mock_subject', x)
+    return _same_test_for('mock_subject', x)
 
 
 def same_test_for_real(x=None):
-    return _same_test_for('_real_subject', x)
+    return _same_test_for('real_subject', x)
 
 
 def _same_test_for(which, m):
@@ -33,14 +33,14 @@ def _same_test_for(which, m):
         def g(f):
             def use_f(self):
                 f()  # in case user sets breakpoint in there
-                _which_fs = getattr(self, which)()
+                _which_fs = getattr(self, which)
                 self.same_test(_which_fs)
             return use_f
     else:
         def g(f):
             def use_f(self):
                 f()  # in case user sets breakpoint in there
-                _which_details = getattr(self, which)()
+                _which_details = getattr(self, which)
                 _which_test = getattr(self, m)
                 _which_test(_which_details)
 
@@ -65,10 +65,12 @@ class Case100_not_exists_not_exists(_TestCase):
         _yes = fs.file_exists('/foo/some_file')
         self.assertFalse(_yes)
 
-    def _mock_subject(self):
+    @property
+    def mock_subject(self):
         return filesystem.FakeFilesystem.the_empty_filesystem()
 
-    def _real_subject(self):
+    @property
+    def real_subject(self):
         return _real_filesystem()
 
 
@@ -105,12 +107,12 @@ class Case350_new_way_not_exists_not_exist(_TestCase):
         self.assertFalse(details.did_exist)
 
     @shared_subject
-    def _mock_subject(self):
+    def mock_subject(self):
         _fs = _this_same_fake_filesystem()
         return _same_details('/cc/dd', _fs)
 
     @shared_subject
-    def _real_subject(self):
+    def real_subject(self):
         _fs = _real_filesystem()
         _path = no_ent_path()
         return _same_details(_path, _fs)
@@ -141,12 +143,12 @@ class Case375_new_way_yes_exist_yes_exists(_TestCase):
         self.assertEqual(details.content, 'ohai i am content\n')
 
     @shared_subject
-    def _mock_subject(self):
+    def mock_subject(self):
         _fs = _this_same_fake_filesystem()
         return _same_details('/aa/bb', _fs)
 
     @shared_subject
-    def _real_subject(self):
+    def real_subject(self):
         _fs = _real_filesystem()
         _path = file_with_content_path()
         return _same_details(_path, _fs)
@@ -208,14 +210,14 @@ class Case300_write_file(_TestCase):
         self.assertEqual(6, details.number_of_bytes_wrote)
 
     @shared_subject
-    def _mock_subject(self):
+    def mock_subject(self):
         fs = filesystem.FakeFilesystem()
         _touch('/aa/xx', fs)
         _touch('/bb/qq', fs)
         return _this_same_story('/zz/mm', fs)
 
     @shared_subject
-    def _real_subject(self):
+    def real_subject(self):
         _fs = _real_filesystem()
         path = os.path.join(writable_tmpdir(), 'some.file')
         x = _this_same_story(path, _fs)

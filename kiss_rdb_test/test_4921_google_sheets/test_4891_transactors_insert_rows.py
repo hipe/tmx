@@ -65,8 +65,6 @@ class Case4886_mock_a_real_life_insert(CommonCase):
         self.assertSequenceEqual(grid[0], (False, True, True))
         self.assertSequenceEqual(grid[1], (True, True, True))
 
-
-    @property
     @shared_subject
     def end_state(self):
         lib = this_lib()

@@ -46,7 +46,6 @@ class CommonCase(unittest.TestCase):
 
     # -- building end state
 
-    @property
     @dangerous_memoize_in_child_classes('_HSSI', '_build_help_screen_sect_idx')
     def help_screen_section_index(self):
         pass
@@ -57,7 +56,6 @@ class CommonCase(unittest.TestCase):
         _lines = self.end_state.stderr_lines
         return section_index_via_unsanitized_strings_(_lines)
 
-    @property
     @dangerous_memoize_in_child_classes('_ES', 'build_end_state')
     def end_state(self):
         pass
@@ -131,7 +129,6 @@ class Case5501_strange_arg_might_splay(CommonCase):
         self.assertEqual(self.head_and_tail[1],
                          "(there's 'foo-bar' and 'biff-baz')")
 
-    @property
     @shared_subject
     def head_and_tail(self):
         return tuple(self.first_line_content.split('. '))
@@ -190,7 +187,6 @@ class Case5507_requesting_help_shows_special_branch_screen_CRAZY(CommonCase):
         _act = self.this_table[1][1]
         self.assertEqual(_act, _exp)
 
-    @property
     @shared_subject
     def this_table(self):
         def f(line):

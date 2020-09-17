@@ -5,11 +5,10 @@ import unittest
 from modality_agnostic.memoization import (  # noqa: E402
         dangerous_memoize as shared_subject)
 
+class CommonCase(unittest.TestCase):
 
-_CommonCase = unittest.TestCase
 
-
-class Case1293_works(_CommonCase):
+class Case1293_works(CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_function())
@@ -25,21 +24,21 @@ class Case1293_works(_CommonCase):
         self.assertEqual(a, ["hello Xx Yy\n"])
 
 
-class Case1299_fails(_CommonCase):
+class Case1299_fails(CommonCase):
 
     def test_100_channel(self):
-        chan = self._channel_and_lines()[0]
+        chan = self.channel_and_lines[0]
         self.assertEqual(
                 chan, ('error', 'expression', 'missing_required_doohahs'))
 
     def test_200_message(self):
-        lines = self._channel_and_lines()[1]
+        lines = self.channel_and_lines[1]
         line, = lines  # assert exactly one
         self.assertEqual(
                 line, 'set these environment variables: (Qfn, Qln)')
 
     @shared_subject
-    def _channel_and_lines(self):
+    def channel_and_lines(self):
 
         def run(listener):
             return _subject_function()(

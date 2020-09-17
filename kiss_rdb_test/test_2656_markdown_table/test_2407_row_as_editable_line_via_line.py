@@ -47,7 +47,7 @@ can dynamically decompose..
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _number_of_cels_is(self, d):
         _row = self.case().row
@@ -76,7 +76,7 @@ def given_input_string(f):  # #decorator #[#510.6]
     return lazify_method_safely(build_value)
 
 
-class Case010_some_failures(_CommonCase):
+class Case2397_some_failures(CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(_subject_module())
@@ -90,7 +90,7 @@ class Case010_some_failures(_CommonCase):
         self.assertEqual(r"expecting '\n' at end of line", _msg)
 
 
-class Case020_one_cel_with_nothing_YES_ENDCAP(_CommonCase):
+class Case2401_one_cel_with_nothing_YES_ENDCAP(CommonCase):
 
     def test_010_number_of_cels_looks_right(self):
         self._number_of_cels_is(1)
@@ -109,10 +109,7 @@ class Case020_one_cel_with_nothing_YES_ENDCAP(_CommonCase):
         return '||\n'
 
 
-# Case2407  # #midpoint
-
-
-class Case022_only_one_pipe(_CommonCase):
+class Case2405_only_one_pipe(CommonCase):
 
     def test_010_number_of_cels_IS_ZERO(self):
         self._number_of_cels_is(0)
@@ -128,7 +125,10 @@ class Case022_only_one_pipe(_CommonCase):
         return '|\n'
 
 
-class Case024_minimal_no_endcap(_CommonCase):
+# Case2407  # #midpoint
+
+
+class Case2409_minimal_no_endcap(CommonCase):
 
     def test_010_number_of_cels_looks_right(self):
         self._number_of_cels_is(1)
@@ -147,7 +147,7 @@ class Case024_minimal_no_endcap(_CommonCase):
         return '|x\n'
 
 
-class Case030_typical_guy(_CommonCase):
+class Case2413_typical_guy(CommonCase):
 
     def test_010_number_of_cels_looks_right(self):
         self._number_of_cels_is(3)

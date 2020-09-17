@@ -7,13 +7,13 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
 # Case1530-Case1610
 
 
-class Case1530_basics(_CommonCase):
+class Case1530_basics(CommonCase):
 
     def test_100_collection_builds(self):
         self.assertIsNotNone(collection_one())
@@ -22,19 +22,19 @@ class Case1530_basics(_CommonCase):
         self.assertIsNotNone(_big_index_one())
 
 
-class Case1540_whole_document_tree_from_first_collection(_CommonCase):
+class Case1540_whole_document_tree_from_first_collection(CommonCase):
 
     def test_100_some_lines_were_made(self):
-        num = self._custom_index().total_line_count
+        num = self.custom_index.total_line_count
         self.assertLess(100, num)
         self.assertLess(num, 120)
 
     def test_220_every_notecard_heading_was_expressed_somehow(self):
-        _actual = len(self._lines_that_expressed_headings())
+        _actual = len(self.lines_that_expressed_headings)
         self.assertEqual(_actual, 6)
 
     def test_240_these_7_notecards_produced_only_4_documents(self):
-        _lines = self._lines_that_expressed_headings()
+        _lines = self.lines_that_expressed_headings
 
         count = 0
         for line in _lines:
@@ -44,15 +44,15 @@ class Case1540_whole_document_tree_from_first_collection(_CommonCase):
         self.assertEqual(count, 4)
 
     def test_300_all_the_bookmarks_came_out(self):
-        _actual = self._custom_index().lines_that_define_bookmarks
+        _actual = self.custom_index.lines_that_define_bookmarks
         self.assertEqual(len(_actual), 7)
 
     @shared_subject
-    def _lines_that_expressed_headings(self):
-        return self._custom_index().lines_that_express_the_notecard_heading
+    def lines_that_expressed_headings(self):
+        return self.custom_index.lines_that_express_the_notecard_heading
 
     @shared_subject
-    def _custom_index(self):
+    def custom_index(self):
         return custom_index_via_big_index(_big_index_one())
 
 
@@ -60,7 +60,7 @@ _this_range = range(59, 60)
 # #history-A.1 bumped max by 1 because of unknown change
 
 
-class Case1580_generate_one_document(_CommonCase):
+class Case1580_generate_one_document(CommonCase):
 
     def test_100_wrote_the_lines_probably(self):
         self.assertIn(len(self['writes']), _this_range)
@@ -79,7 +79,7 @@ class Case1580_generate_one_document(_CommonCase):
         self.assertTrue(self['result_value'] is True)  # like this, it matters
 
     def test_300_emitted_a_summary(self):
-        o = self.ad_hoc_end_state()
+        o = self.ad_hoc_end_state
         chan = o['channel']
         sct = o['payloader_BE_CAREFUL_HOT']()
 
@@ -94,7 +94,7 @@ class Case1580_generate_one_document(_CommonCase):
         self.assertIn(int(md[2]), range(1000, 1200))
 
     def __getitem__(self, k):
-        return self.ad_hoc_end_state()[k]
+        return self.ad_hoc_end_state[k]
 
     @shared_subject
     def ad_hoc_end_state(self):

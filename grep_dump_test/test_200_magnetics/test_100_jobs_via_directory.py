@@ -4,12 +4,13 @@ import unittest
 import os
 p = os.path
 
-from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject)
+
+class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case050_MinimalPairShowingInferiorityOfFunctionBasedContextManagers(
-        unittest.TestCase):
+        CommonCase):
     """(so...)
 
     all we are really doing here is writing unit tests to affirm behavior
@@ -99,7 +100,7 @@ class _ThisException(Exception):  # (only used above)
     pass
 
 
-class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
+class Case010_DirectoriesGetCreatedAndDestoryed(CommonCase):
     """(discussion)
 
     there is potential for confusion because there's two different reasons
@@ -117,7 +118,7 @@ class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
 
     def test_020_everything_gets_destroyed(self):
         # (this test is tacit. we only know it works because #here1)
-        self.assertIsNotNone(self._story_outcome)
+        self.assertIsNotNone(self.end_state)
 
     def test_030_job_directories_were_created(self):
         count = 0
@@ -145,16 +146,15 @@ class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
         self.assertEqual(1, self._directory_tuples[0][0])
 
     def test_060_some_infos_were_emitted(self):
-        _hi = self._story_outcome['number_of_infos']
+        _hi = self.end_state['number_of_infos']
         self.assertEqual(3, _hi)
 
     @property
     def _directory_tuples(self):
-        return self._story_outcome['directory_tuples']
+        return self.end_state['directory_tuples']
 
-    @property
     @shared_subject
-    def _story_outcome(self):
+    def end_state(self):
         """sadly..
 
         sadly, we must "see into the future" to anticipate exactly what the
@@ -205,17 +205,20 @@ class Case010_DirectoriesGetCreatedAndDestoryed(unittest.TestCase):
                 }
 
 
-class Case020_Locking(unittest.TestCase):
+class Case020_Locking(CommonCase):
 
     def test_010_locking_ensures_multiple_servers_dont_use_same_jobs_dir(self):
-
-        from modality_agnostic.test_support.structured_emission import (
-                one_and_done)
+        import modality_agnostic.test_support.common as em
 
         def recv(chan, payloader):
+            assert(not memo.count)
+            memo.count += 1
             self.assertEqual('info', chan[0])
 
-        listener, ran = one_and_done(self, recv)
+        class memo:  # #class-as-namespace
+            count = 0
+
+        listener = em.L_VIA(recv)
         e = None
 
         with _clean_jobs_dir() as jobs_path:
@@ -237,14 +240,13 @@ class Case020_Locking(unittest.TestCase):
                 outer.exit()
 
         self.assertEqual('[Errno 35] Resource temporarily unavailable', str(e))
-        ran()
+        assert(memo.count)
 
 
 class _clean_jobs_dir():
     """(this is the things that establish the prerequisites of the client)"""
 
     def __enter__(self):
-        p = os.path
         self._jobs_dir = p.join(writable_tmpdir(), 'jobs')
         os.mkdir(self._jobs_dir)
         self._lock_me = p.join(self._jobs_dir, 'lock-me')

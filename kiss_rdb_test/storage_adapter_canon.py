@@ -101,7 +101,7 @@ def produce_agent():
 
 
 def _confirm_result_is_none(tc):  # tc = test case
-    es = tc.end_state()
+    es = tc.end_state
     tc.assertIsNone(es['result_value'])
 
 
@@ -110,7 +110,7 @@ class case_of_collection_not_found:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_channel_looks_right(tc):
-        chan = tc.end_state()['channel']
+        chan = tc.end_state['channel']
         tc.assertEqual(chan[0], 'error')
         # for historical and flex reasons, we are allowing expressions here
         tc.assertEqual(chan[2], 'collection_not_found')
@@ -121,7 +121,7 @@ class case_of_collection_not_found:  # #as-namespace-only
 
 
 def _confirm_collection_is_not_none(tc):
-    tc.assertIsNotNone(tc.subject_collection())
+    tc.assertIsNotNone(tc.given_collection())
 
 
 class case_of_empty_collection_found:  # #as-namespace-only
@@ -154,20 +154,20 @@ class case_of_traverse_IDs_from_empty_collection:  # #as-namespace-only
 class case_of_traverse_all_entities:  # #as-namespace
 
     def confirm_all_IDs_in_any_order_no_repeats(tc):
-        _tup = tc.flattened_collection_for_traversal_case()
+        _tup = tc.flattened_collection_for_traversal_case
         _string_tup = tuple(ent.identifier.to_primitive() for ent in _tup)
         _actual_sorted = sorted(_string_tup)  # similar to #here2
         tc.assertSequenceEqual(_actual_sorted, _these_N_IDs)
 
     def confirm_particular_entity_knows_one_of_its_field(tc):
         id_s = _ID_primitive_via_TC(tc)
-        _tup = tc.flattened_collection_for_traversal_case()
+        _tup = tc.flattened_collection_for_traversal_case
         ent = next(ent for ent in _tup if id_s == ent.identifier.to_primitive())  # noqa: E501
         _actual = _yes_value_dict(ent)['thing_A']  # #watch [#867.B] getters?
         tc.assertEqual(_actual, f"hi i'm {id_s}")
 
     def confirm_featherweighting_isnt_biting(tc):
-        _tup = tc.flattened_collection_for_traversal_case()
+        _tup = tc.flattened_collection_for_traversal_case
         these = ('B8H', 'B7G')
         itr = (ent for ent in _tup if ent.identifier.to_string() in these)
         left = next(itr)
@@ -192,7 +192,7 @@ _these_N_IDs = (
 
 
 def build_flattened_collection_for_traversal_case(tc):  # similar to #here1
-    _sc = tc.subject_collection()
+    _sc = tc.given_collection()
     _ents = _sc.to_entity_stream_as_storage_adapter_collection(None)
     return tuple(_ents)
 
@@ -204,7 +204,7 @@ class case_of_entity_not_found_because_identifier_too_deep:
 
     def confirm_emitted_accordingly(tc):
 
-        es = tc.end_state()
+        es = tc.end_state
 
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
@@ -239,7 +239,7 @@ class case_of_entity_not_found:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
@@ -256,14 +256,14 @@ class case_of_retrieve_OK:  # #as-namespace-only
 
     def confirm_entity_is_retrieved_and_looks_ok(tc):
         # assume no emissions bc we built it belo with this implicit assumption
-        ent = tc.end_state()['result_value']
+        ent = tc.end_state['result_value']
         _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_before_update(tc, ent, _)
 
     def build_end_state(tc):
         # we have to deconstruct and duplicate "build end state" b.c no emissio
         iden = tc.identifier_via_primitive(_ID_primitive_via_TC(tc))
-        coll = tc.subject_collection()
+        coll = tc.given_collection()
         wat = _do_retrieve(coll, iden, None)
         return {'result_value': wat, 'collection': coll, 'identifier': iden}
 
@@ -273,7 +273,7 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
@@ -293,7 +293,7 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
 class _common_delete:  # as-namespace-only
 
     def confirm_result_is_the_deleted_entity(tc):
-        sct = tc.end_state()
+        sct = tc.end_state
         deleted_ent = sct['result_value']
         _actual = deleted_ent.identifier
         _expected = sct['identifier']
@@ -301,7 +301,7 @@ class _common_delete:  # as-namespace-only
         tc.CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(deleted_ent)
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
                 es['channel'], ('info', 'structure', 'deleted_entity'))
         _iid_s = es['identifier'].to_primitive()
@@ -331,7 +331,7 @@ class case_of_delete_OK_resulting_in_empty_collection(_common_delete):
     # #as-namespace-only
 
     def confirm_the_collection_is_empty(tc):
-        es = tc.end_state()
+        es = tc.end_state
         coll = es['collection']
         _confirm_collection_empty(tc, coll)
 
@@ -341,9 +341,9 @@ class case_of_create_but_something_is_invalid:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
-            es['channel'], ('error', 'structure', 'cannot_create'))
+            es['channel'][:3], ('error', 'structure', 'cannot_create'))
         reason = _reason_from(es)
 
         _assert_says_cannot_verb(tc, reason, 'create')
@@ -356,19 +356,19 @@ class case_of_create_but_something_is_invalid:  # #as-namespace-only
 
 
 def _create_OK_emitted_accordingly(tc):
-    es = tc.end_state()
+    es = tc.end_state
     tc.assertSequenceEqual(
             es['channel'], ('info', 'structure', 'created_entity'))
     message = _message_from(es)
     # we don't know what ID was provisioned and meh as far as conf
     these = _find_all_identifer_looking_strings(message)
     tc.assertEqual(len(these), 1)  # ..
-    tc.assertRegex(message, "^created '[A-Z1-9]+' with 2 attributes$")
+    tc.assertRegex(message, r"^created '[^']+' with \d attributes$")
 
 
 def _create_OK_confirm_in_collection(tc):
 
-    es = tc.end_state()
+    es = tc.end_state
     ent_one = es['result_value']
     iden = ent_one.identifier
     coll = es['collection']
@@ -382,11 +382,11 @@ def _create_OK_confirm_in_collection(tc):
 class case_of_create_OK_into_empty_collection:  # #as-namespace-only
 
     def confirm_result_is_the_created_entity(tc):
-        sct = tc.end_state()
+        sct = tc.end_state
         dct = _yes_value_dict(sct['result_value'])
-        tc.assertEqual(dct['thing_2'], 123)
-        tc.assertEqual(dct['thing_B'], 3.14)
-        tc.assertEqual(len(dct), 2)
+        # tc.assertEqual(dct['thing_2'], '123')  # #here3
+        tc.assertEqual(dct['thing_B'], '3.14')
+        tc.assertIn(len(dct), (1, 2))  # #here3
 
     confirm_emitted_accordingly = _create_OK_emitted_accordingly
 
@@ -423,7 +423,7 @@ class case_of_update_but_entity_not_found:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
         reason = _reason_from(es)
@@ -442,7 +442,7 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
     confirm_result_is_none = _confirm_result_is_none
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         tc.assertSequenceEqual(
                 es['channel'], ('error', 'structure', 'cannot_update'))
         reason = _reason_from(es)
@@ -462,13 +462,13 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
 class case_of_update_OK:  # #as-namespace-only
 
     def confirm_result_is_before_and_after_entities(tc):
-        sct = tc.end_state()
+        sct = tc.end_state
         before_ent, after_ent = sct['result_value']
         tc.assertEqual(before_ent.identifier, after_ent.identifier)
         tc.assertNotEqual(before_ent, after_ent)
 
     def confirm_emitted_accordingly(tc):
-        es = tc.end_state()
+        es = tc.end_state
         chan = es['channel']
         tc.assertSequenceEqual(chan, ('info', 'structure', 'updated_entity'))
         message = _message_from(es)
@@ -479,17 +479,17 @@ class case_of_update_OK:  # #as-namespace-only
         tc.assertEqual(message, _exp)
 
     def confirm_the_before_entity_has_the_before_values(tc):
-        before_ent, after_ent = tc.end_state()['result_value']
+        before_ent, after_ent = tc.end_state['result_value']
         _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_before_update(tc, before_ent, _)
 
     def confirm_the_after_entity_has_the_after_values(tc):
-        before_ent, after_ent = tc.end_state()['result_value']
+        before_ent, after_ent = tc.end_state['result_value']
         _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_after_update(tc, after_ent, _)
 
     def confirm_retrieve_after_shows_updated_value(tc):
-        es = tc.end_state()
+        es = tc.end_state
         identi = es['identifier']
         coll = es['collection']
         ent = _do_retrieve(coll, identi, None)
@@ -593,7 +593,7 @@ def _end_state_for_update(tc, tup, iid_s, expecting_OK):
         return coll.update_entity_as_storage_adapter_collection(
                 identifier, tup, listener)
     identifier = tc.identifier_via_primitive(iid_s)
-    coll = tc.subject_collection()
+    coll = tc.given_collection()
     return _end_state_plus(tc, run, coll, identifier, expecting_OK)
 
 
@@ -602,7 +602,7 @@ def _end_state_for_update(tc, tup, iid_s, expecting_OK):
 def _end_state_for_create(tc, dct, expecting_OK, with_coll=None):
     def run(listener):
         return coll.create_entity_as_storage_adapter_collection(dct, listener)
-    coll = tc.subject_collection()
+    coll = tc.given_collection()
     if with_coll is not None:
         with_coll(coll)
     es = end_state_via_(tc, run, expecting_OK)
@@ -616,7 +616,7 @@ def _end_state_for_delete_via_string(tc, iid_s, expecting_OK):
     def run(listener):
         return coll.delete_entity_as_storage_adapter_collection(iden, listener)
     iden = tc.identifier_via_primitive(iid_s)
-    coll = tc.subject_collection()
+    coll = tc.given_collection()
     return _end_state_plus(tc, run, coll, iden, expecting_OK)
 
 
@@ -624,7 +624,7 @@ def _end_state_for_delete_via_string(tc, iid_s, expecting_OK):
 
 def _end_state_for_retrieve_via_string(tc, iid_s, expecting_OK):
     iden = tc.identifier_via_primitive(iid_s)
-    coll = tc.subject_collection()
+    coll = tc.given_collection()
 
     def run(listener):
         return _do_retrieve(coll, iden, listener)

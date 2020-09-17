@@ -45,22 +45,22 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _field_names(self):
-        return self._end_state().sync_keys_seen
+        return self.end_state.sync_keys_seen
 
     def _record(self, k):
-        return self._end_state().entity_dictionary_via_sync_key[k]
+        return self.end_state.entity_dictionary_via_sync_key[k]
 
 
-class Case1640DP_hello(_CommonCase):
+class Case1640DP_hello(CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())
 
     def test_200_runs(self):
-        self._end_state()
+        self.end_state
 
     def test_300_the_rename_is_reflected_in_the_field_names(self):
         act = self._field_names()
@@ -99,7 +99,7 @@ class Case1640DP_hello(_CommonCase):
         self.assertEqual(dct['used_by'], 'twill')
 
     @shared_subject
-    def _end_state(self):
+    def end_state(self):
         return build_state_the_bernstein_way(
                 fixture_document_path=html_fixture('0140-bernstein-subtree.html'),  # noqa: E501
                 producer_module=_subject_module(),

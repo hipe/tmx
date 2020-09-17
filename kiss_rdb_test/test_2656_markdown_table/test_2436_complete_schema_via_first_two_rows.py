@@ -3,8 +3,8 @@ from modality_agnostic.test_support.structured_emission import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
-    pass
+class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 def _be_like_so(self, orig_s, exp_s):
@@ -17,10 +17,7 @@ def _split_like_so(self, orig_s, * expect_these_s_a):
     self.assertEqual(_actual_these, expect_these_s_a)
 
 
-class Case2435_camel_case(_CommonCase):
-
-    def test_005_loads(self):
-        self.assertIsNotNone(_subject_module())
+class Case2435_camel_case(CommonCase):
 
     def test_010_nothing(self):
         self._this('hi', 'hi')
@@ -42,7 +39,7 @@ class Case2435_camel_case(_CommonCase):
         return tuple(s for s in f(big_s))
 
 
-class Case2436_normalize_freeform_strings(_CommonCase):  # #midpoint
+class Case2436_normalize_freeform_strings(CommonCase):  # #midpoint
 
     def test_010(self):
         self._this('FooBar  biffo-bazzo', 'foo_bar_biffo_bazzo')
@@ -56,17 +53,20 @@ class Case2436_normalize_freeform_strings(_CommonCase):  # #midpoint
         return _stowaway_subject_function()(big_s)
 
 
-class Case2437_encap_is_required(_CommonCase):
+class Case2437_endcap_is_required(CommonCase):
+
+    def test_010_loads(self):
+        self.assertIsNotNone(subject_function())
 
     def test_rumskalla(self):
-
-        msgs, listener = minimal_listener_spy()
+        listener, emissions = em.listener_and_emissions_for(self, limit=2)
         _line = "|I don't|have an|endcap\n"
-        _ = _subject_module()
-        x = _.row_two_function_and_liner_via_row_one_line(_line, listener)
-        self.assertEqual(x, None)
-        _ = 'header row 1 must have "encap" (trailing pipe)'
-        self.assertEqual(msgs, [_])
+        tup = tuple(subject_function()((_line,), listener))
+        assert(not len(tup))
+        emi, *_ = emissions
+        actual = emi.to_messages()
+        expected = ('header row 1 must have "endcap" (trailing pipe)',)
+        self.assertSequenceEqual(actual, expected)
 
 
 def _stowaway_subject_function():

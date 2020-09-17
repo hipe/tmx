@@ -21,7 +21,7 @@ Orthogonal to canon.
 """
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     expect_big_success = expect_big_success
 
@@ -30,7 +30,8 @@ class _CommonCase(unittest.TestCase):
                 self, 'input_error')
 
 
-class Case4257_simplifed_typical(_CommonCase):
+
+class Case4257_simplifed_typical(CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -56,7 +57,7 @@ class Case4257_simplifed_typical(_CommonCase):
         """
 
 
-class Case4258KR_empty_string(_CommonCase):
+class Case4258KR_empty_string(CommonCase):
 
     def test_100_reason(self):
         self.assertIn('not allowed generally', self.error_structure['reason'])
@@ -70,7 +71,6 @@ class Case4258KR_empty_string(_CommonCase):
         _actual = self.error_structure['suggestion_sentence_phrase']
         self.assertIn('maybe ', _actual)
 
-    @property
     @shared_subject
     def error_structure(self):
         return self.expect_input_error()
@@ -82,7 +82,7 @@ class Case4258KR_empty_string(_CommonCase):
         return ''
 
 
-class Case4259_one_line_special_char(_CommonCase):  # #midpoint
+class Case4259_one_line_special_char(CommonCase):  # #midpoint
 
     def test_100_stores_as_one_line_not_multi_line(self):
         self.expect_big_success()
@@ -99,7 +99,7 @@ class Case4259_one_line_special_char(_CommonCase):  # #midpoint
         return ''
 
 
-class Case4260_multiple_lines_and_special_chars(_CommonCase):
+class Case4260_multiple_lines_and_special_chars(CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -125,7 +125,7 @@ class Case4260_multiple_lines_and_special_chars(_CommonCase):
         """
 
 
-class Case4261_no_newline_on_final_line(_CommonCase):
+class Case4261_no_newline_on_final_line(CommonCase):
 
     def test_100_reason(self):
         self.assertIn('must have a newline', self.error_structure['reason'])
@@ -135,7 +135,6 @@ class Case4261_no_newline_on_final_line(_CommonCase):
         self.assertEqual(o['attribute_name'], 'aa_aa')
         self.assertEqual(o['unsanitized_attribute_value'], 'line 1\nline 2')
 
-    @property
     @shared_subject
     def error_structure(self):
         return self.expect_input_error()

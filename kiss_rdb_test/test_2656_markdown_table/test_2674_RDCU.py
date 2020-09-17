@@ -11,112 +11,112 @@ import unittest
 canon = storage_adapter_canon.produce_agent()
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def reason(self):  # must be used with _flush_reason_early
-        return self.end_state()['reason']
+        return self.end_state['reason']
 
     identifier_via_primitive = storage_adapter_canon.identifier_via_string
 
     do_debug = False
 
 
-class Case2606_entity_not_found_because_identifier_too_deep(_CommonCase):
+class Case2606_entity_not_found_because_identifier_too_deep(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
         self._canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
-    def subject_collection(self):
-        return _collection_empty_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot(pretend_file_empty())
 
     def given_identifier_string(self):
         return 'AB23'
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_entity_not_found_because_identifier_too_deep
 
 
-class Case2609_entity_not_found(_CommonCase):
+class Case2609_entity_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'AB2'
 
-    def subject_collection(self):
-        return _collection_ordinary_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_entity_not_found
 
 
-class Case2612_retrieve_OK(_CommonCase):
+class Case2612_retrieve_OK(CommonCase):
 
     def test_100_the_entity_is_retrieved_and_looks_OK(self):
-        self._canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
+        self.canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'B9H'
 
-    def subject_collection(self):
-        return _collection_ordinary_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_retrieve_OK
 
 
-class Case2641_delete_but_entity_not_found(_CommonCase):
+class Case2641_delete_but_entity_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
-    def subject_collection(self):
-        return _collection_ordinary_will_mutate()  # but actually won't
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     def given_identifier_string(self):
         return 'AB2'
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_delete_but_entity_not_found
 
 
-class Case2644_delete_OK_resulting_in_non_empty_collection(_CommonCase):
+class Case2644_delete_OK_resulting_in_non_empty_collection(CommonCase):
 
     def test_100_result_is_the_deleted_entity(self):
-        self._canon_case.confirm_result_is_the_deleted_entity(self)
+        self.canon_case.confirm_result_is_the_deleted_entity(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_300_now_collection_doesnt_have_that_entity(self):
         self._canon_case.confirm_entity_no_longer_in_collection(self)
@@ -129,23 +129,24 @@ class Case2644_delete_OK_resulting_in_non_empty_collection(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state_for_delete(self, 'B9H')
+        es = self.canon_case.build_end_state_for_delete(self, 'B9H')
+        return self.include_diff_lines_in_end_state(es)
 
-    def subject_collection(self):
-        return _collection_ordinary_will_mutate()
+    def given_collection(self):
+        return self.mutable_collection(pretend_file_ordinary())
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_delete_OK_resulting_in_non_empty_collection
 
 
-class Case2647_delete_OK_resulting_in_empty_collection(_CommonCase):
+class Case2647_delete_OK_resulting_in_empty_collection(CommonCase):
 
     def test_100_result_is_the_deleted_entity(self):
-        self._canon_case.confirm_result_is_the_deleted_entity(self)
+        self.canon_case.confirm_result_is_the_deleted_entity(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_300_the_collection_is_empty_afterwards(self):
         self._canon_case.confirm_the_collection_is_empty(self)
@@ -158,23 +159,24 @@ class Case2647_delete_OK_resulting_in_empty_collection(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state_for_delete(self, 'B9K')
+        es = self.canon_case.build_end_state_for_delete(self, 'B9K')
+        return self.include_diff_lines_in_end_state(es)
 
-    def subject_collection(self):
-        return _collection_of_one_entity_will_mutate()
+    def given_collection(self):
+        return self.mutable_collection(pretend_file_one_shot_one_entity())
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_delete_OK_resulting_in_empty_collection
 
 
-class Case2676_create_but_something_is_invalid(_CommonCase):
+class Case2676_create_but_something_is_invalid(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def CONFIRM_THE_REASON_SAYS_WHAT_IS_WRONG_WITH_IT(self, reason):
         self.assertIn("the field 'thing_C' does not appear", reason)
@@ -190,7 +192,7 @@ class Case2676_create_but_something_is_invalid(_CommonCase):
 
     @shared_subject
     def end_state(self):
-        return _flush_reason_early(self._canon_case.build_end_state(self))
+        return _flush_reason_early(self.canon_case.build_end_state(self))
 
     def dictionary_for_create_with_something_invalid_about_it(self):
         return {
@@ -199,44 +201,44 @@ class Case2676_create_but_something_is_invalid(_CommonCase):
                 'thing_C': 'false',
                 }
 
-    def subject_collection(self):
-        return _collection_ordinary_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_create_but_something_is_invalid
 
 
-class Case2679_create_OK_into_empty_collection(_CommonCase):
+class Case2679_create_OK_into_empty_collection(CommonCase):
 
     def test_100_result_is_created_entity(self):
-        self._canon_case.confirm_result_is_the_created_entity(self)
+        self.canon_case.confirm_result_is_the_created_entity(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_300_now_collection_doesnt_have_that_entity(self):
         self._canon_case.confirm_entity_now_in_collection(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.build_end_state_complicatedly()
 
-    def subject_collection(self):
-        return _collection_empty_will_mutate()
+    def given_collection(self):
+        return self.mutable_collection(pretend_file_empty(), 2)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_create_OK_into_empty_collection
 
 
-class Case2682_create_OK_into_non_empty_collection(_CommonCase):
+class Case2682_create_OK_into_non_empty_collection(CommonCase):
 
     def test_100_result_is_created_entity(self):
-        self._canon_case.confirm_result_is_the_created_entity(self)
+        self.canon_case.confirm_result_is_the_created_entity(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_300_now_collection_doesnt_have_that_entity(self):
         self._canon_case.confirm_entity_now_in_collection(self)
@@ -245,78 +247,78 @@ class Case2682_create_OK_into_non_empty_collection(_CommonCase):
     def end_state(self):
         return self._canon_case.build_end_state(self)
 
-    def subject_collection(self):
-        return _collection_ordinary_will_mutate()
+    def given_collection(self):
+        return self.mutable_collection(pretend_file_one_shot_ordinary_take_2())
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_create_OK_into_non_empty_collection
 
 
-class Case2710_update_but_entity_not_found(_CommonCase):
+class Case2710_update_but_entity_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_reason_contains_number_of_lines(self):
         self.assertIn('(searched 3 line(s))', self.reason())
 
     @shared_subject
     def end_state(self):
-        return _flush_reason_early(self._canon_case.build_end_state(self))
+        return _flush_reason_early(self.canon_case.build_end_state(self))
 
     def request_tuple_for_update_that_will_fail_because_no_ent(self):
         return 'NSE', (('for_now_make_this_bad', 'while-it', 'works'),)
 
-    def subject_collection(self):
-        return _collection_ordinary_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_update_but_entity_not_found
 
 
-class Case2713_update_but_attribute_not_found(_CommonCase):
+class Case2713_update_but_attribute_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def request_tuple_for_update_that_will_fail_because_attr(self):
         return 'B9H', (
                 ('update_attribute', 'thing_1', 'no see'),
                 )
 
-    def subject_collection(self):
-        return _collection_ordinary_wont_mutate()
+    def given_collection(self):
+        return collection_one_shot_ordinary()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_update_but_attribute_not_found
 
 
-class Case2716_update_OK(_CommonCase):
+class Case2716_update_OK(CommonCase):
 
     def test_100_result_is_a_two_tuple_of_before_and_after_entities(self):
-        self._canon_case.confirm_result_is_before_and_after_entities(self)
+        self.canon_case.confirm_result_is_before_and_after_entities(self)
 
     def test_200_the_before_entity_has_the_before_values(self):
-        self._canon_case.confirm_the_before_entity_has_the_before_values(self)
+        self.canon_case.confirm_the_before_entity_has_the_before_values(self)
 
     def test_300_the_after_entity_has_the_after_values(self):
-        self._canon_case.confirm_the_after_entity_has_the_after_values(self)
+        self.canon_case.confirm_the_after_entity_has_the_after_values(self)
 
     def test_400_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_500_retrieve_afterwards_shows_updated_value(self):
         self._canon_case.confirm_retrieve_after_shows_updated_value(self)
@@ -364,14 +366,14 @@ class Case2716_update_OK(_CommonCase):
         self.assertEqual(s.index(exp), 0)
 
     def test_844_still_no_trailing_pipe(self):
-        line = self.my_custom_index()['the_whole_line']
+        line = self.my_custom_index['the_whole_line']
         last_two = line[-2:]
         self.assertEqual(last_two[1], '\n')  # ..
         self.assertNotEqual(last_two[0], '|')
 
     def test_906_that_final_cel_still_isnt_present(self):
-        line = self.my_custom_index()['the_whole_line']
         import re
+        line = self.my_custom_index['the_whole_line']
         import functools
         _count_me = re.findall(r'\|', line)
         _num = functools.reduce(lambda m, x: m + 1, _count_me, 0)
@@ -384,7 +386,7 @@ class Case2716_update_OK(_CommonCase):
         self.assertEqual(act, exp)
 
     def cell_at(self, i):
-        return self.my_custom_index()['cels'][i]
+        return self.my_custom_index['cels'][i]
 
     @shared_subject
     def my_custom_index(self):
@@ -423,11 +425,11 @@ class Case2716_update_OK(_CommonCase):
     def given_identifier_string(self):
         return 'B9H'
 
-    def subject_collection(self):
-        return _collection_ordinary_will_mutate()
+    def given_collection(self):
+        return self.mutable_collection(pretend_file_ordinary())
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_update_OK
 
 

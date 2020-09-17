@@ -37,22 +37,22 @@ See #here1 below for justification of our ad-hoc case ordering raionale.
 """
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def expect_no_structure_value(self, key):
-        if key in self.structure():
+        if key in self.structure:
             raise Exception(f'unexpected key present: {key}')
 
     def expect_structure_value(self, key, value):
-        _actual = self.structure()[key]
+        _actual = self.structure[key]
         self.assertEqual(_actual, value)
 
     def expect_the_usual_channel(self):
-        _chan = self.subject_failure_triple()[1]
+        _chan = self.subject_failure_triple[1]
         self.assertEqual(_chan, ('error', 'structure', 'input_error'))
 
     def expect_run_failed_to_produce_value(self):
-        self.assertIsNone(self.subject_failure_triple()[0])
+        self.assertIsNone(self.subject_failure_triple[0])
 
     def expect_edit(self):
         _expect = unindent(self.expect_these_body_lines_AFTER_edit())
@@ -97,7 +97,7 @@ class _CommonCase(unittest.TestCase):
     def expect_lines_before_edit(self):
         _big_s = self.expect_these_lines_before_edit()
         _expected_lines_gen = unindent(_big_s)
-        self._expect_doc_ent_lines(self.subject(), _expected_lines_gen)
+        self._expect_doc_ent_lines(self.subject, _expected_lines_gen)
 
     def _expect_doc_ent_lines(self, mde, exp_lines_gen):
         _actual_lines_gen = mde.to_line_stream()
@@ -110,7 +110,7 @@ class _CommonCase(unittest.TestCase):
     def expect_body_lines_before_edit(self):
         _big_s = self.expect_these_body_lines_before_edit()
         _expected_lines_gen = unindent(_big_s)
-        _actual_lines_gen = _body_line_gen(self.subject())
+        _actual_lines_gen = _body_line_gen(self.subject)
         self._expect_lines(_actual_lines_gen, _expected_lines_gen)
 
     def _expect_lines(self, actual_lines_gen, expected_lines_gen):
@@ -119,13 +119,13 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(_actual_lines_tup, _expected_lines_tup)
 
     def expect_builds(self):
-        self.assertIsNotNone(self.subject())
+        self.assertIsNotNone(self.subject)
+
 
 
 # == 000's: INTRO, BASICS
 
-
-class Case4153_empty(_CommonCase):
+class Case4153_empty(CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -150,7 +150,7 @@ class Case4153_empty(_CommonCase):
         return _doc_entity_via_lines(())
 
 
-class Case4154_all_three_kinds_of_lines(_CommonCase):
+class Case4154_all_three_kinds_of_lines(CommonCase):
 
     def test_100_builds(self):
         self.expect_builds()
@@ -175,7 +175,7 @@ class Case4154_all_three_kinds_of_lines(_CommonCase):
         return _doc_entity_via_lines(_given)
 
 
-class Case4155_index_gist_collision_in_entity(_CommonCase):
+class Case4155_index_gist_collision_in_entity(CommonCase):
 
     def test_100_expect_run_failed_to_produce_value(self):
         self.expect_run_failed_to_produce_value()
@@ -205,7 +205,7 @@ class Case4155_index_gist_collision_in_entity(_CommonCase):
 
     @shared_subject
     def structure(self):
-        return self.subject_failure_triple()[2]()
+        return self.subject_failure_triple[2]()
 
     @shared_subject
     def subject_failure_triple(self):
@@ -231,8 +231,7 @@ class Case4155_index_gist_collision_in_entity(_CommonCase):
 
 # == APPENDS/INSERTS
 
-
-class Case4156_append_to_empty(_CommonCase):
+class Case4156_append_to_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -250,7 +249,7 @@ class Case4156_append_to_empty(_CommonCase):
         return ()
 
 
-class Case4157_append_to_non_empty(_CommonCase):
+class Case4157_append_to_non_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -271,7 +270,7 @@ class Case4157_append_to_non_empty(_CommonCase):
         """)
 
 
-class Case4159_insert_at_head(_CommonCase):  # #midpoint
+class Case4159_insert_at_head(CommonCase):  # #midpoint
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -294,7 +293,7 @@ class Case4159_insert_at_head(_CommonCase):  # #midpoint
         """)
 
 
-class Case4160_insert_into_mid(_CommonCase):
+class Case4160_insert_into_mid(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -318,7 +317,6 @@ class Case4160_insert_into_mid(_CommonCase):
 
 
 # == DELETES
-
 
 """a note about the rationale behind how we ordered these cases: :#here1
 
@@ -358,7 +356,7 @@ class Case4160_insert_into_mid(_CommonCase):
 """
 
 
-class Case4151_delete_at_head_to_make_non_empty(_CommonCase):
+class Case4151_delete_at_head_to_make_non_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -380,7 +378,7 @@ class Case4151_delete_at_head_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case4162_delete_from_mid_to_make_non_empty(_CommonCase):
+class Case4162_delete_from_mid_to_make_non_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -402,7 +400,7 @@ class Case4162_delete_from_mid_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case4163_delete_from_tail_to_make_non_empty(_CommonCase):
+class Case4163_delete_from_tail_to_make_non_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()
@@ -424,7 +422,7 @@ class Case4163_delete_from_tail_to_make_non_empty(_CommonCase):
         """)
 
 
-class Case4165_delete_to_make_empty(_CommonCase):
+class Case4165_delete_to_make_empty(CommonCase):
 
     def test_100_test_edit(self):
         self.expect_edit()

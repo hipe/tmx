@@ -6,10 +6,10 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
-class Case9050(_CommonCase, ScaryCommonCase):  # #midpoint
+class Case9050(CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#foo', 'and', '(', '#bar', 'or', '#baz', ')', 'xx')

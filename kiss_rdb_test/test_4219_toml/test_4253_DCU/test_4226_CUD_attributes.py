@@ -21,18 +21,18 @@ a collecton façade here, it's not.
 """
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _same_because_sho_madjozi_not_found_in_entity(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertEqual(_actual, " because 'sho_madjozi' not found in entity")
 
     def _same_suggestion_use_this_one_not_that_one(self):
-        _actual = self._three_parts()[2]
+        _actual = self.three_parts[2]
         self.assertEqual(_actual, "use 'SHO_madjozi' not 'sho_madjozi'")
 
     def _same_because_reason_exact_match(self):
-        _actual = self._three_parts()[1]
+        _actual = self.three_parts[1]
         self.assertEqual(_actual, ' because names must match exactly')
 
     expect_big_success = expect_big_success
@@ -58,7 +58,7 @@ class _CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case4214_when_request_empty(_CommonCase):
+class Case4214_when_request_empty(CommonCase):
 
     def test_100_reason(self):
         self.expect_request_error_reason('request was empty')
@@ -67,7 +67,7 @@ class Case4214_when_request_empty(_CommonCase):
         return _request_via_tuples((), listener)
 
 
-class Case4215_strange_verbs(_CommonCase):
+class Case4215_strange_verbs(CommonCase):
 
     def test_100_reason(self):
         self.expect_request_error_reason(
@@ -79,7 +79,7 @@ class Case4215_strange_verbs(_CommonCase):
             listener)
 
 
-class Case4216_wrong_looking_attribute_name(_CommonCase):
+class Case4216_wrong_looking_attribute_name(CommonCase):
 
     def test_100_input_error(self):
         sct = emission_payload_expecting_error_given_run(self, 'input_error')
@@ -94,18 +94,18 @@ class Case4216_wrong_looking_attribute_name(_CommonCase):
             ), listener)
 
 
-class Case4217_duplicate_names_within_request(_CommonCase):
+class Case4217_duplicate_names_within_request(CommonCase):
 
     def test_100_reason(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertTrue(' more than once ' in _actual)
 
     def test_200_detail(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertEqual(_actual, "'foo_bar' appeared twice")
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         _rsn = self.reason_via_expect_request_error()
         return _rsn.split(' and ')
 
@@ -117,18 +117,18 @@ class Case4217_duplicate_names_within_request(_CommonCase):
             ), listener)
 
 
-class Case4218_names_too_similar_within_request(_CommonCase):
+class Case4218_names_too_similar_within_request(CommonCase):
 
     def test_100_reason(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertTrue(' are too similar ' in _actual)
 
     def test_200_oxford_AND(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertEqual(_actual, "'xx_zz', 'xxz_z' and 'xx_ZZ'")
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         _rsn = self.reason_via_expect_request_error()
         return _split_hack(' are ', _rsn)
 
@@ -141,14 +141,14 @@ class Case4218_names_too_similar_within_request(_CommonCase):
             ), listener)
 
 
-class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
+class Case4220_cannot_create_when_attributes_already_exist(CommonCase):
 
     def test_100_reason(self):
         _actual = self._right()
         self.assertTrue(' already exist' in _actual)
 
     def test_200_items(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         _expected = "can't create attribute 'foo_fani'"  # ..
         self.assertEqual(_actual, _expected)
 
@@ -161,10 +161,10 @@ class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
         self.assertTrue(' it already exists ' in _actual)
 
     def _right(self):
-        return self._two_parts()[1]
+        return self.two_parts[1]
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
@@ -177,17 +177,17 @@ class Case4220_cannot_create_when_attributes_already_exist(_CommonCase):
         """
 
 
-class Case4221_cannot_delete_because_attributes_not_found(_CommonCase):
+class Case4221_cannot_delete_because_attributes_not_found(CommonCase):
 
     def test_100_reason(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertEqual(_actual, "can't delete")
 
     def test_200_detail(self):
         self._same_because_sho_madjozi_not_found_in_entity()
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
@@ -205,10 +205,10 @@ class Case4221_cannot_delete_because_attributes_not_found(_CommonCase):
         """
 
 
-class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
+class Case4222_cannot_delete_because_attributes_not_exact_match(CommonCase):  # noqa: E501
 
     def test_100_context(self):
-        _actual = self._three_parts()[0]
+        _actual = self.three_parts[0]
         self.assertEqual(_actual, "can't delete attributes")
 
     def test_200_reason(self):
@@ -218,7 +218,7 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  #
         self._same_suggestion_use_this_one_not_that_one()
 
     @shared_subject
-    def _three_parts(self):
+    def three_parts(self):
         return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
@@ -230,7 +230,7 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(_CommonCase):  #
         """
 
 
-class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
+class Case4223_cannot_update_because_attributes_not_found(CommonCase):
 
     def test_100_result_is_none(self):
         self._canon_case.confirm_result_is_none(self)
@@ -239,7 +239,7 @@ class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
         self._canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
@@ -270,10 +270,10 @@ class Case4223_cannot_update_because_attributes_not_found(_CommonCase):
         return lib
 
 
-class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  # noqa: E501
+class Case4224_cannot_update_because_attributes_not_exact_match(CommonCase):  # noqa: E501
 
     def test_100_context(self):
-        _actual = self._three_parts()[0]
+        _actual = self.three_parts[0]
         self.assertEqual(_actual, "can't update attributes")
 
     def test_200_reason(self):
@@ -283,7 +283,7 @@ class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  #
         self._same_suggestion_use_this_one_not_that_one()
 
     @shared_subject
-    def _three_parts(self):
+    def three_parts(self):
         return _same_three_split(self.reason_via_expect_cannot_update_error())
 
     def given_request_tuples(self):
@@ -295,19 +295,19 @@ class Case4224_cannot_update_because_attributes_not_exact_match(_CommonCase):  #
         """
 
 
-class Case4226_cannot_delete_because_comment_line_above(_CommonCase):
+class Case4226_cannot_delete_because_comment_line_above(CommonCase):
     # #midpoint in file
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertEqual(_actual, "cannot delete 'ab_fab' attribute line")
 
     def test_200_reason_explains_line_above(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertEqual(_actual, 'line touches comment line above')
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
@@ -321,18 +321,18 @@ class Case4226_cannot_delete_because_comment_line_above(_CommonCase):
         """
 
 
-class Case4227_cannot_update_because_comment_line_below(_CommonCase):
+class Case4227_cannot_update_because_comment_line_below(CommonCase):
 
     def test_100_unable_says_verb_and_name_of_attribute(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertEqual(_actual, "cannot update 'ab_fab' attribute line")
 
     def test_200_reason_explains_line_below(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertEqual(_actual, 'line touches comment line below')
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
@@ -346,18 +346,18 @@ class Case4227_cannot_update_because_comment_line_below(_CommonCase):
         """
 
 
-class Case4228_cannot_update_because_attribute_line_has_comment(_CommonCase):  # noqa: E501
+class Case4228_cannot_update_because_attribute_line_has_comment(CommonCase):  # noqa: E501
 
     def test_100_unable(self):
-        _actual = self._two_parts()[0]
+        _actual = self.two_parts[0]
         self.assertEqual(_actual, "cannot update 'ab_fab' attribute line")
 
     def test_200_reason_uses_pronoun_with_antecedent(self):
-        _actual = self._two_parts()[1]
+        _actual = self.two_parts[1]
         self.assertEqual(_actual, 'it has comment')
 
     @shared_subject
-    def _two_parts(self):
+    def two_parts(self):
         return self.reason_via_expect_request_error().split(' because ')
 
     def given_request_tuples(self):
@@ -369,13 +369,13 @@ class Case4228_cannot_update_because_attribute_line_has_comment(_CommonCase):  #
         """
 
 
-class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
+class Case4229_aggregate_multiple_comment_based_failures(CommonCase):
 
     def test_100_broken_up_into_two_sentences(self):
-        self.assertEqual(len(self._two_sentences()), 2)
+        self.assertEqual(len(self.two_sentences), 2)
 
     def test_100_reason(self):
-        _actual = self._two_sentences()[1]
+        _actual = self.two_sentences[1]
 
         _expected = (
             "cannot delete 'ab_fab_2' attribute line "
@@ -385,7 +385,7 @@ class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
         self.assertEqual(_actual, _expected)
 
     @shared_subject
-    def _two_sentences(self):
+    def two_sentences(self):
         return self.reason_via_expect_request_error().split('. ')
 
     def given_request_tuples(self):
@@ -401,10 +401,10 @@ class Case4229_aggregate_multiple_comment_based_failures(_CommonCase):
         """
 
 
-class Case4230_cannot_create_because_comment_line_above(_CommonCase):
+class Case4230_cannot_create_because_comment_line_above(CommonCase):
 
     def test_100_produces_two_sentences(self):
-        self.assertIsNotNone(self._two_sentences())
+        self.assertIsNotNone(self.two_sentences)
 
     def test_200_first_sentence_says_first_component_of_first_group(self):
         return self._same(0, 'dd_dd')
@@ -415,11 +415,11 @@ class Case4230_cannot_create_because_comment_line_above(_CommonCase):
     def _same(self, sp_i, id_s):
         _expected = (f"cannot create '{id_s}' attribute line because "
                      "line touches comment line above")
-        _actual = self._two_sentences()[sp_i]
+        _actual = self.two_sentences[sp_i]
         self.assertEqual(_actual, _expected)
 
     @shared_subject
-    def _two_sentences(self):
+    def two_sentences(self):
         _ = self.reason_via_expect_request_error()
         sp1, sp2 = _.split('. ')
         return (sp1, sp2)
@@ -450,7 +450,7 @@ class Case4230_cannot_create_because_comment_line_above(_CommonCase):
         """
 
 
-class Case4232_can_update_idk(_CommonCase):
+class Case4232_can_update_idk(CommonCase):
 
     # this almost touches #multi-line
 
@@ -473,7 +473,7 @@ class Case4232_can_update_idk(_CommonCase):
         """
 
 
-class Case4233_can_delete(_CommonCase):
+class Case4233_can_delete(CommonCase):
 
     def test_100_something(self):
         self.expect_big_success()
@@ -497,7 +497,7 @@ class Case4233_can_delete(_CommonCase):
         """
 
 
-class Case4234_can_create_when_comment_line_at_tail(_CommonCase):
+class Case4234_can_create_when_comment_line_at_tail(CommonCase):
 
     # this tests for #multi-line but is not
 
@@ -541,7 +541,7 @@ class Case4234_can_create_when_comment_line_at_tail(_CommonCase):
         """
 
 
-class Case4235_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
+class Case4235_can_create_when_comment_line_at_head_of_excerpt(CommonCase):
 
     def test_100_everything(self):
         self.expect_big_success()
@@ -572,7 +572,7 @@ class Case4235_can_create_when_comment_line_at_head_of_excerpt(_CommonCase):
         """
 
 
-class Case4236_create_into_truly_empty(_CommonCase):
+class Case4236_create_into_truly_empty(CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()
@@ -592,7 +592,7 @@ class Case4236_create_into_truly_empty(_CommonCase):
         """
 
 
-class Case4238_create_into_empty_with_comments(_CommonCase):
+class Case4238_create_into_empty_with_comments(CommonCase):
 
     def test_100_note_it_gets_ordered(self):
         self.expect_big_success()

@@ -3,7 +3,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def build_result_lines(self):
         given = _Given()
@@ -16,20 +16,20 @@ class _CommonCase(unittest.TestCase):
         return _ResultLines(ww(big_string=given.big_string))
 
 
-class Case3735_when_end_of_line_hits_mid_word(_CommonCase):
+class Case3735_when_end_of_line_hits_mid_word(CommonCase):
 
     def test_100_it_wraps_to_the_next_line(self):
-        o = self.result_lines()
+        o = self.result_lines
         self.assertEqual(o.first_line.index('One Two'), 0)
         self.assertEqual(o.second_line.index('Three'), 0)
 
     def test_200_the_result_lines_are_NOT_padded_with_trailing_spaces(self):
-        o = self.result_lines()
+        o = self.result_lines
         self.assertNotIn('Two ', o.first_line)
         self.assertNotIn('Three ', o.second_line)
 
     def test_300_the_result_lines_are_NOT_newline_terminated(self):
-        o = self.result_lines()
+        o = self.result_lines
         self.assertNotEqual(o.first_line[-1], '\n')
         self.assertNotEqual(o.second_line[-1], '\n')
 
@@ -44,7 +44,7 @@ class Case3735_when_end_of_line_hits_mid_word(_CommonCase):
                 )
 
 
-class Case3738_when_it_lands_right_on_the_money(_CommonCase):
+class Case3738_when_it_lands_right_on_the_money(CommonCase):
 
     def test_100_ok(self):
         o = self.build_result_lines()
@@ -58,7 +58,7 @@ class Case3738_when_it_lands_right_on_the_money(_CommonCase):
                 )
 
 
-class Case3742_when_a_leftmost_word_would_put_you_over(_CommonCase):
+class Case3742_when_a_leftmost_word_would_put_you_over(CommonCase):
 
     def test_100_it_gets_to_break_the_constraint(self):
         o = self.build_result_lines()
@@ -71,7 +71,7 @@ class Case3742_when_a_leftmost_word_would_put_you_over(_CommonCase):
                 )
 
 
-class Case3745_ellipsis_when_room(_CommonCase):
+class Case3745_ellipsis_when_room(CommonCase):
 
     def test_100_appends(self):
         o = self.build_result_lines()
@@ -85,7 +85,7 @@ class Case3745_ellipsis_when_room(_CommonCase):
                 )
 
 
-class Case3748_ellipsis_when_replace(_CommonCase):
+class Case3748_ellipsis_when_replace(CommonCase):
 
     def test_100_replaces_while_breaking_constraint_because_lazy(self):
         o = self.build_result_lines()
@@ -102,7 +102,7 @@ class Case3748_ellipsis_when_replace(_CommonCase):
 # Case3750  # #midpoint
 
 
-class Case3751_no_room_and_only_one_item_on_last_line(_CommonCase):
+class Case3751_no_room_and_only_one_item_on_last_line(CommonCase):
 
     def test_100_drops_last_line_and_append(self):
         o = self.build_result_lines()
@@ -116,7 +116,7 @@ class Case3751_no_room_and_only_one_item_on_last_line(_CommonCase):
                 )
 
 
-class Case3754_no_room_on_second_to_last(_CommonCase):
+class Case3754_no_room_on_second_to_last(CommonCase):
 
     def test_100_drops_last_line_and_replace(self):
         o = self.build_result_lines()
@@ -130,7 +130,7 @@ class Case3754_no_room_on_second_to_last(_CommonCase):
                 )
 
 
-class Case3757_last_resort(_CommonCase):
+class Case3757_last_resort(CommonCase):
 
     def test_100_makes_some_line_violate_the_constraint(self):
         o = self.build_result_lines()
@@ -144,7 +144,7 @@ class Case3757_last_resort(_CommonCase):
                 )
 
 
-class Case3760_empty_string(_CommonCase):
+class Case3760_empty_string(CommonCase):
 
     def test_100_WAT(self):
             o = self.build_result_lines()

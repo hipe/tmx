@@ -1,7 +1,7 @@
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def expect(self, before, after):
         provisioned_before, length = _provisioned_via_bar(before)
@@ -34,7 +34,7 @@ _yes_no = {
         }
 
 
-class Case1545_simplified(_CommonCase):
+class Case1545_simplified(CommonCase):
 
     def test_07_load_module(self):
         self.assertIsNotNone(_subject_module())

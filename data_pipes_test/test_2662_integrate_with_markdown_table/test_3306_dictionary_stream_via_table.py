@@ -24,16 +24,16 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _field_names(self):
-        return self._end_state().sync_keys_seen
+        return self.end_state.sync_keys_seen
 
     def _record(self, k):
-        return self._end_state().entity_dictionary_via_sync_key[k]
+        return self.end_state.entity_dictionary_via_sync_key[k]
 
 
-class Case3306DP_hello(_CommonCase):
+class Case3306DP_hello(CommonCase):
     """the interesting tests here (towards the end) are (at writing)..
 
     ..a sub-slice of tests in our "mentor" test file (Case1640DP). we have
@@ -64,10 +64,10 @@ class Case3306DP_hello(_CommonCase):
         self.assertIsNotNone(_subject_module())
 
     def test_200_runs(self):
-        self.assertIsNotNone(self._end_state())
+        self.assertIsNotNone(self.end_state)
 
     @shared_subject
-    def _end_state(self):
+    def end_state(self):
         return build_state_the_bernstein_way(
             fixture_document_path=markdown_fixture('0150-bernstein-subtree.md'),  # noqa: E501
             producer_module=_subject_module(),

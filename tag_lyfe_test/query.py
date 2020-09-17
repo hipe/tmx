@@ -33,7 +33,7 @@ class ScaryCommonCase(metaclass=_ScaryCommonCaseWatcher):
             subtree = _build_tag_subtree(tup)
             cache[tup] = subtree
 
-        _query = self.end_state().result
+        _query = self.end_state.result
 
         return _query.yes_no_match_via_tag_subtree(subtree)
 
@@ -48,23 +48,23 @@ class ScaryCommonCase(metaclass=_ScaryCommonCaseWatcher):
         self.assertEqual(offset_of_where_arrow_is_pointing_to, i)
 
     def _yikes_these(self):
-        _1, _2 = self.end_state().first_emission_messages[1:3]
+        _1, _2 = self.end_state.first_emission_messages[1:3]
         return len(_2) - 1, _1
 
     def says(self, s):
-        _act = self.end_state().first_emission_messages[0]
+        _act = self.end_state.first_emission_messages[0]
         self.assertEqual(_act, s)
 
     def fails(self):
-        self.assertIsNone(self.end_state().result)
+        self.assertIsNone(self.end_state.result)
 
     def unparses_to(self, s):
-        _wat = self.end_state().result
+        _wat = self.end_state.result
         _actual = _wat.to_string()
         self.assertEqual(_actual, s)
 
     def query_compiles(self):
-        sta = self.end_state()
+        sta = self.end_state
         self.assertIsNotNone(sta.result)
         self.assertIsNone(sta.first_emission_messages)
 

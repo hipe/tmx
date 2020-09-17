@@ -57,7 +57,7 @@ def expect_everything(orig_f):
     return new_f
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     @expect_everything
     def _expect_everything_for_update(self, kwargs):
@@ -93,7 +93,7 @@ class _CommonCase(unittest.TestCase):
 _empty_dict_OCD = {}
 
 
-class Case4276_create_against_truly_empty_file(_CommonCase):
+class Case4276_create_against_truly_empty_file(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -115,7 +115,7 @@ class Case4276_create_against_truly_empty_file(_CommonCase):
         """
 
 
-class Case4277_create_against_effectively_empty_file_with_comments(_CommonCase):  # noqa: E501
+class Case4277_create_against_effectively_empty_file_with_comments(CommonCase):  # noqa: E501
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -141,7 +141,7 @@ class Case4277_create_against_effectively_empty_file_with_comments(_CommonCase):
         """
 
 
-class Case4278_create_that_appends_entity_to_the_very_end(_CommonCase):
+class Case4278_create_that_appends_entity_to_the_very_end(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -168,7 +168,7 @@ class Case4278_create_that_appends_entity_to_the_very_end(_CommonCase):
         """
 
 
-class Case4279_create_that_inserts_at_the_front(_CommonCase):
+class Case4279_create_that_inserts_at_the_front(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -198,7 +198,7 @@ class Case4279_create_that_inserts_at_the_front(_CommonCase):
         """
 
 
-class Case4280_create_that_inserts_in_between(_CommonCase):
+class Case4280_create_that_inserts_in_between(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -228,7 +228,7 @@ class Case4280_create_that_inserts_in_between(_CommonCase):
         """
 
 
-class Case4282_create_that_inserts_in_between_no_props(_CommonCase):
+class Case4282_create_that_inserts_in_between_no_props(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_create()
@@ -252,7 +252,7 @@ class Case4282_create_that_inserts_in_between_no_props(_CommonCase):
         """
 
 
-class Case4283_delete_at_head_no_fluff(_CommonCase):
+class Case4283_delete_at_head_no_fluff(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()
@@ -275,7 +275,7 @@ class Case4283_delete_at_head_no_fluff(_CommonCase):
         """
 
 
-class Case4284_delete_at_head_yes_fluff(_CommonCase):  # #midpoint in file
+class Case4284_delete_at_head_yes_fluff(CommonCase):  # #midpoint in file
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()
@@ -302,7 +302,7 @@ class Case4284_delete_at_head_yes_fluff(_CommonCase):  # #midpoint in file
         """
 
 
-class Case4285_delete_in_middle(_CommonCase):
+class Case4285_delete_in_middle(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()
@@ -324,7 +324,7 @@ class Case4285_delete_in_middle(_CommonCase):
         """
 
 
-class Case4286_delete_at_end(_CommonCase):
+class Case4286_delete_at_end(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()
@@ -347,7 +347,7 @@ class Case4286_delete_at_end(_CommonCase):
         """
 
 
-class Case4288_delete_leaving_effectively_empty_file(_CommonCase):
+class Case4288_delete_leaving_effectively_empty_file(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_delete()
@@ -365,7 +365,7 @@ class Case4288_delete_leaving_effectively_empty_file(_CommonCase):
         """
 
 
-class Case4289_update_at_beginning(_CommonCase):
+class Case4289_update_at_beginning(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -393,7 +393,7 @@ class Case4289_update_at_beginning(_CommonCase):
         """
 
 
-class Case4290_update_beginning_no_props(_CommonCase):
+class Case4290_update_beginning_no_props(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -416,7 +416,7 @@ class Case4290_update_beginning_no_props(_CommonCase):
         """
 
 
-class Case4291_update_in_middle(_CommonCase):
+class Case4291_update_in_middle(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()
@@ -448,7 +448,7 @@ class Case4291_update_in_middle(_CommonCase):
         """
 
 
-class Case4292_update_at_end(_CommonCase):
+class Case4292_update_at_end(CommonCase):
 
     def test_300_expect_these_lines(self):
         self._expect_everything_for_update()

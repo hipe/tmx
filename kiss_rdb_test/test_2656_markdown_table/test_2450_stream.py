@@ -10,79 +10,95 @@ import unittest
 fixture_path = functions_for('markdown').fixture_path
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
-    def _build_state_expecting_some_emssions(self, path):
-        listener, emissioner = listener_and_emissioner_for(self)
-        business_objects = self._run(path, listener)
-        chan, payloader = emissioner()
-        return _State(business_objects, ((chan, payloader),))
+    def build_state_expecting_some_emssions(self, path):
+        listener, emissions = em.listener_and_emissions_for(self, limit=1)
+        attr_dcts, k = self.my_run(path, listener)
+        emi, = emissions
+        return EndState(attr_dcts, k, ((emi.channel, emi.payloader),))
 
-    def _build_state_expecting_no_emissions(self, path):
-        business_objects = self._run(path, _failey_listener)
-        return _State(business_objects)
+    def build_state_expecting_no_emissions(self, path):
+        attr_dcts, k = self.my_run(path, failey_listener)
+        return EndState(attr_dcts, k)
 
-    def _run(self, path, listener):
-
+    def my_run(self, path, listener):
         from kiss_rdb import collectionerer
         coll = collectionerer().collection_via_path(
                 collection_path=path,
                 adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
                 listener=listener)
         if coll is None:
-            return (), None  # (Case2449DP)
+            return (), None  # (Case2449)
 
-        cm = coll.COLLECTION_IMPLEMENTATION.OPEN_TRAVERSAL_STREAM__(listener)
-        with cm as dcts:
-            business_objects = tuple(dcts)
-        return business_objects
+        ci = coll.COLLECTION_IMPLEMENTATION
+        ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
+
+        dcts, k = [], None
+        for first_ent in ents:
+            def p(ent):
+                dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+                dct[k] = ent.nonblank_identifier_primitive  # ..
+                return dct
+            k = first_ent.identifier_key__
+            dcts.append(p(first_ent))
+            for ent in ents:
+                dcts.append(p(ent))
+        return tuple(dcts), k
+
+    do_debug = False
 
 
-class Case2449DP_fail(_CommonCase):
+class Case2449_fail(CommonCase):
 
     def test_200_fails(self):
-        (chan, payloader), = self._state().emissions
-        self.assertSequenceEqual(chan,
-                ('error', 'structure', 'cannot_load_collection', 'file_has_no_extname'))  # noqa: E501
+        (chan, payloader), = self.end_state.emissions
+        expected = ('error', 'structure', 'cannot_load_collection', 'file_has_no_extname')  # noqa: E501
+        self.assertSequenceEqual(chan, expected)
         _reason = payloader()['reason']
         self.assertRegex(_reason, r'^cannot infer .+om file with no extension')
 
     @shared_subject
-    def _state(self):
-        _md = fixture_path('0080-no-extension')
-        return self._build_state_expecting_some_emssions(_md)
+    def end_state(self):
+        md = fixture_path('0080-no-extension')
+        return self.build_state_expecting_some_emssions(md)
 
 
 # Case2450  #midpoint
 
 
-class Case2451_work(_CommonCase):
+class Case2451_work(CommonCase):
 
     def test_200_runs(self):
-        self.assertIsNotNone(self._state())
+        self.assertIsNotNone(self.end_state)
 
     def test_300_sparse_is_sparse(self):
-        t = self._state().business_objects
-        self.assertIn('stamina', t[0])
-        self.assertNotIn('stamina', t[1])
+        dcts = self.end_state.attribute_dictionaries
+        self.assertIn('stamina', dcts[0])
+        self.assertNotIn('stamina', dcts[1])
 
-    def test_400_empty_is_possible(self):
-        dct = self._state().business_objects[-1]
-        self.assertEqual(len(dct), 0)
+    def test_400_empty_values_dict_is_possible_but_identifiers_necessary(self):
+        """(NOTE easy to change if you don't want to skip non-entities..)"""
+
+        es = self.end_state
+        dcts, k = es.attribute_dictionaries, es.identifier_key
+        ks = tuple(dct[k] for dct in dcts)
+        self.assertSequenceEqual(ks, ('x0', 'y0', 'z0'))
 
     @shared_subject
-    def _state(self):
-        _md = fixture_path('0115-stream-me.md')
-        return self._build_state_expecting_no_emissions(_md)
+    def end_state(self):
+        md = fixture_path('0115-stream-me.md')
+        return self.build_state_expecting_no_emissions(md)
 
 
-class _State:
-    def __init__(self, business_objects, emissions=None):
-        self.business_objects = business_objects
+class EndState:
+    def __init__(self, attribute_dcts, k, emissions=()):
         self.emissions = emissions
+        self.attribute_dictionaries = attribute_dcts
+        self.identifier_key = k
 
 
-def _failey_listener(*a):
+def failey_listener(*a):
     raise Exception('expecting no emissions')
 
 

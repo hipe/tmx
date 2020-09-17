@@ -13,10 +13,10 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
+CommonCase = unittest.TestCase
 
 
-class Case1010_basic_write(_CommonCase):
+class Case1010_basic_write(CommonCase):
 
     def test_100_returns_num_bytes_wrote_no_matter_what_you_result_in(self):
         def f(s):
@@ -28,7 +28,7 @@ class Case1010_basic_write(_CommonCase):
         self.assertEqual(res, 4)
 
 
-class Case1020_flush(_CommonCase):
+class Case1020_flush(CommonCase):
 
     def test_100_there_is_no_flush_normally(self):
         o = _write_only_IO_proxy(None)
@@ -53,18 +53,18 @@ class Case1020_flush(_CommonCase):
         self.assertEqual(counter.value, 1)
 
 
-class Case1030_context_manager(_CommonCase):
+class Case1030_context_manager(CommonCase):
 
     def test_100_wrote(self):
-        writes = self.o()['writes']
+        writes = self.o['writes']
         self.assertSequenceEqual(writes, ('ohai',))
 
     def test_200_called_the_close_callback(self):
-        i = self.o()['count']
+        i = self.o['count']
         self.assertEqual(i, 1)
 
     def test_300_inside_tonext_manager_is_same_object(self):
-        yes = self.o()['is_same']
+        yes = self.o['is_same']
         self.assertTrue(yes)
 
     @shared_subject

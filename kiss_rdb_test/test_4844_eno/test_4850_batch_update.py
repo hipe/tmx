@@ -66,7 +66,7 @@ class CommonCase(unittest.TestCase):
 def against(offset):
     def decorator(orig_f):
         def use_f(self):
-            several = self.against_these()
+            several = self.against_these
             actual = several[offset]
             acts = list(reversed(actual))
 

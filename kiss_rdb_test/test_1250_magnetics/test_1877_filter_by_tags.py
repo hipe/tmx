@@ -6,7 +6,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     @dangerous_memoize_in_child_classes('_end_state', 'build_end_state')
     def end_state():
@@ -16,7 +16,7 @@ class _CommonCase(unittest.TestCase):
         return self.my_case.build_end_state(self)
 
 
-class Case1872_one_column_match_two_out_of_three(_CommonCase):
+class Case1872_one_column_match_two_out_of_three(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_these_two_entities(self)
@@ -32,7 +32,7 @@ class Case1872_one_column_match_two_out_of_three(_CommonCase):
         return case_of_one_column_match_two_out_of_three
 
 
-class Case1875_empty_collection(_CommonCase):
+class Case1875_empty_collection(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_no_entities(self)

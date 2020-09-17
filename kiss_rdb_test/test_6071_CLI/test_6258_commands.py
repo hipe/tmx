@@ -5,20 +5,20 @@ import unittest
 from modality_agnostic.memoization import dangerous_memoize as shared_subject
 
 
-class _CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
+class CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
 
     might_debug = False
 
 
-class Case6248_schema_parse_error(_CommonCase):
+class Case6248_schema_parse_error(CommonCase):
 
     def test_100_fails(self):
-        self.assertEqual(self.end_state().exit_code, 400)
+        self.assertEqual(self.end_state.exit_code, 400)
 
     def test_200_expresses(self):
         # == BEGIN normalize a long path into a short path
         from os import path as os_path
-        lines = list(self.end_state().lines)  # ..
+        lines = list(self.end_state.lines)  # ..
         line = lines[1]
         head, tail = line.split(' ', 1)
         tail = os_path.basename(tail)
@@ -44,25 +44,25 @@ class Case6248_schema_parse_error(_CommonCase):
         return None  # use real filesystem
 
 
-class Case6250_modality_specific_whiner(_CommonCase):
+class Case6250_modality_specific_whiner(CommonCase):
 
     def test_100_exit_code_reflects_failure(self):
         self.expect_exit_code_for_bad_request()
 
     def test_200_main_message_is_in_there(self):
-        self.assertIn('multi-line strings must have', self._message())
+        self.assertIn('multi-line strings must have', self.message)
 
     def test_300_qualifies_it_as_about_this_name_and_value(self):
         self.assertIn(
             "Could not set 'qq' to 'foo\\nbar' because for now, ",
-            self._message())
+            self.message)
 
     def test_400_we_added_our_own_punctuaton_to_the_end(self):
-        self.assertEqual(self._message()[-5:], 'ter.\n')
+        self.assertEqual(self.message[-5:], 'ter.\n')
 
-    @shared_subject  # necessary
-    def _message(self):
-        line, = self.end_state().lines
+    @shared_subject
+    def message(self):
+        line, = self.end_state.lines
         return line
 
     @shared_subject
@@ -80,18 +80,18 @@ class Case6250_modality_specific_whiner(_CommonCase):
         return build_filesystem_expecting_num_file_rewrites(0)  # ..
 
 
-class Case6258_multi_line_create(_CommonCase):  # #midpoint
+class Case6258_multi_line_create(CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
         self.expect_exit_code_is_the_success_exit_code()
 
     def test_200_announces_created(self):
-        _actual, line2 = self.common_entity_screen().stderr_lines_one_and_two
+        _actual, line2 = self.common_entity_screen.stderr_lines_one_and_two
         self.assertEqual(_actual, "created '2HF' with 1 attribute\n")
         self.assertIsNone(line2)
 
     def test_300_outputs_created(self):
-        _actual = self.common_entity_screen().stdout_lines
+        _actual = self.common_entity_screen.stdout_lines
 
         _expected = tuple(unindent('''
         [item.2HF.attributes]

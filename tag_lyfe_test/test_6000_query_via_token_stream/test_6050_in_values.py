@@ -16,7 +16,7 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
 # Case6020 is below
@@ -24,7 +24,7 @@ _CommonCase = unittest.TestCase
 # Case6030 is below
 
 
-class Case6040(_CommonCase, ScaryCommonCase):  # #midpoint
+class Case6040(CommonCase, ScaryCommonCase):  # #midpoint
 
     def given_tokens(self):
         return ('#foo', 'in', '(', 'bar', 'baz', 'quux', ')', 'xx')

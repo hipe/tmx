@@ -14,7 +14,7 @@ import unittest
 # NOTE canon for retrieve is covered in that one file
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # -- comment yes/no
 
@@ -86,20 +86,20 @@ class _CommonCase(unittest.TestCase):
         self.assertEqual(line, '\n')
 
     def table_start_line_object(self):
-        return self.entity()._table_start_line_object
+        return self.entity._table_start_line_object
 
     def body_component_at(self, idx):
-        return self.body_block_index()[idx]
+        return self.body_block_index[idx]
 
     def build_body_block_index(self):
-        return self.entity()._body_blocks
+        return self.entity._body_blocks
 
     def retrieve_expecting_success(self):
         listener = _debugging_listener() if False else _no_listener
         return self.run_retrieve(listener)
 
     def error_structure_at(self, nm):
-        return self.error_structure()[nm]
+        return self.error_structure[nm]
 
     def emission_payload_expecting_entity_not_found(self):
         return self.emission_payload_expecting_channel(
@@ -126,10 +126,11 @@ class _CommonCase(unittest.TestCase):
                 _id_s, _all_lines, listener)
 
 
-class Case4116_simplified_typical_retrieve_in_mid(_CommonCase):
+
+class Case4116_simplified_typical_retrieve_in_mid(CommonCase):
 
     def test_100_runs(self):
-        self.assertIsNotNone(self.entity())
+        self.assertIsNotNone(self.entity)
 
     def test_233_table_start_line_components_look_good(self):
         self.expect_entity_has_this_identifier('BB')
@@ -162,7 +163,7 @@ class Case4116_simplified_typical_retrieve_in_mid(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case4117_not_found(_CommonCase):
+class Case4117_not_found(CommonCase):
 
     def test_100_input_error_type_is_not_found(self):
         self.expect_not_found_input_error_type()
@@ -188,7 +189,7 @@ class Case4117_not_found(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case4118_not_found_anywhere(_CommonCase):
+class Case4118_not_found_anywhere(CommonCase):
 
     def test_300_tells_you_it_traversed_the_whole_thing(self):
         self.assertTrue(self.error_structure_at('did_traverse_whole_file'))
@@ -208,15 +209,15 @@ class Case4118_not_found_anywhere(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case4120_at_head(_CommonCase):
+class Case4120_at_head(CommonCase):
 
     def test_300_attributes(self):
-        a = self.body_block_index()
+        a = self.body_block_index
         self.assertEqual(a[0].line, "prop-1 = 123\n")
         self.assertEqual(a[1].line, 'prop-2 = "value aa"\n')
 
     def test_400_trailing_blank_lines(self):
-        a = self.body_block_index()
+        a = self.body_block_index
         self.expect_block_is_blank_line(a[2])
         self.assertEqual(len(a), 3)
 
@@ -234,21 +235,22 @@ class Case4120_at_head(_CommonCase):
         return _given_ABC_lines()
 
 
-class Case4121_at_tail(_CommonCase):
+class Case4121_at_tail(CommonCase):
 
     def test_300_attributes(self):
-        a = self.body_block_index()
+        a = self.body_block_index
         self.assertEqual(a[0].line, "prop-1 = 345\n")
         self.assertEqual(a[1].line, 'prop-2 = "value cc"\n')
 
     def test_400_notrailing_blank_lines(self):
-        a = self.body_block_index()
+        a = self.body_block_index
         self.assertEqual(len(a), 2)
 
     @shared_subject
     def body_block_index(self):
         return self.build_body_block_index()
 
+    @property
     def entity(self):
         return self.retrieve_expecting_success()
 
@@ -276,7 +278,7 @@ def _given_ABC_lines():
     """))
 
 
-class Case4122_against_empty(_CommonCase):
+class Case4122_against_empty(CommonCase):
 
     # #wish [#867.G] empty files would tell you they're empty in this case
 
@@ -300,7 +302,7 @@ class Case4122_against_empty(_CommonCase):
         return ()
 
 
-class Case4123_meta_not_yet_implemented(_CommonCase):
+class Case4123_meta_not_yet_implemented(CommonCase):
 
     def test_100_message(self):
         es = self.emission_payload_expecting_generic_error()
@@ -328,7 +330,7 @@ class Case4123_meta_not_yet_implemented(_CommonCase):
         """)
 
 
-class Case4124_duplicate_identifiers_can_get_shadowed(_CommonCase):
+class Case4124_duplicate_identifiers_can_get_shadowed(CommonCase):
 
     # [#864.provision-3.1]: stop at the first one
 
@@ -367,23 +369,23 @@ class Case4124_duplicate_identifiers_can_get_shadowed(_CommonCase):
 # Case4125 # #midpoint
 
 
-class Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):  # noqa: E501
+class Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail(CommonCase):  # noqa: E501
 
     """(note we don't actually run this thru a coarse parse)"""
 
     def test_100_in_general_say_toml_decode_error(self):
-        self.assertEqual(self._general_and_specific()[0], 'toml decode error')
+        self.assertEqual(self.general_and_specific[0], 'toml decode error')
 
     def test_200_in_specific_say_this_one_weird_error(self):
         _expect = "This float doesn't have a leading digit (line 2 column 1 char 1)"  # noqa: E501
-        self.assertEqual(self._general_and_specific()[1], _expect)
+        self.assertEqual(self.general_and_specific[1], _expect)
 
     @shared_subject
-    def _general_and_specific(self):
-        return self._structure()['reason'].split(': ')
+    def general_and_specific(self):
+        return self.structure['reason'].split(': ')
 
     @shared_subject
-    def _structure(self):
+    def structure(self):
         def run(listener):
             return _vendor_parse(self.given_entity_body_lines(), listener)
         return self.emission_payload_via_run_expecting_channel(
@@ -395,7 +397,7 @@ class Case4126_invalid_toml_gets_thru_coarse_parse_then_parse_fail(_CommonCase):
         """
 
 
-class Case4127_touch_multi_line(_CommonCase):  # #mutli-line-case
+class Case4127_touch_multi_line(CommonCase):  # #mutli-line-case
     # before #history-A.1, the case around these input lines captured how it
     # was possible to use multi-line strings to "trick" our parser. now that
     # we attempt to support multi-line strings..
@@ -416,7 +418,7 @@ class Case4127_touch_multi_line(_CommonCase):  # #mutli-line-case
         """
 
 
-class Case4128_array_not_suported_yet(_CommonCase):
+class Case4128_array_not_suported_yet(CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('array')
@@ -428,7 +430,7 @@ class Case4128_array_not_suported_yet(_CommonCase):
         return 'array'
 
 
-class Case4129_inline_tables_not_suported_yet(_CommonCase):
+class Case4129_inline_tables_not_suported_yet(CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('inline table')
@@ -440,7 +442,7 @@ class Case4129_inline_tables_not_suported_yet(_CommonCase):
         return 'inline-table'
 
 
-class Case4130_the_easy_cases(_CommonCase):
+class Case4130_the_easy_cases(CommonCase):
 
     def test_316_bool_no_comment(self):
         self.expect_no_comment_easy('bool-no-comment')
@@ -474,7 +476,7 @@ class Case4130_the_easy_cases(_CommonCase):
         self.expect_yes_comment_easy('datetime-yes-comment')
 
 
-class Case4132_literal_string_not_yet_supported(_CommonCase):
+class Case4132_literal_string_not_yet_supported(CommonCase):
 
     def test_100(self):
         self.expect_toml_type_not_supported('literal string')
@@ -486,7 +488,7 @@ class Case4132_literal_string_not_yet_supported(_CommonCase):
         return 'single-line-literal-string'
 
 
-class Case4133_multi_line(_CommonCase):
+class Case4133_multi_line(CommonCase):
 
     # (#tombstone-A.2 remembers when these were not yet supported)
 
@@ -498,7 +500,7 @@ class Case4133_multi_line(_CommonCase):
         self.expect_no_comment_easy('multi-line-basic')
 
 
-class Case4134_the_hard_but_money_cases(_CommonCase):
+class Case4134_the_hard_but_money_cases(CommonCase):
 
     # these are ones where we parse the string by hand and it works
 

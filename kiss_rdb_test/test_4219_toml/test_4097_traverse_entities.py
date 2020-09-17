@@ -6,7 +6,7 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def is_head_block_with_this_many_lines(self, hb, num):
         _actual = len(hb._head_block_lines)
@@ -32,10 +32,10 @@ class _CommonCase(unittest.TestCase):
         return item_count, chan, emit
 
     def the_rest(self):
-        return self.head_block_and_rest()[1]
+        return self.head_block_and_rest[1]
 
     def head_block(self):
-        return self.head_block_and_rest()[0]
+        return self.head_block_and_rest[0]
 
     def when_expecting_success_head_block_and_rest(self):
         itr = self.when_expecting_success_iterator()
@@ -50,7 +50,7 @@ class _CommonCase(unittest.TestCase):
         return block_stream_via_file_lines(_given_lines, listener)
 
 
-class Case4094_simplified_typical(_CommonCase):
+class Case4094_simplified_typical(CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 2)
@@ -87,7 +87,7 @@ class Case4094_simplified_typical(_CommonCase):
         """)
 
 
-class Case4095_effectively_empty_file_of_course_has_head_block(_CommonCase):
+class Case4095_effectively_empty_file_of_course_has_head_block(CommonCase):
 
     def test_100_head_block_looks_good(self):
         lines = self.head_block()._head_block_lines
@@ -111,7 +111,7 @@ class Case4095_effectively_empty_file_of_course_has_head_block(_CommonCase):
         """)
 
 
-class Case4096_truly_empty_file_has_no_head_block(_CommonCase):
+class Case4096_truly_empty_file_has_no_head_block(CommonCase):
 
     def test_100_whatever(self):
         itr = self.when_expecting_success_iterator()
@@ -122,15 +122,15 @@ class Case4096_truly_empty_file_has_no_head_block(_CommonCase):
         return ()
 
 
-class Case4097_error_in_table_start_line(_CommonCase):  # #midpoint
+class Case4097_error_in_table_start_line(CommonCase):  # #midpoint
 
     def test_100_some_error_structure_detail(self):
-        sct = self.count_and_structure()[1]
+        sct = self.count_and_structure[1]
         self.assertEqual(sct['lineno'], 2)
         self.assertEqual(sct['expecting'], 'keyword "item"')
 
     def test_200_it_does_not_yield_even_one_entity(self):
-        count = self.count_and_structure()[0]
+        count = self.count_and_structure[0]
         self.assertEqual(count, 0)
 
     @shared_subject
@@ -145,7 +145,7 @@ class Case4097_error_in_table_start_line(_CommonCase):  # #midpoint
         """)
 
 
-class Case4098_error_in_attribute_value_passes_thru_for_now(_CommonCase):
+class Case4098_error_in_attribute_value_passes_thru_for_now(CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 1)
@@ -168,7 +168,7 @@ class Case4098_error_in_attribute_value_passes_thru_for_now(_CommonCase):
         """)
 
 
-class Case4100_one_no_head(_CommonCase):
+class Case4100_one_no_head(CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 0)
@@ -188,7 +188,7 @@ class Case4100_one_no_head(_CommonCase):
         """)
 
 
-class Case4101_two_yes_head(_CommonCase):
+class Case4101_two_yes_head(CommonCase):
 
     def test_100_head_block_looks_good(self):
         self.is_head_block_with_this_many_lines(self.head_block(), 1)
@@ -216,7 +216,7 @@ class Case4101_two_yes_head(_CommonCase):
         """)
 
 
-class Case4111_integrate_filter_by_tags(_CommonCase):
+class Case4111_integrate_filter_by_tags(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_these_two_entities(self)

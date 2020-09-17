@@ -4,7 +4,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
 class Case5414_AST(CommonCase):
@@ -77,11 +77,11 @@ class ParseyCase(CommonCase):
                 ('error', 'structure', error_category, error_case))
 
     def end_state_error_channel(self):
-        channel, structurer = self.failure_end_state()
+        channel, structurer = self.failure_end_state
         return channel
 
     def flush_end_state_payload(self):
-        channel, structurer = self.failure_end_state()
+        channel, structurer = self.failure_end_state
         return structurer()
 
     @dangerous_memoize_in_child_classes('fail_ES', 'build_failure_end_state')

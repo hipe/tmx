@@ -19,7 +19,7 @@ md_fixture_path = functions_for('markdown').fixture_path
 canon = storage_adapter_canon.produce_agent()
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def build_end_state_expecting_failure(self):
         return canon.build_end_state_expecting_failure_via(self)
@@ -40,16 +40,17 @@ class _CommonCase(unittest.TestCase):
         pass
 
 
-class Case2510_collection_not_found(_CommonCase):
+
+class Case2510_collection_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_channel_looks_right(self):
-        self._canon_case.confirm_channel_looks_right(self)
+        self.canon_case.confirm_channel_looks_right(self)
 
     def test_300_expression_looks_right(self):
-        self._canon_case.confirm_expression_looks_right(self)
+        self.canon_case.confirm_expression_looks_right(self)
 
     @shared_subject
     def end_state(self):
@@ -59,22 +60,22 @@ class Case2510_collection_not_found(_CommonCase):
         return toml_fixture_directory_for('000-no-ent')
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_collection_not_found
 
 
-class Case2513_file_has_no_table(_CommonCase):
+class Case2513_file_has_no_table(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_channel_looks_right(self):
-        self._canon_case.confirm_channel_looks_right(self)
+        self.canon_case.confirm_channel_looks_right(self)
 
     def test_300_expression_looks_right(self):
-        self._canon_case.confirm_expression_looks_right(self)
-        reason = reason_via_end_state(self.end_state())
-        self.assertIn(': no markdown table found in 7 lines - ', reason)
+        self.canon_case.confirm_expression_looks_right(self)
+        reason = reason_via_end_state(self.end_state)
+        self.assertIn(': no markdown table found in 7 lines', reason)
 
     @shared_subject
     def end_state(self):
@@ -84,11 +85,11 @@ class Case2513_file_has_no_table(_CommonCase):
         return md_fixture_path('2515-has-no-table.md')
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_collection_not_found
 
 
-class Case2516_file_has_multiple_tables(_CommonCase):
+class Case2516_file_has_multiple_tables(CommonCase):
 
     def test_100_result_is_none(self):
         self._canon_case.confirm_result_is_none(self)
@@ -129,11 +130,11 @@ class Case2516_file_has_multiple_tables(_CommonCase):
             """)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_collection_not_found
 
 
-class Case2519_empty_collection_found(_CommonCase):
+class Case2519_empty_collection_found(CommonCase):
 
     def test_100_result_is_not_none(self):
         _canon_case = canon.case_of_empty_collection_found
@@ -143,7 +144,7 @@ class Case2519_empty_collection_found(_CommonCase):
         return self.resolve_collection(None)
 
     def given_pretend_file(self):
-        _lines = unindent_with_dot_hack(
+        lines = unindent_with_dot_hack(
             """
             .
 
@@ -151,18 +152,17 @@ class Case2519_empty_collection_found(_CommonCase):
             |aa|bb|cc|
             |---|---|---
             """)
-        return PretendFile(
-            _lines,
-            'pretend-file/2519-empty-collection.md')
+        pretend_path = 'pretend-file/2519-empty-collection.md'
+        return pretend_file_via_path_and_lines(pretend_path, lines)
 
 
-class Case2522_non_empty_collection_found(_CommonCase):
+class Case2522_non_empty_collection_found(CommonCase):
 
     def test_100_result_is_not_none(self):
-        _canon_case = canon.case_of_non_empty_collection_found
-        _canon_case.confirm_collection_is_not_none(self)
+        canon_case = canon.case_of_non_empty_collection_found
+        canon_case.confirm_collection_is_not_none(self)
 
-    def subject_collection(self):
+    def given_collection(self):
         return self.resolve_collection(None)
 
     def given_pretend_file(self):

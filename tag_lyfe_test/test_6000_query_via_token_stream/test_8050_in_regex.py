@@ -10,13 +10,13 @@ from tag_lyfe_test.query import ScaryCommonCase
 import unittest
 
 
-_CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
 
 
 # Case8020 is #here1
 
 
-class Case8048_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):
+class Case8048_bad_regex__no_endthing(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/bar')
@@ -33,7 +33,7 @@ class Case8048_bad_regex__no_endthing(_CommonCase, ScaryCommonCase):
         return self.point_at_offset(len(s) - 1)
 
 
-class Case8049_empty_regexp(_CommonCase, ScaryCommonCase):
+class Case8049_empty_regexp(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '//')
@@ -53,7 +53,7 @@ class Case8049_empty_regexp(_CommonCase, ScaryCommonCase):
 # Case8050  # #midpoint
 
 
-class Case8051_bad_regex(_CommonCase, ScaryCommonCase):
+class Case8051_bad_regex(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/bar[/')
@@ -71,7 +71,7 @@ class Case8051_bad_regex(_CommonCase, ScaryCommonCase):
         # '------------^'
 
 
-class Case8052_good_regex(_CommonCase, ScaryCommonCase):
+class Case8052_good_regex(CommonCase, ScaryCommonCase):
 
     def given_tokens(self):
         return ('#foo', 'in', '/^b(ar|az)$/', 'xx')

@@ -194,9 +194,9 @@ class _ThisState:  # #[#510.2]
 def _whine_about_special_character_not_supported(
         pos, name, line, line_no, listener):
 
-    _use_name = name.lower()
-    _already_has = re.search(' character$', name)
-    _characters = 's' if _already_has else ' characters'
+    use_name = name.lower()
+    already_has = re.search(' character$', name)
+    characters = 's' if already_has else ' characters'
 
     _reason = (
             f'for now, {_use_name}{_characters} are deemed '
@@ -205,7 +205,7 @@ def _whine_about_special_character_not_supported(
 
     def structer():
         return {
-                'reason': _reason,
+                'reason': reason,
                 'position': pos,
                 'line': line,
                 # 'lineno': line_no,  # wrong line number
@@ -227,13 +227,12 @@ def _whine_about_line_too_long(listener, line_number, line, o):
 
 def _whine_about_too_many_lines(listener, has_more, line_number, line, o):
 
-    _max = line_number - 1
-    _more_than = ' more than' if has_more else ''
-    _reason = (
-            f'multi-line string cannot exceed {_max} lines '
-            f'(had{_more_than} {line_number}).'
-            )
-    _emit_input_error_about_string(listener, _reason, line)
+    maxx = line_number - 1
+    more_than = ' more than' if has_more else ''
+    reason = (
+            f'multi-line string cannot exceed {maxx} lines '
+            f'(had{more_than} {line_number}).')
+    _emit_input_error_about_string(listener, reason, line)
 
 
 def _emit_input_error_about_string(listener, reason, line):

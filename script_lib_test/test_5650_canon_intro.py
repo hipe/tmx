@@ -25,7 +25,7 @@ from modality_agnostic.memoization import dangerous_memoize as shared_subject
 import unittest
 
 
-class _CommonCase(CLI_Canon_Case_Methods, unittest.TestCase):
+class CommonCase(CLI_Canon_Case_Methods, unittest.TestCase):
 
     # -- assertion
 
@@ -46,7 +46,7 @@ class _CommonCase(CLI_Canon_Case_Methods, unittest.TestCase):
     do_debug = False
 
 
-class Case5643_no_args(_CommonCase):  # classically case 0
+class Case5643_no_args(CommonCase):  # classically case 0
 
     def test_010_subject_module_loads(self):
         from script_lib import cheap_arg_parse_branch
@@ -65,7 +65,6 @@ class Case5643_no_args(_CommonCase):  # classically case 0
     def test_060_second_line_says_invite(self):
         self.assertEqual(self.second_line[0:4], 'see ')
 
-    @property
     @shared_subject
     def end_state(self):
         return self.invoke_expecting(line_count=2, which='STDERR')
@@ -74,7 +73,7 @@ class Case5643_no_args(_CommonCase):  # classically case 0
         return ()
 
 
-class Case5647_strange_subparser_name(_CommonCase):  # classically case 1.1
+class Case5647_strange_subparser_name(CommonCase):  # classically case 1.1
 
     def test_020_invokes(self):
         self.invokes()
@@ -89,13 +88,12 @@ class Case5647_strange_subparser_name(_CommonCase):  # classically case 1.1
         import re
         md = re.match(r'([^(]+) \(([^)]+)\)$', self.first_line)
         head, tail = md.groups()
-        self.assertEqual(head, "no sub-command for 'fhqwhgads'.")
+        self.assertEqual(head, "no sub-command named 'fhqwhgads'.")
         self.assertEqual(tail, "there's 'foo-bar' and 'biff-baz'")
 
     def test_070_second_line_says_invite(self):
         self.second_line_invites_to('ohai-mami')
 
-    @property
     @shared_subject
     def end_state(self):
         return self.invoke_expecting(line_count=2, which='STDERR')
@@ -107,7 +105,7 @@ class Case5647_strange_subparser_name(_CommonCase):  # classically case 1.1
 # Case5650  # #midpoint
 
 
-class Case5653_strange_option(_CommonCase):  # classically case 1.2
+class Case5653_strange_option(CommonCase):  # classically case 1.2
 
     def test_020_invokes(self):
         self.invokes()
@@ -124,7 +122,6 @@ class Case5653_strange_option(_CommonCase):  # classically case 1.2
     def test_070_second_line_says_invite(self):
         self.second_line_invites_to('ohai-mami')
 
-    @property
     @shared_subject
     def end_state(self):
         return self.invoke_expecting(line_count=2, which='STDERR')
@@ -133,7 +130,7 @@ class Case5653_strange_option(_CommonCase):  # classically case 1.2
         return ('-x', '--another', '--etc')
 
 
-class Case5656_good_sub_command(_CommonCase):  # classically case 1.3
+class Case5656_good_sub_command(CommonCase):  # classically case 1.3
 
     def test_010_invokes(self):
         self.invokes()
@@ -146,7 +143,6 @@ class Case5656_good_sub_command(_CommonCase):  # classically case 1.3
     def test_results_in_user_exitstatus(self):
         self.invocation_results_in_this_exitstatus(4321)
 
-    @property
     @shared_subject
     def end_state(self):
         return self.invoke_expecting(line_count=1, which='STDOUT')

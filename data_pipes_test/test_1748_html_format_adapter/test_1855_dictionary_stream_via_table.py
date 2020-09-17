@@ -40,19 +40,16 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-_CommonCase = unittest.TestCase
-
-
-class Case1855DP_hello(_CommonCase):
+class Case1855DP_hello(unittest.TestCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())
 
     def test_200_runs(self):
-        self._shared_state()
+        self.end_state
 
     def test_300_new_in_this_thing_field_names_in_schema_record(self):
-        _act = self._shared_state().seen_attribute_keys
+        _act = self.end_state.seen_attribute_keys
         _exp = ('comment', 'grammar', 'module', 'name', 'python')
         self.assertSequenceEqual(_act, _exp)
 
@@ -75,17 +72,17 @@ class Case1855DP_hello(_CommonCase):
         self.assertNotIn('grammar', names1)
 
     def _business_row(self, offset):
-        return self._shared_state().business_objects[offset]
+        return self.end_state.business_objects[offset]
 
     def test_500_emits_one_thing(self):
         """emits one thing - #fragile"""
 
-        one, = self._shared_state().emissions
+        one, = self.end_state.emissions
         _exp = ('info', 'expression', 'reading_from_filesystem')
         self.assertSequenceEqual(one.channel, _exp)
 
     @shared_subject
-    def _shared_state(self):
+    def end_state(self):
 
         seen_attribute_keys = {}
         entity_dcts = []
@@ -118,6 +115,7 @@ class Case1855DP_hello(_CommonCase):
             emissions = emissions_
 
         return State
+    do_debug = False
 
 
 def _subject_module():

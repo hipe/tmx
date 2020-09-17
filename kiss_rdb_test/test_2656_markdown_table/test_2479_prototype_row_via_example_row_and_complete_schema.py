@@ -13,7 +13,7 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     def _there_is_NO_endcap_after(self):
         row = self._row_after()
@@ -40,7 +40,7 @@ class _CommonCase(unittest.TestCase):
         return self._row_after().cell_at_offset(self._offset_of_interest())
 
     def _row_after(self):
-        return self._state().row_after
+        return self.end_state.row_after
 
     def _offset_of_interest(self):
         return 1
@@ -49,7 +49,7 @@ class _CommonCase(unittest.TestCase):
 class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
 
     def test_010_loads(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_function())
 
     def test_020_the_content_string_gets_updated(self):
         self.assertEqual(self._content_string_after(), 'X2')
@@ -96,7 +96,7 @@ class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
             )
 
 
-class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCase):  # noqa: E501 #midpoint
+class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(CommonCase):  # noqa: E501 #midpoint
 
     def test_020_the_content_string_gets_updated(self):
         self.assertEqual(self._content_string_after(), 'Y3')
@@ -114,17 +114,17 @@ class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCa
         self.assertEqual(str2, '|Y3          ')
 
     @shared_subject
-    def _state(self):
-        return self._build_state_commonly()
+    def end_state(self):
+        return self.build_state_commonly()
 
     def far_name_value_pairs(self):
         return (('hallo_im_natty_key', 'y1'), ('zig', 'Y3'))
 
     def near_row_before(self):  # NOTE *yes* endcap
-        return _row_via_line('| y1  | y2  |\n')
+        return row_via_line('| y1  | y2  |\n')
 
-    def example_row(self):  # NOTE *yes* encap
-        return _row_via_line('|   eggsie xamply  |   foo fah  |\n')
+    def example_row(self):  # NOTE *yes* endcap
+        return row_via_line('|   eggsie xamply  |  foo fah   |\n')  # 18, 12
 
     def schema_plus(self):
         return _schema_plus_via_two_lines(
@@ -134,7 +134,7 @@ class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(_CommonCa
             )
 
 
-class Case2480KR_change_natural_key_only_OK(_CommonCase):
+class Case2480KR_change_natural_key_only_OK(CommonCase):
     """
     It used to be a thing to short-circuit the record-merge (and leave the
     "before" record alone) if there was nothing but the natural key in the
@@ -164,17 +164,17 @@ class Case2480KR_change_natural_key_only_OK(_CommonCase):
         self.assertEqual(str1, '|        Z1         ')
 
     @shared_subject
-    def _state(self):
-        return self._build_state_commonly()
+    def end_state(self):
+        return self.build_state_commonly()
 
     def far_name_value_pairs(self):
         return (('oi_im_natty', 'Z1'),)
 
     def near_row_before(self):
-        return _row_via_line('| z1  |\n')
+        return row_via_line('| z1  |\n')
 
     def example_row(self):
-        return _row_via_line('|    eggsie xamply  |\n')
+        return row_via_line('|    eggsie xamply  |\n')  # (4) 19 (2)
 
     def schema_plus(self):
         return _schema_plus_via_two_lines(
@@ -190,7 +190,7 @@ class Case2480KR_change_natural_key_only_OK(_CommonCase):
 # (Case2481KR) (no alignment specified) is ricocheted off of elsewhere.)
 
 
-def _build_state_commonly(tc):
+def build_state_commonly(tc):
 
     sp = tc.schema_plus()
     _eg_row = tc.example_row()

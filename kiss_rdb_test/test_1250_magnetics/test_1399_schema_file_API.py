@@ -33,12 +33,12 @@ from modality_agnostic.memoization import (
 import unittest
 
 
-class _CommonCase(unittest.TestCase):
+class CommonCase(unittest.TestCase):
 
     # -- assertons against end state
 
     def emits_error_category(self, ec):
-        es = self.end_state()
+        es = self.end_state
         self.assertIsNone(es['result_value'])  # NOTE sneak this in somehwere
         chan = es['channel']
         expect = ('error', 'structure', ec)
@@ -51,11 +51,11 @@ class _CommonCase(unittest.TestCase):
         self.emits_component('reason', reason)
 
     def emits_component(self, key, expected_value):
-        dct = self.end_state()['payload']
+        dct = self.end_state['payload']
         self.assertEqual(dct[key], expected_value)
 
     def emits_error_context(self, **expect_dct):
-        dct = self.end_state()['payload']
+        dct = self.end_state['payload']
         for k, v in expect_dct.items():
             _actual = dct[k]  # ..
             self.assertEqual(_actual, v)
@@ -99,7 +99,7 @@ class _CommonCase(unittest.TestCase):
         return ErsatzScanner(fake_file)
 
 
-class Case1395_literally_empty_file(_CommonCase):
+class Case1395_literally_empty_file(CommonCase):
 
     def test_100_scans_as_empty(self):
         self.scans_as_empty_file()
@@ -108,7 +108,7 @@ class Case1395_literally_empty_file(_CommonCase):
         return iter(())
 
 
-class Case1396_effectively_empty_file(_CommonCase):
+class Case1396_effectively_empty_file(CommonCase):
 
     def test_100_scans_as_empty(self):
         self.scans_as_empty_file()
@@ -118,7 +118,7 @@ class Case1396_effectively_empty_file(_CommonCase):
         yield ''
 
 
-class Case1398_parse_error(_CommonCase):
+class Case1398_parse_error(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_category('input_error')
@@ -139,7 +139,7 @@ class Case1398_parse_error(_CommonCase):
         yield 'xx yy zz'
 
 
-class Case1399_fields_with_no_content_will_not_even_parse(_CommonCase):
+class Case1399_fields_with_no_content_will_not_even_parse(CommonCase):
     """see discusson here"""
     #
     """
@@ -167,7 +167,7 @@ class Case1399_fields_with_no_content_will_not_even_parse(_CommonCase):
         yield 'Some_Fellow: '
 
 
-class Case1400_yes_parse_field(_CommonCase):
+class Case1400_yes_parse_field(CommonCase):
 
     def test_100_money(self):
         listener = _throwing_listener()
@@ -187,7 +187,7 @@ class Case1400_yes_parse_field(_CommonCase):
 # Case1396
 
 
-class Case1403_flush_as_config_but_unrecognized_names(_CommonCase):
+class Case1403_flush_as_config_but_unrecognized_names(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_category('unrecognized_config_attribute')
@@ -218,7 +218,7 @@ class Case1403_flush_as_config_but_unrecognized_names(_CommonCase):
         yield 'no see'
 
 
-class Case1404_flush_as_config_but_collision_across_records(_CommonCase):
+class Case1404_flush_as_config_but_collision_across_records(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_category(
@@ -249,7 +249,7 @@ class Case1404_flush_as_config_but_collision_across_records(_CommonCase):
         yield 'no see'
 
 
-class Case1406_flush_as_config_but_missing_requireds(_CommonCase):
+class Case1406_flush_as_config_but_missing_requireds(CommonCase):
 
     def test_100_channel(self):
         self.emits_error_category('missing_required_config_fields')
@@ -281,10 +281,10 @@ class Case1406_flush_as_config_but_missing_requireds(_CommonCase):
         yield 'Field_G: gg'
 
 
-class Case1407_flush_as_config_money(_CommonCase):
+class Case1407_flush_as_config_money(CommonCase):
 
     def test_100_all_the_fields_are_there_plus_values(self):
-        self.assertIsNone(self.end_state()['channel'])  # sneak in somewhere
+        self.assertFalse(self.end_state['did_emit'])
         dct = self.result_value()
         assert('aa' == dct['Field_A'])
         assert('cc' == dct['Field_C'])
@@ -304,7 +304,7 @@ class Case1407_flush_as_config_money(_CommonCase):
         self.assertSequenceEqual(_actual, ('G', 'F', 'E', 'C', 'A'))
 
     def result_value(self):
-        return self.end_state()['result_value']
+        return self.end_state['result_value']
 
     def given_run(self, listener):
         scn = self.build_schema_scanner()

@@ -44,7 +44,7 @@ import unittest
 class _CaseMethods:
 
     def _performance_performs(self):
-        self.assertIsNotNone(self._performance())
+        self.assertIsNotNone(self.performance)
 
     def _two_stderr_line_certain_regexp_expectation(self):
         import re
@@ -83,10 +83,10 @@ class Case0243_success_path(_CaseMethods, unittest.TestCase):
         self.assertIsNotNone(self._expectation())
 
     def test_070_performance_perfoms_without_failing(self):
-        self._performance()
+        self.performance
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         _exp = self._expectation()
         perf = _exp.to_performance_under(None)
         perf.stderr.write(newline)
@@ -103,13 +103,13 @@ class Case0246_one_too_many(_CaseMethods, unittest.TestCase):
         self._performance_performs()
 
     def test_080_message_looks_good(self):
-        _actual = self._performance()
+        _actual = self.performance
         self.assertEqual(
          _actual.message,
          "expecting no more lines but this line was outputted on STDERR - ohai\n")  # noqa E501
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
         perf = _exp.to_performance_under(exp)
@@ -130,13 +130,13 @@ class Case0249_one_too_few(_CaseMethods, unittest.TestCase):
         self._performance_performs()
 
     def test_080_message_looks_good(self):
-        _actual = self._performance()
+        _actual = self.performance
         self.assertEqual(
             _actual.message,
             'at end of input, expecting any line on STDERR')
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
         perf = _exp.to_performance_under(exp)
@@ -158,13 +158,13 @@ class Case0252_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
         self._performance_performs()
 
     def test_080_message_looks_good(self):
-        _actual = self._performance()
+        _actual = self.performance
         self.assertEqual(
             _actual.message,
             "expected line on STDERR, had STDOUT: cha cha\n")
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
         perf = _exp.to_performance_under(exp)
@@ -179,16 +179,16 @@ class Case0252_err_not_out_or_out_not_err(_CaseMethods, unittest.TestCase):
 class Case0255_content_mismatch_when_string(_CaseMethods, unittest.TestCase):
 
     def test_070_performance_perfoms(self):
-        self.assertIsNotNone(self._performance())
+        self.assertIsNotNone(self.performance)
 
     def test_080_message_looks_good(self):
-        _actual = self._performance()
+        _actual = self.performance
         self.assertEqual(
             _actual.message,
             "expected (+), had (-):\n+ bar\n- biz\n")
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
         perf = _exp.to_performance_under(exp)
@@ -207,13 +207,13 @@ class Case0258_content_mismatch_when_regexp(_CaseMethods, unittest.TestCase):
         self._performance_performs()
 
     def test_080_message_looks_good(self):
-        _actual = self._performance()
+        _actual = self.performance
         self.assertEqual(
             _actual.message,
             "expected to match regexp (+), had (-):\n+ /^baz$/\n-  baz\n")
 
     @shared_subject
-    def _performance(self):
+    def performance(self):
         exp = _SingleFailExpecter()
         _exp = self._expectation()
         perf = _exp.to_performance_under(exp)

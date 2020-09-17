@@ -1,10 +1,10 @@
 import unittest
 
 
-_CommonCase = unittest.TestCase
+CommonCase = unittest.TestCase
 
 
-class Case5025NC(_CommonCase):
+class Case5025NC(CommonCase):
 
     def test_010_HI(self):
 

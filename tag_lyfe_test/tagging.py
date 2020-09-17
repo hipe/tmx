@@ -7,8 +7,7 @@ class TaggingCommonCase:
     def expect_shadow(self, expected_shadow):
 
         ascii_pieces = []
-
-        _doc_pairs = self.end_state()  # ..
+        doc_pairs = self.end_state
 
         def sep():
             ascii_pieces.append('s' * len(doc_pair.separator_string))
@@ -17,7 +16,7 @@ class TaggingCommonCase:
             _ = doc_pair.tagging.to_string()
             ascii_pieces.append('T' * len(_))
 
-        for _ in _doc_pairs:
+        for _ in doc_pairs:
             doc_pair = _
             if doc_pair.is_end_piece:
                 sep()
@@ -33,6 +32,7 @@ class TaggingCommonCase:
         else:
             self.assertEqual(actual_shadow, expected_shadow)
 
+    @property
     def end_state(self):
         return self._build_end_state()
 

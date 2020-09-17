@@ -329,12 +329,11 @@ def _whine_about_ID_depth(identifier, expected_length, listener):
             head = 'not enough'
         elif act > expected_length:
             head = 'too many'
-        _id_s = identifier.to_string()
-        _reason = (
-                f'{head} digits in identifier {repr(_id_s)} - '
-                f'need {expected_length}, had {act}'
-                )
-        return {'reason': _reason}  # ..
+        id_s = identifier.to_string()
+        reason = (
+                f'{head} digits in identifier {repr(id_s)} - '
+                f'need {expected_length}, had {act}')
+        return {'reason': reason}  # ..
     listener('error', 'structure', 'entity_not_found', structer)
 
 
