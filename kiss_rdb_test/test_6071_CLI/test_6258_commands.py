@@ -2,7 +2,8 @@ from kiss_rdb_test.common_initial_state import functions_for
 from kiss_rdb_test import CLI as CLI_support
 from kiss_rdb_test.CLI import build_filesystem_expecting_num_file_rewrites
 import unittest
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 
 
 class CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
@@ -112,10 +113,8 @@ class Case6258_multi_line_create(CommonCase):  # #midpoint
         return self.build_end_state('stdout_and_stderr', None)
 
     def given_args(self):
-        return (
-                *common_args_head(), 'create', _common_collection,
-                '-val', 'qq', 'foo\nbar\n',
-                )
+        return (*common_args_head(), 'create', _common_collection,
+                '-val', 'qq', 'foo\nbar\n')
 
     def random_number(self):
         return 493  # our 2HF

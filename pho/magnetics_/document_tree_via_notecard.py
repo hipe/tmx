@@ -110,9 +110,8 @@ class _FileWriter:
                     f'wrote {count_files_written}'
                     f' of {count_files_attempted} files'
                     f' ({self.count_lines_written} lines,'
-                    f' ~{self.count_bytes_written} bytes)'
-                    )
-            return {'message': _message}
+                    f' ~{self.count_bytes_written} bytes)')
+            return {'message': msg}
         listener('info', 'structure', 'wrote_files', f)
 
     def write_file(self, out_type, out_value, facets, doc, listener):
@@ -244,8 +243,7 @@ class _FacetsForPublishing:
 
         self.frontmatter_title = (
                 f'{document_title} '
-                f'({doc.head_notecard_identifier_string})'
-                )
+                f'({doc.head_notecard_identifier_string})')
 
         # Finally, append the file extension
 

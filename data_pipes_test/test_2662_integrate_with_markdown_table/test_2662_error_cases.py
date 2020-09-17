@@ -1,11 +1,9 @@
-from data_pipes_test.common_initial_state import (
-        build_end_state_commonly,
-        FakeProducerScript,
-        markdown_fixture,
-        executable_fixture,
-        fixture_files_directory)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from data_pipes_test.sync_support import build_end_state_of_sync
+from data_pipes_test.common_initial_state import \
+        FakeProducerScript, markdown_fixture, \
+        executable_fixture, fixture_files_directory
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 from os import path as os_path
 
@@ -70,11 +68,9 @@ class Case2557DP_strange_format_adapter_name(CommonCase):
         yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
-        return {
-                'producer_script_path': 'no see 324ujerie09heoiw',
-                'near_collection': None,
-                'near_format': 'zig-zag',
-                }
+        return {'producer_script_path': 'no see DP ps path (Case2557DP)',
+                'near_collection': 'no see DP near coll (Case2557DP)'}
+
 
 
 class Case2559_strange_file_extension(CommonCase):
@@ -105,11 +101,11 @@ class Case2559_strange_file_extension(CommonCase):
         yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
-        _near_path = os_path.join(fixture_files_directory(), '080-strange-extension.zongo')  # noqa: E501
-        return {
-                'producer_script_path': 'no see 23os093w3hw33',
-                'near_collection': _near_path,
-                }
+        head = fixture_files_directory()
+        near_path = os_path.join(head, '080-strange-extension.zongo')
+        return {'producer_script_path': 'no see DP ps path (Case2559)',
+                'near_collection': near_path}
+
 
 
 class Case2660DP_no_functions(CommonCase):
@@ -143,14 +139,12 @@ class Case2660DP_no_functions(CommonCase):
         yield 'error', 'expression', 'as', 'first_error'
 
     def given(self):
-        from kiss_rdb_test.common_initial_state import top_fixture_directories_directory  # noqa: E501
-        _near_path = os_path.join(
-                top_fixture_directories_directory(),
-                '2969-rec', '0100-example-from-documentation.rec')
-        return {
-                'producer_script_path': 'no see 32o4iu32boiwr3si',
-                'near_collection': _near_path,
-                }
+        from kiss_rdb_test.common_initial_state import \
+            top_fixture_directories_directory as direc
+        near_path = os_path.join(
+                direc(), '2969-rec', '0100-example-from-documentation.rec')
+        return {'producer_script_path': 'no see 32o4iu32boiwr3si',
+                'near_collection': near_path}
 
 
 class Case2662DP_near_file_not_found(CommonCase):
@@ -177,10 +171,9 @@ class Case2662DP_near_file_not_found(CommonCase):
         yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
-        return {
-                'producer_script_path': executable_fixture('exe_110_extra_cel.py'),  # noqa: E501
-                'near_collection': markdown_fixture('0000-no-such-file.md'),
-                }
+        ps_path = executable_fixture('exe_110_extra_cel.py')
+        return {'producer_script_path': ps_path,
+                'near_collection': markdown_fixture('0000-no-such-file.md')}
 
 
 class Case2664DP_duplicate_key(CommonCase):
@@ -213,20 +206,17 @@ class Case2664DP_duplicate_key(CommonCase):
         yield 'error', 'expression', 'duplicate_key', 'as', 'erx'
 
     def given(self):
-        _dictionaries = (
-            {'col_a': 'qux'},
-            {'col_a': 'xx'},
-            {'col_a': 'qux'},
-        )
-        _producer_script = FakeProducerScript(
+        dictionaries = (
+            {'col_A': 'qux'},
+            {'col_A': 'xx'},
+            {'col_A': 'qux'})
+        producer_script = FakeProducerScript(
                 stream_for_sync_is_alphabetized_by_key_for_sync=False,
                 stream_for_sync_via_stream=sync_stream_using_column_A,
                 dictionaries=dictionaries,
                 near_keyerer=near_keyerer_minimal)
-        return {
-                'producer_script_path': _producer_script,
-                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-        }
+        return {'producer_script_path': producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
 class Case2665DP_preserve_endcappiness_here(CommonCase):
@@ -245,12 +235,10 @@ class Case2665DP_preserve_endcappiness_here(CommonCase):
     """
 
     def test_100_win(self):
-        _act = self._end_state().outputted_lines[2:]
-        _exp = (
-                _same_row_1,
+        _act = self.end_state.outputted_lines[2:]
+        _exp = (same_row_1,
                 '|thing B|thing two\n',  # NOTE still no endcap
-                '|thing C|\n',  # exactly as in file
-                )
+                '|thing C|\n')  # exactly as in file
         self.assertSequenceEqual(_act, _exp)
 
     @shared_subject
@@ -258,19 +246,14 @@ class Case2665DP_preserve_endcappiness_here(CommonCase):
         return self.build_end_state()
 
     def given(self):
-        _dictionaries = (
-                {'col_a': 'thing B', 'col_b': 'thing two'},
-                )
-        _producer_script = FakeProducerScript(
+        dictionaries = ({'col_A': 'thing B', 'col_B': 'thing two'},)
+        producer_script = FakeProducerScript(
                 stream_for_sync_is_alphabetized_by_key_for_sync=False,
                 stream_for_sync_via_stream=sync_stream_using_column_A,
-                dictionaries=_dictionaries,
-                near_keyerer=near_keyerer_minimal,
-                )
-        return {
-                'producer_script_path': _producer_script,
-                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-                }
+                dictionaries=dictionaries,
+                near_keyerer=near_keyerer_minimal)
+        return {'producer_script_path': producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
 class Case2667DP_ADD_end_cappiness_here(CommonCase):
@@ -295,19 +278,14 @@ class Case2667DP_ADD_end_cappiness_here(CommonCase):
         return self.build_end_state()
 
     def given(self):
-        _dictionaries = (
-                {'col_a': 'thing C', 'col_b': 'yerp'},
-                )
+        dictionaries = ({'col_A': 'thing C', 'col_B': 'yerp'},)
         producer_script = FakeProducerScript(
                 stream_for_sync_via_stream=sync_stream_using_column_A,
                 stream_for_sync_is_alphabetized_by_key_for_sync=False,
-                dictionaries=_dictionaries,
-                near_keyerer=near_keyerer_minimal,
-                )
-        return {
-                'producer_script_path': _producer_script,
-                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-                }
+                dictionaries=dictionaries,
+                near_keyerer=near_keyerer_minimal)
+        return {'producer_script_path': producer_script,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
 same_row_1 = '|thing A|x|\n'

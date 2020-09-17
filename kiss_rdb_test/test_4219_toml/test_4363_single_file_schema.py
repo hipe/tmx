@@ -1,15 +1,9 @@
-from kiss_rdb_test.common_initial_state import (
-        StubCollectionIdentity,
-        # debugging_listener,
-        functions_for,
-        unindent)
-from kiss_rdb_test.CUD import (
-        wrap_collection,
-        filesystem_recordings_of,
-        build_filesystem_expecting_num_file_rewrites)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from kiss_rdb_test.common_initial_state import functions_for, unindent
+from kiss_rdb_test.CUD import \
+        wrap_collection, filesystem_recordings_of, \
+        build_filesystem_expecting_num_file_rewrites
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -30,10 +24,7 @@ class Case4359_traversal_OK(CommonCase):
         assert(these)
         _actual = (f(o) for o in these)
 
-        _expected = (
-                '24',
-                '68',
-                )
+        _expected = ('24', '68')
 
         _actual = tuple(_actual)
 

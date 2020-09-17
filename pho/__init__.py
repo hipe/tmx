@@ -143,8 +143,7 @@ def big_index_via_collection_(coll, listener):
 def collection_via_path_(collection_path, listener, rng=None):
     from kiss_rdb import collectionerer
     return collectionerer().collection_via_path(
-            collection_path=collection_path,
-            random_number_generator=rng, listener=listener)
+            collection_path, listener, rng=rng)
 
 
 # ==

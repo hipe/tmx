@@ -1,6 +1,6 @@
 from pho_test.common_initial_state import collection_one
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

@@ -115,10 +115,8 @@ class Case1452_simplified_typical_NO_rerack_at_first(CommonCase):
         """
 
     def given_identifiers(self):
-        return (
-                'AB2',
-                'AB4',
-                )
+        return ('AB2',
+                'AB4')
 
 
 class Case1458_simplified_typical_YES_rerack_at_first(CommonCase):
@@ -139,10 +137,8 @@ class Case1458_simplified_typical_YES_rerack_at_first(CommonCase):
         """
 
     def given_identifiers(self):
-        return (
-                'AB2',
-                'CD4',
-                )
+        return ('AB2',
+                'CD4')
 
 
 class Case1462_simplified_multiple_rack_lines_in_a_row(CommonCase):
@@ -164,12 +160,10 @@ class Case1462_simplified_multiple_rack_lines_in_a_row(CommonCase):
         """
 
     def given_identifiers(self):
-        return (
-                'QY2',
+        return ('QY2',
                 'QY3',
                 'QZ4',
-                'RS5'
-                )
+                'RS5')
 
 
 class Case1466_none(CommonCase):
@@ -214,12 +208,10 @@ class Case1470_deeper(CommonCase):
         """
 
     def given_identifiers(self):
-        return (
-                'ABC2',
+        return ('ABC2',
                 'ABC3',
                 'DEF4',
-                'DGH5',
-                )
+                'DGH5')
 
 
 class Case1474_shallowest(CommonCase):
@@ -238,11 +230,9 @@ class Case1474_shallowest(CommonCase):
         """
 
     def given_identifiers(self):
-        return (
-                'B3',
+        return ('B3',
                 'D2',
-                'D4',
-                )
+                'D4')
 
 
 def _other_subject_mod():

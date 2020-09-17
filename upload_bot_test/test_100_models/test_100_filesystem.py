@@ -3,14 +3,11 @@
 ..that explains its own objective & scope.
 """
 
-from upload_bot_test.common_initial_state import (
-        file_with_content_path,
-        no_ent_path,
-        writable_tmpdir)
+from upload_bot_test.common_initial_state import \
+        file_with_content_path, no_ent_path, writable_tmpdir
 from upload_bot._models import filesystem
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 import os
 

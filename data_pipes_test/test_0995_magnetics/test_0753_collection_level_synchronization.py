@@ -1,13 +1,13 @@
 """
 "collection-level synchronization"
 
-at #history-A.2 when we spiked the new "interleaving" algorithm, we
-preserved this one (for practical reasons) .. see [#447]
+at #history-A.2 when we spiked the new [#447] "interleaving" algorithm, we
+preserved this one (for practical reasons)
 """
 
 from data_pipes_test.sync_support import SyncCase_
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -66,17 +66,13 @@ class Case0752_duplicate_key_far(CommonCase):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
-        return (
-                'a',
+        return ('a',
                 'b',
-                'a',
-                )
+                'a')
 
     def near_collection(self):
-        return (
-                'c',
-                'd',
-                )
+        return ('c',
+                'd')
 
 
 class Case0754_duplicate_key_near(CommonCase):
@@ -93,17 +89,13 @@ class Case0754_duplicate_key_near(CommonCase):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
-        return (
-                'a',
-                'd',
-                )
+        return ('a',
+                'd')
 
     def near_collection(self):
-        return (
-                'b',
+        return ('b',
                 'c',
-                'c',
-                )
+                'c')
 
 
 class Case0755_some_down_on_to_some_no_collisions_appends(CommonCase):
@@ -125,20 +117,15 @@ class Case0757_weird_order_is_OK_here(CommonCase):
                 'd',
                 'c',
                 'b',
-                'a',
-                )
+                'a')
 
     def far_collection(self):
-        return (
-                'b',
-                'a',
-                )
+        return ('b',
+                'a')
 
     def near_collection(self):
-        return (
-                'd',
-                'c',
-                )
+        return ('d',
+                'c')
 
 
 class Case0758_some_down_on_to_some_yes_collisions(CommonCase):

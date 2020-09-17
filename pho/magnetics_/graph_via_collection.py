@@ -39,10 +39,8 @@ def output_lines_via_big_index_(o, listener):
 
     # done
 
-    yield (
-            'label="\\n(generated) notecard relationships\\n'
-            'in your whole collection"'
-            )
+    yield ('label="\\n(generated) notecard relationships\\n'
+           'in your whole collection"')
     yield '}'
 
     def f():
@@ -103,7 +101,6 @@ def _ENCODED_heading_for(frag):
 w = 9
 _word_wrapped_lines_via = word_wrapperer(
         row_max_widths=(w, w, w-len(' (ABC)')+4),
-        ellipsis_string='…',
-        )
+        ellipsis_string='…')
 
 # #born.

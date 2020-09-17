@@ -1,5 +1,5 @@
-from modality_agnostic.test_support.structured_emission import (
-        minimal_listener_spy)
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import lazy
 import unittest
 
 

@@ -1,5 +1,5 @@
-from modality_agnostic.memoization import (
-    dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+    dangerous_memoize as shared_subject
 import unittest
 
 
@@ -40,8 +40,7 @@ class Case3735_when_end_of_line_hits_mid_word(CommonCase):
     def given(self, given):
         given(
                 big_string='One Two Three',
-                row_max_widths=(9, 9),
-                )
+                row_max_widths=(9, 9))
 
 
 class Case3738_when_it_lands_right_on_the_money(CommonCase):
@@ -54,8 +53,7 @@ class Case3738_when_it_lands_right_on_the_money(CommonCase):
     def given(self, given):
         given(
                 big_string='Aaa B Ccc',
-                row_max_widths=(9,),
-                )
+                row_max_widths=(9,))
 
 
 class Case3742_when_a_leftmost_word_would_put_you_over(CommonCase):
@@ -67,8 +65,7 @@ class Case3742_when_a_leftmost_word_would_put_you_over(CommonCase):
     def given(self, given):
         given(
                 big_string='Aaa Bbbbbb Ccc',
-                row_max_widths=(5, 5, 5),
-                )
+                row_max_widths=(5, 5, 5))
 
 
 class Case3745_ellipsis_when_room(CommonCase):
@@ -81,8 +78,7 @@ class Case3745_ellipsis_when_room(CommonCase):
         given(
                 big_string='Aa Bb C D Ee Fff NO_SEE',
                 row_max_widths=(6, 5),
-                ellipsis_string='..',
-                )
+                ellipsis_string='..')
 
 
 class Case3748_ellipsis_when_replace(CommonCase):
@@ -95,8 +91,7 @@ class Case3748_ellipsis_when_replace(CommonCase):
         given(
                 big_string='Aa Bb C D Ee',
                 row_max_widths=(6, 3),
-                ellipsis_string='...',
-                )
+                ellipsis_string='...')
 
 
 # Case3750  # #midpoint
@@ -112,8 +107,7 @@ class Case3751_no_room_and_only_one_item_on_last_line(CommonCase):
         given(
                 big_string='Aa Bb CCC NO_SEE',
                 row_max_widths=(8, 3),
-                ellipsis_string='...',
-                )
+                ellipsis_string='...')
 
 
 class Case3754_no_room_on_second_to_last(CommonCase):
@@ -126,8 +120,7 @@ class Case3754_no_room_on_second_to_last(CommonCase):
         given(
                 big_string='Aa Bb CCC NO_SEE',
                 row_max_widths=(6, 3),
-                ellipsis_string='..',
-                )
+                ellipsis_string='..')
 
 
 class Case3757_last_resort(CommonCase):
@@ -137,24 +130,19 @@ class Case3757_last_resort(CommonCase):
         self.assertSequenceEqual(o.lines, ('Aaaaa', 'Bbbbb…'))
 
     def given(self, given):
-        given(
-                big_string='Aaaaa Bbbbb C',
-                row_max_widths=(5, 5),
-                ellipsis_string='…',
-                )
+        given(big_string='Aaaaa Bbbbb C', row_max_widths=(5, 5),
+              ellipsis_string='…')
 
 
 class Case3760_empty_string(CommonCase):
 
     def test_100_WAT(self):
-            o = self.build_result_lines()
-            self.assertSequenceEqual(o.lines, ())
+        act = self.build_result_lines()
+        self.assertSequenceEqual(act.lines, ())
 
     def given(self, given):
-        given(
-                big_string='',
-                row_max_widths=(1, 2, 3),
-                )
+        given(big_string='',
+              row_max_widths=(1, 2, 3))
 
 
 # == support

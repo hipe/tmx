@@ -13,9 +13,8 @@ several different *separate* responsibilities:
 class collection_via_directory_and_schema:
 
     def __init__(
-            self, collection_identity, collection_schema,
-            random_number_generator=None,
-            filesystem=None):
+            self, collection_directory, collection_schema,
+            random_number_generator=None, filesystem=None):
 
         if random_number_generator is not None:
             self._random_number_generator = random_number_generator

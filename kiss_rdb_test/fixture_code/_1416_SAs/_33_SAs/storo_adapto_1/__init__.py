@@ -4,10 +4,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-        schema_file_scanner, collection_identity,
-        random_number_generator, filesystem, listener):
-
-    collection_identity.collection_path  # hello
+        schema_file_scanner, collection_path, listener=None, **_):
 
     # this below line is kind of a "make a lot of contact" sort of integration
     # test. If we don't do it, we are fine (it is well covered in our previous

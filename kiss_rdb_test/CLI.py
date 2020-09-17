@@ -87,16 +87,14 @@ class CLI_Test_Case_Methods:
         return self.MY_BIG_FLEX(
                 allow_stdout_lines=yes_stdout,
                 allow_stderr_lines=yes_stderr,
-                exception_category=which_e,
-                )
+                exception_category=which_e)
 
     def build_end_state_FOR_DEBUGGING(self, exe_cat='anything experiment'):
 
         o = self.MY_BIG_FLEX(
                 allow_stdout_lines=True,
                 allow_stderr_lines=True,
-                exception_category=exe_cat,
-                )
+                exception_category=exe_cat)
 
         if hasattr(o, 'exception'):
             e = o.exception
@@ -437,8 +435,7 @@ def _write_only_facade(receiver):
     from modality_agnostic import write_only_IO_proxy
     return write_only_IO_proxy(
             write=lambda s: receiver.receive_write(s),
-            flush=lambda: receiver.receive_flush(),
-            )
+            flush=lambda: receiver.receive_flush())
 
 
 def _lines_via_big_string_as_is(big_string):

@@ -240,8 +240,7 @@ class _ScannedLine:
     _THIS_ONE_RE = re.compile(
         '^(?P<margin_string>[ \t]+)?' +  # there need not be any
         '(?P<styled_content_string>[^\n\r]+)?' +  # there need not .. ibid.
-        '(?:\n|\r\n?)'
-    )
+        '(?:\n|\r\n?)')
 
 
 class _scanner_via_iterator:  # #testpoint

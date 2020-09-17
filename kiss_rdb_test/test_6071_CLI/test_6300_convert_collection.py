@@ -1,6 +1,6 @@
-from modality_agnostic.memoization import (
-        dangerous_memoize_in_child_classes,
-        dangerous_memoize as shared_subject, lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes, \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -314,8 +314,7 @@ class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
         return _this_one_lib().FAKE_STDIN(
                 # '{ "header_level": 1 }\n',  # #history-A.2
                 '{ "lesson": "[choo chah](foo fa)" }\n',
-                '{ "lesson": "[boo bah](loo la)" }\n',
-                )
+                '{ "lesson": "[boo bah](loo la)" }\n')
 
     def argv_tail(self):
         return ('-', '--from-format', 'producer-script',

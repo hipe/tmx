@@ -53,8 +53,7 @@ def open_traversal_stream(listener, html_document_path=None):
                 special_field_instructions={
                     'name': ('string_via_cel', _this_more_complicated_string_via_td()),  # noqa: E501
                     },
-                table=table,
-                )
+                table=table)
 
     return _ps_lib().open_dictionary_stream_via(
         url=_url,

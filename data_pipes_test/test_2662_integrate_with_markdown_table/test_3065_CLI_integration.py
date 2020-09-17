@@ -1,9 +1,9 @@
-from kiss_rdb_test.common_initial_state import (
-        publicly_shared_fixture_file)
-from data_pipes_test.common_initial_state import (
-        executable_fixture)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from kiss_rdb_test.common_initial_state import \
+        publicly_shared_fixture_file
+from data_pipes_test.common_initial_state import \
+        executable_fixture
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -263,13 +263,11 @@ class Case3070_money_and_diff(CommonCase):
         self.assertIsNotNone(self.end_parse_tree)
 
     def test_300_these_exactly(self):
-        _act = [x.string for x in self._of_tree('edits')]
-        _exp = (
-                '-| four | five | six\n',
-                '+|four| five |SIX  \n',
-                '+|seven|EIGHT|     |\n',
-                )
-        self.assertSequenceEqual(_act, _exp)
+        act = tuple(wat.string for wat in self._of_tree('edits'))
+        exp = ('-| four | five | six\n',
+               '+|four| five |SIX\n',
+               '+|seven|EIGHT||\n')
+        self.assertSequenceEqual(act, exp)
 
     def test_400_these_paths_look_like_git_paths(self):
         t = self.end_parse_tree

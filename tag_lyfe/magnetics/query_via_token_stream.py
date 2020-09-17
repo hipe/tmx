@@ -203,12 +203,9 @@ def query_model_via_big_string(big_string):
 
     parser = query_parser()
 
-    model = parser.parse(
+    return parser.parse(
             text=big_string,
-            whitespace='',  # see [#707.H] how we do our own whitespace
-            )
-
-    return model
+            whitespace='')  # see [#707.H] how we do our own whitespace
 
 
 @lazy
@@ -220,11 +217,8 @@ def query_parser():
         ebnf_grammar_big_string = fh.read()
 
     import tatsu
-    _ = tatsu.compile(
+    return tatsu.compile(
             ebnf_grammar_big_string,
-            asmodel=True,
-            )
-    return _
-
+            asmodel=True)
 
 # #born.

@@ -17,11 +17,10 @@ than typing a word that ramdomly starts with a dash. (by the way: option
 tokens start with dashes.)
 """
 
-from script_lib.test_support.CLI_canon import (
-        THESE_TWO_CHILDREN_CLI_METHODS,
-        CLI_Canon_Case_Methods)
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
-# lazy ^
+from script_lib.test_support.CLI_canon import \
+        THESE_TWO_CHILDREN_CLI_METHODS, CLI_Canon_Case_Methods
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

@@ -5,9 +5,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_identity, random_number_generator, filesystem, listener):
-
-    collection_path = collection_identity.collection_path  # hello
+        collection_path, listener=None, opn=None, rng=None):
 
     listener('info', 'structure', 'hi_from_SA_2', lambda: {'message': 'SA2'})
 

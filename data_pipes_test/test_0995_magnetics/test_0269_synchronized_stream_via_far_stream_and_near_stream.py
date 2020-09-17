@@ -7,8 +7,8 @@ some of the numbers of test cases line up with test cases in a sibling.
 """
 
 from data_pipes_test.sync_support import SyncCase_
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -120,17 +120,13 @@ class Case0270_duplicate_key_near(CommonCase):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
-        return (
-                'a',
-                'd',
-                )
+        return ('a',
+                'd')
 
     def near_collection(self):
-        return (
-                'b',
+        return ('b',
                 'c',
-                'c',
-                )
+                'c')
 
 
 class Case0271_weird_order_is_bad_in_far_here(CommonCase):
@@ -147,15 +143,11 @@ class Case0271_weird_order_is_bad_in_far_here(CommonCase):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
-        return (
-                'b',
-                'a',
-                )
+        return ('b',
+                'a')
 
     def near_collection(self):
-        return (
-                'c'
-                )
+        return ('c',)
 
 
 class Case0273_interleave_no_collision_both_sides_already_sorted(CommonCase):
@@ -167,22 +159,17 @@ class Case0273_interleave_no_collision_both_sides_already_sorted(CommonCase):
                 'b',  # here's the original first one from near
                 'c',  # flip to far: first of two from far
                 'd',  # second of two from far
-                'e',  # flip back to near
-                )
+                'e')  # flip back to near
 
     def far_collection(self):
-        return (
-                'a',
+        return ('a',
                 'c',
-                'd',
-                )
+                'd')
 
     def near_collection(self):
-        return (
-                # 'x',  # leave brittney alone ##here1
+        return (  # 'x',  # leave brittney alone ##here1
                 'b',
-                'e',
-                )
+                'e')
 
 
 class Case0274_some_down_on_to_some_yes_collisions(CommonCase):
@@ -195,24 +182,19 @@ class Case0274_some_down_on_to_some_yes_collisions(CommonCase):
                 'c',
                 'D',
                 'e',
-                'f',
-                )
+                'f')
 
     def far_collection(self):
-        return (
-                'b',
+        return ('b',
                 'd',
                 'e',
-                'f',
-                )
+                'f')
 
     def near_collection(self):
-        return (
-                'a',
+        return ('a',
                 'b',
                 'c',
-                'd',
-                )
+                'd')
 
 
 class Case0275_bigger_example_of_disorder(CommonCase):
@@ -243,22 +225,18 @@ class Case0275_bigger_example_of_disorder(CommonCase):
         return self.build_end_state_while_listening_()
 
     def far_collection(self):
-        return (
-                'p',
+        return ('p',
                 'r',
                 's',
                 'v',
                 'a',  # yikes out of order
                 'c',
-                'b',  # yikes out of order
-                )
+                'b')  # yikes out of order
 
     def near_collection(self):
-        return (
-                'q',
+        return ('q',
                 't',
-                'u',
-                )
+                'u')
 
 
 def _subject_module():

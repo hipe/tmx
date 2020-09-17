@@ -784,8 +784,7 @@ def _express_edit(listener, UCDs, identifier, verb_preterite):  # #copy-pasted
 _verb_lexeme_via_key = {
         'update_attribute': 'update',
         'create_attribute': 'create',
-        'delete_attribute': 'delete',
-        }
+        'delete_attribute': 'delete'}
 
 
 def lines_via_big_string_(big_s):  # (copy-paste of [#610].)

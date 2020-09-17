@@ -1,9 +1,6 @@
-from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject,
-        lazy)
-from modality_agnostic.test_support.listener_via_expectations import (
-        # for_DEBUGGING,
-        listener_via_emission_receiver)
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 
 
 class _ScaryCommonCaseWatcher(type):

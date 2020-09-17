@@ -223,7 +223,7 @@ def producer_script_module_via_path(script_path, listener):
         path_len = len(path_stem)
         head_len = len(root) + 1  # include a trailing '/' sep yuck
 
-        if 0 is path_stem.find(root) and path_len > head_len:  # ##[#459.L]
+        if 0 == path_stem.find(root) and path_len > head_len:  # ##[#459.L]
             return normal_stem_via_string(path_stem[head_len:path_len])
         else:
             whine(f'absolute path outside of ecosystem - {path_stem}')

@@ -78,8 +78,7 @@ class Case1030_context_manager(CommonCase):
             return 'NO_SEE'
         o = _write_only_IO_proxy(
                 writes.append,
-                on_OK_exit=on_OK_exit,
-                )
+                on_OK_exit=on_OK_exit)
         with o as fh:
             is_same = o is fh
             fh.write('ohai')

@@ -334,9 +334,8 @@ def _live_transactor_via(ss_ID):
 
 
 def _debugging_listener():
-    from modality_agnostic.test_support.listener_via_expectations import \
-        for_DEBUGGING as listener
-    return listener
+    from modality_agnostic.test_support.common import debugging_listener
+    return debugging_listener()
 
 
 # ==== END

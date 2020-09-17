@@ -22,9 +22,7 @@ portion of our sub-project tree would a smell, but in this case the test-
 friendly ("fake") counterpart of Filesystem
 """
 
-from modality_agnostic.memoization import (
-        OneShotMutex,
-        lazy)
+from modality_agnostic import OneShotMutex, lazy
 
 
 @lazy

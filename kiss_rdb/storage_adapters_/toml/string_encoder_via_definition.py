@@ -121,8 +121,7 @@ def _encode(string, o, listener):
 
     return _SemiEncodedString(
             has_special_characters=paragraph_had_one,
-            semi_encoded_lines=tuple(semi_encoded_lines),
-            )
+            semi_encoded_lines=tuple(semi_encoded_lines))
 
 
 class _SemiEncodedString:
@@ -198,10 +197,9 @@ def _whine_about_special_character_not_supported(
     already_has = re.search(' character$', name)
     characters = 's' if already_has else ' characters'
 
-    _reason = (
-            f'for now, {_use_name}{_characters} are deemed '
-            'not pretty enough to store.'
-            )
+    reason = (
+            f'for now, {use_name}{characters} are deemed '
+            'not pretty enough to store.')
 
     def structer():
         return {
@@ -279,8 +277,7 @@ _special_chars_rx = re.compile(
         '\u0022'  # quote
         '\\\\'    # backslash (U+005C) (yes to get it in there we need 4 for 1)
         '\u007F'  # delete
-        ']'
-        )
+        ']')
 
 
 no = False

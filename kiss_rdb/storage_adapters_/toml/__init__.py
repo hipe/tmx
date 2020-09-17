@@ -4,8 +4,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-        schema_file_scanner, collection_identity,
-        random_number_generator, filesystem, listener):
+        schema_file_scanner, collection_path, opn, rng, listener):
 
     schema = __schema_via(schema_file_scanner, listener)
     if schema is None:
@@ -13,10 +12,8 @@ def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
 
     from .collection_via_directory import collection_via_directory_and_schema
     return collection_via_directory_and_schema(
-            collection_identity=collection_identity,
-            collection_schema=schema,
-            random_number_generator=random_number_generator,
-            filesystem=filesystem)
+            collection_directory=collection_path, collection_schema=schema,
+            random_number_generator=rng, filesystem=fs)
 
 
 def __schema_via(schema_file_scanner, listener):

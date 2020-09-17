@@ -158,8 +158,7 @@ def wrapper_two():
             lambda c: f'u:{c}',  # u = uninteresting
             lambda c: f'stl:{c}',  # stl = final
             lambda c: f'l:{c}',  # l = last
-            lambda: 'nada'
-            )
+            lambda: 'nada')
 
 
 @lazy
@@ -167,8 +166,7 @@ def wrapper_one():
     return _subject_module().rotating_bufferer(
             lambda c: f'nf:{c}',  # nf = non-final
             lambda c: f'f:{c}',  # f = final
-            None,  # when empty
-            )
+            None)  # when empty
 
 
 def _subject_module():

@@ -22,12 +22,10 @@ def doc_pairs_via_string(input_string):
 
 def _doc_pairs_via_walker(walker, input_string):
 
-    _model = _query_parser().parse(
+    model = _query_parser().parse(
             text=input_string,
-            whitespace='',  # we do our own whitespace. see #here2
-            )
-
-    return walker.walk(_model)
+            whitespace='')  # we do our own whitespace. see #here2
+    return walker.walk(model)
 
 
 @lazy
@@ -173,11 +171,9 @@ def _query_parser():
         ebnf_grammar_big_string = fh.read()
 
     import tatsu
-    _ = tatsu.compile(
+    return tatsu.compile(
             ebnf_grammar_big_string,
-            asmodel=True,
-            )
-    return _
+            asmodel=True)
 
 
 """.:[#707.H]: :#here2:

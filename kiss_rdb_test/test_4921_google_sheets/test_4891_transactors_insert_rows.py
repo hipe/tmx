@@ -133,9 +133,8 @@ def this_lib():
 
 
 def debugging_listener(*args):
-    from modality_agnostic.test_support.listener_via_expectations import \
-        for_DEBUGGING as listener
-    listener(*args)
+    from modality_agnostic.test_support.common import debugging_listener
+    debugging_listener()(*args)
 
 
 if __name__ == '__main__':

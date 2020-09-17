@@ -1,7 +1,10 @@
-from grep_dump_test.common_initial_state import (
-        writable_tmpdir)
+from grep_dump_test.common_initial_state import writable_tmpdir
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 import os
+
+
 p = os.path
 
 

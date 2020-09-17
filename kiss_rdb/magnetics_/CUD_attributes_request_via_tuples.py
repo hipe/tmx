@@ -140,8 +140,7 @@ class _DeleteAttribute:
 _component_class_via_verb = {
         'create_attribute': _CreateAttributeValueUnsanitized,
         'update_attribute': _UpdateAttributeValueUnsanitized,
-        'delete_attribute': _DeleteAttribute,
-        }
+        'delete_attribute': _DeleteAttribute}
 
 
 class _AttributeName:
@@ -260,9 +259,8 @@ def _emit_request_error_via_reason(msg, listener):
 
 
 def _oxford_AND(itr):
-    from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-            oxford_AND)
-    return oxford_AND(itr)
+    import kiss_rdb.magnetics.via_collection as ox
+    return ox.oxford_AND(itr)
 
 
 # --

@@ -53,8 +53,7 @@ def start_server(pid_func, listener):
     run.run_forever_newschool_(
             _environ,
             port=5001,
-            use_reloader=False,
-            )
+            use_reloader=False)
 
 
 def _build_environment():

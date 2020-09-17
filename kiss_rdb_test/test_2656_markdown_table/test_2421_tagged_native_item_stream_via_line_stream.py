@@ -1,9 +1,5 @@
-from kiss_rdb_test.common_initial_state import (
-        functions_for)
-from modality_agnostic.test_support.structured_emission import (
-        minimal_listener_spy)
-from modality_agnostic.memoization import (
-        lazy)
+from kiss_rdb_test.common_initial_state import functions_for
+import modality_agnostic.test_support.common as em
 import unittest
 
 

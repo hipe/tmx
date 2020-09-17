@@ -1,4 +1,4 @@
-# covers: data_pipes/magnetics/synchronized_stream_via_far_stream_and_near_stream  # noqa: E501
+# covers: data_pipes/magnetics/flat_map_via_far_collection  # noqa: E501
 
 """discussion
 
@@ -35,13 +35,11 @@ class Case0995_hello(unittest.TestCase):
         _orig = _MyBusinessObject(
                 first_name='jim',
                 user_ID='012',
-                tags=['#aa', '#bb'],
-                )
+                tags=['#aa', '#bb'])
         _new = _MyBusinessObject(
                 first_name='james',
                 user_ID='012',
-                tags=['#bb', '#cc'],
-                )
+                tags=['#bb', '#cc'])
         o = _my_sync(_orig, _new)
 
         self.assertEqual(o.first_name, 'james')  # per policy, new name wins

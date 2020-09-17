@@ -435,8 +435,7 @@ def _report_paths():
             shell=False,
             stdout=subprocess.PIPE,
             universal_newlines=None,  # can't be not-none when `text=True`
-            text=True,  # not binary
-            )
+            text=True)  # not binary
 
     with _ as proc:
         sout = proc.stdout

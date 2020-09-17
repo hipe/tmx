@@ -33,13 +33,12 @@ class _DictionaryStream_via_Table:
 
         _string_via_cel = (string_via_td_for_body_row or _s_via_td_loosely)
 
-        import data_pipes.magnetics.dictionary_via_cels_via_definition as _
+        import data_pipes.magnetics.dictionary_via_cells_via_definition as _
 
         f = _(
                 unsanitized_far_field_names=_unsanitized_far_field_names,
                 special_field_instructions=special_field_instructions,
-                string_via_cel=_string_via_cel,
-                )
+                string_via_cel=_string_via_cel)
 
         self.field_names = f.near_field_names
         self._dictionary_via_cels = f

@@ -37,11 +37,10 @@ script-test and its underlying support infrastructure in place:
 """
 
 from data_pipes_test.common_initial_state import html_fixture
-from data_pipes_test.disjoint_small_support import (
-        build_state_the_bernstein_way)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from data_pipes_test.disjoint_small_support import \
+        build_state_the_bernstein_way
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -101,9 +100,8 @@ class Case1640DP_hello(CommonCase):
     @shared_subject
     def end_state(self):
         return build_state_the_bernstein_way(
-                fixture_document_path=html_fixture('0140-bernstein-subtree.html'),  # noqa: E501
-                producer_module=_subject_module(),
-                )
+            fixture_document_path=html_fixture('0140-bernstein-subtree.html'),
+            producer_module=_subject_module())
 
 
 @lazy

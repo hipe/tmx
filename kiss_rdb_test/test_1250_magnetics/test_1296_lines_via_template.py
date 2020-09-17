@@ -1,9 +1,9 @@
-from modality_agnostic.test_support import structured_emission as se_lib
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
-from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject)
 
 class CommonCase(unittest.TestCase):
 

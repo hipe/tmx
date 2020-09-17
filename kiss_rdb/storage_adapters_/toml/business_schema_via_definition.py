@@ -116,8 +116,7 @@ def _default_string_encoder():
     return se_lib.string_encoder_via_definition(
             smaller_string_max_length=56,   # 79 - tmx longest subproject name
             paragraph_line_max_width=79,  # the 80th column is special idk
-            max_paragraph_lines=22,  # half my current screen's height lol
-            )
+            max_paragraph_lines=22)  # half my current screen's height lol
 
 
 # == whiners

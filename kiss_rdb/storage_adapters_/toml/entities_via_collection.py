@@ -22,8 +22,7 @@ def table_block_via_lines_and_table_start_line_object_(
 
     from . import (
             blocks_via_file_lines as blk_lib,
-            identifiers_via_file_lines as sm_lib,
-            )
+            identifiers_via_file_lines as sm_lib)
 
     # == BEGIN massive a hacks to alter parse state to be as if mid-parse
 
@@ -36,8 +35,7 @@ def table_block_via_lines_and_table_start_line_object_(
 
     ps = sm_lib.state_machine_.build_parse_state(
             listener=listener,
-            actions_class=actionser,
-            )
+            actions_class=actionser)
 
     ps.be_in_state_('table begun')  # the state after "table start line"
 
@@ -125,6 +123,7 @@ def _table_start_line_stream_via_dir_path(paths_function, monitor):
     _ = paths_function(when_entities_dir_empty)
 
     for path_pp in _:
+        if True:
             with open(path_pp) as file_lines:
                 for otl in table_start_line_stream_via_file_lines_(
                         file_lines, monitor.listener):

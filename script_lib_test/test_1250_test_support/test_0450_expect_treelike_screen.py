@@ -4,9 +4,8 @@ this is #meta-testing
 """
 
 from script_lib import Exception as MyException
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -155,14 +154,12 @@ class Case0455_these_errors(CommonCase):
     def test_010_a_blank_line_with_extra_whitespace(self):
         self._expect_this_one_error_from_this_one_line(
             "blank line with trailing whitespace is frowned upon: ' \\n'",
-            " \n",
-        )
+            " \n")
 
     def test_020_tabs_no_can_do_for_now(self):
         self._expect_this_one_error_from_this_one_line(
             'tabs are gonna be annoying because math',
-            "\tohai\n",
-        )
+            "\tohai\n")
 
     def _expect_this_one_error_from_this_one_line(self, exp_s, input_s):
         e = None

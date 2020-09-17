@@ -3,7 +3,8 @@ from kiss_rdb_test.CUD import (
         emission_payload_expecting_error_given_run,
         run_given_edit_tuples,
         request_via_tuples as _request_via_tuples)
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -427,8 +428,7 @@ class Case4230_cannot_create_because_comment_line_above(CommonCase):
     def given_request_tuples(self):
         return (('create_attribute', 'dd_dd', '123'),
                 ('create_attribute', 'ee_ee', '123'),
-                ('create_attribute', 'hh_hh', '123'),
-                )
+                ('create_attribute', 'hh_hh', '123'))
 
     def given_entity_body_lines(self):
         # perhaps just visually:
@@ -524,8 +524,7 @@ class Case4234_can_create_when_comment_line_at_tail(CommonCase):
     def given_request_tuples(self):
         return (('create_attribute', 'dd_dd', 123),
                 ('create_attribute', 'ee_ee', '123'),
-                ('create_attribute', 'hh_hh', 123.0),
-                )
+                ('create_attribute', 'hh_hh', 123.0))
 
     def given_entity_body_lines(self):
         return """

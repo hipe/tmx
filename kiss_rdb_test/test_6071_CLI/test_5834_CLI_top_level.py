@@ -1,12 +1,10 @@
-from kiss_rdb_test.common_initial_state import (
-        functions_for,
-        unindent)
+from kiss_rdb_test.common_initial_state import \
+        functions_for, unindent
 from kiss_rdb_test import CLI as CLI_support
-from kiss_rdb_test.CLI import (
-        build_filesystem_expecting_num_file_rewrites)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from kiss_rdb_test.CLI import \
+        build_filesystem_expecting_num_file_rewrites
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -555,8 +553,7 @@ class Case6226_update(CommonCase):
                 '-delete', 'thing_1',
                 '-change', 'thing_2', 'hey F updated',
                 '-add', 'thing_3', 'T3',
-                '-add', 'thing_4', 'T4',
-                )
+                '-add', 'thing_4', 'T4')
 
     def filesystem(self):
         return build_filesystem_expecting_num_file_rewrites(1)
@@ -594,8 +591,7 @@ def _CASE_A():  # usually it's one invocation
             injections_dictionary=None,
             might_debug=False,  # ..
             do_debug_f=lambda: False,  # ..
-            debug_IO_f=debug_IO_f,
-            )
+            debug_IO_f=debug_IO_f)
 
     _tree = CLI_support.tree_via_lines(o.lines)
     return _StructTreeAndExitCode(_tree, o.exit_code)

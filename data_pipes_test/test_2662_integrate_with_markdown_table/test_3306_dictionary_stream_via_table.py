@@ -17,10 +17,10 @@ currently there is no such magnetic in the subject format adapter
 
 
 from data_pipes_test.common_initial_state import markdown_fixture
-from data_pipes_test.disjoint_small_support import (
-        build_state_the_bernstein_way)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from data_pipes_test.disjoint_small_support import \
+        build_state_the_bernstein_way
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -70,8 +70,7 @@ class Case3306DP_hello(CommonCase):
     def end_state(self):
         return build_state_the_bernstein_way(
             fixture_document_path=markdown_fixture('0150-bernstein-subtree.md'),  # noqa: E501
-            producer_module=_subject_module(),
-        )
+            producer_module=_subject_module())
 
     def test_300_the_rename_is_reflected_in_the_field_names(self):
         act = self._field_names()

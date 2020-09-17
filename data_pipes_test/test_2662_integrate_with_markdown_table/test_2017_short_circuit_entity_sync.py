@@ -4,12 +4,10 @@ objectives are severalfold:
     - cover behavior about avoiding no-op entity sync
 """
 
-from data_pipes_test.common_initial_state import (
-        html_fixture,
-        ProducerCaseMethods)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from data_pipes_test.common_initial_state import \
+        html_fixture, ProducerCaseMethods
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -168,13 +166,11 @@ class Case2019DP_omg_syncing(ProducerCaseMethods, CommonCase):
                 _md_link = markdown_link_via(dct['label'], dct['url'])
                 _ = normal_field_name_via_string(dct['label'])
                 _ = simple_key_via_normal_key(_)
-                yield (_, {'add_on': _md_link})
-        return {
-                'stream_for_sync_is_alphabetized_by_key_for_sync': False,
+                yield (_.lower(), {'add_on': _md_link})
+        return {'stream_for_sync_is_alphabetized_by_key_for_sync': False,
                 'stream_for_sync_via_stream': stream_for_sync_via_stream,
                 'dictionaries': _these_dictionaries(),
-                'near_keyerer': near_keyerer_common,
-                }
+                'near_keyerer': near_keyerer_common}
 
     def given_near_collection_mixed__(_):
         return _this_markdown_fellow()

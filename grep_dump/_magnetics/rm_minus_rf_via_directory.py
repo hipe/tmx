@@ -28,8 +28,7 @@ def rm_minus_rf_via_directory(dir_path):
     _tuples = os.walk(
             dir_path,
             topdown=False,  # important - rm files before their parent dirs!
-            onerror='TODO',
-            )
+            onerror='TODO')
 
     def _unit_of_work_for_remove_directory(dir_path):
         def exe(listener):

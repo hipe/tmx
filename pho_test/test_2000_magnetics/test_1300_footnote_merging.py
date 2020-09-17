@@ -1,5 +1,6 @@
 from pho_test import document_state as doc_state_lib
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -93,8 +94,7 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(CommonCase):
                 'understated elegance of [Burger King][66] and [here][33].',
                 '[66]: url_for_bking',
                 '[33]: url_for_here',
-                '[99]: url_for_mcdo',
-                )
+                '[99]: url_for_mcdo')
 
 
 class Case1250_footnotes_are_normalized_across_notecards(CommonCase):
@@ -162,14 +162,12 @@ class Case1250_footnotes_are_normalized_across_notecards(CommonCase):
                 'meet me at the [paris][uno]',
                 'meet me at the [copenhagen][dos]',
                 '[uno]: url_for_paris',
-                '[dos]: url_for_cph',
-                )
+                '[dos]: url_for_cph')
         yield 'el título de frag 2', (
                 "let's meet in [berlin][ein]",
                 "let's meet in [paris][zwei]",
                 '[ein]: url_for_berlin',
-                '[zwei]: url_for_paris',
-                )
+                '[zwei]: url_for_paris')
 
 
 class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
@@ -182,18 +180,16 @@ class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
                 'structured content line',
                 'empty line',
                 'empty line',
-                'footnote definition',
-                )
-        self.assertSequenceEqual(_actual, _expected)
+                'footnote definition')
+        self.assertSequenceEqual(act, exp)
 
     def test_200_the_fenced_code_block_is_just_lines(self):
-        _actual = self.a()[1]._lines
-        _expected = (
+        act = self.end_array[1]._lines
+        exp = (
             '```bash\n',
             '[mami][tchami]\n',
-            '```\n',
-            )
-        self.assertSequenceEqual(_actual, _expected)
+            '```\n')
+        self.assertSequenceEqual(act, exp)
 
     def test_300_but_this_other_fellow_is_actually_a_footnote_reference(self):
         ast = self.end_array[2]
@@ -213,8 +209,7 @@ class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
                 '[mami][tchami]',
                 '```',
                 'see [mami][tchami]',
-                '[tchami]: url_for_tchami',
-                )
+                '[tchami]: url_for_tchami')
 
 
 # could cover: footnote reference with bad name raises key error

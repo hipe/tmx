@@ -337,8 +337,7 @@ def _unattached_transition_via(
     signature = (
             tester is not None,
             dispatcher is not None,
-            tests_for_EOS,
-            )
+            tests_for_EOS)
 
     # if tester
     if (True, False, False) == signature:

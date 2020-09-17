@@ -67,10 +67,10 @@ class _Main:
 
         _sm = grammar_lib.state_machine_
 
+        cls = grammar_lib.Actions_for_ID_Traversal_Non_Validating_
         ps = _sm.build_parse_state(
                 listener=mon.listener,
-                actions_class=grammar_lib.Actions_for_ID_Traversal_Non_Validating_,  # noqa: E501
-                )
+                actions_class=cls)
 
         self._item_itr = ps.items_via_all_lines_(all_lines)
 

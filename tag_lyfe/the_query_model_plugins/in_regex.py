@@ -1,8 +1,5 @@
-from tag_lyfe.the_query_model import (
-        in_subtree_match_any_one_)
-from tag_lyfe import (
-        cover_me,
-        pop_property)
+from tag_lyfe.the_query_model import in_subtree_match_any_one_
+from tag_lyfe import pop_property
 
 
 class UnsanitizedInRegex:

@@ -6,8 +6,7 @@ from wtforms import (
         # SelectField,
         SelectMultipleField,
         StringField,
-        SubmitField,
-        )
+        SubmitField)
 import wtforms.validators as validators  # ..
 from wtforms.validators import DataRequired
 

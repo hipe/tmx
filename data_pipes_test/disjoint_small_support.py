@@ -28,8 +28,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
 
     _open_traversal_stream = producer_module.open_traversal_stream(
             listener,
-            fixture_document_path,  # {html_document_path|markdown_path}, e.g
-            )
+            fixture_document_path)  # {html_document_path|markdown_path}, e.g
 
     seen = {}
     objs = {}

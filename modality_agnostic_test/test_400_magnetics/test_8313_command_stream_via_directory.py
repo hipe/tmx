@@ -1,6 +1,7 @@
 """cover the magnetic of the same name (stem)."""
 
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

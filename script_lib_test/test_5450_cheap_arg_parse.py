@@ -1,6 +1,5 @@
-from modality_agnostic.memoization import (
-    dangerous_memoize_in_child_classes,
-    lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes, lazy
 import unittest
 
 

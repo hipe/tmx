@@ -71,8 +71,7 @@ _templates_dir = __templates_dir()
 
 app = Flask(
         __name__,
-        template_folder=_templates_dir,
-        )
+        template_folder=_templates_dir)
 
 
 class _Config:
@@ -93,14 +92,10 @@ app.config.from_object(_Config)
 do_celery = True  # for now allow us to regress back from celery easily
 if do_celery:
 
-    from celery import (
-            Celery,
-            )
-
+    from celery import Celery
     celery = Celery(
             app.import_name,
-            broker=app.config['CELERY_BROKER_URL']
-            )
+            broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
 
 
@@ -201,8 +196,7 @@ if do_celery:
                         'current': i,
                         'total': total,
                         'status': message,
-                        },
-                    )
+                        })
 
             time.sleep(1)
 

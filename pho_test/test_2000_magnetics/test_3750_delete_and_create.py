@@ -1,6 +1,5 @@
-from pho_test.common_initial_state import \
-        business_collection_one, listener_and_emissions
-from modality_agnostic.memoization import \
+from pho_test.common_initial_state import business_collection_one
+from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes_2
 from unittest import TestCase, main as unittest_main
 

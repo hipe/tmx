@@ -20,8 +20,7 @@ This producer script is covered by multiple test files:
 
 _raw_url = (
         'https://raw.githubusercontent.com'
-        '/webmaven/python-parsing-tools/master/README.md'
-        )
+        '/webmaven/python-parsing-tools/master/README.md')
 
 
 def _CLI(sin, sout, serr, argv):
@@ -35,8 +34,7 @@ def _CLI(sin, sout, serr, argv):
                 ('-s', '--for-sync',
                  'translate to a stream suitable for use in [#447] syncing'),
             ),
-            description_template_valueser=lambda: {'raw_url': _raw_url},
-            )
+            description_template_valueser=lambda: {'raw_url': _raw_url})
 
 
 def _do_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
@@ -69,6 +67,7 @@ def stream_for_sync_via_stream(dcts):
     for dct in dcts:
         # #[#873.5] how sparseness (holes) must be filled lost at #history-A.4
         # lost at #history-A.3 or before was `simplify_keys_`
+
         yield (key_via(dct['name']), dct)
 
 

@@ -38,9 +38,8 @@ but still we can use it as a guide.
 
 
 from kiss_rdb_test.filesystem_spy import build_fake_filesystem
-from modality_agnostic.test_support.structured_emission import (
-        channel_and_payloader_and_result_via_run)
-from modality_agnostic.memoization import (
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import (
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes,
         lazy)
 import unittest

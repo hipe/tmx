@@ -1,8 +1,8 @@
-from kiss_rdb_test.filter_canon import (
-        case_of_one_column_match_two_out_of_three,
-        case_of_empty_collection)
-from modality_agnostic.memoization import (
-        dangerous_memoize_in_child_classes)
+from kiss_rdb_test.filter_canon import \
+        case_of_one_column_match_two_out_of_three, \
+        case_of_empty_collection
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes
 import unittest
 
 
@@ -61,8 +61,7 @@ def _lets_go():
             {
                 'aa': 'ENC',
                 'bb': 'this is #blue.',
-                },
-    )
+                })
 
 
 class _EZ_Entity:

@@ -115,8 +115,7 @@ def SELF(
     line_regex = re.compile(
             r'^(?P<share>\d+\.\d+)'
             '[ ]'
-            r'(?P<desc>[^\n]+)\n'
-            )
+            r'(?P<desc>[^\n]+)\n')
     # (although we waste a little effort regexing share values that we don't
     # end up using, it's better to catch a malformed file early.)
 
@@ -192,8 +191,7 @@ def SELF(
                     'had {act}'
             _msg = _fmt.format(
                     act=real_item_count,
-                    exp=last_known_number_of_line_items,
-                    )
+                    exp=last_known_number_of_line_items)
             raise _MyException(_msg)  # (Case505)
 
     def __advance_over_the_first_line():
@@ -228,8 +226,7 @@ if __name__ == '__main__':
     with open(logfile) as fh:
         xx = SELF(
             last_known_number_of_line_items=last_line_item_number,
-            logfile_line_upstream=fh,
-            )
+            logfile_line_upstream=fh)
 
     print('wahoo: {}'.format(repr(xx)))
 

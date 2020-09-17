@@ -151,8 +151,7 @@ def _date_string_via_conventional_markdown_file(path, listener):
 
             shell=False,  # True if cmd is (EEW) a string
             text=True,  # sfsef encd
-            universal_newlines=None,  # default is False. none b/c text
-            )
+            universal_newlines=None)  # default is False. none b/c text
 
     with cm as proc:
         sout = proc.stdout

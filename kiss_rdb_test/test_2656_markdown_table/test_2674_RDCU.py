@@ -1,11 +1,8 @@
-from kiss_rdb_test.common_initial_state import (
-        StubCollectionIdentity,
-        pretend_file_via_path_and_big_string)
 from kiss_rdb_test import storage_adapter_canon
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
+import re
 
 
 canon = storage_adapter_canon.produce_agent()

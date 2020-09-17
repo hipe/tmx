@@ -26,10 +26,9 @@ recutils project, we would strongly consider refactoring the implementaton.)
 
 
 from kiss_rdb_test.filesystem_spy import build_fake_filesystem
-from modality_agnostic.test_support.structured_emission import (
-        channel_and_payloader_and_result_via_run)
-from modality_agnostic.memoization import (
-        dangerous_memoize_in_child_classes as shared_subject_in_child_classes)
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
@@ -206,8 +205,7 @@ class Case1403_flush_as_config_but_unrecognized_names(CommonCase):
         return scn.flush_to_config(
                 listener,
                 bing_bang='allowed',
-                ding_dang='required',
-                )
+                ding_dang='required')
 
     def given_lines(self):
         yield '# comment'
@@ -238,8 +236,7 @@ class Case1404_flush_as_config_but_collision_across_records(CommonCase):
         return scn.flush_to_config(
                 listener,
                 One_mama='allowed',
-                Two_mama='allowed',
-                )
+                Two_mama='allowed')
 
     def given_lines(self):
         yield 'One_mama: x'
@@ -271,8 +268,7 @@ class Case1406_flush_as_config_but_missing_requireds(CommonCase):
                 Field_D='allowed',
                 Field_E='required',
                 Field_F='allowed',
-                Field_G='required',
-                )
+                Field_G='required')
 
     def given_lines(self):
         yield '# comment'
@@ -316,8 +312,7 @@ class Case1407_flush_as_config_money(CommonCase):
                 Field_D='allowed',
                 Field_E='required',
                 Field_F='allowed',
-                Field_G='required',
-                )
+                Field_G='required')
 
     def given_lines(self):
         yield 'Field_G: gg'

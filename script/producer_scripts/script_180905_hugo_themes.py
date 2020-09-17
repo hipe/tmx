@@ -73,8 +73,7 @@ class open_traversal_stream:
         soup = _ps_lib().soup_via_locators_(
                 url=_url,
                 html_document_path=self._cached_document_path,
-                listener=self._listener,
-                )
+                listener=self._listener)
         if not soup:
             self._OK = False
             return

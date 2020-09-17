@@ -103,8 +103,7 @@ class Report:
         assert('CLI' == modality)
         dispatcher.receive_subscription_to_tap_each_alternative(
                 self.__put_this_alternative_in_a_bucket,
-                self.__when_that_stuff_is_finished,
-                )
+                self.__when_that_stuff_is_finished)
         self._skipped_because_didnt_have_both = []
         self._skipped_because_no_assocs_at_all = []
         self._sort_me = []

@@ -33,10 +33,9 @@ a solution to this possible problem (first mentioned in commit comment
 at #history-A.1 minus three weeee).)
 """
 
-
 from data_pipes_test.common_initial_state import html_fixture
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

@@ -5,8 +5,7 @@ the salient features of the grammar demonstrated here:
   - same as non-tail nodes
 """
 
-from tag_lyfe_test.tagging import (
-        TaggingCommonCasePlusMemoization as _ThisCase)
+from tag_lyfe_test.tagging import TaggingCommonCasePlusMemoization as ThisCase
 import unittest
 
 

@@ -1,10 +1,9 @@
-from data_pipes_test.common_initial_state import (
-        build_end_state_commonly,
-        markdown_fixture,
-        executable_fixture)
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
-from modality_agnostic.test_support.structured_emission import (
-        listener_and_emission_objecter_for)
+from data_pipes_test.sync_support import build_end_state_of_sync
+from data_pipes_test.common_initial_state import \
+        markdown_fixture, executable_fixture
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
+import modality_agnostic.test_support.common as em
 import unittest
 
 
@@ -133,10 +132,8 @@ class Case1314DP_filenames_must_look_a_way(CommonCase):
 
     def given(self):
         # NOTE the dash in the below filename
-        return {
-                'producer_script_path': executable_fixture('chimi-churry.py'),
-                'near_collection': _same_near_collection(),
-                }
+        return {'producer_script_path': executable_fixture('chimi-churry.py'),
+                'near_collection': _same_near_collection()}
 
 
 class Case1315_file_not_found(CommonCase):
@@ -151,10 +148,8 @@ class Case1315_file_not_found(CommonCase):
         return iter(())
 
     def given(self):
-        return {
-                'producer_script_path': 'script/no_such_script_one.py',
-                'near_collection': _same_near_collection(),
-                }
+        return {'producer_script_path': 'script/no_such_script_one.py',
+                'near_collection': _same_near_collection()}
 
 
 # Case1317 was "no metadata row", archived #history-A.1
@@ -172,10 +167,8 @@ class Case1319DP_bad_natural_key(CommonCase):
         return iter(())
 
     def given(self):
-        return {
-                'producer_script_path': _chimi_churri_far_path(),
-                'near_collection': _same_near_collection(),
-                }
+        return {'producer_script_path': _chimi_churri_far_path(),
+                'near_collection': _same_near_collection()}
 
 
 class Case1320DP_extra_cel(CommonCase):
@@ -194,10 +187,8 @@ class Case1320DP_extra_cel(CommonCase):
 
     def given(self):
         _ = executable_fixture('exe_110_extra_cel.py')
-        return {
-                'producer_script_path': _,
-                'near_collection': _same_near_collection(),
-                }
+        return {'producer_script_path': _,
+                'near_collection': _same_near_collection()}
 
 
 class Case1322DP_RUM(CommonCase):
@@ -212,10 +203,9 @@ class Case1322DP_RUM(CommonCase):
         return ()
 
     def given(self):
-        return {
-                'producer_script_path': executable_fixture('exe_120_endcap_yes_no.py'),  # noqa: E501
-                'near_collection': markdown_fixture('0110-endcap-yes-no.md'),
-                }
+        produc_script_path = executable_fixture('exe_120_endcap_yes_no.py')
+        return {'producer_script_path': produc_script_path,
+                'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
 def _chimi_churri_far_path():

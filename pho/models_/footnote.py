@@ -80,8 +80,7 @@ def any_structured_via_line__(line):
 
 footnote_reference_regex_ = re.compile(
         r'\[([^\]]+)\]'
-        r'\[([^\]]+)\]'
-        )
+        r'\[([^\]]+)\]')
 
 
 # == models & associated trivial builder functions
@@ -161,19 +160,16 @@ def __whine_about_bad_footnote_ref(listener, local_id, lineno, inc, idoc):
     else:
         but_what = 'but no footnotes are defined'
 
-    _msg = (
-            f'in document {repr(_iid)} '
-            f'on body line {lineno}, '
-            f'it references a footnote {repr(local_id)} '
-            f'{but_what}'
-            )
-
-    cover_me(_msg)
+    msg = (f'in document {repr(_iid)} '
+           f'on body line {lineno}, '
+           f'it references a footnote {repr(local_id)} '
+           f'{but_what}')
+    xx(msg)
 
 
 # ==
 
-def cover_me(msg=None):
+def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
 # #abstracted.

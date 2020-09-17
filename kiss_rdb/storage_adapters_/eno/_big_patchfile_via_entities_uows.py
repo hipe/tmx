@@ -240,8 +240,7 @@ def _apply_big_patchfile(patchfile_path, listener, is_dry, cwd):
             stdout=sp.PIPE,
             stderr=sp.PIPE,
             text=True,  # don't give me binary, give me utf-8 strings
-            cwd=cwd,  # might be None
-            )
+            cwd=cwd)  # might be None
 
     with opened as proc:
 

@@ -135,7 +135,7 @@ item to use, IFF the first element of the tuple to use is `OK`.
 
         return wrap
 
-    _new_stream = sync(
+    new_stream = sync(
         # ..
         far_item_wrapperer=_far_item_wrapperer,
         # ..

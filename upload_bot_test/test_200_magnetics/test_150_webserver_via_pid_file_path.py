@@ -3,14 +3,10 @@
 the structure of this test file is almost *entirely* derived from the
 [#304.figure-1]. (in fact, that's interesting food for thougt :[#008.F])
 """
-from upload_bot._models import (
-        filesystem)
-from modality_agnostic.memoization import (
-        dangerous_memoize,
-        lazy)
+from upload_bot._models import filesystem
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
-
-shared_subject = dangerous_memoize
 
 
 class _TestCase(unittest.TestCase):
@@ -42,8 +38,7 @@ class Case100_yes_yes(_TestCase):
     def end_tuple(self):
         return _against(
                 is_there_PID_file=True,
-                is_the_process_running=True,
-                )
+                is_the_process_running=True)
 
 
 class Case200_no(_TestCase):
@@ -55,10 +50,8 @@ class Case200_no(_TestCase):
         self._says_server_is_running(4567)
 
     @shared_subject
-    def _tuple(self):
-        return _against(
-                is_there_PID_file=False,
-                )
+    def end_tuple(self):
+        return _against(is_there_PID_file=False)
 
 
 class Case300_yes_no(_TestCase):
@@ -76,8 +69,7 @@ class Case300_yes_no(_TestCase):
     def end_tuple(self):
         return _against(
                 is_there_PID_file=True,
-                is_the_process_running=False
-                )
+                is_the_process_running=False)
 
 
 def _against(
@@ -107,8 +99,7 @@ def _against(
             start_server=_my_start_server,
             psutil=_use_psutil,
             filesystem=_fs,
-            listener=listener,
-            )
+            listener=listener)
 
     return _EndTuple(msgs)
 

@@ -56,8 +56,7 @@ def _do_CLI(monitor, sin, sout, serr, path):
 
         mp = _MadParse(
                 receive_parsed_line=receive_parsed_line,
-                receive_other_line=receive_other_line,
-                )
+                receive_other_line=receive_other_line)
 
     recv = mp.receive_line
     with opened as lines:
@@ -82,8 +81,7 @@ class _MadParse:  # the [#608.4] "mad parse" pattern
                 r'(\d\d):'      # hours
                 r'(\d\d):'      # minutes
                 r'(\d\d)'       # seconds
-                r'([ ]+.+\n)',  # the rest
-                )
+                r'([ ]+.+\n)')  # the rest
 
         self.receive_parsed_line = receive_parsed_line
         self.receive_other_line = receive_other_line

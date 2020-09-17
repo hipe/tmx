@@ -1,9 +1,7 @@
-from kiss_rdb_test.common_initial_state import (
-        functions_for)
-from modality_agnostic.test_support.structured_emission import (
-        listener_and_emissioner_for)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+from kiss_rdb_test.common_initial_state import functions_for
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

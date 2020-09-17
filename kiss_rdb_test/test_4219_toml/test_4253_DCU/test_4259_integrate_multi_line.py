@@ -1,7 +1,8 @@
 from kiss_rdb_test.CUD import (
         expect_big_success,
         emission_payload_expecting_error_given_edit_tuples)
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

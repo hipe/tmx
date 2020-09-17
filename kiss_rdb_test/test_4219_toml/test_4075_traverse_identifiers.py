@@ -1,8 +1,8 @@
-from kiss_rdb_test.common_initial_state import (
-        OneWriteReference,
-        unindent)
-from modality_agnostic.test_support import structured_emission as se_lib
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from kiss_rdb_test.common_initial_state import \
+        OneWriteReference, unindent
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -11,13 +11,11 @@ class CommonCase(unittest.TestCase):
     # (at #tombstone-A.1 we removed the "expression" counterparts.)
 
     def expecting_any_of_these_common_things(self):
-        o = self.emitted_elements()
-        _ = (
-                'blank line or comment line',
-                'table start line',
-                'end of input',
-                )
-        self.assertEqual(o['expecting_any_of'], _)
+        dct = self.emitted_elements
+        exp = ('blank line or comment line',
+               'table start line',
+               'end of input')
+        self.assertEqual(dct['expecting_any_of'], exp)
 
     def line_number_but_not_position(self, lineno):
         o = self.emitted_elements

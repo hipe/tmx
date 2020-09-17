@@ -54,8 +54,7 @@ class _Config:  # :#here1
 app = Flask(
         'grep_dump',
         instance_path=sub_project_dir,
-        root_path=sub_project_dir,  # #here2
-        )
+        root_path=sub_project_dir)  # #here2
 
 app.config.from_object(_Config)
 
@@ -79,8 +78,7 @@ def __build_jobser():  # (next to where we build app above)
     return mag.Jobser(
             dir_path=writable_tmpdir,
             wrapper_class=_build_job,
-            listener=_listener,
-        )
+            listener=listener)
 
 
 jobser = __build_jobser()
@@ -91,8 +89,7 @@ def chiminius_churrious():
     import time
     return render_template(
             'blue-ranger-template.html',
-            time_s=str(time.time()),
-            )
+            time_s=str(time.time()))
 
 
 @app.route('/upload-dump', methods=['GET', 'POST'])
@@ -109,8 +106,7 @@ def upload_dump():
             'upload-dump.html',
             job_number=job_num,
             form=form,
-            title='Upload Time',
-            )
+            title='Upload Time')
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -186,8 +182,7 @@ def _run_server_forever_custom(app):
             request_handler=request_handler,
             static_files=static_files,
             passthrough_errors=passthrough_errors,
-            ssl_context=ssl_context,
-            )
+            ssl_context=ssl_context)
 
 
 def _my_run_simple(

@@ -1,8 +1,6 @@
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
-from modality_agnostic.test_support.structured_emission import (
-        minimal_listener_spy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
+import modality_agnostic.test_support.common as em
 import doctest
 import unittest
 
@@ -34,8 +32,7 @@ class CommonCase(unittest.TestCase):
                 collection_implementation=_coll,
                 needle_function=_needle,
                 listener=listener,
-                **kwargs,
-                )
+                **kwargs)
 
         return (_x, msgs)
 
@@ -86,8 +83,7 @@ class Case1429_splay(CommonCase):
     @shared_subject
     def end_state(self):
         return self._execute_while_listening(
-                item_noun_phrase=lambda: 'choo chi',
-                )
+                item_noun_phrase=lambda: 'choo chi')
 
     def _needle_function(self):
         return 'zanga_tanga'
@@ -110,8 +106,7 @@ class Case1431_ambiguous(CommonCase):
         return self._execute_while_listening(
                 say_collection='bazonga',
                 subfeatures_via_item=lambda k, item: item[2],  # #here1
-                say_needle=lambda: "'fi*'",  # note redundancy with below
-                )
+                say_needle=lambda: "'fi*'")  # note redundancy with below
 
     def _needle_function(self):
         import re
@@ -142,8 +137,7 @@ class Case1432_succeed(CommonCase):
     def end_state(self):
         return self._execute_while_not_listening(
                 say_collection='bazonga',
-                subfeatures_via_item=lambda k, item: item[2],  # #here1
-                )
+                subfeatures_via_item=lambda k, item: item[2])  # #here1
 
     def _needle_function(self):
         return 'foz'
@@ -160,8 +154,7 @@ def _collection_C():
             ('blue_ranger', (x, x, ('fiz', 'fim', 'fap'))),
             ('red_ranger', (x, 'zizi', ('fuz', 'foz', 'faz'))),
             ('yellow_ranger', (x, x, ('fin', 'foo', 'fuu'))),
-            ('green_ranger', (x, x, ())),
-    )
+            ('green_ranger', (x, x, ())))
     return _collection_via_pairs(iter(pairs))  # risky, experimental
 
 
@@ -172,8 +165,7 @@ def _collection_B():
             ('he_hu', 'no see'),
             ('hi_hu', 'no see'),
             ('ho_hu', 'no see'),
-            ('hu_hu', 'no see'),
-    )
+            ('hu_hu', 'no see'))
     return _collection_via_pairs(iter(pairs))  # risky, experimental
 
 

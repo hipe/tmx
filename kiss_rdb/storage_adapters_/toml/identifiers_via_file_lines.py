@@ -349,19 +349,15 @@ def _define_state_machine(funcs):  # interface here is VERY experimental!
                 'inside table',
                 'inside multi-line literal',
                 'inside multi-line basic',
-                ),
-            )
+                ))
     blank_or_comment_stay_here = o(
-            tester=blank_line_or_comment,
-            )
+            tester=blank_line_or_comment)
     table_start__to__table_begun = o(
             tester=table_start,
-            transition_to='table begun',
-            )
+            transition_to='table begun')
     eos_ok = o(
             tests_for_EOS=True,
-            transition_to='done',
-            )
+            transition_to='done')
     # --
 
     # (again, below is derived almost directly from [#863].)

@@ -4,9 +4,7 @@
 looks for any line in {file_moniker} matching {pattern_moniker} and parses it.
 """
 
-from sys import (
-        argv,
-        stderr)
+from sys import argv, stderr
 import re
 
 

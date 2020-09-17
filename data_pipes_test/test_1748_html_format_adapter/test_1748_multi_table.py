@@ -8,14 +8,12 @@ the branch boundaries are being detected and emitted.
 """
 
 
-from data_pipes_test.common_initial_state import (
-        html_fixture,
-        ProducerCaseMethods)
-from kiss_rdb_test.markdown_table_parsers import (
-        table_via_lines, nonblank_line_runs_via_lines)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from data_pipes_test.common_initial_state import \
+        html_fixture, ProducerCaseMethods, passthru_context_manager
+from kiss_rdb_test.markdown_table_parsers import \
+        table_via_lines, nonblank_line_runs_via_lines
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 

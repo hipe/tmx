@@ -1,7 +1,6 @@
 from contextlib import contextmanager
-from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -80,8 +79,7 @@ class Case496_Malformations(_TestCase):
             lines.append('cannot parse me')
         self.expect_error_message(
                 'malformed item line: '
-                r"'cannot parse me\n'"
-                )
+                r"'cannot parse me\n'")
 
     def test_040_unexpected_extra_line(self):
         with self.given_lines() as lines:
@@ -90,8 +88,7 @@ class Case496_Malformations(_TestCase):
             lines.append('extra linezorzz')
         self.expect_error_message(
                 'unexpected extra line in file: '
-                r"'extra linezorzz\n'"
-                )
+                r"'extra linezorzz\n'")
 
 
 class Case497_AgainstJustBegunFile_AfterNoItems(_TestCase):  # :[#510.7.2]
@@ -255,8 +252,7 @@ def okay(_=None):
 def _call_subject_commonly(num, lines):
     return _subject_module().SELF(
         last_known_number_of_line_items=num,
-        logfile_line_upstream=iter(lines),
-        )
+        logfile_line_upstream=iter(lines))
 
 
 def _subject_module():

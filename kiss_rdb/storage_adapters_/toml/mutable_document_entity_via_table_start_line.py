@@ -104,8 +104,7 @@ class _MutableDocumentEntity:
             _whine_about_collision(  # (Case4155)
                     listener=listener,
                     new_name=attr_blk.attribute_name_string,
-                    existing_name=_item.attribute_name_string,
-                    )
+                    existing_name=_item.attribute_name_string)
             return
 
         return gist

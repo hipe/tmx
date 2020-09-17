@@ -1,13 +1,11 @@
-from kiss_rdb_test.common_initial_state import (
-        TSLO_via,
-        debugging_listener as _debugging_listener,
-        unindent as _unindent)
-from kiss_rdb.storage_adapters_.toml.entities_via_collection import (
-        table_block_via_lines_and_table_start_line_object_)
-from modality_agnostic.test_support import structured_emission as se_lib
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from kiss_rdb_test.common_initial_state import \
+        TSLO_via, unindent as _unindent, \
+        debugging_listener as _debugging_listener
+from kiss_rdb.storage_adapters_.toml.entities_via_collection import \
+        table_block_via_lines_and_table_start_line_object_
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -547,8 +545,7 @@ def _comment_tester_one():
         basic-string-000-empty = ""  # hi
         basic-string-050-simple = "hi"
         basic-string-100-escape = "the food is \\"safe\\""#
-        """
-    )
+        """)
 
     # #open [#861.D] these datetime forms not supported in python toml
     # datetime-no-comment = 07:32:00

@@ -10,7 +10,7 @@ flush the whole thing just to find the end).
 As it turns out, there is perhaps a not tiny class of problems that seem to
 fit into this macro category of problem.
 
-Origin story: wwere implementing something elsewhere and we needed one
+Origin story: we were implementing something elsewhere and we needed one
 element of lookahead to determine when we had reached the end of the stream
 before we processed and expressed the current item.
 
@@ -280,8 +280,7 @@ spatialize_with_2_items_of_lookahead = rotating_bufferer(
         _NeitherLastNorSecondToLastItem,
         _SecondToLastItem,
         _LastItem,
-        lambda: _EMPTY_SINGLETON
-        )
+        lambda: _EMPTY_SINGLETON)
 
 # #history-A.2: re-integrate some linguistic functions to use rotating buffer
 # #history-A.1: introduce rotating buffer

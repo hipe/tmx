@@ -60,8 +60,7 @@ def _do_CLI(monitor, stdin, stdout, stderr, themes_dir):
     _big_s = json.dumps(
             dct,
             indent=4,
-            sort_keys=False,  # currently aesthetically ordered.
-            )
+            sort_keys=False)  # currently aesthetically ordered.
     stderr.write(_big_s)
     stderr.write('\n')
     return monitor.exitstatus

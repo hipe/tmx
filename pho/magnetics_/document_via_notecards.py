@@ -330,11 +330,9 @@ def _AST_via_liner(parse_context, listener):
             md = rx.match(line)
             if not md:
                 _at_here = parse_context.say_at_where()
-                reason = (
-                        f'{_at_here}, '
-                        f'what is the deal with this line: {repr(line)}'
-                        )
-                cover_me(reason)
+                reason = (f'{_at_here}, '
+                          f'what is the deal with this line: {repr(line)}')
+                xx(reason)
                 # (did something else before #history-A.3)
 
         from pho.models_ import content_line
@@ -353,10 +351,8 @@ class _ParseContext:
         self.notecard_identifier_string = iid_s
 
     def say_at_where(self):
-        return (
-            f'in {repr(self.notecard_identifier_string)}.body'
-            f' (line {self.lineno})'
-            )
+        return (f'in {repr(self.notecard_identifier_string)}.body'
+                f' (line {self.lineno})')
 
 
 def _fenced_code_block_lib():

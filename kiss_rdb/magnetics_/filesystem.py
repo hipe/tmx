@@ -116,13 +116,11 @@ class _FILE_REWRITE_TRANSACTION:
 
     def __enter__(self):
         del(self._enter_mutex)
-        tc = _FileRewriteTransactionController(
+        return _FileRewriteTransactionController(
                 receive_rewrite_file=self._receive_rewrite_file,
                 receive_finish=self._receive_finish,
                 register_cleanup_function=self._register_cleanup_function,
-                receive_ask_OK=lambda: self._OK,
-                )
-        return tc
+                receive_ask_OK=lambda: self._OK)
 
     def _register_cleanup_function(self, f):
         def use_f(_1, _2, _3):

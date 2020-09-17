@@ -1,11 +1,8 @@
-from kiss_rdb_test.common_initial_state import (
-        MDE_via_lines_and_table_start_line_object,
-        TSLO_via,
-        unindent)
-from modality_agnostic.test_support import structured_emission as se_lib
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from kiss_rdb_test.common_initial_state import \
+        MDE_via_lines_and_table_start_line_object, TSLO_via, unindent
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -170,8 +167,7 @@ class Case4154_all_three_kinds_of_lines(CommonCase):
         _given = (
                 'foo_bar = BAZ\n',
                 '\n',
-                '# comment line\n',
-                )
+                '# comment line\n')
         return _doc_entity_via_lines(_given)
 
 
@@ -441,7 +437,6 @@ class Case4165_delete_to_make_empty(CommonCase):
 
 
 # == SUPPORT
-
 
 def _internal_identifier_via_component_offset(offset, mde):
 

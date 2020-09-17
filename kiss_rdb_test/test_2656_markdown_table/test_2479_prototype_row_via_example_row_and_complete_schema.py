@@ -8,8 +8,9 @@ along the way this evolved to cover also our alignment and other formatting
 behavior (#history-A.1).
 """
 
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject)
+import kiss_rdb_test.markdown_storage_adapter as msa
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -92,8 +93,7 @@ class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
         return _schema_plus_via_two_lines(
             "|Ohai I'm Natty Key|Celo|\n",
             '|--:|--:|\n',  # no colon, yes colon means right  ##here2
-            nkfn='ohai_im_natty_key',
-            )
+            nkfn='ohai_im_natty_key')
 
 
 class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(CommonCase):  # noqa: E501 #midpoint
@@ -130,8 +130,7 @@ class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(CommonCas
         return _schema_plus_via_two_lines(
             "|Hallo I'm Natty Key|Zig|\n",
             '|:--|:--|\n',  # yes colon, no colon means left  ##here2
-            nkfn='hallo_im_natty_key',
-            )
+            nkfn='hallo_im_natty_key')
 
 
 class Case2480KR_change_natural_key_only_OK(CommonCase):
@@ -180,8 +179,7 @@ class Case2480KR_change_natural_key_only_OK(CommonCase):
         return _schema_plus_via_two_lines(
             "|Oi I'm Natty|\n",
             '|:--:|\n',  # yes colon yes colon means center  ##here2
-            nkfn='oi_im_natty',
-            )
+            nkfn='oi_im_natty')
 
     def _offset_of_interest(self):
         return 0

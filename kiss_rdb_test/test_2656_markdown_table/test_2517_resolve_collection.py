@@ -1,11 +1,10 @@
-from kiss_rdb_test.common_initial_state import (
-        StubCollectionIdentity,
-        pretend_file_via_path_and_big_string,
-        PretendFile,
-        unindent_with_dot_hack,
-        functions_for)
+import kiss_rdb_test.markdown_storage_adapter as msa
 from kiss_rdb_test import storage_adapter_canon
-from modality_agnostic.memoization import dangerous_memoize as shared_subject
+from kiss_rdb_test.common_initial_state import \
+        unindent_with_dot_hack, functions_for
+import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 import unittest
 
 

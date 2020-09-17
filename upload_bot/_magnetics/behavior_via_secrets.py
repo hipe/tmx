@@ -56,8 +56,7 @@ def _build_all_responder_functions(secrets):
     def respond_to_url_verification(response, slack_event):
         # (Case501)
         return response.respond_in_JSON_via_simple_dictionary(
-                challenge=slack_event['challenge'],
-                )
+            challenge=slack_event['challenge'])
 
     @responder
     def respond_to_ping(response, slack_event):
@@ -82,10 +81,9 @@ def _verify_application_token(response, slack_event, f, expected):
         # arbitrary clients (Case499)
 
         _msg = (
-          'I AM NOT FOR PRODUCTION\n' +
-          'Invalid Slack verification token:\n' +
-          'received: {} expected: {}\n\n'.format(actual, expected)
-          )
+          'I AM NOT FOR PRODUCTION\n'
+          'Invalid Slack verification token:\n'
+          'received: {} expected: {}\n\n'.format(actual, expected))
 
         response.log('\nyikes:\n{}'.format(_msg))
 

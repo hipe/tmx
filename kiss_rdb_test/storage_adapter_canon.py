@@ -187,8 +187,7 @@ _these_N_IDs = (
         'B8H',
         'B9G',
         'B9H',  # this one is usually used for the create and update case too
-        'B9J',
-        )
+        'B9J')
 
 
 def build_flattened_collection_for_traversal_case(tc):  # similar to #here1

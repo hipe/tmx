@@ -23,22 +23,12 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_identity,
-        random_number_generator,
-        filesystem,
-        listener):
+        collection_path, listener=None, opn=None, rng=None):
 
     from data_pipes.format_adapters.producer_script import \
             COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
 
     return COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            collection_identity, random_number_generator, filesystem, listener)
-
-
-def COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, monitor):
-    from data_pipes.format_adapters.producer_script import \
-            COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM
-
-    return COLLECTION_IMPLEMENTATION_VIA_READ_ONLY_STREAM(stdin, monitor)
+        collection_path, listener, opn=opn, rng=rng)
 
 # #born.

@@ -170,8 +170,7 @@ def _32_32_32():
     return _StorageSchema(
             identifier_depth=3,
             filetree_depth=3,
-            paths_function='paths_when_three_deep',
-            )
+            paths_function='paths_when_three_deep')
 
 
 o['32x32x32'] = _32_32_32
@@ -182,8 +181,7 @@ def _32_32():
     return _StorageSchema(
             identifier_depth=2,
             filetree_depth=2,
-            paths_function='paths_when_two_deep',
-            )
+            paths_function='paths_when_two_deep')
 
 
 o['32x32'] = _32_32
@@ -194,8 +192,7 @@ def _32up2():
     return _StorageSchema(
             identifier_depth=2,
             filetree_depth=1,
-            paths_function='paths_when_single_file',
-            )
+            paths_function='paths_when_single_file')
 
 
 o['32^2'] = _32up2

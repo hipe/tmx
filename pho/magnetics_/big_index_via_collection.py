@@ -564,11 +564,9 @@ class _BigIndex:
         frag = dct[iid_s]
         parend_iid_s = frag.parent_identifier_string
         if parend_iid_s is not None:
-            _reason = (
-                    f'notecard {repr(iid_s)} is not a document head'
-                    f' because has parent {repr(parend_iid_s)}'
-                    )
-            cover_me(_reason)
+            reason = (f'notecard {repr(iid_s)} is not a document head'
+                      f' because has parent {repr(parend_iid_s)}')
+            xx(reason)
 
         ct = _CollectionTraversal(self)
         # even within one document we need to make sure we do not cycle

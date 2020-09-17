@@ -1,11 +1,10 @@
-from modality_agnostic.memoization import (  # noqa: E402
-        dangerous_memoize as shared_subject)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject
 
 
 class TaggingCommonCase:
 
     def expect_shadow(self, expected_shadow):
-
         ascii_pieces = []
         doc_pairs = self.end_state
 

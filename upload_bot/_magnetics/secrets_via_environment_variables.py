@@ -48,8 +48,7 @@ def _SELF(unsanitized_collection):
         'BOT_USER_OATH_ACCESS_TOKEN': o('^xoxb-[0-9]+-[A-Za-z0-9]+$'),
         'VERIFICATION_TOKEN': o('^[A-Za-z0-9]{5,30}$'),  # 24 length prob
         },
-        items_plural='environment variables',
-        )
+        items_plural='environment variables')
 
     return _SELF(unsanitized_collection)
 
@@ -122,8 +121,7 @@ def regex_based_validator(s):
             listener(
                     '{variable_moniker} must match {pattern_moniker} '
                     '(had: {actual_value_moniker})',
-                    pattern_moniker=rx.pattern,
-                    )
+                    pattern_moniker=rx.pattern)
             return _NOT_OK
         else:
             return _OK

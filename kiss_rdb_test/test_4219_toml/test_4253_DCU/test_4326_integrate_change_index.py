@@ -1,19 +1,12 @@
-from kiss_rdb_test.common_initial_state import (
-        StubCollectionIdentity,
-        functions_for,
-        unindent_with_dot_hack,
-        unindent as _unindent)
-from kiss_rdb_test.CUD import (
-        run_for,
-        wrap_collection,
-        filesystem_recordings_of,
-        filesystem_expecting_no_rewrites,
-        build_filesystem_expecting_num_file_rewrites)
+from kiss_rdb_test.common_initial_state import \
+        functions_for, unindent_with_dot_hack, unindent as _unindent
+from kiss_rdb_test.CUD import \
+        run_for, wrap_collection, filesystem_recordings_of, \
+        filesystem_expecting_no_rewrites, \
+        build_filesystem_expecting_num_file_rewrites
 from kiss_rdb_test import storage_adapter_canon
-from modality_agnostic.memoization import (
-        Counter,
-        dangerous_memoize as shared_subject,
-        lazy)
+from modality_agnostic.test_support.common import \
+        Counter, dangerous_memoize as shared_subject, lazy
 import unittest
 
 

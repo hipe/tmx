@@ -19,7 +19,7 @@ under the "special field instructions".)
 import sys
 
 
-def dictionary_via_cels_via_definition(
+def dictionary_via_cells_via_definition(
         unsanitized_far_field_names,
         special_field_instructions,
         string_via_cel,
@@ -189,6 +189,6 @@ class _RowManifold:
         return x
 
 
-sys.modules[__name__] = dictionary_via_cels_via_definition
+sys.modules[__name__] = dictionary_via_cells_via_definition
 
 # #abstracted.

@@ -1,9 +1,6 @@
-from pho_test.common_initial_state import (
-        collection_one,
-        throwing_listenerer)
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+from pho_test.common_initial_state import collection_one, throwing_listenerer
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -103,8 +100,7 @@ class Case1580_generate_one_document(CommonCase):
         from modality_agnostic import write_only_IO_proxy
         spy = write_only_IO_proxy(
                 write=writes.append,
-                on_OK_exit=lambda: None,
-                )
+                on_OK_exit=lambda: None)
 
         _big_index = _big_index_one()
 
@@ -128,12 +124,10 @@ class Case1580_generate_one_document(CommonCase):
         x = run(listener)
         chan, payloader = emissioner()
 
-        return {
-                'result_value': x,
+        return {'result_value': x,
                 'writes': writes,
-                'channel': chan,
-                'payloader_BE_CAREFUL_HOT': payloader,
-                }
+                'channel': emi.channel,
+                'payloader_BE_CAREFUL_HOT': emi.payloader}
 
 
 def custom_index_via_big_index(big_index):
@@ -188,8 +182,7 @@ def custom_index_via_big_index(big_index):
         return _CustomIndex(
                 total_line_counter.value,
                 lines_that_express_the_notecard_heading,
-                lines_that_define_bookmarks,
-                )
+                lines_that_define_bookmarks)
 
 
 class _CustomIndex:

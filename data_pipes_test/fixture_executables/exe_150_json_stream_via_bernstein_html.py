@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W error::Warning::0
+#!/usr/bin/env python3 -W default::Warning::0
 
 """
 generate a stream of JSON from {url}
@@ -55,8 +55,7 @@ def _exit_code_via_producer_script(ps):
         formal_parameters=(
             ('-s', '--for-sync', 'show the traveral stream mapped thru etc'),
             ),
-        description_template_valueser=lambda: {'url': _url},
-        )
+        description_template_valueser=lambda: {'url': _url})
 
 
 def __CLI_function_via_producer_script(ps):
@@ -113,8 +112,7 @@ def open_traversal_stream(listener, html_document_path=None):
                     'parses': ('rename_to', 'grammar'),
                     'updated': ('split_to', ('updated', 'version'), _via_upda),
                     },
-                table=table,
-                )
+                table=table)
 
         for dct in table_o:
             yield dct

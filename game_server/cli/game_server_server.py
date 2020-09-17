@@ -1,5 +1,6 @@
 def _do_work_for_client_socket(client_sock):
-
+    if True:
+        if True:
             while True:
                 print('recv..')
                 recvd_bytes = client_sock.recv(8)
@@ -51,9 +52,7 @@ def _run_my_server_forever(
 
 
 def cli_for_production():
-    _run_my_server_forever(
-        bind_port=50007,
-    )
+    _run_my_server_forever(bind_port=50007)
 
 # #history-A.1: lost self-executability
 # #born

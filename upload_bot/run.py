@@ -79,8 +79,7 @@ def handle_command(command, channel):
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
-        text=response or default_response
-    )
+        text=response or default_response)
 
 
 def _run_forever_oldschool():
@@ -114,8 +113,7 @@ class Exception(Exception):
 if __name__ == "__main__":
     run_forever_newschool_(
             os.environ,
-            use_reloader=False,  # reloader is annoying a.f
-            )
+            use_reloader=False)  # reloader is annoying a.f
 
 
 # #history-A.1: begin to transition from implementing bot to running webserver

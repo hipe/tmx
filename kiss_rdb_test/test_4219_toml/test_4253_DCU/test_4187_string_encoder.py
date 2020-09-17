@@ -1,8 +1,7 @@
 from kiss_rdb_test.common_initial_state import unindent
-from modality_agnostic.test_support import structured_emission as se_lib
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
+import modality_agnostic.test_support.common as ts
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
@@ -276,8 +275,7 @@ def _common_subject():
     return _subject_module().string_encoder_via_definition(
             smaller_string_max_length=_small_limit,
             paragraph_line_max_width=_limit,
-            max_paragraph_lines=3,
-            )
+            max_paragraph_lines=3)
 
 
 _ninety_character_long_string = (
@@ -289,14 +287,12 @@ _ninety_character_long_string = (
     'fifty.....'
     'sixty.....'
     'seventy...'
-    'eighty....'  # this string is 90 chars long
-    )
+    'eighty....')  # this string is 90 chars long
 
 
 _seventy_nine_chars = (
     'one.......ten.......twenty....thirty....'
-    'fourty....fifty.....sixty.....seventy..'
-    )
+    'fourty....fifty.....sixty.....seventy..')
 
 
 _small_limit = 57

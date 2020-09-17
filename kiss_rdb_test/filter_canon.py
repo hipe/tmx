@@ -34,8 +34,7 @@ class _CaseOfSimplifiedTypical(_Case):
                 count_of_items_that_did_not_have_taggings=0,
                 count_of_items_that_had_taggings=3,
                 count_of_items_that_did_not_match=1,
-                count_of_items_that_matched=2,
-                )
+                count_of_items_that_matched=2)
 
     def query(self):
         return ('#red', 'or', '#blue')
@@ -56,8 +55,7 @@ class _CaseOfEmptyCollection(_Case):
                 count_of_items_that_did_not_have_taggings=0,
                 count_of_items_that_had_taggings=0,
                 count_of_items_that_did_not_match=0,
-                count_of_items_that_matched=0,
-                )
+                count_of_items_that_matched=0)
 
     def query(self):
         return ('#aa:bb',)

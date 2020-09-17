@@ -3,13 +3,9 @@
 ..that explains everything.
 """
 
-from modality_agnostic.memoization import (
-        dangerous_memoize,
-        lazy)
-
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
-
-shared_subject = dangerous_memoize
 
 
 class _TestCase(unittest.TestCase):
@@ -117,8 +113,7 @@ def _subject_magnetic():
         }
     return mod._collectioner_via_collection_model(
             collection_model=_requisite_things,
-            items_plural='doo-hahs',
-            )
+            items_plural='doo-hahs')
 
 
 if __name__ == '__main__':

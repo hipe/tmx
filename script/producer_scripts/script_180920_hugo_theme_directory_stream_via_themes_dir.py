@@ -26,7 +26,7 @@ def _CLI(stdin, stdout, stderr, argv):
 
 
 def _do_CLI(monitor, sin, sout, serr, themes_dir):
-
+    if True:
         def visit(dir_path):
             sout.write(f'{dir_path}\n')
 
@@ -138,8 +138,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
                 pass_fds=(),
                 encoding=None,
                 errors=None,
-                text=True,  # default is None. setting to True means no binary
-                )
+                text=True)  # default is None. setting to True means no binary
 
         self._terminate_me = cm
 
@@ -163,8 +162,7 @@ class _open_theme_directory_stream_via_these:  # #testpoint
         return _crazy_interpolate(
                 self._find_command,
                 self._bash_interpolation_expression,
-                self._themes_dir,
-                )
+                self._themes_dir)
 
     def __exit__(self, *_):
         o = self._terminate_me

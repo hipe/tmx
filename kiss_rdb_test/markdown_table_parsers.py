@@ -118,8 +118,7 @@ class _MadParseTable:  # #pattern [#608.4] "mad parse"
                 self._header_row_one,
                 self._header_row_two,
                 self._example_row,
-                self._item_rows,
-                )
+                self._item_rows)
 
 
 dash_dash_dash_rx = re.compile(r'^-{3,}$')  # ..

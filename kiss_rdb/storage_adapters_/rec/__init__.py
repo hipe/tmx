@@ -21,23 +21,14 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_identity,
-        random_number_generator,
-        filesystem,
-        listener):
-
-    assert('THE_ADAPTER_VARIANT_FOR_STREAMING' == collection_identity.adapter_variant)  # noqa: E501 but w/e
-    return _FakeCollection(collection_identity)
+        collection_path, listener=None, opn=None, rng=None):
+    return _FakeCollection(collection_path)
 
 
 class _FakeCollection:
 
-    COLLECTION_CAPABILITIES = {
-            'choo_cha_foo_fah': None,  # (Case2660DP)
-            }
-
-    def __init__(self, collection_identity):
-        self.collection_identity = collection_identity
+    def __init__(self, collection_path):
+        self.collection_path = collection_path  # (Case2660DP)
 
 
 class ErsatzScanner:

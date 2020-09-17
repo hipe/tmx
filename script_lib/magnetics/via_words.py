@@ -5,8 +5,7 @@ def fixed_shape_word_wrapperer(row_max_widths, ellipsis_string=None):
 
     ww_proto = _FixedShapeWordWrap(
             row_max_widths=row_max_widths,
-            ellipsis_string=ellipsis_string,
-            )
+            ellipsis_string=ellipsis_string)
 
     def word_wrapped_lines_via(**kwargs):
 

@@ -1,10 +1,9 @@
 """this tests only the raw meta-parameters, no integration"""
 
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        lazy)
 
 class CommonCase(unittest.TestCase):
 
@@ -79,9 +78,7 @@ class Case7785_default_value_everything(CommonCase):
 
     @shared_subject
     def parameter_(self):
-        return define(
-                default_value=123,
-        )
+        return define(default_value=123)
 
 
 def _default_value_of_this(para):
@@ -155,17 +152,13 @@ def _the_totally_empty_parameter():
 # -- build parameter given one meta-parameter
 
 def _build_parameter_with_this_description(f):
-    return define(
-            description=f,
-    )
+    return define(description=f)
 
 
 def _build_parameter_via_argument_arity_string(s):
     mod = _subject_module()
-    _r = getattr(mod.arities, s)
-    return mod.define(
-            argument_arity=_r,
-    )
+    arity = getattr(mod.arities, s)
+    return mod.define(argument_arity=arity)
 
 
 # --

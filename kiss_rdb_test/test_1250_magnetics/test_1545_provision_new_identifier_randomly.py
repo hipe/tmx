@@ -9,8 +9,7 @@ class CommonCase(unittest.TestCase):
         new_int = _subject_module().provision_integer(
                 provisioned_integers=provisioned_before,
                 capacity=length,
-                random_number_generator=_random_number_generator,
-                )
+                random_number_generator=_random_number_generator)
 
         expected_provisioned_after, _ = _provisioned_via_bar(after)
         expected_provisioned_after = tuple(expected_provisioned_after)

@@ -1,6 +1,6 @@
-from modality_agnostic.memoization import (
-        dangerous_memoize as shared_subject,
-        dangerous_memoize_in_child_classes)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize as shared_subject, \
+        dangerous_memoize_in_child_classes
 import unittest
 
 
