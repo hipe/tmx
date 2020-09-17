@@ -1,399 +1,366 @@
-"""conceptually, the "prototype row" is the thing that makes new rows.
-
-really it's just a function that produces new rows, but we have so-named
-it because:
-
-  - it does the [#458.3] "heuristic templating", so the
-    name is a better semantic fit, because it "feels" like it's coming
-    from a true prototype object (if you're into that sort of thing).
-
-  - the responsibility of this module might expand beyond creating new
-    rows. (it may also create merged rows from one existing row and one
-    far native object.)
+import re
 
 
+def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
 
-## about alignment
+    def updated_row_via(nv_pairs, existing_row, listener):
+        try:
+            parts = new_line_parts_via(nv_pairs, 'U', listener, existing_row)
+            return row_via_parts(parts)
+        except stop:
+            pass
 
-(the below is covered near (Case2478KR) and (Case2479KR)
+    def new_row_via(nv_pairs, listener):
+        try:
+            parts = new_line_parts_via(nv_pairs, 'C', listener)
+            return row_via_parts(parts)
+        except stop:
+            pass
 
-our policy on alignment is guided by one central design objective: when
-bringing in new data (through a sync), format things the way the user wants.
-as it turns out, this is not as straightforward as it may sound:
+    def new_line_parts_via(nv_pairs, u_or_c, listener, existing_row=None):
+        # WAS KeyError (Case0110DP)
 
-when the new content string is of a different width than the old one (and
-even when it is the same width as the old one),
-
-  - do we simply re-use the padding characters ("coddling") from before?
-  - do we try to keep the width of the cell the same?
-  - or do we try to make the width of the cell match the example row?
-  - wat do when the new content string makes the resulting cell so wide
-    that it violates any of the above provisions that you might have?
-
-we assume users may want to "normalize" their formatting to some latest and
-greatest conventional formatting so that the rows generally line up prettily.
-(we arrived at this heuristically.) as such we follow the third option above,
-and when (4) we just let the content push the cell outwards infinitely. (data
-producers can of course always trim their own value strings, too.)
-
-but then that's not all. whenever the content string changes width, or the
-target width of the cell changes; we're typically adding or removing
-"coddling" spaces (padding).
-
-(this is where the right description of our wrong behavior begins.)
-
-currently we weirdly align the content strings within the cels by align
-left, center ("") or right as indicated in the markdown table header,
-which is all of:
-  - purely cosmetic (has no effect on the e.g HTML that is generated)
-  - of not-yet-proven cosmetic value at that
-
-but we accidentally mostly implemented it before realizing this (A) and B)
-it actually does probably make sense to right-align your ASCII "art" for
-right-aligned tables (think numbers).
-
-however, this does not do the [#458.3] "heuristic templating" that it could
-do here.
-(that is, it could try to detect whether the human does in fact (e.g)
-right-align the ASCII art for right-aligned columns, and follow suit
-accordingbly.)
-
-and come to think of it, center-aligning ASCII art seems like a misfeature.
-
-indeed it's a poor separation of content from presentation. the human should
-be able to change the alignment of a column (e.g from `:---` to `---:`) and
-have it not change how subsequent machine-generated rows are aligned. meh
-
-((Case4075) is used formally to connect this magnet with its test file)
-"""
-
-import sys
-
-
-_do_shrink_to_fit_hack = False
-"""
-these are temporary notes towars a possible solution to #open [#458.S]:
-  - the above turns on an experimental behavior that seems likely to become
-    default. it's towards a possible answer to [#873.G].
-  - at #history-A.3 we turned this on and used it to commit the generated
-    document (accompanied in the commit).
-  - (if you're going to try to use it again hackily you will have to comment
-    out a cover.me added below, too.)
-  - but this is far from integrated. we need dedicated design time to consider
-    what the ideal alignment policy should be.
-  - we are imagining a policy like this: `#eg`, `#eg `, ` #eg `, and ` #eg`
-    would express the four possible options for fixed-width policy (with the
-    leftmost being "shrink to fit" and the other 3 expressing the 3 kinds of
-    fixed-width alignment that existed when we got here). (the fact that
-    we chose tag-looking strings here is not meaningful.)
-  - note the above stands in contrast to the current way where we using
-    `---`, `:---`, `:---:` and `---:` to determine a fixed-width policy.
-    this is now deemed squarely a smell because the way you want your HTML
-    rendered should be orthogonal to whether you want to follow fixed-
-    widthisms in your ASCII art.
-  - (note too it would never make sense to have fixed-width columns unless
-    they are head-anchored and contiguous, in terms of their left-to-right
-    order as columns in the markdown table.)
-"""
-
-
-class _SELF:
-
-    def __init__(
-            self,
-            natural_key_field_name,
-            example_row,
-            complete_schema,
-            ):
-
-        orig_children = example_row.children
-        self._eg_endcap = example_row.any_endcap_()
-
-        def f(i):
-            _cel_schema = _cel_schema_via(row_schema_for_alignment.children[i])
-            return _celer_via(orig_children[i], _cel_schema)
-
-        row_schema_for_alignment = complete_schema.row_for_alignment__
-
-        tainted_example_cel_DOM = orig_children[0]
-        tainted_example_cel_DOM.content_string()  # be sure it's decomposed
-        childreners = _childreners_via(tainted_example_cel_DOM)
-
-        _CelllDOM = orig_children[0].__class__  # use any child
-        _celer_via = _celer_via_via(
-                childreners, row_schema_for_alignment, _CelllDOM)
-
-        self._celers = [f(i) for i in range(0, example_row.cels_count)]
-        self._offset_via_field_name = complete_schema.offset_via_field_name__
-        self.__reuse_newline = orig_children[-1]
-        self._RowDOM = example_row.__class__
-        self._cels_count = example_row.cels_count
-        self._natural_key_field_name = natural_key_field_name
-
-    def new_row_via_far_pairs_and_near_row_DOM__(self, far_pairs, near_row_DOM):  # noqa: E501 #testpoint
-        """for each key-value in the far pairs, make the new cell.
-
-        for all the rest, use the doo-hah that was there already!
-        """
-
-        """assume the natural key in the far pairs has the same effective
-        value as that in the near row. no reason to incur the "cost"
-        of updating this value, so delete that item from the dictionary.
-        """
-
-        # (before #history-A.2 we use to do (Case0150DP) here)
-
-        # instead of value via key, we want value via offset.
-
-        offset_via_name = self._offset_via_field_name
-        new_value_via_offset = {offset_via_name[k]: v for k, v in far_pairs}
-        # KeyError (Case0110DP) (1/2)
-
-        # make a reader function for producing near cels from offsets
-
-        def near_f(i):
-            return near_children[i]
-        near_children = near_row_DOM.children
-
-        """the rub: the goal is to have the "correct" end-cappiness.
-        what we mean by "correct" depends:
-        is the near row's length being "pushed outwards" by having new
-        right-anchored cels being added to it that it didn't have before?
-        then you use the end-cappiness of the prototype.
-        otherwise (and its number of cels is staying the same),
-        preserve the existing end-cappiness.
-        """
-
-        far_max_offset = max(new_value_via_offset.keys())
-        near_max_offset = near_row_DOM.cels_count - 1
-
-        near_row_any_endcap = near_row_DOM.any_endcap_()
-
-        if near_max_offset < far_max_offset:
-            use_endcap = self._eg_endcap  # (Case2667DP)
+        if existing_row:  # implies 'U'
+            def my_exi_cell_at(i):
+                if i < exi_row_length:
+                    return my_exi_row.cells[i]
+                pass  # (Case2667DP)
+            exi_row_length = existing_row.cell_count
+            existing_line = existing_row.to_line()
+            my_exi_row = _my_row(existing_line)
         else:
-            use_endcap = near_row_any_endcap  # (Case2665DP)
+            my_exi_cell_at = _monadic_emptiness
 
-        return self._build_new_row(near_f, new_value_via_offset, use_endcap)
+        nv_pairs = tuple(nv_pairs)  # allow a second pass for better error msgs
+        unsanitized_pool = {k: v for k, v in nv_pairs}
 
-    def new_via_normal_dictionary(self, far_dict):
-        """for each key-value in the far pairs, make the new cell.
+        for i in rang:
+            k = field_name_keys[i]
+            my_exi_cell = my_exi_cell_at(i)
+            if k in unsanitized_pool:
+                value_string = unsanitized_pool.pop(k)  # #here1
+                if not isinstance(value_string, str):
+                    if value_string is None:
+                        # now, None means "delete_attribute" (Case2716)
+                        value_string = ''
+                    else:
+                        xx(f"for '{k}', please use strings or none, not {type(value_string)}")  # noqa: E501
+            else:  # (Case0130DP)
+                if 'U' == u_or_c and my_exi_cell:
+                    yield 'cell_part', *my_exi_cell.to_pieces(existing_line)
+                    continue
+                value_string = ''
 
-        for all the rest, make them blank cels.
-        """
+            # my_eg_cell = my_eg_cell_via(i)
+            alignment = alignments[i]
 
-        def spaces_cel(i):  # (Case0130DP)
-            d = _spaces_cel_cache
-            if i not in d:
-                d[i] = _celers[i]('')
-            return d[i]
+            if re.search(r'[\\|]', value_string):
+                xx(f"cover these adventurous strings: {repr(value_string)}")
 
-        _celers = self._celers
+            if 'shrink_to_fit' == alignment:  # (Case2481KR)
+                yield 'cell_part', left_pads[i], value_string, right_pads[i]
+                continue
 
-        _spaces_cel_cache = {}
+            if 'align_center' == alignment:
+                remain = example_widths[i] - len(value_string)
+                if remain < 1:
+                    yield 'cell_part', '', value_string, ''
+                    continue
+                each_side, was_odd = divmod(remain, 2)  # (Case2480KR)
+                left_w, right_w = each_side, each_side
+                if was_odd:
+                    lt_eq_gt = center_tiebreakers[i]
+                    if -1 == lt_eq_gt:
+                        right_w += 1
+                    else:
+                        assert lt_eq_gt in (0, 1)
+                        left_w += 1
+                yield 'cell_part', ' '*left_w, value_string, ' '*right_w
+                continue
 
-        offset = self._offset_via_field_name
-        _nvvo = {offset[k]: v for k, v in far_dict.items()}
-        # KeyError (Case0110DP) (2/2)
+            assert alignment in ('align_left', 'align_right')
 
-        return self._build_new_row(spaces_cel, _nvvo, self._eg_endcap)
+            def stretch(fixed_pad):
+                remain = example_widths[i] - len(value_string) - len(fixed_pad)
+                if remain < 1:
+                    return ''  # content overflow (Case0140DP)
+                return ' ' * remain
 
-    def _build_new_row(self, user_f, new_value_via_offset, near_row_endcap):
+            if 'align_left' == alignment:
+                left_pad = left_pads[i]  # (Case2478KR)
+                yield 'cell_part', left_pad, value_string, stretch(left_pad)
+                continue
 
-        new_cels = self.__build_new_cels(user_f, new_value_via_offset)
+            if 'align_right' == alignment:
+                right_pad = right_pads[i]  # (Case2479KR)
+                yield 'cell_part', stretch(right_pad), value_string, right_pad
+                continue
 
-        has = self.__write_any_endcap(new_cels, near_row_endcap)
+        if len(unsanitized_pool):
+            bads = tuple(unsanitized_pool.keys())
+            goods = tuple(set(field_name_keys) & set(i for i, _ in nv_pairs))
+            listener(*_when_extra(bads, goods, u_or_c, complete_schema))
+            raise stop()  # (Case1319DP)
 
-        new_cels.append(self.__reuse_newline)  # always add a newline
-
-        return self._RowDOM().init_via_all_memberdata_(
-            cels_count=self._cels_count,
-            children=tuple(new_cels),
-            has_endcap=has,
-            )
-
-    def __build_new_cels(self, user_f, new_value_via_offset):
-
-        def new_cel_for(i):
-            if i in new_value_via_offset:
-                return value_cel(i)
+        if 'U' == u_or_c:
+            if existing_row.cell_count < formal_cell_count:
+                endcap_yn = eg_row.has_endcap  # (Case2667DP)
             else:
-                return user_f(i)
-
-        value_cel = self.__value_celer(new_value_via_offset)
-
-        return [new_cel_for(i) for i in range(0, self._cels_count)]
-
-    def __value_celer(self, new_value_via_offset):
-
-        def _value_cel(i):
-            _new_value = new_value_via_offset[i]
-            _new_STRING = str(_new_value)  # ..
-            _new_cel = _celers[i](_new_STRING)
-            return _new_cel
-
-        _celers = self._celers
-
-        return _value_cel
-
-    def __write_any_endcap(self, new_cels, near_row_endcap):
-
-        if near_row_endcap is None:
-            has = False
+                endcap_yn = existing_row.has_endcap  # (Case2665DP)
         else:
-            new_cels.append(near_row_endcap)
-            has = True
-        return has
+            endcap_yn = eg_row.has_endcap
 
+        yield 'endcap', 'has_endcap' if endcap_yn else 'no_endcap'
 
-def _celer_via_via(childreners, cell_schema, _CelllDOM):
+    field_name_keys = complete_schema.field_name_keys
+    formal_cell_count = len(field_name_keys)
+    rang = range(0, formal_cell_count)
 
-    def _celer_via(tainted_example_cel_DOM, cell_schema):
+    names_row, alignment_row = complete_schema.rows_
 
-        """a "celer" is a function that makes cels
-        """
+    eg_line = eg_row.to_line()
+    my_eg_row = _my_row(eg_line)
 
-        def f(new_content_string):
-            new_content_w = len(new_content_string)
-            total_margin_w = max_content_w - new_content_w
-            if total_margin_w < 0:
-                # content overflow (Case0140DP)
-                _gen = aligned_children(0, new_content_string)
-            else:
-                _gen = aligned_children(total_margin_w, new_content_string)
+    if (aa := len(my_eg_row.cells)) < (bb := formal_cell_count):
+        xx(f"example row needs as many cells as schema ({bb}). has {aa}")
 
-            cx = [reuse_pipe]
-            for x in _gen:
-                cx.append(x)
-            return _CelllDOM().init_via_children__(cx)
+    my_eg_cell_via = my_eg_row.cells.__getitem__
 
-        tainted_example_cel_DOM.content_string()  # ensure decomposed
-        tainted_cx = tainted_example_cel_DOM.children
-        reuse_pipe = tainted_cx[0]
+    example_widths = [None for _ in rang]
+    alignments = [None for _ in rang]
 
-        def w(offset):
-            return len(tainted_cx[offset].string_)
+    left_pads, right_pads, center_tiebreakers = {}, {}, {}
 
-        max_content_w = w(1) + w(2) + w(3)  # for (Case1320DP)
+    for i in rang:
+        mec = my_eg_cell_via(i)
 
-        if _do_shrink_to_fit_hack:
-            use_alignment = 'align_always_shrink_to_fit'
+        example_widths[i] = mec.padded_end - mec.padded_begin
+        left_padding = eg_line[mec.padded_begin:mec.value_begin]
+        right_padding = eg_line[mec.value_end:mec.padded_end]
+
+        vs = alignment_row.cell_at_offset(i).value_string
+        alignment = _alignment_type_via_value_string(vs)
+        alignments[i] = alignment
+
+        if 'align_left' == alignment:
+            left_pads[i] = left_padding
+        elif 'align_right' == alignment:
+            right_pads[i] = right_padding
+        elif 'shrink_to_fit' == alignment:
+            left_pads[i] = left_padding
+            right_pads[i] = right_padding
         else:
-            use_alignment = cell_schema.alignment
-        aligned_children = getattr(childreners, use_alignment)
+            assert 'align_center' == alignment
+            lf, rt = len(left_padding), len(right_padding)
+            _ = ((lambda: lf < rt, -1), (lambda: rt < lf, 1), (lambda: lf == rt, 0))  # noqa: E501
+            center_tiebreakers[i] = next(x for yes, x in _ if yes())
 
-        return f
+    example_widths = tuple(example_widths)
+    alignments = tuple(alignments)
 
-    return _celer_via
+    def row_via_parts(parts):
+        mutable_sexps, line = _sexps_and_line_via_parts(parts)
+        return row_AST_via_two(mutable_sexps, line)
 
+    row_AST_via_two = complete_schema.row_AST_via_two_
 
-def _childreners_via(tainted_example_cel_DOM):
+    class stop(RuntimeError):
+        pass
 
-    class _childreners:  # #class-as-namespace
-
-        """
-        each function follows the pattern:
-          1. yield a leaf DOM with the left margin spaces
-          1. yield a leaf DOM with the content string
-          1. yield a leaf DOM with the right margin spaces
-
-        the only difference is whether which functions put the zero-width
-        space as the margin at the (variously) left and/or right margin;
-        and when not, how the nonzero width of that margin is calculated
-        """
-
-        def align_always_shrink_to_fit(total_margin_w, new_content_s):
-            cover_me('this shrink-to-fit alignment worked once visually')
-            yield _spaces(0)
-            yield _fellow(new_content_s)
-            yield _spaces(0)
-
-        def align_left(total_margin_w, new_content_s):  # (Case2478KR)
-            yield _spaces(0)
-            yield _fellow(new_content_s)
-            yield _spaces(total_margin_w)
-
-        def align_center(total_margin_w, new_content_s):  # (Case2480KR)
-            each_side, was_odd = divmod(total_margin_w, 2)
-            yield _spaces(each_side)
-            yield _fellow(new_content_s)
-            yield _spaces(each_side + was_odd)  # hard coded: prefer left by 1
-
-        def align_right(total_margin_w, new_content_s):  # (Case2479KR)
-            yield _spaces(total_margin_w)
-            yield _fellow(new_content_s)
-            yield _spaces(0)
-
-        no_alignment_specified = align_left  # (Case2481KR)
-
-    def _fellow(new_content_s):
-        return _LeafDOM(new_content_s)
-
-    def _spaces(num):
-        if num not in _cache:
-            _cache[num] = _LeafDOM(' ' * num)
-        return _cache[num]
-
-    _cache = {}
-
-    _pipe_meh = tainted_example_cel_DOM.children[0]
-    _LeafDOM = _pipe_meh.__class__
-
-    return _childreners
+    return new_row_via, updated_row_via
 
 
-def _cel_schema_via(cell_DOM):
-    """so,
+def _when_extra(bads, goods, u_or_c, cs):
+    def details():
+        def jumble():  # tech demo for (Case2676) overcrowded, needs abstractio
+            y = 1 == len(bads)
+            s, these, do = ('', 'This', 'does') if y else ('s', 'These', 'do')
+            yield f"Unrecognized attribute{s}", ox.keys_join(bads)
+            yield these, f"field{s}", do, "not apear in"
+            h = dct.get('table_header_line')
+            yield ('"', re.match('^# (.+)', h)[1], '"') if h else "the table"
+            if len(ks := set(cs.field_name_keys) - set(goods)):
+                yield "Did you mean", ox.oxford_OR(ox.keys_map(ks)), '?'
+            yield 'in', dct['collection_path'], ':', dct['lineno']
+        dct = {k: v for row in cs.table_cstack_ for k, v in row.items()}
+        import kiss_rdb.magnetics.via_collection as ox
+        sentencz = (''.join(pcs) for pcs in ox.piece_rows_via_jumble(jumble()))
+        dct['reason'] = ' '.join(sentencz)
+        return dct
 
-    these:
+    category = ('cannot_update', 'cannot_create')[('U', 'C').index(u_or_c)]
+    return 'error', 'structure', category, 'unrecgonized_attributes', details
 
-        :---   left aligned
-        :---:  center aligned
-         ---:  right aligned
-         ---   (it appears this is also left align)
-    """
-    import re
 
-    s = cell_DOM.content_string()
-    md = re.search(r'^(?:(:)|(-))(?:-*(?:(:)|(-)))?$', s)
+def _alignment_type_via_value_string(value_string):
+    # ':---' align left  '---:' align right   ':---:' center  '---' shrink
+    md = re.match('^(?:(:)|(-))-+(?:(:)|(-))$', value_string)
+    if md is None:
+        xx(f"expecting alignment value string: {repr(value_string)}")
+    left_colon, left_dash, right_colon, right_dash = md.groups()
+    if left_colon:
+        if right_dash:
+            return 'align_left'  # (Case2479KR)
+        assert right_colon
+        return 'align_center'  # (Case2480)
+    assert left_dash
+    if right_dash:
+        return 'shrink_to_fit'  # (Case2481KR)
+    assert right_colon
+    return 'align_right'  # (Case2478KR)
 
-    if md[1] is None:
-        if md[3] is None:
-            # no alignment specified (Case2481KR)
-            return _cel_schemas.no_alignment_specified
-        else:
-            # no colon yes colon (Case2478KR)
-            return _cel_schemas.right_aligned
-    elif md[3] is None:
-        # yes colon no colon (Case2479KR)
-        return _cel_schemas.left_aligned
+
+def _sexps_and_line_via_parts(parts):
+    mutable_sxs, line_pieces = [], []
+
+    def append(piece):
+        memo.current_width += len(piece)
+        line_pieces.append(piece)
+
+    class memo:  # #class-as-namespace
+        current_width = 0
+
+    parts = list(parts)
+    encap = parts.pop()
+
+    for typ, lp, vs, rp in parts:
+        assert 'cell_part' == typ
+        append('|')
+        append(lp)
+        v_begin = memo.current_width
+        append(vs)
+        v_end = memo.current_width
+        append(rp)
+        mutable_sxs.append(('padded_cell', (v_begin, v_end)))
+
+    typ, kw = encap
+    assert 'endcap' == typ
+    endcap_yn = ('no_endcap', 'has_endcap').index(kw)
+
+    if endcap_yn:
+        mutable_sxs.append(('line_ended_with_pipe',))
+        append('|')
     else:
-        assert(not md[2])
-        assert(not md[4])
-        # yes colon/yes colon: center aligned (Case2480)
-        return _cel_schemas.center_aligned
+        mutable_sxs.append(('line_ended_without_pipe',))
+    append('\n')
+
+    return mutable_sxs, ''.join(line_pieces)
 
 
-class _CelllSchema:
-    def __init__(self, s):
-        self.alignment = s
+class _my_row:
+    def __init__(self, line):
+        wee = list(_complete_sexp_via_line(line))
+        self.has_endcap = ('no_endcap', 'has_endcap').index(wee.pop()[1])
+        self.cells = tuple(_my_cell(*sx) for sx in wee)
 
 
-class _cel_schemas:  # #class-as-namespace
+class _my_cell:
+    def __init__(self, typ, psx, vsx):
+        assert 'complete_cell' == typ
+        typ, self.padded_begin, self.padded_end = psx
+        assert 'padded_span' == typ
+        typ, self.value_begin, self.value_end = vsx
+        assert 'value_span' == typ
 
-    left_aligned = _CelllSchema('align_left')
-    center_aligned = _CelllSchema('align_center')
-    right_aligned = _CelllSchema('align_right')
-    no_alignment_specified = _CelllSchema('no_alignment_specified')
+    def to_pieces(self, line):
+        yield line[self.padded_begin:self.value_begin]
+        yield line[self.value_begin:self.value_end]
+        yield line[self.value_end:self.padded_end]
 
 
-def cover_me(msg=None):  # #open [#876] cover me
-    raise Exception('cover me' if msg is None else f'cover me: {msg}')
+def _complete_sexp_via_line(line):  # #testpoint
+    # in the main file we KISS how we parse lines. here we have to doe more
+
+    assert len(line)
+    assert '|' == line[0]
+    assert '\n' == line[-1]
+
+    def main():
+        while True:
+            parse_pipe()
+            yield parse_zero_or_more_not_pipes_or_escaped_pipes()
+            if parse_endcap():
+                break
+        yield endcap()
+
+    def parse_zero_or_more_not_pipes_or_escaped_pipes():
+        pad_begin = (cursor := self.cursor)
+        while True:
+            md = zero_or_more_straightforward_chars.match(line, cursor)
+            _, cursor = md.span()
+            char = line[cursor]
+            if char in ('|', '\n'):
+                break
+            assert '\\' == char
+            cursor += 1
+            next_char = line[cursor]
+            if next_char in ('\\', '|'):
+                cursor += 1  # this looks like a decoding algo but we're not ..
+                continue
+            xx(f"invalid escape sequence {repr(char)}")
+        self.cursor = cursor
+        pad_span = 'padded_span', pad_begin, (pad_end := cursor)
+
+        # Basically we take 20 lines to implement strip() that keeps offsets
+
+        # Back up over trailing whitespace
+        while True:
+            cursor -= 1
+            if pad_begin == cursor:
+                break
+            if ' ' == line[cursor]:
+                continue
+            break
+        value_end = cursor + 1
+
+        # Go forward over leading whitespace (we could just use regex BUT WHY!)
+        cursor = pad_begin
+        while True:
+            if pad_end == cursor:
+                break
+            if ' ' == line[cursor]:
+                cursor += 1
+                continue
+            break
+        value_begin = cursor
+
+        value_span = 'value_span', value_begin, value_end
+        return 'complete_cell', pad_span, value_span
+
+    def parse_endcap():
+        md = endcap_rx.match(line, self.cursor)
+        if md is None:
+            return
+        self.endcap_matchdata = md
+        return True
+
+    def endcap():
+        md = self.endcap_matchdata
+        return 'endcap', ('has_endcap' if md[1] else 'no_endcap')
+
+    def parse_pipe():
+        assert '|' == line[self.cursor]
+        self.cursor += 1
+
+    class self:  # #class-as-namespace
+        cursor = 0
+
+    zero_or_more_straightforward_chars = re.compile(r'[^|\\\n]*')
+    endcap_rx = re.compile(r'(\|)?\n')
+
+    return main()
 
 
-sys.modules[__name__] = _SELF
+def _monadic_emptiness(_):
+    pass
 
+
+def xx(msg=None):
+    raise RuntimeError('oops: write me/cover me' + (f': {msg}' if msg else ''))
+
+# #history-A.4 (almost) blind rewrite
 # #history-A.3 (can be temporary): dog-eared specific code
+#   (before #history-A.2 we use to do (Case0150DP) here)
 # #history-A.2: short-circuiting out of updating single-field records moved up
 # #history-A.1: sneak merge into here to be alongside create new
 # #born.

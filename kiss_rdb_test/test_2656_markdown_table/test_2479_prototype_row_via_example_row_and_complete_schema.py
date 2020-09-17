@@ -30,14 +30,16 @@ class CommonCase(unittest.TestCase):
         self.assertEqual(line[-1], '\n')
         self.assertEqual(line[-2], '|')
 
-    def _the_two_cel_byteses(self):
+    def _the_two_cell_byteses(self):
         row = self._row_after()
-        return tuple(row.cell_at_offset(offset).to_string() for offset in (0, 1))  # noqa: E501
+        two = normalize_row(row)
+        assert 2 == len(two)
+        return two
 
     def _content_string_after(self):
-        return self._cel_after().content_string()
+        return self._cell_after().value_string
 
-    def _cel_after(self):
+    def _cell_after(self):
         return self._row_after().cell_at_offset(self._offset_of_interest())
 
     def _row_after(self):
@@ -47,7 +49,92 @@ class CommonCase(unittest.TestCase):
         return 1
 
 
-class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
+class Case2475_parse_line_fully(CommonCase):
+
+    def test_010_empty_row(self):
+        line = "|\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, False)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert '' == vs
+        assert vs == ps
+
+    def test_015_empty_row_plus_endcap(self):
+        line = "||\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, True)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert '' == vs
+        assert vs == ps
+
+    def test_020_some_content(self):
+        line = "|a\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, False)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert 'a' == vs
+        assert vs == ps
+
+    def test_025_some_content_plus_endcap(self):
+        line = "|a|\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, True)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert 'a' == vs
+        assert vs == ps
+
+    def test_030_two_cells_no_encap(self):
+        line = "|a|bc\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 2, False)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert 'a' == vs
+        assert vs == ps
+        ps, vs = PLF_content_and_value_at(line, actual, 1)
+        assert 'bc' == vs
+        assert vs == ps
+
+    def test_035_enter_padding(self):
+        line = "| abc  \n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, False)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert 'abc' == vs
+        assert ' abc  ' == ps
+
+    def test_040_enter_escape(self):
+        line = "|pipe:\\|\n"
+        actual = PLF_against(line)
+        self.PLF_looks_like(actual, 1, False)
+        ps, vs = PLF_content_and_value_at(line, actual, 0)
+        assert 'pipe:\\|' == vs  # ..
+        assert vs == ps
+
+    def PLF_looks_like(self, actual, count, has_endcap):
+        self.assertEqual(len(actual) - 1, count)
+        expected = 'has_endcap' if has_endcap else 'no_endcap'
+        self.assertEqual(actual[-1][1], expected)
+
+
+def PLF_content_and_value_at(line, sexp, offset):
+    cel = sexp[offset]
+    typ, psx, vsx = cel
+    assert 'complete_cell' == typ
+    typ, p_begin, p_end = psx
+    assert 'padded_span' == typ
+    typ, v_begin, v_end = vsx
+    assert 'value_span' == typ
+    return line[p_begin:p_end], line[v_begin:v_end]
+
+
+def PLF_against(line):
+    from kiss_rdb.storage_adapters_.markdown_table\
+        ._prototype_row_via_example_row_and_complete_schema import \
+        _complete_sexp_via_line as func
+    return tuple(func(line))
+
+
+class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(CommonCase):
 
     def test_010_loads(self):
         self.assertIsNotNone(subject_function())
@@ -60,34 +147,29 @@ class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(_CommonCase):
 
     def test_040_things_are_aligned_all_the_way_right(self):
         """
-        as touched on near other mentions of the coverpoint mentioned in the
-        setup, note what is happening at writing: notwithstanding the
-        endcappiness being preserved, the updated characterspans have:
+        A lot going on here:
+          - encappiness of existing row preserved (not pictured)
           - the widths as proscribed in the example row
           - the alignments as proscribed in the second schema row
-
-        note that the "coddling" (the padding-by-whitespace on either side,
-        separately) is lossed-away; both that of the before row and that of
-        the example row. this is probably not what we want but we are covering
-        it to prove it (as existing behavior) and to track it. :#here1
+          - the counterpart cell paddings from the example row
         """
 
-        str1, str2 = self._the_two_cel_byteses()
-        self.assertEqual(str1, '|                x1')
-        self.assertEqual(str2, '|          X2')
+        str1, str2 = self._the_two_cell_byteses()
+        self.assertEqual(str1, '|            x1   ')  # 17 (3)
+        self.assertEqual(str2, '|        X2  ')  # 12 (2)
 
     @shared_subject
-    def _state(self):
-        return self._build_state_commonly()
+    def end_state(self):
+        return self.build_state_commonly()
 
     def far_name_value_pairs(self):
         return (('ohai_im_natty_key', 'x1'), ('celo', 'X2'))
 
     def near_row_before(self):  # NOTE *no* endcap
-        return _row_via_line('| x1  | x2  \n')
+        return row_via_line('| x1  | x2   \n')
 
     def example_row(self):  # NOTE *yes* encap
-        return _row_via_line('|   eggsie xamply  |   foo fah  |\n')
+        return row_via_line('|     seventeen   |    twelve  |\n')  # 3, 2
 
     def schema_plus(self):
         return _schema_plus_via_two_lines(
@@ -105,13 +187,9 @@ class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(CommonCas
         self._there_is_YES_endcap_after()
 
     def test_040_things_are_aligned_all_the_way_left(self):
-        """
-        (if this fails, or change is desired, see exactly #here1)
-        """
-
-        str1, str2 = self._the_two_cel_byteses()
-        self.assertEqual(str1, '|y1                ')
-        self.assertEqual(str2, '|Y3          ')
+        str1, str2 = self._the_two_cell_byteses()
+        self.assertEqual(str1, '|   y1             ')  # (3) 18
+        self.assertEqual(str2, '|  Y3        ')        # (2) 12
 
     @shared_subject
     def end_state(self):
@@ -153,14 +231,16 @@ class Case2480KR_change_natural_key_only_OK(CommonCase):
         self.assertEqual(self._content_string_after(), 'Z1')
 
     def test_040_things_are_aligned_some_kind_of_center(self):
-        """
-        (if this fails, or change is desired, see exactly #here1)
+        # A lot happens: the example row is 19 wide. The argument value is 2
+        # wide. We want it centered, which means we want the same amount of
+        # filler space on each side. But we have an odd number (17) of filler
+        # spaces to use. If we put 8 spaces on each side, we have one left
+        # over we didn't use and it breaks fixed-width alignment. Which side
+        # we put the extra space on is determined by the spacing in the example
+        # cell (if it's at all lopsided). Otherwise we align slightly left.
 
-        NOTE also: when an odd number of spare space, the extra one is on RT
-        """
-
-        str1 = self._row_after().cell_at_offset(0).to_string()
-        self.assertEqual(str1, '|        Z1         ')
+        str1 = normalize_row(self._row_after())[0]
+        self.assertEqual(str1, '|         Z1        ')  # (9) 19 (8)
 
     @shared_subject
     def end_state(self):
@@ -191,59 +271,63 @@ class Case2480KR_change_natural_key_only_OK(CommonCase):
 def build_state_commonly(tc):
 
     sp = tc.schema_plus()
-    _eg_row = tc.example_row()
-    _near_row_before = tc.near_row_before()
-    _far_pairs = tc.far_name_value_pairs()
+    eg_row = tc.example_row()
+    row_before = tc.near_row_before()
+    far_pairs = tc.far_name_value_pairs()
 
-    _proto = _subject_module()(
-            natural_key_field_name=sp.nkfn,
-            example_row=_eg_row,
-            complete_schema=sp.complete_schema,
-            )
+    _, updated_row_via = subject_function()(eg_row, sp.complete_schema)
+    row = updated_row_via(far_pairs, row_before, msa.throwing_listener)
 
-    liner = _proto.new_row_via_far_pairs_and_near_row_DOM__(
-            _far_pairs, _near_row_before)
-
-    class _State:
-        def __init__(self, _1, _2):
-            self.line_after = _1
-            self.row_after = _2
-
-    _line_after = liner.to_line()
-    return _State(_line_after, liner)
+    class end_state:  # #class-as-namespace
+        line_after = row.to_line()
+        row_after = row
+    return end_state
 
 
-_CommonCase._build_state_commonly = _build_state_commonly
+CommonCase.build_state_commonly = build_state_commonly
 
 
-class _schema_plus_via_two_lines:
+class _schema_plus_via_two_lines:  # #todo does this belong here?
 
     def __init__(self, line1, line2, nkfn):
-        from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-            schema_index_via_schema_row as _)
-        _tup = _.row_two_function_and_liner_via_row_one_line(
-                line1, 'listener01')
-        f1, row1 = _tup
-        assert(row1.to_line() == line1)  # not SUT. just checking
-
-        f2, row2 = f1(line2)
-        assert(row2.to_line() == line2)  # not SUT. just checking
-
-        self.complete_schema = f2()
+        row1, row2 = (row_via_line(line) for line in (line1, line2))
+        self.complete_schema = complete_schema_via(row1, row2)
         self.nkfn = nkfn
 
 
-def _row_via_line(line):
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        row_as_editable_line_via_line as _)
-    _row = _(line, listener=None)
-    return _row
+def normalize_row(row):
+    import re
+    line = row.to_line()
+    pieces = re.split(r'(?<=.)(?=\|)', line)  # #[#873.24]
+
+    # Chop off the newline (assert it is there)
+    assert '\n' == pieces[-1][-1]
+    pieces[-1] = pieces[-1][0:-1]
+
+    # If there's an endcap, normalize that away (for now)
+    if '|' == pieces[-1]:
+        pieces.pop()
+
+    return tuple(pieces)
 
 
-def _subject_module():
-    from kiss_rdb.storage_adapters_.markdown_table.magnetics_ import (
-        prototype_row_via_example_row_and_schema_index as mod)
-    return mod
+# ==
+
+def complete_schema_via(row1, row2):
+    return msa.complete_schema_via_row_ASTs(row1, row2)
+
+
+def row_via_line(line):
+    return msa.row_AST_via_line(line, msa.throwing_listener)
+
+
+# ==
+
+def subject_function():
+    from kiss_rdb.storage_adapters_.markdown_table\
+            ._prototype_row_via_example_row_and_complete_schema \
+            import BUILD_CREATE_AND_UPDATE_FUNCTIONS_ as func
+    return func
 
 
 if __name__ == '__main__':
