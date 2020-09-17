@@ -1,74 +1,8 @@
-def COLLECTION_IMPLEMENTATION_FOR_PASS_THRU_WRITE(stdout):
-
-    class CollectionImplementation:  # #class-as-namespace
-
-        def OPEN_PASS_THRU_RECEIVER_AS_STORAGE_ADAPTER(monitor):
-
-            pr = _build_private_receiver(stdout, monitor)
-
-            class Receiver:  # class-as-namespace
-                RECEIVE_PRODUCER_SCRIPT_STATEMENT = \
-                        pr.receive_producer_script_statement
-
-            class ContextManager:
-
-                def __init__(self):
-                    self._mutex = None
-
-                def __enter__(self):
-                    del self._mutex
-                    pr.receive_beginning_of_file()
-                    return Receiver
-
-                def __exit__(self, exception_class, e, traceback):
-                    if e is not None:
-                        return
-                    if not monitor.OK:
-                        return  # don't write tail of file if errored
-                    pr.receive_end_of_file()
-
-            return ContextManager()
-
-    return CollectionImplementation
-
-
-def _build_private_receiver(stdout, MONITOR):
-
-    actions = _BUILD_ACTIONS_INDEX(stdout, MONITOR)
-
-    states = _BUILD_THIS_STATE_MACHINE(actions, _THIS_STATE_MACHINE())
-
-    class PrivateReceiver:
-
-        def __init__(self):
-            s = 'start'
-            self._current_dictionary = states[s].DICTIONARY
-            self._current_state_name = s
-
-        def receive_beginning_of_file(self):
-            actions['output_file_head_placeholder_NOT_IN_FSA'](None)
-
-        def receive_producer_script_statement(self, dct):
-
-            token = _token_via(dct)
-            action_name = self._current_dictionary.get(token, None)
-            if action_name is None:
-                _ = self._current_state_name
-                raise Exception(f"no transition from '{_}' to '{token}'")
-
-            while True:
-                actions[action_name](dct)
-                new_state_node = states[action_name]  # #conflation
-                if new_state_node.is_branch:
-                    self._current_state_name = action_name
-                    self._current_dictionary = new_state_node.DICTIONARY
-                    break
-                action_name = new_state_node.ACTION_NAME  # NAME IS BOTH
-
-        def receive_end_of_file(self):
-            actions['output_file_tail_placeholder_NOT_IN_FSA'](None)
-
-    return PrivateReceiver()
+def pass_thru_collection_for_write_(stdout, listener):
+    class collection_impl_for_write:  # #class-as-namespace
+        def open_pass_thru_receiver_as_storage_adapter(mon):
+            return _open_pass_thru_receiver(stdout, mon)
+    return collection_impl_for_write
 
 
 def _THIS_STATE_MACHINE():
@@ -100,22 +34,9 @@ def _THIS_STATE_MACHINE():
             'entity': 'output_entity'}
 
 
-def _token_via(dct):
-    if '_is_branch_node' not in dct:
-        return 'entity'
-    if 'header_level' not in dct:
-        return 'header_1'
-    return __token_via_header_level[dct['header_level']]
+def _actions():
 
-
-__token_via_header_level = (None, 'header_1', 'header_2', 'header_3')
-
-
-def _BUILD_ACTIONS_INDEX(stdout, MONITOR):
-
-    memory = _hand_written_state_machine(stdout, MONITOR)
-
-    class Actions:  # #class-as-namespace
+    class actions:  # #class-as-namespace
 
         def output_file_head_placeholder_NOT_IN_FSA():
             # output hugo frontmatter. impure but simplifies visual development
@@ -171,252 +92,253 @@ def _BUILD_ACTIONS_INDEX(stdout, MONITOR):
             yield ''
             yield '## (document-meta)'
             yield ''
-            yield '  - #born.'
+            yield '  - #born'
 
-    # == BEGIN HUGE EXPERIMENT
+    class memory:  # #class-as-namespace
+        last_header_two_label = None
 
-    actions_index = {}
+    memory.output_table_header = _build_output_schema_rows(memory)
 
-    write = stdout.write
+    return actions
 
-    def build_normal_function(prepare_args, user_function):
-        def normal_function(dct):
-            for line_content in user_function(** prepare_args(dct)):
-                write(f'{line_content}\n')  # _eol
-        return normal_function
 
-    def when_kwargs(dct):
-        return {k: v for k, v in dct.items() if k not in not_these}
+def _open_pass_thru_receiver(sout, mon):
+    class context_manager:
 
-    not_these = {
-        '_is_branch_node',  # already saw this
-        'header_level',  # header level is reflected in token
-        '_is_composite_node',  # not used, might go away
-        }
+        def __enter__(self):
+            use_sout = sout.__enter__()  # should be same
+            assert sout == use_sout  # ..
 
-    def when_pass_thru(dct):
-        return {'dct': dct}
+            for line in actions.output_file_head_placeholder_NOT_IN_FSA():
+                use_sout.write(f"{line}\n")  # #here4
 
-    def when_monadic(dct):
-        return empty_dct
+            return _build_receiver(sout, actions, mon)
 
-    empty_dct = {}
+        def __exit__(self, *_4):
 
-    # for each action
+            for line in actions.output_file_tail_placeholder_NOT_IN_FSA():
+                sout.write(f"{line}\n")  # #here4
 
-    from inspect import getmembers, isfunction, getfullargspec
-    for name, function in getmembers(Actions, predicate=isfunction):
-        spec = getfullargspec(function)
+            return sout.__exit__(*_4)
+
+    actions = _actions()
+
+    return context_manager()
+
+
+def _build_receiver(sout, actions, mon):
+    # As you receive each next item from the upstream, determine what lines
+    # to output (using our little state machine (see graph)) and write those
+    # lines to STDOUT (or whatever it is). #[#008.2] custom state machine
+
+    def receive(dct):
+        transition_name = transition_name_via_item(dct)
+        return follow_transition(transition_name, dct)
+
+    def transition_name_via_item(dct):
+        if '_is_branch_node' in dct:
+            lvl = dct.get('header_level', 1)
+            return transition_name_via[lvl]
+        return 'entity'
+
+    transition_name_via = {1: 'header_1', 2: 'header_2', 3: 'header_3'}
+
+    def follow_transition(transition_name, dct):
+        branch_rhs = rhs_via_state[self.state_name]
+        action_and_state_name = branch_rhs[transition_name]  # ..
+
+        # Keep performing actions while the transitions are "immediate"
+        while True:
+            # Transition into the current state/action by executing the action
+            for line in change_state_and_execute(action_and_state_name, dct):
+                # For both historical and readability reasons, actions above
+                # do *not* terminate their newlines but table row lines #here4
+                # *do*; hence this conditional. Chunking writes into whole
+                # lines rather than writing little pieces makes debugging
+                # output and test code less clunky (so, better). Ich muss sein
+                if not (len(line) and '\n' == line[-1]):
+                    line = f"{line}\n"
+                sout.write(line)
+
+            # If the right hand side of this transition is another branch,
+            # stop now as-is and wait to receive the next item to continue
+            mixed_rhs = rhs_via_state[action_and_state_name]
+            if isinstance(mixed_rhs, dict):
+                break
+
+            # Otherwise (and the right hand side is a string) this is an
+            # "immediate" transition.
+            assert isinstance(mixed_rhs, str)
+            action_and_state_name = mixed_rhs
+
+    def change_state_and_execute(action_and_state_name, dct):
+        func = getattr(actions, action_and_state_name)
+        kwargs = args_via_dict_via_func(func)(dct)
+        self.state_name = action_and_state_name
+        return func(**kwargs)
+
+    rhs_via_state = {k: x for k, x in _THIS_STATE_MACHINE()}
+    args_via_dict_via_func = _build_args_via_dict_via_func()
+
+    class self:
+        state_name = 'start'
+
+    return receive
+
+
+def _build_output_schema_rows(memo):
+    # The first time you see an entity dictionary.. The second time..
+
+    def output_schema_rows_the_first_time(first_dct):
+
+        def output_schema_rows(_):
+            yield row1.to_line()  # #here4
+            yield row2.to_line()
+
+        def output_business_entity_row(dct):
+            yield new_row_via(dct.items(), None).to_line()  # #here4
+
+        complete_schema = build_complete_schema_via_first_dictionary(first_dct)
+        row1, row2 = complete_schema.rows_
+
+        eg_row = row1  # WHAT TO USE HERE?? we'll use the label row as long as
+        new_row_via, _ = create_and_upd(eg_row, complete_schema)
+
+        # BIG FLEX [re]write the methods of the thing
+        memo.output_table_header = output_schema_rows
+        memo.output_entity = output_business_entity_row
+        return memo.output_table_header(None)
+
+    build_complete_schema_via_first_dictionary = \
+        _build_build_complete_schema_via_first_dictionary()
+
+    from ._prototype_row_via_example_row_and_complete_schema import \
+        BUILD_CREATE_AND_UPDATE_FUNCTIONS_ as create_and_upd
+
+    return output_schema_rows_the_first_time
+
+
+def _build_build_complete_schema_via_first_dictionary():
+    # Because this whole storage adapter is optimized more torwards the reading
+    # (rather than writing) operations relatively quickly and simply, when
+    # we're going in the other direction (encoding not decoding) we do stuff
+    # that can feel superfluous like creating our complete schema by building
+    # the document lines that define it.
+
+    def build_complete_schema_via_first_dictionary(dct):
+        sr1 = line_AST_via_things(things_for_schema_row_line_one(dct))
+        sr2 = line_AST_via_things(things_for_schema_row_line_two(len(dct)))
+        return complete_schema_via_(sr1, sr2)
+
+    def things_for_schema_row_line_one(dct):
+        yield 'padding_on_every_cell', ' ', ' '
+        for k in dct.keys():
+            yield label_via_far_dictionary_key(k)
+
+    def things_for_schema_row_line_two(leng):
+        yield 'padding_on_every_cell', '', ''
+        for _ in range(0, leng):
+            yield '---'
+
+    def line_AST_via_things(things):
+        class memo:  # #class-as-namespace
+            pass
+
+        sexps, pcs, memo.current_width = [], [], 0
+
+        typ, left_padding, right_padding = next(things)
+        assert 'padding_on_every_cell' == typ
+
+        def add_piece(pc):
+            memo.current_width += len(pc)
+            pcs.append(pc)
+
+        for cell_content in things:
+            add_piece('|')  # every cell starts with a pipe
+            span_begin = memo.current_width
+            add_piece(left_padding)
+            add_piece(cell_content)
+            add_piece(right_padding)
+            sexps.append(('padded_cell', (span_begin, memo.current_width)))
+
+        add_piece('|\n')  # add endcap and _eol #here4
+        sexps.append(('line_ended_with_pipe',))
+        return row_AST_via(sexps, ''.join(pcs))
+
+    def label_via_far_dictionary_key(k):  # k = far_dictionary_key
+        assert re.match(r'[a-z]+(_[a-z]+)*$', k)  # ..
+        pcs = k.split('_')
+        pcs[0] = pcs[0].title()
+        return ' '.join(pcs)
+
+    from . import complete_schema_via_, schema_row_builder_
+    row_AST_via = schema_row_builder_()
+
+    import re
+    return build_complete_schema_via_first_dictionary
+
+
+def _build_args_via_dict_via_func():
+    # What arguments should we pass to the action?
+    # For action readability, there's 3 different forms of argument they take
+
+    def args_via_dict_via_func(func):
+        name = func.__name__
+        x = cache.get(name)
+        if not x:
+            cache[name] = do_args_via_dict_via_func(func)
+        return cache[name]
+
+    cache = {}
+
+    def do_args_via_dict_via_func(func):
+        spec = getfullargspec(func)
         spec.defaults  # sometimes None, sometimes (None,)
-        assert(spec.varargs is None)
-        assert(spec.varkw is None)
-        assert(0 == len(spec.kwonlyargs))
-        assert(spec.kwonlydefaults is None)
-        assert(0 == len(spec.annotations))
+        assert spec.varargs is None
+        assert spec.varkw is None
+        assert 0 == len(spec.kwonlyargs)
+        assert spec.kwonlydefaults is None
+        assert 0 == len(spec.annotations)
 
         args = spec.args
         leng = len(args)
 
         if 0 == leng:
-            when_what = when_monadic
-        elif 1 == len(args) and 'dct' == args[0]:  # OOF :#here3
-            when_what = when_pass_thru
-        else:
-            when_what = when_kwargs
+            return monadic
 
-        actions_index[name] = build_normal_function(when_what, function)
+        if 1 == leng and 'dct' == args[0]:  # OOF :#here3
+            return pass_thru
 
-    # == END
+        return sanitized_keywords_via_dict
 
-    return actions_index
+    # == Functions for Action Arguments via Upstream Item Dictionary
 
+    def sanitized_keywords_via_dict(dct):
+        return {k: v for k, v in dct.items() if allow_list[k]}
 
-def _hand_written_state_machine(STDOUT, MONITOR):
+    def pass_thru(dct):  # The action take a single argument called 'dct'
+        return {'dct': dct}
 
-    cell_via = _cel_via_er()
+    def monadic(dct):  # The action takes no arguments
+        return empty_dct
 
-    from kiss_rdb.storage_adapters_.markdown_table import RowAsEntity_
+    # == support for above
 
-    def row_via_cels(orig_func):  # #decorator
-        def use_func(self):
-            return do_row_via_cels(orig_func(self))
-        return use_func
+    # #here2: TODO has business-specific stuff that would need to b abs'd/inj'd
+    allow_list = {  # what components of upstream item do we pass thru
+            'header_level': False,  # ..
+            '_is_branch_node': False,
+            '_is_composite_node': False,  # not used, might go away
+            'label': True,
+            'url': True}
 
-    def do_row_via_cels(cels):
-        cels = tuple(cels)  # often a generator
-        return RowAsEntity_(cels[0], cels[1:], yes_always_trailing_pipe)
+    empty_dct = {}
 
-    yes_always_trailing_pipe = True
-
-    class Memory:
-
-        def __init__(self):
-            self._is_first_entity_ever_seen = True
-
-        def output_table_header(self, dct):
-            if self._is_first_entity_ever_seen:
-                self._is_first_entity_ever_seen = False
-                _kwargs = _index_via_entity(dct)
-                self.__see_first_entity_ever(** _kwargs)
-            else:
-                assert(set(self._content_width_via_key) == set(dct))
-                # we probably don't want table structure to change..
-
-            yield self.__build_labels_row().to_line_content_()
-            yield self.__build_dashes_row().to_line_content_()
-
-        @row_via_cels
-        def __build_labels_row(self):
-            # give each label cel ONE space to its left and ONE to its right
-
-            for k, label in self._labels_as_entity.items():
-                yield cell_via(1, label, 1, k)
-
-        @row_via_cels
-        def __build_dashes_row(self):
-            # make the dashes fill every ASCII pixel, given index. ick/meh
-
-            for k, w in self._content_width_via_key.items():
-                yield cell_via(0, '-' * (w + 2), 0, k)
-
-        def output_entity(self, dct):
-            _cels = self._cels_via_entity(dct)
-            _row = do_row_via_cels(_cels)
-            yield _row.to_line_content_()
-
-        def __see_first_entity_ever(
-                self, labels_as_entity, offset_via_key, content_width_via_key):
-
-            _celer_via_offset = _celer_via_offset_via(content_width_via_key)
-
-            self._cels_via_entity = _cels_via_entity_er(
-                    _celer_via_offset, content_width_via_key, offset_via_key)
-
-            self._labels_as_entity = labels_as_entity
-            self._content_width_via_key = content_width_via_key
-
-    return Memory()
+    from inspect import getfullargspec
+    return args_via_dict_via_func
 
 
-def _cels_via_entity_er(celer_via_offset, content_width_via_key, offset_via_key):  # noqa: E501
-
-    num_cels = len(offset_via_key)
-    rang = range(0, num_cels)
-    keys = tuple(offset_via_key.keys())
-
-    def cels_via_entity(dct):
-        cels = [None for _ in rang]
-        for i, cel in offsets_and_cels_via_entity(dct):
-            cels[i] = cel
-        return tuple(cels)
-
-    def offsets_and_cels_via_entity(dct):
-        dim_pool = set(keys)
-
-        for k, s in dct.items():
-            assert(isinstance(s, str))  # just for now. orthogonal problem
-            dim_pool.remove(k)
-
-            offset = offset_via_key[k]
-            _cel = celer_via_offset[offset](s)
-            yield offset, _cel
-
-        for k in dim_pool:
-            offset = offset_via_key[k]
-            _cel = celer_via_offset[offset]('')
-            yield offset, _cel
-
-    return cels_via_entity
-
-
-def _celer_via_offset_via(content_width_via_key):
-
-    # EXPERIMENTAL this is where we would want to do crazy padding
-
-    cell_via = _cel_via_er()
-
-    def build_cel_builders():
-        for k in content_width_via_key.keys():
-            yield build_cel_builder(content_width_via_key[k], k)
-
-    def build_cel_builder(content_width, key):
-        def build_cel(s):
-            if '' == s:
-                return cell_via(0, '', 0, key)
-            return cell_via(1, s, 1, key)  # CHANGE ME
-        return build_cel
-
-    return tuple(build_cel_builders())
-
-
-def _index_via_entity(dct):
-
-    labels_as_entity = {}
-    content_width_via_key = {}
-    offset_via_key = {}
-
-    import re
-
-    i = -1  # be careful
-    for k in dct.keys():
-        i += 1
-        offset_via_key[k] = i
-        assert(re.match(r'[a-z]+(_[a-z]+)*$', k))
-        pieces = k.split('_')
-        pieces[0] = pieces[0].title()
-        label = ' '.join(pieces)
-        use_w = max(3, len(label))
-        content_width_via_key[k] = use_w
-        labels_as_entity[k] = label
-
-    return {'labels_as_entity': labels_as_entity,
-            'content_width_via_key': content_width_via_key,
-            'offset_via_key': offset_via_key}
-
-
-def _BUILD_THIS_STATE_MACHINE(action_index, these):  # [#008.2] state machine
-
-    states = {}
-    unresolved_references = set()
-
-    def see_action_name(s):
-        if s in states or s in unresolved_references:
-            return
-        unresolved_references.add(s)
-
-    class Branch:
-        def __init__(self, dct):
-            for token_name, action_name in dct.items():
-                see_action_name(action_name)
-            self.DICTIONARY = dct
-
-        is_branch = True
-
-    class TransitionImmediately:
-        def __init__(self, s):
-            see_action_name(s)
-            self.ACTION_NAME = s
-
-        is_branch = False
-
-    for state_name, mixed_RHS in these:
-        assert(state_name not in states)
-        if isinstance(mixed_RHS, str):
-            states[state_name] = TransitionImmediately(mixed_RHS)
-        else:
-            assert(isinstance(mixed_RHS, dict))
-            states[state_name] = Branch(mixed_RHS)
-
-    for k in unresolved_references:
-        assert(k in states)
-
-    return states
-
-
-def _cel_via_er():
-    from kiss_rdb.storage_adapters_.markdown_table import AttributeCell_
-    return AttributeCell_
-
+# #history-B.1: blind rewrite
 # #history-A.3: full rewrite (unification, multi-table, state machine)
 # #history-A.2: move out of scripts directory. no longer an excutable.
 # #history-A.1: (can be temporary) used to use putser_via_IO
