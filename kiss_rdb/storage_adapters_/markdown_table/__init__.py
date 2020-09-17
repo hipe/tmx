@@ -36,7 +36,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         return func(fh, listener)
 
     def cud(typ, listener, *cud_args):
-        from ._file_diff_via_flat_map import cud_ as func
+        from ._flat_map_via_edit import cud_ as func
         return func(all_sexps, collection_path, opn, typ, cud_args, listener)
 
     def identifiers(listener):
