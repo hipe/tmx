@@ -1,0 +1,28 @@
+#!/usr/bin/env zsh
+
+serr () {
+  echo "$1" >&2
+}
+
+if [[ "-h" == "$1" || "--help" == "$1" ]]; then
+  serr "Usage: $0"
+  serr
+  serr "Description: performs asking for an existant but unversioned file"
+  exit 0
+fi
+
+if [[ ! -d 'z' ]]; then
+  serr "execute this from the 'top' of the project"
+  exit 4
+fi
+
+here='z/times'
+if [[ ! -e "$here" ]]; then
+  serr "must exist: $here"
+  exit 4
+fi
+
+git blame "$here"
+exit "$?"
+
+# #born

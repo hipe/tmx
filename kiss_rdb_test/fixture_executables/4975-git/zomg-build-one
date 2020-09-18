@@ -1,0 +1,59 @@
+#!/usr/bin/env zsh
+
+serr () {
+  echo "$1" >&2
+}
+
+if [[ "-h" == "$1" || "--help" == "$1" ]]; then
+  serr "Usage: $0"
+  serr
+  serr "Description: Make a temporary directory, add it to version control,"
+  serr "add into that repository a versioned file with three lines, commit"
+  serr "that version, add two more (non-contiguous) lines to the file, commit"
+  serr 'that version, run `git blame` on the file.'
+  exit 0
+fi
+
+if [[ ! -d 'z' ]]; then
+  serr "execute this from the 'top' of the project"
+  exit 4
+fi
+
+dir="erase-me-now-zomg-1"
+
+if [[ -e "$dir" ]]; then
+  serr "already exists, erase: $dir"
+  exit 4
+fi
+
+mkdir "$dir"
+cd "$dir"
+
+git init .
+
+some_file="some-file.txt"
+
+echo "orig line 1\norig line 2\norig line 3" > "$some_file"
+
+git add "$some_file"
+
+git commit -m "Add $some_file"
+
+echo "orig line 1\nadded line\norig line 2\norig line 3\nadded" > "$some_file"
+
+git add -u "$some_file"
+
+# ugh, make sure the commit timestamp will be on a different datetime
+sleep 1.1
+
+git commit -m "Added 2 lines to $some_file"
+
+echo "⬇️ here's the git blame:"
+
+git blame "$some_file" | cat
+
+cd ..
+
+serr "please remove this directory yourself: $dir"
+
+# #born

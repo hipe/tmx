@@ -84,8 +84,11 @@ class Renderers_:  # centralize how these look & where they are rendered
 
     @property
     def program_name(self):
-        from os import path as os_path
-        return os_path.basename(self._long_program_name)
+        from os.path import dirname, basename
+        use = basename(self._long_program_name)
+        if '__main__.py' == use:
+            use = basename(dirname(self._long_program_name))
+        return use
 
 
 class ParameterError_:  # like listening.emission_via_args

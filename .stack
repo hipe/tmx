@@ -12,4 +12,3 @@ have full on eno
 there are todo's
 the default report is top 10 open issues, VCS chronological order
 you have to be able to parse identifiers and compare them
-GIT VCS adapter: git blame (index)
