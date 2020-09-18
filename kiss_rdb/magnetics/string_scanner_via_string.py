@@ -16,13 +16,13 @@ class StringScanner:  # #[#008.4] a scanner
 
     the permutations are something like "{skip|scan} [required]".
       - we have only created the ones we needed for our use case but etc
-      - currently there is no lookahead/peek variants but that is only bc above
     """
 
-    def __init__(self, line, listener):
+    def __init__(self, line, listener, cstacker=None):
         self._length = len(line)
         self._position = 0
         self._line = line
+        self._cstacker = cstacker
         self._listener = listener
 
     # == SKIPS
@@ -70,10 +70,15 @@ class StringScanner:  # #[#008.4] a scanner
 
     # == READ ONLY things
 
+    def peek(self, w):
+        assert w <= (self._length - self._position)
+        return self._line[self._position:(self._position + w)]
+
     def rest(self):  # #cover-me
         return self._line[self._position:]
 
-    def eos(self):
+    @property
+    def empty(self):
         return self._length == self._position
 
     @property
@@ -89,23 +94,48 @@ class StringScanner:  # #[#008.4] a scanner
     def _required(self, pattern):
         m = self._match(pattern)
         if m is None:
-            self.__emit_input_error_for_single_pattern(pattern)
+            self._emit_input_error_for_single_pattern(pattern)
         else:
             return m
 
-    def __emit_input_error_for_single_pattern(self, pattern):
-        def struct():
-            dct = {'expecting': pattern.description}
-            self.mutate_error_structure(dct)
-            return dct
-        self._listener('error', 'structure', 'input_error', struct)
-
-    def mutate_error_structure(self, dct):
-        dct['position'] = self._position
-        dct['line'] = self._line
-
     def _match(self, pattern):
         return pattern.regex.match(self._line, self._position)
+
+    # ==
+
+    def whine_about_expecting(self, *descs):
+        def descer():
+            from . import via_collection as ox
+            strs = (d if isinstance(d, str) else d.description for d in descs)
+            return ox.oxford_OR(ox.keys_map(strs))
+        self._emit_input_error(descer)
+
+    def _emit_input_error_for_single_pattern(self, pattern):
+        self._emit_input_error(lambda: pattern.description)
+
+    def _emit_input_error(self, descer):
+        def details_struct():  # #[#510.14] like "jumble"
+            return {k: v for k, v in details()}
+
+        def details():
+            pos, line = self._position, self._line
+            yield 'expecting', (desc := descer())
+            yield 'reason', f'expecting {desc}'
+            yield 'position', pos
+            yield 'line', line
+
+            def two_lines():
+                return two_lines_of_ascii_art_via_position_and_line(pos, line)
+
+            yield 'build_two_lines_of_ASCII_art', two_lines
+
+            if not self._cstacker:
+                return
+            cstack = self._cstacker()
+            for frame in cstack:
+                for k, v in frame.items():
+                    yield k, v
+        self._listener('error', 'structure', 'input_error', details_struct)
 
 
 def two_lines_of_ascii_art_via_position_and_line(position, line):

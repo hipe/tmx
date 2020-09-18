@@ -139,7 +139,7 @@ def __pairserer(listener):
         while True:
             w = scn.skip_required(zero_or_more_not_special)
             assert(w is not None)
-            if scn.eos():
+            if scn.empty:
                 xx()  # line ended without a terminating newline
             end_pos = scn.pos
             pairs.append((begin_pos, end_pos))
@@ -148,14 +148,14 @@ def __pairserer(listener):
             if ',' == char:
                 scn.advance_by_one()
                 scn.skip(one_or_more_spaces)
-                if scn.eos():
+                if scn.empty:
                     xx()
                 begin_pos = scn.pos
                 continue
 
             if '\n' == char:
                 scn.advance_by_one()
-                assert(scn.eos())
+                assert(scn.empty)
                 break
 
             if '"' == char:

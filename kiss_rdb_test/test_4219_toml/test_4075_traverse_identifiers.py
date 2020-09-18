@@ -172,6 +172,8 @@ def _two_via_these(
         lineno,  # *
         expecting,  # *
         did_reach_end_of_stream,
+        reason=None,
+        build_two_lines_of_ASCII_art=None,
         ):
     # position, line, lineno=None, expecting=None, expecting_any_of=None,
     # did_reach_end_of_stream=None,

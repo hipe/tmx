@@ -196,7 +196,12 @@ def _attr_value_thing(slots, dim_pool):
 @_define(_reason_stuff)
 def _reason_stuff(slots, dim_pool):
     _all = {'reason', 'message', 'reason_tail', 'expecting'}
-    k, = set(dim_pool.keys()) & _all  # ..
+    intersect = set(dim_pool.keys()) & _all
+    if 1 < len(intersect):
+        # 'reason' and 'expecting' are no longer mutex #history-B.2
+        dim_pool.pop('expecting')
+        intersect.remove('expecting')
+    k, = intersect  # ..
     content_s = dim_pool.pop(k)
 
     if k in ('reason', 'message'):
@@ -248,9 +253,14 @@ def __lines_for_context_for_parse_error(dim_pool):
     lineno = o('lineno', None)
     position = o('position')
     # --
-    from kiss_rdb.magnetics.string_scanner_via_string import (
-            two_lines_of_ascii_art_via_position_and_line)
-    _2 = tuple(two_lines_of_ascii_art_via_position_and_line(position, line))
+
+    k = 'build_two_lines_of_ASCII_art'
+    if k in dim_pool:
+        _2 = tuple(o(k)())
+    else:
+        from kiss_rdb.magnetics.string_scanner_via_string import \
+            two_lines_of_ascii_art_via_position_and_line as func
+        _2 = tuple(func(position, line))
 
     if lineno is None:
         num_as_s = ' '
@@ -292,6 +302,7 @@ def __fix_this_one_smell(channel_tail, dim_pool):  # #point-1
     if 'input_error_type' in dim_pool:
         channel_tail.append(dim_pool.pop('input_error_type'))
 
+# #history-B.2
 # #history-A.2
 # #history-A.1
 # #abstracted.

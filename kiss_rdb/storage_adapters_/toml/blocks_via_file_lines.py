@@ -51,7 +51,7 @@ def _build_name_gist_via_name():
             if s is None:
                 return
             pieces.append(s)
-            if scn.eos():
+            if scn.empty:
                 break
             if not scn.skip_required(field_name_word_separator):
                 return
