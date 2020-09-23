@@ -1,98 +1,99 @@
-"""functions (mostly) to help assert over help screeen content at a high level
+"""Parse a help screen for the purpose of testing
 
 :[603]
 """
 
-from modality_agnostic.test_support.common import lazy
-import re
+
+def parse_help_screen(lines):
+    lines = _dont_trust_lines(lines)
+    func = _treelib().sections_via_lines_allow_align_right__
+    sections = func(lines)
+    sect_via_lines = _build_section_parser()
+    sections = tuple(sect_via_lines(lines) for lines in sections)
+    return _help_screen(sections)
 
 
-def optional_args_index_via_section_index(si):
-    return {k: v for k, v in __do_optionals_index(si)}
+def _help_screen(sects):
+    offset_via_key = {sects[i].section_key: i for i in range(0, len(sects))}
+
+    class help_screen:
+        def to_option_index(_):
+            return _option_index_via_sections(offset_via_key, sects)
+
+        def to_positional_index(_):
+            return _positional_index_via_sections(offset_via_key, sects)
+
+        def __getitem__(_, k):  # an alias. meh
+            return sects[offset_via_key[k]]
+
+        def section_via_key(_, k):
+            return sects[offset_via_key[k]]
+    return help_screen()
 
 
-def section_index_via_unsanitized_strings_(unsanitized_strings):
-    lines = _lines_via_unsanitized_strings(unsanitized_strings)
-    cx = _tree_via_lines(lines).children
-    return {s.label: cx[s.offset] for s in _sections_via_tree_children(cx)}
+def _option_index_via_sections(offset_via_key, sections):
+    offset = _find_section_offset(offset_via_key, _option_headers)
+    return _build_option_index(sections[offset])
 
 
-class BIG_EXPERIMENTAL_SECTION_INDEX:
-    def __init__(self, unsanitized_strings):
-        lines = _lines_via_unsanitized_strings(unsanitized_strings)
-        self.tree = _tree_via_lines(lines)
-        _ = _sections_via_tree_children(self.tree.children)
-        self.sections = {s.label: s for s in _}
+def _positional_index_via_sections(offset_via_key, sections):
+    offset = _find_section_offset(offset_via_key, _positional_headers)
+    return _build_positional_index(sections[offset])
 
 
-def __do_optionals_index(si):
-    against = set(si)
-    needles = {'options', 'option'}
-    these = needles.intersection(against)
-    if not len(these):  # #todo
-        needles = {'optional arguments', 'optional argument'}
-        these = needles.intersection(against)
-    key, = these
-    node = si[key]
+_option_headers = (
+    'options', 'option', 'optional arguments', 'optional argument')
 
-    assert('option' in node.head_line.styled_content_string)
 
-    for node in node.children:
-        _use_n = node if node.is_terminal else node.head_line
-        _use_s = _use_n.styled_content_string
-        o = __option_line_challenge_mode(_use_s)
+_positional_headers = (
+   'arguments', 'sub-commands', 'argument', 'sub-command',
+   'positional arguments', 'positional argument')
+
+
+def _find_section_offset(offset_via_key, keys):
+    key = next(k for k in keys if k in offset_via_key)
+    return offset_via_key[key]
+
+
+def _build_option_index(section):
+    lines = section.to_body_lines()
+    return {k: v for k, v in _do_build_option_index(lines)}
+
+
+def _do_build_option_index(lines):
+    for line in lines:
+        o = _parse_option_line(line)
         yield o.main_long_switch, o
 
 
-def positional_args_index_via_section_index(si):
-    against = set(si)
-    needles = {'arguments', 'sub-commands', 'argument', 'sub-command'}
-    these = needles.intersection(against)
-    if not len(these):  # #todo
-        needles = {'positional arguments', 'positional argument'}
-        these = needles.intersection(against)
-    key, = these
-    cx = si[key].children
-    d = {}
-    for ch in cx:
-        assert(ch.is_terminal)  # else fine but cover
-        _use_s = ch.styled_content_string
-        _match = re.search('^([^ ]+)[ ]{2,}', _use_s)  # ..
-        d[_match[1]] = ch
-    return d
-
-
-def __option_line_challenge_mode(line_s):
+def _parse_option_line(line):
     """EXPERIMENT...
 
     ... if this proves at all useful it should certainly be abstracted.
     """
 
-    def __main():
-        out = {}
-        out['main_short_switch'] = __parse_any_short()
-        out['main_long_switch'] = __parse_long()
-        out['args_tail_of_long'] = __parse_any_args()
-        out['desc_lines'] = [desc_first_line]
-        _my_tuple = __my_named_tuple_for_above()
-        return _my_tuple(**out)
+    def main():
+        yield 'main_short_switch', parse_any_short()
+        yield 'main_long_switch', parse_long()
+        yield 'args_tail_of_long', parse_any_args()
+        yield 'desc_lines', (desc_first_line,)
 
     class my_state:  # #class-as-namespace
         cursor = 0
 
     self = my_state
 
-    def __parse_any_args():
+    def parse_any_args():
         if self.cursor is not len(haystack_s):
-            return _assert_scan('[ =]([^ ].+)$')  # soften if necessary
+            return assert_scan('[ =]([^ ].+)$')  # soften if necessary
 
-    def __parse_long():
-        return _assert_scan('--[a-z]+(?:-[a-z]+)*')  # ..
+    def parse_long():
+        return assert_scan('--[a-z]+(?:-[a-z]+)*')  # ..
 
-    def __parse_any_short():
-        s = _scan('-[a-z]')
+    def parse_any_short():
+        s = scan('-[a-z]')
         if s is not None:
-            _assert_skip(',[ ]')
+            assert_skip(',?[ ]+')
             return s
     # --
 
@@ -102,106 +103,132 @@ def __option_line_challenge_mode(line_s):
         def g(rx_s):
             x = f(rx_s)
             if x is None:
-                _msg = __build_assertion_failure_message(f, rx_s)
-                raise _my_exception(_msg)
+                msg = build_assertion_failure_message(f, rx_s)
+                raise RuntimeError(msg)
             return x
         return g
 
     @assertify
-    def _assert_scan(rx_s):
-        return _scan(rx_s)
+    def assert_scan(rx_s):
+        return scan(rx_s)
 
     @assertify
-    def _assert_skip(rx_s):
-        return _skip(rx_s)
+    def assert_skip(rx_s):
+        return skip(rx_s)
 
-    def _scan(rx_s):
-        match = _match(rx_s)
-        if match is None:
+    def scan(rx_s):
+        md = match(rx_s)
+        if md is None:
             return
-        _advance_cursor_to(match.end())
-        s_a = match.groups()
+        advance_cursor_to(md.end())
+        s_a = md.groups()
         leng = len(s_a)
         if leng == 0:
-            return match[0]
+            return md[0]
         assert(leng == 1)
         # if you use groups in your scan regex,
         # you can only have one group'
         return s_a[0]
 
-    def _skip(rx_s):
-        match = _match(rx_s)
-        if match is not None:
-            cursor_ = match.end()
-            width = cursor_ - self.cursor
-            _advance_cursor_to(cursor_)
-            return width
+    def skip(rx_s):
+        md = match(rx_s)
+        if md is None:
+            return
+        cursor_ = md.end()
+        width = cursor_ - self.cursor
+        advance_cursor_to(cursor_)
+        return width
 
-    def _match(rx_s):
-        _regex = re.compile(rx_s)
-        return _regex.match(haystack_s, self.cursor)
+    def match(rx_s):
+        rx = re.compile(rx_s)
+        return rx.match(haystack_s, self.cursor)
 
-    def __build_assertion_failure_message(f, rx_s):
-        _fmt = 'failed to {verb} /{rx_s}/: {excerpt}'
+    def build_assertion_failure_message(f, rx_s):
+        fmt = 'failed to {verb} /{rx_s}/: {excerpt}'
         fname = f.__name__
-        match = re.search('_([a-z]+)$', fname)
-        if match is None:
+        md = re.search('_([a-z]+)$', fname)
+        if md is None:
             verb = fname
         else:
-            verb = match[1]
+            verb = md[1]
         if self.cursor >= len(haystack_s):
             excerpt = '[empty string]'
         else:
             excerpt = '«%s»' % haystack_s[self.cursor:]
-        return _fmt.format(verb=verb, rx_s=rx_s, excerpt=excerpt)
+        return fmt.format(verb=verb, rx_s=rx_s, excerpt=excerpt)
 
-    def _advance_cursor_to(num):
+    def advance_cursor_to(num):
         self.cursor = num
 
-    _match_obj = re.search('^((?:[^ ]|[ ](?![ ]))+)(?:[ ]{2,}(.+))?$', line_s)
-    haystack_s, desc_first_line = _match_obj.groups()
+    # md = re.search('^((?:[^ ]|[ ](?![ ]))+)(?:[ ]{2,}(.+))?$', line)
+    # haystack, desc_first_line = md.groups()
+    here = line.rindex('  ')
+    haystack_s = line[0:here].strip()
+    desc_first_line = line[here+2:-1]
 
-    return __main()
-
-
-@lazy
-def __my_named_tuple_for_above():
-    import collections
-    return collections.namedtuple('OptionDescLineTree', [
-        'main_short_switch',
-        'main_long_switch',
-        'args_tail_of_long',
-        'desc_lines',
-    ])
+    re = _re()
+    kwargs = {k: v for k, v in main()}
+    return _OptionLine(**kwargs)
 
 
-def _sections_via_tree_children(cx):
-    for i in range(0, len(cx)):
-        node = cx[i]
-        if node.is_terminal:
-            if node.is_blank_line:
-                continue
-            s = node.styled_content_string
-        else:
-            s = node.head_line.styled_content_string
-        md = re.match('^([a-z]+(?:[ -][a-z]+)*):', s)
-        if md is None:
-            continue
-        yield _Section(label=md[1], offset=i)
+class _OptionLine:
+    # used to be collections.namedtuple before #history-B.2
+    def __init__(
+            o, main_short_switch, main_long_switch,
+            args_tail_of_long, desc_lines):
+        o.main_short_switch = main_short_switch
+        o.main_long_switch = main_long_switch
+        o.args_tail_of_long = args_tail_of_long
+        o.desc_lines = desc_lines
 
 
-class _Section:
-    def __init__(self, label, offset):
-        self.label = label
-        self.offset = offset
+def _build_positional_index(section):
+    def split_via_line(line):
+        # md = re.search('^([^ ]+)[ ]{2,}', line)  # before #history-B.2
+        here = line.rindex('  ')
+        return line[:here].strip(), line
+    lines = section.to_body_lines()
+    return {k: v for k, v in (split_via_line(line) for line in lines)}
 
 
-def _tree_via_lines(lines):
-    from .expect_treelike_screen import tree_via_lines
-    return tree_via_lines(lines)
+def _build_section_parser():
+    def sect_via_lines(lines):
+        key = section_key_via_header_line(lines[0])
+        num_lines = len(lines)
+
+        class section:
+            def to_body_lines(_):
+                for i in rang:
+                    yield lines[i]
+            body_line_count = num_lines - 1
+            head_line = lines[0]
+            section_key = key
+        rang = range(1, num_lines)
+        section.lines = lines
+        return section()
+    section_key_via_header_line = _build_section_key_parser()
+    return sect_via_lines
 
 
-def _lines_via_unsanitized_strings(unsanitized_strings):
+def _build_section_key_parser():
+    def parse(line):
+        md = rx.match(line)
+        head = md['this_fellow']
+        return f"{head}s" if md['plural_thing'] else head
+    re = _re()
+    rx = re.compile(r'''
+      (?P<this_fellow>
+        (?:[a-z]+[ ])*             # zero or more (word then space)
+        [a-z]+                     # one word
+      )
+      (?P<plural_thing> \(s\)  )?  # MAYBE "(s)"
+      :                            # every header line has to have one of these
+                                   # (not anchored to end because oneliners)
+    ''', re.IGNORECASE | re.VERBOSE)
+    return parse
+
+
+def _dont_trust_lines(lines):
 
     # in the past we used a vendor library (click) to generate help
     # screens. it (not us) flattened our multi-lines messages and also word-
@@ -209,29 +236,28 @@ def _lines_via_unsanitized_strings(unsanitized_strings):
     # now that this testlib is used against our own generated help screens,
     # we no longer have to turn ONE BIG STRING into a line stream.
 
-    leng = len(unsanitized_strings)
-    assert(leng)
-    if 1 == leng:  # #todo
-        big_string, = unsanitized_strings
-        assert(_eol in big_string)
-        from script_lib import lines_via_big_string
-        return lines_via_big_string(big_string)
-
-    return __sanitized_lines_via_unsanitized_strings(unsanitized_strings)
-
-
-def __sanitized_lines_via_unsanitized_strings(unsanitized_strings):
-    _normal_line_rx = re.compile(r'[^\r\n]*\n\Z')  # _eol
-    for unsanitized_string in unsanitized_strings:
-        assert(_normal_line_rx.match(unsanitized_string))
-        yield unsanitized_string
+    line_rx = _re().compile(r'^.*\n\Z')
+    for line in lines:
+        if line_rx.match(line):
+            yield line
+            continue
+        raise RuntimeError("ohai this is not a well-formed line (see here)")
+        # #history-B.2
+        # from script_lib import lines_via_big_string
 
 
-def _my_exception(msg):  # #copy-pasted
-    from script_lib import Exception as MyException
-    return MyException(msg)
+def xx(msg=''):
+    raise RuntimeError(f"write me: {msg}")
 
 
-_eol = '\n'
+def _treelib():
+    from . import expect_treelike_screen as module
+    return module
 
+
+def _re():
+    import re
+    return re
+
+# #history-B.2 full rewrite to simplify
 # #born.

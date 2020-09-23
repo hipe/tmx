@@ -16,6 +16,98 @@
 """
 
 
+def sections_via_lines_allow_align_right__(lines):
+    # This one recognizes three categories of line and does just a coarse
+    # parse of sections.
+
+    # At #history-B.2 our help screen formatting changed and it broke against
+    # the existing parser. We may or may not alter the reality to match the
+    # test (the breakage did in fact reveal an oversight - we were aligning
+    # right when we didn't mean to of column A items) but here we are.
+
+    # States
+
+    def begin_state():
+        yield if_header_line, move_to_in_section_state
+        yield base_case, whine_about_expecting_etc
+
+    def in_section_state():
+        yield if_indented_line, add_the_line_to_the_section
+        yield if_blank_line, move_to_expecting_section_state
+        yield base_case, say_maybe_we_will_support_this
+
+    def expecting_section_state():
+        yield if_header_line, move_to_in_section_state
+        yield base_case, whine_about_expecting_etc
+
+    # Actions
+
+    def move_to_in_section_state():
+        state.current_section_lines.clear()
+        add_the_line_to_the_section()
+        state.current_state_function = in_section_state
+
+    def add_the_line_to_the_section():
+        state.current_section_lines.append(line)
+
+    def move_to_expecting_section_state():
+        roll_section_over()
+        state.current_state_function = expecting_section_state
+
+    def whine_about_expecting_etc():
+        xx('fun')
+        # the current state is a function that makes a 2xN table. read
+        # column one from the table (all but the last row) and hack the
+        # names out of the functions to get the splay of expecting
+
+    def say_maybe_we_will_support_this():
+        raise RuntimeError("Maybe we will support a run of non-indented lines")
+
+    # Matchers
+
+    def if_header_line():
+        return re.match('^[a-zA-Z]', line)
+
+    def if_indented_line():
+        return ' ' == line[0]
+
+    def if_blank_line():
+        return '\n' == line
+
+    def base_case():
+        return True
+
+    # ..
+
+    def roll_section_over():
+        sections.append(tuple(state.current_section_lines))
+        state.current_section_lines.clear()
+
+    class state:  # #class-as-namespace
+        current_section_lines = []
+        current_state_function = begin_state
+
+    sections = []
+    import re
+
+    for line in lines:
+        these = state.current_state_function()
+        action = next(action for matcher, action in these if matcher())  # 👀
+        action()
+
+    # At the end, we don't want there to be trailing blank lines, nor
+    # (we think) do we want there to be a header line..
+
+    end_state_name = state.current_state_function.__name__
+    if 'in_section_state' != end_state_name:
+        xx()
+
+    # if len(state.current_section_lines
+
+    roll_section_over()
+    return tuple(sections)
+
+
 def tree_via_lines(lines):
     _scanned_line_itr = (_ScannedLine(s) for s in lines)
     scn = _scanner_via_iterator(_scanned_line_itr)
@@ -277,8 +369,13 @@ def _my_exception(msg):  # #copy-pasted
     return MyException(msg)
 
 
+def xx(msg='write me'):
+    raise RuntimeError(msg)
+
+
 _TAB = "\t"
 
+# #history-B.2: spike a new state machine to accomodate align right
 # #history-A.2: overhaul state machine to be less obtuse
 # #history-A.1: refactor line streamer to use generator expression
 # born.
