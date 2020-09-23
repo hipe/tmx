@@ -1,22 +1,24 @@
-"""this testing library is for testing what is written to STDOUT and STDERR.
+"""
+A toolkit of different approaches for testing STDOUT and STDERR writes.
 
-(See also the much simpler version under this same identifier.)
+The Expection-driven facility:
 
-write your test case by modeling what *lines* you expect to be written to
-those IO's, in the order you expect them to be written in, variously for
-STDOUT and STDERR, possibly alternating back and forth between them as
-necessary.
+Write your test case by modeling a sequence of line expectations, each
+expectation modeling which of STDOUT or STDERR is expected to be written to
+next (possibly alternating back and forth between the two if that is the
+expectation).
 
-given this list of expectations, the library gives you proxies for STDOUT
-and STDERR that act as *mocks* (in the proper martin fowler sense): when
+Given this list of expectations, the library gives you proxies for STDOUT
+and STDERR that act as *mocks* (in the proper Martin Fowler sense): when
 your test case runs (as it is running), each next line that is written to
 STDOUT or STDERR is checked against each next expected line. as soon as an
 actual line is written that deviates from what is expected, a failure is
 raised. (likewise failure is raised when there remain any expectations in
 the queue at the end of the case.)
 
-note the immediacy here: one does not simply compare the list of output
+Note the immediacy here: one does not simply compare the list of output
 lines to the list of expected lines after the invocation under test has run.
+(If you prefer that technique (with less moving parts), see the toolkit below.)
 rather, as each line is written we check it against each next line that is
 expected. this distinction means that as soon as an emission is wrong, we
 raise an exception in effect "from within" the mocked IO, giving us a stack
@@ -35,255 +37,278 @@ possible issues:
     newline. (were this no the case, we would have to design whether
     we model expected *writes* or expected *lines*. the truth may be that
     we model neither; that in fact we model the expectation of one *or more*
-    lines per write..
+    lines per write.. #[#605.2]
 
 
-#:[#605.1]
 (Case0250)
 """
 
-from modality_agnostic.test_support.common import lazy
+
+def stdout_and_stderr_and_done_via(expectation_defs, tc):  # tc = test context
+
+    itr = (_line_expectation(mixed) for mixed in expectation_defs)
+    stack = list(reversed(tuple(itr)))
+    # (as a historical footnote, `collections.deque` before #history-B.2)
+
+    _check_arity_signature(stack)
+
+    def recv_sout_write(s):
+        recv_write('STDOUT', s)
+
+    def recv_serr_write(s):
+        recv_write('STDERR', s)
+
+    def recv_write(which, s):
+        if tc and tc.do_debug:  # meh
+            if state.is_first_debugging_message:
+                # can't use build_write_receiver_for_debugging because
+                # that has a static message head and ours is dynamic
+                state.is_first_debugging_message = False
+                from sys import stderr
+                state.debug_IO = stderr
+                state.debug_IO.write('\n')
+            state.debug_IO.write(f"DBG {which}: {repr(s)}\n")
+
+        if not len(stack):
+            return fail(_message_for_extra_line(which, s))
+
+        if not re.search(r'$\n\Z', s):  # #[#605.2]
+            raise RuntimeError("life is easier if `write()`s end in newlines")
+
+        arity, exp_which, content_asserter = stack[-1]  # #here1
+
+        if exp_which is not None and exp_which != which:
+            return fail(_message_about_wrong_which(which, exp_which, s))
+
+        tup = tuple(content_asserter.check_line(s))
+        if len(tup):
+            fmt, dct = tup
+            return fail(fmt.format(**dct))
+
+        state.actual_lines.append((which, s))
+
+        if 'one' == arity:
+            stack.pop()
+            return
+
+        if 'zero_or_one' == arity:
+            stack.pop()  # (Case0265) (Case0267)
+            return
+
+        if 'one_or_more' == arity:
+            state.did_see_one = True
+            return
+
+        assert 'zero_or_more' == arity
+
+    def done():
+        if not len(stack):
+            return flush_result()
+        next_exp = stack[-1]
+        arity = next_exp[0]  # #here3
+
+        # If 'zero' is IN the arity, you passed
+        if 'zero_or_one' == arity:
+            return flush_result()  # (Case0266)
+
+        if 'zero_or_more' == arity:
+            return flush_result()  # (Case0268)
+
+        # If 'one' IS the arity, you definitely failed
+        def do_fail():
+            return fail(_message_for_missing_expected_line(* next_exp))
+
+        if 'one' == arity:
+            return do_fail()  # (Case0249)
+
+        # If the arity is 'one_or_more', whether you failed depends..
+        assert 'one_or_more' == arity
+        if state.did_see_one:
+            return flush_result()  # (Case0264)
+
+        return do_fail()  # (Case0263)
+
+    def flush_result():
+        rv = state.actual_lines
+        del state.actual_lines
+        return tuple(rv)
+
+    def fail(msg):
+        tc.fail(msg)
+
+    class state:  # #class-as-namespace
+        did_see_one = False
+        actual_lines = []  # #undocumented #experimental #todo
+        is_first_debugging_message = True
+
+    from modality_agnostic import write_only_IO_proxy as proxy
+    import re
+    return proxy(recv_sout_write), proxy(recv_serr_write), done
 
 
-def expect_lines(_1, _2):
-    """a higher-level interface for reaching the other two methods
+def _check_arity_signature(stack):  # #here3
+    leng, i, ok, had = len(stack), 0, True, False
 
-    reach either `expect_stdout_lines` or `expect_stderr_lines`
-    """
+    # Advance over zero or one special arity at the bottom of the stack
+    if i < leng and stack[i][0] in _special_arities:
+        had = True
+        i = 1
 
-    return __the_expect_lines_function()(_1, _2)
+    # Traverse the remainder of the stack ensuring no special arities
+    while i < leng:
+        if stack[i][0] in _special_arities:
+            ok = False
+            break
+        i += 1
 
+    if ok:
+        return
 
-@lazy
-def __the_expect_lines_function():
-    dict = {
-        STDOUT: expect_stdout_lines,
-        STDERR: expect_stderr_lines,
-    }
-
-    def f(line_expectation_iter, which_s):
-        _d = _which_via_string(which_s)
-        return dict[_d](line_expectation_iter)
-
-    return f
-
-
-def expect_stderr_lines(itr):
-    return _Expectation((STDERR, x) for x in itr)
-
-
-def expect_stdout_lines(itr):
-    return _Expectation((STDOUT, x) for x in itr)
-
-
-class _Performance:
-    """the moneyshot. mainly, expose the proxies for `stdout` and `stderr`."""
-
-    def __init__(self, test_case, line_expectations):
-
-        from modality_agnostic import write_only_IO_proxy as proxy
-        self.stdout = proxy(self._receive_stdout_line)
-        self.stderr = proxy(self._receive_stderr_line)
-
-        from collections import deque
-        self._deque = deque(line_expectations)
-        self._test_case = test_case
-
-    def _receive_stdout_line(self, line):
-        return self._receive_line(STDOUT, line)
-
-    def _receive_stderr_line(self, line):
-        return self._receive_line(STDERR, line)
-
-    def _receive_line(self, which, line):
-        if 0 == len(self._deque):
-            return self._when_unexpected_line(which, line)
-        else:
-            return self._receive_anticipated_line(which, line)
-
-    def _receive_anticipated_line(self, which, line):
-        """knowing you've anticipated this line, check expectation vs. reality
-
-        life is easier if `write()`s always end with newlines (FOR NOW).
-        a corollary (but *NOT* the design objective) of this is that
-        reporting facilities may assume that the string ends in a newline
-        elsewhere. (this assuption can impact reporting efforts both
-        positively and negatively. if this provision changes, we MUST check
-        each :[605.2], which represents a subscription to this assumption.)
-        """
-
-        if not _ends_in_newline(line):
-            _docstring = self.__class__._receive_anticipated_line.__doc__
-            _msg = _docstring.split(_NEWLINE)[2].strip()
-            raise Exception(_msg)
-
-        exp_line = self._deque.popleft()
-
-        if exp_line.which == which:
-
-            tup = exp_line.failure_tuple_against(line)
-            if tup is not None:
-                return self._test_case_fail(* tup)
-
-        else:
-            return self._when_wrong_which(which, line, exp_line)
-
-    def finish(self):
-        if 0 == len(self._deque):
-            del self._deque  # loud fail if lines written after finish
-        else:
-            self._when_missing_expected_line()
-
-    def _when_wrong_which(self, which, line, exp_line):
-        act_s = _string_via_which(which)
-        exp_s = _string_via_which(exp_line.which)
-
-        fmt = 'expected line on {exp}, had {had}: {line}'
-        dic = {'had': act_s, 'exp': exp_s, 'line': line}
-
-        self._test_case_fail(dic, fmt)
-
-    def _when_unexpected_line(self, which, line):
-
-        fmt = 'expecting no more lines but this line was outputted on {which} - {line}'  # noqa: E501
-        dic = {'which': _string_via_which(which), 'line': line}
-
-        self._test_case_fail(dic, fmt)
-
-    def _when_missing_expected_line(self):
-
-        exp = self._deque[0]
-
-        _msg = self._flatten_message(* exp.to_tuple_about_expecting())
-
-        fmt = 'at end of input, {expecting_etc}'
-        dic = {'expecting_etc': _msg}
-
-        self._test_case_fail(dic, fmt)
-
-    def _test_case_fail(self, dic, fmt):
-        self._test_case.fail(self._flatten_message(dic, fmt))
-
-    def _flatten_message(self, dic, fmt):
-        # TODO - here is where we would do i18n with that one function
-        return fmt.format(** dic)
-
-
-class _Expectation:
-    """the 'expectation' wraps the lines you expect to be emitted..
-
-    and the ability to create a 'performance'
-    """
-
-    def __init__(self, gen):
-        self._these = [_line_expectation(which, x) for (which, x) in gen]
-
-    def to_performance_under(self, test_case):
-        return _Performance(test_case, self._these)
-
-
-def _line_expectation(which, x):
-
-    if x:
-        if hasattr(x, '__call__'):  # if function == type(x)
-            return _FunctionBasedLineExpectation(x, which)
-        elif str == type(x):
-            return _StringBasedLineExpectation(x, which)
-        else:
-            # assume hasattr(x, 'match')
-            return _RegexpBasedLineExpectation(x, which)
+    bad = stack[i][0]
+    tail = f"'{bad}' at stack offset {i}"
+    head = 'You can have max one special arity and it must be the last expectation.'  # noqa: E501
+    if had:
+        lowest = stack[0][0]
+        msg = f"{head} Had '{lowest}' at end but also {tail}"
     else:
-        return _AnyLineExpectation(which)
+        msg = f"{head} Had {tail}"
+    raise _ExpectationDefinitionError(msg)
 
 
-class _LineExpectation:
-    """model the user's expectation for one line..
-
-    ..(in terms of a fixed string, a regexp, or otherwise)
-    """
-
-    def __init__(self, which):
-        self.which = which
-
-    def _which_as_string(self):
-        return _string_via_which(self.which)
+class _ExpectationDefinitionError(RuntimeError):  # #testpoint
+    pass
 
 
-class _StringBasedLineExpectation(_LineExpectation):
-
-    def __init__(self, s, which):
-        self._string = s
-        super(_StringBasedLineExpectation, self).__init__(which)
-
-    def failure_tuple_against(self, line):
-        if self._string != line:
-            fmt = "expected (+), had (-):\n+ {exp}- {had}"  # assume [#605.2]
-            dic = {'had': line, 'exp': self._string}
-            return (dic, fmt)
-
-    def to_tuple_about_expecting(self):
-        fmt = 'expecting on {which} - {expected_line}'
-        dic = {'which': self._which_as_string(), 'expected_line': self._string}
-        return (dic, fmt)
+def _message_about_wrong_which(act_which, exp_which, line):
+    return f'expected line on {exp_which}, had {act_which}: {line}'
 
 
-class _RegexpBasedLineExpectation(_LineExpectation):
-
-    def __init__(self, re, which):
-        self._re = re
-        super(_RegexpBasedLineExpectation, self).__init__(which)
-
-    def failure_tuple_against(self, line):
-        if not self._re.search(line):
-            fmt = "expected to match regexp (+), had (-):\n+ /{pat}/\n- {had}"
-            dic = {'had': line, 'pat': self._re.pattern}
-            return (dic, fmt)
-
-    def to_tuple_about_expecting(self):
-        fmt = 'expecting on {which} a string matching /{pat}/'
-        dic = {'which': self._which_as_string(), 'pat': self._re.pattern}
-        return (dic, fmt)
+def _message_for_missing_expected_line(arity, which, content_asserter):
+    fmt, dct = tuple(content_asserter.express_expecting())
+    tail = fmt.format(** dct)
+    return f'at end of input, {tail}'
 
 
-def _to_tuple_about_expecting_any_line(self):
-    fmt = 'expecting any line on {which}'
-    dic = {'which': self._which_as_string()}
-    return (dic, fmt)
+def _message_for_extra_line(which, line):
+    return f'expecting no more lines but this line was outputted on {which} - {line}'  # noqa: E501
 
 
-class _FunctionBasedLineExpectation(_LineExpectation):
+def _line_expectation(tup):
+
+    if isinstance(tup, str):
+        tup = (tup,)  # allow client to `yield 'STDERR'` e.g
+    elif tup is None:
+        tup = ()
+    stack = list(reversed(tup))
+
+    arity, mixed_matcher, did, which = 'one', None, False, None
+
+    # #undocumented: specifying no 'which'
+
+    if len(stack) and stack[-1] in _special_arities:
+        did = True
+        arity = stack.pop()
+
+    if len(stack):
+        which = stack.pop()
+        if which not in ('STDERR', 'STDOUT', None):
+            keywords = ('STDOUT', 'STDERR')
+            if not did:
+                keywords = (*_special_arities, *keywords)
+            _ = ', '.join(f"'{s}'" for s in keywords)
+            msg = f"Unrecognized keyword '{which}'. Expecting one of ({_})"
+            raise _ExpectationDefinitionError(msg)
+
+    if len(stack):
+        mixed_matcher, = stack  # ..
+
+    content_asserter = _content_asserter_via(mixed_matcher, which or 'ANY')
+    return arity, which, content_asserter  # #here1
+
+
+_special_arities = {
+    'zero_or_one',
+    'zero_or_more',
+    'one_or_more',
+}
+
+
+def _content_asserter_via(x, which):
+    if x is None:
+        return _content_asserter_for_any_line(which)
+    if hasattr(x, '__call__'):
+        return _content_asserter_via_function(x, which)
+    if isinstance(x, str):
+        return _content_asserter_via_exact_match_string(x, which)
+    assert hasattr(x, 'match')
+    return _content_asserter_via_regex(x, which)
+
+
+def _content_asserter_via_exact_match_string(expected_line, which):
+    class these:  # #class-as-namespace
+        def check_line(line):
+            if expected_line == line:
+                return
+            yield "expected (+), had (-):\n+ {exp}- {had}"  # assume [#605.2]
+            yield {'had': line, 'exp': expected_line}
+
+        def express_expecting():
+            yield 'expecting on {which} - {exp}'
+            yield {'which': which, 'exp': expected_line}
+    return these
+
+
+def _content_asserter_via_regex(rx, which):
+    class these:  # #class-as-namespace
+        def check_line(line):
+            if rx.search(line):
+                return
+            yield "expected to match regexp (+), had (-):\n+ /{pat}/\n- {had}"
+            yield {'had': line, 'pat': rx.pattern}
+
+        def express_expecting():
+            yield 'expecting on {which} a string matching /{pat}/'
+            yield {'which': which, 'pat': rx.pattern}
+    return these
+
+
+def _content_asserter_via_function(func, which):
     """like the "any line expectation" but call a function on each line"""
 
-    def __init__(self, f, which):
-        self._f = f
-        super(_FunctionBasedLineExpectation, self).__init__(which)
+    class these:  # #class-as-namespace
+        def check_line(line):
+            x = func(line)
+            return () if x is None else x
 
-    def failure_tuple_against(self, line):
-        """no-op - always pass - call the function too"""
-        self._f(line)
-
-    to_tuple_about_expecting = _to_tuple_about_expecting_any_line
+        def express_expecting():
+            return _express_expecting_any(which)
+    return these
 
 
-class _AnyLineExpectation(_LineExpectation):
+def _content_asserter_for_any_line(which):
 
-    def failure_tuple_against(self, line):
+    class these:  # #class-as-namespace
         """a no-op.
 
         this is the for the expectation model that does no content validation
         on the string. (elsewhere this function is called "MONADIC_EMPTINESS").
         """
-        pass
 
-    to_tuple_about_expecting = _to_tuple_about_expecting_any_line
+        def check_line(line):
+            return ()
+
+        def express_expecting():
+            return _express_expecting_any(which)
+    return these
 
 
-def _ends_in_newline(line):
-    return _NEWLINE == line[-1]
+def _express_expecting_any(which):
+    yield 'expecting any line on {which}'
+    yield {'which': which}
 
 
 # == BEGIN NEW
-''':[#817] EXPERIMENTAL:
+''':[#605.1] EXPERIMENTAL:
 
 as an alternative take on a lot of the above, we offer these modular
 components. There is one "Write Only IO Facade" that dispatches messages
@@ -341,73 +366,86 @@ see topic identifier.
 '''
 
 
-class DebuggingWriteReceiver:
+def spy_on_write_and_lines_for(tc, dbg_head):
+    recvs = [build_write_receiver_for_debugging(dbg_head, lambda: tc.do_debug)]
+    recv, lines = build_write_receiver_for_recording_and_lines()
+    recvs.append(recv)
+    return spy_on_write_via_receivers(recvs), lines
 
-    def __init__(self, label, do_debug_function, debug_IO_function):
-        self._label = label
-        self._do_debug_function = do_debug_function
-        self._debug_IO_function = debug_IO_function
 
-    def receive_write(self, s):
-        if not self._do_debug_function():
+def build_write_receiver_for_debugging(dbg_msg_head, do_debug_function):
+    def recv(s):
+        if not do_debug_function():
             return
-        io = self._debug_IO_function()
-        io.write(f'>> {self._label}: >> ')
-        io.write(s)
-        io.flush()
+        from sys import stderr
+        if recv.is_first_debug:
+            recv.is_first_debug = False
+            stderr.write('\n')  # _eol
+        stderr.write(f"{dbg_msg_head}{s}")
+    recv.is_first_debug = True  # meh
+    return recv
 
-    def receive_flush(self):
+
+def build_write_receiver_for_recording_and_lines():
+    def recv(s):
+        assert re.match(r'[^\r\n]*\n\Z', s)  # [#605.2]
+        lines.append(s)
+    import re
+    return recv, (lines := [])
+
+
+def build_write_receiver_for_stopping(how_many_writes):
+    def recv(_):
+        stop.count += 1
+        if how_many_writes == stop.count:
+            raise stop()
+
+    class stop(RuntimeError):
         pass
+    stop.count = 0  # ick/meh
+    return recv, stop
 
 
-class MuxingWriteReceiver:
+def spy_on_write_via_receivers(receivers):  # multiplex `write()` calls
+    if 1 == len(receivers):
+        def write(s):
+            recv(s)
+            return len(s)
+        recv, = receivers
+    else:
+        def write(s):
+            for recv in receivers:
+                recv(s)
+            return len(s)
+    from modality_agnostic import write_only_IO_proxy as func
+    return func(write=write, flush=lambda: None)
 
-    def __init__(self, children):
-        self._children = children
-
-    def receive_write(self, s):
-        for o in self._children:
-            o.receive_write(s)
-
-    def receive_flush(self):
-        for o in self._children:
-            o.receive_flush()
-
-
-class ProxyingWriteReceiver:
-
-    def __init__(self, f):
-        self._function = f
-
-    def receive_write(self, s):
-        self._function(s)
-
-    def receive_flush(self):
-        pass
 
 # == END NEW
 
 
-_string_via_which_hash = {
-        1: 'STDIN',
-        2: 'STDOUT',
-        3: 'STDERR',
-        }
+# == (absorbed at #history-B.2)
+
+class FAKE_STDIN_INTERACTIVE:  # #class-as-namespace
+    # (if you want a stub that plays back lines, move [#605.4] to here)
+
+    def isatty():
+        return True
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
 
 
-_string_via_which = _string_via_which_hash.__getitem__
+class FAKE_STDIN_NON_INTERACTIVE:  # #class-as-namespace
+
+    def isatty():
+        return False
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
 
 
-_NEWLINE = "\n"
-STDIN = 1
-STDOUT = 2
-STDERR = 3
+# might move [#605.5] to here from a lib evaporated at #hitory-B.2
 
-
-_which_via_string = {
-      'STDOUT': STDOUT,
-      'STDERR': STDERR,
-      'STDIN': STDIN,
-    }.__getitem__
-
+# #history-B.2 unification and simplifcation, became almost full rewrite
 # #born.
