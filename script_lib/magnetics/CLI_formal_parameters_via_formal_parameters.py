@@ -27,12 +27,13 @@ def CLI_function_via_command_module(command_module):
         formals = formal_parms_dict.items()
         param_index = None
 
-    _CLI_foz = tuple(CLI_formal_parameters_via_formal_parameters(formals))
+    param_foz = CLI_formal_parameters_via_formal_parameters(formals)
+    CLI_foz = (('-h', '--help', 'this screen'), *param_foz)
 
-    def do_CLI(mon, sin, sout, serr, *actuals):
-
+    def do_CLI(sin, sout, serr, *rest):
+        *actuals, rscer = rest
         leng = len(formals)
-        assert len(actuals) == leng
+        assert leng == len(actuals)
         kwargs = {formals[i][0]: actuals[i] for i in range(0, leng)}
 
         if param_index is not None:
@@ -53,10 +54,9 @@ def CLI_function_via_command_module(command_module):
         s = command_module.__doc__
     do_CLI.__doc__ = s
 
-    def CLI(sin, sout, serr, argv):
+    def CLI(sin, sout, serr, argv, rscer):  # #[#605.3] five args
         from script_lib.cheap_arg_parse import cheap_arg_parse
-        return cheap_arg_parse(
-                do_CLI, sin, sout, serr, argv, formal_parameters=_CLI_foz)
+        return cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals=CLI_foz)
 
     return CLI
 
@@ -156,14 +156,20 @@ def __second_pass(use_optionals, use_positionals, use_globby):
         mini = r.start
         maxi = r.stop
         assert maxi is None
-
+        slg = slug()
+        # New in #history-B.2 this is a variety of surface forms we can use
+        # to express the imperity and arity of positionals. The form we use
+        # in definitions (like below) is what is used in help screens.
+        # (before, we would specify the kleene forms here.) The asymmetry
+        # in the below two is ~ aesthetic ~ (and somewhat arbitrary)
         if 1 == mini:
             # add required list (globby)
-            yield (f'{slug()}+', *desc_lines())
+            surface_exp = f"{slg} [{slg} […]]"
         else:
             assert 0 == mini
             # add optional list (globby)
-            yield (f'{slug()}*', *desc_lines())
+            surface_exp = f"[{slg} […]]"
+        yield surface_exp, *desc_lines()
 
 
 def __first_pass(formal_parameters):
@@ -250,4 +256,5 @@ def _meta_var_via(normal_name):
 def xx():
     raise Exception('write me')
 
+# #history-B.2
 # #abstracted.

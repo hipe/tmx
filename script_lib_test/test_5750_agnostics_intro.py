@@ -18,11 +18,11 @@ class CommonCase(unittest.TestCase):
 
         _argv = ('/fake-fs/annyong-amma', *self.given_argv_tail())
 
-        from script_lib.test_support import lines_and_spy_io_for_test_context
-        lines, sout = lines_and_spy_io_for_test_context(self, 'DEBUG SOUT: ')
+        from script_lib.test_support import spy_on_write_and_lines_for as func
+        sout, lines = func(self, 'DEBUG SOUT: ')
 
         if self.do_debug:
-            _, serr = lines_and_spy_io_for_test_context(self, 'DEBUG SERR: ')
+            serr, _ = func(self, 'DEBUG SERR: ')
         else:
             serr = None
 
@@ -91,7 +91,7 @@ class Case5750_category_5_required_list(CommonCase):  # #midpoint
         self.expect_expected()
 
     def expect_these(self):
-        return (('cat-5-param+', 'desc for cat 5'),)
+        return (('cat-5-param [cat-5-param […]]', 'desc for cat 5'),)
 
     def given_formal_parameter(self):
         return formal_parameter_for('REQUIRED_LIST', 'cat 5')
@@ -103,7 +103,7 @@ class Case5753_category_3_optional_list(CommonCase):
         self.expect_expected()
 
     def expect_these(self):
-        return (('cat-3-param*', 'desc for cat 3'),)
+        return (('[cat-3-param […]]', 'desc for cat 3'),)
 
     def given_formal_parameter(self):
         return formal_parameter_for('OPTIONAL_LIST', 'cat 3')
@@ -136,7 +136,7 @@ class Case5759_there_can_only_be_one_glob(CommonCase):
         yield ('--arg-1-param', 'desc for arg 1')
         yield ('--arg-2-param=PARAM*', 'desc for arg 2')
         yield ('--arg-3-param=PARAM+', 'desc for arg 3')
-        yield ('arg-4-param*', 'desc for arg 4')
+        yield ('[arg-4-param […]]', 'desc for arg 4')
 
     def given_formal_parameters(self):
         yield formal_parameter_for('FLAG', 'arg 1')
@@ -173,13 +173,13 @@ class Case5762_big_run(CommonCase):
 # == BEGIN
 
 def CLI(sin, sout, serr, argv):
-    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
-
     def children():
+        # yield '-h', '--help',  'this screen'
         yield 'thing-one', load_thing_one
         yield 'thing-two', load_thing_two
 
-    return cheap_arg_parse_branch(sin, sout, serr, argv, children())
+    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+    return func(sin, sout, serr, argv, children())
 
 
 def load_thing_one():

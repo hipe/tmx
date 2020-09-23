@@ -49,22 +49,25 @@ class CommonCase(unittest.TestCase):
 
     # -- build end state
 
-    def _build_end_state(self):
-
-        _argv = self._argv()
-
-        _stdin = self._stdin()
-
-        stdout, stderr, end_stater = self._sout_and_serr_and_end_stater()
-
-        _ss = _subject_script()
-
-        _actual_exitstatus = _ss._CLI(_stdin, stdout, stderr, _argv)
-
-        return end_stater(_actual_exitstatus)
-
-    def _expect_this_many_on_stderr(self, num):
-        return self._expect_on_X_this_many('stderr', num)
+    @property
+    @shared_subj_in_child_classes
+    def end_state(self):
+        argv = self.given_argv()
+        sin = self.given_stdin()
+        exps = self.expected_lines()
+        sout, serr, done = IO_lib().stdout_and_stderr_and_done_via(exps, self)
+        ss = subject_script()
+        es = ss._CLI(sin, sout, serr, argv)
+        lines = done()
+        # ==
+        runs = tuple(_partition(lines))
+        if 1 < len(runs):
+            ens = _EndStateWhenManyRuns(runs)
+        else:
+            run, = runs
+            ens = _EndStateWhenOneRun(run)
+        ens.exitstatus = es
+        return ens
 
     def given_stdin(self):
         return IO_lib().FAKE_STDIN_INTERACTIVE
@@ -399,8 +402,58 @@ class _Symbol:
         return self._range.stop == num
 
 
+# == moved here from sunsetted module at #history-B.2 :[#605.5]
+
+def _EndStateWhenManyRuns(runs):
+    class end_state_when_many_runs:  # #class-as-namespace
+        def first_line_run(which):
+            return next(run for run in runs if which == run.which)
+
+        def last_line_run(which):
+            backwards = (runs[i] for i in reversed(range(0, len(runs))))
+            return next(run for run in backwards if which == run.which)
+    return end_state_when_many_runs
 
 
+class _EndStateWhenOneRun:
+    def __init__(o, run):
+        which = run.which
+        if 'stderr' == which:
+            o.stderr_lines = run.lines
+            return
+        assert 'stdout' == which
+        o.stdout_lines = run.lines
+
+
+def _partition(lines):
+    itr = ((_downcase[w], line) for w, line in lines)
+    for prev_which, line in itr:
+        cache = [line]
+        break
+
+    def flush():
+        rv = tuple(cache)
+        cache.clear()
+        return _Run(prev_which, rv)
+    for which, line in itr:
+        if prev_which != which:
+            yield flush()
+            prev_which = which
+        cache.append(line)
+    if len(cache):
+        yield flush()
+
+
+_downcase = {'STDERR': 'stderr', 'STDOUT': 'stdout'}
+
+
+class _Run:
+    def __init__(o, w, lz):
+        o.which, o.lines = w, lz
+
+
+def _help_screen_lib():
+    import script_lib.test_support.expect_help_screen as lib
     return lib
 
 
@@ -421,5 +474,6 @@ def xx(msg=None):
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.2
 # #history-A.1 (as referenced)
 # #born.

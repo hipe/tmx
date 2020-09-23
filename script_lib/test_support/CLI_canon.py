@@ -2,7 +2,14 @@
 """
 
 
-class CLI_Canon_Case_Methods:
+def _delegate_to_end_state(orig_f):  # #decorator
+    def use_f(self):
+        return getattr(self.end_state, attr)
+    attr = orig_f.__name__
+    return property(use_f)
+
+
+class CLI_Canon_Assertion_Methods:
 
     # -- assertion methods
 
@@ -15,79 +22,53 @@ class CLI_Canon_Case_Methods:
     def invocation_results_in_this_exitstatus(self, es):
         self.assertEqual(self.end_state.exitstatus, es)
 
-    @property
-    def first_line(self):
-        return self.end_state.first_line
+    @_delegate_to_end_state
+    def first_line():
+        pass
 
-    @property
-    def second_line(self):
-        return self.end_state.second_line
+    @_delegate_to_end_state
+    def second_line():
+        pass
+
+    @_delegate_to_end_state
+    def last_line():
+        pass
 
     # -- these
 
-    def invoke_expecting(self, line_count, which):
-
-        def f(sout, serr):
-            return _invoke_CLI(sout, serr, self)
-
-        return _invocation_via(f, line_count, which, self)
-
-    # --
+    def build_end_state_using_line_expectations(self):
+        return _build_end_state_using_line_expectations(self)
 
 
-# --
+def _build_end_state_using_line_expectations(tc):  # tech demo
 
-def _invoke_CLI(stdout, stderr, tc):
+    from . import expect_STDs as lib
+    rcv1 = lib.build_write_receiver_for_debugging('DBG: ', lambda: tc.do_debug)
+    rcv2, lines = lib.build_write_receiver_for_recording_and_lines()
 
-    _argv = (tc.long_program_name, *tc.given_argv_tail())
-    _children = tc.given_children_CLI_functions()
+    def recv(s):
+        rcv1(s)
+        rcv2(s)
 
-    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
-    return cheap_arg_parse_branch(
-            stdin=None, stdout=stdout, stderr=stderr, argv=_argv,
-            children_CLI_functions=_children)
+    def wild_hack_of_tup(tup):
+        if isinstance(tup, str):
+            tup = (tup,)
+        assert(all((k in _keywords) for k in tup))
+        return (*tup, recv)
 
+    exps = tuple(wild_hack_of_tup(tup) for tup in tc.expected_lines())
+    sout, serr, done = lib.stdout_and_stderr_and_done_via(exps, tc)
 
-def _invocation_via(run, num_lines, which, tc):
-
-    s_a, f_a = __recording_and_recorders(num_lines)
-
-    from script_lib.test_support import expect_STDs
-    _expectation = expect_STDs.expect_lines(f_a, which)
-    perf = _expectation.to_performance_under(tc)
-
-    _sout, _serr = __stdout_and_stderr(perf, tc)
-
-    es = run(_sout, _serr)
+    argv = tc.long_program_name, *tc.given_argv_tail()
+    children = tc.given_children_CLI_functions()
+    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+    es = func(None, sout, serr, argv, children)
     assert(isinstance(es, int))
-
-    perf.finish()
-    return _EndState(es, s_a)
-
-
-def __stdout_and_stderr(perf, tc):
-    if not tc.do_debug:
-        return perf.stdout, perf.stderr
-
-    _sout = _debugging_IO(perf.stdout, '%sohai stdout: %s')
-    _serr = _debugging_IO(perf.stderr, '%sohai stderr: %s')
-    return _sout, _serr
+    done()
+    return _EndState(es, tuple(lines))
 
 
-def _debugging_IO(upstream_IO, fmt):
-    def write(s):
-        sys.stderr.write(fmt % (_eol, s))
-        upstream_IO.write(s)
-    import sys
-    from modality_agnostic.io import write_only_IO_proxy
-    return write_only_IO_proxy(write)
-
-
-def __recording_and_recorders(num_lines):
-    def f(line):
-        s_a.append(line)  # hi.
-    s_a = []
-    return s_a, tuple(f for _ in range(0, num_lines))
+_keywords = {'STDERR', 'STDOUT', 'zero_or_one'}
 
 
 class _EndState:
@@ -104,6 +85,10 @@ class _EndState:
     def first_line(self):
         return self._line(0)
 
+    @property
+    def last_line(self):
+        return self._lines[-1]
+
     def _line(self, offset):
         return self._lines[offset]
 
@@ -119,13 +104,15 @@ class _EndState:
 
 def THESE_TWO_CHILDREN_CLI_METHODS():
 
-    def _the_foo_bar_CLI(stdin, stdout, stderr, argv):
-        long_prog_name, *argv_tail = argv
-        assert(' ' in long_prog_name)
-        head, tail = long_prog_name.split(' ', 1)
-        _basename = head[(head.rindex('/')+1):]
-        _use_pn = f'{_basename} {tail}'
-        stdout.write(f"hello from '{_use_pn}'. args: {repr(argv_tail)}\n")
+    def _the_foo_bar_CLI(stdin, stdout, stderr, argv, enver):  # #[#605.3]
+        prog_name, *argv_tail = argv
+        assert ' ' in prog_name
+        if '/' in prog_name:
+            head, tail = prog_name.split(' ', 1)
+            if '/' in head:
+                head = head[(head.rindex('/')+1):]
+                prog_name = ' '.join((head, tail))
+        stdout.write(f"hello from '{prog_name}'. args: {repr(argv_tail)}\n")
         return 4321
 
     yield 'foo-bar', lambda: _the_foo_bar_CLI

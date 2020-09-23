@@ -1,848 +1,695 @@
+import re
 
 
-def cheap_arg_parse(
-        CLI_function, stdin, stdout, stderr, argv, formal_parameters,
-        description_template_valueser=None, enver=None):
+def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, enver=None):
+    # Trying to be exemplary (if you need to roll your own)
 
-    """
-    NOTE This is still highly experimental: it is almost guaranteed that the
-    API will change (in terms of both function signatures and the exposed
-    function constituency). #history-A.4 was an overhaul of this method to add
-    support for parsing arbitrary options and (non-globbing) positional
-    arguments. Its exit criteria was only that the many involved producer
-    scripts continued to work as they did. #here marks new API experiments or
-    places where we carry over some weaknesses from the previous code.
-    :[#608.L]
-    """
+    bash_argv = list(reversed(argv))
+    long_program_name = bash_argv.pop()
 
-    _syntax_AST = syntax_AST_via_parameters_definition_(formal_parameters)
-    CLI = CLI_via_syntax_AST_(_syntax_AST)
+    def prog_name():
+        return _shorten_long_program_name(long_program_name)
 
-    def when_help(parameter_error):
-        _pn = Renderers_(parameter_error.long_program_name).program_name
-        __write_help_lines(
-                stderr, description_template_valueser,
-                CLI_function.__doc__, _pn, CLI)
+    def formals():
+        yield '-h', '--help', 'This screen'
+        yield '<command> [..]', "One of the below"
 
-    two, mon = _parse_CLI_args(stderr, argv, CLI, when_help)
+    # Marrying the prog_name to the formals lets it emit and invite ~15 errors
+    foz = formals_via_definitions(formals(), prog_name, lambda: cx)
 
-    if two is None:
-        return mon.exitstatus
-    opt_vals, arg_vals = two
+    vals, es = foz.nonterminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
 
-    _ = () if enver is None else (enver,)
-    es = CLI_function(mon, stdin, stdout, stderr, *_, *opt_vals, *arg_vals)
+    # Help is here rather than deeper so we can pass trivially complicated doc
+    if vals.get('help'):
+        for line in foz.help_lines(doc=None):
+            serr.write(line)
+        return 0
 
-    # user can return from the above function any arbitrary exitstatus. also
-    # any arbitary emission could have "set" (elevated) the exitstatus.
-    assert(isinstance(es, int))  # #[#022]
-    mon.see_exitstatus(es)
+    # The Ultra-Sexy Mounting of an Alternation Component:
+    cmd_tup = vals.pop('command')  # our grammar specifies at least one
+    cmd_name, cmd_funcer, es = foz.parse_alternation_fuzzily(serr, cmd_tup[0])
+    if not cmd_name:
+        return es
 
-    return mon.exitstatus
+    ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
+    ch_argv = (ch_pn, * cmd_tup[1:])
+
+    es = cmd_funcer()(sin, sout, serr, ch_argv, lambda: xx('oo fun'))
+    assert isinstance(es, int)
+    return es
 
 
-def _parse_CLI_args(stderr, argv, CLI, when_help=None):  # #testpoint
+def cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals,
+                    enver=None, description_valueser=None):
+    assert not enver  # this will take a little work
+    bash_argv = list(reversed(argv))
+    long_program_name = bash_argv.pop()
 
-    from .magnetics.parser_via_grammar import TokenScanner
-    tox = TokenScanner(argv)
+    def prog_name():
+        return _shorten_long_program_name(long_program_name)
 
-    long_program_name = tox.shift()
+    foz = formals_via_definitions(formals, prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
 
-    from .magnetics import error_monitor_via_stderr
-    mon = error_monitor_via_stderr(stderr)
+    if vals.get('help'):
+        for line in foz.help_lines(do_CLI.__doc__, description_valueser):
+            serr.write(line)
+        return 0
 
-    def listener_for_parse_errors(*a):
-        pe = ParameterError_(a, lambda: long_program_name)
-        if pe.is_request_for_help:
-            return when_help(pe)
-        when_parameter_error(pe)
-
-    def when_parameter_error(parameter_error):
-        write_parameter_error_lines_(stderr, parameter_error)
-        mon.see_exitstatus(456)  # be like 457 in sibling
-
-    two = do_parse_(tox, CLI, listener_for_parse_errors)
-    return two, mon
+    opts, args = foz.sparse_tuples_in_grammar_order_via_consume_values(vals)
+    flat = (sin, sout, serr, *opts, *args, lambda: _rscr(serr, enver))
+    return do_CLI(*flat)
 
 
 def require_interactive(stderr, stdin, argv):
     if stdin.isatty():
         return True
-    o = stderr.write
-    o(f"usage error: cannot read from STDIN.{_eol}")
-    o(Renderers_(argv[0]).invite_line)
+    w = stderr.write
+    w("usage error: cannot read from STDIN.\n")
+    w(_invite_line(argv[0]))
 
 
-class Renderers_:  # centralize how these look & where they are rendered
-
-    def __init__(self, long_program_name):
-        self._long_program_name = long_program_name
-
-    @property
-    def invite_line(self):
-        return f"see '{self.program_name} --help'{_eol}"
-
-    @property
-    def program_name(self):
-        from os.path import dirname, basename
-        use = basename(self._long_program_name)
-        if '__main__.py' == use:
-            use = basename(dirname(self._long_program_name))
-        return use
+def _shorten_long_program_name(long_program_name):
+    pcs = long_program_name.split(' ')
+    from os.path import basename
+    pcs[0] = basename(pcs[0])
+    return ' '.join(pcs)
 
 
-class ParameterError_:  # like listening.emission_via_args
-    # encapsulate the "backend" of our "routing" for emissions so it can
-    # be shared. mainly, centralize the hacky way we trap requests for help
-
-    def __init__(self, a, long_program_namer):
-        severity, shape, error_category, error_case, payloader = a
-        assert('error' == severity)
-        assert('structure' == shape)
-        assert('parameter_error' == error_category)  # not sure
-        self.payload_dictionary = payloader()
-        self.error_case = error_case
-        self._long_program_namer = long_program_namer
-
-    @property
-    def is_request_for_help(self):
-        if 'unrecognized_option' != self.error_case:
-            return False
-        return self.payload_dictionary['token'] in ('-h', '--help')
-
-    @property
-    def long_program_name(self):
-        return self._long_program_namer()
+def _flatten_vals(foz, vals):
+    these = {fo.key: None for fo in foz.formal_options}
+    these.pop('help', None)  # typically not exists only in tests (Case5495)
+    opts = tuple(vals.pop(k, None) for k in these.keys())
+    pop_positional_value = _positional_popper(vals)
+    args = tuple(pop_positional_value(fo) for fo in foz.formal_positionals)
+    assert not vals
+    return opts, args
 
 
-def __write_help_lines(
-        stderr, description_template_valueser,
-        doc_string, program_name, CLI):
-
-    from .magnetics.help_lines_via import desc_lineser_via, help_lines_via
-
-    _descser = desc_lineser_via(description_template_valueser, doc_string)
-
-    for line in help_lines_via(program_name, _descser, CLI.opts, CLI.args):
-        stderr.write(_eol if line is None else f'{line}{_eol}')  # [#607.I]
-
-
-def write_parameter_error_lines_(stderr, pe):
-    _lines = __lines_for_parameter_error(pe.error_case, pe.payload_dictionary)
-    for line in _lines:
-        assert(_eol not in line)  # catch these early for now
-
-        # before #history-A.5 we would put the raw line and the EOL in
-        # two separate calls to `write` (think of the memory savings!);
-        # but the "expect STD's" library we are now targeting wants us
-        # to write only terminated lines for its reasons [#605.2]
-
-        stderr.write(f"{line}{_eol}")
-
-    stderr.write(Renderers_(pe.long_program_name).invite_line)
+def _positional_popper(vals):
+    def pop_positional_value(fo):
+        if fo.is_singular:
+            if fo.is_optional:
+                return vals.pop(fo.key, None)
+            return vals.pop(fo.key)
+        assert fo.is_plural
+        if fo.is_optional:
+            x = vals.pop(fo.key, ())  # maybe didn't reach #here8. (Case5486)
+        else:
+            xx('case woh')
+            x = vals.pop(fo.key)
+        assert isinstance(x, tuple)
+        return x
+    return pop_positional_value
 
 
-def __lines_for_parameter_error(error_case, dct):
+def _rscr(serr, enver):  # rough prototype, needs more design. #history-B.2
+    from .magnetics import error_monitor_via_stderr as func
 
-    opt, arg, token_pos, tok = (None, None, None, None)
-    dct = {k: v for k, v in dct.items()}
-    if 'option' in dct:
-        opt = dct.pop('option')
-        opt_moniker = f"'--{opt.long_name}'"
-    if 'argument' in dct:
-        arg = dct.pop('argument')
-        arg_moniker = __arg_moniker_via(arg.styled_moniker)
-    if 'token_position' in dct:
-        token_pos = dct.pop('token_position')
-    if 'token' in dct:
-        tok = dct.pop('token')
-        tok_moniker = repr(tok)
-    assert(not len(dct))  # get earliest possible warning that stuff is wrong
-    mutable_words = error_case.split('_')
-
-    if opt is not None:
-        assert('option' == mutable_words[0])  # #here5
-        mutable_words[0] = opt_moniker
-    else:
-        assert('option' != mutable_words[0])
-
-    if arg is not None:
-        assert(tok is None)
-        mutable_words.append(arg_moniker)
-
-    if token_pos is None and tok is not None:
-        mutable_words[-1] = f"{mutable_words[-1]}:"  # ick/meh
-        mutable_words.append(tok_moniker)
-
-    yield f"parameter error: {' '.join(mutable_words)}"
-
-    if token_pos is not None:
-        from kiss_rdb.magnetics.string_scanner_via_string import (
-                two_lines_of_ascii_art_via_position_and_line)
-        for s in two_lines_of_ascii_art_via_position_and_line(token_pos, tok):
-            yield s
+    class experimental_resources:  # #class-as-namespace
+        monitor = func(serr)
+    return experimental_resources
 
 
-def __arg_moniker_via(arg_name):
-    import re
-    _md = re.match(r'(?:(<)|([a-z])|([A-Z]))', arg_name)  # #here2
-    has_less_than, is_lowcase, is_upcase = _md.groups()
-    if has_less_than:
-        return arg_name
-    if is_lowcase:
-        return f'<{arg_name}>'  # ..
-    assert(is_upcase)
-    return arg_name
+# == Parse Child Command, Nonterminal Parse & Terminal Parse
+
+def _parse_alternation_fuzzily(foz, serr, arg_slug):
+    matches = []
+    rx = re.compile(''.join(('^', re.escape(arg_slug))))
+    for slug, func in foz.childrener():
+        if arg_slug == slug:
+            return slug, func, None
+        if rx.match(slug):
+            matches.append((slug, func))
+
+    if 1 == (leng := len(matches)):
+        return (* matches[0], None)
+
+    if 0 == leng:
+        serr.write(f'Unrecognized command "{arg_slug}". {foz.invite_line}')
+        return None, None, 9  # #here4
+    assert 1 < leng
+    _ = _ox().oxford_OR(_ox().keys_map(k for k, _ in matches))
+    serr.write(f'Ambiguous command "{arg_slug}". Did you mean {_}?\n')
+    return None, None, 10  # #here4
 
 
-class CLI_via_syntax_AST_:  # #testpoint
+def _nonterminal_parse(foz, bash_argv):
+    # This algorithm is useful for branch nodes that have children but
+    # perhaps parse global options before control is passed to children
 
-    def __init__(self, syntax_AST):
-        # pre-compute things that can be pre-computed
-        opts, args, req_opt_offsets = syntax_AST
-        _two = _build_option_index(opts)
-        self.opt_offset_via_short_name, self.opt_offset_via_long_name = _two
-        self.sequence_grammar = tuple(_sequence_grammar_via_syntax_args(args))
-        self.opts = opts
-        self.args = args
-        self.offsets_of_required_options = req_opt_offsets
+    # First, parse all contiguous, head-anchored options. Fail on any unrecog.
+    assert not foz.offsets_of_required_quote_unquote_options  # no use case
+    parse_option = _build_option_parser(vals := {}, bash_argv, foz)
+    while len(bash_argv) and len(s := bash_argv[-1]) and '-' == s[0]:
+        parse_option()
+    if vals.get('help'):  # #here1
+        return vals, None
+    # Then, parse contiguous positionals only according to your formals
+    _parse_contiguous_positionals(vals, bash_argv, foz.formal_positionals)
+    return vals, None
 
 
-def do_parse_(tox, CLI, listener, stop_ASAP=False):
+def _terminal_parse(foz, bash_argv):
+    # This is the more familiar algorithm where options can be interspersed
+    # with arguments but we have to parse all the way to the end of the input
 
-    from .magnetics.parser_via_grammar import (
-            parser_via_grammar_and_symbol_table,
-            TokenScanner)
+    vals, contiguous_actual_positionals = {}, []
+    parse_option = _build_option_parser(vals, bash_argv, foz)
+    while len(bash_argv):
+        if len(s := bash_argv[-1]) and '-' == s[0]:
+            parse_option()
+            continue
+        contiguous_actual_positionals.append(bash_argv.pop())
+    if vals.get('help'):  # #here1
+        return vals, None
+    if (ofs := foz.offsets_of_required_quote_unquote_options):  # (Case5495)
+        fos = tuple(foz.formal_options[i] for i in ofs)
+        if (missing := tuple(fo for fo in fos if fo.key not in vals)):
+            these = _ox().oxford_AND(_ox().keys_map(fo.long for fo in missing))
+            are = 'is' if 1 == len(missing) else 'are'
+            raise _Stop(f"{these} {are} required", 7)
+    bash_argv = list(reversed(contiguous_actual_positionals))
+    _parse_contiguous_positionals(vals, bash_argv, foz.formal_positionals)
+    if len(bash_argv):
+        raise _Stop(f"Unexpected argument: {repr(bash_argv[-1])}", 8)
+    return vals, None
 
-    inner_parser = parser_via_grammar_and_symbol_table(
-        CLI.sequence_grammar, {
-            'option': lambda: option_parsing,
-            'argument': lambda: argument_parsing})
 
-    def listener_for_inner_parse(*a):
-        severity, shape, error_category, error_case, payloader = a
-        assert('error' == severity)
-        assert('structure' == shape)
-        assert('parse_error' == error_category)
+def _stop_and_invite(orig_f):
+    def use_f(foz, serr, bash_argv):
+        try:
+            return orig_f(foz, bash_argv)
+        except _Stop as stop:
+            msg, exitstatus = stop.args
+            if len(msg) < 40:  # to the bane of tests
+                serr.write(f'{msg}. {foz.invite_line}')
+            else:
+                serr.write(f'{msg}\n')
+                serr.write(foz.invite_line)
+            return None, exitstatus
+    return use_f
 
-        if 'extra_input' == error_case:
-            return when('unexpected_argument')  # (Case5449)
 
-        if 'missing_required' == error_case:
-            dct = payloader()
-            i = dct['offset_in_grammar']
-            assert(1 == i % 2)  # (Case5452)
-            return when('expecting', argument=CLI.args[int(i/2)])
+def _parse_contiguous_positionals(values, bash_argv, faz):
+    special = None  # only ever zero or one special, and must be at end #here3
+    minus_one = (end := len(faz)) - 1
+    if end and faz[minus_one].is_special:
+        special = faz[(end := minus_one)]
 
-        assert(False)
+    # Parse off the simple arguments
+    for fo in (faz[i] for i in range(0, end)):
+        assert fo.is_singular and fo.is_required  # again because #here3
+        if not len(bash_argv):
+            raise _Stop(f"Expecting {fo.moniker}", 5)  # #here5
+        values[fo.key] = bash_argv.pop()
 
-    def main():
+    # If there are no special formals, you're done passive-parsing arguments
+    if not special:
+        return
 
-        # parse
-        big_flat = inner_parser.parse(tox, listener_for_inner_parse, stop_ASAP)
-        if big_flat is None:
-            return  # (Case5442)
+    # If there are no more actual arguments, what happens depends on formals..
+    if not len(bash_argv):
+        # Requirement is checked in same way regardless of arity. (U need >= 1)
+        if special.is_required:  # (Case5643)
+            raise _Stop(f"Expecting {special.moniker}", 6)  # #here5
+        return  # nothing to do. no writing, no failure
 
-        # roll up big flat so it is in formal parameter order (Case5421)
-        opts, args = __two_tuples_via_big_flat(big_flat, CLI.opts, CLI.args)
+    if special.is_plural:
+        values[special.key] = tuple(reversed(bash_argv))  # #here8
+        bash_argv.clear()
+        return
 
-        # this crazy thing with required optionals
-        if len(CLI.offsets_of_required_options):
-            for i in CLI.offsets_of_required_options:
-                if opts[i] is not None:
-                    continue
-                # #here5: must start with 'option'
-                return when('option_is_required', option=CLI.opts[i])
+    values[special.key] = bash_argv.pop()
 
-        return opts, args
 
-    # -- parsing the option expressions
-
-    class option_parsing:  # #class-as-namespace
-
-        def match_by_peek_as_subparser(_t):
-            return token_looks_like_option(tox.peek)
-
-        def parse_as_subparser(_t, _l):
-            return parse_option()
+def _build_option_parser(values, bash_argv, foz):
 
     def parse_option():
-
-        chars = TokenScanner(tox.peek)  # YIKES but it works well
-        assert('-' == chars.shift())  # skip over first '-'
-        assert(not chars.is_empty)
-
-        tup = parse_formal_option(chars)
-        if tup is None:
-            return
-        is_short, opt_offset = tup
-        opt = CLI.opts[opt_offset]
-
-        # does the formal option take an argument? parse accordingly for yes/no
-
-        has_stuff_after = not chars.is_empty
-        if opt.takes_argument:
-            if has_stuff_after:
-                if is_short:
-                    wv = short_takes_arg_and_not_done_with_tok(chars)
-                else:
-                    wv = long_takes_arg_and_not_done_with_token(chars)
-            else:
-                wv = short_or_long_takes_arg_and_done_with_token(opt)
-        elif has_stuff_after:
-            if is_short:
-                return parse_flagball(chars, opt_offset)
-            return when('flag_option_must_have_nothing_after_it', chars)
+        if '-' == re.match('-(.)', tok := bash_argv[-1])[1]:
+            parse_long(tok)
         else:
-            # is flag, formally and actually
-            tox.advance()  # (Case5428)
-            wv = (True,)  # #wrapped-AST-value # #option-value:for-flag
-        if wv is None:
-            return
-        # unwrap the wrapped value to get the value. then re-wrap it crazily
-        value, = wv
-        # #option-value #option-slot-values #wrapped-AST-value
-        return (((opt_offset, value),),)
+            parse_short(tok)
 
-    def parse_flagball(chars, opt_offset):
-        # Multiple formal options can be in one token. It seems that other
-        # parsers typically support the mixed-style where a jumble of short
-        # flags can occur before one short-form arg-taking expression, all in
-        # the same token. We intentionally do *not* support this form because
-        # we find it aesthetically upsetting for a savings of only 2 chars.
+    def parse_long(tok):
+        stem = (md := re.match('--([^=]*)(?:=(.*))?$', tok))[1]
+        if (i := offset_via_long_stem.get(stem)) is None:
+            return no(f"Unrecognized option '--{stem}'", 11)
+        if (fo := formal_options[i]).takes_argument:
+            return parse_long_that_takes_argument(md, fo)
+        if md[2] is not None:
+            return no(f'{fo.long} does not take an argument', 12)
+        fo.set_or_increment_value(values)
+        if 'help' == fo.key:
+            return bash_argv.clear()  # #here1
+        bash_argv.pop()
 
-        these = []  # #option-slot-values
-        while True:
-            these.append((opt_offset, True))  # #option-value:for-flag
-            if chars.is_empty:  # never the first time
+    def parse_long_that_takes_argument(md, fo):
+        if (val := md[2]) is not None:
+            if 0 == len(val):  # (Case5463)
+                return no(f"Equals sign must have content after it: '{fo.long}='", 13)  # noqa: E501
+            bash_argv.pop()
+            return fo.set_or_append_value(values, val)
+        fo.set_or_append_value(values, parse_value(fo, 'long'))
+
+    def parse_short(tok):  # we call this a "ball" of options
+        fo = fo_via_char(tok[1])
+        if fo.takes_argument:
+            return parse_short_that_takes_argument(fo, tok)
+        bash_argv.pop()  # pretend you handled it already. you return below
+        i, leng = 1, len(tok)
+        while True:  # (Case5484): now that you have a flag, all others must b
+            fo.set_or_increment_value(values)
+            if 'help' == fo.key:
+                return bash_argv.clear()  # #here1
+            i += 1
+            if leng == i:
                 break
-            opt_offset = CLI.opt_offset_via_short_name.get(chars.peek, None)
-            if opt_offset is None:
-                return when('unrecognized_option', chars)  # (Case5480)
-            if CLI.opts[opt_offset].takes_argument:
-                return when(
-                  'cannot_mix_flags_and_optional_arguments_in_one_token',
-                  chars)  # (Case5477)
-            chars.advance()
-        tox.advance()
-        return (these,)  # #wrapped-AST-value
+            pf = fo
+            fo = fo_via_char(tok[i])
+            if fo.takes_argument:
+                no((f"Can't mix flags and arg-takers in one ball of opts: "
+                    f"'{pf.short}' then '{fo.short}'"), 16)
 
-    def long_takes_arg_and_not_done_with_token(chars):
-        if '=' != chars.peek:
-            return when('expecting_equals_sign', chars)  # (Case5424)
-        chars.advance()  # (Case5428)
-        if chars.is_empty:
-            # suggest = if you want empty string, pass as separate token
-            when('equals_sign_must_have_content_after_it', chars)
-            return  # (Case5463)
-        return flush_the_rest(chars)
+    def fo_via_char(char):
+        if (i := offset_via_short_char.get(char)) is None:
+            return no(f"Unrecognized option: '-{char}'", 17)
+        return formal_options[i]
 
-    def short_takes_arg_and_not_done_with_tok(chars):
-        return flush_the_rest(chars)  # #hi. (Case5431)
+    def parse_short_that_takes_argument(fo, tok):
+        if 2 < len(tok):
+            fo.set_or_append_value(values, tok[2:])
+            return bash_argv.pop()
+        fo.set_or_append_value(values, parse_value(fo, 'short'))
 
-    def flush_the_rest(chars):
-        tox.advance()
-        return (chars.flush_the_rest(),)  # #wrapped-AST-value
+    def parse_value(fo, short_or_long):
+        lns = ('long', 'short').index(short_or_long)  # lns = long not short
+        if 1 == len(bash_argv):
+            no(f"Expecting argument for {fo.long}", 14 if lns else 18)
+        if len(tok := bash_argv[-2]) and '-' == tok[0]:
+            moni, es = getattr(fo, short_or_long), 15 if lns else 19
+            no(f"Value looks like option for {moni}. Use {fo.long}=..", es)
+        bash_argv.pop()
+        return bash_argv.pop()
 
-    def short_or_long_takes_arg_and_done_with_token(opt):
-        # as long: (Case5421)  when short: (Case5435)
-        tox.advance()
-        if tox.is_empty:
-            when('option_requires_argument', option=opt)
-            return  # (Case5456)
-        tok = tox.peek
-        if token_looks_like_option(tok):
-            when('option_value_looks_like_option', option=opt)
-            return  # (Case5470)
-        tox.advance()
-        return (tok,)  # #wrapped-AST-value
+    def no(msg, exitstatus):
+        raise _Stop(msg, exitstatus)  # #here4
 
-    def parse_formal_option(chars):
-        # if the token starts with '--'..
-        if '-' == chars.peek:
-            chars.advance()
+    offset_via_short_char = foz.offset_via_short_char
+    offset_via_long_stem = foz.offset_via_long_stem
+    formal_options = foz.formal_options
 
-            # is the string after the "--" well-formed as an option name?
-            md = long_name_rx.match(chars.tokens, pos=chars.pos)
-            if md is None:
-                # suggest expecting a-zA-Z0-9 etc
-                return when('malformed_option_name', chars)  # (Case5438)
-            long_name = md[0]
-            _beg, end = md.span()
+    return parse_option
 
-            # can you resolve a particular formal option from it?
-            i = CLI.opt_offset_via_long_name.get(long_name, None)
-            if i is None:
-                return when('unrecognized_option')  # (Case5442)
-            chars.advance_to_position(end)
-            is_short = False
+
+# == Render Help
+
+def _help_lines(foz, doc=None, description_valueser=None):
+    # absorbed a whole file at #history-B.2
+
+    pcs, maxi = [foz.program_name], 0
+    opt_rows, arg_rows, cx_rows = [], [], []
+
+    for fo in foz.formal_options:
+        moniker = fo._long_for_column_B()
+        leng = len(moniker)
+        if maxi < leng:
+            maxi = leng
+        pcs.append(f'[{fo.short_for_help}]')
+        opt_rows.append(((fo.short or ''), moniker, fo.descs[0]))
+
+    for fo in foz.formal_positionals:
+        leng = len(fo.moniker)
+        if maxi < leng:
+            maxi = leng
+        pcs.append(fo.surface_expression)
+        arg_rows.append(('', fo.moniker, fo.descs[0]))
+
+    yield ''.join(('usage: ', (' '.join(pcs)), '\n'))
+
+    for key, funcer in (cx() if (cx := foz.childrener) else ()):
+        func = funcer()
+        ch_doc = func.__doc__ or f"(the '{key}' command)"
+        desc = re.match(r'^[^\n]+', ch_doc)[0]
+        leng = len(key)
+        if maxi < leng:
+            maxi = leng
+        cx_rows.append(('', key, desc))
+
+    if doc and len(doc):
+        if description_valueser:
+            doc = doc.format(** description_valueser())
+        if '\n' in doc:
+            itr = (md[1] for md in re.finditer('(.+\n)[ ]*', doc))
         else:
-            # the token starts with '-' not '--' and is not "-"
-            i = CLI.opt_offset_via_short_name.get(chars.peek, None)
-            if i is None:
-                return when('unrecognized_option')  # (Case5445)
-            chars.advance()
-            is_short = True
-        return is_short, i
+            itr = iter((f'{doc}\n',))  # (Case5519)
 
-    import re
-    long_name_rx = re.compile(_long_name_rxs)
+        yield '\n'
+        yield f"description: {next(itr)}"
+        for line in itr:
+            yield f"  {line}"  # indent might go away, idk
 
-    # -- parsing the argument expressions
-
-    class argument_parsing:  # #class-as-namespace
-
-        def match_by_peek_as_subparser(_t):
-            return not token_looks_like_option(tox.peek)
-
-        def parse_as_subparser(_t, _l):
-            return (tox.shift(),)  # (Case5421)
-
-    def token_looks_like_option(tok):
-        leng = len(tok)
-        if 0 == leng:
+    def lines_for_section(label, rows):
+        if not len(rows):
             return
-        if '-' != tok[0]:
-            return
-        if 1 == leng:
-            assert('-' == tok)
-            return  # #todo not covered - pass thru dash as valid arg value
-        return True
+        yield '\n'
+        yield f"{label}:\n"
+        for three in rows:
+            yield format_string % three
 
-    # -- whiners
+    if maxi:
+        format_string = f'  %2s  %{maxi}s    %s\n'
 
-    def when(error_case, character_scanner=None, option=None, argument=None):
-        def structer():
-            dct = {}
-            if option is not None:
-                dct['option'] = option
-            if argument is not None:
-                dct['argument'] = argument
-            if character_scanner is not None:
-                tokens = character_scanner.tokens
-                if character_scanner.is_empty:
-                    use_pos = len(tokens)  # point at the spot after it (cov'd)
-                else:
-                    use_pos = character_scanner.pos
-                dct['token'] = tokens
-                dct['token_position'] = use_pos
-            elif not tox.is_empty:
-                dct['token'] = tox.peek
-            return dct
-        listener('error', 'structure', 'parameter_error', error_case, structer)
-    return main()
+    for line in lines_for_section('option(s)', opt_rows):
+        yield line
+
+    for line in lines_for_section('argument(s)', arg_rows):
+        yield line
+
+    if len(cx_rows):
+        for line in lines_for_section(f'{fo.key}(s)', cx_rows):  # big flex
+            yield line
 
 
-def _build_option_index(opts):
-    # associate every short name and every long name back to a formal option
+# == Parse Formals
 
-    opt_offset_via_short_name = {}
-    opt_offset_via_long_name = {}
+def formals_via_definitions(definitions, prog_namer=None, cxer=None):
+    def main():
+        parse_zero_or_more_formal_options()
+        parse_zero_or_more_formal_positionals()
 
-    for i in range(0, len(opts)):
-        opt = opts[i]
-        s = opt.short_name
-        if s is not None:
-            assert(s not in opt_offset_via_short_name)  # ..
-            opt_offset_via_short_name[s] = i
-        s = opt.long_name
-        assert(s not in opt_offset_via_long_name)  # ..
-        opt_offset_via_long_name[s] = i
+    def parse_zero_or_more_formal_positionals():
+        while len(vertical_stack):
+            fo = parse_formal_positional(vertical_stack.pop())
+            if fo.is_special and len(vertical_stack):  # #here3
+                _no(f"optional or plural positional can only occur at end: '{fo.surface_expression}'")  # noqa: E501
+            formal_posis.append(fo)
 
-    return opt_offset_via_short_name, opt_offset_via_long_name
+    def parse_zero_or_more_formal_options():
+        while len(vertical_stack):
+            if '-' != vertical_stack[-1][0][0]:
+                break
+            parse_formal_option(vertical_stack.pop())
 
+    def parse_formal_option(definition):
+        fp = do_parse_formal_option(definition)
+        offset = len(formal_opts)
+        if fp.is_required:
+            required_options.append(offset)  # (Case5495)
+        if (k := fp.short_char):
+            assert k not in offset_via_short_char
+            offset_via_short_char[k] = offset
+        assert fp.long_stem not in offset_via_long_stem
+        offset_via_long_stem[fp.long_stem] = offset
+        formal_opts.append(fp)
 
-# == the trick with winding and unwinding the thing
+    do_parse_formal_option = _build_formal_option_parser()
+    parse_formal_positional = _build_formal_positional_parser()
 
-def __two_tuples_via_big_flat(big_flat, opts, args):
-    """`big_flat` is a tuple of the actual values whose structure matches
+    offset_via_short_char, offset_via_long_stem, required_options = {}, {}, []
+    formal_opts, formal_posis = [], []
+    vertical_stack = list(reversed(tuple(definitions)))
+    main()
 
-    the sequence grammar produced at #here3. Here we "decode" what was
-    "encoded" there: re-arrange the actuals so they are in two tuples: one for
-    options and one for arguments. (Both tuples have a length and structure
-    derived from the user's formal params.)
-    """
+    class formals_index:  # "foz"
+        childrener = property(lambda _: cxer) if cxer else None
+        sparse_tuples_in_grammar_order_via_consume_values = _flatten_vals
+        offsets_of_required_quote_unquote_options = tuple(required_options)
+        formal_options = tuple(formal_opts)
+        formal_positionals = tuple(formal_posis)
 
-    actual_options = [None for _ in range(0, len(opts))]
-    actual_arguments = []
-    tuplize_these = []
+    cls = formals_index
+    cls.offset_via_short_char = offset_via_short_char
+    cls.offset_via_long_stem = offset_via_long_stem
 
-    def see_actual_options(option_slots_values):
-        if option_slots_values is None:
-            return
-        # one syntax can have many slots where expressions can go. each slot
-        # can have many expressions of option value. so, loop inside loop.
-        for option_slot_values in option_slots_values:  # #option-slot-values
-            for opt_offset, value in option_slot_values:  # #option-value
-                formal = opts[opt_offset]
-                if formal.is_plural:
-                    if formal.takes_argument:
-                        if actual_options[opt_offset] is None:
-                            actual_options[opt_offset] = []
-                            tuplize_these.append(opt_offset)
-                        actual_options[opt_offset].append(value)
-                        continue
-                    if actual_options[opt_offset] is None:
-                        actual_options[opt_offset] = 0
-                    actual_options[opt_offset] += 1
-                    continue
-                actual_options[opt_offset] = value
+    if prog_namer:
+        cls.parse_alternation_fuzzily = _parse_alternation_fuzzily
+        cls.nonterminal_parse = _stop_and_invite(_nonterminal_parse)
+        cls.terminal_parse = _stop_and_invite(_terminal_parse)
+        cls.help_lines = _help_lines
+        cls.invite_line = property(lambda _: _invite_line(prog_namer()))
+        cls.program_name = property(lambda _: prog_namer())
 
-    def see_actual_argument(decoded_value):
-        actual_arguments.append(decoded_value)  # hi.
-
-    _ = __do_two_tuples_via_big_flat(big_flat, opts, args)
-    do_this = {
-            'actual_options': see_actual_options,
-            'actual_argument': see_actual_argument,
-            }
-    for which, payload in _:
-        do_this[which](payload)
-
-    assert(len(actual_arguments) == len(args))
-
-    for i in tuplize_these:
-        actual_options[i] = tuple(actual_options[i])
-
-    return tuple(actual_options), tuple(actual_arguments)
+    return formals_index()
 
 
-def __do_two_tuples_via_big_flat(big_flat, opts, args):  # see caller
-
-    num_args = len(args)
-    has_glob = args[-1].is_plural if num_args else False
-
-    if has_glob:
-        use_num_args = num_args - 1  # traversal stops before
-    else:
-        use_num_args = num_args
-
-    use_num_terms = 1 + 2 * use_num_args  # exactly #here4
-
-    if has_glob:
-        assert(len(big_flat) == use_num_terms + 1)
-    else:
-        assert(len(big_flat) == use_num_terms)
-
-    yield 'actual_options', big_flat[0]  # at least one per #here4
-
-    for i in range(1, use_num_terms, 2):
-        yield 'actual_argument', big_flat[i]
-        yield 'actual_options', big_flat[i + 1]
-
-    if not has_glob:
-        return
-
-    glob_value = big_flat[-1]
-    sub_yield = []
-    for arg_value_item, option_slot_values in (glob_value or ()):
-        yield 'actual_options', option_slot_values
-        sub_yield.append(arg_value_item)
-
-    yield 'actual_argument', tuple(sub_yield)
+def _invite_line(prog_name):
+    return f'Use "{prog_name} -h" for help\n'
 
 
-def _sequence_grammar_via_syntax_args(args):
-    """The bulk of this module's workload is concerned with realizing the
+# == Parse Formal Positional
 
-    client's target CLI syntax by encoding it into a "sequence grammar", then
-    using that sequence grammar to parse user input, then taking the resulting
-    AST and decoding it back into a structure that the client can recognize
-    by associating actual values with formal parameters from the syntax.
+def _build_formal_positional_parser():  # #testpoint
+    # A regular formal positional is required and not plural. But these two
+    # characteristics ("imperity" and arity) are here conceived of as boolean
+    # meta-parameters, both of which may flip freely, producing four
+    # permutations of sensible and allowed form, which we use these shorthand
+    # names for: "regular", "glob", "required plural" & "optional positional".
+    # Furthermore we now support two styles of surface expression of these:
+    #
+    # | which               |  classic way  |        🆒 🆕 way
+    # | glob                |       <foo>*  |   "[<foo> [..]]"
+    # | required plural     |       <foo>+  |     "<foo> [..]"
+    # | optional positional |       <foo>?  |        "[<foo>]"
 
-    For a simple two-arg syntax, the sequence grammar we want is:
-    `opt* arg1 opt* arg2 opt*`.
+    def parse_formal_positional(definition):  # #here7
+        expression, *descs = definition
 
-    (`*` (kleene-star) means "zero or more of the previous thing".)
+        # First, parse off the brackets in "<foo> [..]" or "[<foo> [..]]"
+        pair = _recursively_parse_formal_positional_expression(expression)
+        is_plural, is_required, moniker = _is_plural_is_required_moniker(pair)
 
-    The sequence grammar is peppered with so many `opt*` terms (one at each
-    outer boundary and one at each joint between positional arguments) so
-    that we can parse options passed "anywhere" in the input: at the front,
-    at the end, or between any two adjacent positional arguments.
+        # Then,
+        if not (md := rx.match(moniker)):
+            _no(f"Expecting formal positional expression. Had: {repr(moniker)}")  # noqa: E501
 
-    We can generalize this approach to all N-arg syntaxes with either:
+        # We don't care if u "<foo>" or "foo" or "FOO" but make sure "<>" balan
+        lt, stem, gt, kleene = md.groups()
+        if 1 < len(set((s is None) for s in (lt, gt))):  # (F, F) or (T, T)
+            _no(f"Unbalanced '<' '>'. Need \"<{stem}>\" or \"{stem}\" had \"{stem}\"")  # noqa: E501
 
-        opt* (arg opt*){N}
-    or
-        (opt* arg){N} opt*
+        if kleene is not None:
+            if is_plural or not is_required:
+                _no("Can't use square a bracket form AND a kleene operator ('{kleene}'). Had: {repr(expression)}")  # noqa: E501
+            if '*' == kleene:
+                is_plural, is_required = True, False
+            elif '+' == kleene:
+                is_plural = True
+            else:
+                assert '?' == kleene
+                is_required = False
+            moniker = ''.join(((lt or ''), stem, (gt or '')))  # get kleene out
 
-    We use the former just for better code narrative, so we ease-in to
-    complexity.
+        return _FormalPositional(
+            stem, moniker, descs, is_required, is_plural, expression)
 
-    Our sequence grammar system does not have the ability to express that
-    a grammatical term should be repeated some specific N number of times
-    (because, in part, it's straightforward to write this out "by hand" (when
-    you are writing your grammar by hand)).
+    rx = re.compile(r'''^
+        (?P<less_than><)?                               # maybe starts with "<"
+        (?P<stem>    (?: [a-z][a-z0-9]*(?:-[a-z0-9]+)* )   # "foo-bar" or
+                   | (?: [A-Z][a-z0-9]*(?:_[A-Z0-9]+)* ))  # "FOO_BAR"
+        (?P<greater_than>>)?                            # maybe ends with ">"
+        (?P<kleene_style_arity_expression>[*+?])?$
+    ''', re.VERBOSE)
 
-    As such, essentially all we're doing here is taking some non-negative
-    integer N and exploding it into a sequence grammar according to above.
+    return parse_formal_positional  # #here7
 
-    Note that even for a syntax of zero positional arguments, the generated
-    sequence grammar will still have one `opt*` term. :#here4
 
-    Syntaxes with a glob term (i.e plural, min zero or one, must be at end)
-    are more complictaed. We introduced "sub-expressions" for this
-    (at #history-A.6). This syntatical feature is expressed here as
-    either `( arg opt* )+` or `( arg opt* )*`, at the end.
-    """  # :#here3
+def _is_plural_is_required_moniker(pair):
 
-    yield 'zero or more'
-    yield 'option'
-    if not len(args):
-        return
-    if args[-1].is_plural:
-        *non_globs, glob = args
-        has_glob = True
-    else:
-        non_globs = args
-        has_glob = False
-    for arg in non_globs:
-        assert(arg.is_plural is False)
-        yield 'one'
-        yield 'argument'
-        yield 'zero or more'
-        yield 'option'
-    if has_glob:
-        if '*' == glob.arity_string:
-            yield 'zero or more'
+    # If right side is none, it's a plain old positional. "<arg>"
+    if pair[1] is None:
+        return False, True, pair[0]
+
+    # Currently the innermost moniker of the expression must be an ellipsis
+    _monikers_recursive(monks := [], pair)
+    if monks[-1] not in ('..', '…', '...'):
+        _no("Currently, the innermost moniker of a nested optional positional"
+            f"expression must be an ellipsis. Had: {repr(monks[-1])}")
+
+    # If left side is empty string, the whole thing is contained in []
+    whole_thing_is_optional = 0 == len(pair[0])
+
+    # To support the "[<foo> [<bar> [<baz>]]]" form would be novel but there's
+    # no real-world case yet. Currently we target (only) these three #here6.
+    here = 1 if whole_thing_is_optional else 0
+    nominitive_monikers = monks[here:-1]
+    if 1 < len(uniq := set(nominitive_monikers)):
+        # (Case_5405) flickers if we don't keep the below in surface order
+        ordered = sorted(uniq, key=lambda k: nominitive_monikers.index(k))
+        _ = ''.join(('Had: (', ', '.join(_ox().keys_map(ordered)), ')'))
+        _no("Currently there's no support for multiple optional positionals. "
+            f"All monikers in a positional expression must be the same. {_}")
+
+    if whole_thing_is_optional:  # "[<arg> [..]]"
+        return True, False, monks[here]
+
+    # If left side is not empty string, it's required "<arg> [<arg> [..]]"
+    return True, True, monks[here]
+
+
+def _monikers_recursive(monikers, pair):
+    left, right = pair
+    monikers.append(left)  # maybe empty string
+    if right is not None:
+        _monikers_recursive(monikers, right)
+
+
+def _recursively_parse_formal_positional_expression(string):
+    # Generalize these forms (#here6):
+    #
+    #   - required plural:      <file> [<file> [..]]
+    #   - glob:                 [<command> [..]]
+    #   - regular positional:   <arg>
+
+    if ']' != string[-1]:
+        return string, None  # base case
+
+    # Get the zero or more head content
+    md = re.match(r'^([^ \[]*) ?\[', string)
+    left = md[1]
+    right_string = string[md.span()[1]:-1]
+    right = _recursively_parse_formal_positional_expression(right_string)
+    return left, right
+
+
+# == Parse Formal Option
+
+def _build_formal_option_parser():
+    def parse_formal_option(definition):  # #here7
+        dstack = list(reversed(definition))
+        tok, short, short_char = dstack[-1], None, None
+        is_required, is_plural = False, False
+
+        # Zero or one short
+        if (md := re.match('^-((?!-).+)', tok)):  # '^-' followed by not '-'
+            if not re.match('^[a-zA-Z]$', short_char := md[1]):
+                _no(f"Can't support a short switch like this yet: {repr(tok)}")
+            short = dstack.pop()
+            tok = dstack[-1]  # ..
+
+        # The long expression
+        if not (md := rx.match(tok)):
+            _no(f"Expecting long switch expression, had: {repr(tok)}")
+        long_stem, arg_moniker, arity_or_imperity = md.groups()
+        longg = dstack.pop()
+
+        if arity_or_imperity is None:
+            pass
+        elif '*' == arity_or_imperity:
+            is_plural = True  # (Case5489)
+        elif '!' == arity_or_imperity:  # justified in (Case5495)
+            if not arg_moniker:
+                _no(f"'!' cannot be used on flags, only on options that "
+                    f"take arguments. Had: '{longg}'")  # (Case5494)
+            is_required = True
         else:
-            assert('+' == glob.arity_string)
-            yield 'one or more'
-        yield '('
-        yield 'one'
-        yield 'argument'
-        yield 'zero or more'
-        yield 'option'
-        yield ')'
+            assert '+' == arity_or_imperity  # (Case
+            xx('case this')
+            is_required, is_plural = True, True
+
+        # One or more descs
+        if not len(dstack):
+            _no(f"For now, always supply description ({short or longg})")
+
+        descs = tuple(reversed(dstack))
+
+        return _FormalOption(
+            short_char, long_stem, arg_moniker, descs, is_required, is_plural)
+
+    rx = re.compile(r'''^
+      --(?P<stem>  [a-z][a-z0-9]* (?: -[a-z][a-z0-9]* )* )
+      (?: =
+        (?P<arg_moniker>
+            [a-z][a-z0-9]+(?:-[a-z][a-z0-9]+)*    # dashes IFF all lowercase
+          | [A-Z][A-Z0-9]*(?:_[A-Z][A-Z0-9]+)* )  # underscores IFF all upper
+      )?      # we allow ☝️ a single-character name IFF it's upper (Case5495)
+      (?P<arity_or_imperity>  [!*+]  )?
+    $''', re.VERBOSE)
+
+    return parse_formal_option
 
 
-# ==
+# == Model
 
-def syntax_AST_via_parameters_definition_(tups):  # #testpoint
-    opts, args, req_opt_offsets = __first_pass(tups)
+class _FormalOption:
+    def __init__(o, sc, ls, am, ds, ir, ip):
+        o.short_char, o.long_stem, o.arg_moniker, o.descs = sc, ls, am, ds
+        o.is_required, o.is_plural, o.is_singular = ir, ip, not ip
+        o.takes_argument = o.arg_moniker is not None
+        o.key = o.long_stem.replace('-', '_')
 
-    # check that any glob is in the right place
-    leng = len(args)
-    for i in range(0, leng):
-        if not args[i].is_plural:
-            continue
-        if i == (leng - 1):
-            break
-        _ = args[i].formal_name
-        _msg = f"plural positional args can only occur at the end: '{_}'"
-        raise FormalParametersSyntaxError(_msg)
+    def set_or_append_value(o, vals, val):
+        if o.is_singular:
+            vals[o.key] = val
+            return
+        if o.key not in vals:
+            vals[o.key] = []
+        vals[o.key].append(val)
 
-    return opts, args, req_opt_offsets
-
-
-def __first_pass(tups):
-
-    from .magnetics.parser_via_grammar import (
-        parser_via_grammar_and_symbol_table,
-        TokenScanner)
-
-    parser = parser_via_grammar_and_symbol_table(
-            ('zero or more', 'option',
-             'zero or more', 'argument'),
-            {'option': lambda: FormalOptionParser(),
-             'argument': lambda: FormalPositionalArgumentParser()})
-
-    class Crazee:
-        def __init__(self):
-            self._parser = None
-
-        def parse_as_subparser(self, tox, listener):
-            _subtox = TokenScanner(tox.peek)
-            x = self.parser.parse(_subtox, listener)
-            if x is None:
-                return
-            tox.advance()
-            return (x,)
-
-        @property
-        def parser(self):
-            if self._parser is None:
-                self._parser = self.build_parser()
-            return self._parser
-
-    class FormalOptionParser(Crazee):
-
-        def match_by_peek_as_subparser(self, tox):
-            first_token = tox.peek[0]  # it's a matrix of strings
-            if looks_like_short_rx.match(first_token):
-                return True
-            return looks_like_long_rx.match(first_token)
-
-        def build_parser(self):
-            return parser_via_grammar_and_symbol_table(
-                ('any', 'short', 'one', 'long', 'one or more', 'desc'),
-                {'short': lambda: formal_short_parser,
-                 'long': lambda: formal_long_parser,
-                 'desc': lambda: desc_parser})
-
-    class FormalPositionalArgumentParser(Crazee):
-
-        def match_by_peek_as_subparser(self, tox):
-            return formal_positional_arg_name_head_rx.match(tox.peek[0])
-
-        def build_parser(self):
-            return parser_via_grammar_and_symbol_table(
-                ('one', 'arg name', 'one or more', 'desc'),
-                {'arg name': lambda: arg_name_parser,
-                 'desc': lambda: desc_parser})
-
-    class formal_short_parser:
-
-        def match_by_peek_as_subparser(tox):
-            return looks_like_short_rx.match(tox.peek)
-
-        def parse_as_subparser(tox, listener):
-            return (formal_short_rx.match(tox.shift())[1],)  # ..
-
-    class formal_long_parser:
-
-        def match_by_peek_as_subparser(tox):
-            return looks_like_long_rx.match(tox.peek)
-
-        def parse_as_subparser(tox, listener):
-            md = formal_long_rx.match(tox.peek)
-            if md is None:
-                _ = f'long option has invalid character(s): {repr(tox.peek)}'
-                raise FormalParametersSyntaxError(_)
-            tox.advance()
-            return (md.groups(),)
-
-    class arg_name_parser:
-
-        def match_by_peek_as_subparser(tox):
-            return formal_positional_arg_name_head_rx.match(tox.peek[0])
-
-        def parse_as_subparser(tox, listener):
-            md = formal_positional_arg_name_rx.match(tox.peek)
-            if md is None:
-                _ = f'argument name has invalid character(s): {repr(tox.peek)}'
-                raise FormalParametersSyntaxError(_)
-            tox.advance()
-            return ((md[1], md[2]),)  # #NT_formal_positional_arg
-
-    class desc_parser:  # #class-as-namespace
-
-        def match_by_peek_as_subparser(tox):
-            return looks_like_desc_rx.match(tox.peek)
-
-        def parse_as_subparser(tox, _listener):
-            return (tox.shift(),)  # #wrapped-AST-value
-
-    import re
-    o = re.compile
-    looks_like_short_rx = o('-[a-zA-Z]')
-    formal_short_rx = o('-([a-zA-Z])$')
-    looks_like_long_rx = o('--[a-z][-a-z]')  # ..
-    formal_long_rx = o(f'--({_long_name_rxs})(?:=([_A-Z0-9]+))?([*!])?$')
-    looks_like_desc_rx = o('[a-zA-Z(«]')  # ..
-    formal_positional_arg_name_head_rx = o('[a-zA-Z<]')
-
-    # == BEGIN :#here2:
-    _A = f'<{_lowcase}(?:-{_either_or})*>'
-    _B = f'{_upcase}(?:_{_upcase})*'
-    _C = f'{_lowcase}(?:-{_lowcase})*'  # might deprecate
-
-    formal_positional_arg_name_rx = o(fr'({_A}|{_B}|{_C})([*+])?$')
-    # #NT_formal_positional_arg
-    # == END
-
-    from modality_agnostic import listening
-    listener = listening.throwing_listener
-
-    req_opt_offsets = []
-
-    opts, args = parser.parse(TokenScanner(tups), listener)
-
-    a = []
-    for opt_parts in (opts or ()):
-        short_name, (long_name, meta_var, arity_string), descs = opt_parts
-        formal = FormalOption_(
-                short_name, long_name, meta_var, arity_string, descs)
-        if formal.is_required:
-            req_opt_offsets.append(len(a))
-        a.append(formal)
-    opts = tuple(a)
-
-    args = tuple(_FormalArgument(*arg_parts) for arg_parts in (args or ()))
-
-    return opts, args, req_opt_offsets
-
-
-class FormalOption_:
-
-    def __init__(self, short_name, long_name, meta_var, arity_string, descs):
-
-        if arity_string is None:
-            self.is_plural = False
-        elif '*' == arity_string:
-            # arg-taking form ok, flag form ok
-            self.is_plural = True
-        else:
-            assert('!' == arity_string)
-            if meta_var is None:
-                _msg = (f"'!' cannot be used on flags, only optional fields "
-                        f"('--{long_name}')")
-                raise FormalParametersSyntaxError(_msg)
-            self.is_required = True
-            self.is_plural = False
-
-        if short_name is not None:
-            assert(1 == len(short_name))
-
-        self.short_name = short_name
-        self.long_name = long_name
-        self.meta_var = meta_var
-        self.arity_string = arity_string
-        self.description_lines = descs
+    def set_or_increment_value(o, vals):  # for flags (incrementing and not)
+        if o.is_singular:
+            vals[o.key] = True
+            return
+        if o.key not in vals:
+            vals[o.key] = 0
+        vals[o.key] += 1
 
     @property
-    def takes_argument(self):
-        return self.meta_var is not None  # meh
+    def short_for_help(o):
+        head = o.short if o.short_char else o.long
+        tail = '=X' if o.takes_argument else ''
+        return ''.join((head, tail))
 
-    is_required = False
-
-
-class _FormalArgument:
-
-    def __init__(self, styled_moniker_and_arity, descs):  # ..
-        self.styled_moniker, self.arity_string = styled_moniker_and_arity
-
-        if self.arity_string is None:
-            self.is_plural = False
-        else:
-            assert self.arity_string in ('+', '*')
-            self.is_plural = True
-
-        # #NT_formal_positional_arg
-        self.description_lines = descs
+    def _long_for_column_B(o):
+        return ''.join((o.long, *(('=', o.arg_moniker) if o.takes_argument else ())))  # noqa: E501
 
     @property
-    def formal_name(self):
-        if self.arity_string is None:
-            return self.styled_moniker
-        return f"{self.styled_moniker}{self.arity_string}"
+    def long(o):
+        return f"--{o.long_stem}"
+
+    @property
+    def short(o):
+        if o.short_char:
+            return f'-{o.short_char}'
 
 
-_lowcase = '[a-z][a-z0-9]*'
-_upcase = '[A-Z][A-Z0-9]*'
-_either_or = f'(?:{_lowcase}|{_upcase})'
+class _FormalPositional:
+    def __init__(o, stem, moniker, descs, is_required, is_plural, surface):
+        o.key = stem.replace('-', '_').lower()
+        o.moniker, o.descs = moniker, descs
+        o.is_required, o.is_plural = is_required, is_plural
+        o.is_optional, o.is_singular = (not is_required), (not is_plural)
+        o.is_special = is_plural or o.is_optional
+        o.surface_expression = surface
 
 
-_long_name_rxs = f'{_either_or}(?:-{_either_or})*'
+def _no(msg):
+    raise DefinitionError_(msg)
 
 
-class FormalParametersSyntaxError(Exception):
+class DefinitionError_(RuntimeError):  # #testpoint (only)
     pass
 
 
-_eol = '\n'
+class _Stop(RuntimeError):
+    pass
 
 
+def _ox():
+    import modality_agnostic.magnetics\
+        .rotating_buffer_via_positional_functions as mod
+    return mod
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+
+
+# #history-B.2: blind rewrite
 # #history-A.7: sunsetted last traces of stepper
 # #history-A.6: sub-expressions
 # #history-A.5: expose API for "cheap arg parse branch"

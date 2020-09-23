@@ -1,274 +1,460 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_children, lazy
 import unittest
+import re
+
+
+# [Case5485 - Case5498)
 
 
 class ExtendedSyntaxCase(unittest.TestCase):
 
     # -- assertions
 
-    def expect_sequence_equals_recursive(self, ast, exp):
-        from script_lib.test_support import assert_sequence_equals_recursive
-        return assert_sequence_equals_recursive(ast, exp, self)
+    def expect_first_line_ignorecase(self, rxs):
+        act_line = self.end_state.lines[0]
+        self.assertRegex(act_line, re.compile(rxs, re.IGNORECASE))
+
+    def expect_exitstatus(self, exp):
+        act = self.end_state.exitstatus
+        self.assertEqual(act, exp)
+
+    def expect_invite(self):
+        act_line = self.end_state.lines[-1]
+        self.assertRegex(act_line, r'\bfor help\b')
+
+    def expect_expected_values(self):
+        act = self.end_state.values
+        exp = self.expected_values()
+        act_ks, exp_ks = tuple(tuple(d.keys()) for d in (act, exp))
+        act_vs, exp_vs = tuple(tuple(d.values()) for d in (act, exp))
+        self.assertSequenceEqual(act_ks, exp_ks)
+        self.assertSequenceEqual(act_vs, exp_vs)
+
+    def expect_the_formals_parse_OK(self):
+        self.assertTrue(self.formals())
 
     # -- getters for assertions
 
     @property
-    def the_last_opt(self):
-        return self.the_CLI.opts[-1]
-
-    @property
     def the_last_arg(self):
-        return self.the_CLI.args[-1]
+        return self.formals().formal_positionals[-1]
 
     # -- build end state
 
-    def parse_against(self, *argv_tail):
-        if self.do_debug:
-            from sys import stderr
-            serr = stderr
-        else:
-            serr = None
-        opts_args, mon = self._my_run(serr, argv_tail)
-        assert(mon.OK)
-        assert(0 == mon.exitstatus)
-        return opts_args
+    @property  # ..
+    @shared_subj_in_children
+    def end_state(self):
+        argv = self.given_argv_tail()
+        return self.build_end_state_via_argv_tail(argv)
 
-    def parse_expecting_failure(self, *argv_tail):
-        from script_lib.test_support import lines_and_spy_io_for_test_context
-        lines, spy_stderr = lines_and_spy_io_for_test_context(self, 'DBG: ')
-        opts_args, mon = self._my_run(spy_stderr, argv_tail)
+    def build_end_state_via_argv_tail(self, argv_tail):
 
-        assert(opts_args is None)
-        assert(not mon.OK)
-        assert 0 != mon.exitstatus
+        # Prepare the stderr proxy (either for expecting nothing or something)
+        exps = self.expected_lines()
+        import script_lib.test_support.expect_STDs as lib
+        _, serr, done = lib.stdout_and_stderr_and_done_via(exps or (), self)
 
-        return tuple(lines)
+        # Call our subject under test
+        bash_argv = list(reversed(argv_tail))
+        foz = self.formals()
+        vals, es = foz.terminal_parse(serr, bash_argv)
+        writes = done()
 
-    def _my_run(self, serr, argv_tail):
-        argv = ('/x/y/ya-eomma', *argv_tail)
-        CLI = self.the_CLI
-        from script_lib.cheap_arg_parse import _parse_CLI_args
-        opts_args, mon = _parse_CLI_args(serr, argv, CLI)
-        return opts_args, mon
+        # Simplify the recorded writes
+        def my_assert(which):
+            assert 'STDERR' == which
+            return True
+        lines = tuple(line for which, line in writes if my_assert(which))
 
-    @dangerous_memoize_in_child_classes('_CLI', 'build_CLI')
-    def the_CLI(self):
+        return _EndState(vals, lines, es, foz)
+
+    @shared_subj_in_children
+    def formals(self):
+        return subject_function(self.given_formal_parameters())
+
+    def expected_lines(_):
         pass
-
-    def build_CLI(self):
-        from script_lib.cheap_arg_parse import (
-                CLI_via_syntax_AST_,
-                syntax_AST_via_parameters_definition_)
-        _pdef = self.given_formal_parameters()
-        _syntax_AST = syntax_AST_via_parameters_definition_(_pdef)
-        return CLI_via_syntax_AST_(_syntax_AST)
 
     do_debug = False
 
 
-class Case5485_kleene_star_arg_cannot_be_at_not_the_end(ExtendedSyntaxCase):
+class Case5485_glob_cannot_be_at_not_the_end(ExtendedSyntaxCase):
 
     def test_010_raises(self):
-        _exp = "plural positional args can only occur at the end: 'foo-bar*'"
-        from script_lib.cheap_arg_parse import FormalParametersSyntaxError
-        with self.assertRaises(FormalParametersSyntaxError) as cm:
-            self.build_CLI()
-        exe = cm.exception
-        self.assertEqual(str(exe), _exp)
+        eclass = subject_exception_class()
+        with self.assertRaises(eclass) as cm:
+            self.formals()
+        rxs = r"\bcan only occur at(?: the)? end: 'foo-bar\*'"
+        self.assertRegex(str(cm.exception), re.compile(rxs, re.IGNORECASE))
 
     def given_formal_parameters(self):
-        return (('foo-bar*', 'x'), ('biff-bazz', 'x'))
+        return (('foo-bar*', 'x'), ('biff-baz', 'x'))
 
 
-class Case5486_kleene_star_at_end(ExtendedSyntaxCase):
+class Case5486_1_glob_against_many(ExtendedSyntaxCase):
 
     def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+        self.expect_the_formals_parse_OK()
 
     def test_020_item_looks_right(self):
         arg = self.the_last_arg
         self.assertTrue(arg.is_plural)
-        self.assertEqual(arg.arity_string, '*')
+        self.assertFalse(arg.is_required)
 
-    def test_030_parse_multiple(self):
-        opts, args = self.parse_against('A', 'B', 'C')
-        assert(not len(opts))
-        _exp = ('A', ('B', 'C'))
-        self.expect_sequence_equals_recursive(args, _exp)
+    def test_030_expect_expected(self):
+        self.expect_expected_values()
 
-    def test_040_parse_one(self):
-        opts, args = self.parse_against('A')
-        assert(not len(opts))
-        _exp = ('A', ())
-        self.expect_sequence_equals_recursive(args, _exp)
+    def given_argv_tail(_):
+        return 'A', 'B', 'C'
 
-    def given_formal_parameters(self):
-        return (('foo-bar', 'x'), ('biff-bazz*', 'x'))
+    def formals(_):
+        return case_5486_formals()
+
+    def expected_values(_):
+        return {'foo_bar': 'A', 'biff_baz': ('B', 'C')}
 
 
-class Case5488_kleene_plus_at_end(ExtendedSyntaxCase):
+class Case5486_2_glob_against_none(ExtendedSyntaxCase):
+
+    def test_030_note_it_is_NOT_auto_populated_with_an_empty_tuple(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return ('A',)
+
+    def formals(_):
+        return case_5486_formals()
+
+    def expected_values(_):
+        return {'foo_bar': 'A'}
+
+
+@lazy
+def case_5486_formals():
+    return subject_function((('foo-bar', 'x'), ('biff-baz*', 'x')))
+
+
+class Case5487_required_glob_missing(ExtendedSyntaxCase):
+
+    def test_030_says_this_thing(self):
+        rxs = 'expecting <foo-bar>'
+        self.expect_first_line_ignorecase(rxs)
+
+    def test_040_emits_this_exitsatus(self):
+        self.expect_exitstatus(6)
+
+    def test_050_expect_invite(self):
+        self.expect_invite()
+
+    def given_argv_tail(_):
+        return ()
+
+    def formals(_):
+        return case_5488_formals()
+
+    def expected_lines(_):
+        yield 'STDERR'
+        yield 'zero_or_one', 'STDERR'
+
+
+class Case5488_1_required_glob_against_many(ExtendedSyntaxCase):
 
     def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+        self.expect_the_formals_parse_OK()
 
     def test_020_item_looks_right(self):
         arg = self.the_last_arg
         self.assertTrue(arg.is_plural)
-        self.assertEqual(arg.arity_string, '+')
+        self.assertTrue(arg.is_required)
 
-    def test_030_parse_multiple(self):
-        opts, args = self.parse_against('A', 'B', 'C')
-        assert(not len(opts))
-        _exp = (('A', 'B', 'C'),)
-        self.expect_sequence_equals_recursive(args, _exp)
+    def test_030_expect_expected(self):
+        self.expect_expected_values()
 
-    def test_040_parse_one(self):
-        opts, args = self.parse_against('A')
-        assert(not len(opts))
-        _exp = (('A',),)
-        self.expect_sequence_equals_recursive(args, _exp)
+    def given_argv_tail(_):
+        return 'A', 'B', 'C'
 
-    def test_050_missing_required(self):
-        lines = self.parse_expecting_failure()
-        reason_line, invite_line = lines
-        self.assertIn('expecting <foo-bar>', reason_line)
+    def formals(_):
+        return case_5488_formals()
 
-    def given_formal_parameters(self):
-        return (('foo-bar+', 'x'),)  # #cp-2
+    def expected_values(_):
+        return {'foo_bar': ('A', 'B', 'C')}
 
 
-class Case5489_flag_with_kleene_star(ExtendedSyntaxCase):
+class Case5488_2_required_glob_against_one(ExtendedSyntaxCase):
+
+    def test_030_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return ('A',)
+
+    def formals(_):
+        return case_5488_formals()
+
+    def expected_values(_):
+        return {'foo_bar': ('A',)}
+
+
+@lazy
+def case_5488_formals():
+    return subject_function((('<foo-bar>+', 'x'),))
+
+
+class Case5489_1_kleene_star_flag_against_one_long(ExtendedSyntaxCase):
 
     def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+        self.expect_the_formals_parse_OK()
 
     def test_020_item_looks_right(self):
-        opt = self.the_last_opt
+        opt = self.formals().formal_options[0]
         self.assertFalse(opt.takes_argument)
         self.assertTrue(opt.is_plural)
-        self.assertEqual(opt.arity_string, '*')
+        self.assertFalse(opt.is_required)
 
-    def test_030_parse_one_long(self):
-        opts, args = self.parse_against('--foo-bar')
-        assert(not len(args))
-        self.assertSequenceEqual(opts, (1,))
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
 
-    def test_050_parse_several_short_in_flagball(self):
-        opts, args = self.parse_against('-ff')
-        assert(not len(args))
-        self.assertSequenceEqual(opts, (2,))
+    def given_argv_tail(_):
+        return ('--foo-bar',)
 
-    def test_060_parse_none(self):
-        # NOTE if no opts it's None not empty tuple
-        opts, args = self.parse_against()
-        assert(not len(args))
-        self.assertSequenceEqual(opts, (None,))
+    def formals(_):
+        return case_5489_formals()
 
-    def given_formal_parameters(self):
-        return (('-f', '--foo-bar*', 'x'),)
+    def expected_values(_):
+        return {'foo_bar': 1}
 
 
-class Case5491_optional_field_with_kleene_star(ExtendedSyntaxCase):
+class Case5489_2_kleene_star_flag_against_flagball(ExtendedSyntaxCase):
+
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return '-ff',
+
+    def formals(_):
+        return case_5489_formals()
+
+    def expected_values(_):
+        return {'foo_bar': 2}
+
+
+class Case5489_3_kleene_star_flag_against_none(ExtendedSyntaxCase):
+
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return ()
+
+    def formals(_):
+        return case_5489_formals()
+
+    def expected_values(_):
+        return {}
+
+
+@lazy
+def case_5489_formals():
+    return subject_function((('-f', '--foo-bar*', 'x'),))
+
+
+# Case5490 available
+
+
+class Case5491_1_kleene_star_argumented_option_against_one(ExtendedSyntaxCase):
 
     def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+        self.expect_the_formals_parse_OK()
 
     def test_020_item_looks_right(self):
-        opt = self.the_last_opt
+        opt = self.formals().formal_options[0]
         self.assertTrue(opt.takes_argument)
         self.assertTrue(opt.is_plural)
-        self.assertEqual(opt.arity_string, '*')
+        self.assertFalse(opt.is_required)
 
-    def test_030_parse_one(self):
-        opts, args = self.parse_against('--foo-bar', 'A')
-        assert(not len(args))
-        _exp = (('A',),)
-        self.expect_sequence_equals_recursive(opts, _exp)
+    def given_argv_tail(_):
+        return '--foo-bar', 'A'
 
-    def test_040_parse_several(self):
-        opts, args = self.parse_against('--foo-bar=B', '--foo-bar', 'C')
-        assert(not len(args))
-        _exp = (('B', 'C'),)
-        self.expect_sequence_equals_recursive(opts, _exp)
+    def formals(_):
+        return case_5491_formals()
 
-    def test_050_parse_nothing(self):
-        # NOTE if no opts it's None not empty tuple
-        opts, args = self.parse_against()
-        assert(not len(args))
-        self.assertSequenceEqual(opts, (None,))
-
-    def given_formal_parameters(self):
-        return (('--foo-bar=X*', 'x'),)
+    def expected_values(_):
+        return {'foo_bar': ['A']}
 
 
-class Case5492_integrate_plural_optional_field_with_glob(ExtendedSyntaxCase):
+class Case5491_2_kleene_star_argumented_option_against_two(ExtendedSyntaxCase):
+
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return '--foo-bar=B', '--foo-bar', 'C'
+
+    def formals(_):
+        return case_5491_formals()
+
+    def expected_values(_):
+        return {'foo_bar': ['B', 'C']}
+
+
+class Case5491_3_kleene_star_argumented_option_against_nil(ExtendedSyntaxCase):
+
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return ()
+
+    def formals(_):
+        return case_5491_formals()
+
+    def expected_values(_):
+        return {}
+
+
+@lazy
+def case_5491_formals():
+    return subject_function((('--foo-bar=X*', 'x'),))
+
+
+# Case5493 available - maybe for kleene plus argumented option
+
+
+class Case5493_integrate_plural_optional_field_with_glob(ExtendedSyntaxCase):
 
     def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+        self.expect_the_formals_parse_OK()
 
-    def test_030_parse_options_within_glob(self):
-        opts, args = self.parse_against(
-                '-oA', 'B', '--opt-ario', 'C', 'D', '-o', 'E')
-        self.expect_sequence_equals_recursive(args, (('B', 'D'),))
-        self.expect_sequence_equals_recursive(opts, (('A', 'C', 'E'),))
+    def test_020_parses_options_interspersed_with_glob(self):
+        self.expect_expected_values()
 
-    def given_formal_parameters(self):
-        return (('-o', '--opt-ario=V*', 'x'), ('biff-bazz*', 'x'))
+    def given_argv_tail(_):
+        return '-oA', 'B', '--opt-ario', 'C', 'D', '-o', 'E'
+
+    def given_formal_parameters(_):
+        yield '-o', '--opt-ario=V*', 'x'
+        yield 'biff-baz*', 'x'
+
+    def expected_values(_):
+        return {'opt_ario': ['A', 'C', 'E'], 'biff_baz': ('B', 'D')}
 
 
 class Case5494_exclamation_point_cannot_be_used_on_flags(ExtendedSyntaxCase):
 
     def test_010_raises(self):
-        _ = "'!' cannot be used on flags, only optional fields ('--foo-bar')"
-        from script_lib.cheap_arg_parse import FormalParametersSyntaxError
-        with self.assertRaises(FormalParametersSyntaxError) as cm:
-            self.build_CLI()
-        exe = cm.exception
-        self.assertEqual(str(exe), _)
+        eclass = subject_exception_class()
+        with self.assertRaises(eclass) as cm:
+            self.formals()
+        rxs = r"'!' cannot be used on flags\b.+Had:? '--foo-bar!'"
+        self.assertRegex(str(cm.exception), re.compile(rxs, re.IGNORECASE))
 
     def given_formal_parameters(self):
         return (('--foo-bar!', 'x'),)
 
 
-class Case5495_optional_field_can_have_exclamation_point(ExtendedSyntaxCase):
+class Case5495_missing_required_optionals(ExtendedSyntaxCase):
+    # This weird form allows you to model a field that looks like an option
+    # but has the imperity of a regular positional argument. This facility
+    # exists to make input buffers more readable (albeit longer) and less
+    # error-prone, if you have many required parameters (imagine entities).
+    # ("three" feels like the max of regular positional formals you want.)
 
-    def test_010_builds(self):
-        self.assertIsNotNone(self.the_CLI)
+    def test_010_formals_build(self):
+        self.expect_the_formals_parse_OK()
 
     def test_020_item_looks_right(self):
-        opt = self.the_last_opt
+        opt = self.formals().formal_options[1]  # or 0. #here1
         self.assertTrue(opt.takes_argument)
         self.assertFalse(opt.is_plural)
-        self.assertEqual(opt.arity_string, '!')
+        self.assertTrue(opt.is_required)
 
-    def test_030_regular(self):
-        opts, args = self.parse_against('--foo-bar', 'A')
-        assert(not len(args))
-        _exp = ('A',)
-        self.expect_sequence_equals_recursive(opts, _exp)
+    def test_030_says_this_thing(self):
+        rxs = "'--foo-bar' and '--biff-baz' are required"
+        self.expect_first_line_ignorecase(rxs)
 
-    def test_040_clobber(self):
-        opts, args = self.parse_against('--foo-bar=B', '--foo-bar', 'C')
-        assert(not len(args))
-        _exp = ('C',)
-        self.expect_sequence_equals_recursive(opts, _exp)
+    def test_040_emits_this_exitsatus(self):
+        self.expect_exitstatus(7)
 
-    def test_050_missing_required(self):
-        lines = self.parse_expecting_failure()
-        reason_line, invite_line = lines
-        self.assertIn("'--foo-bar' is required", reason_line)
+    def test_050_expect_invite(self):
+        self.expect_invite()
 
-    # does not show up in help screen
+    def given_argv_tail(_):
+        return '--wee', 'no see'
 
-    def given_formal_parameters(self):
-        return (('--foo-bar=X!', 'x'),)
+    def given_formal_parameters(_):
+        yield '--foo-bar=X!', 'ns'
+        yield '--biff-baz=X!', 'ns'  # #here1
+        yield '--wee=X', 'ns'
+
+    def expected_lines(_):
+        yield 'STDERR'
+        yield 'zero_or_one', 'STDERR'
+
+
+class Case5496_1_required_optional_parses(ExtendedSyntaxCase):
+
+    def test_010_builds(self):
+        self.expect_the_formals_parse_OK()
+
+    def given_argv_tail(_):
+        return '--foo-bar', 'A'
+
+    def formals(_):
+        return case_5496_formals()
+
+    def expected_values(_):
+        return {'foo_bar': 'A'}
+
+
+class Case5496_2_required_optional_clobbers(ExtendedSyntaxCase):
+
+    def test_010_expect_expected(self):
+        self.expect_expected_values()
+
+    def given_argv_tail(_):
+        return '--foo-bar=B', '--foo-bar', 'C'
+
+    def formals(_):
+        return case_5496_formals()
+
+    def expected_values(_):
+        return {'foo_bar': 'C'}
+
+
+# does not show up in help screen
+
+
+@lazy
+def case_5496_formals():
+    return subject_function((('--foo-bar=X!', 'x'),))
 
 
 # stop: Case5498
 
 
+class _EndState:
+    def __init__(o, vals, lines, es, foz):
+        o.values, o.lines, o.exitstatus, o.formals = vals, lines, es, foz
+
+
+def subject_function(defs):
+    func = subject_module().formals_via_definitions
+    return func(defs, lambda: '/x/y/ya-eomma')  # no idea what "ya-eomma" is
+
+
+def subject_exception_class():
+    return subject_module().DefinitionError_
+
+
+def subject_module():
+    import script_lib.cheap_arg_parse as module
+    return module
+
+
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1 during blind rewrite. exemplary cleanup
 # #born.

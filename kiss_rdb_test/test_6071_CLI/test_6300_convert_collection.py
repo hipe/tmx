@@ -104,51 +104,48 @@ class CommonCase(unittest.TestCase):  # #[#459.F]
     def build_end_state(self, case_category):
         # NOTE the biggest challenge is abstracting click's particularies
 
-        recv_sout, recv_serr, fin = _this_one_lib().stdout_stderr_partitioner()
-
-        do_debug = False
-        yes_sout = True
-        yes_serr = True
-        exception_category = None
-        get_lines_normally = True
-        get_exitstatus_normally = True
+        get_lines_normally, get_exitstatus_normally = True, True
+        yes_sout, yes_serr = False, False
+        exception_category, do_debug = None, False
 
         if 'stdout' == case_category:
-            yes_serr = False
-            recv_line = recv_sout
+            yes_sout = True
+            expect_which = 'stdout'
         elif 'stderr' == case_category:
-            yes_sout = False
-            recv_line = recv_serr
+            yes_serr = True
+            expect_which = 'stderr'
         elif 'click_exception' == case_category:
             exception_category = 'click_exception'
             get_lines_normally = False
-            yes_sout = False
+            yes_serr = True
             get_exitstatus_normally = False
-            recv_line = recv_serr
+            expect_which = 'stderr'
         elif 'debug' == case_category:
+            yes_sout, yes_serr = True, True
             do_debug = True
         else:
             assert(False)
 
-        _use_stdin = self.given_stdin()
-
-        _use_argv_tail = ('convert-collection', *self.argv_tail())  # :#here1
+        use_stdin = self.given_stdin()
+        use_argv_tail = ('convert-collection', *self.argv_tail())  # :#here1
 
         def stderrer():
             import sys
             return sys.stderr
 
+        def yes_do_debug():
+            return do_debug or self.do_debug
+
         from kiss_rdb_test.CLI import BIG_FLEX
         big_flex_end_state = BIG_FLEX(
-                given_stdin=_use_stdin,
-                given_args=_use_argv_tail,
+                given_stdin=use_stdin,
+                given_args=use_argv_tail,
                 allow_stdout_lines=yes_sout,
                 allow_stderr_lines=yes_serr,
                 exception_category=exception_category,
                 injections_dictionary=None,  # no rng, no filesystem
-                might_debug=(do_debug or self.do_debug),
-                do_debug_f=lambda: do_debug or self.do_debug,
-                debug_IO_f=stderrer)
+                might_debug=yes_do_debug(),
+                do_debug_f=yes_do_debug)
 
         if get_exitstatus_normally:
             use_exitstatus = big_flex_end_state.exit_code
@@ -159,31 +156,23 @@ class CommonCase(unittest.TestCase):  # #[#459.F]
             lines = big_flex_end_state.lines
         else:
             # 😭
-            writes = []
-            from modality_agnostic import write_only_IO_proxy
-            _IO_for_write = write_only_IO_proxy(
-                    write=writes.append, flush=lambda: None)
-            big_flex_end_state.exception.show(_IO_for_write)
-            _big_string = ''.join(writes)
+            import script_lib.test_support.expect_STDs as lib
+            writes = []  # writes not lines
+            r1 = lib.build_write_receiver_for_debugging('DBG: ', yes_do_debug)
+            io_for_write = lib.spy_on_write_via_receivers((r1, writes.append))
+            big_flex_end_state.exception.show(io_for_write)
+            big_string = ''.join(writes)
             import re
-            _rx = re.compile('(?<=\n)(?=.)', re.DOTALL)  # _eol
-            lines = _rx.split(_big_string)
-            if do_debug or self.do_debug:
-                io = stderrer()
-                io.write('\n')  # _eol
-                for line in lines:
-                    io.write(f"dbg stderr: {line}")
+            lines = re.compile('(?<=\n)(?=.)', re.DOTALL).split(big_string)
 
-        for line in lines:
-            recv_line(line)
-
-        return fin(use_exitstatus)
+        # click likes filling the memory with big strings so meh
+        return _EndState(expect_which, tuple(lines), use_exitstatus)
 
     def stdin_that_is_NOT_interactive(self):
-        return _this_one_lib().MINIMAL_NON_INTERACTIVE_IO
+        return _this_one_lib().FAKE_STDIN_NON_INTERACTIVE
 
     def stdin_that_IS_interactive(self):
-        return _this_one_lib().MINIMAL_INTERACTIVE_IO
+        return _this_one_lib().FAKE_STDIN_INTERACTIVE
 
     do_debug = False
 
@@ -311,7 +300,7 @@ class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
         return self.build_end_state('stdout')
 
     def given_stdin(self):
-        return _this_one_lib().FAKE_STDIN(
+        return STUB_STDIN(
                 # '{ "header_level": 1 }\n',  # #history-A.2
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n')
@@ -353,27 +342,48 @@ class Case060_one_arg_which_is_token(CommonCase):
                 '-', '--to-format', 'markdown-table')
 
 
-@lazy
+class _EndState:
+    def __init__(self, which, lines, es):
+        self._the_only_run = _LineRun(lines)
+        self.exitstatus = es
+        self._which = which
+
+    def first_line_run(self, which):
+        assert self._which == which
+        return self._the_only_run
+
+
+class _LineRun:
+    def __init__(self, lines):
+        self.lines = lines
+
+
+class STUB_STDIN:  # :[#605.4]
+
+    def __init__(self, *lines):
+        self._lines = lines
+
+    def isatty(self):
+        return False
+
+    def __iter__(self):
+        return iter(self._lines)
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
+
+    mode = 'r'
+
+
 def _this_one_lib():
-    # awful, but we want xx
-    from script_lib.test_support.stdout_and_stderr_and_end_stater import (
-            stdout_stderr_partitioner as _1,
-            FAKE_STDIN as _2,
-            MINIMAL_INTERACTIVE_IO as _3,
-            MINIMAL_NON_INTERACTIVE_IO as _4)
-
-    class These:  # class-as-namespace
-        stdout_stderr_partitioner = _1
-        FAKE_STDIN = _2
-        MINIMAL_INTERACTIVE_IO = _3
-        MINIMAL_NON_INTERACTIVE_IO = _4
-
-    return These
+    import script_lib.test_support.expect_STDs as module
+    return module
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.2
 # #history-A.3: moved here from another subproject
 # #history-A.2 implementation moved to kiss (convert collection)
 # #history-A.1: when interfolding became the main algorithm, order changed

@@ -25,7 +25,7 @@ the related API that preceded this one.)
 |---------------------------|:-----:|---|
 |[#610]                     |       | line stream via big string
 |[#608.13]                  | #wish | argument arity `<like-this>?`
-|[#608.L]                   |       | [ cheap arg parse ]
+|[#608.L]                   | #hole |
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
@@ -35,7 +35,7 @@ the related API that preceded this one.)
 |[#608.4]                   | #trak | "mad parse" (whatever that is)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
-|[#607.I]                   | #trak | maybe one day DRY this `_eol` pattern
+|[#607.I]                   | #hole |
 |[#607.H]                   | #hole |
 |[#607.G]                   | #open | sunset the common upstream argument parser module
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
@@ -45,7 +45,12 @@ the related API that preceded this one.)
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
 |[#606]                     | #open | [the unified diff parser]
-|[#605]                     |       | [ expect STD's ]
+|[#605.5]                   | #trak | end state with runs (diff stdout & stderr) moves
+|[#605.4]                   | #trak | mock STDIN that plays back lines
+|[#605.3]                   | #prov | #provision: coding life is easier if we say you need 5: sin, sout, serr, argv, enver
+|[#605.2]                   | #trak | we assume (and occasionally assert) that "line" means "newline terminated"
+|[#605.1]                   |       | this one stdout/stderr tracking toolkit
+|[#605]                     |       | [external tracking or whatever you want]
 |[#604.2]                   | #open | known limitation of our arg parsing
 |[#603]                     |       | [the help screen parser] |
 |:[#602]                    | #open | track that one issue with argparse (should patch) |

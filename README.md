@@ -206,7 +206,7 @@ then in your 'main' terminal:
 |[#019]                     |       | package filesystem conventions ..
 |[#018.B]                   | #edit | edit documentation
 |<a name=018></a>[\[#018\]] |       | installing and deploying python
-|[#017.3]                   |       | placeholder to explain our listener pattern - use [#511] now instead
+|[#017.3]                   |       | explain listeners placeholder - use [#511] now instead - see help screen file deleted at #history-B.2
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [tickler numberspace]
 |[#014]                     |       | [expect tree-like screen]
@@ -267,6 +267,7 @@ then in your 'main' terminal:
 
 ## document-meta
 
+  - #history-B.2
   - #history-A.2
   - spike node table
   - #born.

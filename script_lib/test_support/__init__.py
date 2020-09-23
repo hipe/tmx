@@ -1,26 +1,8 @@
-def lines_and_spy_io_for_test_context(tc, dbg_msg_head):  # #:[#605.1]
-    lines = []
 
-    assert(not hasattr(tc, 'is_first_debug'))
-    tc.is_first_debug = True
 
-    def write(s):
-        assert(re.match(r'[^\r\n]*\n\Z', s))  # [#607.I]
-        if tc.do_debug:
-            from sys import stderr
-            if tc.is_first_debug:
-                tc.is_first_debug = False
-                stderr.write('\n')  # _eol
-            stderr.write(f"{dbg_msg_head}{s}")
-        lines.append(s)
-        return len(s)
-    import re
-
-    from modality_agnostic import write_only_IO_proxy
-    _spy_IO = write_only_IO_proxy(write=write)
-
-    return lines, _spy_IO
-    # (abstracted at #history-A.1)
+def spy_on_write_and_lines_for(tc, dbg_msg_head):
+    from .expect_STDs import spy_on_write_and_lines_for as func
+    return func(tc, dbg_msg_head)  # refactored to use ☝️ there #history-B.2.2
 
 
 class _build_unindent:
@@ -69,6 +51,7 @@ unindent = _build_unindent()
 
 # assert_sequence_equals_recursive moved to client at #history-B.2.1
 
+# #history-B.2.2
 # #history-B.2.1
 # #history-A.1
 # #abstracted.

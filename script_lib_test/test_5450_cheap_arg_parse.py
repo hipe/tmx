@@ -1,18 +1,79 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes, lazy
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_children, lazy
 import unittest
+import re
 
 
 class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case5414_AST(CommonCase):
+class ParsePosiCase(unittest.TestCase):
+
+    @property  # ..
+    @shared_subj_in_children
+    def formal(self):
+        moniker = self.given_string()
+        return subject_function_one()((moniker, 'desc no see'))
+
+
+class Case_5399_required_plural_positional(ParsePosiCase):
+
+    def test_100_(self):
+        fo = self.formal
+        self.assertTrue(fo.is_plural)
+        self.assertTrue(fo.is_required)
+
+    def given_string(self):
+        return '<file> [<file> [..]]'
+
+
+class Case_5401_glob(ParsePosiCase):
+
+    def test_100_(self):
+        fo = self.formal
+        self.assertTrue(fo.is_plural)
+        self.assertFalse(fo.is_required)
+
+    def given_string(self):
+        return '[<command> [..]]'
+
+
+class Case_5403_regular_positional(ParsePosiCase):
+
+    def test_100_(self):
+        fo = self.formal
+        self.assertFalse(fo.is_plural)
+        self.assertTrue(fo.is_required)
+
+    def given_string(self):
+        return '<arg>'
+
+
+class Case_5405_you_must_keep_using_the_same_moniker(ParsePosiCase):
+
+    def test_100_yuck(self):
+        def run():
+            self.formal
+        errcls = subject_module().DefinitionError_
+        self.assertRaisesRegex(errcls, "no support for multi.+IZZO', 'FA", run)
+
+    def given_string(self):
+        return 'FIZZO [FAZZO [..]]'
+
+    def given_method(_):
+        return 'nonterminal_parse'
+
+
+class Case5414_introduce_formals_structure(CommonCase):
+
+    def test_050_builds(self):
+        self.end_state.formal_positionals
 
     def test_100_descriptions_which_are_required_look_like_this(self):
-        a1 = self.first_option.description_lines
-        a2 = self.second_option.description_lines
-        a3 = self.first_argument.description_lines
+        a1 = self.first_option.descs
+        a2 = self.second_option.descs
+        a3 = self.first_argument.descs
         assert(len(a1))
         assert(len(a2))
         assert(len(a3))
@@ -21,83 +82,81 @@ class Case5414_AST(CommonCase):
         assert(isinstance(a3[0], str))
 
     def test_120_the_short_name_is_just_one_character(self):
-        self.assertEqual(self.first_option.short_name, 'a')
+        self.assertEqual(self.first_option.short_char, 'a')
 
     def test_140__the_long_name_doesnt_have_the_leading_dashes(self):
-        self.assertEqual(self.first_option.long_name, 'allo-morph')
+        self.assertEqual(self.first_option.long_stem, 'allo-morph')
 
     def test_160__currently_this_is_how_you_etc(self):
-        self.assertEqual(self.first_option.meta_var, 'OH_HAI')
+        self.assertEqual(self.first_option.arg_moniker, 'OH_HAI')
 
     def test_180_an_option_does_not_need_a_short_name(self):
-        self.assertIsNone(self.second_option.short_name)
+        self.assertIsNone(self.second_option.short)
 
     def test_200_arg_name(self):
-        self.assertEqual(self.first_argument.styled_moniker, 'arg-num1')
+        self.assertEqual(self.first_argument.moniker, 'arg-num1')
 
     @property
     def first_option(self):
-        return self.end_state()[0][0]
+        return self.end_state.formal_options[0]
 
     @property
     def second_option(self):
-        return self.end_state()[0][1]
+        return self.end_state.formal_options[1]
 
     @property
     def first_argument(self):
-        return self.end_state()[1][0]
+        return self.end_state.formal_positionals[0]
 
+    @property
     def end_state(self):
-        return grammar_one()
+        return formals_one()
 
 
 class ParseyCase(CommonCase):
 
     # -- failure assertion and set-up
 
-    def expect_option_with_long_name(self, s):
-        _ = self.flush_end_state_payload()['option'].long_name
-        self.assertEqual(_, s)
+    def expect_unrecognized_option(self, sw):
+        self.expect_lc_reason_includes('unrecognized option', sw)
 
-    def expect_token_and_position(self, tok, pos):
-        dct = self.flush_end_state_payload()
-        self.assertEqual(dct['token'], tok)
-        self.assertEqual(dct['token_position'], pos)
+    def expect_does_not_take_an_argument(self, sw):
+        self.expect_reason_with_agency('does not take an argument', sw)
 
-    def expect_token(self, tok):
-        dct = self.flush_end_state_payload()
-        self.assertEqual(dct['token'], tok)
+    def expect_expecting_argument_for(self, sw):
+        self.expect_lc_reason_includes('expecting argument for', sw)
 
-    def expect_channel_tail(self, channel_tail):
-        self.expect_channel_two_tail('parameter_error', channel_tail)
+    def expect_expecting_argument(self, farg):
+        self.expect_lc_reason_includes('expecting', farg)
 
-    def expect_channel_two_tail(self, error_category, error_case):
-        self.assertSequenceEqual(
-                self.end_state_error_channel(),
-                ('error', 'structure', error_category, error_case))
+    def expect_unexpected_argument(self, farg):
+        self.expect_lc_reason_includes('unexpected argument', farg)
 
-    def end_state_error_channel(self):
-        channel, structurer = self.failure_end_state
-        return channel
+    def expect_la_la_for(self, la_la, farg):
+        rxs = ''.join((re.escape(la_la), " for '?", re.escape(farg)))
+        self.expect_regex_case_insensitive(rxs)
 
-    def flush_end_state_payload(self):
-        channel, structurer = self.failure_end_state
-        return structurer()
+    def expect_reason_with_agency(self, tail, agent):
+        rxs = ''.join(("'?", re.escape(agent), "'? ", re.escape(tail)))
+        self.expect_regex_case_insensitive(rxs)
 
-    @dangerous_memoize_in_child_classes('fail_ES', 'build_failure_end_state')
-    def failure_end_state():
-        pass
+    def expect_lc_reason_includes(self, head, tail):
+        rxs = ''.join((re.escape(head), ":? '?", re.escape(tail), "'?"))
+        self.expect_regex_case_insensitive(rxs)
 
-    def build_failure_end_state(self):
-        channel, structurer = self.expect_failure()
-        return channel, structurer
+    def expect_regex_case_insensitive(self, rxs):
+        rx = re.compile(rxs, re.IGNORECASE)
+        act = self.end_state_reason
+        self.assertRegex(act, rx)
 
-    def expect_failure(self):
-        import modality_agnostic.test_support.common as em
-        listener, emissions = em.listener_and_emissions_for(self, limit=1)
-        self.assertIsNone(self.my_run(listener))
-        emi, = emissions
-        return emi.channel, emi.payloader
+    @property
+    def end_state_reason(self):
+        return self.end_state_stderr_lines_and_exitstatus[0][0]
+
+    @property
+    @shared_subj_in_children
+    def end_state_stderr_lines_and_exitstatus(self):
+        return self.my_run(False)
 
     # -- success assertion and set-up
 
@@ -106,21 +165,36 @@ class ParseyCase(CommonCase):
         assert(not len(tuple(None for x in x_a if x is not None)))
 
     def expect_success(self):
-        two_tups = self.my_run(None)
+        two_tups = self.my_run(True)
         self.assertIsNotNone(two_tups)
         return two_tups
 
     # --
 
-    def my_run(self, listener):
-        token_scn = parse_lib().TokenScanner(self.given_args())
-        CLI_function = self.given_CLI()
-        return CLI_function(token_scn, listener)
+    def my_run(self, do_expect_success):
+        foz = self.given_formals()
+        argv = self.given_args()
+        from script_lib.test_support import \
+            spy_on_write_and_lines_for as func
+        serr, lines = func(self, 'DBG: ')
+        m = self.given_method()
+        vals, es = getattr(foz, m)(serr, list(reversed(argv)))
+        if do_expect_success:
+            self.assertIsNone(es)
+            assert not len(lines)
+            return foz.sparse_tuples_in_grammar_order_via_consume_values(vals)
+        else:
+            self.assertTrue(es)  # eek
+            return tuple(lines), es
+
+    def given_method(_):
+        return 'terminal_parse'
 
 
 class same(ParseyCase):
-    def given_CLI(self):
-        return CLI_one()
+
+    def given_formals(self):
+        return formals_one()
 
 
 class Case5417_all_args_no_opts(same):
@@ -149,11 +223,8 @@ class Case5421_opt_at_head(same):
 
 class Case5424_not_equals(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('expecting_equals_sign')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('--allo-morph?1987', 12)
+    def test_100_reason(self):
+        self.expect_unrecognized_option('--allo-morph?1987')
 
     def given_args(self):
         return ('--allo-morph?1987', 'no see')
@@ -203,11 +274,8 @@ class Case5435_opts_everywhere_note_overwrite(same):
 
 class Case5438_malformed_option_name(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('malformed_option_name')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('---', 2)
+    def test_100_reason(self):
+        self.expect_unrecognized_option('---')
 
     def given_args(self):
         return ('---',)
@@ -215,11 +283,8 @@ class Case5438_malformed_option_name(same):
 
 class Case5442_an_unrecognied_long_looks_like_this(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('unrecognized_option')
-
-    def test_200_payload(self):
-        self.expect_token('--uh-oh')
+    def test_100_reason(self):
+        self.expect_unrecognized_option('--uh-oh')
 
     def given_args(self):
         return ('--bu-ju', '--uh-oh', 'no-see')
@@ -228,11 +293,8 @@ class Case5442_an_unrecognied_long_looks_like_this(same):
 class Case5445_an_unrecognied_short_looks_like_this(same):
     # contrast to (Case5480) below unrec n jumble
 
-    def test_100_channel(self):
-        self.expect_channel_tail('unrecognized_option')
-
-    def test_200_payload(self):
-        self.expect_token('-q')
+    def test_100_reason(self):
+        self.expect_unrecognized_option('-q')
 
     def given_args(self):
         return ('-q', 'no-see')
@@ -240,11 +302,8 @@ class Case5445_an_unrecognied_short_looks_like_this(same):
 
 class Case5449_an_extra_positional_arg_looks_like_this(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('unexpected_argument')
-
-    def test_200_payload(self):
-        self.expect_token('CC')
+    def test_100_reason(self):
+        self.expect_unexpected_argument('CC')
 
     def given_args(self):
         return ('AA', 'BB', 'CC')
@@ -254,13 +313,10 @@ class Case5449_an_extra_positional_arg_looks_like_this(same):
 
 
 class Case5452_an_missing_positional_arg_looks_like_this(same):
+    # and positional moniker with <foo> braces
 
-    def test_100_channel(self):
-        self.expect_channel_tail('expecting')
-
-    def test_200_payload(self):
-        _arg = self.flush_end_state_payload()['argument']
-        self.assertEqual(_arg.styled_moniker, 'arg2')
+    def test_100_reason(self):
+        self.expect_expecting_argument('<arg2>')
 
     def given_args(self):
         return ('AA',)
@@ -268,11 +324,8 @@ class Case5452_an_missing_positional_arg_looks_like_this(same):
 
 class Case5456_if_you_dont_pass_an_arg_taker_an_argument_it_is_sad(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('option_requires_argument')
-
-    def test_200_payload(self):
-        self.expect_option_with_long_name('allo-morph')
+    def test_100_reason(self):
+        self.expect_expecting_argument_for('--allo-morph')
 
     def given_args(self):
         return ('-a',)
@@ -280,23 +333,18 @@ class Case5456_if_you_dont_pass_an_arg_taker_an_argument_it_is_sad(same):
 
 class Case5459_if_you_do_pass_a_flag_a_value_it_is_sad(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('flag_option_must_have_nothing_after_it')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('--bu-ju?1997', 7)
+    def test_100_reason(self):
+        self.expect_does_not_take_an_argument('--bu-ju')
 
     def given_args(self):
-        return ('--bu-ju?1997', 'no see')
+        return ('--bu-ju=1997', 'no see')
 
 
 class Case5463_you_cant_pass_an_arg_taker_the_empty_string_after_equals(same):
 
-    def test_100_channel(self):  # ..
-        self.expect_channel_tail('equals_sign_must_have_content_after_it')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('--allo-morph=', len('--allo-morph='))
+    def test_100_reason(self):
+        self.expect_lc_reason_includes(
+            "equals sign must have content after it", '--allo-morph=')
 
     def given_args(self):
         return ('--allo-morph=',)
@@ -315,13 +363,8 @@ class Case5466_but_you_CAN_pass_empty_string_as_a_separate_argument(same):
 
 class Case5470_arg_taker_separate_arg_cant_look_like_option(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail('option_value_looks_like_option')
-
-    def test_200_payload(self):
-        dct = self.flush_end_state_payload()
-        self.assertEqual(dct['token'], '-x')
-        self.assertEqual(dct['option'].long_name, 'allo-morph')
+    def test_100_reason(self):
+        self.expect_la_la_for("value looks like option", "--allo-morph")
 
     def given_args(self):
         return ('--allo-morph', '-x')
@@ -341,14 +384,14 @@ class Case5473_you_CAN_pass_an_option_looking_option_value_using_equals(same):
 # ========
 
 class same(ParseyCase):
-    def given_CLI(self):
-        return CLI_two()
+    def given_formals(self):
+        return formals_two()
 
 
 class Case5477_you_can_expresss_multiple_flags_in_one_ball(same):
     # also, options only (no arguments)
 
-    def test_100_looks_good(self):
+    def test_100_reason(self):
         opts, args = self.expect_success()
         self.assertEqual(args, ())
         self.assertSequenceEqual(opts, (True, True, True, None))
@@ -360,11 +403,8 @@ class Case5477_you_can_expresss_multiple_flags_in_one_ball(same):
 class Case5480_a_nonfirst_unrecognized_short_in_a_ball_has_more_info(same):
     # contrast to (Case5445) unrecognized flag at the front
 
-    def test_100_channel(self):
-        self.expect_channel_tail('unrecognized_option')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('-abef', 3)
+    def test_100_reason(self):
+        self.expect_unrecognized_option('-e')
 
     def given_args(self):
         return ('-abef',)
@@ -372,12 +412,8 @@ class Case5480_a_nonfirst_unrecognized_short_in_a_ball_has_more_info(same):
 
 class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
 
-    def test_100_channel(self):
-        self.expect_channel_tail(
-                'cannot_mix_flags_and_optional_arguments_in_one_token')
-
-    def test_200_payload(self):
-        self.expect_token_and_position('-abdx1', 3)
+    def test_100_reason(self):
+        self.expect_lc_reason_includes("ball of opts", "-b' then '-d")
 
     def given_args(self):
         return ('-abdx1',)
@@ -393,43 +429,33 @@ class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
 
 
 @lazy
-def CLI_two():
-    return CLI_parse_function_via(AST_via((
+def formals_two():
+    return foz_via_defs((
         ('-a', '--alfalfa', 'd1'),
         ('-b', '--bubu', 'd2'),
         ('-c', '--chou-chou', 'd3'),
-        ('-d', '--dingus=WEE', 'd4'))))
+        ('-d', '--dingus=WEE', 'd4')), prog_namer=lambda: 'ohi')
 
 
 @lazy
-def CLI_one():
-    return CLI_parse_function_via(grammar_one())
-
-
-@lazy
-def grammar_one():
-    return AST_via((
+def formals_one():
+    return foz_via_defs((
         ('-a', '--allo-morph=OH_HAI', 'desc 1A', 'desc 1B'),
         ('--bu-ju', 'desc 2'),
         ('arg-num1', 'desc 3A', 'desc 3B'),
-        ('arg2', 'desc 4')))
+        ('<arg2>', 'desc 4')), prog_namer=lambda: 'ohe')
 
 
-def CLI_parse_function_via(syntax_AST):
-    def parse(token_scanner, listener):
-        return sm.do_parse_(token_scanner, CLI, listener)
-    sm = subject_module()
-    CLI = sm.CLI_via_syntax_AST_(syntax_AST)
-    return parse
+# == Bridges and delegations
+
+def foz_via_defs(definitions, **kwargs):
+    return subject_module().formals_via_definitions(definitions, **kwargs)
+    # #todo replacing syntax_AST_via_parameters_definition_
 
 
-def AST_via(tups):
-    return subject_module().syntax_AST_via_parameters_definition_(tups)
-
-
-def parse_lib():
-    from script_lib.magnetics import parser_via_grammar as parse_lib
-    return parse_lib
+@lazy
+def subject_function_one():
+    return subject_module()._build_formal_positional_parser()
 
 
 def subject_module():
@@ -437,7 +463,12 @@ def subject_module():
     return mod
 
 
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+
+
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.2
 # #born.
