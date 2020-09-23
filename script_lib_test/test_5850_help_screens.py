@@ -1,6 +1,5 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize as shared_subject, \
-        dangerous_memoize_in_child_classes
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_child_classes
 import unittest
 
 
@@ -22,21 +21,19 @@ class CommonCase(unittest.TestCase):
 
     # -- assertions
 
-    def _in_usage_expect_interesting_tail(self, tail_s):
+    def in_usage_expect_interesting_tail(self, tail):
         import re
-        _s = self._section_index['usage'].head_line.styled_content_string
-        _match = re.search('^usage: ohai-mumo my-command (.+)$', _s)
-        _act = _match[1]
-        self.assertEqual(tail_s, _act)
+        line = self.help_screen['usage'].head_line
+        md = re.match(r'^usage: ohai-mumo my-command \[-h\](?: (.+))?$', line)
+        self.assertEqual(tail, md[1])
 
     def _in_details_expect_optionals(self, *s_a):
-        oai = self._optional_args_index()
-        self._same_expect(oai, s_a)
+        act_oi = self.option_index
+        self._same_expect(act_oi, s_a)
 
     def _in_details_expect_positionals(self, *s_a):
-        _act = self._section_index
-        _pai = EHS().positional_args_index_via_section_index(_act)
-        self._same_expect(_pai, s_a)
+        act_pai = self.help_screen.to_positional_index()
+        self._same_expect(act_pai, s_a)
 
     def _same_expect(self, xai, s_a):
         _exp = frozenset(s_a)
@@ -44,47 +41,47 @@ class CommonCase(unittest.TestCase):
         self.assertEqual(_exp, _act)
 
     def _help_screen_renders(self):
-        _lines = self.end_state_lines
-        self.assertIsNot(0, len(_lines[0]))
+        lines = self.end_state_lines
+        self.assertIsNot(0, len(lines))
 
     # -- builders
 
-    def _build_optional_args_index(self):
-        _act = self._section_index
-        oai = EHS().optional_args_index_via_section_index(_act)
-        del oai['--help']  # tacit assertion that it exists, as well as norm
-        return oai
+    @property
+    @shared_subj_in_child_classes
+    def option_index(self):
+        oi = self.help_screen.to_option_index()
+        oi.pop('--help')  # tact assertion. cleans up logic elsewhere
+        return oi
 
-    def build_section_index(self):
-        _ = self.end_state_lines
-        return EHS().section_index_via_unsanitized_strings_(_)
+    @property
+    @shared_subj_in_child_classes
+    def help_screen(self):
+        lines = self.end_state_lines
+        func = EHS().parse_help_screen
+        return func(lines)
 
-    @dangerous_memoize_in_child_classes('_END_STATE_LINES', 'build_lines')
+    @property
+    @shared_subj_in_child_classes
     def end_state_lines(self):
-        pass
-
-    def build_lines(self):
 
         # moved here from a library file at #history-A.1.
         # will DRY with sibling file and maybe push back up maybe later.
         # right now scope is just to green this file
 
-        from script_lib.test_support import lines_and_spy_io_for_test_context
-        lines, spy_IO = lines_and_spy_io_for_test_context(self, 'DEBUG: ')
+        from script_lib.test_support import spy_on_write_and_lines_for as func
+        spy_IO, lines = func(self, 'DEBUG: ')
 
-        _argv = ('/fake-fs/xx/yy/ohai-mumo', 'my-command', '--help')
+        argv = '/fake-fs/xx/yy/ohai-mumo', 'my-command', '--help'
 
-        from script_lib.magnetics.CLI_formal_parameters_via_formal_parameters import (  # noqa: E501
-                CLI_function_via_command_module)
+        from script_lib.magnetics.CLI_formal_parameters_via_formal_parameters \
+            import CLI_function_via_command_module
         _command_module = self.given_command_module()
         _CLI_function = CLI_function_via_command_module(_command_module)
 
-        _cx_CLI_funcs = (('my-command', lambda: _CLI_function),)
+        cx_CLI_funcs = (('my-command', lambda: _CLI_function),)
 
-        from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
-        es = cheap_arg_parse_branch(
-                stdin=None, stdout=None, stderr=spy_IO, argv=_argv,
-                children_CLI_functions=_cx_CLI_funcs)
+        from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+        es = func(None, None, spy_IO, argv=argv, cx=cx_CLI_funcs)
 
         self.assertEqual(0, es)
         return tuple(lines)
@@ -103,11 +100,7 @@ class Case5844_category_4_required_field(CommonCase):
         self._in_details_expect_positionals('foo-bar', 'biff-baz')
 
     def test_030_these_to_positionals_in_usage(self):
-        self._in_usage_expect_interesting_tail('foo-bar biff-baz')
-
-    @shared_subject
-    def _section_index(self):
-        return self.build_section_index()
+        self.in_usage_expect_interesting_tail('foo-bar biff-baz')
 
     def given_command_module(self):
         return command_modules().two_crude_function_parameters_by_function
@@ -122,15 +115,7 @@ class Case5847_category_1_flag(CommonCase):
         self._in_details_expect_optionals('--this-flag')
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('[--this-flag]')
-
-    # NOTE no memoization
-    def _optional_args_index(self):
-        return self._build_optional_args_index()
-
-    @shared_subject
-    def _section_index(self):
-        return self.build_section_index()
+        self.in_usage_expect_interesting_tail('[--this-flag]')
 
     def given_command_module(self):
         return command_modules().category_1_flag_minimal
@@ -161,23 +146,11 @@ class Case5850_category_2_optional_field_NOTE(CommonCase):
         self.assertIsNone(_guy.main_short_switch)
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('[--opto-fieldo=FIELDO]')
+        self.in_usage_expect_interesting_tail('[--opto-fieldo=X]')
 
-    @shared_subject
+    @property
     def _this_one_parsed_option_detail(self):
-        _oai = self._build_optional_args_index()
-        return _oai['--opto-fieldo']
-
-    @shared_subject
-    def _optional_args_index(self):
-        return self._build_optional_args_index()
-        _act = self._section_index
-        oai = EHS().optional_args_index_via_section_index(_act)
-        del oai['--help']  # tacit assertion that it exists, as well as norm
-
-    @shared_subject
-    def _section_index(self):
-        return self.build_section_index()
+        return self.option_index['--opto-fieldo']
 
     def given_command_module(self):
         return command_modules().category_2_optional_field_minimal
@@ -192,12 +165,8 @@ class Case5853_category_3_optional_list(CommonCase):
         self._in_details_expect_positionals('listo-boyo', 'wingo-wanno')
 
     def test_030_usage_tail_is_this(self):
-        _exp = 'wingo-wanno [listo-boyo [listo-boyo …]]'
-        self._in_usage_expect_interesting_tail(_exp)
-
-    @shared_subject
-    def _section_index(self):
-        return self.build_section_index()
+        exp = 'wingo-wanno [listo-boyo […]]'
+        self.in_usage_expect_interesting_tail(exp)
 
     def given_command_module(self):
         return command_modules().category_3_optional_list_minimal
@@ -212,11 +181,7 @@ class Case5856_category_5_required_list(CommonCase):
         self._in_details_expect_positionals('reqo-listo')
 
     def test_030_usage_tail_is_this(self):
-        self._in_usage_expect_interesting_tail('reqo-listo [reqo-listo …]')
-
-    @shared_subject
-    def _section_index(self):
-        return self.build_section_index()
+        self.in_usage_expect_interesting_tail('reqo-listo [reqo-listo […]]')
 
     def given_command_module(self):
         return command_modules().category_5_required_list_minimal
@@ -228,9 +193,9 @@ def EHS():
 
 
 def command_modules():
-    from modality_agnostic.test_support.parameters_canon import (
-            command_modules)
-    return command_modules
+    from modality_agnostic.test_support.parameters_canon import \
+        command_modules as module
+    return module
 
 
 if __name__ == '__main__':

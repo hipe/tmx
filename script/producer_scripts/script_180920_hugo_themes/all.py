@@ -57,18 +57,16 @@ _doc = __doc__
 
 def _CLI_for_all(stdin, stdout, stderr, argv):
 
-    def do_CLI_for_all(mon, sin, sout, serr, htd):
+    def do_CLI_for_all(sin, sout, serr, htd, rscr):
+        mon = rscr().monitor
         _cli = _CLI_Client(mon.listener, sout, serr, argv)
         return _do_CLI_for_all(_cli, mon, sin, sout, serr, htd)
 
     do_CLI_for_all.__doc__ = _doc
 
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            CLI_function=do_CLI_for_all,
-            stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-            formal_parameters=(_same_option(),),
-            description_template_valueser=lambda: {})
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    formals = (_same_option(), _help_option())
+    func(do_CLI_for_all, stdin, stdout, stderr, argv, formals)
 
 
 def _do_CLI_for_all(cli, monitor, sin, sout, serr, htd):
@@ -85,24 +83,26 @@ def CLI_for_Report(report_module):
 
 def _do_CLI_for_report(sin, sout, serr, argv, report_module):
 
-    def do_CLI(mon, sin, sout, serr, htd):
+    def do_CLI(sin, sout, serr, htd, rscr):
+        mon = rscr().monitor
         _cli = _CLI_Client(mon.listener, sout, serr, argv)
         _run_these_reports_for_CLI(_cli, htd, (report_module,))
         return mon.exitstatus
 
     do_CLI.__doc__ = report_module.__doc__
 
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            CLI_function=do_CLI,
-            stdin=sin, stdout=sout, stderr=serr, argv=argv,
-            formal_parameters=(_same_option(),),
-            description_template_valueser=lambda: {})
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    formals = (_same_option(), _help_option())
+    return func(do_CLI, sin, sout, serr, argv, formals)
 
 
 def _same_option():
     return (f'{_this_one_opt}=DIR',
             f'or set {_this_one_env_var} environment variable')
+
+
+def _help_option():
+    return '-h', '--help', 'this screen'
 
 
 def _run_these_reports_for_CLI(cli, themes_dir, report_modules):

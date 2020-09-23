@@ -3,7 +3,8 @@ from kiss_rdb_test.common_initial_state import \
 from data_pipes_test.common_initial_state import \
         executable_fixture
 from modality_agnostic.test_support.common import \
-        dangerous_memoize as shared_subject
+        dangerous_memoize as shared_subject, \
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_child_classes
 import unittest
 
 
@@ -15,34 +16,36 @@ class CommonCase(unittest.TestCase):
 
     # -- assertions
 
-    def _CLI_client_results_in_failure_exitstatus(self):
-        self._CLI_client_results_in_failure_or_success(False)
+    def CLI_client_results_in_failure_exitstatus(self):
+        self.CLI_client_results_in_failure_or_success(False)
 
-    def _CLI_client_results_in_success_exitstatus(self):
-        self._CLI_client_results_in_failure_or_success(True)
+    def CLI_client_results_in_success_exitstatus(self):
+        self.CLI_client_results_in_failure_or_success(True)
 
-    def _CLI_client_results_in_failure_or_success(self, expect_success):
-        sta = self.end_state
-        es = sta.exitstatus
-        self.assertEqual(type(es), int)  # #[#412]
+    def CLI_client_results_in_failure_or_success(self, expect_success):
+        es = self.end_state.exitstatus
+        self.assertTrue(isinstance(es, int))  # #[#412]
         if expect_success:
             self.assertEqual(es, 0)
         else:
             self.assertNotEqual(es, 0)
 
+    def expect_ignorecase(self, act, rxs):
+        import re
+        self.assertRegex(act, re.compile(rxs, re.IGNORECASE))
+
     # -- assertion assist
 
-    def _first_line(self):
-        return self._this_line(0)
+    @property
+    def first_line(self):
+        return self.line_at_offset(0)
 
-    def _second_line(self):
-        return self._this_line(1)
+    @property
+    def last_line(self):
+        return self.line_at_offset(-1)
 
-    def _this_line(self, offset):
-        return self._stderr_lines()[offset]
-
-    def _stderr_lines(self):
-        return self.end_state.stderr_lines
+    def line_at_offset(self, offset):
+        return self.end_state.stderr_lines[offset]
 
     # -- build end state
 
@@ -63,134 +66,120 @@ class CommonCase(unittest.TestCase):
     def _expect_this_many_on_stderr(self, num):
         return self._expect_on_X_this_many('stderr', num)
 
-    def _expect_on_X_this_many(self, which, num):
-        return _these().for_expect_on_which_this_many_under(which, num, self)
+    def given_stdin(self):
+        return IO_lib().FAKE_STDIN_INTERACTIVE
 
-    def _stdin(self):
-        return _these().MINIMAL_INTERACTIVE_IO
+    do_debug = False
 
 
 class Case3060_basics(CommonCase):
 
     def test_100_subject_script_loads(self):
-        self.assertIsNotNone(_subject_script())
+        self.assertIsNotNone(subject_script())
 
 
 class Case3061_must_be_interactive(CommonCase):
 
     def test_100_CLI_client_results_in_failure_exitstatus(self):
-        self._CLI_client_results_in_failure_exitstatus()
+        self.CLI_client_results_in_failure_exitstatus()
 
     def test_110_first_line_explains(self):
-        _exp = 'usage error: cannot read from STDIN.\n'
-        self.assertEqual(self._first_line(), _exp)
+        exp = 'usage error: cannot read from STDIN.\n'
+        self.assertEqual(self.first_line, exp)
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
+    def given_stdin(self):
+        return IO_lib().FAKE_STDIN_NON_INTERACTIVE
 
-    def _stdin(self):
-        return _these().MINIMAL_NON_INTERACTIVE_IO
-
-    def _argv(self):
+    def given_argv(self):
         return ('hoopie-doopie',)
 
-    def _sout_and_serr_and_end_stater(self):
-        return self._expect_this_many_on_stderr(2)
+    def expected_lines(_):
+        yield 'STDERR'
+        yield 'STDERR'
 
 
 class Case3063DP_strange_option(CommonCase):
 
     def test_100_fails(self):
-        self._CLI_client_results_in_failure_exitstatus()
+        self.CLI_client_results_in_failure_exitstatus()
 
     def test_110_first_line_explains(self):
-        _act = self._first_line()
-        _exp = "parameter error: unrecognized option: '--zazoozle'\n"
-        self.assertEqual(_act, _exp)
+        act = self.first_line
+        rxs = "unrecognized option ['\"]--zazoozle"
+        self.expect_ignorecase(act, rxs)
 
     def test_120_invites_to_help(self):
-        _act = self._second_line()
-        _exp = "see 'me --help'\n"
-        self.assertEqual(_act, _exp)
+        act = self.last_line
+        rxs = "['\"]me -(?:h|-help)['\"] for help"
+        self.expect_ignorecase(act, rxs)
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
-
-    def _argv(self):
+    def given_argv(self):
         return ('me', '--zazoozle', 'aa', 'bb')
 
-    def _sout_and_serr_and_end_stater(self):
-        return self._expect_this_many_on_stderr(2)
+    def expected_lines(_):
+        yield 'STDERR'
+        yield 'zero_or_one', 'STDERR'
 
 
 class Case3064_missing_requireds(CommonCase):
 
     def test_100_fails(self):
-        self._CLI_client_results_in_failure_exitstatus()
+        self.CLI_client_results_in_failure_exitstatus()
 
     def test_110_says_expecting(self):
-        _act = self._first_line()
-        _exp = 'parameter error: expecting <near-collection>\n'
-        self.assertEqual(_act, _exp)
+        act = self.first_line
+        rxs = r"expecting <?near-collection"
+        self.expect_ignorecase(act, rxs)
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
-
-    def _argv(self):
+    def given_argv(self):
         return ('me',)
 
-    def _sout_and_serr_and_end_stater(self):
-        return self._expect_this_many_on_stderr(2)
+    def expected_lines(_):
+        yield 'STDERR'
+        yield 'zero_or_one', 'STDERR'
 
 
 class Case3066_top_help_screen(CommonCase):
 
     def test_100_succeeds(self):
-        self._CLI_client_results_in_success_exitstatus()
+        self.CLI_client_results_in_success_exitstatus()
 
     def test_200_something_about_usage(self):
         self.section('usage')  # exists
 
     def test_300_something_about_description(self):
-        _ = self.section('description').styled_content_string
-        self.assertIn('Mutate a near collection by merging', _)
+        act = self.section('description').head_line
+        self.assertIn('Mutate a near collection by merging', act)
 
     def test_400_something_about_arguments(self):
-        s = self.section('arguments')
-        self.assertEqual(len(s.children), 2)
+        act = self.section('arguments').body_line_count
+        self.assertEqual(act, 2)
 
     def test_500_something_about_options(self):
-        s = self.section('options')
-        self.assertEqual(len(s.children), 4)
+        act = self.section('options').body_line_count
+        self.assertEqual(act, 3)  # flickers when no trailing invite
 
-    def section(self, label):
-        si = self.end_section_index
-        se = si.sections[label]
-        return si.tree.children[se.offset]
+    def section(self, key):
+        return self.end_state_help_screen[key]
 
     @shared_subject
-    def end_section_index(self):  # ..
-        _ = self.end_state.stderr_lines
-        return _help_screen_lib().BIG_EXPERIMENTAL_SECTION_INDEX(_)
+    def end_state_help_screen(self):  # ..
+        lines = self.end_state.stderr_lines
+        func = _help_screen_lib().parse_help_screen
+        help_screen = func(lines)
+        return help_screen
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
-
-    def _sout_and_serr_and_end_stater(self):
-        return _these().for_recording_all_stderr_lines()
-
-    def _argv(self):
+    def given_argv(self):
         return ('me', '-h')
+
+    def expected_lines(_):
+        yield 'one_or_more', 'STDERR'
 
 
 class Case3067DP_FA_help_screen(CommonCase):
 
     def test_100_succeeds(self):
-        self._CLI_client_results_in_success_exitstatus()
+        self.CLI_client_results_in_success_exitstatus()
 
     def test_200_stdout_lines_look_like_items__at_least_one(self):
         import re
@@ -211,15 +200,11 @@ class Case3067DP_FA_help_screen(CommonCase):
         _ = 'the filename extension can imply a format adapter.\n'
         self.assertEqual(_s_a[0], _)
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
+    def given_argv(self):
+        return ('me', '--near-format', 'help', 'pp', 'qq')
 
-    def _sout_and_serr_and_end_stater(self):
-        return _these().THREE_FOR_LINE_RUNNER()
-
-    def _argv(self):
-        return ('me', '--near-format', 'help', 'xx', 'yy')
+    def expected_lines(_):
+        yield 'one_or_more'
 
 
 class Case3069DP_strange_format_adapter_name(CommonCase):
@@ -229,7 +214,7 @@ class Case3069DP_strange_format_adapter_name(CommonCase):
     """
 
     def test_100_fails(self):
-        self._CLI_client_results_in_failure_exitstatus()
+        self.CLI_client_results_in_failure_exitstatus()
 
     def test_200_says_not_found(self):
         _ = self.end_two_sentences[0]
@@ -241,23 +226,19 @@ class Case3069DP_strange_format_adapter_name(CommonCase):
 
     @shared_subject
     def end_two_sentences(self):
-        return self._first_line().split('. ')
+        return self.first_line.split('. ')
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
+    def given_argv(self):
+        return 'me', '--near-format', 'zig-zag', 'pp', 'qq'
 
-    def _sout_and_serr_and_end_stater(self):
-        return self._expect_this_many_on_stderr(1)
-
-    def _argv(self):
-        return ('me', '--near-format', 'zig-zag', 'xx', 'yy')
+    def expected_lines(_):
+        yield 'STDERR'
 
 
 class Case3070_money_and_diff(CommonCase):
 
     def test_100_succeeds(self):
-        self._CLI_client_results_in_success_exitstatus()
+        self.CLI_client_results_in_success_exitstatus()
 
     def test_200_entire_output_is_just_the_diff(self):
         self.assertIsNotNone(self.end_parse_tree)
@@ -286,15 +267,11 @@ class Case3070_money_and_diff(CommonCase):
         _lines = self.end_state.stdout_lines
         return _CrazyDiffParse(_lines).execute()
 
-    @shared_subject
-    def end_state(self):
-        return self._build_end_state()
-
-    def _sout_and_serr_and_end_stater(self):
-        return _these().for_recording_all_stdout_lines()
-
-    def _argv(self):
+    def given_argv(self):
         return ('me', '--diff', _markdown_0100(), _far_130())
+
+    def expected_lines(_):
+        yield 'one_or_more', 'STDOUT'
 
 
 # #open [#459.I] cover case: no diff
@@ -422,22 +399,17 @@ class _Symbol:
         return self._range.stop == num
 
 
-def _help_screen_lib():
-    import script_lib.test_support.expect_help_screen as lib
+
+
     return lib
 
 
-def _these():
-    import script_lib.test_support.stdout_and_stderr_and_end_stater as lib
-    return lib
-
-
-def _expect_STDs():
+def IO_lib():
     import script_lib.test_support.expect_STDs as lib
     return lib
 
 
-def _subject_script():
+def subject_script():
     import data_pipes.cli.sync as mod
     return mod
 

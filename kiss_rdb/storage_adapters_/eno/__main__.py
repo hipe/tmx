@@ -152,14 +152,13 @@ def _CLI(sin, sout, serr, argv):
     argv[0] = Xx()
     # == END
 
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv,
-            formal_parameters=(('file', 'some eno file'),),
-            description_template_valueser=lambda: {})
+    formals = (('-h', '--help', 'this screen'),
+               ('file', 'some eno file'))
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, _do_CLI, sin, sout, serr, argv, formals)
 
 
-def _do_CLI(mon, sin, sout, serr, file_path):
+def _do_CLI(sin, sout, serr, file_path, rscr):
     """ad-hoc develoment utility for seeing a parsed eno document as a dump.
 
     not complete. (This was really just tooling to find the cause of a "bug"

@@ -53,7 +53,7 @@ class _CommandModules:
             def fake_desc(name):
                 def lineser(style):  # [#511.4] lineser with styler
                     style.hello_styler()
-                    yield "«desc for parm '{ name }'»"
+                    yield f"«desc for parm '{ name }'»"
                 return lineser
 
             PARAMETERS = {

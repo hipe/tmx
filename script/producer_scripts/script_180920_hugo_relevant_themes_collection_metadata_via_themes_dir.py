@@ -33,22 +33,19 @@ _my_desc = __doc__
 
 
 def _CLI(stdin, stdout, stderr, argv):
-    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+    from script_lib.cheap_arg_parse import \
+        require_interactive, cheap_arg_parse as func
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('themes-dir', 'ohai «help for themes_dir»'),
-            ),
-        description_template_valueser=lambda: {})
+    formals = (('-h', '--help', 'this screen'),
+               ('themes-dir', 'ohai «help for themes_dir»'))
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
 
 
-def _do_CLI(monitor, stdin, stdout, stderr, themes_dir):
-
+def _do_CLI(stdin, stdout, stderr, themes_dir, rscr):
+    mon = rscr().monitor
     cm = relevant_themes_collection_metadata_via_themes_dir(
-            themes_dir, monitor.listener)
+            themes_dir, mon.listener)
     # ..
     dct = cm.to_dictionary()
     if False:  # worked but
@@ -63,7 +60,7 @@ def _do_CLI(monitor, stdin, stdout, stderr, themes_dir):
             sort_keys=False)  # currently aesthetically ordered.
     stderr.write(_big_s)
     stderr.write('\n')
-    return monitor.exitstatus
+    return mon.exitstatus
 
 
 _do_CLI.__doc__ = _my_desc

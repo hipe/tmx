@@ -30,7 +30,7 @@ class CommonCase(unittest.TestCase):
     @shared_subj_in_children
     def end_state_emission(self):
         print("MAKING IT")
-        lstn, done = em.listener_and_done_via(self.expecting_emissions(), self)
+        lstn, done = em.listener_and_done_via(self.expected_emissions(), self)
         cstack = self.given_context_stack()
         parser = subject_function()(lstn, (lambda: cstack if cstack else None))
         x = parser(self.given_string())
@@ -161,7 +161,7 @@ class Case3856_this_parse_error(CommonCase):
     def given_context_stack(_):
         return ({'path': 'zoo-zah.ohi'}, {'lineno': 3})
 
-    def expecting_emissions(_):
+    def expected_emissions(_):
         yield 'error', 'structure', 'input_error', 'as', 'first_emission'
 
 

@@ -24,21 +24,20 @@ _raw_url = (
 
 
 def _CLI(sin, sout, serr, argv):
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            CLI_function=_do_CLI,
-            stdin=sin, stdout=sout, stderr=serr, argv=argv,
-            formal_parameters=(
-                ('-p', '--prepared-for-sync',
-                 'map certain fields from far to near (1 rename, 1 split)'),
-                ('-s', '--for-sync',
-                 'translate to a stream suitable for use in [#447] syncing'),
-            ),
-            description_template_valueser=lambda: {'raw_url': _raw_url})
+    formals = (
+        ('-p', '--prepared-for-sync',
+         'map certain fields from far to near (1 rename, 1 split)'),
+        ('-s', '--for-sync',
+         'translate to a stream suitable for use in [#447] syncing'),
+        ('-h', '--help', 'this screen'))
+    kwargs = {'description_valueser': lambda: {'raw_url': _raw_url}}
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, sin, sout, serr, argv, formals, **kwargs)
 
 
-def _do_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
-    listener = error_monitor.listener
+def _do_CLI(mon, sin, sout, serr, do_prepare, is_for_sync, rscer):
+    mon = rscer().monitor
+    listener = mon.listener
 
     if do_prepare or is_for_sync:
         opened = open_traversal_stream(listener)
@@ -50,7 +49,7 @@ def _do_CLI(error_monitor, sin, sout, serr, do_prepare, is_for_sync):
             dcts = stream_for_sync_via_stream(dcts)
         _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
 
-    return error_monitor.exitstatus
+    return mon.exitstatus
 
 
 _do_CLI.__doc__ = __doc__

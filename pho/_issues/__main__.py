@@ -18,7 +18,10 @@ def _CLI_for_child_1(sin, sout, serr, argv, en=None):
         _do_CLI_for_child_1, sin, sout, serr, argv, _foz_for_child_1, None, en)
 
 
-_foz_for_child_1 = (('string', 'a string to parse as an identifier'),)
+_foz_for_child_1 = (
+    ('-h', '--help', 'this screen'),
+    ('string', 'a string to parse as an identifier'),
+)
 
 
 def _do_CLI_for_child_1(mon, sin, sout, serr, input_string):

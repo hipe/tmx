@@ -1,10 +1,10 @@
 # == BEGIN [#607.6] hidden CLI
 
-_this_var_name = 'template-file'
+_moniker = 'template-file'
 
 _my_doc = """experiment in using python templates
 
-the file pointed to by <{_this_var_name}> should have variables
+the file pointed to by <{moniker}> should have variables
 in it $like_this. set environment variables with names TMPL_LIKE_THIS.
 etc.
 """
@@ -12,17 +12,15 @@ etc.
 
 
 def _CLI(sin, sout, serr, ARGV):
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            CLI_function=_do_CLI,
-            stdin=sin, stdout=sout, stderr=serr, argv=ARGV,
-            formal_parameters=(
-                (_this_var_name, 'ohai i am thing 1'),
-                ),
-            description_template_valueser=lambda: {'_this_var_name': _this_var_name},)  # noqa: E501
+    formals = (('-h', '--help', 'this screen'),
+               (_moniker, 'ohai i am thing 1'))
+    kwargs = {'description_valueser': lambda: {'moniker': _moniker}}
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, sin, sout, serr, ARGV, formals, **kwargs)
 
 
-def _do_CLI(error_monitor, sin, sout, serr, file_1_abc_CHAGEME_):
+def _do_CLI(sin, sout, serr, file_1_abc_CHAGEME_, rscer):
+    mon = rscer().monitor
 
     with open(file_1_abc_CHAGEME_) as fh:
         big_string = fh.read()
@@ -36,16 +34,16 @@ def _do_CLI(error_monitor, sin, sout, serr, file_1_abc_CHAGEME_):
         data_source=environ,
         template_big_string=big_string,
         data_source_key_via_template_variable_name=key_via,
-        listener=error_monitor.listener)
+        listener=mon.listener)
 
     if lines is None:
-        return error_monitor.listener
+        return mon.exitstatus
 
     write = sout.write
     for line in lines:
         write(line)  # assume newline
 
-    return error_monitor.listener
+    return mon.exitstatus
 
 
 _do_CLI.__doc__ = _my_doc

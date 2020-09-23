@@ -46,16 +46,14 @@ def __producer_script_via_producer_script_path(producer_script_path):
 
 
 def _exit_code_via_producer_script(ps):
+    formals = (
+        ('-s', '--for-sync', 'show the traveral stream mapped thru etc'),
+        ('-h', '--help', 'this screen'))
+    kwrgs = {'description_valueser': lambda: {'url': _url}}
     _my_CLI = __CLI_function_via_producer_script(ps)
-    from script_lib.cheap_arg_parse import cheap_arg_parse
     import sys as o
-    return cheap_arg_parse(
-        CLI_function=_my_CLI,
-        stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-        formal_parameters=(
-            ('-s', '--for-sync', 'show the traveral stream mapped thru etc'),
-            ),
-        description_template_valueser=lambda: {'url': _url})
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_my_CLI, o.stdin, o.stdout, o.stderr, o.argv, formals, **kwrgs)
 
 
 def __CLI_function_via_producer_script(ps):
@@ -64,20 +62,16 @@ def __CLI_function_via_producer_script(ps):
     doc = ps.__doc__
     del ps
 
-    def my_CLI(error_monitor, sin, sout, serr, is_for_sync):
-
-        opened = open_trav_stream(error_monitor.listener)
-
+    def my_CLI(sin, sout, serr, is_for_sync, rscr):
+        mon = rscr().monitor
+        opened = open_trav_stream(mon.listener)
         with opened as dcts:
             if is_for_sync:
                 use_this_stream = stream_via_stream(dcts)
             else:
                 use_this_stream = dcts
             _top_html_lib().flush_JSON_stream_into(sout, serr, use_this_stream)
-
-        if error_monitor.OK:
-            return 0
-        return 456
+        return 0 if mon.OK else 456
 
     my_CLI.__doc__ = doc
     return my_CLI

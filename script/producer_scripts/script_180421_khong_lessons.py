@@ -17,12 +17,13 @@ _url = _domain + '/python/pytut.php'  # ..
 _my_doc_string = __doc__
 
 
-def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
-    with open_traversal_stream(error_monitor.listener) as dcts:
+def _my_CLI(sin, sout, serr, is_for_sync, rscer):
+    mon = rscer().monitor
+    with open_traversal_stream(mon.listener) as dcts:
         if is_for_sync:
             dcts = stream_for_sync_via_stream(dcts)
         _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
-    return 0 if error_monitor.OK else 456
+    return 0 if mon.OK else 456
 
 
 _use_key = 'href'  # internally (in function) which component to use for ID
@@ -291,16 +292,14 @@ def xx(s):
 
 
 if __name__ == '__main__':
+    formals = (('-s', '--for-sync',
+                'translate to a stream suitable for use in [#447] syncing'),
+               ('-h', '--help', 'this screen'))
+    kwargs = {'description_valueser': lambda: {'domain': _domain}}
     import sys as o
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    exit(cheap_arg_parse(
-            CLI_function=_my_CLI,
-            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-            formal_parameters=(
-                ('-s', '--for-sync',
-                 'translate to a stream suitable for use in [#447] syncing'),),
-            description_template_valueser=lambda: {'domain': _domain},
-            ))
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    exit(func(_my_CLI, o.stdin, o.stdout, o.stderr, o.argv, formals, **kwargs))
+
 
 # #history-A.4: no more sync-side stream mapping - removed a ton of doc
 # #history-A.3: beaut. soup changed.

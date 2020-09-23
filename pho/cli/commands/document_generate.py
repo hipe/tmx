@@ -17,6 +17,8 @@ def _params():
 
     yield '-n', '--dry-run', "Don't actually write the output file(s)"
 
+    yield '-h', '--help', "This screen"
+
     yield 'notecard-id', 'The head notecard of the document to generate.'
 
     yield ('out-path',

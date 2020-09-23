@@ -271,6 +271,10 @@ of functions in the streamiest and most platform-idiomatic way yet..
 """
 
 
+def keys_map(pcs):
+    return (f"'{pc}'" for pc in pcs)
+
+
 def oxford_AND(these):
     return oxford_join(these, ' and ')
 
@@ -345,27 +349,25 @@ def oxford_join(
         _ = f'need iterator of strings had {type(string_iterator)}'
         raise TypeError(_)
 
-    _itr = __strings_for_oxford_join(
+    itr = _strings_for_oxford_join(
             string_iterator,
             more_significant_separator, less_significant_separator)
 
-    return ''.join(_itr)
+    return ''.join(itr)
 
 
-def __strings_for_oxford_join(
-        string_iterator,
-        more_significant_separator,
-        less_significant_separator):
+def _strings_for_oxford_join(
+        string_iterator, more_significant_sep, less_significant_sep):
 
     _spatialized_itr = spatialize_with_2_items_of_lookahead(string_iterator)
 
     for o in _spatialized_itr:
         if o.is_neither_last_nor_second_to_last_item:
             yield o.item
-            yield less_significant_separator
+            yield less_significant_sep
         elif o.is_second_to_last_item:
             yield o.item
-            yield more_significant_separator
+            yield more_significant_sep
         elif o.is_last_item:
             assert(o.is_last_item)
             yield o.item

@@ -8,6 +8,7 @@ def _params():
     from pho.cli import CP_
     yield '-c', '--collection-path=PATH', * CP_().descs
     yield '-v', '--verify', 'Check the integrity of the notecard collection'
+    yield '-h', '--help', 'this screen'
 
 
 def return_exitstatus(orig_f):
@@ -22,13 +23,14 @@ def return_exitstatus(orig_f):
 
 
 @return_exitstatus
-def _do_CLI(monitor, sin, sout, serr, enver, collection_path, do_veri):
+def _do_CLI(sin, sout, serr, collection_path, do_veri, resourcer):
     """Show every relationship between every notecard in the collection.
 
     Output a graph-viz digraph of the whole collection.
     """
 
-    listener = _build_CLI_enhanced_listener(monitor)
+    mon = resourcer().monitor
+    listener = _build_CLI_enhanced_listener(mon)
 
     if collection_path is None:
         collection_path = _require_collection_path(enver, listener)

@@ -64,7 +64,7 @@ class CommonCase(unittest.TestCase):
         return self.common_run(throwing_listener)
 
     def build_runs_expecting_emissions(self):
-        li, done = em.listener_and_done_via(self.expecting_emissions(), self)
+        li, done = em.listener_and_done_via(self.expected_emissions(), self)
         tup = self.common_run(li)
         assert len(tup)  # or not
         emis_dct = done()
@@ -101,7 +101,7 @@ class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCas
         exp = "Unrecognized attributes ('chalupa fupa', 'propecia alameda')"
         self.assertIn(exp, msg)
 
-    def expecting_emissions(_):
+    def expected_emissions(_):
         yield 'error', '?+', 'as', 'this_emi'
 
     def given_far_dictionaries(_):

@@ -14,12 +14,13 @@ import re
 _url = 'https://github.com/sindresorhus/awesome-electron#boilerplates'
 
 
-def _my_CLI(error_monitor, sin, sout, serr, is_for_sync):
-    with open_traversal_stream(error_monitor.listener) as dcts:
+def _my_CLI(sin, sout, serr, is_for_sync, rscr):
+    mon = rscr().monitor
+    with open_traversal_stream(mon.listener) as dcts:
         if is_for_sync:
             dcts = stream_for_sync_via_stream(dcts)
         _ps_lib().flush_JSON_stream_into(sout, serr, dcts)
-    return 0 if error_monitor.OK else 456
+    return 0 if mon.OK else 456
 
 
 _my_CLI.__doc__ = __doc__
@@ -109,15 +110,13 @@ def _ps_lib():
 
 
 if __name__ == '__main__':
-    from script_lib.cheap_arg_parse import cheap_arg_parse
+    formals = (
+        ('-s', '--for-sync',
+         'translate to a stream suitable for use in [#447] syncing'),
+        ('-h', '--help', 'this screen'))
+    kwargs = {'description_valueser': lambda: {'_this_one_url': _url}}
     import sys as o
-    exit(cheap_arg_parse(
-            CLI_function=_my_CLI,
-            stdin=o.stdin, stdout=o.stdout, stderr=o.stderr, argv=o.argv,
-            formal_parameters=(
-                ('-s', '--for-sync',
-                 'translate to a stream suitable for use in [#447] syncing'),),
-            description_template_valueser=lambda: {'_this_one_url': _url},
-            ))
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    exit(func(_my_CLI, o.stdin, o.stdout, o.stderr, o.argv, formals, **kwargs))
 
 # #birth

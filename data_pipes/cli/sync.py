@@ -42,6 +42,7 @@ _desc = __doc__
 _formal_parameters = (
         ('--near-format=FORMAT_NAME', 'ohai «the near_format»'),
         ('--diff', 'show only the changed lines as a diff'),
+        ('-h', '--help', 'this screen'),
         ('near-collection', 'ohai «help for near_collection»', "try 'help'"),
         ('producer-script', 'ohai «help for producer_script»'))
 
@@ -55,19 +56,15 @@ def _CLI(sin, sout, serr, argv):
     from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
     if not require_interactive(serr, sin, argv):
         return 456  # _exitstatus_for_error
-    return cheap_arg_parse(
-            CLI_function=_do_CLI,
-            stdin=sin, stdout=sout, stderr=serr, argv=argv,
-            formal_parameters=_formal_parameters,
-            description_template_valueser=lambda: {})
+    return cheap_arg_parse(_do_CLI, sin, sout, serr, argv, _formal_parameters)
 
 
-def _do_CLI(mon, sin, sout, serr, near_fmt, do_diff, near_coll, ps_path):
-
+def _do_CLI(sin, sout, serr, near_fmt, do_diff, near_coll, ps_path, rscr):
     if 'help' == near_fmt:
         from data_pipes.cli import SPLAY_FORMAT_ADAPTERS
         return SPLAY_FORMAT_ADAPTERS(sout, serr)
 
+    mon = rscr().monitor
     sout_lines = _stdout_lines_from_sync(
             near_coll, ps_path, mon.listener, do_diff, near_fmt)
     for line in sout_lines:

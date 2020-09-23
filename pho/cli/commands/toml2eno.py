@@ -4,11 +4,13 @@ import re
 def CLI(sin, sout, serr, argv, enver=None):
     # (we have to accept `enver` because our parent does. even tho don't need)
     from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv, (('file-path', 'some file'),))
+    return cheap_arg_parse(_do_CLI, sin, sout, serr, argv, _formals)
 
 
-def _do_CLI(mon, sin, sout, serr, file_path):
+_formals = (('file-path', 'some file'), ('-h', '--help', 'this screen'))
+
+
+def _do_CLI(sin, sout, serr, file_path, _rscr):
     """Quick and dirty hack to change file from toml to eno.
 
     We don't parse toml robustly because at writing it's not possible
@@ -21,7 +23,7 @@ def _do_CLI(mon, sin, sout, serr, file_path):
         for line in __output_lines_via_line_scanner(__file_line_scanner(fh)):
             write(line)
 
-    return mon.exitstatus
+    return 0
 
 
 def __output_lines_via_line_scanner(scn):

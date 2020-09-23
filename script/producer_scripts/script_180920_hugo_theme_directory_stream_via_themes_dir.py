@@ -13,29 +13,27 @@ _my_desc = __doc__
 
 
 def _CLI(stdin, stdout, stderr, argv):
-    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+    from script_lib.cheap_arg_parse import \
+        require_interactive, cheap_arg_parse as func
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('themes-dir', 'ohai «help for themes_dir»'),
-            ),
-        description_template_valueser=lambda: {})
+    formals = (('-h', '--help', 'this screen'),
+               ('themes-dir', 'ohai «help for themes_dir»'))
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
 
 
-def _do_CLI(monitor, sin, sout, serr, themes_dir):
+def _do_CLI(sin, sout, serr, themes_dir, rscr):
+    mon = rscr().monitor
     if True:
         def visit(dir_path):
             sout.write(f'{dir_path}\n')
 
-        _ = open_theme_directory_stream_via_themes_dir(themes_dir, monitor.listener)  # noqa: E501
-        with _ as dirs:
-            for dir_path in dirs:
-                visit(dir_path)
+    opnd = open_theme_directory_stream_via_themes_dir(themes_dir, mon.listener)
+    with opnd as dirs:
+        for dir_path in dirs:
+            visit(dir_path)
 
-        return monitor.exitstatus
+    return mon.exitstatus
 
     # (at #history-A.2 got rid of retrofitting for old way [#608.5]
 

@@ -14,7 +14,9 @@ broadly there are 3 steps to this:
 """
 
 
-raise Exception("worked visually once")  # at #history-A.2 [#676] cover me but:
+raise RuntimeError("worked at #history-B.2. comment out if u're feeling lucky")
+# at #history-B.2 increased expected number of tables from 4 to 6
+# at #history-A.2 [#676] worked but:
 # NOTE - this writes tempfiles so take that into account when you cover
 
 
@@ -41,37 +43,33 @@ tmp_html_file = 'tmp.woody-allen.page.html'
 
 
 def _CLI(stdin, stdout, stderr, argv):
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('--use-numpy', 'do the full monty. requires things'),
-            ),
-        description_template_valueser=lambda: {})
+    formals = (('--use-numpy', 'do the full monty. requires things'),
+               ('-h', '--help', 'this screen'))
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
 
 
-def _do_CLI(error_monitor, sin, sout, serr, do_use_numpy):
+def _do_CLI(sin, sout, serr, do_use_numpy, rscer):
 
-    def __main():
-        ok = __resolve_html_file()
+    def main():
+        ok = resolve_html_file()
         if not ok:
             return exitstatus
 
-        ok = __resolve_numbers()
+        ok = resolve_numbers()
         if not ok:
             return exitstatus
 
         return _display_thing(client, do_use_numpy)
 
-    def __resolve_numbers():
+    def resolve_numbers():
         if client.path_exists(tmp_numbers_file):
             client.info('(using {})', tmp_numbers_file)
             return True
         else:
             return _write_numbers_file(client)
 
-    def __resolve_html_file():
+    def resolve_html_file():
         if client.path_exists(tmp_html_file):
             client.info('(using {})', tmp_html_file)
             return True
@@ -81,7 +79,7 @@ def _do_CLI(error_monitor, sin, sout, serr, do_use_numpy):
     client = _Client(sout, serr)
     exitstatus = 5
 
-    return __main()
+    return main()
 
 
 _do_CLI.__doc__ = _doc
@@ -137,7 +135,7 @@ def _write_numbers_file(client):
 
     tables = soup.find_all(None, 'wikitable')
     ln = len(tables)
-    exp = 4
+    exp = 6
     if ln is not exp:
         client.error('expected {} had {} tables', exp, ln)
         return False
@@ -203,7 +201,7 @@ def _write_html_file(client):
     with open(tmp_html_file, 'w') as fh:
         r = requests.get(url)
         status_code = r.status_code
-        if status_code is 200:
+        if 200 == status_code:
             _bytes = fh.write(r.text)
             client.info('wrote {} ({} bytes)', tmp_html_file, _bytes)
             ok = True

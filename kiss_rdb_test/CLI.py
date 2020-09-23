@@ -1,7 +1,5 @@
-"""DISCUSSION :[#817]: :#here2:
-
-  - this identifier marks a spot in the support library where is described
-    the component architecture from which IO facades (test spies) can be made.
+"""DISCUSSION :#here2:
+  - we use the [#605.1] component architecture to make IO façades
   - here we do a lot of gross bandaid code to accommodate the fact that Click
     is not made testing friendly #[#867.L]
   - here we do our own highly experimental construction of a write-only IO
@@ -132,8 +130,7 @@ class CLI_Test_Case_Methods:
                 exception_category=exception_category,
                 injections_dictionary=injections_dict,
                 might_debug=self.might_debug,
-                do_debug_f=lambda: self.do_debug,
-                debug_IO_f=lambda: _sys().stderr)
+                do_debug_f=lambda: self.do_debug)
 
 
 # == BEGIN stdout capture and support #here2
@@ -146,9 +143,7 @@ def BIG_FLEX(
         exception_category,
         injections_dictionary,
         might_debug,
-        do_debug_f,
-        debug_IO_f,
-        ):
+        do_debug_f):
 
     mixed_writes = []
     is_complicated = False
@@ -162,24 +157,26 @@ def BIG_FLEX(
 
             def receive_serr_write(s):
                 mixed_writes.append(('serr', s))
-            out_WR = _write_receiver_via_function(receive_sout_write)
-            err_WR = _write_receiver_via_function(receive_serr_write)
         else:
             def receive_sout_write(s):
                 mixed_writes.append(s)
-            out_WR = _write_receiver_via_function(receive_sout_write)
-            err_WR = _no_WR
+
+            def receive_serr_write(s):
+                assert()
     else:
+        def receive_sout_write(s):
+            assert()
+
         def receive_serr_write(s):
             mixed_writes.append(s)
-        out_WR = _no_WR
-        err_WR = _write_receiver_via_function(receive_serr_write)
+
+    sout_recvs = [receive_sout_write]
+    serr_recvs = [receive_serr_write]
 
     if might_debug:
-        _odwr = es.DebuggingWriteReceiver('sout', do_debug_f, debug_IO_f)
-        _edwr = es.DebuggingWriteReceiver('serr', do_debug_f, debug_IO_f)
-        out_WR = es.MuxingWriteReceiver((_odwr, out_WR))
-        err_WR = es.MuxingWriteReceiver((_edwr, err_WR))
+        import script_lib.test_support.expect_STDs as lib
+        sout_recvs.append(lib.build_write_receiver_for_debugging('DBG SOUT: ', do_debug_f))  # noqa: E501
+        serr_recvs.append(lib.build_write_receiver_for_debugging('DBG SERR: ', do_debug_f))  # noqa: E501
 
     def invoke_CLI():
         return _invoke_CLI(given_stdin, given_args, injections_dictionary)
@@ -191,7 +188,7 @@ def BIG_FLEX(
 
     if exception_category is None:
 
-        with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
+        with OPEN_HORRIBLE_VENDOR_HACK(sout_recvs, serr_recvs):
             fs_finish, exit_code = invoke_CLI()
 
         fsr = None if fs_finish is None else fs_finish()
@@ -224,7 +221,7 @@ def BIG_FLEX(
 
     did_throw = False
     try:
-        with OPEN_HORRIBLE_VENDOR_HACK(out_WR, err_WR):
+        with OPEN_HORRIBLE_VENDOR_HACK(sout_recvs, serr_recvs):
             invoke_CLI()
     except _exception_class_expression as e_:
         did_throw = True
@@ -248,17 +245,6 @@ class _BigFlexEndStateWithLala:
         self.filesystem_recordings = filesystem_recordings
         self.lines = lines
         self.exit_code = exit_code
-
-
-def _write_receiver_via_function(receive_write):
-    return es.ProxyingWriteReceiver(receive_write)
-
-
-def _expecting_no_writes(s):
-    assert(False)
-
-
-_no_WR = _write_receiver_via_function(_expecting_no_writes)
 
 
 def _invoke_CLI(given_stdin, given_args, injections_dictionary):
@@ -334,7 +320,7 @@ def __flatten_these(random_number, filesystem):
     return random_number, filesystem
 
 
-def OPEN_HORRIBLE_VENDOR_HACK(sout_write_receiver, serr_write_receiver):
+def OPEN_HORRIBLE_VENDOR_HACK(sout_recvs, serr_recvs):
     """.#open [#867.L] this so bad:
 
     click is not written to be test-friendly in any injection-sense, so
@@ -350,8 +336,8 @@ def OPEN_HORRIBLE_VENDOR_HACK(sout_write_receiver, serr_write_receiver):
 
     from click import utils as EEK_click_utils
 
-    sout_iof = _write_only_facade(sout_write_receiver)
-    serr_iof = _write_only_facade(serr_write_receiver)
+    sout_iof = es.spy_on_write_via_receivers(sout_recvs)
+    serr_iof = es.spy_on_write_via_receivers(serr_recvs)
 
     dtso = getattr(EEK_click_utils, '_default_text_stdout')
     dtse = getattr(EEK_click_utils, '_default_text_stderr')
@@ -425,21 +411,9 @@ def __lines_via_writes(writes):
             yield line
 
 
-def _write_only_facade(receiver):
-    from modality_agnostic import write_only_IO_proxy
-    return write_only_IO_proxy(
-            write=lambda s: receiver.receive_write(s),
-            flush=lambda: receiver.receive_flush())
-
-
 def _lines_via_big_string_as_is(big_string):
     import kiss_rdb.storage_adapters_.toml.CUD_attributes_via_request as lib
     return lib.lines_via_big_string_(big_string)
-
-
-def _sys():
-    import sys as _
-    return _
 
 
 def xx(msg=None):

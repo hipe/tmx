@@ -7,7 +7,6 @@ class CommonCase(unittest.TestCase):
     # -- assertions
 
     def expect_sequence_equals_recursive(self, ast, exp):
-        from script_lib.test_support import assert_sequence_equals_recursive
         return assert_sequence_equals_recursive(ast, exp, self)
 
     # -- create end state
@@ -229,6 +228,21 @@ class build_minimal_parser:
         return (self._string,)
 
 
+def assert_sequence_equals_recursive(act, exp, tc, depth=0):  # depth not used
+    # moved here at #history-B.2
+    for i in range(0, max(len(act), len(exp))):
+        act_ = act[i]
+        exp_ = exp[i]
+        if isinstance(exp_, str):
+            tc.assertEqual(act_, exp_)
+        elif isinstance(exp_, tuple):
+            tc.assertIsInstance(act_, tuple)
+            assert_sequence_equals_recursive(act_, exp_, tc, depth+1)
+        else:
+            assert(exp_ is None)
+            tc.assertIsNone(act_)
+
+
 def subject_module():
     from script_lib.magnetics import parser_via_grammar as mod
     return mod
@@ -237,4 +251,5 @@ def subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.2
 # #born

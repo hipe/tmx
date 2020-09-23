@@ -38,7 +38,7 @@ def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
         whine(f'when {arg_moniker} is "-", STDIN must be pipe')
 
     def whine(msg):
-        stderr.write(f'parameter error: {msg}\n')  # [#607.I] _eol
+        stderr.write(f'parameter error: {msg}\n')  # [#605.2] _eol
 
     return main()
 

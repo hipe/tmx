@@ -16,11 +16,12 @@ def _CLI(sin, sout, serr, argv):
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
             _do_CLI, sin, sout, serr, argv,
-            formal_parameters=(('file', 'zim zum'),),
-            description_template_valueser=lambda: {})
+            formal_parameters=(
+                ('-h', '--help', 'this screen'),
+                ('file', 'zim zum')))
 
 
-def _do_CLI(mon, sin, sout, serr, path):
+def _do_CLI(sin, sout, serr, path, _rscr):
     "experiment. just for testing patch files"
 
     def work(lines):
@@ -447,4 +448,5 @@ def xx(msg=None):
 if '__main__' == __name__:
     cli_for_production()
 
+# #history-B.2
 # #began-as-abstraction

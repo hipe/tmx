@@ -18,22 +18,18 @@ _my_desc = __doc__
 
 
 def _CLI(stdin, stdout, stderr, argv):
-    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
-
+    from script_lib.cheap_arg_parse import require_interactive, \
+        cheap_arg_parse as func
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
-
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('themes-dir', 'ohai «help for themes_dir»'),
-            ),
-        description_template_valueser=lambda: {})
+    formals = (('-h', '--help', 'this screen'),
+               ('themes-dir', 'ohai «help for themes_dir»'))
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
 
 
-def _do_CLI(monitor, sin, sout, serr, themes_dir):
-
+def _do_CLI(sin, sout, serr, themes_dir, rscr):
+    mon = rscr().monitor
+    if True:
         def visit(path, dct):
             sout.write(path)
             write_newline()
@@ -45,12 +41,13 @@ def _do_CLI(monitor, sin, sout, serr, themes_dir):
         import pprint
         pp = pprint.PrettyPrinter(indent=2, stream=sout).pprint
         except_first_time = _ExceptFirstTime(write_newline)
-        _ = theme_toml_stream_via_themes_dir(themes_dir, monitor.listener)
-        for path, dct in _:
-            except_first_time()
-            visit(path, dct)
 
-        return monitor.exitstatus
+    pairs = theme_toml_stream_via_themes_dir(themes_dir, mon.listener)
+    for path, dct in pairs:
+        except_first_time()
+        visit(path, dct)
+
+    return mon.exitstatus
 
 
 def theme_toml_stream_via_themes_dir(themes_dir, listener):  # glue

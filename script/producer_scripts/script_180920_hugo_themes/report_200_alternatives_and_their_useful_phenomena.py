@@ -130,10 +130,9 @@ def _me_as_module():
 
 
 if __name__ == '__main__':
-    from all import CLI_for_Report as _
-    _CLI = _(_me_as_module())
+    from all import CLI_for_Report as func
+    _CLI = func(_me_as_module())
     import sys as o
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.

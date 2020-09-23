@@ -1,17 +1,3 @@
-def assert_sequence_equals_recursive(act, exp, tc, depth=0):  # depth not used
-    for i in range(0, max(len(act), len(exp))):
-        act_ = act[i]
-        exp_ = exp[i]
-        if isinstance(exp_, str):
-            tc.assertEqual(act_, exp_)
-        elif isinstance(exp_, tuple):
-            tc.assertIsInstance(act_, tuple)
-            assert_sequence_equals_recursive(act_, exp_, tc, depth+1)
-        else:
-            assert(exp_ is None)
-            tc.assertIsNone(act_)
-
-
 def lines_and_spy_io_for_test_context(tc, dbg_msg_head):  # #:[#605.1]
     lines = []
 
@@ -81,5 +67,8 @@ class _build_unindent:
 
 unindent = _build_unindent()
 
+# assert_sequence_equals_recursive moved to client at #history-B.2.1
+
+# #history-B.2.1
 # #history-A.1
 # #abstracted.

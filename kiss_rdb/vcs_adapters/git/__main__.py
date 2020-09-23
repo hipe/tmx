@@ -25,7 +25,9 @@ def _CLI_for_child_1(sin, sout, serr, argv, en=None):
         _do_CLI_for_child_1, sin, sout, serr, argv, _foz_for_child_1, None, en)
 
 
-_foz_for_child_2 = ()
+_foz_for_child_2 = (
+    ('-h', '--help', 'this screen'),
+)
 
 
 def _do_CLI_for_child_2(mon, sin, sout, serr):
@@ -43,7 +45,9 @@ def _do_CLI_for_child_2(mon, sin, sout, serr):
     return 0
 
 
-_foz_for_child_1 = ()
+_foz_for_child_1 = (
+    ('-h', '--help', 'this screen'),
+)
 
 
 def _do_CLI_for_child_1(mon, sin, sout, serr):

@@ -577,10 +577,6 @@ class Case6242_search_help(CommonCase):
 @lazy
 def _CASE_A():  # usually it's one invocation
 
-    def debug_IO_f():
-        import sys as _
-        return _.stderr
-
     o = CLI_support.BIG_FLEX(
             given_stdin=None,
             given_args=('--help',),
@@ -590,7 +586,7 @@ def _CASE_A():  # usually it's one invocation
             injections_dictionary=None,
             might_debug=False,  # ..
             do_debug_f=lambda: False,  # ..
-            debug_IO_f=debug_IO_f)
+            )
 
     _tree = CLI_support.tree_via_lines(o.lines)
     return _StructTreeAndExitCode(_tree, o.exit_code)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 -W default::Warning::0
 
 
-raise Exception("worked at #history-A.3 - comment out if you're feeling lucky")
+raise RuntimeError("worked at #history-B.2. comment out if u're feeling lucky")
 
 """A sort of producer script sourced from kubernetes documentation.
 
@@ -15,35 +15,33 @@ a punchlist somehow.
 
 _doc = __doc__
 
-_example_url = 'https://kubernetes.io/docs/concepts/'
+_eg_url = 'https://kubernetes.io/docs/concepts/'
 
 
 # (worked "visually" (mostly) at #history-A.2)
 
 
 def _CLI(stdin, stdout, stderr, argv):
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('url', 'example: https://some-k8s-site.com/docs/foo-bar/'),
-            ),
-        description_template_valueser=lambda: {'eg_url': _example_url})
+    formals = (('-h', '--help', 'this screen'),
+               ('url', 'example: https://some-k8s-site.com/docs/foo-bar/'))
+    kwargs = {'description_valueser': lambda: {'eg_url': _eg_url}}
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals, **kwargs)
 
 
-def _do_CLI(monitor, stdin, stdout, stderr, url):
+def _do_CLI(stdin, stdout, stderr, url, rscr):
+    mon = rscr().monitor
 
     from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
     recv = dictionary_dumper_as_JSON_via_output_stream(stdout)
 
-    _opened = open_traversal_stream(monitor.listener, url)
+    _opened = open_traversal_stream(mon.listener, url)
     with _opened as dcts:
         for dct in dcts:
             recv(dct)
 
     stdout.write('\n')  # _eol
-    return monitor.exitstatus
+    return mon.exitstatus
 
 
 _do_CLI.__doc__ = _doc
@@ -217,6 +215,7 @@ if __name__ == '__main__':
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-B.2
 # #history-A.3
 # #history-A.2
 # #history-A.1

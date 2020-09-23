@@ -2,18 +2,14 @@
 
 
 def _CLI(sin, sout, serr, argv):
-    from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            CLI_function=_do_CLI,
-            stdin=sin, stdout=sout, stderr=serr, argv=argv,
-            formal_parameters=(
-                ('<file>',
-                 'The input file to look for timestamps in.',
-                 "Use '-' to read from STDIN."),),
-            description_template_valueser=lambda: {})
+    formals = (('-h', '--help', 'this screen'),
+               ('<file>', 'The input file to look for timestamps in.',
+                          "Use '-' to read from STDIN."))
+    from script_lib.cheap_arg_parse import cheap_arg_parse as func
+    return func(_do_CLI, sin, sout, serr, argv, formals)
 
 
-def _do_CLI(monitor, sin, sout, serr, path):
+def _do_CLI(sin, sout, serr, path, _rscr):
     """
     A one-off script (possibly re-usable) meant to format streams of lines
 
@@ -64,7 +60,7 @@ def _do_CLI(monitor, sin, sout, serr, path):
             recv(line)
 
     serr.write('done!\n')
-    return monitor.exitstatus
+    return 0
 
 
 class _MadParse:  # the [#608.4] "mad parse" pattern

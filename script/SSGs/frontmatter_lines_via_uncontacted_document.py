@@ -55,24 +55,21 @@ _my_doc = __doc__
 
 
 def _CLI(stdin, stdout, stderr, argv):
-
-    from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
+    from script_lib.cheap_arg_parse import \
+        require_interactive, cheap_arg_parse as func
 
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
 
-    return cheap_arg_parse(
-        CLI_function=_do_CLI,
-        stdin=stdin, stdout=stdout, stderr=stderr, argv=argv,
-        formal_parameters=(
-            ('markdown-file', "the path to the conventional markdown document"),  # noqa: E501
-            ),
-        description_template_valueser=lambda: {})
+    formals = (
+        ('-h', '--help', 'this screen'),
+        ('markdown-file', "the path to the conventional markdown document"))
+    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
 
 
-def _do_CLI(monitor, sin, sout, serr, markdown_file):
-
-    dct = _dictionary_via_file(markdown_file, monitor.listener)
+def _do_CLI(sin, sout, serr, markdown_file, rscr):
+    mon = rscr().listener
+    dct = _dictionary_via_file(markdown_file, mon.listener)
     if dct is None:
         return
 
@@ -80,7 +77,7 @@ def _do_CLI(monitor, sin, sout, serr, markdown_file):
     for line in _frontmatter_lines_via_dictionary(dct):
         write(line)
 
-    return monitor.exitstatus
+    return mon.exitstatus
 
 
 _do_CLI.__doc__ = _my_doc

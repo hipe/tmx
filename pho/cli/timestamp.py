@@ -54,10 +54,10 @@ def _sync_CLI(sin, sout, serr, argv, enver=None):
         argv[0] = s
     return cheap_arg_parse(
             _do_sync_CLI, sin, sout, serr, argv,
-            tuple(_sync_params()), enver=enver)
+            tuple(_formals()), enver=enver)
 
 
-def _sync_params():
+def _formals():
     def default(s):
         return f'default: {s}'
 
@@ -67,6 +67,7 @@ def _sync_params():
     yield ('--cell-range=A1_RANGE', default(_default_cell_range))
     yield ('--oauth-token-path=PATH', default(_default_OTP()))
     yield ('--oauth-credentials-path', default(_default_OCP()))
+    yield '-h', '--help', 'this screen'
     yield ('-n', '--dry-run', 'read from sheet but do not write to it')
 
 

@@ -192,12 +192,9 @@ _looks_like_acronym_rx = re.compile('^[A-Z]{2,}$')
 
 
 if __name__ == '__main__':
-    import sys
-    _me = sys.modules[__name__]
-    from all import CLI_for_Report as _
-    _CLI = _(_me)
-    o = sys
-    _exitstatus = _CLI(o.stdin, o.stdout, o.stderr, o.argv).execute()
-    exit(_exitstatus)
+    import sys as o
+    from all import CLI_for_Report as func
+    _CLI = func(o.modules[__name__])
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
 # #born.
