@@ -57,11 +57,19 @@ def _pairs_from_my_sync(orig, new):
     far_pairs = new._to_normal_stream()
     near_pairs = orig._to_normal_stream()
 
-    flat_map = subject_function()(far_pairs)
+    # == BEGIN [#459.R]
+    def keyerer(_normally):  #
+        return keyer  # hi.
+
+    def keyer(k):  # because #here5
+        return k  # hi.
+    # == END
+
+    flat_map = subject_function()(far_pairs, build_near_sync_keyer=keyerer)
 
     # First, send each near item into the flat map and follow its directives
     for near_key, near_value in near_pairs:
-        directives = flat_map.receive_item(near_key)
+        directives = flat_map.receive_item(near_key)  # #here5
         for directive in directives:
             typ = (stack := list(reversed(directive))).pop()
             if 'pass_through' == typ:
@@ -90,7 +98,6 @@ def _pairs_from_my_sync(orig, new):
 
 
 def _item_via_collision(far_key, far_value, near_key, near_value):
-    # (#provision [#458.6] four args)
 
     assert(far_key == near_key)
 

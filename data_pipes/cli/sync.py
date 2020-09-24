@@ -93,17 +93,19 @@ def _stdout_lines_from_sync(  # #testpoint
         with opened as far_dcts:
             stream_for_sync = ps.stream_for_sync_via_stream(far_dcts)
             from data_pipes.magnetics.flat_map_via_far_collection import \
-                flat_map_via_producer_script as flat_map_via
-            flat_map = flat_map_via(
-                    far_pairs=stream_for_sync,
+                flat_map_via_producer_script as func
+            flat_map = func(
+                    stream_for_sync,
                     stream_for_sync_is_alphabetized_by_key_for_sync=far_sorted,
-                    preserve_freeform_order_and_insert_at_end=False)  # ..
+                    preserve_freeform_order_and_insert_at_end=False,
+                    build_near_sync_keyer=near_keyerer,  # [#459.R]
+                    )
             if do_diff:
                 m = 'DIFF_LINES_VIA'
             else:
                 m = 'NEW_LINES_VIA'
             call_me = getattr(self.sync_agent, m)
-            olines = call_me(flat_map, near_keyerer, listener)
+            olines = call_me(flat_map, listener)
             for line in olines:
                 yield line
 

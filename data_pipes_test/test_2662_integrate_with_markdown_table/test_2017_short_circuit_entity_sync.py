@@ -211,20 +211,16 @@ def production_producer_script():
     return 'script/producer_scripts/script_180421_heroku_add_ons.py'
 
 
-def near_keyerer_common(key_via_native, schema, listener):  # pure pass-thru
-
+def near_keyerer_common(normally):  # pure pass-thru
     from kiss_rdb.storage_adapters.markdown import \
-            simplified_key_via_markdown_link_er
+            simplified_key_via_markdown_link_er as funcer
+    func = funcer()
 
-    # (reminder: function takes a row_DOM and returns a sync_key)
+    def near_keyer(row_AST):
+        sk = normally(row_AST)
+        return func(sk)
 
-    simplified_key_via_markdown_link = simplified_key_via_markdown_link_er()
-
-    def simplified_key_via_row_DOM(row_DOM):
-        _orig_key = key_via_native(row_DOM)
-        return simplified_key_via_markdown_link(_orig_key)
-
-    return simplified_key_via_row_DOM
+    return near_keyer
 
 
 _reduced_number = 4  # how many business items in our reduced collection?

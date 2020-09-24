@@ -136,7 +136,7 @@ class Case0130DP_adds_only(CommonCase):
 
     def test_060_the_new_one_was_added(self):
         """
-        .#open [#459.J]:
+        test_060_the_new_one_was_added #open [#459.J]:
         this test (although small in codesize) is overloaded. if you
         refactor this test, consider breaking it up to test these separately:
 
@@ -213,15 +213,6 @@ class Case0150DP_what_if_no_business_attrs_besides_ID(CommonCase):
 
 
 class Case0160DP_custom_keyers(CommonCase):
-
-    def test_050_we_used_to_pass_near_keyerer_as_string(self):
-        # #history-B.1
-        near_use_to_look_like_this = common_near_keyerer_as_string()
-        near_keyerer = value_via_module_path(near_use_to_look_like_this)
-        # loading the selfsame file as a module isn't working the nice way
-        use_loaded = near_keyerer.__name__
-        use_expected = Chimmy_Chamosa_001_near.__name__
-        self.assertEqual(use_loaded, use_expected)
 
     def test_100_the_NOT_updated_business_cel_stays_as_is(self):
         self.assertEqual(self.end_cel_strings[2], '| six\n')
@@ -375,24 +366,23 @@ def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
 
     # fsfs = far stream for sync
 
-    custom_near, fsfs = god_help_me(sorted_far_dcts, two_keyerers)
+    custom_near, fsfs = these_2_via_these_2(sorted_far_dcts, two_keyerers)
 
     # Resolve the "Flat Map" injection from the "stream for sync" (from etc)
     assert hasattr(sorted_far_dcts, '__next__')  # does it look like an iterat
     sorted_far_dcts = tuple(sorted_far_dcts)
 
-    from data_pipes_test.sync_support import flat_map_via
-    flat_map = flat_map_via(fsfs)
+    from data_pipes_test.sync_support import flat_map_via as func
+    flat_map = func(fsfs, build_near_sync_keyer=custom_near)
 
     # Resolve the sync agent
     ci = collection_impl_via(mixed_near)
     sa = ci.SYNC_AGENT_FOR_DATA_PIPES()
 
-    return sa.NEW_SEXPS_VIA(
-            flat_map, near_keyerer=custom_near, listener=listener)
+    return sa.NEW_SEXPS_VIA(flat_map, listener)
 
 
-def god_help_me(sorted_far_dcts, two_keyerers):
+def these_2_via_these_2(sorted_far_dcts, two_keyerers):
 
     sorted_far_dcts = tuple(sorted_far_dcts)
 
@@ -403,7 +393,8 @@ def god_help_me(sorted_far_dcts, two_keyerers):
 
     near_keyerer = None
     if two_keyerers:
-        near_keyerer, far_keyer = two_keyerers
+        near_keyerer, far_keyerer = two_keyerers
+        far_keyer = far_keyerer()  # #here1
         fsfs = tuple((far_keyer(k, item), item) for k, item in fsfs)
 
     return near_keyerer, fsfs
@@ -449,39 +440,33 @@ def value_via_module_path(module_path):  # moved here at #history-B.1
     return getattr(mod, value_name)  # ..
 
 
+# == FROM [#459.R] #here1
+
 def common_two_keyerers():
-    def far_keyer(sync_key, item):
-        return simplify_and_add_guillemets(sync_key)
-
-    return common_near_keyerer(), far_keyer
+    return common_near_keyerer, common_far_keyerer
 
 
-def common_near_keyerer_as_string():
-    # really nasty, but OK while it works: load this selfsame test file
-    # *as* a module, to see if we can reach the function using this identifier
-
-    from os import path as os_path
-    o = __file__.split(os_path.sep)
-    _mod_name = '.'.join((o[-3], o[-2], os_path.splitext(o[-1])[0]))
-    return f'{_mod_name}.Chimmy_Chamosa_001_near'  # (in this file)
-
-
-def common_near_keyerer():
-    return Chimmy_Chamosa_001_near
+def common_near_keyerer(sync_key_normally):
+    def use_f(ent):
+        sk = sync_key_normally(ent)
+        if sk is None:
+            return
+        return simplify_and_add_guillemets(sk)
+    return use_f
 
 
-def Chimmy_Chamosa_001_near(key_via_row_DOM_normally, complete_schema, listen):
-    """at #history-A.3 this changed, symmetry broke"""
+def common_far_keyerer():
+    return common_far_keyer  # hi.
 
-    def key_via_row_DOM(row_DOM):
-        _k = key_via_row_DOM_normally(row_DOM)
-        return simplify_and_add_guillemets(_k)
 
-    return key_via_row_DOM
+def common_far_keyer(k, item):
+    return simplify_and_add_guillemets(k)
 
 
 def simplify_and_add_guillemets(k):
     return f'«{k.strip().upper()}»'
+
+# == TO
 
 
 class TypeRun:

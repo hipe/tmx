@@ -1,9 +1,8 @@
 def sync_agent_(all_sexpser, coll_path):
     all_sexpser = _experiment_2(all_sexpser)
 
-    def _diff_lines_via(*sync_args):
+    def _diff_lines_via(flat_map, listener):
         # Read original sexps (then lines) in to memory
-        flat_map, *rst, listener = sync_args
         orig_sx_itr = all_sexpser(listener)
         orig_sxs, count, sanity = [], 0, 274  # ~ num lines in longest README
         for sx in orig_sx_itr:
@@ -15,7 +14,7 @@ def sync_agent_(all_sexpser, coll_path):
         orig_lines = tuple(_lines_via_sexps(orig_sxs))
 
         # Read new sexps (then lines) in to memory
-        new_sxs = _new_sexps(iter(orig_sxs), flat_map, *rst, listener)
+        new_sxs = _new_sexps(iter(orig_sxs), flat_map, listener)
         new_lines = tuple(_lines_via_sexps(new_sxs))
 
         # Make the Diff!
@@ -31,16 +30,16 @@ def sync_agent_(all_sexpser, coll_path):
         from difflib import unified_diff
         return unified_diff(orig_lines, new_lines, pathA, pathB)
 
-    def _new_lines_via(*sync_args):
+    def _new_lines_via(flat_map, listener):
         try:
-            for line in _lines_via_sexps(_new_sexps_via(*sync_args)):
+            for line in _lines_via_sexps(_new_sexps_via(flat_map, listener)):
                 yield line
         except _Stop:
             pass
 
-    def _new_sexps_via(flat_map, near_keyerer, listener):
+    def _new_sexps_via(flat_map, listener):
         orig_sxs = all_sexpser(listener)
-        return _new_sexps(orig_sxs, flat_map, near_keyerer, listener)
+        return _new_sexps(orig_sxs, flat_map, listener)
 
     class sync_agent:  # #class-as-namespace
         SYNC_AGENT_CAN_PRODUCE_DIFF_LINES = True
@@ -78,7 +77,7 @@ def _lines_via_sexps(new_sexps):
         yield func(sx)
 
 
-def _new_sexps(itr, flat_map, near_keyerer, listener):
+def _new_sexps(itr, flat_map, listener):
     # Output zero or more head lines (lines before the table)
     # #todo this was written before action stacks and could be cleaned up
 
@@ -99,8 +98,7 @@ def _new_sexps(itr, flat_map, near_keyerer, listener):
         for tsl2_sx in itr:
             yield tsl2_sx  # table_schema_line_TWO_of_two
             cs = tsl2_sx[2]  # yikes
-            _2 = (getattr(cs, k) for k in ('field_name_keys', 'table_cstack_'))
-            if (d := flat_map.receive_field_name_keys(*_2)) is not None:
+            if (d := flat_map.receive_schema(cs)) is not None:
                 assert 'error' == d[0][0]  # #here3
                 listener(*d[0])
                 return
@@ -122,7 +120,7 @@ def _new_sexps(itr, flat_map, near_keyerer, listener):
     if actual_eg_row:
         yield 'business_row_AST', actual_eg_row
 
-    near_key_for = _build_near_keyer(near_keyerer, cs)  # ..
+    # == SPOT B
 
     process_directives_during, process_directives_at_end = \
         _build_directives_processer(use_eg_row, cs, listener)
@@ -132,14 +130,12 @@ def _new_sexps(itr, flat_map, near_keyerer, listener):
         if (typ := sx[0]) in after_table:
             sexps_after_table_on_deck.append(sx)
             break
-        assert 'business_row_AST' == sx[0]
+        assert 'business_row_AST' == typ
         ent = sx[1]
-        near_key = near_key_for(ent)
-        if near_key is None:
-            yield sx  # pass thru table rows with a blank identifier cell or et
-            continue
 
-        directives = flat_map.receive_item(near_key)
+        # == SPOT C
+
+        directives = flat_map.receive_item(ent)
         for sx in process_directives_during(directives, sx):
             yield sx
 
@@ -266,17 +262,7 @@ def _dct_via_edit(edit, exi_dct, cs, listener):
     return arg_dct, counts
 
 
-def _build_near_keyer(near_keyerer, complete_schema):  # (Case0160DP has hist.)
-
-    def near_keyer_normally(ent):
-        # might be #provision [#871.1] (leftmost is guy) but we don't know
-        # might be None! it's not a validation failure to have blank cell here
-        return ent.nonblank_identifier_primitive
-
-    if near_keyerer is None:
-        return near_keyer_normally
-
-    return near_keyerer(near_keyer_normally, complete_schema, None)
+# == SPOT A
 
 
 # == Low-Level Support
@@ -325,6 +311,7 @@ def _emit_edited(listener, UCDs, eid, preterite):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.3
 # #history-B.1 blind rewrite
 # #history-A.2: big refactor, go gung-ho with context managers. extracted.
 # #history-A.1: add experimental feature "sync keyerser"

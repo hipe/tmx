@@ -51,56 +51,75 @@ class SyncCase_(unittest_TestCase):
 
     @property
     def end_state(self):  # NOTE - not memoized by default
-        return self._build_snapshot_plus(do_listen=False)
+        return self._build_end_state_plus(do_listen=False)
 
     # -- build state
 
     def build_end_state_while_listening_(self):
-        return self._build_snapshot_plus(do_listen=True)
+        return self._build_end_state_plus(do_listen=True)
 
-    def _build_snapshot_plus(self, do_listen):
+    def _build_end_state_plus(self, do_listen):
         fc = self.far_collection()
         nc = self.near_collection()
         do_preserve = self.preserve_freeform_order()
-        return _build_snapshot(self, fc, nc, do_preserve, do_listen)
+        return _build_end_state(self, fc, nc, do_preserve, do_listen)
 
     def preserve_freeform_order(self):
         return False
 
 
-class _build_snapshot:
+def _build_end_state(tc, far, near, preserve_freeform_order, do_listen):
 
-    def __init__(self, tc, far, near, preserve_freeform_order, do_listen):
-        flat_map_opts = {}
-
-        if do_listen:
-            listener, emissions = em().listener_and_emissions_for(tc, limit=None)
-        else:
-            listener = em().throwing_listener
-
-        if preserve_freeform_order:
-            flat_map_opts['preserve_freeform_order_and_insert_at_end'] = True
-
+    def main():
         normal_far_items = ((x, x) for x in far)
-        normal_near_items = ((x, x) for x in near)
-
+        listener, emissions = listener_and_emissions()
+        flat_map_opts = {k: v for k, v in flat_map_options()}
         flat_map = flat_map_via(normal_far_items, **flat_map_opts)
+        itr = _minimal_example_of_using_the_flat_map_for_collection_sync(
+                near, flat_map, listener)
+        new_items = tuple(itr)
+        emissions = tuple(emissions) if do_listen else None
+        return klass(emissions=emissions, result=new_items)
 
-        _ = _minimal_example_of_using_the_flat_map_for_collection_sync(
-                normal_near_items, flat_map, listener)
-        new_items = tuple(_)
+    def flat_map_options():
+        if preserve_freeform_order:
+            yield 'preserve_freeform_order_and_insert_at_end', True
+        yield 'build_near_sync_keyer', build_near_sync_keyer
 
-        self.result = new_items
+    # == BEGIN [#459.R]
+
+    def build_near_sync_keyer(_normally):
+        return sync_key_when_items_are_primitives  # hi.
+
+    def sync_key_when_items_are_primitives(item):
+        assert isinstance(item, str)
+        return item
+
+    # == END
+
+    def listener_and_emissions():
         if do_listen:
-            self.emissions = tuple(emissions)
+            return em().listener_and_emissions_for(tc, limit=None)
+        return em().throwing_listener, None
+
+    def klass(**kwargs):
+        if (o := _build_end_state).klass is None:
+            from collections import namedtuple as func
+            o.klass = func('EndState', ('emissions', 'result'))
+        return o.klass(**kwargs)
+
+    return main()
+
+
+_build_end_state.klass = None
 
 
 def _minimal_example_of_using_the_flat_map_for_collection_sync(
-        normal_near_pairs, flat_map, listener):
+        near_items, flat_map, listener):
 
     # First, send each near item into the flat map and follow its directives
-    for near_key, near_mixed in normal_near_pairs:
-        directives = flat_map.receive_item(near_key)
+    for near_mixed in near_items:
+        directives = flat_map.receive_item(near_mixed)
         for directive in directives:
             if 'pass_through' == directive[0]:
                 yield near_mixed
@@ -110,7 +129,8 @@ def _minimal_example_of_using_the_flat_map_for_collection_sync(
                 continue
             if 'merge_with_item' == directive[0]:
                 far_mixed = directive[1]
-                yield _item_via_collision(near_key, far_mixed, near_key, near_mixed)  # noqa: E501
+                assert near_mixed == far_mixed
+                yield near_mixed.upper()
                 continue
             if 'error' == directive[0]:
                 listener(*directive)
@@ -128,13 +148,6 @@ def _minimal_example_of_using_the_flat_map_for_collection_sync(
             listener(*directive)
             return
         assert()
-
-
-def _item_via_collision(far_key, far_s, near_key, near_s):
-    # #todo below isn't a thing any more. it's storage adapter's choice
-    # (#provision #[#458.6] four args)
-    assert(far_s == near_s)
-    return near_s.upper()
 
 
 # == Corralpoints
@@ -166,7 +179,7 @@ def _corralpoint(near, far, listener, near_format):  # #corralpoint
 
 
 def flat_map_via(far_pairs, **opts):
-    return _subject_module().flat_map_via_producer_script(far_pairs, *opts)
+    return _subject_module().flat_map_via_producer_script(far_pairs, **opts)
 
 
 def _subject_module():

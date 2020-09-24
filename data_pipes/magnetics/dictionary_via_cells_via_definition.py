@@ -191,4 +191,5 @@ class _RowManifold:
 
 sys.modules[__name__] = dictionary_via_cells_via_definition
 
+# #pending-rename: something about flat map horizontal
 # #abstracted.

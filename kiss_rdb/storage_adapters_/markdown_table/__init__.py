@@ -23,7 +23,7 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, rng=None):
+        collection_path, listener=None, opn=None, rng=None, iden_clser=None):
     del rng  # ..
 
     # If collection path looks like a filehandle open for write (e.g STDOUT)
@@ -67,7 +67,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
             e = ee  # 😢, (Case2662DP)
             return listener('error', 'structure', 'cannot_load_collection',
                             'no_such_file_or_directory', lambda: func(e))
-        sexps = _every_line_sexp(opened, listener, context_stack)
+        sexps = _every_line_sexp(opened, listener, context_stack, iden_clser)
         return _sexps_via_stack(sexps, use_stack, listener, context_stack)
 
     context_stack = ({'collection_path': collection_path},)
@@ -238,11 +238,11 @@ def _sexps_via_stack(sexps, stack, _listener, _context_stack):
 
 # ==
 
-def _every_line_sexp(opened, listener, context_stack):
+def _every_line_sexp(opened, listener, context_stack, iden_clser):
     with opened as lines:
         tagged_lines = _tagged_lines_via_lines(lines)
         sexps = _tagged_row_ASTs_or_lines_via_tagged_lines(
-                tagged_lines, listener, context_stack)
+                tagged_lines, listener, context_stack, iden_clser)
         for sexp in sexps:
             yield sexp
 
@@ -310,10 +310,9 @@ def _build_row_AST_via_two(schema=None):
         memo = {}
 
         def identifier():
-            s = ent.nonblank_identifier_primitive
-            if s is None:
+            if (s := ent.nonblank_identifier_primitive) is None:
                 return
-            return _identifier(s)
+            return use_identifier_class(s)
 
         def nonblank_identifier_string():
             cell = ent.cell_at_offset(identifier_offset)
@@ -341,6 +340,7 @@ def _build_row_AST_via_two(schema=None):
     if schema is None:
         return row_AST_via_two
 
+    use_identifier_class = schema.identifier_class_  # #here5 = [#857.C]
     key_via_offset = schema.field_name_keys
     identifier_key = key_via_offset[0]  # #provision: [#871.1]
     offset_via_key = schema.offset_via_key_
@@ -357,15 +357,29 @@ _endcap_yn = {'line_ended_with_pipe': True, 'line_ended_without_pipe': False}
 
 class _identifier:  # #testpoint
     def __init__(self, eid):
-        def eq(otr):
-            assert isinstance(otr, _identifier)
-            return eid == otr.to_string()
-        self._eq = eq
-        self.to_string = lambda: eid
-        self.to_primitive = self.to_string
+        assert isinstance(eid, str)  # [#022]
+        self._str = eid
+
+    def to_string(self):
+        return self._str
+
+    to_primitive = to_string
 
     def __eq__(self, otr):
-        return self._eq(otr)
+        return 0 == self._cmp(otr)
+
+    def __lt__(self, otr):
+        return -1 == self._cmp(otr)
+
+    def _cmp(self, otr):
+        assert isinstance(otr, self.__class__)
+        mine, yours = self._str, otr._str
+        if mine == yours:
+            return 0
+        if mine < yours:
+            return -1
+        assert yours < mine
+        return 1
 
     has_depth_ = False
 
@@ -380,7 +394,7 @@ def _cell_AST(span, line):
     return document_cell()
 
 
-def complete_schema_via_(ast1, ast2, table_cstack=None):
+def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
     def key_via_cell(cell):
         s = normal_field_name_via_string(cell.value_string)
         assert(len(s))  # ..
@@ -397,6 +411,7 @@ def complete_schema_via_(ast1, ast2, table_cstack=None):
         offset_via_key_ = offset_via_key
         field_name_keys = keys  # (Case3306DP)
         rows_ = (ast1, ast2)
+        identifier_class_ = (iden_cls or _identifier)  # #here5
         table_cstack_ = table_cstack
 
     complete_schema.row_AST_via_two_ = _build_row_AST_via_two(complete_schema)
@@ -501,7 +516,7 @@ def _build_row_AST_via_line(listener, context_stack, schema=None):
     (
         'table_schema_line_ONE_of_two' '..two..' 'business_row_AST'*
 
-        ('other_line'* 'table_schema_line_one..' '..two..', 'busi..'*)?
+        ('other_line'* 'table_schema_line_one..' '..two..', 'busi..'*)*
 
         'other_line'*
     )?
@@ -533,10 +548,12 @@ in practice we are not so lenient given:
 """
 
 
-def _tagged_row_ASTs_or_lines_via_tagged_lines(tagged_lines, listener, stack):
+def _tagged_row_ASTs_or_lines_via_tagged_lines(
+        tagged_lines, listener, stack, iden_clser=None):
     # #testpoint: has its own unit test file
 
-    itr = _tagged_row_ASTs_or_lines_via(tagged_lines, listener, stack)
+    itr = _tagged_row_ASTs_or_lines_via(
+            tagged_lines, listener, stack, iden_clser)
     exception_class = next(itr)  # so sinful
     try:
         for two in itr:
@@ -545,20 +562,26 @@ def _tagged_row_ASTs_or_lines_via_tagged_lines(tagged_lines, listener, stack):
         pass
 
 
-def _tagged_row_ASTs_or_lines_via(tagged_lines, listener, context_stack):
+def _tagged_row_ASTs_or_lines_via(
+        tagged_lines, listener, context_stack, iden_clser=None):
 
     # -- exception stuff at top because we hackishly yield our exception class
 
     def stop_because(reason):
-        sct = {'reason': reason, 'line': line, 'lineno': lineno_er()}
-        if context_stack:
-            sct = _flatten_context_stack((*context_stack, sct))
+        sct = _flatten_context_stack((*build_cstack(), {'reason': reason}))
         throwing_listener('error', 'structure', 'stop', lambda: sct)
 
     def throwing_listener(severity, *rest):
         listener(severity, *rest)
         if 'error' == severity:
             raise stop()
+
+    def build_cstack():
+        return (*(context_stack or ()), {'line': line, 'lineno': lineno_er()})
+
+    iden_cls = None
+    if iden_clser:
+        iden_cls = iden_clser(throwing_listener, build_cstack)  # VERY EXPERIM
 
     class stop(RuntimeError):
         pass
@@ -630,7 +653,8 @@ def _tagged_row_ASTs_or_lines_via(tagged_lines, listener, context_stack):
             pass  # endcap on one but not the other is okay (Case2557)
 
         cstck = (*context_stack, table_context_frame)
-        complete_schema = complete_schema_via_(tsl1of2_ast, tsl2of2_ast, cstck)
+        complete_schema = complete_schema_via_(
+            tsl1of2_ast, tsl2of2_ast, cstck, iden_cls)
 
         yield 'table_schema_line_TWO_of_two', line, complete_schema  # #here3
 
@@ -870,11 +894,7 @@ def _scanner_via_next_function(next_item):
 
 
 def _flatten_context_stack(context_stack):
-    def walk():
-        for frame in context_stack:
-            for k, v in frame.items():
-                yield k, v
-    return {k: v for k, v in walk()}
+    return {k: v for row in context_stack for k, v in row.items()}
 
 
 def xx(msg=None):

@@ -106,6 +106,7 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.C]                   |       | injectable custom identifier classes (near schema)
 |[#857.2]                   |       | sentences via jumble
 |[#857.1]                   |       | backend roadmap
 |[#856]                     |       | example data model

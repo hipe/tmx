@@ -3,9 +3,32 @@ digraph g {
 
 /* nodes */
 
+subgraph cluster_3 {
+label="the fourth way"
+
+subgraph cluster_3_1 {
+label="near collection"
+n3_001[label="near 'item'" shape=rect]
+
+}
+
+
+
+n3_001->n3_002
+
+
+subgraph cluster_3_2 {
+label="flat map"
+n3_002[label="black box\nmysteries of\nthe universe"]
+}
+
+n3_002->n3_001[label="directives"]
+
+}
+
 subgraph cluster_2 {
 
-label="the new new way"
+label="the third way"
 
 nn_far_native_object[label="far native\nobject" shape=rect]
 nn_far_native_object->nn_script
@@ -15,7 +38,7 @@ nn_tuple[label="normal tuple\nfor syncing" shape=rect style=filled]
 }
 subgraph cluster_1 {
 
-label="the new way"
+label="the second way"
 
 n_dvn[label="dict via name
 value pairs
@@ -43,7 +66,7 @@ shape=rect
 
 subgraph cluster_0 {
 
-label="the old way"
+label="the first way"
 
 n_o_dvn[label="dict via name
 value pairs
@@ -91,10 +114,10 @@ fig. 423.B:
 
 (movement is right-to-left because in CLI far is a further out arg.)
 
-in the old way the keyer's argument was
+in the first way the keyer's argument was
 a native object, in the new way a dict.
 
-the old way has the \"advantage\" that the keyer can leverage
+the first way has the \"advantage\" that the keyer can leverage
 weird native things (like a method) to make the key. the new
 way has the advantage that the keyer can see derived fields.
 

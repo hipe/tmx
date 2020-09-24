@@ -1,11 +1,12 @@
-# two syncing algorithms, both docuumented exhaustively (and first) at [447]
+# two syncing algorithms, both documented exhaustively (and first) at [447]
 
 # we called this "flat map" because {see the ReactiveX pattern}
 
 def flat_map_via_producer_script(
         far_pairs,
         preserve_freeform_order_and_insert_at_end=False,
-        stream_for_sync_is_alphabetized_by_key_for_sync=None):
+        stream_for_sync_is_alphabetized_by_key_for_sync=None,
+        build_near_sync_keyer=None):
 
     if preserve_freeform_order_and_insert_at_end:
         return _flat_map_with_diminishing_pool_algorithm(far_pairs)
@@ -16,7 +17,7 @@ def flat_map_via_producer_script(
 
     def _receive_item(near_sync_key):
         try:
-            for directive in _do_receive_item(near_sync_key):
+            for directive in do_receive_item(near_sync_key):
                 yield directive
         except _Stop as e:
             yield e.args
@@ -29,9 +30,10 @@ def flat_map_via_producer_script(
         except _Stop as e:
             yield e.args
 
-    def _do_receive_item(near_sync_key):
-
+    def do_receive_item(ent):
+        near_sync_key = near_sync_key_for(ent)
         check_order_of_near_items(near_sync_key)
+        del ent
 
         # the main thing: flush out the zero or more insertions from the
         # far collection (us) that come before the current near item
@@ -63,13 +65,31 @@ def flat_map_via_producer_script(
             return
         raise _disorder('near', self.prev_far_sync_key, near_sync_key)
 
+    # == BEGIN [#459.R]
+
+    def near_sync_key_for_ent_normally(ent):
+        # for now we bake the handling of kiss ents in as a default..
+        eid = ent.nonblank_identifier_primitive
+        # ent.identifier.to_primitive() same
+        if eid is None:
+            return
+        assert isinstance(eid, str)
+        return eid
+
+    if build_near_sync_keyer:
+        near_sync_key_for = build_near_sync_keyer(near_sync_key_for_ent_normally)  # noqa: E501 # #here3
+    else:
+        near_sync_key_for = near_sync_key_for_ent_normally
+
+    # == END
+
     class self:
         is_first_far_item = True
 
     scn = _far_scanner(far_pairs)
 
     class flat_map:  # #class-as-namespace
-        def receive_field_name_keys(*_):
+        def receive_schema(_):  # #here3
             pass
         receive_item = _receive_item
         receive_end = _receive_end

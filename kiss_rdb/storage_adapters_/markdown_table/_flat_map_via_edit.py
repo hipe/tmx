@@ -2,7 +2,7 @@ def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener):
     flat_map, state = _these_two_for[typ](*cud_args, listener)
     from ._file_diff_via_flat_map import sync_agent_ as sync_agent_via
     sa = sync_agent_via(all_sexpser, coll_path)
-    diff_lines = sa.DIFF_LINES_VIA(flat_map, None, listener)  # mebbe none
+    diff_lines = sa.DIFF_LINES_VIA(flat_map, listener)
     if diff_lines is None:
         return
     rv = state.result_value
@@ -37,14 +37,15 @@ _implement, _these_two_for = _build_decorator()
 
 
 @_implement('update')
-def _(iden, edit, listener, state):
-    def receive(eid):
-        if eid < needle_eid:  # #here1
+def _(needle_iden, edit, listener, state):
+
+    def receive_identifier(iden):
+        if iden < needle_iden:  # #here1
             return _pass_through
-        if needle_eid > eid:  # #here1
+        if needle_iden > iden:  # #here1
             xx("didn't find it for update")
-        assert needle_eid == eid
-        state.client_receive_item = _pass_thru_remaining_items  # done
+        assert needle_iden == iden
+        state.recv_iden = _pass_thru_remaining_items  # done
         return (('give_me_the_AST_please', recv_before_AST),
                 ('update_item', edit, recv_edited))
 
@@ -52,7 +53,7 @@ def _(iden, edit, listener, state):
         if state.result_value is not None:
             return _no_directives
         from . import emission_components_for_entity_not_found_ as func
-        return(func(needle_eid, state.item_count, 'update'),)
+        return(func(needle_iden.to_string(), state.item_count, 'update'),)
 
     def recv_before_AST(ast):
         state.result_value = [ast, None]
@@ -61,30 +62,32 @@ def _(iden, edit, listener, state):
         state.result_value[1] = ast
         state.result_value = tuple(state.result_value)
 
-    yield 'recv_item', receive, 'recv_end', at_end  # emit_edited #here5
-    needle_eid = iden.to_primitive()
+    yield 'recv_iden', receive_identifier, 'recv_end', at_end
 
 
 @_implement('create')
 def _(dct, listener, state):
 
-    def recv_ks(ks, cstack):
+    def recv_sch(sch):
+        ks = sch.field_name_keys
         iden_key = ks[0]  # [#871.1] leftmost is the one
         if iden_key not in dct:
             xx("whine about how you need an identifier in the arg dict")
             return (('error', '..'),)  # #here3
-        state.new_eid = (new_eid := dct[iden_key])
+        new_eid = dct[iden_key]
+        new_iden = sch.identifier_class_(new_eid)
+        state.new_eid = new_eid
         # (check the dct against the allowlist not here but there for DRY)
 
-        def receive(eid):
-            if eid < new_eid:  # #here1
+        def receive_identifier(iden):
+            if iden < new_iden:  # #here1
                 return _pass_through
-            if new_eid == eid:  # #here1
+            if new_iden == iden:  # #here1
                 xx("collision")
-            assert new_eid < eid  # #here1 we found the 1st item > than new
-            state.client_receive_item = _pass_thru_remaining_items  # done
+            assert new_iden < iden  # #here1 we found the 1st item > than new
+            state.recv_iden = _pass_thru_remaining_items  # done
             return (('insert_item', dct, recv_created), ('pass_through',))
-        state.client_receive_item = receive
+        state.recv_iden = receive_identifier
 
     def emit_edited(ast):
         assert state.new_eid == ast.nonblank_identifier_primitive
@@ -99,16 +102,15 @@ def _(dct, listener, state):
             return _no_directives
         return (('insert_item', dct, recv_created),)
 
-    yield 'recv_ks', recv_ks, 'recv_end', at_end, 'emit_edited', emit_edited
+    yield 'recv_sch', recv_sch, 'recv_end', at_end, 'emit_edited', emit_edited
 
 
 @_implement('delete')
 def _(needle_iden, listener, state):
-
-    def receive(this_eid):
-        if needle_eid != this_eid:  # #here1
+    def receive_identifier(iden):
+        if needle_iden != iden:  # #here1
             return _pass_through
-        state.client_receive_item = _pass_thru_remaining_items  # Don't keep lo
+        state.recv_iden = _pass_thru_remaining_items  # Don't keep lo
         return (('give_me_the_AST_please', receive_deleted_AST),)
 
     def receive_deleted_AST(ast):  # Tell the traversal you want the whole AST
@@ -118,40 +120,24 @@ def _(needle_iden, listener, state):
         if state.result_value is not None:
             return _no_directives
         from . import emission_components_for_entity_not_found_ as func
-        return (func(needle_eid, state.item_count, 'delete'),)
+        return (func(str(needle_iden), state.item_count, 'delete'),)
 
     def edited(ast):
-        assert needle_eid == ast.nonblank_identifier_primitive
+        assert needle_iden == ast.identifier
         eek = tuple(None for _ in range(0, ast.cell_count))
-        _emit_edited(listener, ((), (), eek), needle_eid, 'deleted')
+        lol = ((), (), eek)
+        _emit_edited(listener, lol, needle_iden.to_string(), 'deleted')
 
-    yield 'recv_item', receive, 'recv_end', at_end, 'emit_edited', edited
-    needle_eid = needle_iden.to_primitive()
+    yield 'recv_iden', receive_identifier
+    yield 'recv_end', at_end, 'emit_edited', edited
 
 
 def _pass_thru_remaining_items(_):  # Don't keep looking after you find it
     return _pass_through
 
 
-_pass_through = (('pass_through',),)
-_no_directives = ()
-
-
-def _build_flat_map(
-        state, recv_end, recv_ks=None, recv_item=None, emit_edited=None):
-    state.client_receive_item = recv_item
-    state.client_receive_end = recv_end
-
-    class flat_map:  # #class-as-namespace
-        def receive_item(eid):
-            return state.receive_item(eid)
-
-        def receive_end():
-            return state.receive_end()
-
-        receive_field_name_keys = (recv_ks or _anyadic_noop)
-
-    flat_map.emit_edited = emit_edited
+def _build_flat_map(state, recv_end,
+                    recv_sch=None, recv_iden=None, emit_edited=None):
 
     # == FROM
     def catch_annotated_stops(orig_f):
@@ -159,7 +145,7 @@ def _build_flat_map(
             try:
                 return orig_f(*a)
             except annotated_stop as e:
-                state.receive_item, state.receive_end = None, None
+                state.recv_iden, state.recv_end = None, None
                 return (e.emission_arguments,)
         return use_f
 
@@ -168,29 +154,42 @@ def _build_flat_map(
             self.emission_arguments = a
     # == TO
 
-    @catch_annotated_stops
-    def receive_item(eid):
-        state.item_count += 1
-        state.check_collection_order(eid)
-        return state.client_receive_item(eid)
+    def flat_map_receive_schema(sch):
+        recv_sch and recv_sch(sch)
 
-    def check_collection_order_the_first_time(eid):
-        state.previous_string = eid
+    @catch_annotated_stops
+    def flat_map_receive_item(ent):
+        state.item_count += 1  # count ones with no IDs? sure. or don't
+        iden = ent.identifier
+        if iden is None:
+            return _pass_through
+        state.check_collection_order(iden)
+        return state.recv_iden(iden)
+
+    state.recv_iden = recv_iden  # None at first for some
+    state.item_count = 0
+
+    def check_collection_order_the_first_time(iden):
+        state.previous_sync_key = iden
         state.check_collection_order = check_collection_order
 
-    def check_collection_order(eid):
-        if state.previous_string < eid:  # #here1
-            state.previous_string = eid
+    state.check_collection_order = check_collection_order_the_first_time
+
+    def check_collection_order(iden):
+        if state.previous_sync_key < iden:  # #here1
+            state.previous_sync_key = iden
             return
-        xx()
-        prev = state.previous_string
-        a, b = (lambda s: lambda: f"'{s}'" for s in (prev, eid))
+
+        # with custom iden cls: (Case2746)
+
+        prev = state.previous_sync_key
+        a, b = ((lambda o: lambda: f"'{o}'")(oo) for oo in (prev, iden))
 
         def experiment():
-            yield lambda: prev == eid  # #here1
+            yield lambda: prev > iden  # #here1
             yield 'disorder'
-            yield lambda: f"collection is not in order ({a()} then {b()})"
-            yield lambda: prev > eid  # #here1
+            yield lambda: f"Collection is not in order. Had: {a()} then {b()})"
+            yield lambda: prev == iden  # #here1
             yield 'duplicate_identifier'
             yield lambda: f"duplicate identifier in collection: {a()}"
 
@@ -198,15 +197,23 @@ def _build_flat_map(
         cat, msg = next((b, c()) for a, b, c in triplets if a())
         raise annotated_stop('error', 'expression', cat, lambda: (msg,))
 
-    def receive_end():
-        return state.client_receive_end()
+    def flat_map_receive_end():
+        return state.recv_end()
 
-    state.check_collection_order = check_collection_order_the_first_time
-    state.receive_item = receive_item
-    state.receive_end = receive_end
-    state.item_count = 0
+    state.recv_end = recv_end
+
+    class flat_map:  # #class-as-namepace
+        receive_schema = flat_map_receive_schema
+        receive_item = flat_map_receive_item
+        receive_end = flat_map_receive_end
+
+    flat_map.emit_edited = emit_edited  # let client see if it's there for no r
 
     return flat_map
+
+
+_pass_through = (('pass_through',),)
+_no_directives = ()
 
 
 """
@@ -303,10 +310,6 @@ def _chunk_forever(n, flat):
 
 def _chunk(n, flat):
     return (flat[i*n:(i+1)*n] for i in range((len(flat)+1)//n))
-
-
-def _anyadic_noop(*_):
-    pass
 
 
 # == Delegations

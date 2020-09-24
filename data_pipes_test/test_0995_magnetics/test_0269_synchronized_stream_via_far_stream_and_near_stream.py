@@ -23,7 +23,7 @@ class Case0262_none_down_on_to_none_produces_none(CommonCase):
     # NOTE at writing, this is the only case with external references
 
     def test_010_magnetic_loads(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_module())
 
     def test_020_this_case(self):
         self.expect_these_()
@@ -240,9 +240,9 @@ class Case0275_bigger_example_of_disorder(CommonCase):
                 'u')
 
 
-def _subject_module():
-    import data_pipes.magnetics.flat_map_via_far_collection as _  # noqa: E501
-    return _
+def subject_module():
+    import data_pipes.magnetics.flat_map_via_far_collection as module
+    return module
 
 
 if __name__ == '__main__':

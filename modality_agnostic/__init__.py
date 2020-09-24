@@ -299,6 +299,7 @@ class Exception(RuntimeError):
     pass
 
 
+# #history-B.6: archived few lines (elsewhere) that load resource from string
 # #history-B.5: as referenced
 # #history-B.4: as referenced
 # #history-B.3: get rid of emitting assistants

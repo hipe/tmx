@@ -297,9 +297,9 @@ def sync_stream_using_column_A(dcts):
         yield (dct['col_A'], dct)
 
 
-def near_keyerer_minimal(key_via_native, schema, listener):
-    def near_keyer(native):
-        return native.cell_at_offset(0).value_string
+def near_keyerer_minimal(_normally):
+    def near_keyer(row_AST):
+        return row_AST.cell_at_offset(0).value_string
     return near_keyer
 
 
