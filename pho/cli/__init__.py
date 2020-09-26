@@ -9,9 +9,8 @@ def cli_for_production():
 def _CLI(sin, sout, serr, argv, enver):
     def line_contents():
         yield 'experiments in generating documents from "notecards"'
-    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
-    return cheap_arg_parse_branch(
-            sin, sout, serr, argv, _big_flex(), line_contents, enver)
+    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+    return func(sin, sout, serr, argv, _big_flex(), line_contents, enver)
 
 
 def _lazy(build):  # [#510.8] yet another take on "lazy"
