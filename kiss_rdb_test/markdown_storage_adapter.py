@@ -64,10 +64,13 @@ def complete_schema_via_row_ASTs(row1, row2):
 def row_AST_via_line():
     def row_AST_via_line(line, listener):
         row_AST_via_line = _build_row_AST_via_line(listener, context_stack)
-        return row_AST_via_line(line)
+        try:
+            return row_AST_via_line(line)
+        except _Stop:
+            pass
 
     from kiss_rdb.storage_adapters_.markdown_table import \
-        _build_row_AST_via_line
+        _build_row_AST_via_line, _Stop
 
     context_stack = ({'path': __file__},)
 
@@ -77,15 +80,18 @@ def row_AST_via_line():
 @lazy_function
 def tagged_row_ASTs_or_lines_via_lines():
     def tagged_row_ASTs_or_lines_via_lines(lines, listener):
-        tagged_lines = _tagged_lines_via_lines(lines)
-        return _tagged_row_ASTs_or_lines_via_tagged_lines(
-                tagged_lines, listener, context_stack)
+        def opn(path):
+            assert pretend_path == path
+            return pfile
+        pfile = build_pfile(pretend_path, lines)
+        ci = build_ci(pretend_path, listener, opn=opn)
+        return ci._raw_sexps()
 
-    context_stack = ({'path': __file__},)
-
+    pretend_path = __file__
+    from .common_initial_state import \
+        pretend_file_via_path_and_lines as build_pfile
     from kiss_rdb.storage_adapters_.markdown_table import \
-        _tagged_row_ASTs_or_lines_via_tagged_lines, _tagged_lines_via_lines
-
+        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as build_ci
     return tagged_row_ASTs_or_lines_via_lines
 
 

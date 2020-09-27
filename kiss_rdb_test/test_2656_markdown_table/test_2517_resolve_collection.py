@@ -204,8 +204,8 @@ def traverse(ci, listener):
 
 
 def traverse_entities(ci, listener):
-    for ent in ci.to_entity_stream_as_storage_adapter_collection(listener):
-        yield ent
+    itr = ci.to_entity_stream_as_storage_adapter_collection(listener)
+    return itr or ()  # new at writing
 
 
 reason_via_end_state = canon.reason_via_end_state

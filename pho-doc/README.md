@@ -45,8 +45,8 @@ when you click create
 
 (Our range is [#876]-[#899].)
 
-|Id                         | Main Tag | Content
-|---------------------------|:-----:|---
+|Id                         | Main Tag | Content  |
+|---------------------------|:-----:|----|
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
 |[#883.4]                   |       | provision: TEMPORARY document demarcation

@@ -185,7 +185,7 @@ then in your 'main' terminal:
 
 (this table is explained at [\[#002\]] using the node table.)
 
-|Id                         | Main Tag | Content
+|Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |[#876]-[#899]              |       | (pho)
 |[#851]-[#875]              |       | (kiss-rdb)

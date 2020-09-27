@@ -63,8 +63,8 @@ class Case2437_endcap_is_required(CommonCase):
     def test_rumskalla(self):
         listener, emissions = em.listener_and_emissions_for(self, limit=2)
         _line = "|I don't|have an|endcap\n"
-        tup = tuple(subject_function()((_line,), listener))
-        assert(not len(tup))
+        itr = subject_function()((_line,), listener)
+        assert itr is None  # new at writing
         emi, *_ = emissions
         actual = emi.to_messages()
         expected = ('header row 1 must have "endcap" (trailing pipe)',)

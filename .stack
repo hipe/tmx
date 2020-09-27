@@ -12,9 +12,4 @@ have full on eno
 there are todo's
 oh boy, creating issues with the most complicated imaginagble algorithm
 the default report is top 10 open issues, VCS chronological order
-maybe introduce CLI late in the game
 maybe the "simple" VCS integration where you map a traversal through datestamps
-maybe a config file or dotfile of several readmes. correct major issues in them
-a simple single tag search (using tatsu but also with some fast cheat). data pipes?
-traverse over the entities of a collection using your custom identifier
-inject your custom identifier into kiss rdb collections

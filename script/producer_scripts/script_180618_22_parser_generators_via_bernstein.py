@@ -157,7 +157,7 @@ def _main(opened, do_field_names, listener):
         ('head_line',),
         ('beginning_of_file',)]
 
-    sxs = ci.sexps_via_stack(action_stack, listener)
+    sxs = ci.sexps_via_action_stack(action_stack, listener)
     sx = next(sxs)
     assert 'table_schema_line_TWO_of_two' == sx[0]
     complete_schema = sx[2]

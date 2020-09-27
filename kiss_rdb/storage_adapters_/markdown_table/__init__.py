@@ -23,7 +23,7 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, rng=None, iden_clser=None):
+        collection_path, listener=None, opn=None, iden_clser=None, rng=None):
     del rng  # ..
 
     # If collection path looks like a filehandle open for write (e.g STDOUT)
@@ -34,43 +34,6 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         from ._output_lines_via_far_collection import \
             pass_thru_collection_for_write_ as func
         return func(fh, listener)
-
-    def cud(typ, listener, *cud_args):
-        from ._flat_map_via_edit import cud_ as func
-        return func(all_sexps, collection_path, opn, typ, cud_args, listener)
-
-    def identifiers(listener):
-        return (ent.identifier for ent in entities(listener))
-
-    def entities(listener):
-        return any_entities(listener) or ()
-
-    def any_entities(listener):
-        if (sexps := _via_stack(_action_stack_for_entities(), listener)):
-            ents = (sexp[1] for sexp in sexps)
-            for _ in ents:
-                break  # [#867.E] advance over example row even if blank ID
-            return (ent for ent in ents if ent.nonblank_identifier_primitive)
-
-    def all_sexps(listener):
-        action_stack = [('beginning_of_file', lambda o: o.turn_yield_on())]
-        return _via_stack(action_stack, listener)
-
-    def _via_stack(stack, listener):
-        use_stack = _action_stack_for_check_single_table()
-        _merge_action_stacks(use_stack, stack)
-        try:
-            opened = (opn or open)(collection_path)
-        except FileNotFoundError as ee:
-            from modality_agnostic import \
-                emission_details_via_file_not_found_error as func
-            e = ee  # 😢, (Case2662DP)
-            return listener('error', 'structure', 'cannot_load_collection',
-                            'no_such_file_or_directory', lambda: func(e))
-        sexps = _every_line_sexp(opened, listener, context_stack, iden_clser)
-        return _sexps_via_stack(sexps, use_stack, listener, context_stack)
-
-    context_stack = ({'collection_path': collection_path},)
 
     class single_traversal_collection:  # #class-as-namespace
         def update_entity_as_storage_adapter_collection(iden, edit, listener):
@@ -83,17 +46,83 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
             return cud('delete', listener, iden)
 
         def retrieve_entity_as_storage_adapter_collection(iden, listener):
-            if (ents := any_entities(listener)):
-                return _retrieve(ents, iden, listener)
-
-        to_entity_stream_as_storage_adapter_collection = entities
-        to_identifier_stream_as_storage_adapter_collection = identifiers
-        sexps_via_stack = _via_stack  # (Case3306DP)
+            ents = entities(listener)
+            return _retrieve(ents, iden, listener)
 
         def SYNC_AGENT_FOR_DATA_PIPES():
             from ._file_diff_via_flat_map import sync_agent_ as func
-            return func(all_sexps, collection_path)
+            return func(all_sxs, collection_path)
 
+        def to_identifier_stream_as_storage_adapter_collection(listener):
+            return eek(lambda: (ent.identifier for ent in entities(listener)))
+
+        def to_entity_stream_as_storage_adapter_collection(listener):
+            return eek(lambda: entities(listener))
+
+        def sexps_via_action_stack(astack, listener):  # (Case3306DP)
+            return eek(lambda: sexps_via_action_stack(astack, listener))
+
+        def _raw_sexps():  # #testpoint
+            return eek(lambda: to_raw_sexps(listener))
+
+    def cud(typ, listener, *cud_args):
+        from ._flat_map_via_edit import cud_ as func
+        return func(all_sxs, collection_path, opn, typ, cud_args, listener)
+
+    def entities(listener):
+        sxs = sexps_via_action_stack(_action_stack_for_entities(), listener)
+        ents = (sexp[1] for sexp in sxs)
+        for _ in ents:
+            break  # skip example row (Case2451)
+        return (ent for ent in ents if ent.nonblank_identifier_primitive)
+
+    def all_sxs(listener):
+        return eek(lambda: checked_sxs(listener))
+
+    def checked_sxs(listener):
+        astack = [('beginning_of_file', lambda o: o.turn_yield_on())]
+        return sexps_via_action_stack(astack, listener)
+
+    def sexps_via_action_stack(astack, listener):
+        use_astack = _action_stack_for_check_single_table()
+        _merge_stack_in_to_stack(use_astack, astack)
+        sxs = to_raw_sexps(listener)
+        return _sexps_via_stack(sxs, use_astack, cstack, listener)
+
+    def to_raw_sexps(listener):
+        tagged = _tagged_lines_via_lines(to_lines(listener))
+        return _line_sexps_via(tagged, cstack, listener, iden_clser)
+
+    def to_lines(listener):
+        opened = None
+        try:
+            opened = (opn or open)(collection_path)
+        except FileNotFoundError as e:
+            fnf_err = e
+        if opened is None:
+            _when_file_not_found(listener, fnf_err)
+            raise _Stop()
+        return lines_via_opened(opened)
+
+    def lines_via_opened(opened):
+        with opened as lines:
+            for line in lines:
+                yield line
+
+    def eek(build_iter):  # catch stop while building an iter so none not empty
+        try:
+            return eek2(build_iter())
+        except _Stop:
+            return
+
+    def eek2(itr):  # catch a mid-traversal stop
+        try:
+            for x in itr:
+                yield x
+        except _Stop:
+            return
+
+    cstack = ({'collection_path': collection_path},)  # context_stack
     return single_traversal_collection
 
 
@@ -130,6 +159,13 @@ def _when_identifier_too_deep(listener, iden, max_depth):  # will go away
     msg = (f"can't retrieve '{eid}' because that identifier depth "
            f"({depth}) exceeds the max for this format ({max_depth})")
     listener('error', 'structure', 'entity_not_found', lambda: {'reason': msg})
+
+
+def _when_file_not_found(listener, e):
+    from modality_agnostic import \
+        emission_details_via_file_not_found_error as func
+    listener('error', 'structure', 'cannot_load_collection',
+             'no_such_file_or_directory', lambda: func(e))
 
 
 # == **EXPERIMENTAL** "Action Stacks":
@@ -193,7 +229,7 @@ def _action_stack_for_check_single_table():
         ('beginning_of_file',)]
 
 
-def _sexps_via_stack(sexps, stack, _listener, _context_stack):
+def _sexps_via_stack(sexps, stack, cstack, listener):
 
     class controller:  # #class-as-namespace
         def turn_yield_on():
@@ -208,13 +244,12 @@ def _sexps_via_stack(sexps, stack, _listener, _context_stack):
         def sexp():
             return sx
 
-        context_stack = _context_stack
-        listener = _listener
-
         _do_stop = False
         _do_yield = False
 
     self = (o := controller)  # ..
+    o.context_stack = cstack
+    o.listener = listener
 
     sexps, o.counter = _add_counter_to_iterator(sexps)  # dup #here1 meh
 
@@ -234,17 +269,6 @@ def _sexps_via_stack(sexps, stack, _listener, _context_stack):
                 break
         if o._do_yield:
             yield sx
-
-
-# ==
-
-def _every_line_sexp(opened, listener, context_stack, iden_clser):
-    with opened as lines:
-        tagged_lines = _tagged_lines_via_lines(lines)
-        sexps = _tagged_row_ASTs_or_lines_via_tagged_lines(
-                tagged_lines, listener, context_stack, iden_clser)
-        for sexp in sexps:
-            yield sexp
 
 
 # == Pseudo-Models
@@ -424,11 +448,8 @@ def _build_row_AST_via_line(listener, context_stack, schema=None):
     # #testpoint (for unit testing parsing row lines)
 
     def row_AST_via_line(line):
-        try:
-            scn = line_scanner_via_line(line)
-            return row_AST_via_two(list(sexps_via_line_scanner(scn)), line)
-        except stop:
-            pass
+        scn = line_scanner_via_line(line)
+        return row_AST_via_two(list(sexps_via_line_scanner(scn)), line)
 
     if schema:
         row_AST_via_two = schema.row_AST_via_two_
@@ -502,10 +523,7 @@ def _build_row_AST_via_line(listener, context_stack, schema=None):
 
     def stop_with_error(lineser):
         listener('error', 'expression', lineser)
-        raise stop()
-
-    class stop(RuntimeError):
-        pass
+        raise _Stop()
 
     return row_AST_via_line
 
@@ -548,33 +566,17 @@ in practice we are not so lenient given:
 """
 
 
-def _tagged_row_ASTs_or_lines_via_tagged_lines(
-        tagged_lines, listener, stack, iden_clser=None):
-    # #testpoint: has its own unit test file
-
-    itr = _tagged_row_ASTs_or_lines_via(
-            tagged_lines, listener, stack, iden_clser)
-    exception_class = next(itr)  # so sinful
-    try:
-        for two in itr:
-            yield two
-    except exception_class:
-        pass
-
-
-def _tagged_row_ASTs_or_lines_via(
-        tagged_lines, listener, context_stack, iden_clser=None):
-
-    # -- exception stuff at top because we hackishly yield our exception class
+def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
 
     def stop_because(reason):
         sct = _flatten_context_stack((*build_cstack(), {'reason': reason}))
-        throwing_listener('error', 'structure', 'stop', lambda: sct)
+        listener('error', 'structure', 'stop', lambda: sct)
+        raise _Stop()
 
     def throwing_listener(severity, *rest):
         listener(severity, *rest)
         if 'error' == severity:
-            raise stop()
+            raise _Stop()
 
     def build_cstack():
         return (*(context_stack or ()), {'line': line, 'lineno': lineno_er()})
@@ -582,13 +584,6 @@ def _tagged_row_ASTs_or_lines_via(
     iden_cls = None
     if iden_clser:
         iden_cls = iden_clser(throwing_listener, build_cstack)  # VERY EXPERIM
-
-    class stop(RuntimeError):
-        pass
-
-    yield stop  # ick/meh
-
-    # --
 
     scn = _scanner_via_iterator(tagged_lines)
     lineno_er = _hackishly_derive_counter(scn)  # duplication #here1 meh
@@ -679,6 +674,10 @@ def _line_about_cell_count_delta(count3, count1):
     more_or_less = 'more' if count1 < count3 else 'less'
     return (f'row cannot have {more_or_less} cels than the schema row has. '
             f'(had {count3}, needed {count1}.)')
+
+
+class _Stop(RuntimeError):
+    pass
 
 
 # == Produce a Stream of Tagged Lines
@@ -791,7 +790,7 @@ def _build_change_detector(initial_type=None):  # #[#508.2] chunker
     return is_same
 
 
-def _merge_action_stacks(main_stack, second_stack):  # goofy experiment
+def _merge_stack_in_to_stack(main_stack, second_stack):  # goofy experiment
     main_offset = len(main_stack)
     while len(second_stack):
         main_offset -= 1

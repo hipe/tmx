@@ -91,7 +91,7 @@ this is why the author feels strongly about "regression order".
 
 ## sub-node table (experiment)
 
-|Id                         | Main Tag | Content
+|Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |[#015.B]                   | #edit | edit documentation
 |[#001.B]                   | #edit | edit documentation

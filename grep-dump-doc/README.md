@@ -134,7 +134,7 @@ to run the whole test suite:
 
 (this table is explained at [\[#002\]] using the node table.)
 
-| Id                        | Main Tag | Content
+| Id                        | Main Tag | Content |
 |---------------------------|:-----:|-
 |                   [#207.C]| #open | hack for file touch
 |                   [#207.B]| #open | secret key is in version control

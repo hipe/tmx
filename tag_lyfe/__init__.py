@@ -72,4 +72,5 @@ def pop_property(self, var):
     delattr(self, var)
     return x
 
+# #pending-rename: this is actually a `__main__`. and change perimssions huh
 # #born.

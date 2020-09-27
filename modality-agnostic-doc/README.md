@@ -20,7 +20,7 @@ only in modeling interfaces for this purpose.
 
 (this table is explained at [\[#002\]] using the node table.)
 
-|Id                         | Main Tag | Content
+|Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |[#511.4]                   |       | the previous but plus styler
 |[#511.3]                   |       | provision: expression with yield

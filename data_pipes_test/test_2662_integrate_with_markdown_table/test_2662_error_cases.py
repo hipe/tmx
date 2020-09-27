@@ -3,6 +3,7 @@ from data_pipes_test.common_initial_state import \
         FakeProducerScript, markdown_fixture, \
         executable_fixture, fixture_files_directory
 from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_children, \
         dangerous_memoize as shared_subject
 import unittest
 from os import path as os_path
@@ -27,7 +28,10 @@ class CommonCase(unittest.TestCase):
 
     # -- build state hook-ins & other support
 
-    build_end_state = build_end_state_of_sync
+    @property
+    @shared_subj_in_children
+    def end_state(self):
+        return build_end_state_of_sync(self)
 
     def expect_emissions(self):
         # (by default, we expect no emissions)
@@ -64,10 +68,6 @@ class Case2557DP_strange_format_adapter_name(CommonCase):
     def two_sentences(self):
         return self._build_two_sentences_commonly()
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
-
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
 
@@ -98,10 +98,6 @@ class Case2559_strange_file_extension(CommonCase):
     @shared_subject
     def two_sentences(self):
         return self._build_two_sentences_commonly()
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
@@ -139,10 +135,6 @@ class Case2660DP_no_functions(CommonCase):
         msg, = self._emission('first_error').to_messages()
         return msg.split('. ')
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
-
     def expect_emissions(self):
         yield 'error', 'expression', 'as', 'first_error'
 
@@ -171,10 +163,6 @@ class Case2662DP_near_file_not_found(CommonCase):
         self.assertEqual(sct['reason'], 'No such file or directory')
         self.assertIn('0000-no-such-file', sct['filename'])
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
-
     def expect_emissions(self):
         yield 'error', '?+', 'as', 'first_error'
 
@@ -198,10 +186,6 @@ class Case2664DP_duplicate_key(CommonCase):
                 '|:--|--:|\n',
                 '|thing A|x|\n')
         self.assertSequenceEqual(act, exp)
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
 
     def expect_emissions(self):
         yield 'error', 'expression', 'duplicate_key', 'as', 'erx'
@@ -242,10 +226,6 @@ class Case2665DP_preserve_endcappiness_here(CommonCase):
                 '|thing C|\n')  # exactly as in file
         self.assertSequenceEqual(_act, _exp)
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
-
     def given(self):
         dictionaries = ({'col_A': 'thing B', 'col_B': 'thing two'},)
         producer_script = FakeProducerScript(
@@ -273,10 +253,6 @@ class Case2667DP_ADD_end_cappiness_here(CommonCase):
                 '|thing B| thing one\n',  # exactly as in file
                 '|thing C|yerp|\n')  # note yes encap
         self.assertSequenceEqual(act, exp)
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state()
 
     def given(self):
         dictionaries = ({'col_A': 'thing C', 'col_B': 'yerp'},)

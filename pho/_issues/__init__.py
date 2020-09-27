@@ -1,4 +1,114 @@
-# just messing around
+def list_(query, readme, listener, opn=None):
+    body_keys, all_ents = _hmm_and_ents(readme, listener, opn)
+
+    if not all_ents:
+        return ()
+
+    # If there's no filter, return all
+    if not query:  # #here3
+        return all_ents
+
+    assert isinstance(query, str)  # for now
+    matcher = _build_matcher(query, body_keys)
+    return (ent for ent in all_ents if matcher(ent))
+
+
+# == Fast Query
+
+def _build_matcher(query_string, body_keys):
+    def match_yn(row_AST):
+        dct = row_AST.core_attributes_dictionary_as_storage_adapter_entity
+        for k in body_keys:
+            if (cel_content := dct.get(k)) is None:
+                continue
+            if match_cel_yn(cel_content):
+                return True
+    match_cel_yn = _build_cel_matcher(query_string)
+    return match_yn
+
+
+def _build_cel_matcher(query_string):
+    def match_cel_yn(cel_content):
+        if -1 == cel_content.find('#'):
+            return  # optimization lol
+        return rx.search(cel_content)
+    import re
+    rx = re.compile(''.join(('(^|[ ])', query_string, r'\b')))  # assume #here4
+    return match_cel_yn
+
+
+def parse_query_(query, listener):
+    if query is None:
+        return
+
+    def main():
+        parse_the_first_token()
+        if_theres_more_than_one_token_whine_for_now()
+        return tok
+
+    def parse_the_first_token():  # all #here4
+        begin = scn.pos  # probably zero
+        scn.skip_required(leading_octothorpe)
+        scn.skip_required(tag_body)
+        scn.skip_required(the_end)
+        assert 0 == begin and scn.empty and scn.pos == len(tok)
+
+    def if_theres_more_than_one_token_whine_for_now():
+        if not len(hstack):
+            return
+        msg = f"Sorry, no compound queries yet in this version: {hstack[-1]!r}"
+        listener('error', 'expression', 'not_yet', lambda: (msg,))
+        raise stop()
+
+    o, build_string_scanner, stop = _throwing_string_scan(listener)
+    leading_octothorpe = o("'#'", '#')
+    tag_body = o('tag body ([-a-z]..)', '[a-z]+(?:-[a-z]+)*')
+    the_end = o('end of tag', r'\Z')
+
+    hstack = list(reversed(query))
+    tok = hstack.pop()  # guaranteed because #here3
+    scn = build_string_scanner(tok)
+
+    try:
+        return main()
+    except stop:
+        pass
+
+
+# ==
+
+def _hmm_and_ents(readme, listener, opn):
+    from kiss_rdb.storage_adapters_.markdown_table import \
+        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
+    iden_clser = _build_identifier_parser
+    ci = func(readme, listener, opn=opn, iden_clser=iden_clser)
+
+    # Make a custom request of the document, to get the ents AND the schema
+    custom_action_stack = [
+        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
+        ('table_schema_line_ONE_of_two',),
+        ('other_line', lambda o: o.turn_yield_off()),
+        ('business_row_AST',),
+        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
+        ('table_schema_line_ONE_of_two',),
+        ('head_line',),
+        ('beginning_of_file',)]
+    sxs = ci.sexps_via_action_stack(custom_action_stack, listener)
+    if sxs is None:
+        return None, None
+
+    # Pop off the schema (always the 1st item of the possibly empty itr)
+    schema, body_keys = None, None
+    for csr2_sx in sxs:
+        schema = csr2_sx[2]
+        body_keys = schema.field_name_keys[1:]
+        break
+
+    if body_keys is not None and ('main_tag', 'content') != body_keys:
+        raise RuntimeError(f"This is fine but hello: {body_keys!r}")
+
+    return body_keys, (sx[1] for sx in sxs)
+
 
 def _build_identifier_parser(listener, cstacker=None):  # #testpoint
     def identifier_via_string(piece):
@@ -90,16 +200,8 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
             xx()
 
         one_or_two_identifiers = []
+        scn = build_string_scanner(piece)
 
-        def throwing_listener(sev, *rest):
-            listener(sev, *rest)
-            if 'error' == sev:
-                raise stop()
-
-        class stop(RuntimeError):
-            pass
-
-        scn = lib.StringScanner(piece, throwing_listener, cstacker)
         try:
             main()
         except stop:
@@ -110,17 +212,35 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
             return iden
         return _IdentifierRange(*rang)
 
-    import kiss_rdb.magnetics.string_scanner_via_string as lib
-    o = lib.pattern_via_description_and_regex_string
+    o, build_string_scanner, stop = _throwing_string_scan(listener, cstacker)
     fnetd = o('for now exactly three digits', '[0-9]{3}')
     octothorpe = o('octothorpe', '#')
     open_bracket = o('open bracket', r'\[')
     second_component_as_letter = o('second component', '[A-Z]')
     second_component_as_number = o('second component', '[0-9]{1,2}')
     close_bracket = o('close bracket', r']')
-
     return identifier_via_string
 
+
+def _throwing_string_scan(listener, cstacker=None):
+    def build_scanner(piece):
+        return StringScanner(piece, throwing_listener, cstacker)
+
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise stop()
+
+    from kiss_rdb.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
+
+    class stop(RuntimeError):
+        pass
+
+    return o, build_scanner, stop
+
+
+# == Models
 
 class _IdentifierRange:
 

@@ -35,6 +35,14 @@ A simple case as a regression-point: (Case5918)
 
 def express_structured_emission(echo, channel_tail, dim_pool):
     # dim_pool = "diminishing pool"
+
+    # (cut-out for `collection_path` meh)
+    if 'path' not in dim_pool:
+        for k, v in dim_pool.items():
+            if '_path' == k[-5:]:
+                dim_pool['path'] = dim_pool.pop(k)
+                break
+
     for line in __lines(channel_tail, dim_pool):
         echo(line)
 
@@ -110,8 +118,12 @@ class _Slots:
     def __getitem__(self, which):
         return self._values[which]  # should raise when None but meh
 
+    def __contains__(self, which):
+        raise RuntimeError('where')
+        return which in self._values
 
-_slots = ('A', 'B', 'C', 'D', 'multiple_lines')
+
+_slots = ('slot_A', 'slot_B', 'slot_C', 'slot_D', 'multiple_lines')
 
 
 def __lines_via_prepared(slots):
@@ -123,41 +135,35 @@ def __lines_via_prepared(slots):
 
 
 def __pieces_for_first_line(slots):
-
-    class _IsFirst:
-        def __init__(self):
-            self._is_first = True
-
-        def clear(self):
-            self._is_first = True
-
-        def __call__(self):
-            if self._is_first:
-                self._is_first = False
-                return False
+    def y():
+        if y.is_subsequent:
             return True
+        y.is_subsequent = True
 
-    y = _IsFirst()
+    def _clear():
+        y.is_subsequent = False
+    y.clear = _clear
+    y.clear()
 
-    for human in slots['A']:
+    for human in (slots['slot_A'] or ()):
         if y():
             yield ': '
         yield ' '.join(human)
 
-    if slots.slot_is_occupied('B'):
+    if slots.slot_is_occupied('slot_B'):
         if y():
             yield ': '
-        yield slots['B']
+        yield slots['slot_B']
         y.clear()  # (Case6258)
 
-    if slots.slot_is_occupied('C'):
+    if slots.slot_is_occupied('slot_C'):
         if y():
             yield ': '
-        yield slots['C']
+        yield slots['slot_C']
 
-    if slots.slot_is_occupied('D'):
+    if slots.slot_is_occupied('slot_D'):
         assert(not slots.did_express_path_on_multi_lines)
-        o = slots['D']
+        o = slots['slot_D']
         if y():
             yield o.separator_before_path
         yield o.filename_or_path
@@ -181,7 +187,11 @@ def _define(i):
 # define the functions
 
 def __occupy_slot_A(slots, channel_tail):
-    slots.occupy_slot('A', [s.split('_') for s in channel_tail])  # #here2
+    deny = {'stop'}
+    these = [s.split('_') for s in channel_tail if s not in deny]  # b.c #here2
+    if not len(these):
+        return
+    slots.occupy_slot('slot_A', these)
 
 
 @_define(_attr_value_thing)
@@ -189,7 +199,7 @@ def _attr_value_thing(slots, dim_pool):
     o = dim_pool.pop
     an = o('attribute_name')
     av = o('unsanitized_attribute_value')
-    slots.occupy_slot('B', f"Could not set '{an}' to {repr(av)} because ")
+    slots.occupy_slot('slot_B', f"Could not set '{an}' to {repr(av)} because ")
     slots.do_use_final_period = True
 
 
@@ -214,7 +224,7 @@ def _reason_stuff(slots, dim_pool):
         assert('expecting' == k)
         s = f'expecting {content_s}'
         y = False
-    slots.occupy_slot('C', s)
+    slots.occupy_slot('slot_C', s)
     slots.do_reduce_redundancy = y
 
 
@@ -231,17 +241,17 @@ def _pathish_stuff(slots, dim_pool):
         separator_before_path = ' - '
         filename_or_path = dim_pool.pop(k)
 
-    slots.occupy_slot('D', struct)
+    slots.occupy_slot('slot_D', struct)
 
 
 @_define(_context_for_parse_error)
 def _context_for_parse_error(slots, dim_pool):
     slots.did_express_path_on_multi_lines = True  # (Case6248)
-    _ = tuple(__lines_for_context_for_parse_error(dim_pool))
+    _ = tuple(_lines_for_context_for_parse_error(dim_pool))
     slots.occupy_slot('multiple_lines', _)
 
 
-def __lines_for_context_for_parse_error(dim_pool):
+def _lines_for_context_for_parse_error(dim_pool):
     # we fold "filename" in because even though it is not used as part of
     # parse error context metadata, its surface format is the same
 
@@ -251,11 +261,9 @@ def __lines_for_context_for_parse_error(dim_pool):
     path = o('path', None)
     line = o('line')
     lineno = o('lineno', None)
-    position = o('position')
+    position = o('position', len(line)-1)  # meh
     # --
-
-    k = 'build_two_lines_of_ASCII_art'
-    if k in dim_pool:
+    if (k := 'build_two_lines_of_ASCII_art') in dim_pool:
         _2 = tuple(o(k)())
     else:
         from kiss_rdb.magnetics.string_scanner_via_string import \
@@ -286,12 +294,14 @@ def __we_are_explicitly_ignoring_these_components(dim_pool):
 
 
 def __reduce_redundancy(slots):
+    if slots['slot_A'] is None:
+        return
     import re
-    _first_word = re.match('[^ :]+', slots['C'])[0]
-    _first_word_of_last_human = slots['A'][-1][0]
+    _first_word = re.match('[^ :]+', slots['slot_C'])[0]
+    _first_word_of_last_human = slots['slot_A'][-1][0]
     if _first_word_of_last_human == _first_word.lower():
         # covered at: ('cannot_load_collection', 'no_such_file_or_directory')
-        slots['A'].pop()  # #here2
+        slots['slot_A'].pop()  # #here2
 
 
 def __fix_this_one_smell(channel_tail, dim_pool):  # #point-1

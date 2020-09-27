@@ -69,7 +69,7 @@ we use these <a name='aliases'>aliases</a>
 
 (this table is explained at [\[#002\]] using the node table.)
 
-| Id                        | Main Tag | Content
+| Id                        | Main Tag | Content |
 |---------------------------|:-----:|-
 |                   [#309.B]| #edit | edit documentation
 |              [\[#309\]]   |       | rabbitmq

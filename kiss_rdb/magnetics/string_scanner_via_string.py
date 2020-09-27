@@ -119,6 +119,7 @@ class StringScanner:  # #[#008.4] a scanner
 
         def details():
             pos, line = self._position, self._line
+
             yield 'expecting', (desc := descer())
             yield 'reason', f'expecting {desc}'
             yield 'position', pos
@@ -212,5 +213,6 @@ class pattern_via_description_and_regex_string:
         self.description = desc
         self.regex = re.compile(rx_string, *flags)
 
+# #pending-rename: this feels like it would be a better fit in script lib
 # #history-A.1
 # #born.
