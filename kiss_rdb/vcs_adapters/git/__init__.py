@@ -38,7 +38,7 @@ def _build_lazy_blame_index(sha_w, contrib_w, lineno_w, lines):
 
     def second_parse(line):
         datetime_s = line[datetime_begin:datetime_end]
-        dt = strptime(datetime_s, _DATETIME_FORMAT)
+        dt = strptime(datetime_s, DATETIME_FORMAT)
         return _Commit(dt)
 
     def first_parse(line):
@@ -180,7 +180,7 @@ def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
 
-_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'  # pho
 _GIT_EXE = 'git'
 
 # #born

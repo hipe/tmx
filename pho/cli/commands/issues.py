@@ -52,6 +52,8 @@ def CLI(sin, sout, serr, argv, enver):
 
 def _formals_for_list():
     yield '-h', '--help', 'this screen'
+    yield '-m', '--oldest-first', 'sort by time last modified (acc. to VCS)'
+    yield '-M', '--newest-first', 'sort by time last modified (acc. to VCS)'
     yield '-b', '--batch', "treat --readme (or PHO_README) as list of paths"
     yield '[query […]]', "e.g '#open'. Currently limited to 1 tag."
 
@@ -70,6 +72,15 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
         return _write_help_into(serr, _subcommand_list.__doc__, foz)
 
     # Local variables via vals
+    sort_by_time = None
+    if vals.get('oldest_first'):
+        if vals.get('newest_first'):
+            serr.write(f"-m and -M are mutually exclusive. {foz.invite_line}")
+            return 4
+        sort_by_time = 'ASCENDING'
+    elif vals.get('newest_first'):
+        sort_by_time = 'DESCENDING'
+
     env_stack = env_stacker()
     readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
     if not readme:
@@ -82,9 +93,10 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
     # Resolve query
     from script_lib.magnetics import error_monitor_via_stderr as func
     mon = func(serr, default_error_exitstatus=4)
-    from pho._issues import parse_query_, list_
-    if query and (query := parse_query_(query, mon.listener)) is None:
-        return 4
+    if query is not None:
+        from pho._issues import parse_query_ as func
+        if (query := func(query, mon.listener)) is None:
+            return 4
 
     # Quad table
     if do_batch:
@@ -101,22 +113,45 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
         # Pass the readme path to the collection
         opened = _pass_thru_context_manager((readme,))
 
-    # Go money
-    file_count, item_count = 0, 0
-    with opened as readme_paths:
-        for readme_path in readme_paths:
-            file_count += 1
-            if do_batch:
-                sout.write(f"## {readme_path}")
-                readme_path = readme_path[0:-1]  # chop
-            itr = list_(query, readme_path, mon.listener)
-            if not itr:
-                return mon.exitstatus
-            for row_AST in itr:
-                item_count += 1
-                sout.write(row_AST.to_line())
-    if do_batch:
-        serr.write(f"({item_count} items(s) in {file_count} file(s)\n")
+    # Run the query
+    from pho._issues import records_via_query_ as func
+    itr = func(opened, sort_by_time, query, do_batch, mon.listener)
+    jsoner, counts = next(itr)
+
+    # Prepare for output
+    def maybe_output_header(_):
+        pass
+
+    maybe_output_header(None)  # #todo syntax checker bug
+
+    do_json = False
+    if sort_by_time is None:
+        def output_record(rec):
+            sout.write(rec.row_AST.to_line())
+        if do_batch:
+            def maybe_output_header(rec):
+                sout.write(f"## {rec.readme}\n")
+    else:
+        output_record = jsoner(sout)
+        do_json = True
+
+    # Output results
+    if do_json:
+        sout.write('[')
+
+    curr_readme = None
+    for rec in itr:
+        counts.items += 1
+        output_record(rec)
+        if curr_readme != rec.readme:
+            curr_readme = rec.readme
+            maybe_output_header(rec)
+
+    if do_json:
+        sout.write(']\n')
+
+    if do_batch or 0 == counts.items:
+        serr.write(f"({counts.items} items(s) in {counts.files} file(s)\n")
     return mon.exitstatus
 
 

@@ -165,7 +165,7 @@ def _main(opened, do_field_names, listener):
     if do_field_names:
         yield ks
     for sx in sxs:
-        typ, ast = sx
+        typ, ast, _lineno = sx
         assert 'business_row_AST' == typ
         dct = ast.core_attributes_dictionary_as_storage_adapter_entity
         dct['name'] = ast.nonblank_identifier_primitive  # yikes

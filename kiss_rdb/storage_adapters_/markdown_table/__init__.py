@@ -662,7 +662,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
             count3 = ast.cell_count
             if count1 < count3:  # #here4
                 stop_because(_line_about_cell_count_delta(count3, count1))
-            yield 'business_row_AST', ast
+            yield 'business_row_AST', ast, lineno_er()
             scn.advance()
 
         # Zero or more "other" lines (either til end of file or til next table)

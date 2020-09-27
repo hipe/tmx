@@ -1,16 +1,106 @@
-def list_(query, readme, listener, opn=None):
-    body_keys, all_ents = _hmm_and_ents(readme, listener, opn)
+def records_via_query_(
+        opened, sort_by_time, tag_query, do_batch, listener, opn=None):
 
-    if not all_ents:
-        return ()
+    class counts:  # #class-as-namespace
+        items = 0
+        files = 0
 
-    # If there's no filter, return all
-    if not query:  # #here3
-        return all_ents
+    yield _jsonerer, counts
 
-    assert isinstance(query, str)  # for now
-    matcher = _build_matcher(query, body_keys)
-    return (ent for ent in all_ents if matcher(ent))
+    records_via_readme = _build_records_via_readme(
+            counts, sort_by_time, tag_query, listener, opn)
+
+    readmes = _readmes_via_opened(opened, do_batch)
+    for readme in readmes:
+        for record in records_via_readme(readme):
+            yield record
+
+
+def _jsonerer(sout):
+
+    def output_json(rec):
+        if is_subsequent():
+            sout.write(',\n')
+        dct = {}
+        dct['mtime'] = rec.mtime.strftime(strftime_fmt)
+        ent = rec.row_AST
+        dct['identifier'] = ent.nonblank_identifier_primitive
+        dct2 = ent.core_attributes_dictionary_as_storage_adapter_entity
+        for k, v in dct2.items():
+            assert k not in dct
+            dct[k] = v
+        dct['readme'] = rec.readme
+        json_dump(dct, sout, indent=2)
+
+    def is_subsequent():
+        if self.is_subsequent:
+            return True
+        self.is_subsequent = True
+
+    class self:
+        is_subsequent = False
+
+    from kiss_rdb.vcs_adapters.git import DATETIME_FORMAT as strftime_fmt
+    from json import dump as json_dump
+    return output_json
+
+
+def _readmes_via_opened(opened, do_batch):
+    with opened as readmes:
+        if do_batch:
+            for readme in readmes:
+                assert '\n' == readme[-1]  # #here5
+                yield readme[:-1]  # chop/chomp
+            return
+        for readme in readmes:
+            assert '\n' != readme[-1]  # #here5
+            yield readme
+
+
+def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
+    rec = _named_tuple('Record', ('mtime', 'row_AST', 'readme'))
+
+    def records_via_readme(readme):
+        counts.files += 1
+        body_keys, ent_sxs = _body_keys_and_ent_sexps(readme, listener, opn)
+
+        # If some kind of failure (eg {file|table} not found), None not iter
+        if ent_sxs is None:
+            return
+
+        # If there is no filter and no sort, you are done
+        if tag_query is None and sort_by_time is None:
+            return (rec(None, sx[1], readme) for sx in ent_sxs)  # #here5
+
+        # Maybe filter by tag query
+        if tag_query is not None:
+            assert isinstance(tag_query, str)  # for now
+            ent_does_match = _build_matcher(tag_query, body_keys)
+            ent_sxs = (sx for sx in ent_sxs if ent_does_match(sx[1]))
+
+        # If no sort by mtime, you are done
+        if sort_by_time is None:
+            return (rec(None, sx[1], readme) for sx in ent_sxs)  # #here5
+
+        # The rest is the heavy lift. Lazily once per file get this badboy
+        from kiss_rdb.vcs_adapters.git import blame_index_via_path as func
+        vcs_index = func(readme, listener, opn)
+        if vcs_index is None:
+            xx()
+
+        mtime = vcs_index.datetime_for_lineno  # #here5 (below)
+        unordered = (rec(mtime(sx[2]), sx[1], readme) for sx in ent_sxs)
+        # (we can imagine some world where we return it unsorted but not here)
+        return sorted(unordered, **sort_kwargs)
+
+    if sort_by_time is not None:
+        sort_kwargs = {'key': lambda rec: rec.mtime}
+        if 'DESCENDING' == sort_by_time:
+            sort_kwargs['reverse'] = True
+        else:
+            assert 'ASCENDING' == sort_by_time
+
+    return records_via_readme
 
 
 # == Fast Query
@@ -77,7 +167,7 @@ def parse_query_(query, listener):
 
 # ==
 
-def _hmm_and_ents(readme, listener, opn):
+def _body_keys_and_ent_sexps(readme, listener, opn):
     from kiss_rdb.storage_adapters_.markdown_table import \
         COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
     iden_clser = _build_identifier_parser
@@ -107,7 +197,7 @@ def _hmm_and_ents(readme, listener, opn):
     if body_keys is not None and ('main_tag', 'content') != body_keys:
         raise RuntimeError(f"This is fine but hello: {body_keys!r}")
 
-    return body_keys, (sx[1] for sx in sxs)
+    return body_keys, sxs
 
 
 def _build_identifier_parser(listener, cstacker=None):  # #testpoint
@@ -331,6 +421,11 @@ class _Identifier:
         return 0
 
     is_range = False
+
+
+def _named_tuple(s, t):
+    from collections import namedtuple as nt
+    return nt(s, t)
 
 
 def xx(msg=None):
