@@ -57,6 +57,10 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
             if re.search(r'[\\|]', value_string):
                 xx(f"cover these adventurous strings: {repr(value_string)}")
 
+            if '' == value_string:  # (Case2482) (experimental - omit padding)
+                yield 'cell_part', '', '', ''
+                continue
+
             if 'shrink_to_fit' == alignment:  # (Case2481KR)
                 yield 'cell_part', left_pads[i], value_string, right_pads[i]
                 continue

@@ -23,7 +23,8 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, iden_clser=None, rng=None):
+        collection_path, listener=None, opn=None, iden_clser=None, rng=None,
+        file_grows_downwards=True):
     del rng  # ..
 
     # If collection path looks like a filehandle open for write (e.g STDOUT)
@@ -67,7 +68,8 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
 
     def cud(typ, listener, *cud_args):
         from ._flat_map_via_edit import cud_ as func
-        return func(all_sxs, collection_path, opn, typ, cud_args, listener)
+        yn = file_grows_downwards
+        return func(all_sxs, collection_path, opn, typ, cud_args, listener, yn)
 
     def entities(listener):
         sxs = sexps_via_action_stack(_action_stack_for_entities(), listener)

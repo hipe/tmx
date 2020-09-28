@@ -151,7 +151,7 @@ class Case0130DP_adds_only(CommonCase):
         pcs = split_row_line(row)
 
         self.assertEqual(pcs[0], '|3A')  # "one" in example row
-        self.assertEqual(pcs[1], '|   ')  # "two" in example row
+        self.assertEqual(pcs[1], '|')  # "two" in example row
         self.assertEqual(pcs[2], '|choo choo')  # "three" in example row
 
         self.assertEqual(row.has_endcap, True)

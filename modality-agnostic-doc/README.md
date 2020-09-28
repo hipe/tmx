@@ -38,6 +38,8 @@ only in modeling interfaces for this purpose.
 |[#510.3]                   |       | track custom states
 |[#510.2]                   |       | track blank states
 |[#509]                     |       | [listener via expectations]
+|[#508.4]                   | #trak | track pretend files
+|[#508.3]                   | #trak | track this named temporary file pattern
 |[#508.2]                   | #trak | track chunker
 |[#507.10]                  | #open | at least 3 memoizers are similar
 |[#507.9]                   |       | [ modality agnostic error monitor ]

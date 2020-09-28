@@ -43,7 +43,7 @@ def pretend_file_via_path_and_big_string(path, big_string):
     return pretend_file_via_path_and_lines(path, unindent(big_string))
 
 
-class pretend_file_via_path_and_lines:  # :[#877.B]
+class pretend_file_via_path_and_lines:  # :[#877.B] #[#504.8]
     # (LIKE [#510.12] pass-thru etc but plus a `path` param)
     # if you find yourself wishing it had a path property, unify with [#877.C]
 

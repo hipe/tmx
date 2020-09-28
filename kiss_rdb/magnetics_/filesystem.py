@@ -135,7 +135,7 @@ class _FILE_REWRITE_TRANSACTION:
 
         import tempfile
 
-        tmp_cm = tempfile.NamedTemporaryFile(mode='w+')
+        tmp_cm = tempfile.NamedTemporaryFile(mode='w+')  # #[#508.3] pattern
         """we keep flip-flopping between two ways:
 
         one way is you construct the above as default which is in 'w+b'

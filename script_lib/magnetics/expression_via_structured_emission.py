@@ -205,13 +205,13 @@ def _attr_value_thing(slots, dim_pool):
 
 @_define(_reason_stuff)
 def _reason_stuff(slots, dim_pool):
-    _all = {'reason', 'message', 'reason_tail', 'expecting'}
-    intersect = set(dim_pool.keys()) & _all
-    if 1 < len(intersect):
+    leftmost_wins = ('expecting', 'reason_tail', 'reason', 'message')
+    intersect = tuple(set(dim_pool.keys()) & set(leftmost_wins))
+    intersect = sorted(intersect, key=lambda s: leftmost_wins.index(s))
+    while 1 < len(intersect):
         # 'reason' and 'expecting' are no longer mutex #history-B.2
-        dim_pool.pop('expecting')
-        intersect.remove('expecting')
-    k, = intersect  # ..
+        dim_pool.pop(intersect.pop())
+    k, = intersect
     content_s = dim_pool.pop(k)
 
     if k in ('reason', 'message'):

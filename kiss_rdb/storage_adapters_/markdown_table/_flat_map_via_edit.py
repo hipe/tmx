@@ -1,12 +1,12 @@
-def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener):
-    flat_map, state = _these_two_for[typ](*cud_args, listener)
+def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener, grow_downwards):
+    flat_map, state = _these_two_for[typ](*cud_args, grow_downwards, listener)
     from ._file_diff_via_flat_map import sync_agent_ as sync_agent_via
     sa = sync_agent_via(all_sexpser, coll_path)
     diff_lines = sa.DIFF_LINES_VIA(flat_map, listener)
     if diff_lines is None:
         return
     rv = state.result_value
-    if opn.HOLY_SMOKES_WIP_(diff_lines):
+    if opn.RECEIVE_DIFF_LINES(diff_lines):
         (f := flat_map.emit_edited) and f(rv)
         return rv
 
@@ -20,7 +20,9 @@ def _build_decorator():
                 rows = tuple(orig_f(*cud_args, state))
                 flat = tuple(x for row in rows for x in row)  # yeah idk
                 prs = _chunk(2, flat)
-                flat_map = _build_flat_map(state, **{k: v for k, v in prs})
+                grow_down = cud_args[-2]  # YUCK
+                assert isinstance(grow_down, bool)
+                flat_map = _build_flat_map(state, grow_down, **{k: v for k, v in prs})  # noqa: E501
                 return flat_map, state
             assert cud not in dct
             dct[cud] = use_f
@@ -37,13 +39,16 @@ _implement, _these_two_for = _build_decorator()
 
 
 @_implement('update')
-def _(needle_iden, edit, listener, state):
+def _(needle_iden, edit, grow_downwards, listener, state):
 
     def receive_identifier(iden):
-        if iden < needle_iden:  # #here1
+        if above(iden, needle_iden):
             return _pass_through
-        if needle_iden > iden:  # #here1
-            xx("didn't find it for update")
+        if above(needle_iden, iden):
+            xtra = f"Or it's out of order. (stopped at {iden.to_string()!r})"
+            direc = _no_ent(needle_iden.to_string(), state.item_count,
+                            'update', xtra)
+            return (direc,)
         assert needle_iden == iden
         state.recv_iden = _pass_thru_remaining_items  # done
         return (('give_me_the_AST_please', recv_before_AST),
@@ -52,8 +57,7 @@ def _(needle_iden, edit, listener, state):
     def at_end():  # exactly as delete #here4
         if state.result_value is not None:
             return _no_directives
-        from . import emission_components_for_entity_not_found_ as func
-        return(func(needle_iden.to_string(), state.item_count, 'update'),)
+        return (_no_ent(needle_iden.to_string(), state.item_count, 'update'),)
 
     def recv_before_AST(ast):
         state.result_value = [ast, None]
@@ -62,11 +66,15 @@ def _(needle_iden, edit, listener, state):
         state.result_value[1] = ast
         state.result_value = tuple(state.result_value)
 
+    above = _less_than if grow_downwards else _greater_than
+
     yield 'recv_iden', receive_identifier, 'recv_end', at_end
 
 
 @_implement('create')
-def _(dct, listener, state):
+def _(dct, grow_downwards, listener, state):
+    if not grow_downwards:
+        xx('cover this for grow upwards')
 
     def recv_sch(sch):
         ks = sch.field_name_keys
@@ -106,7 +114,10 @@ def _(dct, listener, state):
 
 
 @_implement('delete')
-def _(needle_iden, listener, state):
+def _(needle_iden, _grow_downwards, listener, state):
+    if not _grow_downwards:
+        xx('cover this for grow upwards')
+
     def receive_identifier(iden):
         if needle_iden != iden:  # #here1
             return _pass_through
@@ -119,8 +130,8 @@ def _(needle_iden, listener, state):
     def at_end():  # exactly as update #here4
         if state.result_value is not None:
             return _no_directives
-        from . import emission_components_for_entity_not_found_ as func
-        return (func(str(needle_iden), state.item_count, 'delete'),)
+        direc = _no_ent(str(needle_iden), state.item_count, 'delete')
+        return (direc,)
 
     def edited(ast):
         assert needle_iden == ast.identifier
@@ -132,11 +143,21 @@ def _(needle_iden, listener, state):
     yield 'recv_end', at_end, 'emit_edited', edited
 
 
+def _no_ent(eid, count, verb_stem_phrz, xtra=None):
+    from . import emission_components_for_entity_not_found_ as func
+    tup = func(eid, count, verb_stem_phrz)
+    if xtra is None:
+        return tup
+    rsn_head = (dct := tup[-1]())['reason']
+    dct['reason'] = '. '.join((rsn_head, xtra))
+    return (*tup[:-1], lambda: dct)
+
+
 def _pass_thru_remaining_items(_):  # Don't keep looking after you find it
     return _pass_through
 
 
-def _build_flat_map(state, recv_end,
+def _build_flat_map(state, grow_down, recv_end,
                     recv_sch=None, recv_iden=None, emit_edited=None):
 
     # == FROM
@@ -176,17 +197,24 @@ def _build_flat_map(state, recv_end,
     state.check_collection_order = check_collection_order_the_first_time
 
     def check_collection_order(iden):
-        if state.previous_sync_key < iden:  # #here1
+        if above(state.previous_sync_key, iden):
             state.previous_sync_key = iden
             return
 
         # with custom iden cls: (Case2746)
 
         prev = state.previous_sync_key
-        a, b = ((lambda o: lambda: f"'{o}'")(oo) for oo in (prev, iden))
+        if isinstance(prev, str):
+            def str_via(s):
+                return f"'{s}'"
+        else:
+            def str_via(o):
+                return o.to_string()
+
+        a, b = ((lambda o: lambda: str_via(o))(oo) for oo in (prev, iden))
 
         def experiment():
-            yield lambda: prev > iden  # #here1
+            yield lambda: above(iden, prev)
             yield 'disorder'
             yield lambda: f"Collection is not in order. Had: {a()} then {b()})"
             yield lambda: prev == iden  # #here1
@@ -202,6 +230,8 @@ def _build_flat_map(state, recv_end,
 
     state.recv_end = recv_end
 
+    above = _less_than if grow_down else _greater_than
+
     class flat_map:  # #class-as-namepace
         receive_schema = flat_map_receive_schema
         receive_item = flat_map_receive_item
@@ -210,6 +240,14 @@ def _build_flat_map(state, recv_end,
     flat_map.emit_edited = emit_edited  # let client see if it's there for no r
 
     return flat_map
+
+
+def _greater_than(iden_A, iden_B):
+    return iden_A > iden_B  # #here1
+
+
+def _less_than(iden_A, iden_B):
+    return iden_A < iden_B  # #here1
 
 
 _pass_through = (('pass_through',),)

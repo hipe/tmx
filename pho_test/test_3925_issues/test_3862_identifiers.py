@@ -171,7 +171,7 @@ def memoized_parser():
 
 
 def subject_function():
-    from pho._issues import _build_identifier_parser as func
+    from pho._issues import build_identifier_parser_ as func
     return func
 
 

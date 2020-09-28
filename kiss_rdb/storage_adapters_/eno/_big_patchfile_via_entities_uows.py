@@ -1,4 +1,3 @@
-_PATCH_EXE_NAME = 'patch'
 
 
 def build_big_patchfile__(ifc, ent_uows, reser, coll, order, listener):
@@ -187,72 +186,12 @@ def _line_detemplatizer_via(var_values):
 
 def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
     # (used for here and used by neighbor for creating collections!)
-    from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile('w+') as fp:  # #[#873.Y]
-        for line in lines:
-            fp.write(line)
-        fp.flush()
-        ok = _apply_big_patchfile(fp.name, listener, is_dry, cwd)
-        if not ok:
-            fp.seek(0)
-            dst = 'z/_LAST_PATCH_.diff'
-            with open(dst, 'w') as dst_fp:  # from shutil import copyfile meh
-                for line in fp:
-                    dst_fp.write(line)
-            msg = f"(wrote this copy of patchfile for debugging: {dst})"
-            listener('info', 'expression', 'wrote', lambda: (msg,))
+
+    from script_lib.magnetics.file_patches_via_unified_diff_lines \
+        import apply_patch_via_lines as func
+    ok = func(lines, is_dry, listener, cwd)
     if ok:
         return reser()
 
-
-def _apply_big_patchfile(patchfile_path, listener, is_dry, cwd):
-
-    def serr(msg):
-        if '\n' == msg[-1]:  # lines coming from the subprocess
-            msg = msg[0:-1]
-        listener('info', 'expression', 'from_patchfile', lambda: (msg,))
-
-    import subprocess as sp
-
-    args = [_PATCH_EXE_NAME]
-    if is_dry:
-        line = "(executing patch with --dry-run ON)"
-        listener('info', 'expression', 'dry_run', lambda: (line,))
-        args.append('--dry-run')
-
-    args += ('--strip', '1', '--input', patchfile_path)
-
-    opened = sp.Popen(
-            args=args,
-            stdin=sp.DEVNULL,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE,
-            text=True,  # don't give me binary, give me utf-8 strings
-            cwd=cwd)  # might be None
-
-    with opened as proc:
-
-        stay = True
-        while stay:
-            stay = False
-            for line in proc.stdout:
-                serr(f"GOT THIS STDOUT LINE: {line}")
-                stay = True
-                break
-            for line in proc.stderr:
-                serr(f"GOT THIS STDERR LINE: {line}")
-                stay = True
-                break
-
-        proc.wait()  # not terminate. maybe timeout one day
-        es = proc.returncode
-
-    if 0 == es:
-        return True
-    serr(f"EXITSTATUS: {repr(es)}\n")
-
-
-def xx(msg=None):
-    raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
-
+# #history: lost apply patch function
 # #abstracted

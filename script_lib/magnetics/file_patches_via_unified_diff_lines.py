@@ -441,6 +441,80 @@ def _line_scanner_via_lines(lines):  # #[#008.4] a scanner
     return self
 
 
+# ==
+
+def apply_patch_via_lines(lines, is_dry, listener, cwd=None):
+
+    from tempfile import NamedTemporaryFile
+    with NamedTemporaryFile('w+') as fp:  # #[#508.3] this pattern
+
+        # Write the diff lines to a temporary file
+        for line in lines:
+            fp.write(line)
+        fp.flush()
+
+        # Apply the patch and be done!
+        if _apply_big_patchfile(fp.name, is_dry, cwd, listener):
+            return True
+
+        # If there was an issue, write the diff to a tempfile for dbg (#todo)
+        fp.seek(0)
+        dst = 'z/_LAST_PATCH_.diff'
+        with open(dst, 'w') as dst_fp:  # from shutil import copyfile meh
+            for line in fp:
+                dst_fp.write(line)
+        msg = f"(wrote a copy of patchfile for debugging - {dst})"
+        listener('info', 'expression', 'wrote', lambda: (msg,))
+
+
+def _apply_big_patchfile(patchfile_path, is_dry, cwd, listener):
+
+    def serr(msg):
+        if '\n' == msg[-1]:  # lines coming from the subprocess
+            msg = msg[0:-1]
+        listener('info', 'expression', 'from_patchfile', lambda: (msg,))
+
+    args = [_PATCH_EXE_NAME]
+    if is_dry:
+        line = "(executing patch with --dry-run ON)"
+        listener('info', 'expression', 'dry_run', lambda: (line,))
+        args.append('--dry-run')
+    args += ('--strip', '1', '--input', patchfile_path)
+
+    import subprocess as sp
+    opened = sp.Popen(
+        args=args, stdin=sp.DEVNULL, stdout=sp.PIPE, stderr=sp.PIPE,
+        text=True,  # don't give me binary, give me utf-8 strings
+        cwd=cwd)  # might be None
+
+    with opened as proc:
+
+        # #todo the below is kinda funny looking and may need an expert
+        stay = True
+        while stay:
+            stay = False
+            for line in proc.stdout:
+                serr(f"GOT THIS STDOUT LINE: {line}")
+                stay = True
+                break
+            for line in proc.stderr:
+                serr(f"GOT THIS STDERR LINE: {line}")
+                stay = True
+                break
+
+        proc.wait()  # not terminate. maybe timeout one day
+        es = proc.returncode
+
+    if 0 == es:
+        return True
+    serr(f"EXITSTATUS: {repr(es)}\n")
+
+
+_PATCH_EXE_NAME = 'patch'
+
+
+# ==
+
 def xx(msg=None):
     raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
 
@@ -448,5 +522,7 @@ def xx(msg=None):
 if '__main__' == __name__:
     cli_for_production()
 
+# #pending-rename: modality agnostic feels like it would be a better home.
+#                  and give it a name something like "diff and patch"
 # #history-B.2
 # #began-as-abstraction

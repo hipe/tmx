@@ -168,10 +168,7 @@ def parse_query_(query, listener):
 # ==
 
 def _body_keys_and_ent_sexps(readme, listener, opn):
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
-    iden_clser = _build_identifier_parser
-    ci = func(readme, listener, opn=opn, iden_clser=iden_clser)
+    ci = coll_impl_via_(readme, listener, opn)
 
     # Make a custom request of the document, to get the ents AND the schema
     custom_action_stack = [
@@ -200,7 +197,35 @@ def _body_keys_and_ent_sexps(readme, listener, opn):
     return body_keys, sxs
 
 
-def _build_identifier_parser(listener, cstacker=None):  # #testpoint
+def coll_impl_via_(readme, listener, opn=None):
+    if opn is None:
+        opn = _build_real_open(listener)
+    from kiss_rdb.storage_adapters_.markdown_table import \
+        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
+    return func(readme, listener, opn=opn, iden_clser=build_identifier_parser_,
+                file_grows_downwards=False)
+
+
+def _build_real_open(listener):
+    def opn(path, *mode):
+        return open(path, *mode)
+
+    def recv_diff_lines(itr):
+        return _real_apply_diff(itr, listener)
+
+    opn.RECEIVE_DIFF_LINES = recv_diff_lines  # needs improvement
+    return opn
+
+
+def _real_apply_diff(itr, listener):
+    # #todo wouldn't you like to guard this with a VCS check
+    from script_lib.magnetics.file_patches_via_unified_diff_lines \
+        import apply_patch_via_lines as func
+    is_dry, cwd = False, None
+    return func(itr, is_dry, listener, cwd)
+
+
+def build_identifier_parser_(listener, cstacker=None):  # #testpoint
     def identifier_via_string(piece):
         def main():
             if parse_any_open_bracket():
@@ -216,38 +241,44 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
                         parse_the_rest_of_the_identifier_and_close_bracket()
                 parse_end_of_string()
             elif parse_any_octothorpe():
+                begin_identifier()
                 parse_the_rest_of_the_identifier()
                 parse_end_of_string()
             else:
                 expecting_open_bracket_or_octothorphe()
 
         def parse_the_rest_of_the_identifier_and_close_bracket():
+            parse_the_first_component()
+            if ']' == scn.peek(1):
+                scn.advance_by_one()
+                return
+            parse_the_second_component()
+            scn.skip_required(close_bracket)
+
+        def parse_the_rest_of_the_identifier():
+            parse_the_first_component()
+            if scn.empty:
+                return
+            parse_the_second_component()
+
+        def parse_the_first_component():
             ddd = scn.scan_required(fnetd)
             if not ddd:
                 raise stop()
             one_or_two_identifiers[-1][0] = int(ddd)  # #here1
-            char = scn.peek(1)
-            if ']' == char:
-                scn.advance_by_one()
-                return
-            if '.' != char:
-                scn.whine_about_expecting('.')
-            scn.advance_by_one()
+
+        def parse_the_second_component():
+            scn.skip_required(dot)
             if (s := scn.scan(second_component_as_letter)):
                 one_or_two_identifiers[-1][1] = (True, s)  # #here2
             elif (s := scn.scan(second_component_as_number)):
                 one_or_two_identifiers[-1][1] = (False, s)  # #here2
             else:
-                xx("sketched out elaboratedly..")
                 scn.whine_about_expecting(
                     second_component_as_letter, second_component_as_number)
-            scn.skip_required(close_bracket)
-
-        def parse_the_rest_of_the_identifier():
-            xx()
 
         def parse_any_octothorpe():
-            xx()
+            return scn.skip(octothorpe)
 
         def parse_octothorpe():
             scn.skip_required(octothorpe)
@@ -265,13 +296,13 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
         def parse_any_open_bracket():
             if '[' == scn.peek(1):
                 scn.advance_by_one()
-                one_or_two_identifiers.append([None, None, True])  # #here1
+                begin_identifier()
                 return True
 
         def parse_open_bracket():
             scn.skip_required(open_bracket)
             xx()
-            one_or_two_identifiers.append([None, None, True])  # #here1
+            begin_identifier()
 
         def parse_any_dash():
             if scn.empty:
@@ -287,7 +318,10 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
             scn.whine_about_expecting('end of string')
 
         def expecting_open_bracket_or_octothorphe():
-            xx()
+            scn.whine_about_expecting(open_bracket, octothorpe)
+
+        def begin_identifier():
+            one_or_two_identifiers.append([None, None, True])  # #here1
 
         one_or_two_identifiers = []
         scn = build_string_scanner(piece)
@@ -304,10 +338,11 @@ def _build_identifier_parser(listener, cstacker=None):  # #testpoint
 
     o, build_string_scanner, stop = _throwing_string_scan(listener, cstacker)
     fnetd = o('for now exactly three digits', '[0-9]{3}')
+    dot = o('"."', r'\.')
     octothorpe = o('octothorpe', '#')
     open_bracket = o('open bracket', r'\[')
-    second_component_as_letter = o('second component', '[A-Z]')
-    second_component_as_number = o('second component', '[0-9]{1,2}')
+    second_component_as_letter = o('second component as letter ([A-Z])', '[A-Z]')  # noqa: E501
+    second_component_as_number = o('second component as number (d or dd)', '[0-9]{1,2}')  # noqa: E501
     close_bracket = o('close bracket', r']')
     return identifier_via_string
 
@@ -413,7 +448,7 @@ class _Identifier:
             return -1
         else:
             return 0
-        if left_int < right_has:
+        if left_int < right_int:
             return -1
         if right_int < left_int:
             return 1

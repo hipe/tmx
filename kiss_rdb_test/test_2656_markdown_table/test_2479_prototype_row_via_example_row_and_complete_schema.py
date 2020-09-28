@@ -10,42 +10,47 @@ behavior (#history-A.1).
 
 import kiss_rdb_test.markdown_storage_adapter as msa
 from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes_2 as shared_subj_in_children, \
         dangerous_memoize as shared_subject
 import unittest
 
 
 class CommonCase(unittest.TestCase):
 
-    def _there_is_NO_endcap_after(self):
-        row = self._row_after()
+    def expect_NO_endcap_after(self):
+        row = self.end_state_row
         self.assertEqual(row.has_endcap, False)
         line = row.to_line()
         self.assertEqual(line[-1], '\n')
         self.assertNotEqual(line[-2], '|')
 
-    def _there_is_YES_endcap_after(self):
-        row = self._row_after()
+    def expect_YES_endcap_after(self):
+        row = self.end_state_row
         self.assertEqual(row.has_endcap, True)
         line = row.to_line()
         self.assertEqual(line[-1], '\n')
         self.assertEqual(line[-2], '|')
 
-    def _the_two_cell_byteses(self):
-        row = self._row_after()
-        two = normalize_row(row)
+    def the_two_end_state_content_strings(self):
+        two = normalize_row(self.end_state_row)
         assert 2 == len(two)
         return two
 
-    def _content_string_after(self):
-        return self._cell_after().value_string
+    @property
+    def end_state_content_string(self):
+        offset = self.given_offset_of_interest()
+        return self.end_state_row.cell_at_offset(offset).value_string
 
-    def _cell_after(self):
-        return self._row_after().cell_at_offset(self._offset_of_interest())
-
-    def _row_after(self):
+    @property
+    def end_state_row(self):
         return self.end_state.row_after
 
-    def _offset_of_interest(self):
+    @property
+    @shared_subj_in_children
+    def end_state(self):
+        return self.build_end_state_commonly()
+
+    def given_offset_of_interest(self):
         return 1
 
 
@@ -140,10 +145,10 @@ class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(CommonCase):
         self.assertIsNotNone(subject_function())
 
     def test_020_the_content_string_gets_updated(self):
-        self.assertEqual(self._content_string_after(), 'X2')
+        self.assertEqual(self.end_state_content_string, 'X2')
 
     def test_030_there_is_NO_endcap_after(self):
-        self._there_is_NO_endcap_after()
+        self.expect_NO_endcap_after()
 
     def test_040_things_are_aligned_all_the_way_right(self):
         """
@@ -154,61 +159,53 @@ class Case2478KR_example_row_HAS_endcap_and_before_line_does_NOT(CommonCase):
           - the counterpart cell paddings from the example row
         """
 
-        str1, str2 = self._the_two_cell_byteses()
+        str1, str2 = self.the_two_end_state_content_strings()
         self.assertEqual(str1, '|            x1   ')  # 17 (3)
         self.assertEqual(str2, '|        X2  ')  # 12 (2)
 
-    @shared_subject
-    def end_state(self):
-        return self.build_state_commonly()
+    def given_schema(_):
+        yield 'natural_key_field_name', 'ohai_im_natty_key'
+        yield "|Ohai I'm Natty Key|Celo|\n"
+        yield '|--:|--:|\n'  # no colon, yes colon means right  #here2
 
-    def far_name_value_pairs(self):
-        return (('ohai_im_natty_key', 'x1'), ('celo', 'X2'))
+    def given_example_row(_):
+        return '|     seventeen   |    twelve  |\n'  # 3, 2 *yes* endcap
 
-    def near_row_before(self):  # NOTE *no* endcap
-        return row_via_line('| x1  | x2   \n')
+    def given_near_row_before(_):
+        return '| x1  | x2   \n'  # *no* endcap
 
-    def example_row(self):  # NOTE *yes* encap
-        return row_via_line('|     seventeen   |    twelve  |\n')  # 3, 2
-
-    def schema_plus(self):
-        return _schema_plus_via_two_lines(
-            "|Ohai I'm Natty Key|Celo|\n",
-            '|--:|--:|\n',  # no colon, yes colon means right  ##here2
-            nkfn='ohai_im_natty_key')
+    def given_far_name_value_pairs(_):
+        yield 'ohai_im_natty_key', 'x1'
+        yield 'celo', 'X2'
 
 
 class Case2479KR_example_row_does_NOT_have_endcap_and_before_line_DOES(CommonCase):  # noqa: E501 #midpoint
 
     def test_020_the_content_string_gets_updated(self):
-        self.assertEqual(self._content_string_after(), 'Y3')
+        self.assertEqual(self.end_state_content_string, 'Y3')
 
     def test_030_there_is_YES_endcap_after(self):
-        self._there_is_YES_endcap_after()
+        self.expect_YES_endcap_after()
 
     def test_040_things_are_aligned_all_the_way_left(self):
-        str1, str2 = self._the_two_cell_byteses()
+        str1, str2 = self.the_two_end_state_content_strings()
         self.assertEqual(str1, '|   y1             ')  # (3) 18
         self.assertEqual(str2, '|  Y3        ')        # (2) 12
 
-    @shared_subject
-    def end_state(self):
-        return self.build_state_commonly()
+    def given_schema(_):
+        yield 'natural_key_field_name', 'hallo_im_natty_key'
+        yield "|Hallo I'm Natty Key|Zig|\n"
+        yield '|:--|:--|\n'  # yes colon, no colon means left  #here2
 
-    def far_name_value_pairs(self):
-        return (('hallo_im_natty_key', 'y1'), ('zig', 'Y3'))
+    def given_example_row(_):
+        return '|   eggsie xamply  |  foo fah   |\n'  # 18, 12 *yes* endcap
 
-    def near_row_before(self):  # NOTE *yes* endcap
-        return row_via_line('| y1  | y2  |\n')
+    def given_near_row_before(_):
+        return '| y1  | y2  |\n'  # *yes* endcap
 
-    def example_row(self):  # NOTE *yes* endcap
-        return row_via_line('|   eggsie xamply  |  foo fah   |\n')  # 18, 12
-
-    def schema_plus(self):
-        return _schema_plus_via_two_lines(
-            "|Hallo I'm Natty Key|Zig|\n",
-            '|:--|:--|\n',  # yes colon, no colon means left  ##here2
-            nkfn='hallo_im_natty_key')
+    def given_far_name_value_pairs(_):
+        yield 'hallo_im_natty_key', 'y1'
+        yield 'zig', 'Y3'
 
 
 class Case2480KR_change_natural_key_only_OK(CommonCase):
@@ -228,7 +225,7 @@ class Case2480KR_change_natural_key_only_OK(CommonCase):
     """
 
     def test_020_the_content_string_gets_updated(self):
-        self.assertEqual(self._content_string_after(), 'Z1')
+        self.assertEqual(self.end_state_content_string, 'Z1')
 
     def test_040_things_are_aligned_some_kind_of_center(self):
         # A lot happens: the example row is 19 wide. The argument value is 2
@@ -239,41 +236,75 @@ class Case2480KR_change_natural_key_only_OK(CommonCase):
         # we put the extra space on is determined by the spacing in the example
         # cell (if it's at all lopsided). Otherwise we align slightly left.
 
-        str1 = normalize_row(self._row_after())[0]
+        str1 = normalize_row(self.end_state_row)[0]
         self.assertEqual(str1, '|         Z1        ')  # (9) 19 (8)
 
-    @shared_subject
-    def end_state(self):
-        return self.build_state_commonly()
+    def given_schema(_):
+        yield 'natural_key_field_name', 'oi_im_natty'
+        yield "|Oi I'm Natty|\n"
+        yield '|:--:|\n'  # yes colon yes colon means center  #here2
 
-    def far_name_value_pairs(self):
-        return (('oi_im_natty', 'Z1'),)
+    def given_example_row(_):
+        return '|    eggsie xamply  |\n'  # (4) 19 (2)
 
-    def near_row_before(self):
-        return row_via_line('| z1  |\n')
+    def given_near_row_before(_):
+        return '| z1  |\n'
 
-    def example_row(self):
-        return row_via_line('|    eggsie xamply  |\n')  # (4) 19 (2)
+    def given_far_name_value_pairs(self):
+        yield 'oi_im_natty', 'Z1'
 
-    def schema_plus(self):
-        return _schema_plus_via_two_lines(
-            "|Oi I'm Natty|\n",
-            '|:--:|\n',  # yes colon yes colon means center  ##here2
-            nkfn='oi_im_natty')
-
-    def _offset_of_interest(self):
+    def given_offset_of_interest(self):
         return 0
 
 
 # (Case2481KR) (no alignment specified) is ricocheted off of elsewhere.)
 
 
-def build_state_commonly(tc):
+class Case2482_update_against_no_endcap_with_blank_strings(CommonCase):
 
-    sp = tc.schema_plus()
-    eg_row = tc.example_row()
-    row_before = tc.near_row_before()
-    far_pairs = tc.far_name_value_pairs()
+    def test_100_the_inside_cel_shrink_to_zero_width(self):
+        cel1, cel2, *_ = self.normal_cels
+        self.assertEqual(cel2, '|')
+        assert cel1, '| [#123 '
+
+    def test_200_it_is_as_if_the_rightmost_cel_never_existed(self):
+        self.assertEqual(len(self.normal_cels), 2)
+        # redundantly but for clarity, assert the whole expected line
+        end_line = self.end_state_row.to_line()
+        self.assertEqual(end_line, self.expected_end_line())
+
+    @shared_subject
+    def normal_cels(self):
+        return normalize_row(self.end_state_row)
+
+    def given_schema(_):
+        yield 'natural_key_field_name', 'identito'
+        yield '| identito | main_tag | body |\n'
+        yield '|---|---|---|\n'
+
+    def given_example_row(_):
+        return '| eg | eg2 | eg3\n'  # no trailing ws
+
+    def given_near_row_before(_):
+        return '| [#123] | #tagg | change me\n'  # no trailing ws
+
+    def given_far_name_value_pairs(self):
+        yield 'identito', '[#123]'
+        yield 'main_tag', ''  # empty string
+        yield 'body', ''  # empty string
+
+    def expected_end_line(_):
+        return '| [#123] ||\n'
+
+
+def build_end_state_commonly(tc):
+    itr = tc.given_schema()
+    kwargs = {k: v for k, v in (next(itr),)}
+    line1, line2 = itr
+    sp = complete_schema_plus_via(line1, line2, **kwargs)
+    eg_row = row_via_line(tc.given_example_row())
+    row_before = row_via_line(tc.given_near_row_before())
+    far_pairs = tuple((k, v) for k, v in tc.given_far_name_value_pairs())
 
     _, updated_row_via = subject_function()(eg_row, sp.complete_schema)
     row = updated_row_via(far_pairs, row_before, msa.throwing_listener)
@@ -284,15 +315,15 @@ def build_state_commonly(tc):
     return end_state
 
 
-CommonCase.build_state_commonly = build_state_commonly
+CommonCase.build_end_state_commonly = build_end_state_commonly
 
 
-class _schema_plus_via_two_lines:  # #todo does this belong here?
+class complete_schema_plus_via:
 
-    def __init__(self, line1, line2, nkfn):
+    def __init__(self, line1, line2, natural_key_field_name):
         row1, row2 = (row_via_line(line) for line in (line1, line2))
         self.complete_schema = complete_schema_via(row1, row2)
-        self.nkfn = nkfn
+        self.nkfn = natural_key_field_name
 
 
 def normalize_row(row):

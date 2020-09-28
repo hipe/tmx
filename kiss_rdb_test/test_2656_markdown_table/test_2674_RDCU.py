@@ -44,11 +44,11 @@ class CommonCase(unittest.TestCase):
             pfiler = pretend_filer_via_pfile(pfile)
             stack = [pfiler() for _ in range(0, num_times_read_file)]
 
-        def egads(diff_lines):
+        def recv_diff_lines(diff_lines):
             tc.omg_diff_lines = tuple(diff_lines)
-            return True
+            return True  # important: tell it u succeeded in applying the patch
 
-        opn.HOLY_SMOKES_WIP_ = egads
+        opn.RECEIVE_DIFF_LINES = recv_diff_lines
         tc.omg_diff_lines = None
 
         if 1 < num_times_read_file:
@@ -282,7 +282,7 @@ class Case2679_create_OK_into_empty_collection(CommonCase):
         hunk, = fp.hunks  # with one hunk
         run, = hunk.to_add_lines_runs()  # with one run of added lines
         line, = run.lines  # with one line
-        self.assertEqual(line, '+| 123 |  |3.14|  |\n')
+        self.assertEqual(line, '+| 123 ||3.14||\n')
 
     @shared_subject
     def end_state(self):
@@ -442,11 +442,9 @@ class Case2716_update_OK(CommonCase):
         exp = '  I\'m modified "thing_B"'
         self.assertEqual(s.index(exp), 0)
 
-    def test_844_still_no_trailing_pipe(self):
+    def test_844_had_endcap_before_so_endcap_after(self):
         line = self.my_custom_index['the_whole_line']
-        last_two = line[-2:]
-        self.assertEqual(last_two[1], '\n')  # ..
-        self.assertNotEqual(last_two[0], '|')
+        assert -1 != line.rfind('modified "thing_B"|\n')
 
     def test_906_that_final_cel_still_isnt_present(self):
         line = self.my_custom_index['the_whole_line']

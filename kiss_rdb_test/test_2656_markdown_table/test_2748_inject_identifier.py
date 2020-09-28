@@ -48,17 +48,17 @@ class CommonCase(unittest.TestCase):
             assert fname == path
             return pfile
 
-        def recv_thing(diff_lines):
-            assert recv_thing.value is None
-            recv_thing.value = tuple(diff_lines)
+        def recv_diff_lines(diff_lines):
+            assert recv_diff_lines.value is None
+            recv_diff_lines.value = tuple(diff_lines)
             return True  # important! tell it you succeeded
 
-        opn.HOLY_SMOKES_WIP_ = recv_thing
-        recv_thing.value = None
+        opn.RECEIVE_DIFF_LINES = recv_diff_lines
+        recv_diff_lines.value = None
 
         func = subject_module().COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
         ci = func(fname, opn=opn, iden_clser=self.given_identity_class)
-        return ci, recv_thing.value
+        return ci, recv_diff_lines.value
 
     do_debug = False
 
@@ -198,7 +198,10 @@ class MyCustomClass:
         self._my_ordinality = _correct_order.index(title)
         self._title = title
 
-    def __str__(self):
+    def __str__(self):  # (Case2748)
+        return self.to_string()
+
+    def to_string(self):  # (Case2746)
         return f"👉___{self._title}___👈"
 
     def __lt__(self, otr):

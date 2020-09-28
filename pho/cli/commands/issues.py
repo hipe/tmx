@@ -9,6 +9,7 @@ def _formals_for_toplevel():
 
 def _subcommands():
     yield 'list', lambda: _subcommand_list
+    yield 'close', lambda: _subcommand_close
     yield 'find-readmes', lambda: _subcommand_find_readmes
 
 
@@ -50,6 +51,35 @@ def CLI(sin, sout, serr, argv, enver):
     return cmd_funcer()(sin, sout, serr, ch_argv, env_and_related)
 
 
+def _formals_for_close():
+    yield '-h', '--help', 'this screen'
+    yield '<identifier>', 'whomst ("123" or "#123" or "[#123]" all OK)'
+
+
+def _subcommand_close(sin, sout, serr, argv, env_stacker):
+    """Actually a macro around update..."""
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = formals_via(_formals_for_close(), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        return _write_help_into(serr, _subcommand_close.__doc__, foz)
+
+    env_stack = env_stacker()
+    if (readme := _resolve_readme(serr, env_stack)) is None:
+        return 4
+
+    eid = vals['identifier']
+
+    mon = _error_monitor(serr)
+    from pho._issues.edit import close_issue as func
+    func(readme, eid, mon.listener)
+    return mon.exitstatus
+
+
 def _formals_for_list():
     yield '-h', '--help', 'this screen'
     yield '-m', '--oldest-first', 'sort by time last modified (acc. to VCS)'
@@ -64,7 +94,7 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
     bash_argv = list(reversed(argv))
     prog_name = bash_argv.pop()
     foz = formals_via(_formals_for_list(), lambda: prog_name)
-    vals, es = foz.nonterminal_parse(serr, bash_argv)
+    vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
 
@@ -82,17 +112,15 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
         sort_by_time = 'DESCENDING'
 
     env_stack = env_stacker()
-    readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
-    if not readme:
-        serr.write("please use -r or PHO_README for now.\n")
+    if (readme := _resolve_readme(serr, env_stack)) is None:
         return 4
+
     readme_is_dash = '-' == readme
     do_batch = vals.get('batch')
     query = vals.get('query')
 
     # Resolve query
-    from script_lib.magnetics import error_monitor_via_stderr as func
-    mon = func(serr, default_error_exitstatus=4)
+    mon = _error_monitor(serr)
     if query is not None:
         from pho._issues import parse_query_ as func
         if (query := func(query, mon.listener)) is None:
@@ -155,6 +183,13 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
     return mon.exitstatus
 
 
+def _resolve_readme(serr, env_stack):
+    readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
+    if readme:
+        return readme
+    serr.write("please use -r or PHO_README for now.\n")
+
+
 def _formals_for_find_readmes():
     yield '-h', '--help', 'This screen'
     yield 'path?', "Filesystem path to search (default: '.')"  # [path] #todo
@@ -203,6 +238,11 @@ def _write_help_into(serr, doc, foz):
     for line in foz.help_lines(doc):
         serr.write(line)
     return 0
+
+
+def _error_monitor(serr):
+    from script_lib.magnetics import error_monitor_via_stderr as func
+    return func(serr, default_error_exitstatus=4)
 
 
 def _pass_thru_context_manager(lines):  # #[#510.12] pass-thru context manager

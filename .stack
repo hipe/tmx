@@ -12,3 +12,7 @@ have full on eno
 there are todo's
 oh boy, creating issues with the most complicated imaginagble algorithm
 the default report is top 10 open issues, VCS chronological order
+open an issue (which will be an insert or an update)
+refactor: get rid of that one memoizer, unify to use only that other
+close an issue (which is an update) which will be used in open
+abstract apply patch out of md if you didn't already
