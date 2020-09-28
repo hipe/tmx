@@ -1,5 +1,5 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes_2 as shared_subj_in_children, lazy
+        dangerous_memoize_in_child_classes as shared_subj_in_children, lazy
 import unittest
 
 

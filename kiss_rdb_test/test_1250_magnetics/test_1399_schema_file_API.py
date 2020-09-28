@@ -69,11 +69,9 @@ class CommonCase(unittest.TestCase):
 
     # -- setup
 
-    @shared_subject_in_child_classes('_end_state', 'build_end_state')
+    @property
+    @shared_subject_in_child_classes
     def end_state(self):
-        pass
-
-    def build_end_state(self):
         listener, emissions = em.listener_and_emissions_for(self, limit=1)
         rv = self.given_run(listener)
         dct = {}

@@ -4,7 +4,7 @@ from data_pipes_test.common_initial_state import \
         executable_fixture
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, \
-        dangerous_memoize_in_child_classes_2 as shared_subj_in_child_classes
+        dangerous_memoize_in_child_classes as shared_subj_in_child_classes
 import unittest
 
 

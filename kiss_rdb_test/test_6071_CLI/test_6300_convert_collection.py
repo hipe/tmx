@@ -1,6 +1,6 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes, \
-        dangerous_memoize as shared_subject, lazy
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
+        dangerous_memoize as shared_subject
 import unittest
 
 
@@ -49,11 +49,9 @@ class CommonCase(unittest.TestCase):  # #[#459.F]
     def _lines(self, stdout_or_stderr):
         return self.end_state.first_line_run(stdout_or_stderr).lines
 
-    @dangerous_memoize_in_child_classes('_OFL', 'build_outputted_file_lines')
-    def outputted_file_lines():
-        pass
-
-    def build_outputted_file_lines(self):
+    @property
+    @shared_subject_in_child_classes
+    def outputted_file_lines(self):
 
         itr = iter(self.end_state.first_line_run('stdout').lines)
         line = next(itr)

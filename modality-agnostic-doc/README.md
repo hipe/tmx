@@ -41,7 +41,7 @@ only in modeling interfaces for this purpose.
 |[#508.4]                   | #trak | track pretend files
 |[#508.3]                   | #trak | track this named temporary file pattern
 |[#508.2]                   | #trak | track chunker
-|[#507.10]                  | #open | at least 3 memoizers are similar
+|[#507.10]                  | #trak | at least 2 custom child class memoizers
 |[#507.9]                   |       | [ modality agnostic error monitor ]
 |[#507.H]                   | #hole |
 |[#507.G]                   | #open | idiomize something for the test platform

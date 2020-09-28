@@ -1,5 +1,5 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
@@ -8,21 +8,17 @@ class CommonCase(unittest.TestCase):
     def function_index_builds(self):
         self.assertIsNotNone(self.function_index)
 
-    @dangerous_memoize_in_child_classes('_OP', 'build_only_parameter')
+    @property
+    @shared_subject_in_child_classes
     def only_parameter(self):
-        pass
-
-    def build_only_parameter(self):
         only, = self.function_index.parameters_that_do_not_start_with_underscores  # noqa: E501
         name, param = only
         assert(isinstance(name, str))
         return param
 
-    @dangerous_memoize_in_child_classes('_FI', 'build_function_index')
+    @property
+    @shared_subject_in_child_classes
     def function_index(self):
-        pass
-
-    def build_function_index(self):
         _ = self.given_function()
         return subject_module().parameter_index_via_mixed(_)
 

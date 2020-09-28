@@ -39,9 +39,9 @@ but still we can use it as a guide.
 
 from kiss_rdb_test.filesystem_spy import build_fake_filesystem
 import modality_agnostic.test_support.common as em
-from modality_agnostic.test_support.common import (
-        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,
-        lazy)
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
+        lazy
 import unittest
 
 
@@ -78,9 +78,10 @@ class CommonCase(unittest.TestCase):
 
     # -- setup
 
-    @shared_subject_in_child_classes('_end_state', 'build_end_state')
+    @property
+    @shared_subject_in_child_classes
     def end_state(self):
-        pass  # see the decorator
+        return self.build_end_state()
 
     def build_end_state(self):
         # The arguments to the SUT function: 1) coll path 2) listener 3) opn

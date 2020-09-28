@@ -170,30 +170,9 @@ class _Emission:
 
 # == Memoizers
 
-def dangerous_memoize_in_child_classes(attr, builder_method_name):
-    """decorator takes two parameters: an attribute to set the value in
-
-    IN THE CLASS, and the name of a builder method to call.
-    .#open [#507.6] integrate this with teardown so the memory is reclaimed
-    """
-
-    def decorate(f):
-        return __do_wicked_memoizer(f, attr, builder_method_name)
-    return decorate
-
-
-def __do_wicked_memoizer(f, attr, builder_method_name):
-    def use_f(tc):  # tc = test case
-        o = tc.__class__
-        if not hasattr(o, attr):
-            setattr(o, attr, getattr(tc, builder_method_name)())
-        return getattr(o, attr)
-    return property(use_f)
-
-
-def dangerous_memoize_in_child_classes_2(orig_f):
-    # #open [#507.10] this is different from the above because with this way
-    # you can't have the child classes use their own builder..
+def dangerous_memoize_in_child_classes(orig_f):
+    # #open [#507.6] integrate this with teardown so the memory is reclaimed
+    # :[#507.10] this is the central, shared memoizer for child classes
 
     k = orig_f.__name__
 

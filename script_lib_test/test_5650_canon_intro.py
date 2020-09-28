@@ -19,7 +19,7 @@ tokens start with dashes.)
 from script_lib.test_support.CLI_canon import \
         THESE_TWO_CHILDREN_CLI_METHODS, CLI_Canon_Assertion_Methods
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes_2 as shared_subj_in_children
+        dangerous_memoize_in_child_classes as shared_subj_in_children
 import unittest
 import re
 

@@ -1,7 +1,8 @@
 from kiss_rdb_test.common_initial_state import functions_for
 from kiss_rdb_test import storage_adapter_canon
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes, lazy
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
+        lazy
 import unittest
 
 
@@ -10,11 +11,9 @@ canon = storage_adapter_canon.produce_agent()
 
 class CommonCase(unittest.TestCase):
 
-    @dangerous_memoize_in_child_classes('_ES', 'build_end_state')
+    @property
+    @shared_subject_in_child_classes
     def end_state(self):
-        pass
-
-    def build_end_state(self):
         return self.canon_case.build_end_state(self)
 
     def given_collection(self):

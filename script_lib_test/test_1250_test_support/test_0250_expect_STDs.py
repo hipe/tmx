@@ -37,7 +37,7 @@ system-under-test is itself a testing library. (but see more N-meta antics
 """
 
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes_2 as shared_subj_in_children
+        dangerous_memoize_in_child_classes as shared_subj_in_children
 import unittest
 
 

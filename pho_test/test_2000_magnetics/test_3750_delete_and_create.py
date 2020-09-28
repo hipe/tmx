@@ -1,6 +1,6 @@
 from pho_test.common_initial_state import business_collection_one
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes_2
+        dangerous_memoize_in_child_classes
 from unittest import TestCase, main as unittest_main
 
 
@@ -46,7 +46,7 @@ class CommonCase(TestCase):
         pass
 
     @property
-    @dangerous_memoize_in_child_classes_2
+    @dangerous_memoize_in_child_classes
     def big_patchfile(self):
         import modality_agnostic.test_support.common as em
         listener, emissions = em.listener_and_emissions_for(self)
