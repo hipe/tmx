@@ -241,6 +241,7 @@ class write_only_IO_proxy:
     def fileno(_):  # #provision [#608.15]: implement this correctly
         return 1
 
+    name = '<pretend-stdout>'
     mode = 'w'  # KR
 
 

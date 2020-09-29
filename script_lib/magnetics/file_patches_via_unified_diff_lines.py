@@ -494,11 +494,11 @@ def _apply_big_patchfile(patchfile_path, is_dry, cwd, listener):
         while stay:
             stay = False
             for line in proc.stdout:
-                serr(f"GOT THIS STDOUT LINE: {line}")
+                serr(f"stdout from patch: {line}")
                 stay = True
                 break
             for line in proc.stderr:
-                serr(f"GOT THIS STDERR LINE: {line}")
+                serr(f"stderr from patch: {line}")
                 stay = True
                 break
 
@@ -507,7 +507,7 @@ def _apply_big_patchfile(patchfile_path, is_dry, cwd, listener):
 
     if 0 == es:
         return True
-    serr(f"EXITSTATUS: {repr(es)}\n")
+    serr(f"exitstatus from patch: {repr(es)}\n")
 
 
 _PATCH_EXE_NAME = 'patch'

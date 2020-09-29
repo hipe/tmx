@@ -73,8 +73,6 @@ def _(needle_iden, edit, grow_downwards, listener, state):
 
 @_implement('create')
 def _(dct, grow_downwards, listener, state):
-    if not grow_downwards:
-        xx('cover this for grow upwards')
 
     def recv_sch(sch):
         ks = sch.field_name_keys
@@ -88,11 +86,11 @@ def _(dct, grow_downwards, listener, state):
         # (check the dct against the allowlist not here but there for DRY)
 
         def receive_identifier(iden):
-            if iden < new_iden:  # #here1
+            if above(iden, new_iden):
                 return _pass_through
             if new_iden == iden:  # #here1
                 xx("collision")
-            assert new_iden < iden  # #here1 we found the 1st item > than new
+            assert above(new_iden, iden)  # we found the 1st item > than new
             state.recv_iden = _pass_thru_remaining_items  # done
             return (('insert_item', dct, recv_created), ('pass_through',))
         state.recv_iden = receive_identifier
@@ -109,6 +107,8 @@ def _(dct, grow_downwards, listener, state):
         if state.result_value is not None:
             return _no_directives
         return (('insert_item', dct, recv_created),)
+
+    above = _less_than if grow_downwards else _greater_than
 
     yield 'recv_sch', recv_sch, 'recv_end', at_end, 'emit_edited', emit_edited
 

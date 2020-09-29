@@ -200,10 +200,14 @@ def _body_keys_and_ent_sexps(readme, listener, opn):
 def coll_impl_via_(readme, listener, opn=None):
     if opn is None:
         opn = _build_real_open(listener)
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
+    func = _md_table_lib().COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
     return func(readme, listener, opn=opn, iden_clser=build_identifier_parser_,
                 file_grows_downwards=False)
+
+
+def _md_table_lib():
+    import kiss_rdb.storage_adapters_.markdown_table as module
+    return module
 
 
 def _build_real_open(listener):
@@ -381,33 +385,33 @@ class _IdentifierRange:
 
 class _Identifier:
 
-    def __init__(self, i, tail_primitive=None, include_bracket=True):  # #here1
-        if tail_primitive is None:
+    def __init__(self, i, tail_tuple=None, include_bracket=True):  # #here1
+        if tail_tuple is None:
             self._sub_component_primitive = None
         else:
-            yn, value = tail_primitive  # #here2
+            yn, value = tail_tuple  # #here2
             if yn:
                 # A => 1, B => 2 ..
-                self._sub_component_as_integer = ord(value) - 64
+                self.minor_integer = ord(value) - 64
             else:
                 value = int(value)
-                self._sub_component_as_integer = value
+                self.minor_integer = value
             self._sub_component_primitive = value  # #testpoint (visual)
-        self._include_bracket = include_bracket
-        self._integer = i  # #testpoint (visual)
+        self.include_bracket = include_bracket
+        self.major_integer = i
 
     def to_string(self):
         return ''.join(self._to_string_pieces())
 
     def _to_string_pieces(self):
-        if self._include_bracket:
+        if self.include_bracket:
             yield '['
         yield '#'
-        yield '%03d' % self._integer
+        yield '%03d' % self.major_integer
         if self._sub_component_primitive is not None:
             yield '.'
             yield str(self._sub_component_primitive)  # (Case3853)
-        if self._include_bracket:
+        if self.include_bracket:
             yield ']'
 
     def __le__(self, otr):
@@ -430,7 +434,7 @@ class _Identifier:
 
     def _compare(self, otr):
         assert isinstance(otr, _Identifier)  # ..
-        left_int, right_int = self._integer, otr._integer
+        left_int, right_int = self.major_integer, otr.major_integer
         if left_int < right_int:
             return -1
         if left_int > right_int:
@@ -440,8 +444,8 @@ class _Identifier:
         right_has = otr._sub_component_primitive is not None
         if left_has:
             if right_has:
-                left_int = self._sub_component_as_integer
-                right_int = otr._sub_component_as_integer
+                left_int = self.minor_integer
+                right_int = otr.minor_integer
             else:
                 return 1
         elif right_has:
@@ -454,6 +458,10 @@ class _Identifier:
             return 1
         assert left_int == right_int
         return 0
+
+    @property
+    def has_sub_component(self):
+        return self._sub_component_primitive is not None
 
     is_range = False
 

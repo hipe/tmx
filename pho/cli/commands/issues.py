@@ -9,8 +9,10 @@ def _formals_for_toplevel():
 
 def _subcommands():
     yield 'list', lambda: _subcommand_list
+    yield 'open', lambda: _subcommand_open
     yield 'close', lambda: _subcommand_close
     yield 'find-readmes', lambda: _subcommand_find_readmes
+    yield 'which', lambda: _subcommand_which
 
 
 def CLI(sin, sout, serr, argv, enver):
@@ -49,6 +51,45 @@ def CLI(sin, sout, serr, argv, enver):
         return environ, vals
 
     return cmd_funcer()(sin, sout, serr, ch_argv, env_and_related)
+
+
+# == FROM
+
+def _formals_for_open():
+    yield '-h', '--help', 'this screen'
+    yield '<message>', 'any one line of some appropriate length'
+
+
+def _subcommand_open(sin, sout, serr, argv, env_stacker):
+    """Does a complicated identifier provisioning thing"""
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = formals_via(_formals_for_open(), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        return _write_help_into(serr, _subcommand_open.__doc__, foz)
+
+    env_stack = env_stacker()
+    if (readme := _resolve_readme(serr, env_stack)) is None:
+        return 4
+
+    dct = {'main_tag': '#open', 'content': vals['message']}
+    mon = _error_monitor(serr)
+    from pho._issues.edit import open_issue as func
+    bef_aft = func(readme, dct, mon.listener)
+    if bef_aft is not None:
+        before, after = bef_aft
+        if before:
+            serr.write(f"before: {before.to_line()}")
+            serr.write(f"after:  {after.to_line()}")
+        else:
+            serr.write("line:   {after.to_line()}")
+    return mon.exitstatus
+
+# == TO
 
 
 def _formals_for_close():
@@ -232,6 +273,29 @@ def _subcommand_find_readmes(sin, sout, serr, argv, env_and_vals_er):
         proc.wait()
         exitstatus = proc.returncode
     return exitstatus
+
+
+def _subcommand_which(sin, sout, serr, argv, env_stacker):
+    """Which readme is selected? (per env variable 'PHO_README')"""
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    formals = (('-h', '--help', 'this screen'),)
+    foz = formals_via(formals, lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        return _write_help_into(serr, _subcommand_which.__doc__, foz)
+
+    env_stack = env_stacker()
+    if (readme := _resolve_readme(serr, env_stack)) is None:
+        serr.write("no readme selected.\n")
+        return 4
+
+    sout.write(readme)
+    sout.write('\n')
+    return 0
 
 
 def _write_help_into(serr, doc, foz):

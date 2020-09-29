@@ -47,6 +47,7 @@ when you click create
 
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
+|[#899]                     | #exmp | This is an example issue.
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
 |[#883.4]                   |       | provision: TEMPORARY document demarcation

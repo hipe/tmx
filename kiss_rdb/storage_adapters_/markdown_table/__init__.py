@@ -27,10 +27,17 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         file_grows_downwards=True):
     del rng  # ..
 
-    # If collection path looks like a filehandle open for write (e.g STDOUT)
     if hasattr(collection_path, 'fileno'):
         fh = collection_path
-        assert 'w' == fh.mode[0]
+        del collection_path
+        mode = fh.mode[0]
+        use_filename = fh.name
+        was_passed_open_filehandle = True
+    else:
+        use_filename = collection_path
+        was_passed_open_filehandle = False
+
+    if was_passed_open_filehandle and 'w' == mode:
         assert 1 == fh.fileno()  # until it isn't..
         from ._output_lines_via_far_collection import \
             pass_thru_collection_for_write_ as func
@@ -52,7 +59,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
 
         def SYNC_AGENT_FOR_DATA_PIPES():
             from ._file_diff_via_flat_map import sync_agent_ as func
-            return func(all_sxs, collection_path)
+            return func(all_sxs, use_filename)
 
         def to_identifier_stream_as_storage_adapter_collection(listener):
             return eek(lambda: (ent.identifier for ent in entities(listener)))
@@ -69,7 +76,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
     def cud(typ, listener, *cud_args):
         from ._flat_map_via_edit import cud_ as func
         yn = file_grows_downwards
-        return func(all_sxs, collection_path, opn, typ, cud_args, listener, yn)
+        return func(all_sxs, use_filename, opn, typ, cud_args, listener, yn)
 
     def entities(listener):
         sxs = sexps_via_action_stack(_action_stack_for_entities(), listener)
@@ -96,13 +103,15 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         return _line_sexps_via(tagged, cstack, listener, iden_clser)
 
     def to_lines(listener):
+        if was_passed_open_filehandle:
+            return to_lines_when_opened_filehandle()
         opened = None
         try:
             opened = (opn or open)(collection_path)
         except FileNotFoundError as e:
             fnf_err = e
         if opened is None:
-            _when_file_not_found(listener, fnf_err)
+            whine_about_file_not_found_(listener, fnf_err)
             raise _Stop()
         return lines_via_opened(opened)
 
@@ -110,6 +119,10 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         with opened as lines:
             for line in lines:
                 yield line
+
+    def to_lines_when_opened_filehandle():
+        for line in fh:  # we don't use a context manager b.c don't close it
+            yield line
 
     def eek(build_iter):  # catch stop while building an iter so none not empty
         try:
@@ -124,7 +137,8 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         except _Stop:
             return
 
-    cstack = ({'collection_path': collection_path},)  # context_stack
+    cstack = ({'collection_path': use_filename},)  # context_stack
+
     return single_traversal_collection
 
 
@@ -163,7 +177,7 @@ def _when_identifier_too_deep(listener, iden, max_depth):  # will go away
     listener('error', 'structure', 'entity_not_found', lambda: {'reason': msg})
 
 
-def _when_file_not_found(listener, e):
+def whine_about_file_not_found_(listener, e):
     from modality_agnostic import \
         emission_details_via_file_not_found_error as func
     listener('error', 'structure', 'cannot_load_collection',

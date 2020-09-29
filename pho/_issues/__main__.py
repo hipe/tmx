@@ -49,7 +49,7 @@ def _do_CLI_for_child_1(mon, sin, sout, serr, input_string):
         return 4  # assuing emitted
 
     sout.write('parsed!\n')
-    sout.write(f'integer: {iden._integer}\n')
+    sout.write(f'integer: {iden.major_integer}\n')
     x = iden._sub_component_primitive
     sout.write(f'sub-component: {x}\n')
     return 0

@@ -54,8 +54,11 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
             # my_eg_cell = my_eg_cell_via(i)
             alignment = alignments[i]
 
-            if re.search(r'[\\|]', value_string):
-                xx(f"cover these adventurous strings: {repr(value_string)}")
+            if (md := re.search(r'[\\|]', value_string)):
+                dct = {'line': value_string, 'position': md.span()[0]}
+                dct['reason'] = "value string has characters too adventurous"
+                listener('error', 'structure', 'input_error', lambda: dct)
+                raise stop()
 
             if '' == value_string:  # (Case2482) (experimental - omit padding)
                 yield 'cell_part', '', '', ''
