@@ -108,9 +108,6 @@ parameter); but don't do that.
 :[#502]
 """
 
-from modality_agnostic import dangerous_memoize
-
-
 # == BEGIN [#008.12] function reflection
 #    At #history-A.3 this became stowaway here & sunsetted anemic other file.
 #    There are lots of holes here that would be straightforward to fill,
@@ -202,35 +199,39 @@ class _FormalParameter:
 define = _FormalParameter
 
 
+def lazy_property(orig_f):  # #[#510.6] custom memoizy decorator
+    def use_f(self):
+        if not hasattr(self, attr):
+            setattr(self, attr, orig_f(self))
+        return getattr(self, attr)
+    attr = ''.join(('_', orig_f.__name__))
+    return property(use_f)
+
+
 class _CommonArityKinds:
     """(per the list in [#502])"""
 
-    @property
-    @dangerous_memoize
+    @lazy_property
     def REQUIRED_LIST(self):
         """(category 5)"""
         return _MyArity(1, None)
 
-    @property
-    @dangerous_memoize
+    @lazy_property
     def REQUIRED_FIELD(self):
         """(category 4)"""
         return range(1, 1)
 
-    @property
-    @dangerous_memoize
+    @lazy_property
     def OPTIONAL_LIST(self):
         """(category 3)"""
         return _MyArity(0, None)
 
-    @property
-    @dangerous_memoize
+    @lazy_property
     def OPTIONAL_FIELD(self):
         """(category 2)"""
         return range(0, 1)
 
-    @property
-    @dangerous_memoize
+    @lazy_property
     def FLAG(self):
         """(category 1)"""
         return range(0, 0)

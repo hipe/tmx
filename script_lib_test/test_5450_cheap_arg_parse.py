@@ -174,8 +174,7 @@ class ParseyCase(CommonCase):
     def my_run(self, do_expect_success):
         foz = self.given_formals()
         argv = self.given_args()
-        from script_lib.test_support import \
-            spy_on_write_and_lines_for as func
+        from script_lib.test_support import spy_on_write_and_lines_for as func
         serr, lines = func(self, 'DBG: ')
         m = self.given_method()
         vals, es = getattr(foz, m)(serr, list(reversed(argv)))

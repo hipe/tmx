@@ -257,7 +257,8 @@ def _build_option_parser(values, bash_argv, foz):
         fo.set_or_append_value(values, parse_value(fo, 'long'))
 
     def parse_short(tok):  # we call this a "ball" of options
-        fo = fo_via_char(tok[1])
+        if (fo := any_fo_via_char(tok[1])) is None:
+            return try_to_parse_custom(tok)
         if fo.takes_argument:
             return parse_short_that_takes_argument(fo, tok)
         bash_argv.pop()  # pretend you handled it already. you return below
@@ -275,10 +276,25 @@ def _build_option_parser(values, bash_argv, foz):
                 no((f"Can't mix flags and arg-takers in one ball of opts: "
                     f"'{pf.short}' then '{fo.short}'"), 16)
 
+    def try_to_parse_custom(tok):
+        for fo in (foz.formal_options[i] for i in foz.offsets_of_custom_options):  # noqa: E501
+            rx_match_ish = fo.customer()
+            mixed_trueish = rx_match_ish(tok)
+            if mixed_trueish is None:
+                continue
+            bash_argv.pop()
+            fo.set_or_append_value(values, mixed_trueish)
+            return
+        fo_via_char(tok[1])  # trigger failure
+
     def fo_via_char(char):
-        if (i := offset_via_short_char.get(char)) is None:
-            return no(f"Unrecognized option: '-{char}'", 17)
-        return formal_options[i]
+        if (fo := any_fo_via_char(char)) is None:
+            no(f"Unrecognized option: '-{char}'", 17)
+        return fo
+
+    def any_fo_via_char(char):
+        if (i := offset_via_short_char.get(char)) is not None:
+            return formal_options[i]
 
     def parse_short_that_takes_argument(fo, tok):
         if 2 < len(tok):
@@ -398,6 +414,8 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
     def parse_formal_option(definition):
         fp = do_parse_formal_option(definition)
         offset = len(formal_opts)
+        if fp.customer:
+            custom_options.append(offset)  # (Case5474)
         if fp.is_required:
             required_options.append(offset)  # (Case5495)
         if (k := fp.short_char):
@@ -410,7 +428,8 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
     do_parse_formal_option = _build_formal_option_parser()
     parse_formal_positional = _build_formal_positional_parser()
 
-    offset_via_short_char, offset_via_long_stem, required_options = {}, {}, []
+    custom_options, required_options = [], []
+    offset_via_short_char, offset_via_long_stem = {}, {}
     formal_opts, formal_posis = [], []
     vertical_stack = list(reversed(tuple(definitions)))
     main()
@@ -418,6 +437,7 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
     class formals_index:  # "foz"
         childrener = property(lambda _: cxer) if cxer else None
         sparse_tuples_in_grammar_order_via_consume_values = _flatten_vals
+        offsets_of_custom_options = tuple(custom_options)
         offsets_of_required_quote_unquote_options = tuple(required_options)
         formal_options = tuple(formal_opts)
         formal_positionals = tuple(formal_posis)
@@ -561,22 +581,69 @@ def _recursively_parse_formal_positional_expression(string):
 def _build_formal_option_parser():
     def parse_formal_option(definition):  # #here7
         dstack = list(reversed(definition))
-        tok, short, short_char = dstack[-1], None, None
+
+        # == begin experiment
+
+        def main():
+            if head_looks_short():
+                if scan_ordinary_short():
+                    parse_long()
+                else:
+                    parse_custom()
+            else:
+                parse_long()
+
+        def head_looks_short():  # '^-' followed by not '-'
+            return store('md', re.match('^-((?!-).+)', tok()))
+
+        def scan_ordinary_short():
+            if re.match('^[a-zA-Z]$', short_char := self.md[1]):
+                return store('short_char', 'short', short_char, pop())
+
+        def parse_long():
+            if not (md := long_rx.match(tok())):
+                _no(f"Expecting long switch expression, had: {tok()!r}")
+            _ = (pop(), *md.groups())
+            store('longg', 'long_stem', 'arg_moniker', 'arity_or_imperity', *_)
+
+        def parse_custom():
+            rx = re.compile("""^
+                -< (?P<stem>  [a-z][a-z0-9]*(?:-[a-z0-9]+)*  ) >
+                (?P<arity_or_imperity>  [!*+]  )?  $""", re.VERBOSE)
+            if not (md := rx.match(tok())):
+                _no(f"Can't support a short switch like this yet: {tok()!r}")
+            store('long_stem', 'arity_or_imperity',  *md.groups())  # noqa: E501
+            store('short', 'customer', pop(), pop())
+            assert callable(self.customer)
+
+        def store(*omg):
+            half, rem = divmod(leng := len(omg), 2)
+            assert not rem
+            keys, vals = omg[:half], omg[half:]
+            for i in range(0, half):
+                setattr(self, keys[i], vals[i])
+            return vals[0] if 2 == leng else True
+
+        def pop():
+            return dstack.pop()
+
+        def tok(what=None):
+            if len(dstack):
+                return dstack[-1]
+            _no(f"Definition ended too early: {definition!r}")
+
+        these = 'short', 'short_char', 'customer', \
+            'longg', 'long_stem', 'arg_moniker', 'arity_or_imperity'
+        self = main  # meh
+        store(*these, *(None for _ in range(0, len(these))))
+        main()
+        short, short_char, customer, \
+            longg, long_stem, arg_moniker, arity_or_imperity = \
+            (getattr(self, k) for k in these)
+
+        # == end experiment
+
         is_required, is_plural = False, False
-
-        # Zero or one short
-        if (md := re.match('^-((?!-).+)', tok)):  # '^-' followed by not '-'
-            if not re.match('^[a-zA-Z]$', short_char := md[1]):
-                _no(f"Can't support a short switch like this yet: {repr(tok)}")
-            short = dstack.pop()
-            tok = dstack[-1]  # ..
-
-        # The long expression
-        if not (md := rx.match(tok)):
-            _no(f"Expecting long switch expression, had: {repr(tok)}")
-        long_stem, arg_moniker, arity_or_imperity = md.groups()
-        longg = dstack.pop()
-
         if arity_or_imperity is None:
             pass
         elif '*' == arity_or_imperity:
@@ -596,11 +663,10 @@ def _build_formal_option_parser():
             _no(f"For now, always supply description ({short or longg})")
 
         descs = tuple(reversed(dstack))
+        return _FormalOption(short_char, customer, long_stem,
+                             arg_moniker, descs, is_required, is_plural)
 
-        return _FormalOption(
-            short_char, long_stem, arg_moniker, descs, is_required, is_plural)
-
-    rx = re.compile(r'''^
+    long_rx = re.compile(r'''^
       --(?P<stem>  [a-z][a-z0-9]* (?: -[a-z][a-z0-9]* )* )
       (?: =
         (?P<arg_moniker>
@@ -616,7 +682,8 @@ def _build_formal_option_parser():
 # == Model
 
 class _FormalOption:
-    def __init__(o, sc, ls, am, ds, ir, ip):
+    def __init__(o, sc, customer, ls, am, ds, ir, ip):
+        o.customer = customer
         o.short_char, o.long_stem, o.arg_moniker, o.descs = sc, ls, am, ds
         o.is_required, o.is_plural, o.is_singular = ir, ip, not ip
         o.takes_argument = o.arg_moniker is not None
@@ -649,6 +716,8 @@ class _FormalOption:
 
     @property
     def long(o):
+        if o.customer:
+            return f"-<{o.long_stem}>"
         return f"--{o.long_stem}"
 
     @property

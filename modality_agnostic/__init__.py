@@ -276,14 +276,7 @@ class OneShotMutex:
         self._is_first_call = False
 
 
-def dangerous_memoize(orig_f):  # #decorator
-    def use_f(volatile_self):
-        if len(meh):
-            return meh[0]
-        meh.append(orig_f(volatile_self))  # imagine passing none
-        return meh[0]
-    meh = []
-    return use_f
+# out-factored lazy_property at #history-B.7
 
 
 def lazy(orig_f):  # #decorator, #[#510.8]
@@ -300,6 +293,7 @@ class Exception(RuntimeError):
     pass
 
 
+# #history-B.7
 # #history-B.6: archived few lines (elsewhere) that load resource from string
 # #history-B.5: as referenced
 # #history-B.4: as referenced
