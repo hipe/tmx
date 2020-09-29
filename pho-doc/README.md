@@ -48,6 +48,8 @@ when you click create
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
 |[#899]                     | #exmp | This is an example issue.
+|[#887]                     | #open | think about hard-coding fixed width logic for the first two cels (as we do)
+|[#886]                     | #open | jagged alignment of multiline descs (see "close")
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
 |[#883.4]                   |       | provision: TEMPORARY document demarcation

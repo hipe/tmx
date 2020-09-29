@@ -63,8 +63,11 @@ def _validate_content(dct, allowed_keys, listener):
         s = dct.get(k)
         if s is None:
             continue
-        if 41 < len(s):
-            errs.append((k, 'is too long (max 41 chars)'))
+        maxi = 77  # the widest cel in the README at #history-B.3 lol
+        over = len(s) - maxi
+        if 0 < over:
+            msg = f'is too long (max {maxi} chars. over by {over})'
+            errs.append((k, msg))
             continue
         # regex? or no
     if not errs:
@@ -294,4 +297,5 @@ def _md_table_lib():
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.3
 # #born

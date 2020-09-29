@@ -16,13 +16,14 @@ def records_via_query_(
             yield record
 
 
-def _jsonerer(sout):
+def _jsonerer(sout, do_time):
 
     def output_json(rec):
         if is_subsequent():
             sout.write(',\n')
         dct = {}
-        dct['mtime'] = rec.mtime.strftime(strftime_fmt)
+        if do_time:
+            dct['mtime'] = rec.mtime.strftime(strftime_fmt)
         ent = rec.row_AST
         dct['identifier'] = ent.nonblank_identifier_primitive
         dct2 = ent.core_attributes_dictionary_as_storage_adapter_entity
