@@ -6,18 +6,19 @@ class TaggingCommonCase:
 
     def expect_shadow(self, expected_shadow):
         ascii_pieces = []
-        doc_pairs = self.end_state
+        top_thing = self.end_state
 
         def sep():
-            ascii_pieces.append('s' * len(doc_pair.separator_string))
+            ascii_pieces.append('s' * len(s))
 
         def tag():
-            _ = doc_pair.tagging.to_string()
+            _ = ast._to_string()
             ascii_pieces.append('T' * len(_))
 
-        for _ in doc_pairs:
-            doc_pair = _
-            if doc_pair.is_end_piece:
+        for doc_pair in top_thing.doc_pairs:
+            s = doc_pair.not_tag
+            ast = doc_pair.tag
+            if ast is None:
                 sep()
             else:
                 sep()
@@ -64,9 +65,7 @@ class TaggingCommonCasePlusMemoization(
         TaggingCommonCase,
         metaclass=_MetaClass,
         ):
-
-    def _build_end_state(self):
-        return tuple(super()._build_end_state())
+    pass
 
 
 # #born.

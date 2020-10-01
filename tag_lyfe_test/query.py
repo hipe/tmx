@@ -74,33 +74,34 @@ def _add_scary_common_case_memoizing_methods(cls):
 
 
 def _build_tag_subtree(tag_emblems):
-    import tag_lyfe.the_tagging_model as lib
+    return tuple(_tag_ast_via_tag_emblem(te) for te in tag_emblems)
+
+
+def _tag_ast_via_tag_emblem(tag_emblem):
+    # Initially, we couldn't use the parser to parse taggings because we
+    # developed the query parsing before tagging parsing. Now that we *could*,
+    # we still don't want to because carefully writing sexp's by hand is less
+    # clunky and less coupled. 👈 part of overhaul at #history-B.3
+
     import re
-
-    cache = _yikes_cache_of_tags
-
-    def f(tag_emblem):
-        if tag_emblem in cache:
-            return cache[tag_emblem]
-        else:
-            tag = build(tag_emblem)
-            cache[tag_emblem] = tag
-            return tag
-
-    def build(tag_emblem):
-        """due to [#707.D] the catch-22 of our development, we can't yet
-        robustly parse such taggings. so, this rough work instead.
-        """
-
-        post_hashtag = pass_1_rx.search(tag_emblem)[1]  # ..
-        if ':' in post_hashtag:
-            return lib.tagging_via_sanitized_pieces(post_hashtag.split(':'))
-        else:
-            return lib.tagging_via_sanitized_tag_stem(post_hashtag)
-
-    pass_1_rx = re.compile(r'^#([a-z:0-9.]+)$')
-
-    return lib.tag_subtree_via_tags(f(x) for x in tag_emblems)
+    stem = re.match(r'^#([a-z:0-9.]+)$', tag_emblem)[1]
+    if ':' in stem:
+        stack = stem.split(':')
+        subcomps = []
+        while True:
+            stem = stack.pop()
+            assert len(stem)
+            sx = 'non_head_bare_tag_stem', stem
+            sx = 'tagging_subcomponent', ':', sx
+            subcomps.append(sx)
+            if 1 == len(stack):
+                break
+        stem, = stack
+        sx = 'deep_tagging', '#', stem, tuple(reversed(subcomps))
+    else:
+        sx = 'shallow_tagging', '#', stem
+    from tag_lyfe.the_tagging_model import ast_via_sexp_ as func
+    return func(sx)
 
 
 class _EndState:
@@ -143,9 +144,9 @@ def _word_regex():
 
 
 _yikes_cache_of_tag_subtrees = {}
-_yikes_cache_of_tags = {}
 
 
+# #history-B.3
 # #history-A.2: this used to be the _init file but took the history DNA
 # #history-A.1: things changed at upgrade to python 3.7
 # #born.

@@ -43,8 +43,8 @@ NOTEs about its adapation to CLI:
 
 def stats_future_and_results_via_entity_stream_and_query(ents, q):
 
-    from tag_lyfe.magnetics.tagging_subtree_via_string import (
-            doc_pairs_via_string_LIGHTWEIGHT)
+    from tag_lyfe.magnetics.tagging_subtree_via_string import \
+        doc_pairs_via_string
 
     count_of_items_that_did_not_match = 0
     count_of_items_that_matched = 0
@@ -69,16 +69,16 @@ def stats_future_and_results_via_entity_stream_and_query(ents, q):
         taggings = None
         _use_keys = these_keys_via_dictionary(dct)
         for k in _use_keys:
-
-            _ = doc_pairs_via_string_LIGHTWEIGHT(dct[k])
-            *pairs, _end_piece = _
-            # a 'pair' is tag-then-not-tag. there's always one end piece
-            if 0 == len(pairs):
+            top_thing = doc_pairs_via_string(dct[k])
+            pairs = top_thing.doc_pairs
+            if 1 == len(pairs) and pairs[0].tag is None:
                 continue  # no taggings in that cel content
             if taggings is None:
                 taggings = []
             for pair in pairs:
-                taggings.append(pair.tagging)
+                if (tag := pair.tag) is None:
+                    continue
+                taggings.append(tag)
 
         if taggings is None:
             count_of_items_that_did_not_have_taggings += 1

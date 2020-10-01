@@ -19,14 +19,15 @@ class _InValuesFunction:
     def __init__(self, strings, tagging_query):
 
         def f(tagging):
-            sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
-            if sub_tagging is None:
+            subtagging = tagging_query.dig_recursive_(tagging)
+            if subtagging is None:
                 return  # (Case6020)
-            elif sub_tagging.is_deep:  # then it has a value (child)
-                sub_sub_tagging = sub_tagging.child
-                needle = sub_sub_tagging.tag_stem
+            elif subtagging.is_deep:  # then it has a value (child)
+                subcomponents = subtagging.subcomponents
+                subsubtagging = subcomponents[0].body_slot
+                needle = subsubtagging.self_which_is_string  # ..
                 if needle in strings:  # (easy for now)
-                    if sub_sub_tagging.is_deep:
+                    if 1 < len(subcomponents):
                         return True  # (Case6060) hi.
                     else:
                         return True  # (Case6050) hi.

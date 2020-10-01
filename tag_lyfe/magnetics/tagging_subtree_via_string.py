@@ -6,22 +6,18 @@ for this grammar (tagging), no other part of the sub-project should have
 to know the specifics of working with our grammar and our parser-generator.
 
 this takes as input a "one big string" and puts as output something like
-our custom, native AST.
+a big S-expression.
 """
 
 from modality_agnostic import lazy
 
 
-def doc_pairs_via_string_LIGHTWEIGHT(input_string):
-    return _doc_pairs_via_walker(_walkers().Light, input_string)
-
-
 def doc_pairs_via_string(input_string):
-    return _doc_pairs_via_walker(_walkers().Heavy, input_string)
+    return _walk_using_this('the_only_walker', input_string)
 
 
-def _doc_pairs_via_walker(walker, input_string):
-
+def _walk_using_this(which, input_string):
+    walker = getattr(_walkers(), which)
     model = _query_parser().parse(
             text=input_string,
             whitespace='')  # we do our own whitespace. see #here2
@@ -34,73 +30,76 @@ def _walkers():
     file), things regress more nicely when we load this lazily
     """
 
-    import tag_lyfe.the_tagging_model as native_models
     from tatsu.walkers import NodeWalker
 
-    class MyWalker(NodeWalker):
+    def attrs(*attrs):  # #decorator
+        def decorator(orig_f):
+            def use_f(walker, node):
+                vals = (getattr(node, attr) for attr in attrs)
+                return orig_f(walker, *vals)
+            return use_f
+        return decorator
+
+    class SexpBasedWalker(NodeWalker):
 
         def walk_object(self, node):
-            raise Exception(f'hello: {type(node)}')
+            raise RuntimeError(f'ohai: {type(node)}')
 
         def walk__top_thing(self, node):
-            """
-            NOTE we are a GENERATOR which is NEAT HERE
+            # kind of an ugly asymmetry that every other method results in
+            # sexps but we result in an AST but meh
 
-            (make a little mess so we accomodate the document (string) both
-            with and without taggings using the same function..
-            """
+            cx = tuple(self.top_thing_children(node))
+            sx = 'top_thing', cx
+            from tag_lyfe.the_tagging_model import ast_via_sexp_ as func
+            return func(sx)
 
-            ft = node.first_tagging
-            if ft is not None:
+        @attrs('head_sep', 'first_tagging', 'more_taggings', 'tail_garbage')
+        def top_thing_children(
+                self, head_sep, first_tagging, more_taggings, tail_garbage):
 
-                _ts = self._MY_walk_tagging_sep(node.head_sep)
-                _ta = self.walk(ft)  # #here3
+            if first_tagging:
+                for sep, tag in ((head_sep, first_tagging), *more_taggings):
+                    if sep:
+                        wat1 = self.walk(sep)
+                        assert isinstance(wat1, str)
+                    else:
+                        wat1 = ''
+                    wat2 = self.walk(tag)
+                    yield 'not_tag_then_tag', wat1, wat2
 
-                yield native_models.DocumentPair(_ts, _ta)
-
-                for (tagging_sep, tagging) in node.more_taggings:
-
-                    _ts = self.walk(tagging_sep)
-                    _ta = self.walk(tagging)
-
-                    yield native_models.DocumentPair(_ts, _ta)
-
-            a = node.tail_garbage
-            if len(a):
-                use_tail = ''.join(a)
-            else:
-                use_tail = ''
-
-            yield native_models.EndPiece(use_tail)
+            if len(tail_garbage):
+                yield 'not_tag_then_tag', ''.join(tail_garbage), None
 
         def walk__tagging_separator(self, node):
-            """
-            MEMORY
-            """
-            flat_pieces = []
-
             def recurse(ast):
                 for x in ast:
                     if isinstance(x, str):
                         flat_pieces.append(x)
                     else:
+                        assert isinstance(x, list)
                         recurse(x)
+            flat_pieces = []
             recurse(node.ast)
             return ''.join(flat_pieces)
 
-        def walk__wahoo_tagging(self, node):
-            head_stem = node.head_stem
-            x = node.any_tail
-            if x is None:
-                return native_models.tagging_via_sanitized_tag_stem(head_stem)
-            else:
-                pcs = [native_models.BareNameComponent(head_stem)]
-                for _colon, mixed_name in x:
-                    pcs.append(self.walk(mixed_name))
-                return native_models.deep_tagging_via_name_components(pcs)
+        @attrs('head_stem', 'any_tail')
+        def walk__wahoo_tagging(self, head_stem, any_tail):
+            assert isinstance(head_stem, str)  # #[#022]
+            if any_tail is None:
+                return 'shallow_tagging', '#', head_stem
+            cx = tuple(self.child_tag(colon, x) for colon, x in any_tail)
+            return 'deep_tagging', '#', head_stem, cx
+
+        def child_tag(self, colon, node):
+            assert ':' == colon
+            various = self.walk(node)
+            assert isinstance(various, tuple)
+            return 'tagging_subcomponent', ':', various
 
         def walk__non_head_tag_surface_name_as_is(self, node):
-            return native_models.BareNameComponent(node.ast)  # (Case1020)
+            assert isinstance(node.ast, str)
+            return ('non_head_bare_tag_stem', node.ast)
 
         def walk__double_quoted_string(self, node):
             """
@@ -110,49 +109,38 @@ def _walkers():
             (Case1030)
             """
 
-            final_pieces = []
-            chars = []
+            sxs, chars = [], []
 
             def swallow_string():
                 if len(chars):
-                    final_pieces.append(('raw_string', ''.join(chars)))
+                    sxs.append(('raw_string', ''.join(chars)))
                     chars.clear()
 
             for x in node.inside:
-                is_escaped, s = self.walk(x)
+                hello, is_escaped, s = self.walk(x)
+                assert 'hello_internally' == hello
                 if is_escaped:  # #here2
                     swallow_string()  # (Case1040) 1/2
-                    final_pieces.append(('escaped_character', s))
+                    sxs.append(('escaped_character', '\\', s))
                 else:
                     chars.append(s)
 
             swallow_string()
-
-            return native_models.DoubleQuotedStringNameComponent(tuple(final_pieces))  # noqa: E501
+            return 'double_quoted_string', '"', tuple(sxs), '"'
 
         def walk__escaped_double_quote(self, node):
-            return (True, '"')  # or (ick/meh) node.ast[1]. (Case1040) 2/2
+            return 'hello_internally', True, '"'  # (Case1040) 2/2
 
         def walk__not_double_quote(self, node):
-            return (False, node.ast)  # #here2
+            return 'hello_internally', False, node.ast
 
-    class LightWalker(MyWalker):
-        def _MY_walk_tagging_sep(self, node):
-            return NOT_REAL_SEPARATOR
-
-    class NOT_REAL_SEPARATOR:
-        pass
-
-    class HeavyWalker(MyWalker):
-        def _MY_walk_tagging_sep(self, node):
-            if node is None:
-                return ''
-            else:
-                return self.walk(node)  # #here3
+        def walk__bracketed_lyfe(self, node):
+            string, = node.the_inside
+            assert isinstance(string, str)  # [#022]
+            return 'bracketed_lyfe', '[', string, ']'
 
     class walkers:  # #as-namespace-only
-        Light = LightWalker()
-        Heavy = HeavyWalker()
+        the_only_walker = SexpBasedWalker()
 
     return walkers
 
@@ -188,4 +176,5 @@ is and isn't whitespace. (actually we don't have much of a concept of it
 in our grammar.)
 """
 
+# #history-B.3: overhaul to use new simplified sexp pattern
 # #born.

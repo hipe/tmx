@@ -38,12 +38,12 @@ class _InRangeFunction:
         end_num = end._number
 
         def f(tagging):
-            sub_tagging = tagging_query.dig_recursive_(tagging.root_node)
-            if sub_tagging is None:
+            subtagging = tagging_query.dig_recursive_(tagging)
+            if subtagging is None:
                 xx('no such sub tagging')
-            elif sub_tagging.is_deep:  # then it has a value (child)
-                sub_sub_tagging = sub_tagging.child
-                needle = sub_sub_tagging.tag_stem
+            elif subtagging.is_deep:  # then it has a value (child)
+                subsubtagging = subtagging.subcomponents[0]
+                needle = subsubtagging.body_slot.self_which_is_string
                 md = _number_rx.search(needle)
                 if md is None:
                     # tagging value does not look like num (Case7020)

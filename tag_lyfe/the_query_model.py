@@ -450,34 +450,59 @@ class _NameChainNode:
         return in_subtree_match_any_one_(subtree, self._simple_match)
 
     def _simple_match(self, tagging):
-        _inner_tagging = self.dig_recursive_(tagging.root_node)
+        _inner_tagging = self.dig_recursive_(tagging)
         return _inner_tagging is not None
 
     def _init_dig_recursive(self):
 
+        def name_matches(tagging):
+            typ = tagging._type
+            if typ in ('shallow_tagging', 'deep_tagging'):
+                use_stem = tagging.head_stem
+            elif 'non_head_bare_tag_stem' == typ:
+                use_stem = tagging.self_which_is_string
+            else:
+                xx()
+            return name_stem == use_stem
+
         name_stem = self._stem
 
-        def name_matches(tagging_node):
-            return name_stem == tagging_node.tag_stem
-
         if self._has_child:
-            child = self._child
-
-            def f(tagging_node):
-                if not tagging_node.is_deep:
+            def entrypoint_for_dig(tagging):
+                if not tagging.is_deep:
                     # deeper query won't match shallower tag (Case3020)
                     return
-                if name_matches(tagging_node):
-                    return child.dig_recursive_(tagging_node.child)
+
+                if not name_matches(tagging):
+                    return
+
+                stack = list(reversed(tagging.subcomponents))
+                return child._do_dig_recursive(stack)
+
+            child = self._child
         else:
-            def f(tagging_node):
-                if name_matches(tagging_node):
-                    if tagging_node.is_deep:
-                        # deeper tag matches shallower query (Case3030)
-                        return tagging_node
-                    else:
-                        return tagging_node
-        self.dig_recursive_ = f
+            def entrypoint_for_dig(tagging):
+                if not name_matches(tagging):
+                    return
+                if tagging.is_deep:
+                    # Deeper tag matches shallower query (Case3030)
+                    pass  # hi.
+                return tagging
+
+        def do_dig_recursive(stack):
+            subtagging = stack.pop().body_slot
+            if not name_matches(subtagging):
+                return
+            if self._has_child:
+                if len(stack):
+                    return child._do_dig_recursive(stack)  # recursive call
+                # If the query goes deeper than the tagging, no match
+                return
+            # Query node has no childs. Yes match, regardless of tagging depth
+            return subtagging  # or whatever
+
+        self.dig_recursive_ = entrypoint_for_dig
+        self._do_dig_recursive = do_dig_recursive
 
     def wordables_(self):  # for #here3
         yield self
@@ -589,7 +614,7 @@ class _WithOrWithoutValue:
         my_test = self.__class__._my_test
 
         def f(tagging):
-            found = child.dig_recursive_(tagging.root_node)
+            found = child.dig_recursive_(tagging)
             if found is not None:
                 return my_test(found)
 
@@ -642,5 +667,6 @@ def _validate_tag_stem_name(listener, s):  # #track [#707.C] when we formalize
     return True
 
 
+# #history-B.3: accomodate new simplified sexp pattern
 # #history-A.1: deep vs shallow distinction out. simplified name-chain model in
 # #born.

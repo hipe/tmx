@@ -96,16 +96,16 @@ consumed by arbitrary other processes.
 |                   #708    |       | (external tracking)
 |                   #707.K  | #open | reconcile something with something
 |                   #707.J  |       | maybe lost coverage/created appendates at #history-A.1
-|                   #707.I  | #open | #refactor: queries and tagging should use same grammar (for tagging)
+|                   #707.I  | #hole |
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics
 |                   #707.F  | #trak | the "wordables" micro API
 |                   #707.E  | #trak | quoted string terminal nodes in taggings & queries
 |                   #707.D  | #trak | the catch-22 of development order (see)
 |                   #707.C  | #trak | when we formalize allowable tag names
-|                   #707.B  |       | for now no 'tag subtree' class
+|                   #707.B  | #hole |
 |                   #707    |       | (internal tracking)
-|                   #705    |       | the tagging model (graph viz file)
+|                   #705    | #hole |
 |                   #704    |       | experimental conventions
 |                  [#703.B] | #edit | edit documentation
 |                   #703    |       | soft notes
