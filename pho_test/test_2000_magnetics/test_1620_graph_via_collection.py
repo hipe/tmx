@@ -47,6 +47,11 @@ class Case1620_MONO_CASE(unittest.TestCase):
         lines = run(listener)
         emi, = emissions
 
+        if self.do_debug:
+            assert isinstance(lines, tuple)
+            print('WOWZAA:')
+            print('\n'.join(lines))
+
         return lines, emi.payloader, emi.channel
 
     do_debug = False

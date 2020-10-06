@@ -86,7 +86,7 @@ def _walkers():
         @attrs('head_stem', 'any_tail')
         def walk__wahoo_tagging(self, head_stem, any_tail):
             assert isinstance(head_stem, str)  # #[#022]
-            if any_tail is None:
+            if not any_tail:  # None or empty list
                 return 'shallow_tagging', '#', head_stem
             cx = tuple(self.child_tag(colon, x) for colon, x in any_tail)
             return 'deep_tagging', '#', head_stem, cx

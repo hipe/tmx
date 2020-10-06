@@ -6,7 +6,8 @@ def open_issue(readme, dct, listener, opn=None):
     tup = _provision_identifier(readme, listener, opn)
     if tup is None:
         return
-    typ, iden, read_fh, schema, ci = tup  # #here1
+    typ, iden, read_fh, schema, ic = tup  # #here1
+    ci = ic.collection_implementation
 
     # This algorithm is necessarily two-pass: you have to traverse the whole
     # collection once to provision the identifier (you don't know what it will
@@ -192,9 +193,11 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
     stopping_listener = _build_throwing_listener(stop, listener)
 
     try:
-        ci = _coll_impl_via(read_fh, stopping_listener, opn)
-        itr = _schema_then_entities(ci, stopping_listener)
-        cs = next(itr)[2]
+        ic = _issues_collection_via(read_fh, stopping_listener, opn)
+        itr = ic.to_schema_then_entity_sexps()
+        if not itr:
+            raise stop()
+        cs = next(itr)  # guaranteed
         assert 'main_tag' == cs.field_name_keys[1]  # or w/e
         main_tag_key = 'main_tag'
         ents = (sx[1] for sx in itr)
@@ -204,7 +207,7 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
         if res_tup is None:
             read_fh.close()
             return
-        return (*res_tup, read_fh, cs, ci)  # #here1
+        return (*res_tup, read_fh, cs, ic)  # #here1
     except stop:
         read_fh.close()
     except AssertionError as e:
@@ -216,7 +219,7 @@ def _increment_identifier(iden, maj_or_min):
     use_maj, use_minor = iden.major_integer, None
 
     if 'minor' == maj_or_min:
-        use_minor = (False, (iden.minor_integer + 1))  # ick, meh
+        use_minor = (False, str(iden.minor_integer + 1))  # ick, meh
     else:
         assert 'major' == maj_or_min
         use_maj += 1
@@ -228,7 +231,8 @@ def _increment_identifier(iden, maj_or_min):
 def close_issue(readme, eid, listener, opn=None):
     def main():
         iden = parse_identifier()
-        ci = _coll_impl_via(readme, listener, opn)
+        ic = _issues_collection_via(readme, listener, opn)
+        ci = ic.collection_implementation
         edit = (('update_attribute', 'main_tag', '#hole'),
                 ('update_attribute', 'content', ''))
         two = ci.update_entity_as_storage_adapter_collection(
@@ -259,19 +263,6 @@ def close_issue(readme, eid, listener, opn=None):
         pass
 
 
-def _schema_then_entities(ci, throwing_listener):
-    astack = [
-        ('end_of_file', lambda o: o.turn_yield_off()),
-        ('table_schema_line_ONE_of_two',),
-        ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
-        ('table_schema_line_ONE_of_two',),
-        ('head_line',),
-        ('beginning_of_file',)]
-    return ci.sexps_via_action_stack(astack, throwing_listener)
-
-
 def _build_throwing_listener(stop, listener):
     def throwing_listener(sev, *rest):
         listener(sev, *rest)
@@ -282,8 +273,8 @@ def _build_throwing_listener(stop, listener):
 
 # == Delegations & Hops
 
-def _coll_impl_via(readme, listener, opn):
-    from . import coll_impl_via_ as func
+def _issues_collection_via(readme, listener, opn):
+    from pho._issues import issues_collection_via_ as func
     return func(readme, listener, opn)
 
 

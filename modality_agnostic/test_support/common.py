@@ -165,7 +165,10 @@ class _Emission:
         if 'expression' == (shape := self.channel[1]):
             return tuple(self.payloader())
         assert('structure' == shape)
-        return (self.payloader()['reason'],)
+        sct = self.payloader()
+        if 'reason' in sct:
+            return (sct['reason'],)
+        return (sct['message'],)
 
 
 # == Memoizers

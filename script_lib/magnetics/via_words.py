@@ -1,24 +1,29 @@
 from modality_agnostic import lazy
 
 
-def fixed_shape_word_wrapperer(row_max_widths, ellipsis_string=None):
+def fixed_shape_word_wrapperer(
+        row_max_widths, input_format, ellipsis_string='…'):
 
-    ww_proto = _FixedShapeWordWrap(
-            row_max_widths=row_max_widths,
-            ellipsis_string=ellipsis_string)
+    if 'big_string' == input_format:
+        def word_wrapped_lines_via_big_stream(big_string):
+            tox = _token_stream_via_big_string(big_string)
+            return word_wrapped_lines_via_tokens(tox)
+        rv = word_wrapped_lines_via_big_stream
 
-    def word_wrapped_lines_via(**kwargs):
+    else:
+        assert 'words' == input_format
 
-        which, = kwargs.keys()
-        if 'big_string' == which:
-            tokens = __token_stream_via_big_string(kwargs['big_string'])
-        else:
-            raise KeyError(which)
+        def word_wrapped_lines_via_words(words):
+            tox = _tokens_via_token_strings()(words)
+            return word_wrapped_lines_via_tokens(tox)
 
-        _ww = ww_proto.duplicate_plus(tokens=tokens)
-        return _ww.flush_to_structured_lines()
+        rv = word_wrapped_lines_via_words
 
-    return word_wrapped_lines_via
+    def word_wrapped_lines_via_tokens(tox):
+        return ww_proto.duplicate_plus(tox).flush_to_structured_lines()
+
+    ww_proto = _FixedShapeWordWrap(row_max_widths, ellipsis_string)
+    return rv
 
 
 def complicated_join(left, sep, right, itr, max_width, string_via_item):
@@ -296,7 +301,7 @@ class _SpacePlusWord:
         return f' {self._word.string}'
 
 
-def __token_stream_via_big_string(big_string):
+def _token_stream_via_big_string(big_string):
     import re
     itr = re.finditer('([^ ]+)([ ]+|$)', big_string)  # risky
     itr = (md[1] for md in itr)

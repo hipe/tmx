@@ -54,6 +54,7 @@ def _this_definition():
     yield 'deep_tagging', 's', 's', 'as', 'head_stem', \
           'sexps', 'as', 'subcomponents', 'plus', _deep
     yield 'tagging_subcomponent', 's', 'sexp', 'as', 'body_slot'
+    yield 'bracketed_lyfe', 's', 's', 'as', 'inside_string', 's'
     yield 'non_head_bare_tag_stem', 's', 'as', 'self_which_is_string'
     yield 'double_quoted_string', 's', 'sexps', 'as', 'alternating_pieces', 's'
     yield 'escaped_character', 's', 's', 'as', 'unescaped_character'

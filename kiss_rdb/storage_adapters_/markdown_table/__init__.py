@@ -344,7 +344,12 @@ def _build_row_AST_via_two(schema=None):
         def get_lazy_item(func):
             key = func.__name__
             if key not in memo:
-                memo[key] = func()
+                x = None
+                try:
+                    x = func()
+                except _Stop:
+                    pass
+                memo[key] = x
             return memo[key]
 
         memo = {}

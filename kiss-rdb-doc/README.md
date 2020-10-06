@@ -26,9 +26,11 @@ woah boy.
 
 ## (the identifier registry)
 
+(Our range is [#880-899], a narrow allocation range for now.)
+
 |Id                         | Main Tag | Content |
-|---------------------------|:------|---|
-|[#880-899]                 |       | narrow allocation for "pho" for now
+|---------------------------|:------|:----|
+|[#899.Z]                   | #eg   | eg
 |[#877.C]                   |       | [other pretend file]
 |[#877.B]                   |       | [pretend file]
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine

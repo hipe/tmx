@@ -67,6 +67,12 @@ non_head_tag_surface_name
     =
     | non_head_tag_surface_name_as_is
     | double_quoted_string
+    | bracketed_lyfe
+    ;
+
+bracketed_lyfe::BracketedLyfe
+    =
+    '[' the_inside:{ /[^\]]+/ } ']'
     ;
 
 non_head_tag_surface_name_as_is::NonHeadTagSurfaceNameAsIs

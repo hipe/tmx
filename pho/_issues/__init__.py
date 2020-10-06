@@ -63,7 +63,8 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
 
     def records_via_readme(readme):
         counts.files += 1
-        body_keys, ent_sxs = _body_keys_and_ent_sexps(readme, listener, opn)
+        ic = issues_collection_via_(readme, listener, opn)
+        body_keys, ent_sxs = ic.to_body_keys_and_end_sexps()
 
         # If some kind of failure (eg {file|table} not found), None not iter
         if ent_sxs is None:
@@ -168,11 +169,51 @@ def parse_query_(query, listener):
 
 # ==
 
-def _body_keys_and_ent_sexps(readme, listener, opn):
-    ci = coll_impl_via_(readme, listener, opn)
+def issues_collection_via_(readme, listener, opn=None):
+    ci = _coll_impl_via(readme, listener, opn)
+    if ci is None:
+        return
 
+    class issues_collection:  # #class-as-namespace
+        def to_graph_lines(listener=listener):
+            from .graph import to_graph_lines_ as func
+            return func(issues_collection, listener)
+
+        def to_schema_then_entity_sexps(listener=listener):
+            return _to_schema_then_entity_sexps(ci, listener)
+        collection_implementation = ci
+
+    return issues_collection
+
+
+def _to_schema_then_entity_sexps(ci, listener):
+    sxs = ci.sexps_via_action_stack(_this_one_action_stack(), listener)
+    if sxs is None:
+        return
+
+    # Pop off the schema (always the 1st item of the possibly empty itr)
+    schema = None
+    for csr2_sx in sxs:
+        schema = csr2_sx[2]
+        break
+    if schema is None:
+        return
+
+    body_keys = schema.field_name_keys[1:]
+    if ('main_tag', 'content') != body_keys:
+        raise RuntimeError(f"This is fine but hello: {body_keys!r}")
+
+    def rewind():
+        yield schema
+        for sx in sxs:
+            yield sx
+
+    return rewind()
+
+
+def _this_one_action_stack():
     # Make a custom request of the document, to get the ents AND the schema
-    custom_action_stack = [
+    return [
         ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
         ('table_schema_line_ONE_of_two',),
         ('other_line', lambda o: o.turn_yield_off()),
@@ -181,24 +222,9 @@ def _body_keys_and_ent_sexps(readme, listener, opn):
         ('table_schema_line_ONE_of_two',),
         ('head_line',),
         ('beginning_of_file',)]
-    sxs = ci.sexps_via_action_stack(custom_action_stack, listener)
-    if sxs is None:
-        return None, None
-
-    # Pop off the schema (always the 1st item of the possibly empty itr)
-    schema, body_keys = None, None
-    for csr2_sx in sxs:
-        schema = csr2_sx[2]
-        body_keys = schema.field_name_keys[1:]
-        break
-
-    if body_keys is not None and ('main_tag', 'content') != body_keys:
-        raise RuntimeError(f"This is fine but hello: {body_keys!r}")
-
-    return body_keys, sxs
 
 
-def coll_impl_via_(readme, listener, opn=None):
+def _coll_impl_via(readme, listener, opn=None):
     if opn is None:
         opn = _build_real_open(listener)
     func = _md_table_lib().COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
@@ -254,7 +280,7 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
 
         def parse_the_rest_of_the_identifier_and_close_bracket():
             parse_the_first_component()
-            if ']' == scn.peek(1):
+            if not scn.empty and ']' == scn.peek(1):
                 scn.advance_by_one()
                 return
             parse_the_second_component()
@@ -386,32 +412,40 @@ class _IdentifierRange:
 
 class _Identifier:
 
-    def __init__(self, i, tail_tuple=None, include_bracket=True):  # #here1
-        if tail_tuple is None:
-            self._sub_component_primitive = None
-        else:
-            yn, value = tail_tuple  # #here2
+    def __init__(
+            self, major_int, tail_tuple=None, include_bracket=True):  # #here1
+
+        minor_int, minor_int = None, None
+        if tail_tuple is not None:
+            yn, minor_surface = tail_tuple  # #here2
+            if not isinstance(minor_surface, str):
+                raise RuntimeError(f"where: {type(minor_surface)} {minor_surface!r}")  # noqa: E501  [#022]
             if yn:
                 # A => 1, B => 2 ..
-                self.minor_integer = ord(value) - 64
+                minor_int = ord(minor_surface) - 64
             else:
-                value = int(value)
-                self.minor_integer = value
-            self._sub_component_primitive = value  # #testpoint (visual)
+                minor_int = int(minor_surface)
+            self.minor_integer = minor_int
+            self._minor_surface = minor_surface
+
         self.include_bracket = include_bracket
-        self.major_integer = i
+        self.key = (major_int, minor_int)
+        self._as_string_lazy = None
 
     def to_string(self):
-        return ''.join(self._to_string_pieces())
+        if self._as_string_lazy is None:
+            self._as_string_lazy = ''.join(self._to_string_pieces())
+        return self._as_string_lazy
 
     def _to_string_pieces(self):
+        major_int, minor_int = self.key
         if self.include_bracket:
             yield '['
         yield '#'
-        yield '%03d' % self.major_integer
-        if self._sub_component_primitive is not None:
+        yield '%03d' % major_int
+        if minor_int is not None:
             yield '.'
-            yield str(self._sub_component_primitive)  # (Case3853)
+            yield self._minor_surface  # (Case3853)
         if self.include_bracket:
             yield ']'
 
@@ -435,34 +469,36 @@ class _Identifier:
 
     def _compare(self, otr):
         assert isinstance(otr, _Identifier)  # ..
-        left_int, right_int = self.major_integer, otr.major_integer
-        if left_int < right_int:
+        (my_major, my_minor), (otr_major, otr_minor) = self.key, otr.key
+        if my_major < otr_major:
             return -1
-        if left_int > right_int:
+        if otr_major < my_major:
             return 1
-        assert left_int == right_int
-        left_has = self._sub_component_primitive is not None
-        right_has = otr._sub_component_primitive is not None
-        if left_has:
-            if right_has:
-                left_int = self.minor_integer
-                right_int = otr.minor_integer
-            else:
-                return 1
-        elif right_has:
+        assert my_major == otr_major
+        if my_minor is None:
+            if otr_minor is None:
+                return 0
+            if 0 == otr_minor:
+                return 0
             return -1
-        else:
-            return 0
-        if left_int < right_int:
-            return -1
-        if right_int < left_int:
+        elif otr_minor is None:
+            if 0 == my_minor:
+                return 0
             return 1
-        assert left_int == right_int
+        if my_minor < otr_minor:
+            return -1
+        if otr_minor < my_minor:
+            return 1
+        assert my_minor == otr_minor
         return 0
 
     @property
     def has_sub_component(self):
-        return self._sub_component_primitive is not None
+        return self.key[1] is not None
+
+    @property
+    def major_integer(self):
+        return self.key[0]
 
     is_range = False
 

@@ -1,7 +1,3 @@
-from script_lib.magnetics.via_words import (
-        fixed_shape_word_wrapperer as word_wrapperer)
-
-
 _max_rows_per_label = 3
 _max_cols_per_label = 9
 
@@ -30,12 +26,14 @@ def output_lines_via_big_index_(o, listener):
         yield f'_{iid}->"(no parent)"'
 
     # labels for nodes
+    notch = len(' (ABC)') - 4  # ??
+    these = _these_via_these(_max_cols_per_label, _max_rows_per_label, notch)
+    label_via = _build_label_maker(these, '(', ')')
 
     frag_of = o.notecard_of
     for k, frag in frag_of.items():
-
-        _encoded = _ENCODED_heading_for(frag)
-        yield f'_{k}[label={_encoded}]'
+        label = label_via(frag.heading, frag.identifier_string)
+        yield f'_{k}[label={label}]'
 
     # done
 
@@ -50,7 +48,7 @@ def output_lines_via_big_index_(o, listener):
     listener('info', 'structure', 'summary', f)
 
 
-def _ENCODED_heading_for(frag):
+def _build_label_maker(row_max_widths, op='', cp='', ellipsis_string='…'):
     """DISCUSSION: Please enjoy the custom word-wrapper we built bespoke for
     this visualization omg.
     Start by imagining a 3x9 (for example) ASCII rectangular area:
@@ -77,30 +75,42 @@ def _ENCODED_heading_for(frag):
     behavior to express aesthetic results.)
 
     (We will cheat and give the third line four (4) more chars than what is
-    pictured above.)
+    pictured above.) :[#882.P]
     """
 
-    _itr = _word_wrapped_lines_via(big_string=frag.heading)
-    these = list(_itr)
-    lines = list(o.to_string() for o in these)
+    def make_label(body_content, notch_content):
+        itr = word_wrapped_lines_via(body_content)
+        pcs = pieces_via_lines((o.to_string() for o in itr), notch_content)
+        return ''.join(pcs)
 
-    pieces = ['"']
-    is_first = True
-    for line in lines:
-        if is_first:
-            is_first = False
-        else:
-            pieces.append('\\n')
-        pieces.append(line.replace('"', '\\"'))
+    def pieces_via_lines(lines, notch_content):
+        yield '"'
+        is_first = True
+        for line in lines:
+            if is_first:
+                is_first = False
+            else:
+                yield r'\n'
+            yield line.replace('"', r'\"')
+        yield ' '
+        yield op
+        yield notch_content
+        yield cp
+        yield '"'
 
-    pieces.append(f' ({frag.identifier_string})')
-    pieces.append('"')
-    return ''.join(pieces)
+    from script_lib.magnetics.via_words import \
+        fixed_shape_word_wrapperer as fun
+    word_wrapped_lines_via = fun(row_max_widths, 'big_string', ellipsis_string)
+    return make_label
 
 
-w = 9
-_word_wrapped_lines_via = word_wrapperer(
-        row_max_widths=(w, w, w-len(' (ABC)')+4),
-        ellipsis_string='…')
+def _these_via_these(max_cols_per_label, max_rows_per_label, notch_w):
+    assert 0 < max_rows_per_label
+    assert 4 < max_cols_per_label  # sanity
+    assert -1 < notch_w
+    assert notch_w < max_cols_per_label
+    result = [max_cols_per_label for _ in range(0, max_rows_per_label)]
+    result[-1] = max_cols_per_label - notch_w
+    return tuple(result)
 
 # #born.

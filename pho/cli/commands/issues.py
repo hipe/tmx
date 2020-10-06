@@ -15,6 +15,7 @@ def _subcommands():
     yield 'which', lambda: _subcommand_which
     yield 'use', lambda: _subcommand_use
     yield 'find-readmes', lambda: _subcommand_find_readmes
+    yield 'graph', lambda: _subcommand_graph
 
 
 def CLI(sin, sout, serr, argv, enver):
@@ -447,7 +448,10 @@ def _subcommand_which(sin, sout, serr, argv, env_stacker):
 def _subcommand_use(sin, sout, serr, argv, env_stacker):
     """Use a different readme (a shellable line. experimental)
 
-    line 2"""
+    EXPERIMENTALLY you can try `$( pi use ./foo/bar/README.md )`
+    You can get a list of available files with the `find` subcommand
+    sibling to this one.
+    """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
     formals = (('-h', '--help', 'this screen'), ('<readme>', 'path to file'))
@@ -475,6 +479,42 @@ def _subcommand_use(sin, sout, serr, argv, env_stacker):
         return 4
     sout.write(''.join(('export PHO_README=', quote(readme), '\n')))
     return 0
+
+
+def _formals_for_graph():
+    yield '-h', '--help', 'this screen'
+
+
+def _subcommand_graph(sin, sout, serr, argv, env_stacker):
+    """Experimental graph-viz visualization of issues..
+
+    Use tags in your issue rows like `#after:[#123.4]` or `#part-of:[#123.4]`
+    """
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = formals_via(_formals_for_graph(), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        return _write_help_into(serr, _subcommand_graph.__doc__, foz)
+
+    env_stack = env_stacker()
+    if (readme := _resolve_readme(serr, env_stack)) is None:
+        return 4
+
+    mon = _error_monitor(serr)
+
+    from pho._issues import issues_collection_via_ as func
+    ic = func(readme, mon.listener)
+    # ..
+
+    from pho._issues.graph import to_graph_lines_ as func
+    for line in func(ic, mon.listener):
+        sout.write(line)
+
+    return mon.exitstatus
 
 
 def _write_help_into(serr, doc, foz):
