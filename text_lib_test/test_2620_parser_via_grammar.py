@@ -244,7 +244,7 @@ def assert_sequence_equals_recursive(act, exp, tc, depth=0):  # depth not used
 
 
 def subject_module():
-    from script_lib.magnetics import parser_via_grammar as mod
+    from text_lib.magnetics import parser_via_grammar as mod
     return mod
 
 

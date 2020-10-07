@@ -99,8 +99,9 @@ def open_traversal_stream(listener, markdown_path=None):
 
 def _dict_via_cels_via(far_field_names):
     _split_th_version = updated_and_version_via_string
-    from data_pipes.magnetics import dictionary_via_cells_via_definition
-    return dictionary_via_cells_via_definition(
+    from data_pipes.magnetics.flat_map_horizontal_via_definition import \
+        dictionary_via_cells_via_definition as func
+    return func(
         unsanitized_far_field_names=far_field_names,
         special_field_instructions={
             'name': ('string_via_cel', lambda s: s),

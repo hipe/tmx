@@ -48,8 +48,8 @@ woah boy.
 |[#873.20]                  |       | places where we relied on toml types and lost them, also wish for type schema
 |[#873.S]                   | #trak | eno has fixed storage schema for now
 |[#873.R]                   | #open | unify error monitor
-|[#873.Q]                   | #open | #related-to: [#873.P] unify how we render markdown
-|[#873.P]                   | #open | XXX unify all markdown parsing so it's stream-based and not random access
+|[#873.Q]                   | #open | unify how we render markdown
+|[#873.P]                   | #hole |
 |[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
 |[#873.M]                   |       | integrating external format adapters (storage adapters)

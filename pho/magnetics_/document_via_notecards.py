@@ -370,7 +370,7 @@ def _the_empty_line_AST():
     return empty_line.the_empty_line_AST
 
 
-def _lines_via_big_string(big_s):  # (copy-paste of [#610].)
+def _lines_via_big_string(big_s):  # #[#610]
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
 
 

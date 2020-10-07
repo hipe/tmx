@@ -18,7 +18,8 @@ class CommonCase(unittest.TestCase):
 
         _argv = ('/fake-fs/annyong-amma', *self.given_argv_tail())
 
-        from script_lib.test_support import spy_on_write_and_lines_for as func
+        from script_lib.test_support.expect_STDs import \
+            spy_on_write_and_lines_for as func
         sout, lines = func(self, 'DEBUG SOUT: ')
 
         if self.do_debug:

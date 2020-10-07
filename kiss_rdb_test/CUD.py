@@ -164,7 +164,7 @@ def _DEBUGGING_LISTENER():
 
 
 def _unindent(big_string):
-    from script_lib.test_support import unindent
+    from text_lib.magnetics.via_words import unindent
     return unindent(big_string)
 
 

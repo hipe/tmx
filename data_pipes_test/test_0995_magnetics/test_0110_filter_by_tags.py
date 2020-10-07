@@ -1,6 +1,3 @@
-from kiss_rdb_test.filter_canon import \
-        case_of_one_column_match_two_out_of_three, \
-        case_of_empty_collection
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
@@ -14,7 +11,7 @@ class CommonCase(unittest.TestCase):
         return self.my_case.build_end_state(self)
 
 
-class Case1872_one_column_match_two_out_of_three(CommonCase):
+class Case0110_one_column_match_two_out_of_three(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_these_two_entities(self)
@@ -27,10 +24,10 @@ class Case1872_one_column_match_two_out_of_three(CommonCase):
 
     @property
     def my_case(self):
-        return case_of_one_column_match_two_out_of_three
+        return canon().case_of_one_column_match_two_out_of_three
 
 
-class Case1875_empty_collection(CommonCase):
+class Case0113_empty_collection(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_no_entities(self)
@@ -43,7 +40,7 @@ class Case1875_empty_collection(CommonCase):
 
     @property
     def my_case(self):
-        return case_of_empty_collection
+        return canon().case_of_empty_collection
 
 
 def _lets_go():
@@ -74,6 +71,11 @@ class _EZ_Entity:
     @property
     def core_attributes_dictionary_as_storage_adapter_entity(self):
         return self._dct
+
+
+def canon():
+    import data_pipes_test.filter_canon as mod
+    return mod
 
 
 if __name__ == '__main__':

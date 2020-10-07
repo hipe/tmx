@@ -376,7 +376,7 @@ def _parse_file_patch(lines):
 
 @lazy
 def _parser_builder():
-    from script_lib.magnetics.parser_via_grammar import \
+    from text_lib.magnetics.parser_via_grammar import \
         WIP_PARSER_BUILDER_VIA_DEFINITION as parser_builder_via, THESE_LINES
 
     parser_builder = parser_builder_via(_define_grammar)
@@ -522,7 +522,5 @@ def xx(msg=None):
 if '__main__' == __name__:
     cli_for_production()
 
-# #pending-rename: modality agnostic feels like it would be a better home.
-#                  and give it a name something like "diff and patch"
 # #history-B.2
 # #began-as-abstraction

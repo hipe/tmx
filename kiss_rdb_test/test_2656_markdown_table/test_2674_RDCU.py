@@ -15,8 +15,8 @@ class CommonCase(unittest.TestCase):
 
     def build_file_patch(self):
         lines = self.end_state['diff_lines']
-        from script_lib.magnetics.file_patches_via_unified_diff_lines \
-            import file_patches_via_unified_diff_lines as func
+        from text_lib.diff_and_patch import \
+            file_patches_via_unified_diff_lines as func
         file_patch, = tuple(func(lines))
         return file_patch
 

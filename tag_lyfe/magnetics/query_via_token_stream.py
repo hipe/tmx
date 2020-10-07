@@ -210,8 +210,8 @@ def query_model_via_big_string(big_string):
 
 @lazy
 def query_parser():
-    from tag_lyfe import grammar_path_
-    _grammar_path = grammar_path_('the-query-grammar.ebnf')
+    from .tagging_subtree_via_string import grammar_path_ as func
+    _grammar_path = func('the-query-grammar.ebnf')
 
     with open(_grammar_path) as fh:
         ebnf_grammar_big_string = fh.read()

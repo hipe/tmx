@@ -44,8 +44,6 @@ why lossless?
     node for API stuff has no crossover with this concern.)
 """
 
-from tag_lyfe import pop_property
-
 
 # == support (early because etc)
 
@@ -666,6 +664,11 @@ def in_subtree_match_any_one_(subtree, yes_no_via_tag):
 def _validate_tag_stem_name(listener, s):  # #track [#707.C] when we formalize
     return True
 
+
+def pop_property(o, attr):
+    x = getattr(o, attr)
+    delattr(o, attr)
+    return x
 
 # #history-B.3: accomodate new simplified sexp pattern
 # #history-A.1: deep vs shallow distinction out. simplified name-chain model in

@@ -41,9 +41,7 @@ traverse
 
 
 5950 5967 5983
-select help
-select fail
-select
+("select" moved to dp at #history-B.3)
 
 
 5999 6015 6031 6048 6064 6080
@@ -94,4 +92,5 @@ expansion two 3 more
 expansion three 3 more
 
 
+  - #history-B.3
   - #born.

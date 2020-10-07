@@ -1,5 +1,4 @@
 from tag_lyfe.the_query_model import in_subtree_match_any_one_
-from tag_lyfe import pop_property
 import re
 
 
@@ -10,8 +9,10 @@ class UnsanitizedInRange:
         self._end_easy_number = end_AST
 
     def sanitize_plus(self, listener, tagging_query):
-        beg = pop_property(self, '_begin_easy_number')
-        end = pop_property(self, '_end_easy_number')
+        beg = self._begin_easy_number
+        end = self._end_easy_number
+        del self._begin_easy_number
+        del self._end_easy_number
         beg_num = beg._number
         end_num = end._number
         NOT_NECESSARILY_VALID = _InRangeFunction(beg, end, tagging_query)

@@ -44,6 +44,108 @@ possible issues:
 """
 
 
+# == Tracked with [#605.5], long history bouncing around different homes
+
+def build_end_state_actively_for(tc):
+    sin = _stdin_for(tc)
+    exps = tc.expected_lines()
+    sout, serr, done = stdout_and_stderr_and_done_via(exps, tc)
+    argv = tc.given_argv()
+    ec = tc.given_CLI()(sin, sout, serr, argv, None)
+    lines = done()
+    runs = tuple(_line_runs_via_lines(lines))
+    return _end_state_via_runs(runs, ec)
+
+
+def build_end_state_passively_for(tc):
+    sin = _stdin_for(tc)
+    func = spy_on_write_and_lines_for
+    sout, sout_lines = func(tc, 'DBG SOUT: ')
+    serr, serr_lines = func(tc, 'DBG SERR: ')
+    argv = tc.given_argv()
+    ec = tc.given_CLI()(sin, sout, serr, argv, None)
+
+    if len(sout_lines):
+        if len(serr_lines):
+            raise RuntimeError("oo fun, compound output")
+        else:
+            run = _LineRun('stdout', tuple(sout_lines))
+    elif len(serr_lines):
+        run = _LineRun('stderr', tuple(serr_lines))
+    else:
+        run = _LineRun('neither', ())
+
+    return _end_state_via_runs((run,), ec)
+
+
+def _stdin_for(tc):
+    sin = tc.given_stdin()
+    if sin is None:
+        return
+    if isinstance(sin, str):
+        return _fake_stdins[sin]
+    sin.isatty  # assert
+    return sin
+
+
+def _line_runs_via_lines(lines):  # #[#459.19] partitioning
+    itr = ((_downcase[w], line) for w, line in lines)
+    for prev_which, line in itr:
+        cache = [line]
+        break
+
+    def flush():
+        lines = tuple(cache)
+        cache.clear()
+        return _LineRun(prev_which, lines)
+    for which, line in itr:
+        if prev_which != which:
+            yield flush()
+            prev_which = which
+        cache.append(line)
+    if len(cache):
+        yield flush()
+
+
+_downcase = {'STDERR': 'stderr', 'STDOUT': 'stdout'}  # ☝️
+
+
+def _end_state_via_runs(runs, ec):
+    if 1 == (leng := len(runs)):
+        run, = runs
+
+    class end_state:  # #class-as-namespace
+        if 1 == leng:
+            if 'stderr' == run.which:
+                stderr_lines = run.lines
+            else:
+                assert 'stdout' == run.which
+                stdout_lines = run.lines
+
+            lines = run.lines  # client might want to be indifferent to which
+
+            def first_line_run(which):
+                assert run.which == which
+                return run
+        else:
+            def first_line_run(which):
+                return next(run for run in runs if which == run.which)
+
+            def last_line_run(which):
+                backwards = (runs[i] for i in reversed(range(0, len(runs))))
+                return next(run for run in backwards if which == run.which)
+
+        exitcode = ec
+    return end_state
+
+
+class _LineRun:
+    def __init__(o, w, lz):
+        o.which, o.lines = w, lz
+
+
+# ==
+
 def stdout_and_stderr_and_done_via(expectation_defs, tc):  # tc = test context
 
     itr = (_line_expectation(mixed) for mixed in expectation_defs)
@@ -388,7 +490,8 @@ def build_write_receiver_for_debugging(dbg_msg_head, do_debug_function):
 
 def build_write_receiver_for_recording_and_lines():
     def recv(s):
-        assert re.match(r'[^\r\n]*\n\Z', s)  # [#605.2]
+        if not re.match(r'[^\r\n]*\n\Z', s):  # [#605.2]
+            raise RuntimeError(f"we need whole lines - {s!r}")
         lines.append(s)
     import re
     return recv, (lines := [])
@@ -424,7 +527,7 @@ def spy_on_write_via_receivers(receivers):  # multiplex `write()` calls
 # == END NEW
 
 
-# == (absorbed at #history-B.2)
+# == (absorbed at #history-B.2) (see [#605.4] for a mock)
 
 class FAKE_STDIN_INTERACTIVE:  # #class-as-namespace
     # (if you want a stub that plays back lines, move [#605.4] to here)
@@ -445,7 +548,12 @@ class FAKE_STDIN_NON_INTERACTIVE:  # #class-as-namespace
         return 0
 
 
-# might move [#605.5] to here from a lib evaporated at #hitory-B.2
+_fake_stdins = {
+    'FAKE_STDIN_INTERACTIVE': FAKE_STDIN_INTERACTIVE,
+    'FAKE_STDIN_NON_INTERACTIVE': FAKE_STDIN_NON_INTERACTIVE,
+}
+
+# might move [#605.5] to here from a lib evaporated at #history-B.2
 
 # #history-B.2 unification and simplifcation, became almost full rewrite
 # #born.

@@ -145,8 +145,8 @@ def _nonterminal_parse(foz, bash_argv):
     # First, parse all contiguous, head-anchored options. Fail on any unrecog.
     assert not foz.offsets_of_required_quote_unquote_options  # no use case
     parse_option = _build_option_parser(vals := {}, bash_argv, foz)
-    while len(bash_argv) and len(s := bash_argv[-1]) and '-' == s[0]:
-        parse_option()
+    while len(bash_argv) and (md := re.match('^-(.)', bash_argv[-1])):
+        parse_option(md[1])
     if vals.get('help'):  # #here1
         return vals, None
     # Then, parse contiguous positionals only according to your formals
@@ -161,8 +161,8 @@ def _terminal_parse(foz, bash_argv):
     vals, contiguous_actual_positionals = {}, []
     parse_option = _build_option_parser(vals, bash_argv, foz)
     while len(bash_argv):
-        if len(s := bash_argv[-1]) and '-' == s[0]:
-            parse_option()
+        if (md := re.match('^-(.)', bash_argv[-1])):
+            parse_option(md[1])
             continue
         contiguous_actual_positionals.append(bash_argv.pop())
     if vals.get('help'):  # #here1
@@ -229,8 +229,9 @@ def _parse_contiguous_positionals(values, bash_argv, faz):
 
 def _build_option_parser(values, bash_argv, foz):
 
-    def parse_option():
-        if '-' == re.match('-(.)', tok := bash_argv[-1])[1]:
+    def parse_option(char):
+        tok = bash_argv[-1]
+        if '-' == char:
             parse_long(tok)
         else:
             parse_short(tok)
@@ -350,7 +351,7 @@ def _help_lines(foz, doc=None, description_valueser=None):
     for key, funcer in (cx() if (cx := foz.childrener) else ()):
         func = funcer()
         ch_doc = func.__doc__ or f"(the '{key}' command)"
-        desc = re.match(r'^[^\n]+', ch_doc)[0]
+        desc = re.match(r'^\n?([^\n]+)', ch_doc)[1]
         leng = len(key)
         if maxi < leng:
             maxi = leng
@@ -510,7 +511,7 @@ def _build_formal_positional_parser():  # #testpoint
     rx = re.compile(r'''^
         (?P<less_than><)?                               # maybe starts with "<"
         (?P<stem>    (?: [a-z][a-z0-9]*(?:-[a-z0-9]+)* )   # "foo-bar" or
-                   | (?: [A-Z][a-z0-9]*(?:_[A-Z0-9]+)* ))  # "FOO_BAR"
+                   | (?: [A-Z][A-Z0-9]*(?:_[A-Z0-9]+)* ))  # "FOO_BAR"
         (?P<greater_than>>)?                            # maybe ends with ">"
         (?P<kleene_style_arity_expression>[*+?])?$
     ''', re.VERBOSE)
@@ -670,7 +671,7 @@ def _build_formal_option_parser():
       --(?P<stem>  [a-z][a-z0-9]* (?: -[a-z][a-z0-9]* )* )
       (?: =
         (?P<arg_moniker>
-            [a-z][a-z0-9]+(?:-[a-z][a-z0-9]+)*    # dashes IFF all lowercase
+           <[a-z][a-z0-9]+(?:-[a-z][a-z0-9]+)*>   # dashes IFF all lowercase
           | [A-Z][A-Z0-9]*(?:_[A-Z][A-Z0-9]+)* )  # underscores IFF all upper
       )?      # we allow ☝️ a single-character name IFF it's upper (Case5495)
       (?P<arity_or_imperity>  [!*+]  )?
@@ -749,8 +750,7 @@ class _Stop(RuntimeError):
 
 
 def _ox():
-    import modality_agnostic.magnetics\
-        .rotating_buffer_via_positional_functions as mod
+    from text_lib.magnetics import via_words as mod
     return mod
 
 

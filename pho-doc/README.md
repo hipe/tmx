@@ -48,7 +48,7 @@ when you click create
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
 |[#899]                     | #exmp | This is an example issue.
-|[#887]                     | #open | think about hard-coding fixed width logic for the first two cels (as we do)
+|[#887]                     | #hole |
 |[#886]                     | #open | jagged alignment of multiline descs (see "close")
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
@@ -60,18 +60,19 @@ when you click create
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
 |[#882.M]                   | #trak | formal attributes (the model) is balkanized
 |[#882.L]                   | #trak | really fragile DOM navigation but we don't want jquery
-|[#882.K]                   | #open | known vulnerabilities to integrity errors
+|[#882.K]                   | #open | detect cycles in notecard collection integrity check
 |[#882.J]                   | #trak | timetrack syncing: local vs remote, time field
 |[#882.I]                   | #edit | edits to do in fragments
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
 |[#882.G]                   | #trak | empty but self-documentary files
 |[#882.F]                   | #open | we need proper markdown parsing
-|[#882.E]                   | #open | give the dylib a better name #after:[#882.B]
-|[#882.D]                   | #open | refactor to make sexp's classes
-|[#882.C]                   | #open | prove by trying it that NSTask is not wha..
-|[#882.B]                   | #open | learn swift build tool enough to automate..
-|[#882.A]                   | #open | any unit tests at all ASAP!
+|[#882.E]                   | #hole |
+|[#882.D]                   | #hole |
+|[#882.C]                   | #hole |
+|[#882.B]                   | #hole |
+|[#882.A]                   | #hole |
 |[#882]                     |       | (internal tracking)
+|[#881.3]                   |       | a roadmaps table lol
 |[#881.2]                   |       | roadmap-2.dot
 |[#881]                     |       | roadmap.dot
 |[#880.B]                   | #edit | edit documentation

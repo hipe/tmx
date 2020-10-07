@@ -1,3 +1,96 @@
+def cli_for_production():
+    import sys as o
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv, lambda *_: xx()))
+
+
+def _formals_for_toplevel():
+    yield '-h', '--help', 'This screen'
+    yield 'command [..]', "One of the below"
+
+
+def _subcommands():
+    yield 'select', lambda: _command_called_select
+    yield 'filter-by-tags', lambda: _load('.filter_by_tags')
+    yield 'convert-collection', lambda: _load('.convert_collection')
+    yield 'sync', lambda: _load('.sync')
+
+
+def _CLI(sin, sout, serr, argv, enver):
+    """Data Pipes is an experimental potpourri of higher-level operations
+
+    that operate on top of collections, sort of in the spirit of ReactiveX
+    """
+
+    bash_argv = list(reversed(argv))
+    long_prog_name = bash_argv.pop()
+
+    def prog_name():
+        pcs = long_prog_name.split(' ')
+        from os.path import basename
+        pcs[0] = basename(pcs[0])
+        return ' '.join(pcs)
+
+    foz = formals_via_(_formals_for_toplevel(), prog_name, _subcommands)
+    vals, es = foz.nonterminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        return write_help_into_(serr, _CLI.__doc__, foz)
+
+    # The Ultra-Sexy Mounting of an Alternation Component:
+    cmd_tup = vals.pop('command')
+    cmd_name, cmd_funcer, es = foz.parse_alternation_fuzzily(serr, cmd_tup[0])
+    if not cmd_name:
+        return es
+
+    ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
+    ch_argv = (ch_pn, * cmd_tup[1:])
+
+    def env_and_related():
+        xx()
+
+    return cmd_funcer()(sin, sout, serr, ch_argv, env_and_related)
+
+
+def _formals_for_select():
+    yield '-h', '--help', this_screen_
+    yield '<collection>', _desc_for_collection
+    yield '<field-name>', 'maybe one day..'
+
+
+def _command_called_select(sin, sout, serr, argv, _rscser):
+    """(experimental) something sorta like the SQL command. needs design
+    """
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = formals_via_(_formals_for_select(), lambda: prog_name)
+
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+    if vals.get('help'):
+        return write_help_into_(serr, _command_called_select.__doc__, foz)
+    xx('soon')
+
+
+def resolve_collection_(serr, coll_path):
+    mon = monitor_via_(serr)
+    collectioner = meta_collection_()
+    coll = collectioner.collection_via_path(coll_path, mon.listener)
+    return coll, mon
+
+
+def meta_collection_():
+    from kiss_rdb import collectionerer as func
+    return func()
+
+
+def monitor_via_(serr):
+    from script_lib.magnetics import error_monitor_via_stderr as func
+    return func(serr, default_error_exitstatus=4)
+
+
 def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
     """if the user passes the string "help" for the argument, display
 
@@ -30,6 +123,32 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
         count += 1
     o(f'({count} total.)\n')
     return 0  # _exitstatus_for_success
+
+
+def _load(key):
+    from importlib import import_module
+    mod = import_module(key, __name__)
+    return mod.CLI_
+
+
+def write_help_into_(serr, doc, foz):
+    for line in foz.help_lines(doc):
+        serr.write(line)
+    return 0
+
+
+def formals_via_(itr, prog_name, subcommands=None):
+    from script_lib.cheap_arg_parse import formals_via_definitions as func
+    return func(itr, prog_name, subcommands)
+
+
+_desc_for_collection = 'usually a fileystem path to your collection'
+this_screen_ = 'this screen'
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('hello', * ((': ', msg) if msg else ()))))
+
 
 # #history-A.5: lost almost all the stuff
 # #history-A.4: become not executable any more

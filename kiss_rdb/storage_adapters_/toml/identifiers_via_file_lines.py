@@ -6,9 +6,8 @@ it is a near-exact adaptation of [#863]
 """
 
 from kiss_rdb.magnetics_.state_machine_via_definition import StateMachine
-from kiss_rdb.magnetics.string_scanner_via_string import (
-        StringScanner,
-        pattern_via_description_and_regex_string)
+from text_lib.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string
 
 
 def table_start_line_stream_via_file_lines_(file_lines, listener):

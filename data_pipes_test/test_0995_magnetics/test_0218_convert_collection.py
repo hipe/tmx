@@ -1,10 +1,9 @@
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
-        dangerous_memoize as shared_subject
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
-class CommonCase(unittest.TestCase):  # #[#459.F]
+class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 
     # -- assertions & assistance
 
@@ -22,15 +21,15 @@ class CommonCase(unittest.TestCase):  # #[#459.F]
 
     def _validated_exitstatus(self):
         _es = self.end_state
-        es = _es.exitstatus
-        self.assertIsInstance(es, int)
-        return es
+        ec = _es.exitcode
+        self.assertIsInstance(ec, int)
+        return ec
 
     def invites(self):
         # _exp = "see 'ohai-mami --help'\n"
-        _exp = "Try 'ohai-mami convert-collection --help' for help.\n"
-        _act = self.stderr_lines[1]
-        self.assertEqual(_act, _exp)
+        # _exp = "Try 'ohai-mami convert-collection --help' for help.\n"
+        exp = 'Use "ohai mami convert-collection -h" for help'
+        self.assertIn(exp, self.last_stderr_line())
 
     @property
     def reason_stderr_line(self):
@@ -99,78 +98,28 @@ class CommonCase(unittest.TestCase):  # #[#459.F]
 
         return OutputtedFileLines
 
-    def build_end_state(self, case_category):
-        # NOTE the biggest challenge is abstracting click's particularies
+    @property
+    @shared_subject_in_child_classes
+    def end_state(self):
+        # (before #history-B.3 this was the UGLIEST support code for click)
 
-        get_lines_normally, get_exitstatus_normally = True, True
-        yes_sout, yes_serr = False, False
-        exception_category, do_debug = None, False
+        from script_lib.test_support.expect_STDs import \
+            build_end_state_passively_for as func
 
-        if 'stdout' == case_category:
-            yes_sout = True
-            expect_which = 'stdout'
-        elif 'stderr' == case_category:
-            yes_serr = True
-            expect_which = 'stderr'
-        elif 'click_exception' == case_category:
-            exception_category = 'click_exception'
-            get_lines_normally = False
-            yes_serr = True
-            get_exitstatus_normally = False
-            expect_which = 'stderr'
-        elif 'debug' == case_category:
-            yes_sout, yes_serr = True, True
-            do_debug = True
-        else:
-            assert(False)
-
-        use_stdin = self.given_stdin()
-        use_argv_tail = ('convert-collection', *self.argv_tail())  # :#here1
-
-        def stderrer():
-            import sys
-            return sys.stderr
-
-        def yes_do_debug():
-            return do_debug or self.do_debug
-
-        from kiss_rdb_test.CLI import BIG_FLEX
-        big_flex_end_state = BIG_FLEX(
-                given_stdin=use_stdin,
-                given_args=use_argv_tail,
-                allow_stdout_lines=yes_sout,
-                allow_stderr_lines=yes_serr,
-                exception_category=exception_category,
-                injections_dictionary=None,  # no rng, no filesystem
-                might_debug=yes_do_debug(),
-                do_debug_f=yes_do_debug)
-
-        if get_exitstatus_normally:
-            use_exitstatus = big_flex_end_state.exit_code
-        else:
-            use_exitstatus = 9876  # so bad
-
-        if get_lines_normally:
-            lines = big_flex_end_state.lines
-        else:
-            # 😭
-            import script_lib.test_support.expect_STDs as lib
-            writes = []  # writes not lines
-            r1 = lib.build_write_receiver_for_debugging('DBG: ', yes_do_debug)
-            io_for_write = lib.spy_on_write_via_receivers((r1, writes.append))
-            big_flex_end_state.exception.show(io_for_write)
-            big_string = ''.join(writes)
-            import re
-            lines = re.compile('(?<=\n)(?=.)', re.DOTALL).split(big_string)
-
-        # click likes filling the memory with big strings so meh
-        return _EndState(expect_which, tuple(lines), use_exitstatus)
+        return func(self)
 
     def stdin_that_is_NOT_interactive(self):
-        return _this_one_lib().FAKE_STDIN_NON_INTERACTIVE
+        return 'FAKE_STDIN_NON_INTERACTIVE'
 
     def stdin_that_IS_interactive(self):
-        return _this_one_lib().FAKE_STDIN_INTERACTIVE
+        return 'FAKE_STDIN_INTERACTIVE'
+
+    def given_argv(self):
+        return 'ohai mami', 'convert-collection', *self.argv_tail()
+
+    def given_CLI(_):
+        from data_pipes.cli import _CLI as func
+        return func
 
     do_debug = False
 
@@ -181,13 +130,9 @@ class Case010_help(CommonCase):
         self.succeeds()
 
     def test_200_content(self):
-        lines = self.end_state.first_line_run('stdout').lines  # click
-        self.assertIn('Usage: ', lines[0])
+        lines = self.end_state.first_line_run('stderr').lines
+        self.assertIn('usage: ', lines[0])
         self.assertAlmostEqual(len(lines), 18, delta=2)
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('stdout')  # because click
 
     def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
@@ -202,16 +147,11 @@ class Case020_no_args(CommonCase):
         self.fails()
 
     def test_200_whines(self):
-        _exp = "Error: Missing argument 'FROM_COLLECTION'.\n"
-        # _exp = 'parameter error: expecting <script>\n'
-        self.assertEqual(self.reason_stderr_line, _exp)
+        exp = "Expecting FROM_COLLECTION"
+        self.assertIn(exp, self.reason_stderr_line)
 
-    def test_300_DOES_NOT_INVITE(self):
+    def test_300_invites(self):
         self.invites()
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('click_exception')
 
     def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
@@ -226,19 +166,15 @@ class Case030_args_and_stdin(CommonCase):
         self.fails()
 
     def test_200_content(self):
-        _exp = "STDIN cannot be a pipe unless FROM_COLLECTION is '-'\n"
-        # _exp = 'parameter error: when piping from STDIN, <script> must be "-"
-        _act = self.first_stderr_line()
-        self.assertEqual(_act, _exp)
+        # exp = 'parameter error: when piping from STDIN, <script> must be "-"
+        exp = "STDIN cannot be a pipe unless FROM_COLLECTION is '-'\n"
+        act = self.first_stderr_line()
+        self.assertEqual(act, exp)
 
     def test_300_invites(self):
         # broke at #history-A.2
         self.assertEqual(len(self.stderr_lines), 1)
         # self.invites()
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('stderr')
 
     def given_stdin(self):
         return self.stdin_that_is_NOT_interactive()
@@ -253,17 +189,14 @@ class Case040_too_many_args(CommonCase):
         self.fails()
 
     def test_200_content(self):
-        _act = self.reason_stderr_line
-        _exp = "Error: no such option: --fing-foo\n"
-        # _exp = "parameter error: unrecognized option: '--fing-foo'\n"
-        self.assertEqual(_act, _exp)
+        act = self.reason_stderr_line
+        # exp = "parameter error: unrecognized option: '--fing-foo'\n"
+        # exp = "Error: no such option: --fing-foo\n"
+        exp = "Unrecognized option '--fing-foo'"
+        self.assertIn(exp, act)
 
     def test_300_invites(self):
         self.invites()
-
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('click_exception')
 
     def given_stdin(self):
         return self.stdin_that_IS_interactive()
@@ -293,10 +226,6 @@ class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
         _act = self.outputted_file_lines.tail_lines
         self.assertIn('#born', _act[-1])
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('stdout')
-
     def given_stdin(self):
         return STUB_STDIN(
                 # '{ "header_level": 1 }\n',  # #history-A.2
@@ -310,50 +239,22 @@ class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
 
 class Case060_one_arg_which_is_token(CommonCase):
 
-    # (at #history-A.2 (the big upgrade when we put this under kiss instead
-    # of a standalone script) it would have been nice to exercise the option
-    # (almost certainly broken right now) of outputting to a file instead of
-    # to STDOUT; BUT A) easy workaround and B) it would be best to wait until
-    # after/during [#873.P] when we try to unify the markdown adapter as
-    # streaming
-
     def test_100_succeeds(self):
         self.succeeds()
 
     def test_200_same_business_lines(self):
         self._same_business_lines()
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state('stdout')
-
     def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
     def argv_tail(self):
-        from os.path import dirname, join
-        test_dir = dirname(dirname(__file__))
-        tail = 'exe_140_khong_micro.py'
-        data_provider = join(test_dir, 'fixture_executables', tail)
-
-        return (data_provider,
-                '-', '--to-format', 'markdown-table')
-
-
-class _EndState:
-    def __init__(self, which, lines, es):
-        self._the_only_run = _LineRun(lines)
-        self.exitstatus = es
-        self._which = which
-
-    def first_line_run(self, which):
-        assert self._which == which
-        return self._the_only_run
-
-
-class _LineRun:
-    def __init__(self, lines):
-        self.lines = lines
+        from kiss_rdb_test import fixture_executables as mod
+        these = mod.__path__._path
+        fixtures_dir, = tuple(set(these))  # sometimes there's 2 idk
+        from os.path import join
+        producer_script = join(fixtures_dir, 'exe_140_khong_micro.py')
+        return producer_script, '-', '--to-format', 'markdown-table'
 
 
 class STUB_STDIN:  # :[#605.4]
@@ -373,14 +274,10 @@ class STUB_STDIN:  # :[#605.4]
     mode = 'r'
 
 
-def _this_one_lib():
-    import script_lib.test_support.expect_STDs as module
-    return module
-
-
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.3 get rid of the ugliest click related code ever
 # #history-B.2
 # #history-A.3: moved here from another subproject
 # #history-A.2 implementation moved to kiss (convert collection)

@@ -75,7 +75,7 @@ setup(
             tmx-dot2cytoscape=pho.cli.dot2cytoscape:cli_for_production
             tmx-timestamp=pho.cli.timestamp:cli_for_production
             kss=kiss_rdb.cli:cli_for_production
-            dp-sync=data_pipes.cli.sync:cli_for_production
+            dp=data_pipes.cli:cli_for_production
             DTF_game_server=game_server:cli_for_production
             DTF_game_server_adapter=game_server.cli.game_server_adapter:cli_for_production
             DTF_game_server_server=game_server.cli.game_server_server:cli_for_production

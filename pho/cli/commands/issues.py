@@ -126,7 +126,7 @@ def _subcommand_close(sin, sout, serr, argv, env_stacker):
 
 def _formals_for_top():
     yield '-M', '--newest-first', 'opposite of default (oldest first)'
-    yield '--no-mtime', 'take away sort by mtime'
+    yield '-q', '--quick', 'take away sort by mtime. overrides above'
     yield _batch_opt
     yield '-f', '--format=FMT', '{json|table} (default: table)'
     yield '-<number>', _build_int_matcher, 'show the top N items (default: 3)'
@@ -154,7 +154,7 @@ def _subcommand_top(sin, sout, serr, argv, env_stacker):
     if 'newest_first' not in vals:
         vals['oldest_first'] = True
 
-    if vals.get('no_mtime'):
+    if vals.get('quick'):
         vals.pop('oldest_first', None)
         vals.pop('newest_first', None)
 

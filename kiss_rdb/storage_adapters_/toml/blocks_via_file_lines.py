@@ -21,10 +21,8 @@ class attribute_name_functions_:
 
 
 def _build_name_gist_via_name():
-
-    from kiss_rdb.magnetics.string_scanner_via_string import (
-            StringScanner,
-            pattern_via_description_and_regex_string as o)
+    from text_lib.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
 
     # define some reflexive regexes
 

@@ -1,20 +1,8 @@
 """
-the document object model for all strings as it pertains to taggings:
+Mainly, generate "AST" (abstract syntax tree) classes whose main job is to
+wrap a "sexp" (S-expression) and give it convenience getter methods so you
+are never accessing sexp components by their offset
 
-    [ document_pair [ document_pair [..]]]
-
-    document_pair = separator_string tagging
-
-this "structure grammar" is intended to work for all strings.
-
-at #history-B.3 we buried [#705] a digraph explaining the formal structure
-of taggings, because the structure changed.
-"""
-
-from modality_agnostic import lazy
-
-
-"""
 Born out of frustration with everything in this package that is not the
 initial grammar (the *.ebnf files); experimental new rules (experiment was
 a success):
@@ -30,16 +18,12 @@ a success):
 - Every formal (and actual) body component must be of the THREE hard types:
   STRING, SEXP, or a LIST (tuple) *of* *sexps*. (One proviso below.)
 - For string body components, never use none, always use empty string
-- For list, never use none always use empty tup
-- The only time "none" permitted anywhere in a sexp is to signifying a sexp
+- For list, never use none, always use empty tup
+- The only time none is permitted anywhere in a sexp is to signifying a sexp
   body component slot is unoccupied (where it makes grammatical sense).
 
 - Optionally: if it's faithful it's faithful, and order matters
 
-Now that we have completed the experiment, the code in this file is mostly
-concerned with generating "AST" classes whose main job is to wrap a sexp
-and give it convenience getter methods so you are never accessing components
-by their offset.
 
 The below notation: 's' for strings 'sexp' for sexp 'sexps' for the list type.
 'as' associates the slot before it with the name after it, creating a getter
@@ -47,39 +31,7 @@ method. 'plus' is bleeding-edge experimental
 """
 
 
-def _this_definition():
-    yield 'top_thing', 'sexps', 'as', 'doc_pairs'
-    yield 'not_tag_then_tag', 's', 'as', 'not_tag', 'sexp', 'as', 'tag'
-    yield 'shallow_tagging', 's', 's', 'as', 'head_stem', 'plus', _shallow
-    yield 'deep_tagging', 's', 's', 'as', 'head_stem', \
-          'sexps', 'as', 'subcomponents', 'plus', _deep
-    yield 'tagging_subcomponent', 's', 'sexp', 'as', 'body_slot'
-    yield 'bracketed_lyfe', 's', 's', 'as', 'inside_string', 's'
-    yield 'non_head_bare_tag_stem', 's', 'as', 'self_which_is_string'
-    yield 'double_quoted_string', 's', 'sexps', 'as', 'alternating_pieces', 's'
-    yield 'escaped_character', 's', 's', 'as', 'unescaped_character'
-    yield 'raw_string', 's', 'as', 'self_which_is_string'
-
-
-def _deep(cls):
-    cls.is_deep = True
-
-
-def _shallow(cls):
-    cls.is_deep = False
-
-
-def ast_via_sexp_(sx):
-    coll = _lazy_classes_collection()
-    return coll.AST_via_sexp(sx)
-
-
-@lazy
-def _lazy_classes_collection():
-    return _lazy_classes_collection_via_AST_definitions(_this_definition())
-
-
-def _lazy_classes_collection_via_AST_definitions(defs):
+def lazy_classes_collection_via_AST_definitions(defs):
 
     def AST_via_sexp(sx):
         typ = sx[0]
@@ -282,8 +234,16 @@ def _looks_like_sexp(sx):
 class _DefinitionError(RuntimeError):
     pass
 
-# #pending-rename: probably eventually to 'lazy AST classes via definition' and
-#     move the actual definitions to the client
+
+"""
+At #history-B.4 this re-housed and re-purposed from a business module to a
+library module (and kept the DNA. business structure extracted out).
+
+At #history-B.3 we buried [#705] a digraph explaining the formal structure
+of taggings, because the structure changed
+"""
+
+# #history-B.4: elevated to library module, lost business-specifics
 # #history-B.3: blind rewrite intruducing simplified sexps
 # #history-A.2: yet another new and improved model to accomodate quotes
 # #history-A.1: begin actually using this to build native structures from AST's

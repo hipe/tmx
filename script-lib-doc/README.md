@@ -19,11 +19,10 @@ the related API that preceded this one.)
 ## <a name="node-table"></a>the node table
 
 (this is a [\[#002\]] node table.)
-(our range is 601-699)
+(Our range is compound: 600-608, then ??)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
-|[#610]                     |       | line stream via big string
 |[#608.13]                  | #wish | argument arity `<like-this>?`
 |[#608.L]                   | #hole |
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..

@@ -125,8 +125,8 @@ def __for_now_extremely_strict(pairs, first_line, listener):
 
 def __pairserer(listener):
 
-    from kiss_rdb.magnetics.string_scanner_via_string import (
-            StringScanner, pattern_via_description_and_regex_string as o)
+    from text_rdb.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
 
     zero_or_more_not_special = o('zero or more not special', r'[^,"\\\n\r]*')
     one_or_more_spaces = o('one or more spaces', '[ ]+')

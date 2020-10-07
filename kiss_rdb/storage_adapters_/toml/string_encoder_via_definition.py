@@ -131,7 +131,7 @@ class _SemiEncodedString:
         self.semi_encoded_lines = semi_encoded_lines
 
 
-def lines_via_big_string_(big_s):  # (ANOTHER copy-paste of [#610].)
+def lines_via_big_string_(big_s):  # #[#610]
     import re
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
 

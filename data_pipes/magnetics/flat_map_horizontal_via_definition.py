@@ -16,14 +16,11 @@ generically this whole mess of fields and their directives is specified
 under the "special field instructions".)
 """
 
-import sys
-
 
 def dictionary_via_cells_via_definition(
         unsanitized_far_field_names,
         special_field_instructions,
-        string_via_cel,
-        ):
+        string_via_cel):
 
     near_field_names = []  # note them along the way yikes
     specials = (special_field_instructions or ())
@@ -188,8 +185,4 @@ class _RowManifold:
         del self._dict
         return x
 
-
-sys.modules[__name__] = dictionary_via_cells_via_definition
-
-# #pending-rename: something about flat map horizontal
 # #abstracted.

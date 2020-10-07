@@ -1,5 +1,6 @@
-"""filter the stream of entities by looking for hashtag-like markup in
-certain of its cels.
+"""
+Filter the stream of entities by looking for hashtag-like markup in
+certain of its cels. E.g.: \\( "#open" and not "#cosmetic" \\) or "#critical"
 
   - we once had a feature where you could indicate which "fields" to look
     in for tags, but we removed it at #history-A.1 for lack of necessity.

@@ -17,6 +17,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |                  [#463]   |       | functional pipelines (2 files)
+|                 [#459.19] |       | track algorithm: partitioning
 |                  [#459.R] |       | near sync keyer (builder) in flux
 |                 [#459.17] | #trak | producer script moudules that aren't modules
 |                  [#459.P] | #open | tmpfile is hardcoded

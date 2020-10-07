@@ -510,7 +510,7 @@ def _attribute_block_head_lines_via(eno_type, value, dattr):
 
     # Break a big string up into lines, while preserving the newline characters
     import re
-    lines = [md[0] for md in re.finditer('[^\n]*\n|[^\n]+', value)]  # [#610]
+    lines = [md[0] for md in re.finditer('[^\n]*\n|[^\n]+', value)]  # #[#610]
 
     # See `man git-log` near terminator vs separator semantics. The form data
     # we have coming in has newlines with separator sematics: a typical

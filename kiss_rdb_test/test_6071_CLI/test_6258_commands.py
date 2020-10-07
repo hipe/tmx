@@ -126,7 +126,7 @@ class Case6258_multi_line_create(CommonCase):  # #midpoint
 
 
 def unindent(big_s):
-    from script_lib.test_support import unindent
+    from text_lib.magnetics.via_words import unindent
     return unindent(big_s)
 
 

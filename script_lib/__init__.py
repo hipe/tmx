@@ -83,6 +83,7 @@ def deindented_strings_via_big_string_(big_string):
 
 
 def _deindent(item_itr, empty_item):
+    # (this should be in text_lib now, but we're leaving it here for now.)
 
     def peek():
         item = next(item_itr)  # ..
@@ -148,7 +149,7 @@ def _deindent(item_itr, empty_item):
         yield md[1]
 
 
-def lines_via_big_string(big_string):  # :[#610]
+def lines_via_big_string(big_string):  # #[#610]
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_string))
 
 

@@ -433,8 +433,8 @@ def _document_sections(document, path, mon):
 def _tokenized_sections(document, path, listener):
     # the only allowed sections in the document look like this
 
-    from kiss_rdb.magnetics.string_scanner_via_string import StringScanner, \
-            pattern_via_description_and_regex_string as o
+    from text_lib.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
 
     first_word = o('entity|document-meta', r'(entity|document-meta)\b')
     eos = o('end of string', '$')

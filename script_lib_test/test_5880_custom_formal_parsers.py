@@ -8,7 +8,8 @@ class CommonCase(unittest.TestCase):
     def build_end_state_expecting_success(self):
         foz = self.build_formals()
         argv = self.given_argv()
-        from script_lib.test_support import spy_on_write_and_lines_for as func
+        from script_lib.test_support.expect_STDs import \
+            spy_on_write_and_lines_for as func
         serr, lines = func(self, 'DBG: ')
         vals, es = foz.terminal_parse(serr, list(reversed(argv)))
         assert es is None
@@ -19,7 +20,7 @@ class CommonCase(unittest.TestCase):
         foz_defs = self.given_formals()
         return subject_module().formals_via_definitions(foz_defs, lambda: 'lets-dance')  # noqa: E501
 
-    do_debug = True
+    do_debug = False
 
 
 class Case5472_help_screen(CommonCase):

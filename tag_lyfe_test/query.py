@@ -100,7 +100,8 @@ def _tag_ast_via_tag_emblem(tag_emblem):
         sx = 'deep_tagging', '#', stem, tuple(reversed(subcomps))
     else:
         sx = 'shallow_tagging', '#', stem
-    from tag_lyfe.the_tagging_model import ast_via_sexp_ as func
+    from tag_lyfe.magnetics.tagging_subtree_via_string import \
+        ast_via_sexp_ as func
     return func(sx)
 
 
@@ -113,9 +114,7 @@ class _EndState:
 
         from tag_lyfe.magnetics import query_via_token_stream as mag
 
-        from tag_lyfe import NULL_BYTE_
-
-        query_s = NULL_BYTE_.join(tox)
+        query_s = '\0'.join(tox)  # NULL_BYTE_
 
         itr = mag.MAKE_CRAZY_ITERATOR_THING(query_s)
 

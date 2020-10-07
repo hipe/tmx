@@ -95,7 +95,8 @@ class CommonCase(unittest.TestCase):
         return lambda: None, None
 
     def build_IO_recorder(self, dbg_msg_head):
-        from script_lib.test_support import spy_on_write_and_lines_for as func
+        from script_lib.test_support.expect_STDs import \
+            spy_on_write_and_lines_for as func
         spy_IO, lines = func(self, dbg_msg_head)
         return lambda: tuple(lines), spy_IO
 

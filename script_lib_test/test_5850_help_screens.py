@@ -68,7 +68,8 @@ class CommonCase(unittest.TestCase):
         # will DRY with sibling file and maybe push back up maybe later.
         # right now scope is just to green this file
 
-        from script_lib.test_support import spy_on_write_and_lines_for as func
+        from script_lib.test_support.expect_STDs import \
+            spy_on_write_and_lines_for as func
         spy_IO, lines = func(self, 'DEBUG: ')
 
         argv = '/fake-fs/xx/yy/ohai-mumo', 'my-command', '--help'

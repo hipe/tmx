@@ -172,7 +172,7 @@ def _render_lines(roots, tka, fla):
             self.offset = where
 
     notch_w = len(' [#123.4]')  # see notching described at [#882.P]
-    from script_lib.magnetics.via_words import fixed_shape_word_wrapperer as fu
+    from text_lib.magnetics.via_words import fixed_shape_word_wrapperer as fu
 
     class label_renderers:  # #class-as-namespace
         leading = label_renderer(0, _group_label_w, _group_label_h)
@@ -523,10 +523,9 @@ def _classified_row_ASTs_via_issues_collection(ic):
         yield 'doc_pairs', top_thing.doc_pairs
 
     # See if the readme file begins to parse OK
-    sxs = ic.to_schema_then_entity_sexps()
-    if sxs is None:
+    if (sch_sxs := ic.to_schema_and_entity_sexps()) is None:
         return
-    schema = next(sxs)
+    schema, sxs = sch_sxs
     ks = schema.field_name_keys[1:]
     del schema
 

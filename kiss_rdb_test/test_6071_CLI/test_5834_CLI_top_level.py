@@ -247,23 +247,6 @@ class Case5934_traverse(CommonCase):
         return real_filesystem_read_only()
 
 
-class Case5950_select_help(CommonCase):
-
-    def test_100_expect_requires_these_particular_arguments(self):
-        self.expect_requires_these_particular_arguments()
-
-    def test_200_expect_this_string_in_first_line_of_description(self):
-        self.expect_this_string_in_first_line_of_description(
-                'sorta like the SQL command')
-
-    @shared_subject
-    def command_help_screen(self):
-        return self.build_command_help_screen_subtree()
-
-    def given_args(self):
-        return ('select', '--help')
-
-
 class Case5999_get_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
@@ -556,22 +539,6 @@ class Case6226_update(CommonCase):
 
     def filesystem(self):
         return build_filesystem_expecting_num_file_rewrites(1)
-
-
-class Case6242_search_help(CommonCase):
-
-    def test_100_expect_requires_these_particular_arguments(self):
-        self.expect_requires_these_particular_arguments('[QUERY]...')
-
-    def test_200_expect_this_string_in_first_line_of_description(self):
-        self.expect_this_string_in_first_line_of_description('EXPERIMENTAL')
-
-    @shared_subject
-    def command_help_screen(self):
-        return self.build_command_help_screen_subtree()
-
-    def given_args(self):
-        return ('filter-by-tags', '--help')
 
 
 @lazy

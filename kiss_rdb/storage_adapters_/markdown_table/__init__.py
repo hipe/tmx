@@ -67,6 +67,9 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         def to_entity_stream_as_storage_adapter_collection(listener):
             return eek(lambda: entities(listener))
 
+        def to_schema_and_entity_sexps(listener):
+            return _to_schema_and(single_traversal_collection, listener)
+
         def sexps_via_action_stack(astack, listener):  # (Case3306DP)
             return eek(lambda: sexps_via_action_stack(astack, listener))
 
@@ -140,6 +143,21 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
     cstack = ({'collection_path': use_filename},)  # context_stack
 
     return single_traversal_collection
+
+
+def _to_schema_and(ci, listener):
+    astack = [
+        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
+        ('table_schema_line_ONE_of_two',),
+        ('other_line', lambda o: o.turn_yield_off()),
+        ('business_row_AST',),
+        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
+        ('table_schema_line_ONE_of_two',), ('head_line',),
+        ('beginning_of_file',)]
+    if (sxs := ci.sexps_via_action_stack(astack, listener)) is None:
+        return
+    for sr2_sx in sxs:
+        return sr2_sx[2], sxs
 
 
 # == RETRIEVE

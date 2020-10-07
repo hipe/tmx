@@ -266,7 +266,7 @@ def _lines_for_context_for_parse_error(dim_pool):
     if (k := 'build_two_lines_of_ASCII_art') in dim_pool:
         _2 = tuple(o(k)())
     else:
-        from kiss_rdb.magnetics.string_scanner_via_string import \
+        from text_lib.magnetics.string_scanner_via_string import \
             two_lines_of_ascii_art_via_position_and_line as func
         _2 = tuple(func(position, line))
 

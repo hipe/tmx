@@ -82,7 +82,7 @@ class open_dictionary_stream_via:  # #[#459.3] class as context manager
             _itr = self.second_selector(x, self._listener)
             return _itr
         else:
-            return iter(())  # [#412]
+            return iter(())
 
     def __exit__(self, *_):
         del(self._exit_mutex)

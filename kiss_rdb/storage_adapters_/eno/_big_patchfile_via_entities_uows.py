@@ -187,8 +187,7 @@ def _line_detemplatizer_via(var_values):
 def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
     # (used for here and used by neighbor for creating collections!)
 
-    from script_lib.magnetics.file_patches_via_unified_diff_lines \
-        import apply_patch_via_lines as func
+    from text_lib.diff_and_patch import apply_patch_via_lines as func
     ok = func(lines, is_dry, listener, cwd)
     if ok:
         return reser()

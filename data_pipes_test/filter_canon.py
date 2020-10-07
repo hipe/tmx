@@ -1,7 +1,6 @@
 def _build_end_state(cc, tc):
-    from kiss_rdb.magnetics_.entities_via_filter_by_tags import (
-            stats_future_and_results_via_entity_stream_and_query,
-            prepare_query)
+    from data_pipes.magnetics.entities_via_filter_by_tags import \
+        stats_future_and_results_via_entity_stream_and_query, prepare_query
 
     itr = stats_future_and_results_via_entity_stream_and_query(
             tc.given_collection(), prepare_query(cc.query()))

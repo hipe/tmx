@@ -79,7 +79,7 @@ def unindent_with_dot_hack(big_s):
     if '' == big_s:
         return iter(())
 
-    from script_lib.test_support import unindent
+    unindent = _load_unindent()
 
     itr = unindent(big_s)
     for line in itr:  # once
@@ -90,8 +90,12 @@ def unindent_with_dot_hack(big_s):
 
 def unindent(big_string):
     # #[#008.I]
-    from script_lib.test_support import unindent
-    return unindent(big_string)
+    return _load_unindent()(big_string)
+
+
+def _load_unindent():
+    from text_lib.magnetics.via_words import unindent
+    return unindent
 
 
 def debugging_listener():

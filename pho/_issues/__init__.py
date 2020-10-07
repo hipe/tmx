@@ -64,11 +64,12 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
     def records_via_readme(readme):
         counts.files += 1
         ic = issues_collection_via_(readme, listener, opn)
-        body_keys, ent_sxs = ic.to_body_keys_and_end_sexps()
 
         # If some kind of failure (eg {file|table} not found), None not iter
-        if ent_sxs is None:
+        if (sch_sxs := ic.to_schema_and_entity_sexps()) is None:
             return
+        sch, ent_sxs = sch_sxs
+        body_keys = sch.field_name_keys[1:]  # [#871.1]
 
         # If there is no filter and no sort, you are done
         if tag_query is None and sort_by_time is None:
@@ -179,49 +180,18 @@ def issues_collection_via_(readme, listener, opn=None):
             from .graph import to_graph_lines_ as func
             return func(issues_collection, listener)
 
-        def to_schema_then_entity_sexps(listener=listener):
-            return _to_schema_then_entity_sexps(ci, listener)
+        def to_schema_and_entity_sexps(listener=listener):
+            if (sch_sxs := ci.to_schema_and_entity_sexps(listener)) is None:
+                return
+            schema, sxs = sch_sxs
+            body_keys = schema.field_name_keys[1:]
+            if ('main_tag', 'content') != body_keys:
+                raise RuntimeError(f"This is fine but hello: {body_keys!r}")
+            return schema, sxs
+
         collection_implementation = ci
 
     return issues_collection
-
-
-def _to_schema_then_entity_sexps(ci, listener):
-    sxs = ci.sexps_via_action_stack(_this_one_action_stack(), listener)
-    if sxs is None:
-        return
-
-    # Pop off the schema (always the 1st item of the possibly empty itr)
-    schema = None
-    for csr2_sx in sxs:
-        schema = csr2_sx[2]
-        break
-    if schema is None:
-        return
-
-    body_keys = schema.field_name_keys[1:]
-    if ('main_tag', 'content') != body_keys:
-        raise RuntimeError(f"This is fine but hello: {body_keys!r}")
-
-    def rewind():
-        yield schema
-        for sx in sxs:
-            yield sx
-
-    return rewind()
-
-
-def _this_one_action_stack():
-    # Make a custom request of the document, to get the ents AND the schema
-    return [
-        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
-        ('table_schema_line_ONE_of_two',),
-        ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
-        ('table_schema_line_ONE_of_two',),
-        ('head_line',),
-        ('beginning_of_file',)]
 
 
 def _coll_impl_via(readme, listener, opn=None):
@@ -250,8 +220,7 @@ def _build_real_open(listener):
 
 def _real_apply_diff(itr, listener):
     # #todo wouldn't you like to guard this with a VCS check
-    from script_lib.magnetics.file_patches_via_unified_diff_lines \
-        import apply_patch_via_lines as func
+    from text_lib.diff_and_patch import apply_patch_via_lines as func
     is_dry, cwd = False, None
     return func(itr, is_dry, listener, cwd)
 
@@ -387,7 +356,7 @@ def _throwing_string_scan(listener, cstacker=None):
         if 'error' == sev:
             raise stop()
 
-    from kiss_rdb.magnetics.string_scanner_via_string import \
+    from text_lib.magnetics.string_scanner_via_string import \
         StringScanner, pattern_via_description_and_regex_string as o
 
     class stop(RuntimeError):

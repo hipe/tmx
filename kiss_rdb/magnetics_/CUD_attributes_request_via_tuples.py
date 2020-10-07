@@ -324,7 +324,7 @@ def _emit_request_error_via_reason(msg, listener):
 
 
 def _oxford_AND(itr):
-    import kiss_rdb.magnetics.via_collection as ox
+    from text_lib.magnetics import via_words as ox
     return ox.oxford_AND(itr)
 
 

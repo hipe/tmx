@@ -95,7 +95,7 @@ consumed by arbitrary other processes.
 |                   #708.2  |       | (this one script, cross-sub-project coverage)
 |                   #708    |       | (external tracking)
 |                   #707.K  | #open | reconcile something with something
-|                   #707.J  |       | maybe lost coverage/created appendates at #history-A.1
+|                 [#707.10] |       | maybe lost coverage/created appendates at #history-A.1
 |                   #707.I  | #hole |
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics

@@ -33,9 +33,9 @@ class _DictionaryStream_via_Table:
 
         _string_via_cel = (string_via_td_for_body_row or _s_via_td_loosely)
 
-        import data_pipes.magnetics.dictionary_via_cells_via_definition as _
-
-        f = _(
+        from data_pipes.magnetics.flat_map_horizontal_via_definition import \
+            dictionary_via_cells_via_definition as func
+        f = func(
                 unsanitized_far_field_names=_unsanitized_far_field_names,
                 special_field_instructions=special_field_instructions,
                 string_via_cel=_string_via_cel)

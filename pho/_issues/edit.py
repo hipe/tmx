@@ -1,6 +1,3 @@
-import re
-
-
 def open_issue(readme, dct, listener, opn=None):
 
     tup = _provision_identifier(readme, listener, opn)
@@ -154,6 +151,7 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
             return
         return rx.match(s)
 
+    import re
     rx = re.compile(r'(?:^| )#hole\b')
 
     def compare(above_iden, iden, is_under_branch):
@@ -194,10 +192,9 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
 
     try:
         ic = _issues_collection_via(read_fh, stopping_listener, opn)
-        itr = ic.to_schema_then_entity_sexps()
-        if not itr:
+        if (two := ic.to_schema_and_entity_sexps()) is None:
             raise stop()
-        cs = next(itr)  # guaranteed
+        cs, itr = two
         assert 'main_tag' == cs.field_name_keys[1]  # or w/e
         main_tag_key = 'main_tag'
         ents = (sx[1] for sx in itr)
@@ -248,7 +245,8 @@ def close_issue(readme, eid, listener, opn=None):
 
     def parse_identifier():
         # Give eid's w/o leading '[', '#' a '#' so we can use cust iden class
-        use_eid = f"#{eid}" if re.match(r'^(?!=\[|#)', eid) else eid
+
+        use_eid = eid if (len(eid) and eid[0] in ('[', '#')) else f"#{eid}"
         from . import build_identifier_parser_ as func
         return func(throwing_listener)(use_eid)
 

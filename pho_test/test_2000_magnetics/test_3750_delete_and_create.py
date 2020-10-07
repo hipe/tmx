@@ -9,9 +9,9 @@ def patch_at_N(n):  # #decorator
         def use_f(self):
             patch_file = self.big_patchfile.patches[n]
 
-            from script_lib.magnetics.file_patches_via_unified_diff_lines \
-                import file_patches_via_unified_diff_lines
-            _2 = file_patches_via_unified_diff_lines(patch_file.diff_lines)
+            from text_lib.diff_and_patch import \
+                file_patches_via_unified_diff_lines as func
+            _2 = func(patch_file.diff_lines)
             _1 = patch_file
 
             class these_two:  # #class-as-namespace

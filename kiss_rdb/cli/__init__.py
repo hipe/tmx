@@ -10,6 +10,13 @@ class _CommonFunctions:
         self.unsanitized_collections_hub = collections_hub
         self._injections = injections
 
+    def resolve_collection(self, coll_path, *release_these):
+        mon = self.build_monitor()
+        kw = self.release_these_injections(*release_these)
+        coll = self.collection_via_unsanitized_argument(
+            coll_path, mon.listener, **kw)
+        return coll, mon
+
     def release_these_injections(self, *names):
         o = self._injections
         del(self._injections)
@@ -165,15 +172,11 @@ def create(ctx, collection, value):
     given name-value pairs expressed by the --value option.
     """
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
-    listener = mon.listener
-    _inj = cf.release_these_injections('rng', 'opn')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    coll, mon = ctx.obj.resolve_collection(collection, 'rng', 'opn')
     if coll is None:
         return mon.errno
-    # end
+
+    listener = mon.listener
 
     attr_values = {name_s: val_s for name_s, val_s in value}  # ..
     doc_ent = coll.create_entity(attr_values, listener)
@@ -215,15 +218,9 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     set of attributes. (is currently quite strict and particular :P)
     """
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
-    listener = mon.listener
-    _inj = cf.release_these_injections('opn')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    coll, mon = ctx.obj.resolve_collection(collection, 'opn')
     if coll is None:
         return mon.errno
-    # end
 
     cuds = []
     for n, v in add:
@@ -233,7 +230,7 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     for n in delete:
         cuds.append(('delete_attribute', n))
 
-    before_after = coll.update_entity(internal_identifier, cuds, listener)
+    before_after = coll.update_entity(internal_identifier, cuds, mon.listener)
 
     # exact same thing as 2 others #here3:
 
@@ -268,17 +265,11 @@ def get(ctx, collection, internal_identifier):
     with a where clause mebbe
     """
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
-    listener = mon.listener
-    # _inj = cf.release_these_injections('opn')
-    coll = cf.collection_via_unsanitized_argument(collection, listener)
+    coll, mon = ctx.obj.resolve_collection(collection, 'opn')
     if coll is None:
         return mon.errno
-    # end
 
-    dct = coll.retrieve_entity(internal_identifier, listener)
+    dct = coll.retrieve_entity(internal_identifier, mon.listener)
     if dct is None:
         return mon.max_errno or 404  # (Case6064)  ##here1
 
@@ -301,17 +292,11 @@ def delete(ctx, collection, internal_identifier):
     given the entity's internal identifier
     """
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
-    listener = mon.listener
-    _inj = cf.release_these_injections('rng', 'opn')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    coll, mon = ctx.obj.resolve_collection(collection, 'rng', 'opn')
     if coll is None:
         return mon.errno
-    # end
 
-    doc_ent = coll.delete_entity(internal_identifier, listener)
+    doc_ent = coll.delete_entity(internal_identifier, mon.listener)
 
     # exact same thing as 2 others #here3:
 
@@ -342,17 +327,11 @@ def traverse(ctx, collection):
     we don't even know if we want this
     """
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
-    listener = mon.listener
-    _inj = cf.release_these_injections('opn')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
+    coll, mon = ctx.obj.resolve_collection(collection, 'opn')
     if coll is None:
         return mon.errno
-    # end
 
-    _iids = coll.to_identifier_stream(listener)
+    _iids = coll.to_identifier_stream(mon.listener)
 
     echo = click.echo
     for iid in _iids:
@@ -365,33 +344,7 @@ def traverse(ctx, collection):
         return success_exit_code_
 
 
-@cli.command()
-@click.argument('collection')
-def select():
-    """(experimental) something sorta like the SQL command. needs design
-    """
-
-    click.echo('#open [#867.M] select')
-
-
-@cli.command(short_help='reduce entity collection by tags')
-@click.argument('collection')
-@click.argument('query', nargs=-1)
-@click.pass_context
-# #history-A.3 (did require hub)
-def filter_by_tags(ctx, collection, query):
-    """EXPERIMENTAL. example: \\( "#open" and not "#cosmetic" \\) or "#critical"
-    unfortunately you will have to follow the code to find the documentaton
-    because there's no easy way for us to blit all of it here and there's a lot
-    """
-
-    from ._filter_by_tags import filter_by_tags  # this-CLI-specific library
-    return filter_by_tags(ctx, collection, query)
-
-
 # -- commands concerned with CRUD of collections themselves (and adjacent)
-
-_same_help = "(or will try to infer from file extension if present)"
 
 
 @cli.command()
@@ -415,39 +368,6 @@ def create_collection(ctx, adapter_name, collection_path, dry_run):
     import sys
     serr, = (getattr(sys, x) for x in ('stderr',))
     serr.write(f"created collection: {collection_path}\n")
-
-
-@cli.command()
-@click.option('--from-format', metavar='<fmt>', help=_same_help)
-@click.option('--from-arg', metavar='<arg>', multiple=True,
-              help='EXPERIMENTAL pass thru to producer script (yikes)')
-@click.argument('from-collection')
-@click.option('--to-format', metavar='<fmt>', help=_same_help)
-@click.argument('to-collection')
-@click.pass_context
-def convert_collection(
-        ctx, from_format, from_arg, from_collection,
-        to_format, to_collection):
-
-    """EXPERIMENTAL.
-
-    Created as a cheap-and-easy way to create and populate a collection
-    with a producer script or similar.
-
-    With FROM_COLLECTION of "-", lines of the indicated format are read from
-    STDIN. With TO_COLLECTION of "-", lines of the specified format are
-    written to STDOUT. Only certain formats are available for certain cases;
-    for example an output of "-" is available only for single-file formats.
-
-    There is only one particiapting output format at writing, and it
-    only writes to STDOUT.
-    """
-
-    from ._convert_collection import convert_collection
-    return convert_collection(
-            ctx.obj, from_format, from_arg, from_collection,
-            to_format, to_collection
-    )
 
 
 # == END commands

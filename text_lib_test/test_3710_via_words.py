@@ -4,7 +4,7 @@ import unittest
 
 
 def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
-    tests.addTests(doctest.DocTestSuite(_subject_module()))
+    tests.addTests(doctest.DocTestSuite(subject_module()))
     # `oxford_join` hi.
     return tests
 
@@ -32,7 +32,7 @@ class _WrapperOneCase(_WrapperCase):
         return wrapper_one()
 
 
-class Case5129_typical(_WrapperTwoCase):
+class Case3696_typical(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -44,7 +44,7 @@ class Case5129_typical(_WrapperTwoCase):
         return ('A', 'B', 'C', 'D', 'E', 'F', 'G')
 
 
-class Case5135_three(_WrapperTwoCase):
+class Case3690_three(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -56,7 +56,7 @@ class Case5135_three(_WrapperTwoCase):
         return ('A', 'B', 'C')
 
 
-class Case5141_two(_WrapperTwoCase):
+class Case3700_two(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -68,7 +68,7 @@ class Case5141_two(_WrapperTwoCase):
         return ('A', 'B')
 
 
-class Case5147_one(_WrapperTwoCase):
+class Case3702_one(_WrapperTwoCase):
 
     def test(self):
         self.do_test()
@@ -80,7 +80,7 @@ class Case5147_one(_WrapperTwoCase):
         return ('A',)
 
 
-class Case5153_two(_WrapperOneCase):
+class Case3704_two(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -92,7 +92,7 @@ class Case5153_two(_WrapperOneCase):
         return ('A', 'B')
 
 
-class Case5159_one(_WrapperOneCase):
+class Case3706_one(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -104,7 +104,7 @@ class Case5159_one(_WrapperOneCase):
         return ('A',)
 
 
-class Case5165_zero_when_no_callback(_WrapperOneCase):
+class Case3708_zero_when_no_callback(_WrapperOneCase):
 
     def test(self):
         self.do_test()
@@ -116,7 +116,7 @@ class Case5165_zero_when_no_callback(_WrapperOneCase):
         return ()
 
 
-class Case5171_zero_when_yes_callback(_WrapperTwoCase):
+class Case3710_zero_when_yes_callback(_WrapperTwoCase):  # #midpoint
 
     def test(self):
         self.do_test()
@@ -128,7 +128,7 @@ class Case5171_zero_when_yes_callback(_WrapperTwoCase):
         return ()
 
 
-class Case5177_oxford_join_hand_written_unit_test(unittest.TestCase):
+class Case3713_oxford_join_hand_written_unit_test(unittest.TestCase):
 
     def test_000_zero_items_OK(self):
         self.expect((), 'nothing')
@@ -146,10 +146,8 @@ class Case5177_oxford_join_hand_written_unit_test(unittest.TestCase):
         self.expect(('A', 'B', 'C', 'D'), 'A, B, C or D')
 
     def expect(self, given_tuple, expected_string):
-        from modality_agnostic.magnetics.rotating_buffer_via_positional_functions import (  # noqa: E501
-                oxford_OR)
-        _actual = oxford_OR(iter(given_tuple))
-        self.assertEqual(_actual, expected_string)
+        act = subject_module().oxford_OR(given_tuple)
+        self.assertEqual(act, expected_string)
 
 
 class JumbleCase(unittest.TestCase):
@@ -167,10 +165,10 @@ class JumbleCase(unittest.TestCase):
         self.assertEqual(len(expected_stack), 0)
 
     def build_actual_rows(self):
-        return _subject_module().piece_rows_via_jumble(self.given_jumble())
+        return subject_module().piece_rows_via_jumble(self.given_jumble())
 
 
-class Case5180_jumble_titlecased_token_starts_a_new_sentence(JumbleCase):
+class Case3721_jumble_titlecased_token_starts_a_new_sentence(JumbleCase):
 
     def test_100(self):
         self.expect_table(('One', ' ', 'love', '.'), ('One heart',))
@@ -180,7 +178,7 @@ class Case5180_jumble_titlecased_token_starts_a_new_sentence(JumbleCase):
         yield 'One heart'  # NOTE this is a string not a tuple. this is to spec
 
 
-class Case5181_jumble_colon_normally_adds_space_after(JumbleCase):
+class Case3723_jumble_colon_normally_adds_space_after(JumbleCase):
 
     def test_100(self):
         self.expect_table(('Look', ':', ' ', 'neato', ' ', 'skeeto'))
@@ -189,7 +187,7 @@ class Case5181_jumble_colon_normally_adds_space_after(JumbleCase):
         yield 'Look', ':', 'neato', 'skeeto'
 
 
-class Case5182_jumble_colon_is_hacked_for_path_colon_lineno(JumbleCase):
+class Case3725_jumble_colon_is_hacked_for_path_colon_lineno(JumbleCase):
 
     def test_100(self):
         self.expect_table(('Ohai some-file.pz', ':', '182'))
@@ -198,7 +196,7 @@ class Case5182_jumble_colon_is_hacked_for_path_colon_lineno(JumbleCase):
         yield 'Ohai some-file.pz', ':', 182
 
 
-class Case5185_jumble_quotes_hug_the_content(JumbleCase):
+class Case3727_jumble_quotes_hug_the_content(JumbleCase):
 
     def test_100(self):
         self.expect_lines('She said my room looked "somewhat clean".', 'Wow')
@@ -207,7 +205,7 @@ class Case5185_jumble_quotes_hug_the_content(JumbleCase):
         yield 'She said my room looked', '"', 'somewhat', 'clean', '"', 'Wow'
 
 
-class Case5188_jumble_experimental_parenthesis_hack(JumbleCase):
+class Case3729_jumble_experimental_parenthesis_hack(JumbleCase):
 
     def test_100(self):
         self.expect_lines("When will 2020 end?", "(if ever)")
@@ -216,7 +214,7 @@ class Case5188_jumble_experimental_parenthesis_hack(JumbleCase):
         yield "When will 2020 end", "?", "if", "ever"
 
 
-class Case5192_jumble_target_case(JumbleCase):
+class Case3731_jumble_target_case(JumbleCase):
 
     def test_100(self):
         self.expect_lines(
@@ -235,7 +233,7 @@ class Case5192_jumble_target_case(JumbleCase):
 
 @lazy
 def wrapper_two():
-    return _subject_module().rotating_bufferer(
+    return subject_module().rotating_bufferer(
             lambda c: f'u:{c}',  # u = uninteresting
             lambda c: f'stl:{c}',  # stl = final
             lambda c: f'l:{c}',  # l = last
@@ -244,15 +242,15 @@ def wrapper_two():
 
 @lazy
 def wrapper_one():
-    return _subject_module().rotating_bufferer(
+    return subject_module().rotating_bufferer(
             lambda c: f'nf:{c}',  # nf = non-final
             lambda c: f'f:{c}',  # f = final
             None)  # when empty
 
 
-def _subject_module():
-    import modality_agnostic.magnetics.rotating_buffer_via_positional_functions as _  # noqa: E501
-    return _
+def subject_module():
+    import text_lib.magnetics.via_words as module
+    return module
 
 
 if __name__ == '__main__':

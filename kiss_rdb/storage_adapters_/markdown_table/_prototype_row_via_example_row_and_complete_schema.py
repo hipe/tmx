@@ -182,7 +182,7 @@ def _when_extra(bads, goods, u_or_c, cs):
         def jumble():  # tech demo for (Case2676) overcrowded, needs abstractio
             y = 1 == len(bads)
             s, these, do = ('', 'This', 'does') if y else ('s', 'These', 'do')
-            yield f"Unrecognized attribute{s}", ox.keys_join(bads)
+            yield f"Unrecognized attribute{s}", _keys_join(bads)
             yield these, f"field{s}", do, "not apear in"
             h = dct.get('table_header_line')
             yield ('"', re.match('^# (.+)', h)[1], '"') if h else "the table"
@@ -190,13 +190,24 @@ def _when_extra(bads, goods, u_or_c, cs):
                 yield "Did you mean", ox.oxford_OR(ox.keys_map(ks)), '?'
             yield 'in', dct['collection_path'], ':', dct['lineno']
         dct = {k: v for row in cs.table_cstack_ for k, v in row.items()}
-        import kiss_rdb.magnetics.via_collection as ox
+        ox = _ox()
         sentencz = (''.join(pcs) for pcs in ox.piece_rows_via_jumble(jumble()))
         dct['reason'] = ' '.join(sentencz)
         return dct
 
     category = ('cannot_update', 'cannot_create')[('U', 'C').index(u_or_c)]
     return 'error', 'structure', category, 'unrecgonized_attributes', details
+
+
+def _keys_join(pcs):  # #experimental
+    if 1 == len(pcs):
+        return ''.join((': ', *_ox().keys_map(pcs)))
+    return ''.join(('(', ', '.join(_ox().keys_map(pcs)), ')'))
+
+
+def _ox():
+    from text_lib.magnetics import via_words as module
+    return module
 
 
 def _alignment_type_via_value_string(value_string):

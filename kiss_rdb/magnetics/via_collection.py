@@ -9,55 +9,6 @@ for the function we used to call "procure".
 """
 
 
-# == Oxfords (some are decorators so this whole section is at top)
-
-def _lazy_load_function_from(module_name):  # #decorator, #[#510.6]
-    def decorator(orig_f):
-        def use_f(*a):
-            from importlib import import_module
-            return getattr(import_module(module_name), attr)(*a)
-        attr = orig_f.__name__
-        return use_f
-    return decorator
-
-
-_ = 'modality_agnostic.magnetics.rotating_buffer_via_positional_functions'
-
-
-@_lazy_load_function_from(_)
-def piece_rows_via_jumble():
-    pass
-
-
-@_lazy_load_function_from(_)
-def oxford_AND():
-    pass
-
-
-@_lazy_load_function_from(_)
-def oxford_OR():
-    pass
-
-
-@_lazy_load_function_from(_)
-def oxford_join():
-    pass
-
-
-def keys_join(pcs):  # #experimental
-    if 1 == len(pcs):
-        return ''.join((': ', *keys_map(pcs)))
-    return ''.join(('(', ', '.join(keys_map(pcs)), ')'))
-
-
-def keys_map(pcs):
-    return (f"'{pc}'" for pc in pcs)
-
-
-def paragraph_via_jumble(itr):
-    return ' '.join(s for row in itr for s in row)  # this will blow up later
-
-
 # == Dig
 
 def DIGGY_DIG(top_object, dig_path, say_collection, listener):
@@ -246,11 +197,10 @@ def _when_ambiguous(say_needle, item_noun_phrase, say_coll, err, posi_mem):
     # (Case1431)
 
     f = placeholder_for_say_subfeature
-
-    _these = (f(x) for x in posi_mem)
-    _this_or_this = oxford_OR(_these)
-
-    err('{} was ambiguous. did you mean {}?', say_needle(), _this_or_this)
+    these = (f(x) for x in posi_mem)
+    from text_lib.magnetics import via_words as ox
+    this_or_this = ox.oxford_OR(these)
+    err('{} was ambiguous. did you mean {}?', say_needle(), this_or_this)
 
 
 @_ui_thing
@@ -274,7 +224,7 @@ def _when_not_found(say_needle, item_noun_phrase, say_coll, err, neg_mem=None):
 
     _tmpl = _when_not_found_table[tuple(zero_or_ones)]
     msg_head = _tmpl.format(**tmpl_args)
-    msg_tail = None if neg_mem is None else __splay_memory(neg_mem)
+    msg_tail = None if neg_mem is None else _splay_memory(neg_mem)
     msg = msg_head if msg_tail is None else '%s. %s' % (msg_head, msg_tail)
 
     err(msg)
@@ -294,14 +244,13 @@ _when_not_found_table = {
         }
 
 
-def __splay_memory(neg_mem):
+def _splay_memory(neg_mem):
 
     max_displayed = 2  # the number of features you display can meet not exceed
     num_displayed = 0  # keep track of how many *unique* features you've seen
     max_exceeded = False  # is there at least one more than the max
 
-    seen = {}
-    display = []
+    seen, display = {}, []
 
     for feat_x in neg_mem:
         if seen.get(feat_x, False):
@@ -315,11 +264,14 @@ def __splay_memory(neg_mem):
         num_displayed += 1
         display.append(feat_x)
 
-    f = placeholder_for_say_subfeature
-    _these = (f(x) for x in display)
-    _use_f = _ellipsis_join if max_exceeded else oxford_join
-    _this_and_this = _use_f(_these)
-    return "(there's %s)" % _this_and_this
+    say = placeholder_for_say_subfeature
+    these = (say(o) for o in display)
+
+    from text_lib.magnetics.via_words import oxford_join, ELLIPSIS_JOIN
+    func = ELLIPSIS_JOIN if max_exceeded else oxford_join
+    this_and_this = func(these)
+
+    return ''.join(("(there's ", this_and_this, ")"))
 
 
 def _normalize_needle_function(needle_function):
@@ -625,41 +577,6 @@ class collection_via_DICTIONARY:
 
     def to_identifier_stream_as_storage_adapter_collection(self):  # ..
         return self._dictionary.keys()
-
-
-# == Support
-
-def _ellipsis_join(itr, ellipsis='…', sep=', '):
-    """this is the un-sexy counterpart to "oxford join" above.
-
-    simply join the zero or more items with the separator, and append the
-    ellipsis glyph.
-
-    >>> ellipsis_join(())
-    '…'
-
-    (eew/meh) ☝️
-
-    >>> ellipsis_join(('A'))
-    'A…'
-
-    >>> ellipsis_join(('A', 'B'))
-    'A, B…'
-
-    >>> ellipsis_join(('A', 'B', 'C'))
-    'A, B, C…'
-
-    """
-
-    # #history-A.3 buries something complicated & awkward (but "streaming")
-
-    _ = sep.join(itr)
-    return f'{_}{ellipsis}'
-
-
-ellipsis_join = _ellipsis_join
-# at writing the function is module (file) private, but for aesthetics,
-# we want the doctest tests to read as if it's an "ordinary" function.
 
 
 # #history-A.5

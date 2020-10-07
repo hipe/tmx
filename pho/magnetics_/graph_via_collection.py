@@ -98,8 +98,7 @@ def _build_label_maker(row_max_widths, op='', cp='', ellipsis_string='…'):
         yield cp
         yield '"'
 
-    from script_lib.magnetics.via_words import \
-        fixed_shape_word_wrapperer as fun
+    from text_lib.magnetics.via_words import fixed_shape_word_wrapperer as fun
     word_wrapped_lines_via = fun(row_max_widths, 'big_string', ellipsis_string)
     return make_label
 

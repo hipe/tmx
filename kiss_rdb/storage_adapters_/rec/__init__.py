@@ -9,9 +9,8 @@ seems almost certain that we can future-fit the below implementation while
 preserving this "block scanner"-style interface for our one client.
 """
 
-from kiss_rdb.magnetics.string_scanner_via_string import (
-        StringScanner,
-        pattern_via_description_and_regex_string as o)
+from text_lib.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
 
 
 STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False

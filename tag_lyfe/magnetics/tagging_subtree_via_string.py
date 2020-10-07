@@ -12,8 +12,26 @@ a big S-expression.
 from modality_agnostic import lazy
 
 
+def lazy_function(orig_f):  # #decorator, #[#510.6]
+    def use_f(*a, **kw):
+        if not ptr:
+            ptr.append(orig_f())
+        return ptr[0](*a, **kw)
+    ptr = []  # ick/meh
+    return use_f
+
+
 def doc_pairs_via_string(input_string):
     return _walk_using_this('the_only_walker', input_string)
+
+
+@lazy_function
+def grammar_path_():
+    def grammar_path(tail):
+        return join(grammars_dir, tail)
+    from os.path import join, dirname as dn
+    grammars_dir = join(dn(dn(__file__)), 'grammars')
+    return grammar_path
 
 
 def _walk_using_this(which, input_string):
@@ -22,6 +40,52 @@ def _walk_using_this(which, input_string):
             text=input_string,
             whitespace='')  # we do our own whitespace. see #here2
     return walker.walk(model)
+
+
+def ast_via_sexp_(sx):
+    coll = _lazy_classes_collection()
+    return coll.AST_via_sexp(sx)
+
+
+@lazy
+def _lazy_classes_collection():
+    from text_lib.magnetics.ast_via_sexp_via_definition import \
+        lazy_classes_collection_via_AST_definitions as func
+    return func(_this_definition())
+
+
+def _this_definition():
+    """
+    the document object model for all strings as it pertains to taggings:
+
+        [ document_pair [ document_pair [..]]]
+
+        document_pair = separator_string tagging
+
+    this "structure grammar" is intended to work for all strings.
+
+    (At #history-B.4 this was extracted out of what is now a library module.
+    There in its original home buries a digraph explaining the formal
+    structures of tagging, which has since changed drastically.)
+    """
+
+    def deep_tings(cls):
+        cls.is_deep = True
+
+    def shallow_tings(cls):
+        cls.is_deep = False
+
+    yield 'top_thing', 'sexps', 'as', 'doc_pairs'
+    yield 'not_tag_then_tag', 's', 'as', 'not_tag', 'sexp', 'as', 'tag'
+    yield 'shallow_tagging', 's', 's', 'as', 'head_stem', 'plus', shallow_tings
+    yield 'deep_tagging', 's', 's', 'as', 'head_stem', \
+          'sexps', 'as', 'subcomponents', 'plus', deep_tings
+    yield 'tagging_subcomponent', 's', 'sexp', 'as', 'body_slot'
+    yield 'bracketed_lyfe', 's', 's', 'as', 'inside_string', 's'
+    yield 'non_head_bare_tag_stem', 's', 'as', 'self_which_is_string'
+    yield 'double_quoted_string', 's', 'sexps', 'as', 'alternating_pieces', 's'
+    yield 'escaped_character', 's', 's', 'as', 'unescaped_character'
+    yield 'raw_string', 's', 'as', 'self_which_is_string'
 
 
 @lazy
@@ -51,8 +115,7 @@ def _walkers():
 
             cx = tuple(self.top_thing_children(node))
             sx = 'top_thing', cx
-            from tag_lyfe.the_tagging_model import ast_via_sexp_ as func
-            return func(sx)
+            return ast_via_sexp_(sx)
 
         @attrs('head_sep', 'first_tagging', 'more_taggings', 'tail_garbage')
         def top_thing_children(
@@ -152,7 +215,6 @@ exactly what kind of (grammatical) node this is #open [#709.C])
 
 @lazy
 def _query_parser():
-    from tag_lyfe import grammar_path_
     _grammar_path = grammar_path_('the-tagging-grammar.ebnf')
 
     with open(_grammar_path) as fh:
@@ -176,5 +238,6 @@ is and isn't whitespace. (actually we don't have much of a concept of it
 in our grammar.)
 """
 
+# #history-B.4
 # #history-B.3: overhaul to use new simplified sexp pattern
 # #born.

@@ -1,5 +1,4 @@
 from tag_lyfe.the_query_model import in_subtree_match_any_one_
-from tag_lyfe import pop_property
 
 
 class UnsanitizedInRegex:
@@ -14,7 +13,8 @@ class UnsanitizedInRegex:
         self._tagging_query = tagging_query
         self._listener = listener
 
-        s = pop_property(self, '_hacky_string')
+        s = self._hacky_string
+        del self._hacky_string
 
         last_char = s[-1]
 

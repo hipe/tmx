@@ -43,20 +43,18 @@ _formal_parameters = (
         ('--near-format=FORMAT_NAME', 'ohai «the near_format»'),
         ('--diff', 'show only the changed lines as a diff'),
         ('-h', '--help', 'this screen'),
-        ('near-collection', 'ohai «help for near_collection»', "try 'help'"),
-        ('producer-script', 'ohai «help for producer_script»'))
+        ('<near-collection>', 'ohai «help for near_collection»', "try 'help'"),
+        ('<producer-script>', 'ohai «help for producer_script»'))
 
 
-def cli_for_production():
-    import sys as o
-    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
-
-
-def _CLI(sin, sout, serr, argv):
+def CLI_(sin, sout, serr, argv, _rscer):
     from script_lib.cheap_arg_parse import require_interactive, cheap_arg_parse
     if not require_interactive(serr, sin, argv):
         return 456  # _exitstatus_for_error
     return cheap_arg_parse(_do_CLI, sin, sout, serr, argv, _formal_parameters)
+
+
+CLI_.__doc__ = _desc
 
 
 def _do_CLI(sin, sout, serr, near_fmt, do_diff, near_coll, ps_path, rscr):
@@ -170,7 +168,8 @@ _do_CLI.__doc__ = _desc
 if '__main__' == __name__:
     # until we #open [#008.13] figure out how to setup.py, we added this
     # (at #history-A.4) so that we can invoke this script directly
-    cli_for_production()
+    import sys as o
+    exit(CLI_(o.stdin, o.stdout, o.stderr, o.argv, lambda: xx()))
 
 # #history-B.1: blind rewrite
 # #history-A.4

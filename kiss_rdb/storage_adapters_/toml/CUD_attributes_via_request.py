@@ -459,8 +459,7 @@ def __build_offset_via_gist(body_blocks, listener):
 
 def _emit_comment_proximity_problems(problems, listener):
     sp_a = []
-    import kiss_rdb.magnetics.via_collection as ox
-
+    from text_lib.magnetics import via_words as ox
     for cmpo, (above, on, below) in problems:
         bc_join = []
         if above or below:
@@ -782,7 +781,7 @@ _verb_lexeme_via_key = {
         'delete_attribute': 'delete'}
 
 
-def lines_via_big_string_(big_s):  # (copy-paste of [#610].)
+def lines_via_big_string_(big_s):  # #[#610]
     import re
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
 

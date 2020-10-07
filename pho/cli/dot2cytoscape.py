@@ -321,7 +321,7 @@ def _AST_via_input_lines(lines, listener):  # #testpoint
     def debug_lines():
         yield f'{lineno}: {input_line[0:-1]}'
 
-    from script_lib.magnetics.parser_via_grammar import \
+    from text_lib.magnetics.parser_via_grammar import \
         WIP_PARSER_BUILDER_VIA_DEFINITION as parser_builder_via, THESE_LINES
 
     parser_builder = parser_builder_via(_define_grammar)

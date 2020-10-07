@@ -1,7 +1,5 @@
-from kiss_rdb_test.common_initial_state import \
-        publicly_shared_fixture_file
-from data_pipes_test.common_initial_state import \
-        executable_fixture
+from kiss_rdb_test.common_initial_state import publicly_shared_fixture_file
+from data_pipes_test.common_initial_state import executable_fixture
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, \
         dangerous_memoize_in_child_classes as shared_subj_in_child_classes
@@ -23,12 +21,12 @@ class CommonCase(unittest.TestCase):
         self.CLI_client_results_in_failure_or_success(True)
 
     def CLI_client_results_in_failure_or_success(self, expect_success):
-        es = self.end_state.exitstatus
-        self.assertTrue(isinstance(es, int))  # #[#412]
+        ec = self.end_state.exitcode
+        self.assertTrue(isinstance(ec, int))
         if expect_success:
-            self.assertEqual(es, 0)
+            self.assertEqual(ec, 0)
         else:
-            self.assertNotEqual(es, 0)
+            self.assertNotEqual(ec, 0)
 
     def expect_ignorecase(self, act, rxs):
         import re
@@ -52,25 +50,15 @@ class CommonCase(unittest.TestCase):
     @property
     @shared_subj_in_child_classes
     def end_state(self):
-        argv = self.given_argv()
-        sin = self.given_stdin()
-        exps = self.expected_lines()
-        sout, serr, done = IO_lib().stdout_and_stderr_and_done_via(exps, self)
-        ss = subject_script()
-        es = ss._CLI(sin, sout, serr, argv)
-        lines = done()
-        # ==
-        runs = tuple(_partition(lines))
-        if 1 < len(runs):
-            ens = _EndStateWhenManyRuns(runs)
-        else:
-            run, = runs
-            ens = _EndStateWhenOneRun(run)
-        ens.exitstatus = es
-        return ens
+        from script_lib.test_support.expect_STDs import \
+            build_end_state_actively_for as func
+        return func(self)
 
     def given_stdin(self):
-        return IO_lib().FAKE_STDIN_INTERACTIVE
+        return 'FAKE_STDIN_INTERACTIVE'
+
+    def given_CLI(self):
+        return subject_script().CLI_
 
     do_debug = False
 
@@ -91,7 +79,7 @@ class Case3061_must_be_interactive(CommonCase):
         self.assertEqual(self.first_line, exp)
 
     def given_stdin(self):
-        return IO_lib().FAKE_STDIN_NON_INTERACTIVE
+        return 'FAKE_STDIN_NON_INTERACTIVE'
 
     def given_argv(self):
         return ('hoopie-doopie',)
@@ -402,63 +390,8 @@ class _Symbol:
         return self._range.stop == num
 
 
-# == moved here from sunsetted module at #history-B.2 :[#605.5]
-
-def _EndStateWhenManyRuns(runs):
-    class end_state_when_many_runs:  # #class-as-namespace
-        def first_line_run(which):
-            return next(run for run in runs if which == run.which)
-
-        def last_line_run(which):
-            backwards = (runs[i] for i in reversed(range(0, len(runs))))
-            return next(run for run in backwards if which == run.which)
-    return end_state_when_many_runs
-
-
-class _EndStateWhenOneRun:
-    def __init__(o, run):
-        which = run.which
-        if 'stderr' == which:
-            o.stderr_lines = run.lines
-            return
-        assert 'stdout' == which
-        o.stdout_lines = run.lines
-
-
-def _partition(lines):
-    itr = ((_downcase[w], line) for w, line in lines)
-    for prev_which, line in itr:
-        cache = [line]
-        break
-
-    def flush():
-        rv = tuple(cache)
-        cache.clear()
-        return _Run(prev_which, rv)
-    for which, line in itr:
-        if prev_which != which:
-            yield flush()
-            prev_which = which
-        cache.append(line)
-    if len(cache):
-        yield flush()
-
-
-_downcase = {'STDERR': 'stderr', 'STDOUT': 'stdout'}
-
-
-class _Run:
-    def __init__(o, w, lz):
-        o.which, o.lines = w, lz
-
-
 def _help_screen_lib():
     import script_lib.test_support.expect_help_screen as lib
-    return lib
-
-
-def IO_lib():
-    import script_lib.test_support.expect_STDs as lib
     return lib
 
 

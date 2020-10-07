@@ -2,6 +2,7 @@ game_server_test
 grep_dump_test
 upload_bot_test
 modality_agnostic_test
+text_lib_test
 script_lib_test
 tag_lyfe_test
 kiss_rdb_test

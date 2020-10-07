@@ -105,7 +105,7 @@ class StringScanner:  # #[#008.4] a scanner
 
     def whine_about_expecting(self, *descs):
         def descer():
-            from . import via_collection as ox
+            from . import via_words as ox
             strs = (d if isinstance(d, str) else d.description for d in descs)
             return ox.oxford_OR(ox.keys_map(strs))
         self._emit_input_error(descer)
@@ -213,6 +213,5 @@ class pattern_via_description_and_regex_string:
         self.description = desc
         self.regex = re.compile(rx_string, *flags)
 
-# #pending-rename: this feels like it would be a better fit in script lib
 # #history-A.1
 # #born.

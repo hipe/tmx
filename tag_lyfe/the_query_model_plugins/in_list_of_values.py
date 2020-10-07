@@ -1,8 +1,5 @@
-from tag_lyfe.the_query_model import (
-        in_subtree_match_any_one_,
-        wordable_via_string_)
-from tag_lyfe import (
-        pop_property)
+from tag_lyfe.the_query_model import \
+        in_subtree_match_any_one_, wordable_via_string_
 
 
 class UnsanitizedInValuesFunction:
@@ -11,7 +8,9 @@ class UnsanitizedInValuesFunction:
         self._strings = strings
 
     def sanitize_plus(self, listener, tagging_query):
-        return _InValuesFunction(pop_property(self, '_strings'), tagging_query)
+        ss = self._strings
+        del self._strings
+        return _InValuesFunction(ss, tagging_query)
 
 
 class _InValuesFunction:

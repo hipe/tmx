@@ -1,48 +1,43 @@
-def help_lines():
+def _help_lines():
+    # (at #history-B.3 got rid of file-reading hack)
+    from data_pipes.magnetics import entities_via_filter_by_tags as mod
+    return mod.__doc__
 
-    """(this worked but we couldn't use it because click does not appear to
-    give you a facility to resolve the help string lazily. We absolutely do
-    not want this to be evaluated at every CLI invocaton. Also, instead of
-    reading this file, try loading it as a module and reading its docstring.)
+
+def _formals():
+    yield '-h', '--help', 'this screen'
+    yield '<collection>', 'usually a filesystem path to the collection'
+    yield '<query> [<query> [..]]', 'elements of your tag query'
+
+
+def CLI_(sin, sout, serr, argv, rscser):
+    """Filter the collection by looking for hashtag-like markup in certain
+    of its cels., E.g.: "#critical" or \\( "#open" and not "#cosmetic" \\)
     """
 
-    from os.path import (dirname as dn, join)  # os_path
-    _ = join(dn(dn(__file__)), 'magnetics_', 'entities_via_filter_by_tags.py')
-    import re
-    rx = re.compile(r'^"""')
-    with open(_) as lines:
-        md = rx.match(next(lines))
-        yield md.string[md.span()[1]:-1]
-        while True:
-            line = next(lines)
-            md = rx.match(line)
-            if md is None:
-                yield line[:-1]
-                continue
-            yield line[md.span()[1]:-1]
-            break
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    from data_pipes.cli import formals_via_ as func, \
+        write_help_into_, meta_collection_, monitor_via_
 
+    foz = func(_formals(), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
 
-def filter_by_tags(ctx, collection, query):
+    if vals.get('help'):
+        return write_help_into_(serr, CLI_.__doc__, foz)
 
-    # begin boilerplate-esque
-    cf = ctx.obj  # "cf" = common functions
-    mon = cf.build_monitor()
+    coll_path = vals.get('collection')
+    query = vals.get('query')
+
+    mon = monitor_via_(serr)
     listener = mon.listener
-    _inj = cf.release_these_injections('filesystem')
-    coll = cf.collection_via_unsanitized_argument(collection, listener, **_inj)
-    if coll is None:
-        return mon.errno
-    # end
+    coll = meta_collection_().collection_via_path(coll_path, listener)
 
     _ents = coll._impl.to_entity_stream_as_storage_adapter_collection(listener)
 
-    from kiss_rdb.magnetics_.entities_via_filter_by_tags import (
-            stats_future_and_results_via_entity_stream_and_query,
-            prepare_query)
-
-    if not len(query):
-        raise Exception('cover me - no query')
+    from data_pipes.magnetics.entities_via_filter_by_tags import \
+        stats_future_and_results_via_entity_stream_and_query, prepare_query
 
     q = prepare_query(query, listener)
     if q is None:
@@ -103,4 +98,5 @@ def __summarize_search_stats(o):  # deleted coverage at #history-A.3
     else:
         yield o(f'{matched} match(es) of {total} item(s) seen')
 
+# #history-B.3
 # #re-housed #abstracted
