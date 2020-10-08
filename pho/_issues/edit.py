@@ -192,12 +192,11 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
 
     try:
         ic = _issues_collection_via(read_fh, stopping_listener, opn)
-        if (two := ic.to_schema_and_entity_sexps()) is None:
+        if (two := ic.to_schema_and_entities()) is None:
             raise stop()
-        cs, itr = two
+        cs, ents = two
         assert 'main_tag' == cs.field_name_keys[1]  # or w/e
         main_tag_key = 'main_tag'
-        ents = (sx[1] for sx in itr)
         end_iden = (eg_iden := next(ents).identifier)
         assert not end_iden.has_sub_component
         res_tup = main()

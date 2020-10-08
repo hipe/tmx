@@ -61,6 +61,11 @@ class FakeProducerScript:  # [#459.17] a fake producer script
     HELLO_I_AM_A_PRODUCER_SCRIPT__ = None
 
 
+def production_collectioner():
+    from data_pipes import meta_collection_ as func
+    return func()
+
+
 def executable_fixture(stem):
     return os_path.join(_top_test_dir(), 'fixture_executables', stem)
 

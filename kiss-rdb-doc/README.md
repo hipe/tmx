@@ -52,7 +52,7 @@ woah boy.
 |[#873.P]                   | #hole |
 |[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
-|[#873.M]                   |       | integrating external format adapters (storage adapters)
+|[#873.M]                   | #hole |
 |[#873.12]                  |       | #experimental. we may remove this API point. capability functions
 |[#873.K]                   | #spec | eno: the assumption of a document-meta section makes life easier
 |[#873.J]                   | #open | debugging `print` statements for kiss-rdb commit

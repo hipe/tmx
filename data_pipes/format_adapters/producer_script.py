@@ -4,6 +4,7 @@ The "central conceit" of JSON scripts is that they are the grand unifier
 lingua franca: they can be implemented by any language/runtime environment,
 (possibly even happening through sockets over a network). The client need
 only know that she will have a stream of lines on STDOUT, and that each line
+(or see [#459.C], might not be lines)
 will parse as a JSON object.
 
 But once you appreciate the elegance of this arrangement, you can also see
@@ -112,6 +113,12 @@ full producer script API, so.. (:#here2)
 """
 
 
+STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
+STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
+STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.py',)
+STORAGE_ADAPTER_IS_AVAILABLE = True
+
+
 def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         collection_path, listener=None, opn=None, rng=None):
 
@@ -119,7 +126,11 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         fh = collection_path
         assert 'r' == fh.mode[0]
         assert 0 == fh.fileno()
-        return _collection_implementation_via_read_only_stream(fh, listener)
+
+        class collection_impl_via_read_only_stream:  # #class-as-namespace
+            def to_schema_and_entities(this_listener):
+                return _to_schema_and_entities(fh, this_listener)
+        return collection_impl_via_read_only_stream
 
     assert not opn
 
@@ -129,28 +140,40 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
     return _collection_implementation_via_module(mod)
 
 
-def _collection_implementation_via_read_only_stream(stdin, _monitor):
+def _to_schema_and_entities(stdin, listener):
+    def ents():
+        lineno = 0
+        for line in stdin:
+            lineno += 1
+            dct = loads(line)
+            yield _ReallyLightweightEntity(dct, lineno, '<stdin>')
+    from json import loads
+    return None, ents()
 
-    class collection_impl_via_read_only_stream:  # #class-as-namespace
 
-        def multi_depth_value_dictionaries_as_storage_adapter(from_args, mon):
-            assert 0 == len(from_args)
-            from json import loads
-            for line in stdin:
-                yield loads(line)
-
-    return collection_impl_via_read_only_stream
+class _ReallyLightweightEntity:
+    def __init__(self, dct, lineno, path):
+        self.core_attributes_dictionary_as_storage_adapter_entity = dct
+        self.lineno = lineno
+        self.path = path
 
 
 def _collection_implementation_via_module(mod):  # #testpoint
 
-    def _multi_depth_dcts(from_args, mon):
-        if 1 < len(from_args):
-            raise Exception('cover me - multiple pass-thru args')
+    def _to_schema_and_entities(listener):
+        from_args = ()  # gone at #history-B.3 or before
 
-        opened = mod.open_traversal_stream(mon.listener, *from_args)
+        def ents():
+            opened = mod.open_traversal_stream(listener, *from_args)
+            for dct, lineno in dct_and_linenos(opened):
+                yield _Entity(dct, lineno, module_path)
+
+        return None, ents()
+
+    def dct_and_linenos(opened):
+        lineno = 0
         with opened as orig_dcts:
-
+            lineno += 1
             m = 'multi_depth_value_dictionary_stream_via_traversal_stream'
             if hasattr(mod, m):  # see #here2
                 out_dcts = getattr(mod, m)(orig_dcts)
@@ -161,12 +184,21 @@ def _collection_implementation_via_module(mod):  # #testpoint
                 key_and_dcts = mod.stream_for_sync_via_stream(orig_dcts)
                 out_dcts = (key_and_dct[1] for key_and_dct in key_and_dcts)
             for dct in out_dcts:
-                yield dct
+                yield dct, lineno
+
+    module_path = mod.__file__
 
     class collection_impl_via_module:  # #class-as-namespace
-        multi_depth_value_dictionaries_as_storage_adapter = _multi_depth_dcts
+        to_schema_and_entities = _to_schema_and_entities
 
     return collection_impl_via_module
+
+
+class _Entity:
+    def __init__(self, dct, lineno, path):
+        self.core_attributes_dictionary_as_storage_adapter_entity = dct
+        self.lineno = lineno
+        self.path = path
 
 
 def producer_script_module_via_path(script_path, listener):
@@ -249,6 +281,7 @@ def producer_script_module_via_path(script_path, listener):
     return main()
 
 
+# #history-B.3
 # #history-A.2: collection conversion
 # #history-A.1: storage adapter not format adapter
 # #born.

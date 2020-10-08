@@ -208,12 +208,13 @@ class Case3069DP_strange_format_adapter_name(CommonCase):
         self.CLI_client_results_in_failure_exitstatus()
 
     def test_200_says_not_found(self):
-        _ = self.end_two_sentences[0]
-        self.assertIn("unrecognized format name 'zig-zag'", _)
+        act = self.end_two_sentences[0]
+        self.assertIn("unrecognized format name 'zig-zag'", act)
 
     def test_300_says_did_you_mean(self):
-        _ = self.end_two_sentences[1]
-        self.assertRegex(_, r"\bknown format name\(s\): \('[a-z]+', '[a-z]+'")
+        act = self.end_two_sentences[1]
+        exp = r"\bknown format name\(s\): \('[-a-z]+', '[-a-z]+'"
+        self.assertRegex(act, exp)
 
     @shared_subject
     def end_two_sentences(self):

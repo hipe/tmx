@@ -33,7 +33,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.F] | #trak | CLI integration tests have redundant setup
 |                  [#459.E] | #trak | [record mapper]
 |                  [#459.D] | #hole |
-|                  [#459.3] | #hole |
+|                  [#459.C] |       | [the new way]
 |                  [#459.2] |       | an exemplary implementation of sync
 |                  [#459]   |       | (internal & external tracking of small)
 |                  [#458.D] |       | example row

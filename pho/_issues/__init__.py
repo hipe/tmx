@@ -66,24 +66,25 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
         ic = issues_collection_via_(readme, listener, opn)
 
         # If some kind of failure (eg {file|table} not found), None not iter
-        if (sch_sxs := ic.to_schema_and_entity_sexps()) is None:
+        if (sch_ents := ic.to_schema_and_entities()) is None:
             return
-        sch, ent_sxs = sch_sxs
+
+        sch, ents = sch_ents
         body_keys = sch.field_name_keys[1:]  # [#871.1]
 
         # If there is no filter and no sort, you are done
         if tag_query is None and sort_by_time is None:
-            return (rec(None, sx[1], readme) for sx in ent_sxs)  # #here5
+            return (rec(None, ent, readme) for ent in ents)  # #here5
 
         # Maybe filter by tag query
         if tag_query is not None:
             assert isinstance(tag_query, str)  # for now
             ent_does_match = _build_matcher(tag_query, body_keys)
-            ent_sxs = (sx for sx in ent_sxs if ent_does_match(sx[1]))
+            ents = (ent for ent in ents if ent_does_match(ent))
 
         # If no sort by mtime, you are done
         if sort_by_time is None:
-            return (rec(None, sx[1], readme) for sx in ent_sxs)  # #here5
+            return (rec(None, ent, readme) for ent in ents)  # #here5
 
         # The rest is the heavy lift. Lazily once per file get this badboy
         from kiss_rdb.vcs_adapters.git import blame_index_via_path as func
@@ -92,7 +93,7 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
             xx()
 
         mtime = vcs_index.datetime_for_lineno  # #here5 (below)
-        unordered = (rec(mtime(sx[2]), sx[1], readme) for sx in ent_sxs)
+        unordered = (rec(mtime(ent.lineno), ent, readme) for ent in ents)
         # (we can imagine some world where we return it unsorted but not here)
         return sorted(unordered, **sort_kwargs)
 
@@ -180,14 +181,14 @@ def issues_collection_via_(readme, listener, opn=None):
             from .graph import to_graph_lines_ as func
             return func(issues_collection, listener)
 
-        def to_schema_and_entity_sexps(listener=listener):
-            if (sch_sxs := ci.to_schema_and_entity_sexps(listener)) is None:
+        def to_schema_and_entities(listener=listener):
+            if (sch_ents := ci.to_schema_and_entities(listener)) is None:
                 return
-            schema, sxs = sch_sxs
+            schema, ents = sch_ents
             body_keys = schema.field_name_keys[1:]
             if ('main_tag', 'content') != body_keys:
                 raise RuntimeError(f"This is fine but hello: {body_keys!r}")
-            return schema, sxs
+            return schema, ents
 
         collection_implementation = ci
 

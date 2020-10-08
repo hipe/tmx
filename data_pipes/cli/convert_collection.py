@@ -20,6 +20,10 @@ _same_help = "(or will try to infer from file extension if present)"
 
 
 def CLI_(stdin, stdout, stderr, argv, rscer):
+    """Harness the power of pipes…"""
+
+    # ..
+
     """EXPERIMENTAL. Created as a cheap-and-easy way to create and populate
     a collection with a producer script or similar.
 
@@ -34,7 +38,7 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
     from data_pipes.cli import formals_via_ as func, \
-        write_help_into_, meta_collection_, monitor_via_
+        write_help_into_, monitor_via_
     foz = func(_formals(), lambda: prog_name)
     vals, es = foz.terminal_parse(stderr, bash_argv)
     if vals is None:
@@ -43,11 +47,20 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     if vals.get('help'):
         return write_help_into_(stderr, CLI_.__doc__, foz)
 
-    from_format = vals.pop('from_format', None)
-    to_format = vals.pop('to_format', None)
     from_collection = vals.pop('from_collection')
     to_collection = vals.pop('to_collection')
+
+    to_format_default = None
+    if '-' == to_collection:
+        to_format_default = 'json'  # experiment
+
+    from_format = vals.pop('from_format', None)
+    to_format = vals.pop('to_format', to_format_default)
+
     from_args = vals.pop('from_arg', ())
+    if len(from_args):
+        raise RuntimeError('gone now')
+
     assert not vals
 
     # shouldn't need RNG ever - don't we want to transfer the same ID's in?
@@ -58,12 +71,14 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         make_sure_STDIN_interactivity_looks_right()
         from_coll = resolve_from_collection()
         to_coll = resolve_to_collection()
-        dcts = from_coll.multi_depth_value_dictionaries_as_storage_adapter(from_args, mon)  # noqa: E501
-        with to_coll.open_pass_thru_receiver_as_storage_adapter(mon) as recv:
-            for dct in dcts:
-                recv(dct)
-                if not mon.OK:
-                    raise RuntimeError("cover me: in-loop failure")
+        sch, ents = from_coll.to_schema_and_entities(throwing_listener)
+        with to_coll.open_pass_thru_receiver_as_storage_adapter(mon.listener) as recv:  # noqa: E501
+            if True:
+                for ent in ents:
+                    assert ent.path
+                    assert ent.lineno
+                    dct = ent.core_attributes_dictionary_as_storage_adapter_entity  # noqa: E501
+                    recv(dct)
         return mon.exitstatus
 
     def resolve_to_collection():
@@ -74,11 +89,11 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
 
     def when_STDOUT():
         return self.to_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            stdout, mon)
+            stdout, mon.listener)
 
     def when_STDIN():
         return self.from_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            stdin, mon)
+            stdin, mon.listener)
 
     def when_not_STDOUT():
         return meta_collection.collection_via_path(
@@ -115,10 +130,12 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
 
     # == Listeners and related
 
-    def tl(sev, *rest):
+    def throwing_listener(sev, *rest):
         mon.listener(sev, *rest)
         if 'error' == sev:
             raise stop()
+
+    tl = throwing_listener
 
     def error(msg):
         stderr.write(''.join((msg, '\n')))  # ich muss sein [#605.2]
@@ -136,8 +153,9 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         pass
 
     # == Smalls and go!
+    from data_pipes import meta_collection_ as func
+    meta_collection = func()
 
-    meta_collection = meta_collection_()
     mon = monitor_via_(stderr)
     try:
         return main()

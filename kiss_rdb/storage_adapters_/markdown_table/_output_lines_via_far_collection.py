@@ -1,7 +1,7 @@
-def pass_thru_collection_for_write_(stdout, listener):
+def pass_thru_collection_for_write_(stdout, _listener):
     class collection_impl_for_write:  # #class-as-namespace
-        def open_pass_thru_receiver_as_storage_adapter(mon):
-            return _open_pass_thru_receiver(stdout, mon)
+        def open_pass_thru_receiver_as_storage_adapter(_listener):
+            return _open_pass_thru_receiver(stdout, _listener)
     return collection_impl_for_write
 
 
@@ -102,7 +102,7 @@ def _actions():
     return actions
 
 
-def _open_pass_thru_receiver(sout, mon):
+def _open_pass_thru_receiver(sout, _listener):
     class context_manager:
 
         def __enter__(self):
@@ -112,7 +112,7 @@ def _open_pass_thru_receiver(sout, mon):
             for line in actions.output_file_head_placeholder_NOT_IN_FSA():
                 use_sout.write(f"{line}\n")  # #here4
 
-            return _build_receiver(sout, actions, mon)
+            return _build_receiver(sout, actions, _listener)
 
         def __exit__(self, *_4):
 
@@ -126,7 +126,7 @@ def _open_pass_thru_receiver(sout, mon):
     return context_manager()
 
 
-def _build_receiver(sout, actions, mon):
+def _build_receiver(sout, actions, _listener):
     # As you receive each next item from the upstream, determine what lines
     # to output (using our little state machine (see graph)) and write those
     # lines to STDOUT (or whatever it is). #[#008.2] custom state machine
@@ -263,7 +263,7 @@ def _build_build_complete_schema_via_first_dictionary():
 
         add_piece('|\n')  # add endcap and _eol #here4
         sexps.append(('line_ended_with_pipe',))
-        return row_AST_via(sexps, ''.join(pcs))
+        return row_AST_via(sexps, ''.join(pcs), 0)
 
     def label_via_far_dictionary_key(k):  # k = far_dictionary_key
         assert re.match(r'[a-z]+(_[a-z]+)*$', k)  # ..

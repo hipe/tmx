@@ -1,5 +1,6 @@
 from data_pipes_test.sync_support import build_end_state_of_sync
 from data_pipes_test.common_initial_state import \
+        production_collectioner, \
         markdown_fixture, executable_fixture
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject
@@ -224,9 +225,9 @@ def _same_near_collection():
 
 
 def _build_collection(path, yes_no, listener=None):
-    _kwargs = {'format_name': 'producer-script'} if yes_no else {}
-    from kiss_rdb import collectionerer
-    return collectionerer().collection_via_path(path, listener, **_kwargs)
+    kw = {'format_name': 'producer-script'} if yes_no else {}
+    hubs = production_collectioner()
+    return hubs.collection_via_path(path, listener, **kw)
 
 
 _yes_cheat = True

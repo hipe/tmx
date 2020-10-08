@@ -132,7 +132,7 @@ class Case010_help(CommonCase):
     def test_200_content(self):
         lines = self.end_state.first_line_run('stderr').lines
         self.assertIn('usage: ', lines[0])
-        self.assertAlmostEqual(len(lines), 18, delta=2)
+        self.assertAlmostEqual(len(lines), 18, delta=5)
 
     def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks

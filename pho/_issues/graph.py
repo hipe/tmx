@@ -501,15 +501,15 @@ def _build_tag_classifier(allow, cstacker):
 
 def _classified_row_ASTs_via_issues_collection(ic):
     def main():
-        for sx in sxs:
-            attr_rows = keys_and_values_via_row_sexp(* sx[1:])
+        for ent in ents:
+            attr_rows = keys_and_values_via_ent(ent)
             row_itrs = (iter(row) for row in attr_rows)
             kvs = ((k, next(row_itr)) for row_itr in row_itrs for k in row_itr)
             dct = {k: v for k, v in kvs}
             yield _ClassifiedRow(**dct)
 
-    def keys_and_values_via_row_sexp(ent, lineno):
-        yield 'row_AST', ent, 'lineno', lineno
+    def keys_and_values_via_ent(ent):
+        yield 'row_AST', ent, 'lineno', ent.lineno
         if ent.identifier is None:
             yield 'notice_message', "Row{s} {doesnt_dont} have an identifier {on}"  # noqa: E501
             return
@@ -523,9 +523,10 @@ def _classified_row_ASTs_via_issues_collection(ic):
         yield 'doc_pairs', top_thing.doc_pairs
 
     # See if the readme file begins to parse OK
-    if (sch_sxs := ic.to_schema_and_entity_sexps()) is None:
+    if (sch_ents := ic.to_schema_and_entities()) is None:
         return
-    schema, sxs = sch_sxs
+
+    schema, ents = sch_ents
     ks = schema.field_name_keys[1:]
     del schema
 

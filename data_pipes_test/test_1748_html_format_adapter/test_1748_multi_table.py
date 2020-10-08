@@ -9,6 +9,7 @@ the branch boundaries are being detected and emitted.
 
 
 from data_pipes_test.common_initial_state import \
+        production_collectioner, \
         html_fixture, ProducerCaseMethods, passthru_context_manager
 from kiss_rdb_test.markdown_table_parsers import \
         table_via_lines, nonblank_line_runs_via_lines
@@ -44,31 +45,22 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
         # Make the "to" collection (around a fake stdout)
         fake_sout, lines = fake_STDOUT_and_lines_for(self)
 
-        from kiss_rdb import collectionerer
-        collectioner = collectionerer()
+        collectioner = production_collectioner()
 
         to_coll = collectioner.collection_via_path(
                 fake_sout, format_name='markdown-table')
 
         # get busy
 
-        class mon:  # #class-as-namespace
-            listener = None
-            OK = True
-
-        from_args = ()
-
-        # == FROM this used to be a single function before #history-B.1
-        #    but we were losing a taste for collection wrappers
         from_ci, to_ci = (o._impl for o in (from_coll, to_coll))  # ..
-        dcts = from_ci.multi_depth_value_dictionaries_as_storage_adapter(from_args, mon)  # noqa: E501
-        with to_ci.open_pass_thru_receiver_as_storage_adapter(mon) as recv:
-            for dct in dcts:
-                recv(dct)
-                if not mon.OK:
-                    break
-        # == TO
 
+        sch, ents = from_ci.to_schema_and_entities(None)
+        with to_ci.open_pass_thru_receiver_as_storage_adapter(None) as recv:
+            if True:
+                for ent in ents:
+                    assert ent.path
+                    assert ent.lineno
+                    recv(ent.core_attributes_dictionary_as_storage_adapter_entity)  # noqa: E501
         return tuple(lines)
 
     do_debug = False
@@ -84,6 +76,8 @@ def fake_producer_script_via_dictionary_tuple(dct_tup):
 
         def open_traversal_stream(listener):
             return passthru_context_manager(dct_tup)
+
+    fake_producer_script.__file__ = __file__
 
     from data_pipes.format_adapters.producer_script import \
         _collection_implementation_via_module

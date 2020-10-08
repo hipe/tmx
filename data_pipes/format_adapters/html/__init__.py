@@ -4,6 +4,14 @@
 """
 
 
+STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
+STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
+STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.html',)
+STORAGE_ADAPTER_IS_AVAILABLE = False
+STORAGE_ADAPTER_UNAVAILABLE_REASON = \
+    "Currently this node holds support code only. See `producer_script`"
+
+
 # (Case0810DP) is first to load
 # something about (Case1314DP)
 

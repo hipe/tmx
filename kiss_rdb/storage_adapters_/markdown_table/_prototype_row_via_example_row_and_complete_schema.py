@@ -167,9 +167,9 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
 
     def row_via_parts(parts):
         mutable_sexps, line = _sexps_and_line_via_parts(parts)
-        return row_AST_via_two(mutable_sexps, line)
+        return row_AST_via_three(mutable_sexps, line, 0)
 
-    row_AST_via_two = complete_schema.row_AST_via_two_
+    row_AST_via_three = complete_schema.row_AST_via_three_
 
     class stop(RuntimeError):
         pass

@@ -104,26 +104,35 @@ def _storage_adapter_via(original_method):  # #decorator
 class collectioner_via_storage_adapters_module:  # "_MetaCollection"
     # this is the thing that wraps the module that holds storage adapters
 
-    def __init__(self, module_name, module_directory):
+    def __init__(self, module_name, module_directory, *more_of_same):
         # module_name = mod.__name__
         # module_directory = mod.__path__._path[0]
         # --
         from os import listdir
         from fnmatch import fnmatch
+        from os.path import splitext
         # from glob import glob
         # _glob_path = os_path.join(_dir, '[!_]*')
         # order = tuple(sorted(glob(_glob_path)))  # gives you full paths
 
-        _ = (s for s in listdir(module_directory) if fnmatch(s, '[!_]*'))
-        order = tuple(sorted(_))
+        adapters, hubs = {}, []
 
-        # --
-        # for now using the filesystem entries as the keys but this is not guar
-        references = {k: _NOT_YET_LOADED for k in order}
-        # --
-        self._order = order
-        self._reference_via_key = references
-        self._SAs_module_name = module_name
+        itr = iter((module_name, module_directory, *more_of_same))
+        for mod_name in itr:
+            mod_dir = next(itr)
+            hub_offset = len(hubs)
+            hubs.append(mod_name)  # #here3
+            for entry in listdir(mod_dir):
+                if not fnmatch(entry, '[!_]*'):
+                    continue
+                key, _ = splitext(entry)
+                if key in adapters:
+                    raise RuntimeError(f"collision: '{key}'")
+                adapters[key] = 'reference', hub_offset  # #here2
+
+        self._order = tuple(sorted(adapters.keys()))
+        self._reference_via_key = adapters
+        self._hubs = tuple(hubs)
         self._key_via_extname = None
         self._key_via_format_name = None
 
@@ -256,15 +265,18 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
             yield (key, build_dereferencer(key))
 
     def _dereference(self, key):
-        ref = self._reference_via_key[key]
-        if ref.is_loaded:
-            return ref
+        sx = self._reference_via_key[key]
+        if 'loaded' == sx[0]:  # #here2
+            return sx[1]
         self._reference_via_key[key] = False  # lock it for safety
-        from importlib import import_module
-        _module_name = f'{self._SAs_module_name}.{key}'
-        _module = import_module(_module_name)
-        sa = _StorageAdapter(_module, key)
-        self._reference_via_key[key] = sa
+        typ, hub_offset = sx
+        assert 'reference' == typ
+        hub_mod_name = self._hubs[hub_offset]  # #here3
+        mod_name = '.'.join((hub_mod_name, key))
+        from importlib import import_module as func
+        module = func(mod_name)
+        sa = _StorageAdapter(module, key)
+        self._reference_via_key[key] = 'loaded', sa  # #here2
         return sa
 
 

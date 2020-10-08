@@ -74,18 +74,6 @@ def _command_called_select(sin, sout, serr, argv, _rscser):
     xx('soon')
 
 
-def resolve_collection_(serr, coll_path):
-    mon = monitor_via_(serr)
-    collectioner = meta_collection_()
-    coll = collectioner.collection_via_path(coll_path, mon.listener)
-    return coll, mon
-
-
-def meta_collection_():
-    from kiss_rdb import collectionerer as func
-    return func()
-
-
 def monitor_via_(serr):
     from script_lib.magnetics import error_monitor_via_stderr as func
     return func(serr, default_error_exitstatus=4)

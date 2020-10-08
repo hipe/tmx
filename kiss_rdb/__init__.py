@@ -30,16 +30,16 @@ _lazy, _lazily_defined_monadic_function = _build_these()
 
 @_lazy
 def collectionerer():
-    components = ('kiss_rdb', 'storage_adapters_')
-
-    from os.path import join as path_join, dirname as dn
-    mod_dir = path_join(dn(dn(__file__)), *components)
-
-    mod_name = '.'.join(components)
-
+    mod_name, mod_dir = hub_mod_name_and_mod_dir()
     from kiss_rdb.magnetics_.collection_via_path import \
         collectioner_via_storage_adapters_module as collectioner_via
     return collectioner_via(mod_name, mod_dir)
+
+
+def hub_mod_name_and_mod_dir():
+    pcs = 'kiss_rdb', 'storage_adapters_'
+    from os.path import join as path_join, dirname as dn
+    return '.'.join(pcs), path_join(dn(dn(__file__)), *pcs)
 
 
 # == Higher-Level Module Support: Specific Presentation Stuff

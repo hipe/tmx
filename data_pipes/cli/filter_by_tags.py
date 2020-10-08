@@ -17,7 +17,7 @@ def CLI_(sin, sout, serr, argv, rscser):
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
     from data_pipes.cli import formals_via_ as func, \
-        write_help_into_, meta_collection_, monitor_via_
+        write_help_into_, monitor_via_
 
     foz = func(_formals(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
@@ -32,7 +32,10 @@ def CLI_(sin, sout, serr, argv, rscser):
 
     mon = monitor_via_(serr)
     listener = mon.listener
-    coll = meta_collection_().collection_via_path(coll_path, listener)
+
+    from data_pipes import meta_collection_ as func
+    mc = func()
+    coll = mc.collection_via_path(coll_path, listener)
 
     _ents = coll._impl.to_entity_stream_as_storage_adapter_collection(listener)
 

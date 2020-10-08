@@ -54,10 +54,12 @@ def _collection_implementation_via_read_only_stream(stdin, _monitor):
 class _CollectionImplementation:
 
     def __init__(self, f):
-        self.multi_depth_value_dictionaries_as_storage_adapter = f
+        raise RuntimeError('away this')
+        self._GONE_multi_depth_value_dictionaries_as_storage_adapter = f
 
 
 def _traverse_via_upstream(opened, listener):
+    raise RuntimeError('where')
 
     pairs_via_line = __pairserer(listener)
 

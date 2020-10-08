@@ -65,7 +65,7 @@ def row_AST_via_line():
     def row_AST_via_line(line, listener):
         row_AST_via_line = _build_row_AST_via_line(listener, context_stack)
         try:
-            return row_AST_via_line(line)
+            return row_AST_via_line(line, 0)
         except _Stop:
             pass
 

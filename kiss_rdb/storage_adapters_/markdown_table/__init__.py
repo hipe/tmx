@@ -67,8 +67,8 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         def to_entity_stream_as_storage_adapter_collection(listener):
             return eek(lambda: entities(listener))
 
-        def to_schema_and_entity_sexps(listener):
-            return _to_schema_and(single_traversal_collection, listener)
+        def to_schema_and_entities(listener):
+            return _to_schema_and_ents(single_traversal_collection, listener)
 
         def sexps_via_action_stack(astack, listener):  # (Case3306DP)
             return eek(lambda: sexps_via_action_stack(astack, listener))
@@ -145,7 +145,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
     return single_traversal_collection
 
 
-def _to_schema_and(ci, listener):
+def _to_schema_and_ents(ci, listener):
     astack = [
         ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
         ('table_schema_line_ONE_of_two',),
@@ -157,7 +157,7 @@ def _to_schema_and(ci, listener):
     if (sxs := ci.sexps_via_action_stack(astack, listener)) is None:
         return
     for sr2_sx in sxs:
-        return sr2_sx[2], sxs
+        return sr2_sx[2], (sx[1] for sx in sxs)
 
 
 # == RETRIEVE
@@ -308,12 +308,12 @@ def _sexps_via_stack(sexps, stack, cstack, listener):
 # == Pseudo-Models
 
 def schema_row_builder_():
-    return _build_row_AST_via_two()
+    return _build_row_AST_via_three()
 
 
-def _build_row_AST_via_two(schema=None):
+def _build_row_AST_via_three(schema=None):
 
-    def row_AST_via_two(mutable_sexps, line):
+    def row_AST_via_three(mutable_sexps, line, lineno):
 
         typ, = mutable_sexps.pop()
         cell_sexps = tuple(mutable_sexps)
@@ -332,7 +332,7 @@ def _build_row_AST_via_two(schema=None):
 
             cell_count = _cell_count
             has_endcap = _has_endcap
-
+        row_AST.lineno = lineno
         if schema is None:  # kind of crazy experiment to follow..
             return row_AST()
 
@@ -401,7 +401,7 @@ def _build_row_AST_via_two(schema=None):
         return (ent := row_AST_entity())
 
     if schema is None:
-        return row_AST_via_two
+        return row_AST_via_three
 
     use_identifier_class = schema.identifier_class_  # #here5 = [#857.C]
     key_via_offset = schema.field_name_keys
@@ -412,7 +412,7 @@ def _build_row_AST_via_two(schema=None):
     i = key_via_offset.index(identifier_key)
     non_identifier_attr_keys = (*key_via_offset[:i], *key_via_offset[i+1:])
 
-    return row_AST_via_two
+    return row_AST_via_three
 
 
 _endcap_yn = {'line_ended_with_pipe': True, 'line_ended_without_pipe': False}
@@ -477,7 +477,7 @@ def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
         identifier_class_ = (iden_cls or _identifier)  # #here5
         table_cstack_ = table_cstack
 
-    complete_schema.row_AST_via_two_ = _build_row_AST_via_two(complete_schema)
+    complete_schema.row_AST_via_three_ = _build_row_AST_via_three(complete_schema)  # noqa: E501
     return complete_schema
 
 
@@ -486,14 +486,15 @@ def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
 def _build_row_AST_via_line(listener, context_stack, schema=None):
     # #testpoint (for unit testing parsing row lines)
 
-    def row_AST_via_line(line):
+    def row_AST_via_line(line, lineno):
         scn = line_scanner_via_line(line)
-        return row_AST_via_two(list(sexps_via_line_scanner(scn)), line)
+        sx = list(sexps_via_line_scanner(scn))
+        return row_AST_via_three(sx, line, lineno)
 
     if schema:
-        row_AST_via_two = schema.row_AST_via_two_
+        row_AST_via_three = schema.row_AST_via_three_
     else:
-        row_AST_via_two = _build_row_AST_via_two()
+        row_AST_via_three = _build_row_AST_via_three()
 
     def sexps_via_line_scanner(scn):
         while True:
@@ -660,7 +661,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
         table_lineno = lineno_er()
         typ, line = scn.advance()
         assert 'table_line' == typ  # per the upstream grammar
-        tsl1of2_ast = schema_row_AST_via_line(line)
+        tsl1of2_ast = schema_row_AST_via_line(line, table_lineno)
         if not tsl1of2_ast.has_endcap:
             stop_because('header row 1 must have "endcap" (trailing pipe)')
         yield 'table_schema_line_ONE_of_two', line  # for now, AST 4 me not u
@@ -673,7 +674,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
         typ, line = scn.advance()
         if 'table_line' != typ:
             xx(f"expected table schema line 2 (alignments), had '{typ}'")
-        tsl2of2_ast = schema_row_AST_via_line(line)
+        tsl2of2_ast = schema_row_AST_via_line(line, 0)
 
         # Make sure the two schema lines accord
         two = (tsl1of2_ast, tsl2of2_ast)
@@ -697,7 +698,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
 
         # Zero or more business object rows
         while not scn.empty and 'table_line' == scn.peek[0]:
-            ast = row_AST_via_line(line := scn.peek[1])
+            ast = row_AST_via_line((line := scn.peek[1]), lineno_er())
             count3 = ast.cell_count
             if count1 < count3:  # #here4
                 stop_because(_line_about_cell_count_delta(count3, count1))
