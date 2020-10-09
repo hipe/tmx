@@ -1,8 +1,12 @@
 #!/usr/bin/env python3 -W default::Warning::0
 
+from text_lib.magnetics.scanner_via import scanner_via_list
 import toml  # #[#867.K]
 import re
 from sys import stdout, stderr, argv
+
+
+raise RuntimeError('lol')  # #history-B.3 changed scanner. what is this file
 
 
 # (there is a known bug where if you do --help and --reverse it ignores --help)
@@ -60,12 +64,12 @@ def run_alternatively():
         whine()
         return
 
-    one_agument = arg_stream.shift()
+    one_agument = arg_stream.next()
 
     consume_options()
 
     if there_are_more_arguments():
-        token = arg_stream.head_token()
+        token = arg_stream.peek
         serr(f'unexpected argument: {repr(token)}')
         whine()
         return
@@ -108,8 +112,8 @@ def yes_do_some_officious_thing():
 
 def consume_a_name_value_pair():
 
-    key_token = arg_stream.shift()
-    if arg_stream.is_empty():
+    key_token = arg_stream.next()
+    if arg_stream.empty:
         bork('input error: odd-number of non-option arguments')
         return
 
@@ -123,7 +127,7 @@ def consume_a_name_value_pair():
         bork(f'name used multiple times: {repr(key_token)}')
         return
 
-    value_token = arg_stream.shift()
+    value_token = arg_stream.next()
 
     if '\\' in value_token:
         value_token = the_worst(value_token)
@@ -139,8 +143,8 @@ def the_worst(value_token):  # do #[#867.W] again :(
 
 
 def consume_option_at_head():
-    if '--reverse' == arg_stream.head_token():
-        arg_stream.shift()
+    if '--reverse' == arg_stream.peek:
+        arg_stream.advance()
         side_effects['run_in_the_dump_direction'] = False
 
     elif head_token_matches_help_and_consume():
@@ -167,14 +171,14 @@ def bork_about_not_an_option_at_non_head():
 
 
 def _bork_about_not_an_option(tail):
-    token = arg_stream.head_token()
+    token = arg_stream.peek
     bork(f'not an option{tail}: {repr(token)}')
 
 
 def head_token_matches_help_and_consume():
-    if not re.match(r'^--?h(:?e(?:lp?)?)?$', arg_stream.head_token()):
+    if not re.match(r'^--?h(:?e(?:lp?)?)?$', arg_stream.peek):
         return False
-    arg_stream.shift()
+    arg_stream.advance()
     return True
 
 
@@ -184,11 +188,11 @@ def plan_to_do_help():
 
 
 def the_head_argument_looks_like_an_option():
-    return '-' == arg_stream.head_token()[0]
+    return '-' == arg_stream.peek[0]
 
 
 def there_are_more_arguments():
-    return not arg_stream.is_empty()
+    return arg_stream.more
 
 
 # == common CLI UI stuff - lower-level, non-business
@@ -245,25 +249,6 @@ sout = _line_writer_for(stdout)
 serr = _line_writer_for(stderr)
 
 
-class _ArgumentStream:
-
-    def __init__(self, argv):
-        self.cursor = 0
-        self.length = len(argv)
-        self.argv = argv
-
-    def shift(self):
-        res = self.head_token()
-        self.cursor += 1
-        return res
-
-    def head_token(self):
-        return self.argv[self.cursor]
-
-    def is_empty(self):
-        return self.cursor == self.length
-
-
 class _StopEarly(Exception):
     pass
 
@@ -277,9 +262,10 @@ side_effects = {
         'exit_code': 0,
         }
 
-arg_stream = _ArgumentStream(argv)
 
-side_effects['program_name'] = arg_stream.shift()  # guaranteed
+arg_stream = scanner_via_list(argv)
+side_effects['program_name'] = arg_stream.next()  # guaranteed
+
 
 try:
     main()
@@ -288,4 +274,5 @@ except _StopEarly:
 
 exit(side_effects['exit_code'])
 
+# #history-B.3
 # #born.

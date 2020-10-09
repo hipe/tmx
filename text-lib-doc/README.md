@@ -16,6 +16,7 @@ to draw in facilities that are not related to CLI.
 
 |Id        | Main Tag | Content |
 |----------|:-----:|---|
+|[#611]    |       | [the scanner lib]
 |[#610]    | #trak | track "line stream via big string", always copy-pasted
 |[#609]    |       | This library
 

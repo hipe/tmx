@@ -64,18 +64,18 @@ def file_patches_via_unified_diff_lines(lines):  # :[#606]
 
     scn = _line_scanner_via_lines(lines)
     line_cache = []
-    while not scn.is_empty:
+    while scn.more:
         while True:
             first_char = scn.peek[0]
             if '@' == first_char:
                 break
             assert(' ' != first_char)
-            line_cache.append(scn.shift())
-            assert(not scn.is_empty)
+            line_cache.append(scn.next())
+            assert not scn.empty
 
         while True:
-            line_cache.append(scn.shift())
-            if scn.is_empty:
+            line_cache.append(scn.next())
+            if scn.empty:
                 break  # this might let some invalid unidiffs thru
             first_char = scn.peek[0]
             if first_char in (' ', '+', '-', '@'):
@@ -409,36 +409,11 @@ def _define_grammar(g):
     define('body_line', regex(r'^[- +]'))
 
 
-def _line_scanner_via_lines(lines):  # #[#008.4] a scanner
-
-    itr = iter(lines)
-    del(lines)  # when this is a tuple and you think it's an io, bad time
-
-    def advance():
-        for line in itr:
-            self.pos += 1
-            self.peek = line
-            return
-        self.is_empty = True
-        del self.peek
-
-    class line_scanner:
-        def __init__(self):
-            self.pos = 0
-            self.peek = None
-            self.is_empty = False
-
-        def shift(self):
-            x = self.peek
-            self.advance()
-            return x
-
-        def advance(_):
-            advance()
-
-    self = line_scanner()
-    advance()
-    return self
+def _line_scanner_via_lines(lines):
+    if not hasattr(lines, '__next__'):
+        lines = iter(lines)  # we could do scanner_via_list but don't
+    from text_lib.magnetics import scanner_via as scnlib
+    return scnlib.scanner_via_iterator(lines)
 
 
 # ==

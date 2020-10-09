@@ -11,6 +11,16 @@ class Case250_parse_lines(CommonCase):
     def test_100_loads(self):
         self.assertIsNotNone(asset_lib())
 
+    def test_125_what_does_line_number_mean(self):
+        mod = asset_lib()
+        scn = mod._scanner_via_iterator(iter(('line1', 'line2')))
+        self.assertEqual(scn.lineno, 0)
+        assert 'line1' == scn.next()
+        self.assertEqual(scn.lineno, 1)
+        assert 'line2' == scn.next()
+        self.assertEqual(scn.lineno, 2)
+        assert scn.empty
+
     def test_150_parses(self):
         self.assertLess(0, len(self.raw_structs))
 

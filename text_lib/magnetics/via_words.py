@@ -15,7 +15,7 @@ in the stream that are that far from the end. The hypothesis is that we can
 generalize several language production problems requiring lookahead to be
 applications of this same foundational function.
 
-(Indeed, under this methodology a [#008.4] scanner is a specialized type of
+(Indeed, under this methodology a [#611] scanner is a specialized type of
 rotating buffer, and we use those all over the place. But we don't go so far
 as to require this rotating buffer for these scanners, to avoid overcomplicated
 coupling/dependency. On this subject, our rotating buffer function used to
@@ -85,7 +85,7 @@ def piece_rows_via_jumble(itr):
         stack.pop()
         stack_push(base_state)
         stack_push(sentence_state)
-        add_piece(scn.advance())
+        add_piece(scn.next())
 
     def pop_push_between_sentences():
         assert 2 == len(stack)  # or not
@@ -94,37 +94,37 @@ def piece_rows_via_jumble(itr):
         if pieces[-1][-1] not in sentence_ending_punc_char:
             add_piece('.')  # the trick of not perioding the last sentence
         prepare_for_flush()
-        add_piece(scn.advance())
+        add_piece(scn.next())
 
     def push_sentence_state():
         prepare_for_flush()
-        add_piece(scn.advance())
+        add_piece(scn.next())
 
     def pop_sentence_state():
-        add_piece(scn.advance())  # the punctuation
+        add_piece(scn.next())  # the punctuation
         prepare_for_flush()
         stack_pop()
 
     def push_quote_state():
         stack_push(quote_state)
         (frame := top_frame()).which_quote = scn.peek
-        add_pieces(' ', scn.advance())
+        add_pieces(' ', scn.next())
         frame.do_add_space = False
 
     def handle_end_quote():
-        add_pieces(scn.advance())
+        add_pieces(scn.next())
         stack_pop()
 
     def handle_colon_with_some_hacking():
         path = pieces[-1]
-        add_piece(scn.advance())  # the colon
+        add_piece(scn.next())  # the colon
         if re.search(r'\.[a-z0-9]{2,3}$', path) and isinstance(scn.peek, int):
             top_frame().do_add_space = False
             scn.peek = str(scn.peek)  # watch the world burn
 
     def push_hacked_parenthesis_state():
         stack_push(hacked_parenthesis_state, close_parenthesis_on_pop)
-        add_pieces('(', scn.advance())
+        add_pieces('(', scn.next())
 
     def close_parenthesis_on_pop():
         add_piece(')')  # ..
@@ -134,7 +134,7 @@ def piece_rows_via_jumble(itr):
 
     def add_space_and_token():
         maybe_add_space()
-        add_piece(scn.advance())
+        add_piece(scn.next())
 
     def whine_about_not_capitalized():
         xx()
@@ -216,7 +216,8 @@ def piece_rows_via_jumble(itr):
     class global_state:
         has_sentence = False
 
-    scn = _scanner_via_iterator(_pieces_via_jumble(itr))
+    from .scanner_via import scanner_via_iterator as func
+    scn = func(_pieces_via_jumble(itr))
 
     # == Stack
 
@@ -861,28 +862,6 @@ def _the_unindent_function():
     line_rx = re.compile(r'(?P<whole_line_including_newline>[^\n]*\n)')
     return unindent
 
-
-# == Internal Smalls
-
-def _scanner_via_iterator(itr):  # #[#008.4] a scanner
-    def advance():
-        rv = scn.peek
-        for nrv in itr:
-            scn.peek = nrv
-            return rv
-        scn.more, scn.empty = False, True
-        del scn.advance
-        del scn.peek
-        return rv
-
-    class scn:
-        more, empty, peek = True, False, None
-    scn.advance = advance
-    advance()
-    return scn
-
-
-# ==
 
 def _re():
     import re as module

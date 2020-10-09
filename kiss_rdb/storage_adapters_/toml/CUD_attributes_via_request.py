@@ -246,22 +246,21 @@ def __determine_insertion_groupings(qits, creates):
         # when there are no attributes in the entity, just append (Case4236)
         return ((), tuple(o_a))  # no groups, all appends
 
-    doc_scn = _Scanner(i_a)
-    req_scn = _Scanner(o_a)
+    doc_scn = _scanner_via_list(i_a)
+    req_scn = _scanner_via_list(o_a)
 
     def current_req_s():
-        return req_scn.value.attribute_name.name_string
+        return req_scn.peek.attribute_name.name_string
 
     def current_doc_s():
-        return qits[doc_scn.value].body_block.attribute_name_string
+        return qits[doc_scn.peek].body_block.attribute_name_string
 
     groups = []  # list of tuples of (qits offset, insertion requests)
     group = []
     appends = ()
 
     def add_to_group():
-        group.append(req_scn.value)
-        req_scn.advance()
+        group.append(req_scn.next())
 
     def roll_over_line_and_maybe_group():
         if len(group):
@@ -269,7 +268,7 @@ def __determine_insertion_groupings(qits, creates):
         doc_scn.advance()
 
     def swallow_group():
-        groups.append((doc_scn.value, tuple(group)))
+        groups.append((doc_scn.peek, tuple(group)))
         group.clear()
 
     doc_s = current_doc_s()
@@ -279,7 +278,7 @@ def __determine_insertion_groupings(qits, creates):
 
         if req_s < doc_s:
             add_to_group()
-            if req_scn.eos:
+            if req_scn.empty:
                 if len(group):
                     swallow_group()
                 break
@@ -289,15 +288,13 @@ def __determine_insertion_groupings(qits, creates):
         assert(doc_s < req_s)
 
         roll_over_line_and_maybe_group()
-        if doc_scn.eos:
+        if doc_scn.empty:
             # when you reach the end of the excerpt & you still have inserts
             # (CREATEs) to make, this is where appends come from. (Case4234)
 
-            a = [req_scn.value]
-            req_scn.advance()
-            while not req_scn.eos:
-                a.append(req_scn.value)
-                req_scn.advance()
+            a = [req_scn.next()]
+            while req_scn.more:
+                a.append(req_scn.next())
             appends = tuple(a)
             break
 
@@ -730,37 +727,6 @@ def __flush_deletes(mde, deletes):
         mde.delete_attribute_body_block_via_gist__(_gist)
 
 
-# == SUPPORT
-
-class _Scanner():  # [#008.4] a scanner
-    """
-    a … scanner. like an iterator but more low-level & empty-friendly
-
-        scn = _Scanner(('a', 'b', 'c'))
-        while not scn.eos:
-            yield o.value
-            o.advance()
-        # (this yields 'a', 'b', and 'c'.)
-    """
-
-    def __init__(self, a):
-        self._position = -1
-        final_position = len(a) - 1
-        self.eos = False
-        self.value = None
-
-        def advance():
-            if final_position == self._position:
-                del(self.advance)
-                del(self.value)
-                self.eos = True
-            else:
-                self._position += 1
-                self.value = a[self._position]
-        self.advance = advance
-        advance()
-
-
 # == whiners
 
 def _emit_request_error_via_reason(msg, listener):
@@ -784,6 +750,11 @@ _verb_lexeme_via_key = {
 def lines_via_big_string_(big_s):  # #[#610]
     import re
     return (md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s))
+
+
+def _scanner_via_list(tup):
+    from text_lib.magnetics.scanner_via import scanner_via_list as func
+    return func(tup)
 
 
 def _blocks_lib():

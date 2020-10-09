@@ -1,10 +1,10 @@
 from modality_agnostic.test_support.common import lazy
-import doctest
+from doctest import DocTestSuite
 import unittest
 
 
 def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
-    tests.addTests(doctest.DocTestSuite(subject_module()))
+    tests.addTests(DocTestSuite(subject_module()))
     # `oxford_join` hi.
     return tests
 

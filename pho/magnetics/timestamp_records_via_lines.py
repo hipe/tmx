@@ -104,8 +104,8 @@ def reference_and_normal_entities_to_sync_(
     find_this_time_s = remote_normal.time_string
     assert(5 == len(find_this_time_s))  # [#882.J]
 
-    scn = _ScannerViaIterator(local_normals_iterator)
-    if scn.is_empty:
+    scn = _scanner_via_iterator(local_normals_iterator)
+    if scn.empty:
         xx("logfile empty? nothing to sync?")
 
     def is_equal():
@@ -122,8 +122,8 @@ def reference_and_normal_entities_to_sync_(
 
     # discard every local entity we traverse over including the one that match
     found_reference_entity = False
-    while not scn.is_empty:
-        local_normal = scn.shift()
+    while scn.more:
+        local_normal = scn.next()
         if is_equal():
             found_reference_entity = True
             break
@@ -131,12 +131,12 @@ def reference_and_normal_entities_to_sync_(
     if not found_reference_entity:
         xx(f"remote entity not found anywhere in {scn.lineno} lines")
 
-    if scn.is_empty:
+    if scn.empty:
         xx("apparently there are no new entities to push")
 
     push_these = []
-    while not scn.is_empty:
-        push_these.append(scn.shift())
+    while scn.more:
+        push_these.append(scn.next())
     assert(len(push_these))
     return (remote_normal, tuple(push_these))
 
@@ -145,11 +145,11 @@ def _normal_topmost_entity(remote_records_iterator, listener):
     # this would be nicer as a stream of normal entities like the other thing.
     # imagine paging, stopping after each entity with a date
 
-    scn = _ScannerViaIterator(remote_records_iterator)
-    if scn.is_empty:
+    scn = _scanner_via_iterator(remote_records_iterator)
+    if scn.empty:
         xx()
 
-    date_s, time_s, msg = scn.shift()
+    date_s, time_s, msg = scn.next()
 
     # keep (only) the first date that we find
     def maybe_remember_date():
@@ -173,8 +173,8 @@ def _normal_topmost_entity(remote_records_iterator, listener):
     # we don't know that we've found the last message for this entity until
     # either we exhaust the input or we find another populated time cell
 
-    while not scn.is_empty:
-        date_s, time_s, msg = scn.shift()
+    while scn.more:
+        date_s, time_s, msg = scn.next()
         maybe_remember_date()
         if len(time_s):  # you found a record with time. it's the next entity
             break
@@ -183,12 +183,12 @@ def _normal_topmost_entity(remote_records_iterator, listener):
 
     # now, keep looking for a date if we haven't found one yet
 
-    while not (len(use_date_s_pointer) or scn.is_empty):
-        date_s, _, __ = scn.shift()
+    while not (len(use_date_s_pointer) or scn.empty):
+        date_s, _, __ = scn.next()
         maybe_remember_date()
 
     if not len(use_date_s_pointer):
-        assert scn.is_empty
+        assert scn.empty
         xx(f'no date found in {scn.lineno} records')
 
     use_date_s, = use_date_s_pointer
@@ -339,35 +339,14 @@ class _LineRecordStruct:
         self.lineno = lineno
 
 
-class _ScannerViaIterator:  # #[#008.4] a scanner
-
-    def __init__(self, itr):
-        # == begin #[#022] it's crucial that this is a generator and not e.g
-        # a tuple or a list because otherwise #here2 will inf loop
-        # (doesn't work for list_iterator: from types import GeneratorType)
-        if not hasattr(itr, '__next__'):
-            raise TypeError('need iterator had %s' % (type(itr)))
-        # == end
-
-        self._iterator = itr
-        self.peek = None  # be careful
-        self.is_empty = False  # be careful
-        self.lineno = 0
-        self.advance()
-
-    def shift(self):
-        x = self.peek
-        self.advance()
-        return x
-
-    def advance(self):
-        for x in self._iterator:  # #here2
-            self.lineno += 1
-            self.peek = x
-            return
-        self.is_empty = True
-        del self.peek
-        del self._iterator
+def _scanner_via_iterator(itr):  # #testpoint (for lineno)
+    def on_advance():
+        scn.lineno += 1
+    import text_lib.magnetics.scanner_via as scnlib
+    scn = scnlib.scanner_via_iterator(itr)
+    scn.lineno = 0
+    scnlib.MUTATE_add_advance_observer(scn, on_advance)
+    return scn
 
 
 def xx(msg=None):

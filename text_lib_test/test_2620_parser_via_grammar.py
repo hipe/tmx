@@ -31,7 +31,7 @@ class CommonCase(unittest.TestCase):
         return self._do_run(listener, tokens)
 
     def _do_run(self, listener, tokens):  # can't call it `run` b.c unittest
-        _scn = subject_module().TokenScanner(tokens)
+        _scn = subject_module()._scanner_via_list(tokens)
         _grammar = self.given_grammar()
         return _grammar.parse(_scn, listener)
 

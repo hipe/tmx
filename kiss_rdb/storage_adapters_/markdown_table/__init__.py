@@ -285,7 +285,8 @@ def _sexps_via_stack(sexps, stack, cstack, listener):
     o.context_stack = cstack
     o.listener = listener
 
-    sexps, o.counter = _add_counter_to_iterator(sexps)  # dup #here1 meh
+    sexps, o.counter = _scnlib().add_counter_to_iterator(sexps)
+    # dup #here1 meh
 
     def expanded_sexps():
         yield ('beginning_of_file',)
@@ -619,24 +620,26 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
             raise _Stop()
 
     def build_cstack():
-        return (*(context_stack or ()), {'line': line, 'lineno': lineno_er()})
+        return (*(context_stack or ()), {'line': line, 'lineno': peek_lineno()})  # noqa: E501
 
     iden_cls = None
     if iden_clser:
         iden_cls = iden_clser(throwing_listener, build_cstack)  # VERY EXPERIM
 
-    scn = _scanner_via_iterator(tagged_lines)
-    lineno_er = _hackishly_derive_counter(scn)  # duplication #here1 meh
+    def peek_lineno():
+        return counter_count() + 1
+    scn = _scnlib().scanner_via_iterator(tagged_lines)
+    counter_count = _scnlib().MUTATE_add_counter(scn)  # duplication #here1 meh
 
     # Skip over leading other lines
-    while not scn.empty and 'other' == scn.peek[0]:
-        yield 'head_line', scn.advance()[1]
+    while scn.more and 'other' == scn.peek[0]:
+        yield 'head_line', scn.next()[1]
 
     is_first = True
 
     # (It may be that no table was found in zero or more lines)
 
-    while not scn.empty:
+    while scn.more:
         # Something other than 'other' is guaranteed; so, a table
 
         # For now we don't keep 'table_header_interstitial'*
@@ -650,7 +653,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
                 head_line_or_other_line = 'other_line'  # (Case2516)
 
             while True:
-                yield head_line_or_other_line, scn.advance()[1]
+                yield head_line_or_other_line, scn.next()[1]
                 if 'table_header_interstitial' != scn.peek[0]:
                     break
 
@@ -658,8 +661,8 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
                 throwing_listener, context_stack, schema=None)
 
         # First table schema line
-        table_lineno = lineno_er()
-        typ, line = scn.advance()
+        table_lineno = peek_lineno()
+        typ, line = scn.next()
         assert 'table_line' == typ  # per the upstream grammar
         tsl1of2_ast = schema_row_AST_via_line(line, table_lineno)
         if not tsl1of2_ast.has_endcap:
@@ -671,7 +674,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
             xx("file ended on first table schema line - what do we output?")
 
         # Second table schema line
-        typ, line = scn.advance()
+        typ, line = scn.next()
         if 'table_line' != typ:
             xx(f"expected table schema line 2 (alignments), had '{typ}'")
         tsl2of2_ast = schema_row_AST_via_line(line, 0)
@@ -697,17 +700,17 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
                 throwing_listener, context_stack, complete_schema)
 
         # Zero or more business object rows
-        while not scn.empty and 'table_line' == scn.peek[0]:
-            ast = row_AST_via_line((line := scn.peek[1]), lineno_er())
+        while scn.more and 'table_line' == scn.peek[0]:
+            ast = row_AST_via_line((line := scn.peek[1]), peek_lineno())
             count3 = ast.cell_count
             if count1 < count3:  # #here4
                 stop_because(_line_about_cell_count_delta(count3, count1))
-            yield 'business_row_AST', ast, lineno_er()
+            yield 'business_row_AST', ast, peek_lineno()
             scn.advance()
 
         # Zero or more "other" lines (either til end of file or til next table)
-        while not scn.empty and 'other' == scn.peek[0]:
-            yield 'other_line', scn.advance()[1]
+        while scn.more and 'other' == scn.peek[0]:
+            yield 'other_line', scn.next()[1]
 
 
 def _line_about_cell_count_delta(count3, count1):
@@ -738,12 +741,15 @@ def _tagged_lines_via_lines(lines):
         return 'other'
 
     def on_advance():
-        type_ptr[0] = type_via_line(scn.peek)
+        if scn.more:
+            type_ptr[0] = type_via_line(scn.peek)
+        else:
+            type_ptr[0] = 'ALL_DONE'
 
     type_ptr = [0]  # #meh
-
-    scn = _scanner_via_iterator(iter(lines))
-    _hackishly_add_subscriber(scn, on_advance)
+    scn = _scnlib().scanner_via_iterator(iter(lines))
+    on_advance()  # set it for the first peek
+    _scnlib().MUTATE_add_advance_observer(scn, on_advance)
 
     def typ():
         return type_ptr[0]
@@ -752,17 +758,16 @@ def _tagged_lines_via_lines(lines):
 
     cache = []
 
-    while not scn.empty:
-
+    while scn.more:
         if is_junk[typ()]:
-            yield 'other', scn.advance()
+            yield 'other', scn.next()
             continue
 
         # HEADER { COMMENT | BLANK }* TABLE
         if 'header' == typ():
-            cache.append(scn.advance())
-            while not scn.empty and ('blank' == typ() or '(' == scn.peek[0]):
-                cache.append(scn.advance())
+            cache.append(scn.next())
+            while scn.more and ('blank' == typ() or '(' == scn.peek[0]):
+                cache.append(scn.next())
             if scn.empty or 'table' != typ():
                 for line in cache:
                     yield 'other', line
@@ -777,7 +782,7 @@ def _tagged_lines_via_lines(lines):
         assert 'table' == typ()
 
         while True:
-            yield 'table_line', scn.advance()
+            yield 'table_line', scn.next()
             if scn.empty:
                 break
             if 'table' == typ():
@@ -859,81 +864,13 @@ def _combine_two_monadics(f1, f2):
     return f3
 
 
-# == Scanners
-
-def _hackishly_derive_counter(scn):
-    def on_advance():
-        counter.increment()
-
-    def count():
-        return counter.count
-
-    counter = _Counter()
-    _hackishly_add_subscriber(scn, on_advance)
-    return count
-
-
-def _add_counter_to_iterator(itr):
-    def use_iterator():
-        for item in itr:
-            counter.increment()
-            yield item
-    counter = _Counter()
-    return use_iterator(), counter
-
-
-class _Counter:  # #[#510.13]
-    def __init__(self):
-        self.count = 0
-
-    def increment(self):
-        self.count += 1
-
-
-def _hackishly_add_subscriber(scn, on_advance):
-    if scn.empty:
-        return  # because next line
-    on_advance()  # YIKES
-
-    def use_advance():
-        x = orig_advance()
-        if not scn.empty:
-            on_advance()
-        return x
-
-    orig_advance = scn.advance
-    scn.advance = use_advance
-    return scn
-
-
-def _scanner_via_iterator(itr):
-    def next_item():
-        for item in itr:
-            return item
-    return _scanner_via_next_function(next_item)
-
-
-def _scanner_via_next_function(next_item):
-    class scanner:
-        def __init__(self):
-            self.empty = False
-            self.peek = None
-            self.advance()
-
-        def advance(self):
-            res = self.peek
-            item = next_item()
-            if item is None:
-                del self.peek
-                self.empty = True
-            else:
-                self.peek = item
-            return res
-    return scanner()
-
-
 def _flatten_context_stack(context_stack):
     return {k: v for row in context_stack for k, v in row.items()}
+
+
+def _scnlib():
+    from text_lib.magnetics import scanner_via as module
+    return module
 
 
 def xx(msg=None):

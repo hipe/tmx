@@ -225,7 +225,7 @@ then in your 'main' terminal:
 |[#008.G]                   |       | track callable modules
 |[#008.F]                   | #vape | machine-generated tests
 |[#008.E]                   | #wish | gettext uber alles
-|[#008.4]                   | #trak | track scanners
+|[#008.D]                   | #hole |
 |[#008.C]                   | #wish | function-based commands
 |[#008.2]                   | #trak | track state machine implementations
 |[#008]                     |       | (placeheld for small internal tracking)

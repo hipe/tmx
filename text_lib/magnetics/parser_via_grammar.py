@@ -29,11 +29,11 @@ about it) is limited only to the grammar node that immediately houses it.
 def parser_via_grammar_and_symbol_table(tokens, symbol_table):
 
     # do the following only once per (outermost) grammar/syntax
-    tox = TokenScanner(tokens)
+    tox = _scanner_via_list(tokens)
 
     # at the top node, exit criteria is this. (at non-top node, it's ')')
     def keep_going():
-        return not tox.is_empty
+        return tox.more
 
     _digraph, _seq_grammar, _sub_exp_parsers = _parse_parse(tox, keep_going)
     _use_symbol_table = _THING_FROM_THING(symbol_table)
@@ -102,7 +102,7 @@ def _parse(token_scanner, stop_ASAP, grammar, symbols, listener, is_sub=False):
     # changes each iteration
     transitions = digraph[0]  # #transitions
 
-    while not token_scanner.is_empty:
+    while token_scanner.more:
 
         # the essence of all (packrat?) parsing: first match wins
 
@@ -210,8 +210,8 @@ def _parse_parse(tox, keep_going):
         excludes_zero, goes_to_infinity = __arities[tox.peek]  # ..
         tox.advance()
 
-        tok = tox.shift()  # ..
-        # if not tox.is_empty and 'as' == tox.peek ..
+        tok = tox.next()  # ..
+        # if not tox.empty and 'as' == tox.peek ..
 
         """.#here1 is the key thing: this pair in concert with the
         "participating states" expresses a set of transitions to add to our
@@ -835,39 +835,9 @@ class _SubExpressionTransition:
     is_sub_expression_transition = True
 
 
-class TokenScanner:  # #[#008.4] a scanner
-    # NOTE this is now used experimentally also as a character scanner!
-
-    def __init__(self, tokens):
-        self._length = len(tokens)
-        self.tokens = tokens
-        self.pos = -1  # re value: BE CAREFUL! re name: be like ruby meh
-        self.peek = None  # BE CAREFUL
-        self.is_empty = False
-        self.advance()
-
-    def flush_the_rest(self):
-        x = self.tokens[self.pos:]
-        self.advance_to_position(self._length)
-        return x
-
-    def shift(self):
-        x = self.peek
-        self.advance()
-        return x
-
-    def advance(self):
-        self.advance_to_position(self.pos + 1)
-
-    def advance_to_position(self, pos):
-        self.pos = pos
-        if self.pos == self._length:
-            self.is_empty = True
-            del self._length
-            del self.pos
-            del self.peek
-            return
-        self.peek = self.tokens[self.pos]
+def _scanner_via_list(tokens):
+    from .scanner_via import scanner_via_list as func
+    return func(tokens)
 
 
 # -- whiners
