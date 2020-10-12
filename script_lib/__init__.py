@@ -54,8 +54,8 @@ def CACHED_DOCUMENT_VIA_TWO(cached_path, url, noun_phrase, listener):
 
 
 def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
-    from data_pipes.format_adapters.html.magnetics import (
-            cached_doc_via_url_via_temporary_directory as cachelib)
+    from data_pipes.format_adapters.html.magnetics import \
+        cached_doc_via_url_via_temporary_directory as cachelib
 
     def lineser():
         yield f'(reading {noun_phrase} from filesystem - {cached_path})'
@@ -64,10 +64,25 @@ def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
 
 
 def _cached_doc_via_url(url, listener):
-    from data_pipes.format_adapters.html.magnetics import (
-            cached_doc_via_url_via_temporary_directory as cachelib)
+    from data_pipes.format_adapters.html.magnetics import \
+        cached_doc_via_url_via_temporary_directory as cachelib
     return cachelib(TEMPORARY_DIR)(url, listener)
+
+
 # --
+
+def build_path_relativizer():
+    def relativize_path(path):
+        if head != path[0:leng]:
+            raise RuntimeError(f'oops: (head, path): ({head}, {path})')
+        tail = path[leng:]
+        assert not isabs(tail)
+        return tail
+    from os import path as os_path, getcwd
+    isabs = os_path.isabs
+    head = os_path.join(getcwd(), '')
+    leng = len(head)
+    return relativize_path
 
 
 def deindented_lines_via_big_string_(big_string):

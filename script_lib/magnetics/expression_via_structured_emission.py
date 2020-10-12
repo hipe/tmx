@@ -66,18 +66,20 @@ def __lines(channel_tail, dim_pool):  # dim_pool = "diminishing pool"
 
 # forward-declare functions we define below
 
-def _():
+def _the_series_of_counting_numbers():
     i = 0
     while True:
         i += 1
         yield i
 
 
-o = _().__next__
+o = _the_series_of_counting_numbers().__next__
+del _the_series_of_counting_numbers
 _attr_value_thing = o()
 _reason_stuff = o()
 _context_for_parse_error = o()  # before next (#here1)
 _pathish_stuff = o()  # after above (#here1)
+del o
 
 
 # associate each payload component with ONE expresser function

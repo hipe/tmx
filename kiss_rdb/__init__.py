@@ -116,20 +116,6 @@ SCHEMA_FILE_ENTRY_ = 'schema.rec'
 
 # == Lower-Level: System and Filesytem
 
-@_lazy
-def build_path_relativizer_():
-    def relativize_path(path):
-        if head != path[0:leng]:
-            raise RuntimeError(f'oops: (head, path): ({head}, {path})')
-        tail = path[leng:]
-        assert not isabs(tail)
-        return tail
-    from os import path as os_path, getcwd
-    isabs = os_path.isabs
-    head = os_path.join(getcwd(), '')
-    leng = len(head)
-    return relativize_path
-
 
 @_lazy
 def real_filesystem_read_only__():  # at writing only used by one test file

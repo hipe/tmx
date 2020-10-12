@@ -16,7 +16,7 @@ def _CLI(sin, sout, serr, argv):
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
             _do_CLI, sin, sout, serr, argv,
-            formal_parameters=(
+            (
                 ('-h', '--help', 'this screen'),
                 ('file', 'zim zum')))
 
@@ -417,6 +417,31 @@ def _line_scanner_via_lines(lines):
 
 
 # ==
+
+def patch_unit_of_work_via(before_lines, after_lines, path_tail, do_create):
+    assert isinstance(before_lines, tuple)  # #[#011]
+    assert isinstance(after_lines, tuple)  # #[#011]
+
+    if do_create:
+        assert not len(before_lines)
+        pathA = '/dev/null'
+    else:
+        pathA = f'a/{path_tail}'
+
+    pathB = f'b/{path_tail}'
+
+    from difflib import unified_diff
+    diff_lines = tuple(unified_diff(before_lines, after_lines, pathA, pathB))
+
+    class patch_unit_of_work:  # #class-as-namespace
+        def replace_path_tail(new_path_tail):
+            return patch_unit_of_work_via(  # ick/meh
+                before_lines, after_lines, new_path_tail, do_create)
+    o = patch_unit_of_work
+    o.path_tail, o.do_create_file = path_tail, do_create
+    o.diff_lines = diff_lines
+    return o
+
 
 def apply_patch_via_lines(lines, is_dry, listener, cwd=None):
 

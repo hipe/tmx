@@ -237,8 +237,8 @@ def _desc_lines_via_description_value(mixed):
         from inspect import signature  # [#008.12]
         _yes = (0, 1).index(len(signature(mixed).parameters))
         if _yes:
-            from . import STYLER_
-            return tuple(mixed(STYLER_))  # ..
+            from .error_monitor_via_stderr import STYLER_ as styler
+            return tuple(mixed(styler))  # ..
         return tuple(mixed())
 
     assert mixed is None

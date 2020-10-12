@@ -19,6 +19,8 @@ only in modeling interfaces for this purpose.
 ## <a name="node-table"></a>the node table
 
 (this table is explained at [\[#002\]] using the node table.)
+(my range is 501-599 inclusive)
+
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
@@ -53,7 +55,8 @@ only in modeling interfaces for this purpose.
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |
 |[#504]                     | #hole |
-|[#503]                     | #hole |
+|[#503.B]                   |       | does wicked require that the file exist? yes
+|[#503]                     |       | [wicked]
 |[#502]                     | #open | parameter modeling thoery & API
 |[#501]                     |       | (placeholder for this readme)
 

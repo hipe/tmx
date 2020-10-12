@@ -1,7 +1,4 @@
-# == BEGIN listener stowaway
-
-
-class error_monitor_via_stderr:
+class func:  # error_monitor_via_stderr
     """a common CLI-targeted expression strategy for emissions
 
     Its main useful exposure is a modality-specific implementation of a
@@ -124,9 +121,6 @@ class STYLER_:
 
     def hello_styler():  # #[#022]
         pass
-
-
-# == END listener stowaway
 
 # #history-A.2 rewrite
 # #history-A.1

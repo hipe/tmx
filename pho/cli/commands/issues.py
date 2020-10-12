@@ -533,7 +533,7 @@ def _build_int_matcher():
 
 
 def _error_monitor(serr):
-    from script_lib.magnetics import error_monitor_via_stderr as func
+    from script_lib.magnetics.error_monitor_via_stderr import func
     return func(serr, default_error_exitstatus=4)
 
 

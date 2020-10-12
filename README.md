@@ -231,7 +231,7 @@ then in your 'main' terminal:
 |[#008]                     |       | (placeheld for small internal tracking)
 |[#007.E]                   | #open | probably refactor all `format` and (probably) `%` to use f-strings
 |[#007.D]                   | #open | PEP8 (now that we know how to activate it)
-|[#007.C]                   | #hole |
+|[#007.3]                   | #trak | track where we use 'z' as a temp dir (1x)
 |[#007.2]                   | #open | refactor helper.py memoizers to use doctest (now, general doctest wishers)
 |[#007]                     |       | (placeheld for small wishlist items)
 |[\[#006\]]                 |       | the README for the game server

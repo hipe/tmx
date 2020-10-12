@@ -22,7 +22,7 @@ def sync_agent_(all_sexpser, coll_path):
             xx('no change, no diff to make')
         from os.path import isabs
         if isabs(coll_path):
-            from kiss_rdb import build_path_relativizer_ as build
+            from script_lib import build_path_relativizer as build
             path_tail = build()(coll_path)
         else:
             path_tail = coll_path  # relative only in tests mebbe (Case2644)

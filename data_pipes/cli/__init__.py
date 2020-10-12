@@ -21,8 +21,7 @@ def _CLI(sin, sout, serr, argv, enver):
     that operate on top of collections, sort of in the spirit of ReactiveX
     """
 
-    bash_argv = list(reversed(argv))
-    long_prog_name = bash_argv.pop()
+    long_prog_name = (bash_argv := list(reversed(argv))).pop()
 
     def prog_name():
         pcs = long_prog_name.split(' ')
@@ -75,7 +74,7 @@ def _command_called_select(sin, sout, serr, argv, _rscser):
 
 
 def monitor_via_(serr):
-    from script_lib.magnetics import error_monitor_via_stderr as func
+    from script_lib.magnetics.error_monitor_via_stderr import func
     return func(serr, default_error_exitstatus=4)
 
 

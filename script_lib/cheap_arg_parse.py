@@ -108,7 +108,7 @@ def _positional_popper(vals):
 
 
 def _rscr(serr, enver):  # rough prototype, needs more design. #history-B.2
-    from .magnetics import error_monitor_via_stderr as func
+    from .magnetics.error_monitor_via_stderr import func
 
     class experimental_resources:  # #class-as-namespace
         monitor = func(serr)

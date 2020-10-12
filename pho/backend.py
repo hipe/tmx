@@ -388,8 +388,8 @@ def _yikes(big_string, errcode_hack, serr):
 
 
 def _monitor_via_stderr(serr):
-    from script_lib.magnetics import error_monitor_via_stderr
-    return error_monitor_via_stderr(serr, default_error_exitstatus=33)
+    from script_lib.magnetics.error_monitor_via_stderr import func
+    return func(serr, default_error_exitstatus=33)
 
 
 class _prefixer:

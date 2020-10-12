@@ -14,7 +14,7 @@ def _build_big_patchfile(ifc, entities_uows, reser, coll, order, emi):
     from ._blocks_via_path import file_units_of_work_via__
     file_uows = file_units_of_work_via__(entities_uows, coll, emi)
 
-    from kiss_rdb import build_path_relativizer_ as build
+    from script_lib import build_path_relativizer as build
     relativize_path = build()
     from os.path import isabs
 
@@ -84,28 +84,6 @@ def _make_patch(fuow, coll, order, emi, **bot):
 
     return _patch_unit_of_work(
             before_lines, new_file_lines, tail, do_create_file)
-
-
-def _patch_unit_of_work(before_lines, after_lines, path_tail, do_create):
-    assert(isinstance(before_lines, tuple))  # #[#011]
-    assert(isinstance(after_lines, tuple))  # #[#011]
-
-    if do_create:
-        assert(not len(before_lines))
-        pathA = '/dev/null'
-    else:
-        pathA = f'a/{path_tail}'
-
-    pathB = f'b/{path_tail}'
-
-    from difflib import unified_diff
-    _diff_lines = tuple(unified_diff(before_lines, after_lines, pathA, pathB))
-
-    class patch_unit_of_work:  # #class-as-namespace
-        diff_lines = _diff_lines
-        do_create_file = do_create
-
-    return patch_unit_of_work
 
 
 def _APPLY_PATCHES(patches, reser, listener, is_dry):
@@ -184,13 +162,23 @@ def _line_detemplatizer_via(var_values):
     return detemplatize_line
 
 
+def _patch_unit_of_work(before_lines, after_lines, path_tail, do_create):
+    func = _patchlib().patch_unit_of_work_via
+    return func(before_lines, after_lines, path_tail, do_create)
+
+
 def _apply_big_patchfile_via_lines(lines, reser, listener, is_dry, cwd=None):
     # (used for here and used by neighbor for creating collections!)
 
-    from text_lib.diff_and_patch import apply_patch_via_lines as func
+    func = _patchlib().apply_patch_via_lines
     ok = func(lines, is_dry, listener, cwd)
     if ok:
         return reser()
+
+
+def _patchlib():
+    import text_lib.diff_and_patch as module
+    return module
 
 # #history: lost apply patch function
 # #abstracted
