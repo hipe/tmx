@@ -131,46 +131,60 @@ def _patch_units_of_work_via(file_diff_ingredientses, relativize, listener):
     return (patch_UOW(fd, cd, uow) for fd, cd, uow in file_diff_ingredientses)
 
 
-def _resolve_files(files, hub, listener):
+def _resolve_files(file_args, hub, listener):
 
     # If argument list was empty, all files
-    if not len(files):
+    if not len(file_args):
         return hub.file_units_of_work
 
-    # Make a diminishing pool of the arguments
-    rang = range(0, len(files))
-    result_slots = [None for i in rang]
+    def actions():
+        def add_to_set(uow):
+            k = uow.absolute_path
+            if k in uow_set:
+                return
+            uow_set[k] = uow
 
-    # First, do the trick where we treat every arg as a needle against the whol
-    matched_none, matched_multiple, matches = [], [], []
-    for i in rang:
-        file_arg = files[i]
-        matches.clear()
-        for formal in hub.file_units_of_work:
-            if file_arg not in formal.tail:
-                continue
-            matches.append(formal)
+        def target_not_found(file_arg):
+            file_args_that_matched_none.append(file_arg)
+
+        return locals()
+
+    actions = actions()
+    file_args_that_matched_none = []
+    uow_set = {}  # if multiple file args match a same target, silently comply
+
+    for direc, val in _directives_for_resolve_files(file_args, hub):
+        actions[direc](val)
+
+    if len(file_args_that_matched_none):
+        return _whine_about_matched_none(listener, file_args_that_matched_none, hub)  # noqa: E501
+
+    assert len(uow_set)  # because some file args
+    return tuple(uow_set.values())
+
+
+def _directives_for_resolve_files(file_args, hub):
+
+    def fuzzy_match(file_arg):
+        for tail in uow_via_tail.keys():
+            if file_arg in tail:
+                yield uow_via_tail[tail]
+
+    uow_via_tail = {uow.tail: uow for uow in hub.file_units_of_work}
+
+    for file_arg in file_args:
+        matches = tuple(fuzzy_match(file_arg))
         leng = len(matches)
         if 1 == leng:
-            formal, = matches
-            result_slots[i] = formal
+            uow, = matches
+            yield 'add_to_set', uow
             continue
         if 0 == leng:
-            matched_none.append(i)
+            yield 'target_not_found', file_arg
             continue
-        assert 1 < leng
-        matched_multiple.append((i, tuple(matches)))
-
-    if matched_none:
-        these = tuple(files[i] for i in matched_none)
-        return _whine_about_matched_none(listener, these, hub)
-
-    if matched_multiple:
-        these = tuple(files[i] for i in matched_multiple)
-        return _whine_about_ambiguous(listener, these, hub)
-
-    assert all(result_slots)
-    return tuple(result_slots)
+        for uow in matches:
+            # before #history-B.3 we failed on multiple, now we expand
+            yield 'add_to_set', uow
 
 
 def _write_files(ext, patch_units_of_work, listener, is_dry):
@@ -275,17 +289,6 @@ def _whine_about_file_not_found(listener, e):
     listener('error', 'expression', 'file_not_found', lambda: msgs)
 
 
-def _whine_about_ambiguous(listener, pairs, hub):
-    def lines():
-        ox = _oxlib()
-        for arg, uows in pairs:
-            yield f"Found multiple managed files matching {arg!r}"
-            pcs = tuple(f.tail for f in uows)
-            or_these = ox.oxford_OR(ox.keys_map(pcs))
-            yield f"Did you mean {or_these}?"
-    listener('error', 'expression', 'ambigous_targets', lines)
-
-
 def _whine_about_matched_none(listener, args, hub):
     def lines():
         ox = _oxlib()
@@ -320,4 +323,5 @@ def _oxlib():
 def xx(msg=None):
     raise RuntimeError(msg or "wee")
 
+# #history-B.3
 # #born

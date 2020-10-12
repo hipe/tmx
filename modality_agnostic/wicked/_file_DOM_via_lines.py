@@ -13,15 +13,15 @@ def updated_file_blocks_via_(plan, listener):
     def update_client_case_with_template_case(ci, ti):
         ccase = client_maybe_cases[ci]
         tcase = template_cases[ci]
-        from ._updated_case_via_two_cases import updated_case_via_ as func
-        nu_case = func(ccase, tcase, throwing_listener)
+        nu_case = updated_case_via(ccase, tcase, throwing_listener)
         use(nu_case)
 
-    def insert(offset):
-        use(plan.template_cases[offset])
+    def insert_case(offset):
+        use_me = surface_case_via(template_cases[offset])
+        use(use_me)
 
-    def insert_block(tb):
-        use(tb)  # hi.
+    def insert_plain(tb):
+        use(tb.without_directive())
 
     locs = locals()
     actions = {k: locs[k] for k in (set(locs.keys()) - before_ks)}
@@ -40,9 +40,7 @@ def updated_file_blocks_via_(plan, listener):
             return use(cb)
 
         # 3), otherwise (YIKES) overwrite whatever is there
-        if tb.has_directive:
-            tb = tb.without_directive()
-        use(tb)
+        use(tb.without_directive())
 
     client_maybe_cases = plan.client_maybe_cases
     template_cases = plan.template_cases
@@ -59,6 +57,12 @@ def updated_file_blocks_via_(plan, listener):
 
     class stop(RuntimeError):
         pass
+
+    from ._updated_case_via_two_cases import \
+        updated_case_via_ as updated_case_via, \
+        build_case_surfacer_function_ as func
+
+    surface_case_via = func(throwing_listener)
 
     try:
         for (action_k, *args) in plan.steps:
@@ -110,25 +114,22 @@ def plan_via_client_and_template_blocks_(cblx, tblx, listener):  # #testpoint
         return _FilePlan(
             final_plan, self.client_maybe_cases, self.template_cases)
 
-    def decide_tail_plan():
-        cb, tb = self.client_tail_plain_block, self.template_tail_plain_block
-        if cb is None:
-            if tb is None:
-                return
-            return 'insert_block', tb
-        if tb is None:
-            return 'pass_through_client_plain', cb
-        return 'merge_tail_blocks', cb, tb
-
     def decide_head_plan():
         cb, tb = self.client_head_plain_block, self.template_head_plain_block
+        return decide_head_and_tail_plan('merge_head_blocks', cb, tb)
+
+    def decide_tail_plan():
+        cb, tb = self.client_tail_plain_block, self.template_tail_plain_block
+        return decide_head_and_tail_plan('merge_tail_blocks', cb, tb)
+
+    def decide_head_and_tail_plan(special_name, cb, tb):
         if cb is None:
             if tb is None:
                 return
-            return 'insert_block', tb
+            return 'insert_plain', tb
         if tb is None:
             return 'pass_through_client_plain', cb
-        return 'merge_head_blocks', cb, tb
+        return special_name, cb, tb
 
     def walk_each_client_block_ensuring_many_things():
         plan = []
@@ -182,7 +183,7 @@ def plan_via_client_and_template_blocks_(cblx, tblx, listener):  # #testpoint
 
         # Flush out the {all|[any] remaining} template cases you didn't process
         for ti in range(offset_of_prev_template_case+1, len(t_cases)):
-            plan.append(('insert', ti))
+            plan.append(('insert_case', ti))
 
         self.cases_plan = tuple(plan)
 

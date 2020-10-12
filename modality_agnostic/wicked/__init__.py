@@ -34,14 +34,14 @@ def hub_via_defininition_(definition):
 
     def handle_templates_dir(def_val):
         if not isabs(def_val):
-            def_val = join(o['template_head'], def_val)
+            def_val = normpath(join(o['template_head'], def_val))
         o['templates_dir'] = def_val
 
     def handle_here_file(def_val):
         o['template_head'] = dirname(def_val)
         o['test_path_head'] = dirname(o['template_head'])
 
-    from os.path import dirname, isabs, join
+    from os.path import dirname, isabs, normpath, join
 
     o = {'files': []}
 

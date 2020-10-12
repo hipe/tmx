@@ -121,9 +121,10 @@ class _open_raw_traversal_stream:  # #[#459.3] class as context manager
 
     def __enter__(self):
         self._close_this = None
-        from script_lib import CACHED_DOCUMENT_VIA_TWO
-        doc = CACHED_DOCUMENT_VIA_TWO(
-                self._markdown_path, self._raw_url, 'markdown', self._listener)
+        from data_pipes.format_adapters.html.script_common \
+            import cached_document_via as func
+        doc = func(
+            self._markdown_path, self._raw_url, 'markdown', self._listener)
         # ..
         opened = open(doc.cache_path)
         self._close_this = opened

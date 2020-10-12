@@ -58,6 +58,42 @@ class _CollectionImplementation:
         self._GONE_multi_depth_value_dictionaries_as_storage_adapter = f
 
 
+def LINES_VIA_SCHEMA_AND_ENTITIES(schema, ents, listener):
+
+    def titleize(k):  # ..
+        words = k.split('_')
+        word = words[0]
+        use_word = ''.join((word[0].upper(), word[1:]))
+        words[0] = use_word
+        return ' '.join(words)
+
+    def line_via_fixed_number_of_cel_strings(cels):
+        pcs = list(stream_join(cels))
+        pcs.append('\n')
+        return ''.join(pcs)
+
+    stream_join = _build_stream_join(', ')
+    ks = schema.field_name_keys
+    labels = (titleize(k) for k in ks)
+    yield line_via_fixed_number_of_cel_strings(labels)
+
+    def cel_pcs_via_ent(ent):
+        dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+        for k in ks:
+            s = dct[k]
+            assert isinstance(s, str)
+            yield s
+
+    count = 0
+    for ent in ents:
+        count += 1
+        pcs = cel_pcs_via_ent(ent)
+        yield line_via_fixed_number_of_cel_strings(pcs)
+
+    if not count:
+        xx("maybe emit a warny warn")
+
+
 def _traverse_via_upstream(opened, listener):
     raise RuntimeError('where')
 
@@ -167,6 +203,19 @@ def __pairserer(listener):
 
         return tuple(pairs)
     return pairser
+
+
+def _build_stream_join(sep):
+    def stream_join(itr):  # :[#459.D] near [#611] things we do with scanners
+        scn = func(itr)
+        yield scn.next()  # ..
+        while True:  # ..
+            yield sep
+            yield scn.next()
+            if scn.empty:
+                break
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    return stream_join
 
 
 def xx():

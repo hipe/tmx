@@ -19,7 +19,3 @@ make sure all old unusued code is gone in csv
 magnetize two storage adapters: csv, json
 schema and ents via lines for json
 schema and ents via lines for csv
-lines via schema and ents for json
-lines via schema and ents for csv
-move wicked cli templates to kiss rdb, split the home
-spike wicked

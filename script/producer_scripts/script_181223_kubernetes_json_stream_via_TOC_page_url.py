@@ -75,8 +75,9 @@ def _build_traversal_stream(listener, url, cached_path=None):
     if not _validate_url(url, listener):
         return
 
-    from script_lib import CACHED_DOCUMENT_VIA_TWO as _
-    doc = _(cached_path, url, 'html document', listener)
+    from data_pipes.format_adapters.html.script_common import \
+        cached_document_via as func
+    doc = func(cached_path, url, 'html document', listener)
     if doc is None:
         return
 

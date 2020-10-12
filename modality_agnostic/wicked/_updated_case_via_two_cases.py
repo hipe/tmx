@@ -11,29 +11,11 @@ def updated_case_via_(ccase, tcase, listener):  # #testpoint
         return apply_the_plan()
 
     def apply_the_plan():
-        result_functions = resolve_result_functions()
+        result_funcs = resolve_result_functions()
         result_head_lines = resolve_head_lines()
         # (cases don't have tail lines, just zero or more function runs)
 
-        # NOTE currently the case block doesn't itself have a concept of
-        # "functions" (because our recursive descent parsing). So, when we
-        # make a new case from all our work, we flatten our result list of
-        # functions into just lines. This is okay, but we could complexify it
-
-        # We never change the first line
-
-        use_AST = ccase.first_line_AST_
-        lines = [ccase.lines[0]]
-
-        if result_head_lines:
-            for line in result_head_lines.lines:
-                lines.append(line)
-
-        for func in result_functions:
-            for line in func.lines:
-                lines.append(line)
-
-        return ccase.__class__(use_AST, tuple(lines))
+        return _assemble_surface_case(ccase, result_head_lines, result_funcs)
 
     def resolve_head_lines():
         c_head, t_head = self.c_head, self.t_head
@@ -153,14 +135,74 @@ def updated_case_via_(ccase, tcase, listener):  # #testpoint
             yield funcs[i].all_purpose_function_key, i
 
     def check_that_the_remaining_chunks_of_both_cases_are_all_test_functions():
-        self.t_functions = must_be_all_functions(tscn, tcase, 'template case')
-        self.c_functions = must_be_all_functions(cscn, tcase, 'client case')
+        self.t_functions = t_surfacer.must_be_all_functions()
+        self.c_functions = c_surfacer.must_be_all_functions()
 
     def assert_that_the_two_cases_start_with_head_lines_and_stow_them_away():
-        self.t_head = must_have_HLs_and_advance(tscn, tcase, 'template case')
-        self.c_head = must_have_HLs_and_advance(cscn, ccase, 'client case')
+        self.t_head = t_surfacer.if_not_empty_must_start_with_head_lines()
+        self.c_head = c_surfacer.if_not_empty_must_start_with_head_lines()
 
-    def must_be_all_functions(scn, case, noun_phrase):
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise stop()
+
+    t_surfacer = _surfacer_via_case(throwing_listener, tcase, 'template case')
+    c_surfacer = _surfacer_via_case(throwing_listener, ccase, 'client case')
+
+    class self:  # #class-as-namespace
+        pass
+
+    class stop(RuntimeError):
+        pass
+
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def build_case_surfacer_function_(listener):
+    def surface_case_via(tcase):
+        t_surfacer = _surfacer_via_case(listener, tcase, 'template case')
+        header_lines = t_surfacer.if_not_empty_must_start_with_head_lines()
+        funcs = t_surfacer.must_be_all_functions()
+        funcs = tuple(f.without_directive() for f in funcs)
+        return _assemble_surface_case(tcase, header_lines, funcs)
+    return surface_case_via
+
+
+def _assemble_surface_case(case, head_lines, funcs):
+    # For now our model of a "case" is not structured (beyond its AST of the
+    # first line): it's the result of a coarse parse and its body is just a
+    # flat list of lines. This is because our parsing is recursive descent,
+    # because test regressability, because decoupling. The cost of this is
+    # that when we "surface" a template case or update a client case with a
+    # template case, the last step is that we have to "physically" flatten the
+    # components back into a list of lines "ourselves". This is seen as a
+    # negligible cost for now. The front-of-mind alternative, that we have a
+    # separate, recursively-descended into class that's a "structured case"
+    # instead of a "coarse case", has the cost of its own of complexifying
+    # the class landscape of our API; but this seems a likely eventuality
+
+    use_AST = case.first_line_AST_  # The first line never changes
+    lines = [case.lines[0]]
+
+    if head_lines:
+        for line in head_lines.lines:
+            lines.append(line)
+
+    for func in funcs:
+        for line in func.lines:
+            lines.append(line)
+
+    return case.__class__(use_AST, tuple(lines))
+
+
+def _surfacer_via_case(listener, case, noun_phrase):
+    before_ks = set((*locals().keys(), 'before_ks'))
+
+    def must_be_all_functions():
         # Assert that all ZERO or more remaining items in the scan are..
         result = []
         while scn.more:
@@ -174,9 +216,8 @@ def updated_case_via_(ccase, tcase, listener):  # #testpoint
             use_np = ''.join((noun_phrase, ' ', repr(case.case_key)))
             yield f"{use_np} needed function here: {case.lines[0]!r}"
         listener('error', 'expression', 'unconventional_looking_case', lines)
-        raise stop()
 
-    def must_have_HLs_and_advance(scn, case, noun_phrase):  # #here2
+    def if_not_empty_must_start_with_head_lines():  # #here2
         if scn.empty:
             return
         if 'head_lines' == (act_type := scn.peek.type):
@@ -186,23 +227,17 @@ def updated_case_via_(ccase, tcase, listener):  # #testpoint
             use_np = ''.join((noun_phrase, ' ', repr(case.case_key)))
             yield f"{use_np} can't immediately start with '{act_type}'"
         listener('error', 'expression', 'unconventional_looking_case', lines)
-        raise stop()
 
-    cchunx = tuple(_chunks_via_case(ccase))
-    tchunx = tuple(_chunks_via_case(tcase))
-    cscn = _scanner_via_list(cchunx)
-    tscn = _scanner_via_list(tchunx)
+    these_ks = set((locs := locals()).keys()) - before_ks
 
-    class self:  # #class-as-namespace
+    FOR_DEBUGGING = tuple(_chunks_via_case(case))
+    scn = _scnlib().scanner_via_list(FOR_DEBUGGING)
+
+    class surfacer:  # #class-as-namespace
         pass
-
-    class stop(RuntimeError):
-        pass
-
-    try:
-        return main()
-    except stop:
-        pass
+    for k in these_ks:
+        setattr(surfacer, k, locs[k])
+    return surfacer
 
 
 def _chunks_via_case(case):
@@ -276,8 +311,7 @@ class _Function:
     def without_directive(self):  # make it ready to write into output
         if not self.has_directive:
             return self
-        new_lines = (self.lines[0], *self.lines[_DI+1:])
-        new = self.__class__(self._first_line_AST, new_lines)
+        new = self._replace_body_lines(self.lines[_DI+1:])
         new._has_directive = False
         return new
 
@@ -319,6 +353,10 @@ class _TestFunction(_Function):
 
     # ==
 
+    def _replace_body_lines(self, body_lines):
+        new_lines = (self.lines[0], *body_lines)
+        return self.__class__(self._first_line_AST, new_lines)
+
     @property
     def all_purpose_function_key(self):
         if self._OFAPK is None:
@@ -347,6 +385,10 @@ class _OrdinaryFunction(_Function):
     def updated_by(self, otr):
         # for now let's just meh
         return otr
+
+    def _replace_body_lines(self, body_lines):
+        new_lines = (self.lines[0], *body_lines)
+        return self.__class__(self.fname, new_lines)
 
     @property
     def all_purpose_function_key(self):
@@ -394,7 +436,7 @@ def _coarse_chunks_via_case(case):
     # lines into  [ 'head_lines', [ 'coarse_def' [..]] ]
 
     cache = []
-    scn = _scanner_via_list(case.lines)
+    scn = _scnlib().scanner_via_list(case.lines)
     scn.advance()
     while scn.more:
         if _ting_rx.match(scn.peek):
@@ -424,13 +466,13 @@ _ting_rx = re.compile(r'^[ ]{4}def[ ]')
 _otr_thing_rx = re.compile(r'^(?:$|[ ]{4})')
 
 
-def _scanner_via_list(ls):
-    from text_lib.magnetics.scanner_via import scanner_via_list as func
-    return func(ls)
-
-
 class _DirectiveError(RuntimeError):
     pass
+
+
+def _scnlib():
+    import text_lib.magnetics.scanner_via as module
+    return module
 
 
 def xx(msg=None):

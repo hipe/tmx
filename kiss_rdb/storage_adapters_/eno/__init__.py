@@ -104,6 +104,8 @@ def eno_collection_via_(directory, rng=None, opn=None):  # #testpoint
                 import json
                 big_s = json.dumps(ent, indent=2)
                 import re
+                # #[#610] lines via big string, two ways:
+                # this might work too: re.split(r'(?<=\n)(?!\Z)', big_s)
                 lines = [md[0] for md in re.finditer('[^\n]*\n|[^\n]+', big_s)]
                 lines[-1] = f"{lines[-1]}\n"
                 return tuple(lines)

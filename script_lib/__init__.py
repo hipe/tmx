@@ -43,34 +43,6 @@ def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
     return main()
 
 
-# -- abstracted at #history-A.1 - scream case because kludge, reach-down
-
-def CACHED_DOCUMENT_VIA_TWO(cached_path, url, noun_phrase, listener):
-    # ugly to reach down but that hard coded doo-hah is here & convenient
-    if cached_path is None:
-        return _cached_doc_via_url(url, listener)
-    else:
-        return _cached_doc_via_filesystem(cached_path, noun_phrase, listener)
-
-
-def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
-    from data_pipes.format_adapters.html.magnetics import \
-        cached_doc_via_url_via_temporary_directory as cachelib
-
-    def lineser():
-        yield f'(reading {noun_phrase} from filesystem - {cached_path})'
-    listener('info', 'expression', 'reading_from_filesystem', lineser)
-    return cachelib.Cached_HTTP_Document(cached_path)
-
-
-def _cached_doc_via_url(url, listener):
-    from data_pipes.format_adapters.html.magnetics import \
-        cached_doc_via_url_via_temporary_directory as cachelib
-    return cachelib(TEMPORARY_DIR)(url, listener)
-
-
-# --
-
 def build_path_relativizer():
     def relativize_path(path):
         if head != path[0:leng]:
@@ -220,7 +192,6 @@ class Exception(Exception):
 
 GENERIC_ERROR = 2
 SUCCESS = 0
-TEMPORARY_DIR = 'z'  # ick/meh
 
 
 _eol = '\n'

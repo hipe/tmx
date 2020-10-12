@@ -156,8 +156,31 @@ class _soup_via_things:
 
 
 def _cached_doc_via_url_or_local_path(url, filesystem_path, listener):
-    from script_lib import CACHED_DOCUMENT_VIA_TWO as _
-    return _(filesystem_path, url, 'HTML', listener)
+    return cached_document_via(filesystem_path, url, 'HTML', listener)
+
+
+def cached_document_via(cached_path, url, noun_phrase, listener):
+    # ugly to reach down but that hard coded doo-hah is here & convenient
+    if cached_path is None:
+        return _cached_doc_via_url(url, listener)
+    else:
+        return _cached_doc_via_filesystem(cached_path, noun_phrase, listener)
+
+
+def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
+    from data_pipes.format_adapters.html.magnetics import (
+            cached_doc_via_url_via_temporary_directory as cachelib)
+
+    def lineser():
+        yield f'(reading {noun_phrase} from filesystem - {cached_path})'
+    listener('info', 'expression', 'reading_from_filesystem', lineser)
+    return cachelib.Cached_HTTP_Document(cached_path)
+
+
+def _cached_doc_via_url(url, listener):
+    from data_pipes.format_adapters.html.magnetics import (
+            cached_doc_via_url_via_temporary_directory as cachelib)
+    return cachelib(_TEMPORARY_DIR)(url, listener)
 
 
 def pop_property(obj, attr):
@@ -165,7 +188,9 @@ def pop_property(obj, attr):
     delattr(obj, attr)
     return x
 
-# --
+
+_TEMPORARY_DIR = 'z'  # #[#007.3]
+
 
 # #history-A.5: sunset this as an entrypoint script
 # #history-A-4: key simplifier (reads markdown links) left to be with friends
