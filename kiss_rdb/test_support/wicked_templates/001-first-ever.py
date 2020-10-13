@@ -17,7 +17,7 @@ class CaseNNNN_lines_via_two_entities(CommonCase):
         assert self.given_module()
 
     def test_100_output_lines_look_right(self):
-        self.output_lines_look_right()
+        self.expect_expected_lines_given_entities()
 
     def given_entities(_):
         yield {'field_A': 'A1', 'field_B': 'B1'}
@@ -28,6 +28,28 @@ class CaseNNNN_lines_via_two_entities(CommonCase):
         yield 'YOUR EXPECTED LINE 1\n'
         yield 'YOUR EXPECTED LINE 2\n'
         yield 'ETC\n'
+
+
+class CaseNNNN_two_entities_via_lines(CommonCase):
+
+    def test_100_schema_looks_right(self):
+        self.expect_expected_schema_field_name_keys()
+
+    def test_200_result_entities_look_right(self):
+        self.expect_expected_entities_given_lines()
+
+    def given_lines(_):
+        # wicked: default
+        yield 'YOUR SURFACE LINE 1\n'
+        yield 'YOUR SURFACE LINE 2\n'
+        yield 'ETC\n'
+
+    def expected_field_name_keys(_):
+        return 'field_A', 'field_B'
+
+    def expected_entities(_):
+        yield {'field_A': 'A1', 'field_B': 'B1'}
+        yield {'field_A': 'A2', 'field_B': 'B2'}
 
 
 # wicked: default

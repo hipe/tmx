@@ -140,7 +140,7 @@ def scanner_via_iterator(itr):
         for item in itr:
             return True, item
         return False, None
-    assert hasattr(itr, '__next__')
+    assert hasattr(itr, '__next__')  # [#022]
     return _scanner_via_universal_function(func)
 
 

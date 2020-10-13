@@ -16,6 +16,12 @@ to draw in facilities that are not related to CLI.
 
 |Id        | Main Tag | Content |
 |----------|:-----:|---|
+|[#613.1]  | #wish | lazy instatiation of tuples that make up 'sexps' component
+|[#612.5]  | #trak | track things similar to "jumble"
+|[#612.4]  | #trak | stream concatenation
+|[#612.3]  | #trak | rewinding iterators
+|[#612.2]  | #trak | track custom "assert sequence equal" (with scanners)
+|[#612]    |       | externals, algorithm tracking
 |[#611]    |       | [the scanner lib]
 |[#610]    | #trak | track "line stream via big string", always copy-pasted
 |[#609]    |       | This library

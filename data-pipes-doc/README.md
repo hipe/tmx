@@ -32,7 +32,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.G] | #trak | whether in-memory should be official format
 |                  [#459.F] | #trak | CLI integration tests have redundant setup
 |                  [#459.E] | #trak | [record mapper]
-|                  [#459.D] | #trak | stream concatenation
+|                  [#459.D] | #hole |
 |                  [#459.C] |       | [the new way]
 |                  [#459.2] |       | an exemplary implementation of sync
 |                  [#459]   |       | (internal & external tracking of small)

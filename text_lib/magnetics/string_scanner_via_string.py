@@ -114,7 +114,7 @@ class StringScanner:  # see also [#611] the scanner library
         self._emit_input_error(lambda: pattern.description)
 
     def _emit_input_error(self, descer):
-        def details_struct():  # #[#510.14] like "jumble"
+        def details_struct():  # #[#612.5] this simpler form of "jumble"
             return {k: v for k, v in details()}
 
         def details():

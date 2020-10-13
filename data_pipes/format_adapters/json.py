@@ -1,7 +1,124 @@
+from collections import namedtuple as _nt
+
+
 STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
 STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
 STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.json',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
+
+
+def SCHEMA_AND_ENTITIES_VIA_LINES(lines, listener):
+    scn = _scnlib().scanner_via_iterator(lines)
+    if scn.empty:
+        xx("cover me: line stream was empty (no lines)")
+
+    if '[]\n' == scn.peek:
+        xx("cover me: line stream expressed an empty JSON list")
+
+    dcts = _one_or_more_dictionaries_via_JSON_line_stream(scn, listener)
+    if dcts is None:
+        return
+
+    first_dct = next(dcts)
+
+    def rewound():  # #[#612.3] rewinding an interator
+        yield first_dct
+        for dct in dcts:
+            yield dct
+
+    schema = _MinimalSchema(tuple(first_dct.keys()))  # ..
+    return schema, (_JustEnoughEntity(dct) for dct in rewound())
+
+
+def _one_or_more_dictionaries_via_JSON_line_stream(scn, LISTENER):
+    def main():
+        expect_first_line_has_opening_square_bracket_and_stash_the_line_tail()
+
+        while True:  # Each entity
+            for_now_expect_at_least_one_attribute_line_noting_the_comma()
+
+            while True:  # Each attribute
+                if the_above_line_had_a_comma():
+                    expect_another_attribute_line_noting_the_comma()
+                    continue
+                break
+
+            expect_closing_curly_and_either_comma_or_closing_square_bracket()
+            yield release_the_dictionary()
+            if the_above_line_had_a_comma():
+                continue
+            break
+        if scn.empty:
+            return
+        xx("had extra lines after closing square bracket")
+
+    def release_the_dictionary():
+        one_json_object = ''.join(attribute_lines_cache)
+        attribute_lines_cache.clear()
+        return json_loads(one_json_object)  # ..
+
+    def expect_closing_curly_and_either_comma_or_closing_square_bracket():
+        line = scn.peek
+        if '},\n' == line:
+            scn.advance()
+            attribute_lines_cache.append('}\n')  # LOOK
+            self.had_comma = True
+            return
+        if '}]\n' == line:
+            scn.advance()
+            attribute_lines_cache.append('}\n')  # LOOK
+            self.had_comma = False
+            return
+        raise expecting(("closing curly bracket and either a comma"
+                         " or a closing square bracket"), '"}," or "}]"')
+
+    def the_above_line_had_a_comma():
+        return self.had_comma
+
+    def for_now_expect_at_least_one_attribute_line_noting_the_comma():
+        if '{\n' != scn.peek:
+            raise expecting('open curly bracket', '{')
+        attribute_lines_cache.append(scn.next())
+        if scn.empty:
+            raise expecting("attribute line")
+        expect_another_attribute_line_noting_the_comma()
+
+    def expect_another_attribute_line_noting_the_comma():  # assume line
+        md = re.match(r'[ ]{2}"[^"]+":[ ].*(?:[^,\n]|(?P<comma>,))$', scn.peek)
+        if not md:
+            raise expecting("indented attribute line")  # could be nicer
+        self.had_comma = -1 != md.span('comma')[0]
+        attribute_lines_cache.append(scn.next())
+
+    def expect_first_line_has_opening_square_bracket_and_stash_the_line_tail():
+        line = scn.peek
+        beg, end = re.match('(?P<first_char>.)?', line).span('first_char')
+        if -1 != beg:
+            first_char, rest = line[beg:end], line[end:]
+            if '[' == first_char:
+                scn.peek = rest  # BIG HACK
+                return
+        raise expecting('open square bracket', '[')
+
+    def expecting(descr_np, char=None, pos=None):
+        xx("write the cool thing with the arrows. note we never use pos")
+
+    attribute_lines_cache = []
+
+    class self:  # #class-as-namespace
+        pass
+
+    class stop(RuntimeError):
+        pass
+
+    from json import loads as json_loads
+    import re
+
+    try:
+        for dct in main():
+            yield dct
+    except stop:
+        pass
 
 
 def LINES_VIA_SCHEMA_AND_ENTITIES(schema, given_ents, listener):
@@ -49,6 +166,10 @@ def LINES_VIA_SCHEMA_AND_ENTITIES(schema, given_ents, listener):
     # Last item only: smunge that ']' on to there
     line = ''.join((last_line_of_previous, ']\n'))
     yield line
+
+
+_JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary_as_storage_adapter_entity',))  # noqa: E501
+_MinimalSchema = _nt('MinimalSchema', ('field_name_keys',))
 
 
 def _scnlib():

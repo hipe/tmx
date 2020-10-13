@@ -17,5 +17,3 @@ filesystem_functions does nothing
 magnetize storage adapter impl uber alles so resource management is abstracted
 make sure all old unusued code is gone in csv
 magnetize two storage adapters: csv, json
-schema and ents via lines for json
-schema and ents via lines for csv

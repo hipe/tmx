@@ -3,7 +3,8 @@ Mainly, generate "AST" (abstract syntax tree) classes whose main job is to
 wrap a "sexp" (S-expression) and give it convenience getter methods so you
 are never accessing sexp components by their offset
 
-Born out of frustration with everything in this package that is not the
+Born out of frustration with low information-density, noisy, hard-to-read
+code (in the client or origin) that was not the
 initial grammar (the *.ebnf files); experimental new rules (experiment was
 a success):
 
