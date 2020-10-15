@@ -6,7 +6,7 @@
 # have been inserted into the received content; which otherwise appears
 # exactly as-received.
 #
-# The #birth purpose of this file was merely for (Case2660DP) to produce *any*
+# The #birth purpose of this file was merely for (Case3425DP) to produce *any*
 # collection implementation that doesn't have the requisite (or any)
 # .[#873.L] "capability functions", so that the story fails as expected.
 # We will perhaps write the case only with stub classes, so that it doesn't

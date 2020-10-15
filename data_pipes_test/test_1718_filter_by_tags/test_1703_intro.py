@@ -11,7 +11,7 @@ class CommonCase(unittest.TestCase):
         return self.my_case.build_end_state(self)
 
 
-class Case0110_one_column_match_two_out_of_three(CommonCase):
+class Case1700_one_column_match_two_out_of_three(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_these_two_entities(self)
@@ -27,7 +27,7 @@ class Case0110_one_column_match_two_out_of_three(CommonCase):
         return canon().case_of_one_column_match_two_out_of_three
 
 
-class Case0113_empty_collection(CommonCase):
+class Case1703_empty_collection(CommonCase):
 
     def test_100_result(self):
         self.my_case.expect_no_entities(self)

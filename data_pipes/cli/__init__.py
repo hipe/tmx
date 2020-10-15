@@ -89,7 +89,7 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
     o('(or you can specify an adapter explicitly by name.)\n')
     o('known format adapters (and associated extensions):\n')
 
-    out = stdout.write  # imagine piping output (! errput) (Case3067DP)
+    out = stdout.write  # imagine piping output (! errput) (Case3459DP)
     count = 0
 
     from kiss_rdb import collectionerer

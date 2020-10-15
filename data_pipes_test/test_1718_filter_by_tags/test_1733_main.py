@@ -4,7 +4,7 @@ from modality_agnostic.test_support.common import \
 import unittest
 
 
-class Case0130_integrate_filter_by_tags(unittest.TestCase):
+class Case1730_integrate_filter_by_tags(unittest.TestCase):
 
     def test_100_result(self):
         self.my_case.expect_these_two_entities(self)
@@ -61,7 +61,7 @@ class CLI_Case(unittest.TestCase):
     do_debug = False
 
 
-class Case0133_filter_by_tags_help(CLI_Case):
+class Case1733_filter_by_tags_help(CLI_Case):
 
     def test_100_expect_requires_these_particular_arguments(self):
         exp = '<query> [<query> [..]]'

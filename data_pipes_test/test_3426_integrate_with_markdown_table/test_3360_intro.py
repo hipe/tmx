@@ -93,7 +93,7 @@ class CommonCase(unittest.TestCase):
 
 # == Test Cases
 
-class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCase):  # noqa: E501
+class Case3353DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCase):  # noqa: E501
 
     def test_020_it_just_throws_a_key_error(self):
         emi, = self.build_runs_expecting_emissions()
@@ -110,7 +110,7 @@ class Case0110DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCas
     do_memoize = False
 
 
-class Case0130DP_adds_only(CommonCase):
+class Case3356DP_adds_only(CommonCase):
 
     def test_002_does_not_fail(self):
         self.assertIsNotNone(self.runs)
@@ -140,9 +140,9 @@ class Case0130DP_adds_only(CommonCase):
         this test (although small in codesize) is overloaded. if you
         refactor this test, consider breaking it up to test these separately:
 
-          - that original widths are respected when possible (Case0120DP)
-          - that blank cels also get padded appropriately (Case0130DP)
-          - what happens with content overflow (Case0140DP)
+          - that original widths are respected when possible
+          - that blank cels also get padded appropriately (Case1718DP)
+          - what happens with content overflow (Case3359DP)
         """
 
         items = self._items()
@@ -167,7 +167,7 @@ class Case0130DP_adds_only(CommonCase):
         return case_100_far_dictionaries()
 
 
-class Case0140DP_MERGE(CommonCase):
+class Case3359DP_MERGE(CommonCase):
 
     def test_010_does_not_fail(self):
         self.assertIsNotNone(self.runs)
@@ -192,7 +192,7 @@ class Case0140DP_MERGE(CommonCase):
         return case_200_far_dictionaries()
 
 
-class Case0150DP_what_if_no_business_attrs_besides_ID(CommonCase):
+class Case3362DP_what_if_no_business_attrs_besides_ID(CommonCase):
     # Even though there is nothing to do, this sync happens [#458.7]
 
     def test_100_whoopsie_the_changed_cell_takes_on_the_EG_styling(self):
@@ -212,7 +212,7 @@ class Case0150DP_what_if_no_business_attrs_besides_ID(CommonCase):
     do_memoize = False
 
 
-class Case0160DP_custom_keyers(CommonCase):
+class Case3365DP_custom_keyers(CommonCase):
 
     def test_100_the_NOT_updated_business_cel_stays_as_is(self):
         self.assertEqual(self.end_cel_strings[2], '| six\n')
@@ -241,7 +241,7 @@ class Case0160DP_custom_keyers(CommonCase):
         return common_two_keyerers()
 
 
-class Case0170DP_in_this_case_mono_value_does_YES_update(CommonCase):
+class Case3368_in_this_case_mono_value_does_YES_update(CommonCase):
     # [#458.7] when natural keys are different, take the far value
 
     def test_100_the_cell_with_no_attribute_in_far_stream_is_untouched(self):

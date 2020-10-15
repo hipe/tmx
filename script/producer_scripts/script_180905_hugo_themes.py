@@ -5,7 +5,7 @@
 this is a "shallow scrape", in contrast to a "deep scrape"
 available in a sibling script.
 """
-# This producer script is covered by (Case2018DP)
+# This producer script is covered by (Case3395DP)
 
 import soupsieve as sv
 

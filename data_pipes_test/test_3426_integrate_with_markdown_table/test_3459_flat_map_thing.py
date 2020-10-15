@@ -33,10 +33,10 @@ class CommonCase(unittest.TestCase):
         return self.end_state.entity_dictionary_via_sync_key[k]
 
 
-class Case3306DP_hello(CommonCase):
+class Case3459DP_hello(CommonCase):
     """the interesting tests here (towards the end) are (at writing)..
 
-    ..a sub-slice of tests in our "mentor" test file (Case1640DP). we have
+    ..a sub-slice of tests in our "mentor" test file (Case2754DP). we have
     carried over only a sub-slice of those tests, having the sole intention
     of covering only our format adapter's implementation of [#459.E] record
     mapping in most of its directives:

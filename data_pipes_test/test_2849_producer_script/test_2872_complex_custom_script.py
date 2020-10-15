@@ -4,7 +4,7 @@ from modality_agnostic.test_support.common import \
 import unittest
 
 
-class Case0810DP_khong(unittest.TestCase):
+class Case2872DP_khong(unittest.TestCase):
     # this exists only to assert that we don't break this complicated
     # production producer script
 
@@ -28,7 +28,7 @@ class Case0810DP_khong(unittest.TestCase):
     @shared_subject
     def end_state(self):
         import modality_agnostic.test_support.common as em
-        use_listener, emissions = em.listener_and_emissions_for(self, limit=None)
+        use_listener, emissions = em.listener_and_emissions_for(self, limit=None)  # noqa: E501
 
         sections = []
 

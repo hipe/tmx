@@ -17,7 +17,7 @@ class CommonCase(SyncCase_):
     do_debug = False
 
 
-class Case0747_none_down_on_to_none_produces_none(CommonCase):
+class Case1330_none_down_on_to_none_produces_none(CommonCase):
 
     def test(self):
         self.expect_these_()
@@ -29,7 +29,7 @@ class Case0747_none_down_on_to_none_produces_none(CommonCase):
         return ()
 
 
-class Case0749_none_down_on_to_some_is_unsurprising(CommonCase):
+class Case1333_none_down_on_to_some_is_unsurprising(CommonCase):
 
     def test(self):
         self.expect_these_('a', 'b', 'c')
@@ -41,7 +41,7 @@ class Case0749_none_down_on_to_some_is_unsurprising(CommonCase):
         return ('a', 'b', 'c')
 
 
-class Case0751_some_down_on_to_none_is_unsurprising(CommonCase):
+class Case1336_some_down_on_to_none_is_unsurprising(CommonCase):
 
     def test(self):
         self.expect_these_('d', 'e', 'f')
@@ -53,7 +53,7 @@ class Case0751_some_down_on_to_none_is_unsurprising(CommonCase):
         return ()
 
 
-class Case0752_duplicate_key_far(CommonCase):
+class Case1339_duplicate_key_far(CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'duplicate_key')
@@ -76,7 +76,7 @@ class Case0752_duplicate_key_far(CommonCase):
                 'd')
 
 
-class Case0754_duplicate_key_near(CommonCase):
+class Case1342_duplicate_key_near(CommonCase):
 
     def test_100_this_error(self):
         self.this_error_('error', 'expression', 'duplicate_key')
@@ -99,7 +99,7 @@ class Case0754_duplicate_key_near(CommonCase):
                 'c')
 
 
-class Case0755_some_down_on_to_some_no_collisions_appends(CommonCase):
+class Case1345_some_down_on_to_some_no_collisions_appends(CommonCase):
 
     def test(self):
         self.expect_these_('a', 'b', 'c', 'd', 'e', 'f')
@@ -111,7 +111,7 @@ class Case0755_some_down_on_to_some_no_collisions_appends(CommonCase):
         return ('a', 'b', 'c')
 
 
-class Case0757_weird_order_is_OK_here(CommonCase):
+class Case1348_weird_order_is_OK_here(CommonCase):
 
     def test_100_inserted_at_end(self):
         self.expect_these_(
@@ -129,7 +129,7 @@ class Case0757_weird_order_is_OK_here(CommonCase):
                 'c')
 
 
-class Case0758_some_down_on_to_some_yes_collisions(CommonCase):
+class Case1351_some_down_on_to_some_yes_collisions(CommonCase):
 
     def test(self):
         self.expect_these_('a', 'B', 'c', 'D', 'e', 'f')

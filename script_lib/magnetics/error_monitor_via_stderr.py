@@ -76,7 +76,7 @@ class func:  # error_monitor_via_stderr
         # it's convenient to be able to return from your CLI function using
         # only `monitor.exitstatus` rather than needing also to check
         # `monitor.OK`. as such, experimentally we're always gonna bump this
-        # up from zero in these cases (Case3069DP)
+        # up from zero in these cases (Case3498DP)
 
         self.see_exitstatus(self._default_error_exitstatus)
 

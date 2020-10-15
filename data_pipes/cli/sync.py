@@ -28,7 +28,7 @@ but there is only one participating format adapter for near collections
 so it holds for "all".)
 """
 
-# NOTE some of the content of the above text is covered by (Case3066)
+# NOTE some of the content of the above text is covered by (Case3492)
 # [#447] describes the above algorithm more formally
 
 # at #history-A.3, you can visual test this with

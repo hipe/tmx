@@ -29,7 +29,7 @@ facility can be applied usefully to this use case. the cost:
 import unittest
 
 
-class Case0995_hello(unittest.TestCase):
+class Case1372_hello(unittest.TestCase):
 
     def test_yes_we_can(self):
         _orig = _MyBusinessObject(

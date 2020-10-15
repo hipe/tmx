@@ -11,7 +11,7 @@ class CommonCase(CommonestCase, unittest.TestCase):
         return subject_module()
 
 
-class Case1003_lines_via_two_entities(CommonCase):
+class Case0048_lines_via_two_entities(CommonCase):
 
     def test_050_loads(self):
         assert self.given_module()
@@ -29,7 +29,7 @@ class Case1003_lines_via_two_entities(CommonCase):
         yield 'A2, B2\n'
 
 
-class Case1005_two_entities_via_lines(CommonCase):
+class Case0058_two_entities_via_lines(CommonCase):
 
     def test_100_schema_looks_right(self):
         self.expect_expected_schema_field_name_keys()

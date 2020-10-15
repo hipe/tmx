@@ -2,8 +2,8 @@ def _wicked_definition():
     yield 'here_file', __file__
     yield 'templates_dir', '../../kiss_rdb/test_support/wicked_templates'
     yield 'template', '001-first-ever.py'
-    yield 'file', 'test_1015_csv/test_1007_intro.py'
-    yield 'file', 'test_1040_json/test_1040_intro.py'
+    yield 'file', 'test_0063_csv/test_0063_intro.py'
+    yield 'file', 'test_0188_json/test_0188_intro.py'
 
 
 if '__main__' == __name__:

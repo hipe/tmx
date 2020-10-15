@@ -183,7 +183,7 @@ def _build_directives_processer(eg_row, cs, listener):
                 continue
             assert 'error' == typ
             listener(*directive)
-            raise _Stop()  # (Case2664DP)
+            raise _Stop()  # (Case3431DP)
 
     def process_directives_at_end(directives):
         for directive in directives:

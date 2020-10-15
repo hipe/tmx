@@ -43,7 +43,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case2557DP_strange_format_adapter_name(CommonCase):
+class Case3419DP_strange_format_adapter_name(CommonCase):
     """(this is the other end of getting us "over the wall" - this has
 
     two copy-pasted tests that appear the same in the modality-specific
@@ -72,14 +72,14 @@ class Case2557DP_strange_format_adapter_name(CommonCase):
         yield 'error', '?+', 'as', 'first_error'
 
     def given(self):
-        return {'producer_script_path': 'no see DP ps path (Case2557DP)',
-                'near_collection': 'no see DP near coll (Case2557DP)'}
+        return {'producer_script_path': 'no see DP ps path (Case3419DP)',
+                'near_collection': 'no see DP near coll (Case3419DP)'}
 
     def given_near_format_name(_):
         return 'zig-zag'
 
 
-class Case2559_strange_file_extension(CommonCase):
+class Case3422_strange_file_extension(CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
@@ -105,14 +105,14 @@ class Case2559_strange_file_extension(CommonCase):
     def given(self):
         head = fixture_files_directory()
         near_path = os_path.join(head, '080-strange-extension.zongo')
-        return {'producer_script_path': 'no see DP ps path (Case2559)',
+        return {'producer_script_path': 'no see DP ps path (Case3422)',
                 'near_collection': near_path}
 
     def given_near_format_name(_):
         pass  # induce from path
 
 
-class Case2660DP_no_functions(CommonCase):
+class Case3425DP_no_functions(CommonCase):
     # The point of this case changed once at #history-A.1 and then once again
     # at #history-A.2. Currently its only purpose is to cover what happens
     # when the collection implementation doesn't have the requisite [#873.12]
@@ -147,7 +147,7 @@ class Case2660DP_no_functions(CommonCase):
                 'near_collection': near_path}
 
 
-class Case2662DP_near_file_not_found(CommonCase):
+class Case3428_near_file_not_found(CommonCase):
 
     # this is the first code to rustle up a lot of stuff
 
@@ -172,7 +172,7 @@ class Case2662DP_near_file_not_found(CommonCase):
                 'near_collection': markdown_fixture('0000-no-such-file.md')}
 
 
-class Case2664DP_duplicate_key(CommonCase):
+class Case3431DP_duplicate_key(CommonCase):
 
     def test_100_says_this_thing(self):
         actual, = self._emission('erx').to_messages()
@@ -204,7 +204,7 @@ class Case2664DP_duplicate_key(CommonCase):
                 'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
-class Case2665DP_preserve_endcappiness_here(CommonCase):
+class Case3434DP_preserve_endcappiness_here(CommonCase):
     """this is the proof of bugfix - we want that a row that didn't
     have an endcap before, DOESN'T have an endcap after (even though
     the last cel's value changed.
@@ -237,7 +237,7 @@ class Case2665DP_preserve_endcappiness_here(CommonCase):
                 'near_collection': markdown_fixture('0110-endcap-yes-no.md')}
 
 
-class Case2667DP_ADD_end_cappiness_here(CommonCase):
+class Case3437DP_ADD_end_cappiness_here(CommonCase):
     """this is kind of an edge case as a corollary of the above thing,
     and it reveals something about the idea of "endcap" - here, the
     endcap gets added because we are lengthening the number of cels.

@@ -205,7 +205,7 @@ class Case040_too_many_args(CommonCase):
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case050SA_one_arg_which_is_stdin(CommonCase):  # #midpoint
+class Case1062_one_arg_which_is_stdin(CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
         self.succeeds()

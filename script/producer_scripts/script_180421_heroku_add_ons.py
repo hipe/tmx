@@ -5,7 +5,7 @@
 
 (this is the content-producer of the producer/consumer pair)
 """
-# This producer script is covered by (Case2013DP).
+# This producer script is covered by (Case3393DP).
 
 
 _domain = 'https://devcenter.heroku.com'

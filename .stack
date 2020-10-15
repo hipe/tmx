@@ -17,3 +17,8 @@ filesystem_functions does nothing
 magnetize storage adapter impl uber alles so resource management is abstracted
 make sure all old unusued code is gone in csv
 magnetize two storage adapters: csv, json
+away COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
+don't forget in your fake paths add isalnum and __fspath__
+move smalls to lower
+get convert to have good coverage for the two things
+rearrange datapipes test numbers

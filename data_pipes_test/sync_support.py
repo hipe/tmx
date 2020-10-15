@@ -160,7 +160,7 @@ def _corralpoint(near, far, listener, near_format):  # #corralpoint
         if isinstance(far, dict):
             far = cls(**far)
         else:
-            assert isinstance(far, cls)  # #[#022] (Case2664DP)
+            assert isinstance(far, cls)  # #[#022] (Case3431DP)
 
     if not isinstance(near, str):
         assert hasattr(near, '__next__')

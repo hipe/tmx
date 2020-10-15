@@ -35,7 +35,7 @@ def simple_key_via_normal_key(normal_key):
     return normal_key.replace('_', '')
 
 
-def label_via_string_via_max_width(max_width):  # (Case0810DP)
+def label_via_string_via_max_width(max_width):  # (Case2867DP)
     def f(s):
         use_s = s[:(max_width-1)] + '…' if max_width < len(s) else s
         # (could also be accomplished by that one regex thing maybe)
@@ -45,7 +45,7 @@ def label_via_string_via_max_width(max_width):  # (Case0810DP)
     return f
 
 
-def url_via_href_via_domain(domain):  # (Case0810DP)
+def url_via_href_via_domain(domain):  # (Case2867DP)
     def f(href):
         _escaped_href = href.replace(' ', '%20')
         return url_head_format.format(_escaped_href)
@@ -54,7 +54,7 @@ def url_via_href_via_domain(domain):  # (Case0810DP)
 
 
 def _markdown_link_via_dictionary(dct):
-    return markdown_link_via(dct['label'], dct['url'])  # (Case1749DP)
+    return markdown_link_via(dct['label'], dct['url'])  # (Case2760DP)
 
 
 def markdown_link_via(label, url):

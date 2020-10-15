@@ -157,7 +157,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
             return self._collection_via_directory(
                 collection_path, listener, adapter_variant, rng, opn)
 
-        if sa is None:  # (Case2557DP)
+        if sa is None:  # (Case3419DP)
             return
 
         ci = sa.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
@@ -256,7 +256,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         self._key_via_extname = dct
 
     def splay_storage_adapters__(self):
-        def build_dereferencer(key):  # (Case3067DP)
+        def build_dereferencer(key):  # (Case3498DP)
             def f():
                 return self._dereference(key)
             return f

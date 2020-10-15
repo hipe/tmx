@@ -5,7 +5,7 @@ generate a stream of JSON from {url}
 
 (this is the content-producer of the producer/consumer pair)
 """
-# This producer script is covered by (Case1855DP).
+# This producer script is covered by (Case2763DP).
 
 
 _domain = 'https://wiki.python.org'
@@ -77,7 +77,7 @@ def _this_more_complicated_string_via_td():
         a_tag, = _filter('a', _p)
         url = a_tag['href']
         if '/' == url[0]:
-            url = url_via_href(url)  # ick/meh (Case1855DP) (test 400)
+            url = url_via_href(url)  # ick/meh (Case2763DP) (test 400)
         return markdown_link_via(_string_via_el(a_tag), url)
 
     return f

@@ -25,7 +25,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case0044_select_help(CommonCase):
+class Case1167_select_help(CommonCase):
 
     def test_050_executes(self):
         self.assertEqual(self.end_state.exitcode, 0)

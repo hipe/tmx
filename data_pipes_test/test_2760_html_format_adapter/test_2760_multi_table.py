@@ -87,7 +87,7 @@ def fake_producer_script_via_dictionary_tuple(dct_tup):
     return _Collection(ci)
 
 
-class Case1747_does_scrape_work(CommonCase):
+class Case2757_does_scrape_work(CommonCase):
 
     def test_010_scrape_works(self):
         self.assertGreaterEqual(len(self.end_dicts), 2)  # meh whatever
@@ -138,7 +138,7 @@ class Case1747_does_scrape_work(CommonCase):
         return html_fixture('0170-hugo-docs.html')
 
 
-class Case1749DP_generate(CommonCase):
+class Case2760DP_generate(CommonCase):
 
     def test_100_outputs_more_than_one_line(self):
         self.assertLessEqual(1, len(self.output_lines))

@@ -12,7 +12,7 @@ as better because it uses the presentation structure which is
 presumably the most representative of yadda..
 """
 # [#874.4] tracks multi-tablism, which this script engages in
-# This producer script is covered by (Case3306DP).
+# This producer script is covered by (Case3459DP).
 
 
 import soupsieve as sv

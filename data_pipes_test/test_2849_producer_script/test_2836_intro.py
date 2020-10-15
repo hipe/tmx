@@ -36,14 +36,14 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case1302_this_path_fails_because_absolute_path_too_crazy(CommonCase):
+class Case2823_this_path_fails_because_absolute_path_too_crazy(CommonCase):
 
     def test_100_fails(self):
         _msg = self._fail_against('/egads/ohai.py')
         self.assertRegex(_msg, r'\babsolute path outside of ecosystem\b')
 
 
-class Case1305_this_one_file_fails_because_invalid_chars_in_name(CommonCase):
+class Case2826_this_one_file_fails_because_invalid_chars_in_name(CommonCase):
 
     def test_100_fails(self):
         _path = executable_fixture('no-ent.py')
@@ -51,7 +51,7 @@ class Case1305_this_one_file_fails_because_invalid_chars_in_name(CommonCase):
         self.assertRegex(_msg, "\\bcharacter we don't like[^a-zA-Z]+-")
 
 
-class Case1308_here_is_a_low_level_doo_hah(CommonCase):
+class Case2829_here_is_a_low_level_doo_hah(CommonCase):
     # at #history-A.2 imported this from a whole other dedicated file
 
     def test_100_runs(self):
@@ -89,7 +89,7 @@ class Case1308_here_is_a_low_level_doo_hah(CommonCase):
         return flat
 
 
-class Case1311_RUMSKALLA:
+class Case2832_RUMSKALLA:
 
     def test_100_rumspringa(self):
         _path = _chimi_churri_far_path()
@@ -115,7 +115,7 @@ class Case1311_RUMSKALLA:
         self.assertEqual(key_for_sync, 'foo fa')
 
 
-class Case1314DP_filenames_must_look_a_way(CommonCase):
+class Case2835_filenames_must_look_a_way(CommonCase):
 
     def test_100_outputs_no_lines(self):
         self._outputs_no_lines()
@@ -137,7 +137,7 @@ class Case1314DP_filenames_must_look_a_way(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-class Case1315_file_not_found(CommonCase):
+class Case2838_file_not_found(CommonCase):
 
     def test_100_throws_happenstance_exception(self):
         def run():
@@ -153,10 +153,10 @@ class Case1315_file_not_found(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-# Case1317 was "no metadata row", archived #history-A.1
+# Case2841 was "no metadata row", archived #history-A.1
 
 
-class Case1319DP_bad_natural_key(CommonCase):
+class Case2844DP_bad_natural_key(CommonCase):
 
     def test_100_emits(self):
         emi = self.build_end_state().actual_emission_index['this_emi']
@@ -173,8 +173,8 @@ class Case1319DP_bad_natural_key(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-class Case1320DP_extra_cel(CommonCase):
-    """(may be partially or wholly redundant with (Case0110DP))
+class Case2847_extra_cel(CommonCase):
+    """(may be partially or wholly redundant with (Case3353DP))
     (may be #overloaded. is first coverage of an oblique thing.)
     """
 
@@ -194,7 +194,7 @@ class Case1320DP_extra_cel(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-class Case1322DP_RUM(CommonCase):
+class Case2850_RUM(CommonCase):
 
     def test_100_RUM(self):
         _ = self.build_end_state()

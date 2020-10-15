@@ -53,7 +53,7 @@ class CommonCase(unittest.TestCase):
         return self.end_state.entity_dictionary_via_sync_key[k]
 
 
-class Case1640DP_hello(CommonCase):
+class Case2754DP_hello(CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())

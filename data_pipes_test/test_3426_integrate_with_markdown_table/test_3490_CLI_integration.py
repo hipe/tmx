@@ -63,13 +63,13 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case3060_basics(CommonCase):
+class Case3480_basics(CommonCase):
 
     def test_100_subject_script_loads(self):
         self.assertIsNotNone(subject_script())
 
 
-class Case3061_must_be_interactive(CommonCase):
+class Case3483_must_be_interactive(CommonCase):
 
     def test_100_CLI_client_results_in_failure_exitstatus(self):
         self.CLI_client_results_in_failure_exitstatus()
@@ -89,7 +89,7 @@ class Case3061_must_be_interactive(CommonCase):
         yield 'STDERR'
 
 
-class Case3063DP_strange_option(CommonCase):
+class Case3486DP_strange_option(CommonCase):
 
     def test_100_fails(self):
         self.CLI_client_results_in_failure_exitstatus()
@@ -112,7 +112,7 @@ class Case3063DP_strange_option(CommonCase):
         yield 'zero_or_one', 'STDERR'
 
 
-class Case3064_missing_requireds(CommonCase):
+class Case3489_missing_requireds(CommonCase):
 
     def test_100_fails(self):
         self.CLI_client_results_in_failure_exitstatus()
@@ -130,7 +130,7 @@ class Case3064_missing_requireds(CommonCase):
         yield 'zero_or_one', 'STDERR'
 
 
-class Case3066_top_help_screen(CommonCase):
+class Case3492_top_help_screen(CommonCase):
 
     def test_100_succeeds(self):
         self.CLI_client_results_in_success_exitstatus()
@@ -167,7 +167,7 @@ class Case3066_top_help_screen(CommonCase):
         yield 'one_or_more', 'STDERR'
 
 
-class Case3067DP_FA_help_screen(CommonCase):
+class Case3495DP_FA_help_screen(CommonCase):
 
     def test_100_succeeds(self):
         self.CLI_client_results_in_success_exitstatus()
@@ -198,7 +198,7 @@ class Case3067DP_FA_help_screen(CommonCase):
         yield 'one_or_more'
 
 
-class Case3069DP_strange_format_adapter_name(CommonCase):
+class Case3498DP_strange_format_adapter_name(CommonCase):
     """(this is to get us "over the wall - there is another test just like
 
     it that is modality-agnostic. (but this one came first! yikes)
@@ -227,7 +227,7 @@ class Case3069DP_strange_format_adapter_name(CommonCase):
         yield 'STDERR'
 
 
-class Case3070_money_and_diff(CommonCase):
+class Case3502_money_and_diff(CommonCase):
 
     def test_100_succeeds(self):
         self.CLI_client_results_in_success_exitstatus()

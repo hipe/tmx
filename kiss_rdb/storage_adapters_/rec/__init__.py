@@ -27,7 +27,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
 class _FakeCollection:
 
     def __init__(self, collection_path):
-        self.collection_path = collection_path  # (Case2660DP)
+        self.collection_path = collection_path  # (Case3425DP)
 
 
 class ErsatzScanner:

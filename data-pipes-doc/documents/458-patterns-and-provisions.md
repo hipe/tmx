@@ -137,7 +137,7 @@ A "keyer" is a function that makes keys.
 
 (A "keyerer" is a function that makes such a function).
 
-One case that that covers this provision is (Case0160DP).
+One case that that covers this provision is (Case3365DP).
 
 .#open [#459.N] it is a smell to have near sync keyerers associated with
 producer scripts (producer scripts should be target agnostic) but this

@@ -39,7 +39,7 @@ from modality_agnostic.test_support.common import \
 import unittest
 
 
-class Case1855DP_hello(unittest.TestCase):
+class Case2763DP_hello(unittest.TestCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(_subject_module())

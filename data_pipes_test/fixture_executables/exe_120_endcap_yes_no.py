@@ -16,7 +16,7 @@ class open_traversal_stream:
         pass
 
     def __enter__(self):
-        yield {'col_A': 'thing B', 'col_B': 'y'}  # (Case1322DP)
+        yield {'col_A': 'thing B', 'col_B': 'y'}  # (Case2850)
 
     def __exit__(*_):
         return False  # no, don't trap exceptions

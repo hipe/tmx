@@ -12,8 +12,8 @@ STORAGE_ADAPTER_UNAVAILABLE_REASON = \
     "Currently this node holds support code only. See `producer_script`"
 
 
-# (Case0810DP) is first to load
-# something about (Case1314DP)
+# (Case2872DP) is first to load
+# something about (Case2835)
 
 
 # #history-A.1: file emergently refactored to be totally empty

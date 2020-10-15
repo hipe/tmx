@@ -10,7 +10,7 @@ class ProducerCaseMethods:
         cached_doc_path = self.cached_document_path()
         listener = self.use_listener()
         if isinstance(cached_doc_path, tuple):
-            opened = passthru_context_manager(cached_doc_path)  # (Case2016)
+            opened = passthru_context_manager(cached_doc_path)  # (Case3392)
         else:
             opened = ps.open_traversal_stream(listener, cached_doc_path)
         with opened as dcts:

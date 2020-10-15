@@ -70,7 +70,7 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         def to_schema_and_entities(listener):
             return _to_schema_and_ents(single_traversal_collection, listener)
 
-        def sexps_via_action_stack(astack, listener):  # (Case3306DP)
+        def sexps_via_action_stack(astack, listener):  # (Case3459DP)
             return eek(lambda: sexps_via_action_stack(astack, listener))
 
         def _raw_sexps():  # #testpoint
@@ -473,7 +473,7 @@ def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
 
     class complete_schema:  # #class-as-namespace
         offset_via_key_ = offset_via_key
-        field_name_keys = keys  # (Case3306DP)
+        field_name_keys = keys  # (Case3459DP)
         rows_ = (ast1, ast2)
         identifier_class_ = (iden_cls or _identifier)  # #here5
         table_cstack_ = table_cstack

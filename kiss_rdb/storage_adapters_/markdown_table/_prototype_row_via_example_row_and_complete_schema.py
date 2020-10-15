@@ -18,13 +18,13 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
             pass
 
     def new_line_parts_via(nv_pairs, u_or_c, listener, existing_row=None):
-        # WAS KeyError (Case0110DP)
+        # WAS KeyError (Case3353DP)
 
         if existing_row:  # implies 'U'
             def my_exi_cell_at(i):
                 if i < exi_row_length:
                     return my_exi_row.cells[i]
-                pass  # (Case2667DP)
+                pass  # (Case3437DP)
             exi_row_length = existing_row.cell_count
             existing_line = existing_row.to_line()
             my_exi_row = _my_row(existing_line)
@@ -45,7 +45,7 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
                         value_string = ''
                     else:
                         xx(f"for '{k}', please use strings or none, not {type(value_string)}")  # noqa: E501
-            else:  # (Case0130DP)
+            else:  # (Case1718DP)
                 if 'U' == u_or_c and my_exi_cell:
                     yield 'cell_part', *my_exi_cell.to_pieces(existing_line)
                     continue
@@ -90,7 +90,7 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
             def stretch(fixed_pad):
                 remain = example_widths[i] - len(value_string) - len(fixed_pad)
                 if remain < 1:
-                    return ''  # content overflow (Case0140DP)
+                    return ''  # content overflow (Case3359DP)
                 return ' ' * remain
 
             if 'align_left' == alignment:
@@ -107,13 +107,13 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
             bads = tuple(unsanitized_pool.keys())
             goods = tuple(set(field_name_keys) & set(i for i, _ in nv_pairs))
             listener(*_when_extra(bads, goods, u_or_c, complete_schema))
-            raise stop()  # (Case1319DP)
+            raise stop()  # (Case2844DP)
 
         if 'U' == u_or_c:
             if existing_row.cell_count < formal_cell_count:
-                endcap_yn = eg_row.has_endcap  # (Case2667DP)
+                endcap_yn = eg_row.has_endcap  # (Case3437DP)
             else:
-                endcap_yn = existing_row.has_endcap  # (Case2665DP)
+                endcap_yn = existing_row.has_endcap  # (Case3434DP)
         else:
             endcap_yn = eg_row.has_endcap
 
@@ -378,7 +378,7 @@ def xx(msg=None):
 
 # #history-A.4 (almost) blind rewrite
 # #history-A.3 (can be temporary): dog-eared specific code
-#   (before #history-A.2 we use to do (Case0150DP) here)
+#   (before #history-A.2 we use to do (Case3362DP) here)
 # #history-A.2: short-circuiting out of updating single-field records moved up
 # #history-A.1: sneak merge into here to be alongside create new
 # #born.
