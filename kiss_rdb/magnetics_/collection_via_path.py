@@ -1,4 +1,4 @@
-from os import path as os_path
+from os import path as os_path, unlink as os_unlink
 
 
 def _throwing_listenerer(*args):  # used as default argument
@@ -92,12 +92,176 @@ class _Collection:  # #tespoint
         return self._impl
 
 
+# == NEW WAY
+#    NOTE lots of redundancies with #here4 during transition to magnetic field
+#    collection overhaul. Also this has lots holes the other doesn't for now.
+#    Eventually hook-ins so SA can totally circumvent all of this up front
+
+
+def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, mcoll, listener):
+    def main():
+        sa = resolve_storage_adapter()
+        lines_via_two = sa.module.LINES_VIA_SCHEMA_AND_ENTITIES
+        lines_via_two
+        from contextlib import contextmanager
+
+        @contextmanager
+        def build_cm():
+            build_receiver, close = resolve_receiver_and_closer()
+            recv = build_receiver(lines_via_two)
+            ok = False
+            try:
+                yield recv
+                ok = True
+            finally:
+                close(ok)
+        return build_cm()
+
+    def resolve_receiver_and_closer():
+        if o.arg_looks_like_file_handle:
+            if o.arg_looks_like_writable_file_handle:
+                return receiver_and_closer_when_writable_file_handle()
+            raise stop_because_not_open_for_writing()
+        if o.arg_looks_like_string:
+            return receiver_and_closer_by_open_and_close_file()
+        raise stop_because_unrecognized_identifier_shape()
+
+    def receiver_and_closer_by_open_and_close_file():
+        def close(was_OK):
+            if was_OK:
+                fp.close()
+                return
+            fp.seek(0)  # OCD
+            fp.truncate(0)  # WHY
+            os_unlink(x)  # YIKES
+        fp = open(x, 'x')  # crazy experiment
+        build_receiver = build_build_receiver(fp)
+        return build_receiver, close
+
+    def receiver_and_closer_when_writable_file_handle():
+        build_receiver = build_build_receiver(x)
+        return build_receiver, lambda _: None
+
+    def build_build_receiver(writable_fp):
+        def build_receiver(lines_via_two):
+            return _build_receiver_NEW_WAY(writable_fp, lines_via_two)
+        return build_receiver
+
+    def stop_because_not_open_for_writing():
+        xx()
+
+    def stop_because_unrecognized_identifier_shape():
+        xx()
+
+    def resolve_storage_adapter():
+        return _resolve_storage_ad_NEW_WAY(o, fmt, x, mcoll, throwing_listener)
+
+    o = _classify_collection_identifier_for_NEW_WAY(x)
+    throwing_listener, stop = _throwing_listener_and_stop(listener)
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def _build_receiver_NEW_WAY(writable_fp, lines_via_schema_and_entities):
+    def receive_schema_and_entities(schema, ents, listener):
+        for line in lines_via_schema_and_entities(schema, ents, listener):
+            writable_fp.write(line)
+
+    class receiver:  # #class-as-namespace
+        pass
+    receiver.receive_schema_and_entities = receive_schema_and_entities
+    return receiver
+
+
+def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, mcoll, listener):
+    def main():
+        sa = resolve_storage_adapter()
+        two_via_lines = sa.module.SCHEMA_AND_ENTITIES_VIA_LINES  # ..
+        resolve_lines_and_closer = resolve_lines_and_closer_function()
+        from contextlib import contextmanager
+
+        @contextmanager
+        def build_cm():
+            lines, close = resolve_lines_and_closer()
+            try:
+                schema, ents = two_via_lines(lines, listener)
+                yield schema, ents
+            finally:
+                close()
+        return build_cm()
+
+    def resolve_lines_and_closer_function():
+        if o.arg_looks_like_string:
+            return lines_and_closer_by_opening_and_closing_file
+        if o.arg_looks_like_file_handle:
+            if o.arg_looks_like_readable_file_handle:
+                return lines_and_closer_by_pass_thru_and_no_close
+            raise stop_because_not_open_for_reading()
+        raise stop_because_unrecognized_identifier_shape()
+
+    def lines_and_closer_by_opening_and_closing_file():
+        if True:  # TRY/EXCEPT eventually
+            fp = open(x, 'r')  # we once had `opn` but no more. now use fake fp
+
+        return fp, fp.close
+
+    def lines_and_closer_by_pass_thru_and_no_close():
+        return x, lambda: None
+
+    def stop_because_not_open_for_reading():
+        xx()
+
+    def stop_because_unrecognized_identifier_shape():
+        xx()
+
+    def resolve_storage_adapter():
+        return _resolve_storage_ad_NEW_WAY(o, fmt, x, mcoll, throwing_listener)
+
+    # ==
+
+    o = _classify_collection_identifier_for_NEW_WAY(x)
+    throwing_listener, stop = _throwing_listener_and_stop(listener)
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def _resolve_storage_ad_NEW_WAY(cic, fmt, x, mcoll, listener):
+    # mostly redundant with #here4 (fresh vers)
+
+    def main():
+        if fmt:
+            return resolve_storage_adapter_via_format_name()
+        if cic.arg_looks_like_string:
+            return resolve_storage_adapter_via_path_extension()
+        xx(f"this is a coarse experiment for now. can't resolve SA from {x!r}")
+
+    def resolve_storage_adapter_via_path_extension():
+        def csckr():
+            return ({'path': x},)
+        ext = os_path.splitext(x)[1]
+        if not len(ext):
+            xx(f"we are not ready to tackle directories yet ({x!r})")
+        return mcoll.storage_adapter_via_extname(ext, listener, csckr)
+
+    def resolve_storage_adapter_via_format_name():
+        return mcoll.storage_adapter_via_format_name(fmt, listener)
+
+    return main()
+
+
+# cstacker = a function that makes a [#XXX.X] context stack
+
+
 def _storage_adapter_via(original_method):  # #decorator
-    def use_method(self, needle, listener, contextualize=None, validate=None):
+    def use_method(self, needle, listener, cstacker=None, validate=None):
         key = original_method(self, needle, listener)
         if key is None:
             return
-        return self._finish_lookup(key, listener, contextualize, validate)
+        return self._finish_lookup(key, listener, cstacker, validate)
     return use_method
 
 
@@ -136,7 +300,13 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         self._key_via_extname = None
         self._key_via_format_name = None
 
-    def collection_via_path(
+    def OPEN_FOR_WRITING_THE_NEW_WAY(self, fmt, x, listener):
+        return _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, self, listener)
+
+    def OPEN_FOR_READING_THE_NEW_WAY(self, fmt, x, listener):
+        return _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, self, listener)
+
+    def collection_via_path(  # #here4
             self, collection_path,
             listener=_throwing_listenerer, opn=None,
             # (parameter order is API-fixed above, not guaranteed below)
@@ -148,9 +318,9 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
 
         # Otherwise, if the collection path looks like a file, use extension
         elif len(ext := os_path.splitext(collection_path)[1]):
-            def contextu(dct):
-                dct['path'] = collection_path
-            sa = self.storage_adapter_via_extname(ext, listener, contextu)
+            def cstacker():
+                return ({'path': collection_path},)
+            sa = self.storage_adapter_via_extname(ext, listener, cstacker)
 
         # Otherwise, assume it is a directory and try to open a schema file
         else:
@@ -218,16 +388,15 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         return self._key_via_format_name[format_name]
 
     def storage_adapter_via_key(
-            self, key, listener, contextualize=None, validate=None):
+            self, key, listener, cstacker=None, validate=None):
 
         if key not in self._reference_via_key:
-            _emit_about_SA_key(listener, key, self._order, contextualize)
+            _emit_about_SA_key(listener, key, self._order, cstacker)
             return
 
-        return self._finish_lookup(
-                key, listener, contextualize, validate)
+        return self._finish_lookup(key, listener, cstacker, validate)
 
-    def _finish_lookup(self, key, listener, contextualize, validate):
+    def _finish_lookup(self, key, listener, cstacker, validate):
 
         sa = self._dereference(key)
 
@@ -237,7 +406,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
                 return
 
         if not sa.module.STORAGE_ADAPTER_IS_AVAILABLE:
-            return _emit_about_nonworking_stub(listener, sa, contextualize)
+            return _emit_about_nonworking_stub(listener, sa, cstacker)
 
         return sa
 
@@ -283,16 +452,16 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
 def _crazy_schema_thing(opened, main, meta_collection, listener):
 
     def resolve_storage_adapter_given_name():
-        def contextualize(dct):
-            scanner.contextualize_about_field_value(dct, reso.field)
+        def cstacker():
+            return (scanner.contextualize_about_field_value({}, reso.field),)
 
         def validate(sa):
             if sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
                 return True
-            return _emit_about_not_directory_based(listener, sa, contextualize)
+            return _emit_about_not_directory_based(listener, sa, cstacker)
 
         sa = meta_collection.storage_adapter_via_key(
-            reso.field.field_value_string, listener, contextualize, validate)
+            reso.field.field_value_string, listener, cstacker, validate)
         if sa is None:
             raise stop()
         reso.storage_adapter = sa
@@ -302,9 +471,9 @@ def _crazy_schema_thing(opened, main, meta_collection, listener):
         if 'storage_adapter' == reso.field.field_name:
             return
 
-        def contextualize(dct):
-            scanner.contextualize_about_field_name(dct, reso.field)
-        _emit_about_first_field_name(listener, contextualize)
+        def cstacker():
+            return (scanner.contextualize_about_field_name({}, reso.field),)
+        _emit_about_first_field_name(listener, cstacker)
         raise stop()
 
     def resolve_first_field_line():
@@ -373,6 +542,35 @@ def _crazy_schema_thing(opened, main, meta_collection, listener):
         pass
 
 
+def _classify_collection_identifier_for_NEW_WAY(x):
+    # exists only to DRY up any logic to be shared between the two new ways
+
+    def these():
+        def arg_looks_like_writable_file_handle():  # assume ..
+            return x.writable()
+
+        def arg_looks_like_readable_file_handle():  # assume below
+            return x.readable()
+
+        def arg_looks_like_file_handle():
+            return hasattr(x, 'fileno')
+
+        def arg_looks_like_string():
+            return hasattr(x, 'isalnum')
+
+        return locals()
+
+    class lazy_classifier:
+        pass
+
+    def build_method(f):
+        return property(lambda _: f())
+
+    for attr, f in these().items():
+        setattr(lazy_classifier, attr, build_method(f))
+    return lazy_classifier()
+
+
 # == models
 
 class _StorageAdapter:  # move this to its own file if it gets big
@@ -402,9 +600,9 @@ class _NOT_YET_LOADED:  # #as-namespace-only
 
 # == whiners
 
-def _emit_about_nonworking_stub(listener, sa, contextualize=None):
+def _emit_about_nonworking_stub(listener, sa, cstacker=None):
     def structurer():  # #not-covered, kind of crazy
-        dct = {}
+        dct = _flatten_context_stack(cstacker()) if cstacker else {}
         mod = sa.module
         moniker = repr(sa.key)
         if hasattr(mod, 'STORAGE_ADAPTER_UNAVAILABLE_REASON'):
@@ -415,18 +613,15 @@ def _emit_about_nonworking_stub(listener, sa, contextualize=None):
             dct['reason_tail'] = use_msg
         else:
             dct['reason_tail'] = repr(sa.key)
-        if contextualize is not None:
-            contextualize(dct)
         return dct
     listener(*_EC_for_cannot_load,
              'storage_adapter_is_not_available', structurer)
 
 
-def _emit_about_not_directory_based(listener, sa, contextualize):
+def _emit_about_not_directory_based(listener, sa, cstacker):
     def structurer():  # (Case1421)
-        _long_reason = ''.join(__pieces_for_not_dir_based(sa))
-        dct = {'reason': _long_reason}
-        contextualize(dct)
+        dct = _flatten_context_stack(cstacker())
+        dct['reason'] = ''.join(__pieces_for_not_dir_based(sa))
         return dct
     listener(*_EC_for_cannot_load,
              'storage_adapter_is_not_directory_based', structurer)
@@ -454,11 +649,10 @@ def __pieces_for_not_dir_based(sa):
         yield f"the '{sa.key} storage adapter is not available"
 
 
-def _emit_about_first_field_name(listener, contextualize):
+def _emit_about_first_field_name(listener, cstacker):
     def structurer():  # (Case1418)
-        dct = {}
+        dct = _flatten_context_stack(cstacker())
         dct['expecting'] = '"storage_adapter" as field name'
-        contextualize(dct)
         return dct
     listener(*_EC_for_cannot_load,
              'unexpected_first_field_of_schema_file', structurer)
@@ -516,13 +710,12 @@ def _same_splay_reason(noun_singular, wrong, key_via_what):
     return {'reason': _reason}
 
 
-def _emit_about_SA_key(listener, key, order, contextualize):
+def _emit_about_SA_key(listener, key, order, cstacker):
     def structurer():  # (Case1419)
-        dct = {}
+        dct = _flatten_context_stack(cstacker())
         _these = ', '.join(repr(s) for s in order)
         dct['reason'] = (f"unknown storage adapter {repr(key)}. "
                          f"known storage adapters: ({_these})")
-        contextualize(dct)
         return dct
     listener(*_EC_for_cannot_load, 'unknown_storage_adapter', structurer)
 
@@ -533,6 +726,27 @@ def _say_extname_collision(en, first_key, second_key):
                    f"'{first_key}' and '{first_key}'. There can only be one.")
         return _reason
 
+
+# == Smalls
+
+def _throwing_listener_and_stop(listener):
+
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise stop()
+
+    class stop(RuntimeError):
+        pass
+
+    return throwing_listener, stop
+
+
+def _flatten_context_stack(context_stack):  # #[#510.14]
+    return {k: v for row in context_stack for k, v in row.items()}
+
+
+# == Libs
 
 def re_lib():
     import re

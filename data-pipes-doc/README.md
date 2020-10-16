@@ -17,6 +17,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |                  [#463]   |       | functional pipelines (2 files)
+|                 [#459.T]  | #wish | parse like ffmpeg so -f format opt works at both
 |                 [#459.19] |       | track algorithm: partitioning
 |                  [#459.R] |       | near sync keyer (builder) in flux
 |                 [#459.17] | #trak | producer script moudules that aren't modules
@@ -32,7 +33,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.G] | #trak | whether in-memory should be official format
 |                  [#459.F] | #trak | CLI integration tests have redundant setup
 |                  [#459.E] | #trak | [record mapper]
-|                  [#459.D] | #hole |
+|                  [#459.4] |       | [the last roadmap]
 |                  [#459.C] |       | [the new way]
 |                  [#459.2] |       | an exemplary implementation of sync
 |                  [#459]   |       | (internal & external tracking of small)

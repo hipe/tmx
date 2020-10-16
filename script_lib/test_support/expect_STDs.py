@@ -60,8 +60,8 @@ def build_end_state_actively_for(tc):
 def build_end_state_passively_for(tc):
     sin = _stdin_for(tc)
     func = spy_on_write_and_lines_for
-    sout, sout_lines = func(tc, 'DBG SOUT: ')
-    serr, serr_lines = func(tc, 'DBG SERR: ')
+    sout, sout_lines = func(tc, 'DBG SOUT: ', isatty=True)
+    serr, serr_lines = func(tc, 'DBG SERR: ', isatty=True)
     argv = tc.given_argv()
     ec = tc.given_CLI()(sin, sout, serr, argv, None)
 
@@ -83,7 +83,13 @@ def _stdin_for(tc):
     if sin is None:
         return
     if isinstance(sin, str):
-        return _fake_stdins[sin]
+        return _pretend_STDIN_via_key(sin)
+    if hasattr(sin, '__next__'):
+        base = _pretend_STDIN_via_key('FAKE_STDIN_NON_INTERACTIVE')
+        return base._replace(lines=sin)
+    if isinstance(sin, tuple):
+        base = _pretend_STDIN_via_key('FAKE_STDIN_NON_INTERACTIVE')
+        return base._replace(lines=sin)
     sin.isatty  # assert
     return sin
 
@@ -468,11 +474,12 @@ see topic identifier.
 '''
 
 
-def spy_on_write_and_lines_for(tc, dbg_head):
-    recvs = [build_write_receiver_for_debugging(dbg_head, lambda: tc.do_debug)]
+def spy_on_write_and_lines_for(tc, dbg_head, isatty=None):
+    wr = build_write_receiver_for_debugging(dbg_head, lambda: tc.do_debug)
+    recvs = [wr]
     recv, lines = build_write_receiver_for_recording_and_lines()
     recvs.append(recv)
-    return spy_on_write_via_receivers(recvs), lines
+    return spy_on_write_via_receivers(recvs, isatty), lines
 
 
 def build_write_receiver_for_debugging(dbg_msg_head, do_debug_function):
@@ -509,7 +516,9 @@ def build_write_receiver_for_stopping(how_many_writes):
     return recv, stop
 
 
-def spy_on_write_via_receivers(receivers):  # multiplex `write()` calls
+def spy_on_write_via_receivers(receivers, isatty=None):
+    # multiplex `write()` calls
+
     if 1 == len(receivers):
         def write(s):
             recv(s)
@@ -521,39 +530,88 @@ def spy_on_write_via_receivers(receivers):  # multiplex `write()` calls
                 recv(s)
             return len(s)
     from modality_agnostic import write_only_IO_proxy as func
-    return func(write=write, flush=lambda: None)
+    return func(write=write, flush=lambda: None, isatty=isatty)
 
 
 # == END NEW
 
 
-# == (absorbed at #history-B.2) (see [#605.4] for a mock)
+# == (absorbed at #history-B.2)
 
-class FAKE_STDIN_INTERACTIVE:  # #class-as-namespace
-    # (if you want a stub that plays back lines, move [#605.4] to here)
 
-    def isatty():
+def _definitions():
+    yield 'FAKE_STDIN_INTERACTIVE', {'isatty': True}
+    yield 'FAKE_STDIN_NON_INTERACTIVE', {'isatty': False}
+
+
+def _pretend_STDIN_via_key(k):
+    memo = _pretend_STDIN_via_key
+    if memo.value is None:
+        memo.value = _build_dereferencer()
+    return memo.value(k)
+
+
+_pretend_STDIN_via_key.value = None
+
+
+def _build_dereferencer():
+    def dereference(k):
+        if k not in cache:
+            cache[k] = _Fake_Stub_or_Mock_STDIN(**definitions_pool.pop(k))
+        return cache[k]
+    definitions_pool = {k: dct for k, dct in _definitions()}
+    cache = {}
+    return dereference
+
+
+class _Fake_Stub_or_Mock_STDIN:
+
+    def __init__(self, isatty):
+        self._isatty = isatty
+
+    def _replace(self, **kwargs):
+        otr = self.__class__(self._isatty)
+        recv_via_k = _receiver_via_option_key(otr)
+        for k, v in kwargs.items():
+            recv_via_k[k](v)
+        return otr
+
+    def __iter__(self):
+        return self  # (Case1068DP)
+
+    def __next__(self):
+        return self._produce_next_item()
+
+    def isatty(self):
+        return self._isatty
+
+    def fileno(_):  # #provision [#608.15]: implement this correctly
+        return 0
+
+    def readable(_):
         return True
 
-    def fileno(_):  # #provision [#608.15]: implement this correctly
-        return 0
+    mode = 'r'
 
 
-class FAKE_STDIN_NON_INTERACTIVE:  # #class-as-namespace
+def _receiver_via_option_key(self):
+    def lines(lines):
+        if hasattr(lines, '__next__'):
+            def use():
+                return next(lines)
+        elif isinstance(lines, tuple):
+            def use():
+                return next(itr)
+            itr = iter(lines)
+            self._LINE = lines
+        else:
+            # #[#022]
+            raise TypeError(f"needed tup or gen (had {type(lines)!r})")
+        self._produce_next_item = use
+    locs = locals()
+    return {k: locs[k] for k in (set(locs.keys()) - {'locs', 'self'})}
 
-    def isatty():
-        return False
 
-    def fileno(_):  # #provision [#608.15]: implement this correctly
-        return 0
-
-
-_fake_stdins = {
-    'FAKE_STDIN_INTERACTIVE': FAKE_STDIN_INTERACTIVE,
-    'FAKE_STDIN_NON_INTERACTIVE': FAKE_STDIN_NON_INTERACTIVE,
-}
-
-# might move [#605.5] to here from a lib evaporated at #history-B.2
-
+# #history-B.3
 # #history-B.2 unification and simplifcation, became almost full rewrite
 # #born.

@@ -214,7 +214,7 @@ class write_only_IO_proxy:
         .#used-by: upload-bot
     """
 
-    def __init__(self, write, on_OK_exit=None, flush=None):
+    def __init__(self, write, on_OK_exit=None, flush=None, isatty=None):
         self._on_OK_exit = on_OK_exit
 
         def use_write(s):
@@ -225,6 +225,9 @@ class write_only_IO_proxy:
 
         if flush is not None:
             self.flush = flush  # #used-by: kiss-rdb-test
+
+        if isatty is not None:
+            self._isatty = isatty
 
     def __enter__(self):
         return self
@@ -237,6 +240,12 @@ class write_only_IO_proxy:
         f = self._on_OK_exit
         self._on_OK_exit = None
         f()
+
+    def isatty(self):
+        self._isatty
+
+    def writable(_):
+        return True  # (Case1068DP)
 
     def fileno(_):  # #provision [#608.15]: implement this correctly
         return 1

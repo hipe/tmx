@@ -79,8 +79,8 @@ class FakeFilesystem:
             mutex.shoot()
             self._receive_writes(buff, path)
 
-        from modality_agnostic import write_only_IO_proxy
-        return write_only_IO_proxy(
+        from modality_agnostic import write_only_IO_proxy as func
+        return func(
                 write=lambda s: buff.append(s),  # #hi.
                 on_OK_exit=on_OK_exit)
 

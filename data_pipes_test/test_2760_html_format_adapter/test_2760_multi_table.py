@@ -233,8 +233,8 @@ def fake_STDOUT_and_lines_for(tc):
     else:
         recv_write = lines.append
 
-    from modality_agnostic import write_only_IO_proxy
-    return write_only_IO_proxy(recv_write, on_OK_exit=lambda: None), lines
+    from modality_agnostic import write_only_IO_proxy as func
+    return func(recv_write, on_OK_exit=lambda: None), lines
 
 
 _url = 'https://gohugo.io'

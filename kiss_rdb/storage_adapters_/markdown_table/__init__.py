@@ -864,7 +864,7 @@ def _combine_two_monadics(f1, f2):
     return f3
 
 
-def _flatten_context_stack(context_stack):
+def _flatten_context_stack(context_stack):  # #[#510.14]
     return {k: v for row in context_stack for k, v in row.items()}
 
 

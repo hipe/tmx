@@ -12,7 +12,14 @@ def _subcommands():
     yield 'select', lambda: _command_called_select
     yield 'filter-by-tags', lambda: _load('.filter_by_tags')
     yield 'convert-collection', lambda: _load('.convert_collection')
+    yield 'cc', lambda: _hack_an_alias_to_cc
     yield 'sync', lambda: _load('.sync')
+
+
+def _hack_an_alias_to_cc(*_5):  # #wish [#608.11]
+    "(alias to `convert-collection` (hacky experiment))"
+
+    return _load('.convert_collection')(*_5)
 
 
 def _CLI(sin, sout, serr, argv, enver):

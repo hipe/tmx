@@ -98,8 +98,8 @@ class _FileWriter:
         self.force_is_present = force_is_present
         self.is_dry = is_dry
         if is_dry:
-            from modality_agnostic import write_only_IO_proxy
-            self._dry_open_file = write_only_IO_proxy(
+            from modality_agnostic import write_only_IO_proxy as func
+            self._dry_open_file = func(
                     write=lambda x: None,
                     on_OK_exit=lambda: None)
 

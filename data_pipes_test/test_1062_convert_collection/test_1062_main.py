@@ -5,25 +5,26 @@ import unittest
 
 class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 
-    # -- assertions & assistance
+    # == Assert Exitcode (assertions then readers)
 
-    def _same_business_lines(self):  # NOTE not alphabetized (unlike before)
-        act = self.outputted_file_lines.table_lines
+    def expect_failure_exitcode(self):
+        self.assertNotEqual(self.exitcode_checked(), 0)
+
+    def expect_success_exitcode(self):
+        self.assertEqual(self.exitcode_checked(), 0)
+
+    def exitcode_checked(self):
+        act = self.end_state.exitcode
+        self.assertIsInstance(act, int)
+        return act
+
+    # == High-Level Custom Assertions
+
+    def expect_choo_cha_boo_bah(self):  # NOTE not alphabetized (unlike before)
+        act = self.end_state_file_table.table_lines
         self.assertIn('choo chah', act[-2])
         self.assertIn('boo bah', act[-1])
         self.assertEqual(len(act), 4)
-
-    def fails(self):
-        self.assertNotEqual(self._validated_exitstatus(), 0)
-
-    def succeeds(self):
-        self.assertEqual(self._validated_exitstatus(), 0)
-
-    def _validated_exitstatus(self):
-        _es = self.end_state
-        ec = _es.exitcode
-        self.assertIsInstance(ec, int)
-        return ec
 
     def invites(self):
         # _exp = "see 'ohai-mami --help'\n"
@@ -32,27 +33,9 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
         self.assertIn(exp, self.last_stderr_line())
 
     @property
-    def reason_stderr_line(self):
-        return self.last_stderr_line()  # click ick/meh
-
-    def first_stderr_line(self):
-        return self.stderr_lines[0]
-
-    def last_stderr_line(self):
-        return self.stderr_lines[-1]
-
-    @property
-    def stderr_lines(self):
-        return self._lines('stderr')
-
-    def _lines(self, stdout_or_stderr):
-        return self.end_state.first_line_run(stdout_or_stderr).lines
-
-    @property
     @shared_subject_in_child_classes
-    def outputted_file_lines(self):
-
-        itr = iter(self.end_state.first_line_run('stdout').lines)
+    def end_state_file_table(self):
+        itr = iter(self.stdout_lines)
         line = next(itr)
         head_lines = []
         if '---' == line[0:3]:
@@ -98,6 +81,35 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 
         return OutputtedFileLines
 
+    # == Assert Output Lines
+
+    def expect_expected_output_lines(self):
+        actual_lines = self.stdout_lines
+        expected_lines = tuple(self.expected_output_lines())
+        self.assertSequenceEqual(actual_lines, expected_lines)
+
+    # == Read End State Lines
+
+    @property
+    def reason_stderr_line(self):
+        return self.last_stderr_line()  # click ick/meh
+
+    def first_stderr_line(self):
+        return self.stderr_lines[0]
+
+    def last_stderr_line(self):
+        return self.stderr_lines[-1]
+
+    @property
+    def stdout_lines(self):
+        return self.end_state.stdout_lines
+
+    @property
+    def stderr_lines(self):
+        return self.end_state.stderr_lines
+
+    # == Build End State
+
     @property
     @shared_subject_in_child_classes
     def end_state(self):
@@ -108,6 +120,8 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 
         return func(self)
 
+    # == Givens (defaults & convenience readers)
+
     def stdin_that_is_NOT_interactive(self):
         return 'FAKE_STDIN_NON_INTERACTIVE'
 
@@ -115,7 +129,7 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
         return 'FAKE_STDIN_INTERACTIVE'
 
     def given_argv(self):
-        return 'ohai mami', 'convert-collection', *self.argv_tail()
+        return 'ohai mami', 'convert-collection', *self.given_argv_tail()
 
     def given_CLI(_):
         from data_pipes.cli import _CLI as func
@@ -124,10 +138,10 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
     do_debug = False
 
 
-class Case010_help(CommonCase):
+class Case1050_help(CommonCase):
 
     def test_100_succeeds(self):
-        self.succeeds()
+        self.expect_success_exitcode()
 
     def test_200_content(self):
         lines = self.end_state.first_line_run('stderr').lines
@@ -137,14 +151,14 @@ class Case010_help(CommonCase):
     def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         return ('--help',)
 
 
-class Case020_no_args(CommonCase):
+class Case1053_no_args(CommonCase):
 
     def test_100_fails(self):
-        self.fails()
+        self.expect_failure_exitcode()
 
     def test_200_whines(self):
         exp = "Expecting FROM_COLLECTION"
@@ -156,14 +170,14 @@ class Case020_no_args(CommonCase):
     def given_stdin(self):
         return self.stdin_that_IS_interactive()  # be jerks
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         return ()
 
 
-class Case030_args_and_stdin(CommonCase):
+class Case1056_args_and_stdin(CommonCase):
 
     def test_100_fails(self):
-        self.fails()
+        self.expect_failure_exitcode()
 
     def test_200_content(self):
         # exp = 'parameter error: when piping from STDIN, <script> must be "-"
@@ -179,14 +193,14 @@ class Case030_args_and_stdin(CommonCase):
     def given_stdin(self):
         return self.stdin_that_is_NOT_interactive()
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         return ('no-see-1', 'no-see-2')
 
 
-class Case040_too_many_args(CommonCase):
+class Case1059_too_many_args(CommonCase):
 
     def test_100_fails(self):
-        self.fails()
+        self.expect_failure_exitcode()
 
     def test_200_content(self):
         act = self.reason_stderr_line
@@ -201,54 +215,54 @@ class Case040_too_many_args(CommonCase):
     def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case1062_one_arg_which_is_stdin(CommonCase):  # #midpoint
+class Case1062DP_one_arg_which_is_stdin(CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
-        self.succeeds()
+        self.expect_success_exitcode()
 
     def test_200_header_row_and_second_one(self):
-        act = self.outputted_file_lines.table_lines
+        act = self.end_state_file_table.table_lines
         self.assertRegex(act[0], r'^\| [A-Z][a-z]+ \|$')
         self.assertRegex(act[1], r'^(?:\|[-:]-+:?)+\|$')
 
     def test_220_business_object_rows_are_NOT_alpahbetized(self):
-        self._same_business_lines()
+        self.expect_choo_cha_boo_bah()
 
     def test_300_head_lines(self):
-        _act = self.outputted_file_lines.head_lines
+        _act = self.end_state_file_table.head_lines
         self.assertIn('i am your collection', _act[1])
 
     def test_400_tail_lines(self):
-        _act = self.outputted_file_lines.tail_lines
+        _act = self.end_state_file_table.tail_lines
         self.assertIn('#born', _act[-1])
 
     def given_stdin(self):
-        return STUB_STDIN(
+        return (
                 # '{ "header_level": 1 }\n',  # #history-A.2
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n')
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         return ('-', '--from-format', 'producer-script',
                 '-', '--to-format', 'markdown-table')
 
 
-class Case060_one_arg_which_is_token(CommonCase):
+class Case1065_one_arg_which_is_token(CommonCase):
 
     def test_100_succeeds(self):
-        self.succeeds()
+        self.expect_success_exitcode()
 
     def test_200_same_business_lines(self):
-        self._same_business_lines()
+        self.expect_choo_cha_boo_bah()
 
     def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
-    def argv_tail(self):
+    def given_argv_tail(self):
         from kiss_rdb_test import fixture_executables as mod
         these = mod.__path__._path
         fixtures_dir, = tuple(set(these))  # sometimes there's 2 idk
@@ -257,26 +271,64 @@ class Case060_one_arg_which_is_token(CommonCase):
         return producer_script, '-', '--to-format', 'markdown-table'
 
 
-class STUB_STDIN:  # :[#605.4]
+class Case1068DP_convert_from_CSV_to_json(CommonCase):
 
-    def __init__(self, *lines):
-        self._lines = lines
+    def test_100_succeeds(self):
+        self.expect_success_exitcode()
 
-    def isatty(self):
-        return False
+    def test_200_outputs_correctly(self):
+        self.expect_expected_output_lines()
 
-    def __iter__(self):
-        return iter(self._lines)
+    def given_argv_tail(self):
+        return '-f', 'csv', '-', '-'  # json is default format
 
-    def fileno(_):  # #provision [#608.15]: implement this correctly
-        return 0
+    def given_stdin(self):
+        yield 'Field A, Field B\n'
+        yield 'ting 1, ting 2\n'
+        yield 'ting 3, ting 4\n'
 
-    mode = 'r'
+    def expected_output_lines(_):
+        yield '[{\n'
+        yield '  "field_A": "ting 1",\n'
+        yield '  "field_B": "ting 2"\n'
+        yield '},\n'
+        yield '{\n'
+        yield '  "field_A": "ting 3",\n'
+        yield '  "field_B": "ting 4"\n'
+        yield '}]\n'
+
+
+class Case1071_convert_from_json_to_CSV(CommonCase):
+
+    def test_100_succeeds(self):
+        self.expect_success_exitcode()
+
+    def test_200_outputs_correctly(self):
+        self.expect_expected_output_lines()
+
+    def given_argv_tail(self):
+        return '-f', 'json', '-', '-t', 'csv', '-'
+
+    def given_stdin(self):
+        yield '[{\n'
+        yield '  "field_A": "ting 1",\n'
+        yield '  "field_B": "ting 2"\n'
+        yield '},\n'
+        yield '{\n'
+        yield '  "field_A": "ting 3",\n'
+        yield '  "field_B": "ting 4"\n'
+        yield '}]\n'
+
+    def expected_output_lines(_):
+        yield 'Field A, Field B\n'
+        yield 'ting 1, ting 2\n'
+        yield 'ting 3, ting 4\n'
 
 
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4 begin magnetic cloud transition
 # #history-B.3 get rid of the ugliest click related code ever
 # #history-B.2
 # #history-A.3: moved here from another subproject

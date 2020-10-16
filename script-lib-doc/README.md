@@ -26,6 +26,7 @@ the related API that preceded this one.)
 |[#608.13]                  | #wish | argument arity `<like-this>?`
 |[#608.L]                   | #hole |
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
+|[#608.11]                  | #wish | command aliases
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
 |[#608.8]                   | #trak | track places where we render parse error context
 |[#608.7]                   | #trak | expression shape: convert category into first line prefix

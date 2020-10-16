@@ -98,8 +98,8 @@ class Case1580_generate_one_document(CommonCase):
     def ad_hoc_end_state(self):
 
         writes = []
-        from modality_agnostic import write_only_IO_proxy
-        spy = write_only_IO_proxy(
+        from modality_agnostic import write_only_IO_proxy as func
+        spy = func(
                 write=writes.append,
                 on_OK_exit=lambda: None)
 

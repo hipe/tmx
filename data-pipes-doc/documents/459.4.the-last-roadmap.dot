@@ -1,0 +1,29 @@
+digraph g {
+label="\n
+fig. 459.4: the last roadmap"
+rankdir=BT
+n5[label="change it\nto a thing"]
+n4->n5
+n4[label="choose\na roadmap"]
+n3_C->n4
+n3_B->n4
+n3_A->n4
+n3_C[label="select"]
+n3_B[label="filter\nby tags"]
+n3_A[label="convert"]
+n2->n3_C
+n2->n3_B
+n2->n3_A
+n2[label="did you dismantle\nthe idea of\na collection?"]
+n1->n2
+n1[label="fieldify\nall remaining\nnon-fielded\nSA's"]
+n1_C->n1
+n1_B->n1
+n1_A->n1
+n1_C[label="markdown"]
+n1_B[label="producer script"]
+n1_A[label="rec"]
+}
+/*
+# #born
+*/

@@ -81,8 +81,7 @@ class schema_file_scanner_via_recfile_scanner:
         def structurer():  # (Case1404)
             dct = {}
             dct['reason'] = f'{repr(field.field_name)} appears at least twice'
-            self.contextualize_about_field_name(dct, field)
-            return dct
+            return self.contextualize_about_field_name(dct, field)
         listener('error', 'structure',
                  'config_field_names_cannot_occur_more_than_once_in_a_file',
                  structurer)
@@ -99,16 +98,17 @@ class schema_file_scanner_via_recfile_scanner:
 
     def contextualize_about_field_name(self, dct, field):
         dct['position'] = field.position_of_start_of_field_name
-        self._common_contextualize(dct)
+        return self._common_contextualize(dct)
 
     def contextualize_about_field_value(self, dct, field):
         dct['position'] = field.position_of_start_of_value
-        self._common_contextualize(dct)
+        return self._common_contextualize(dct)
 
     def _common_contextualize(self, dct):
         parse_state = self.recfile_scanner
         dct['line'] = parse_state.line
         dct['lineno'] = parse_state.lineno
         dct['path'] = parse_state.path
+        return dct
 
 # #born.

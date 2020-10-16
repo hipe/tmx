@@ -1,19 +1,28 @@
+from collections import namedtuple as _nt
+
+
 def _formals():
-    yield f'{_from_format_flag}=<fmt>', _same_help
+
+    # (using '-f' is nice because it looks and means like ffmpeg)
+    yield '-f', f'{_from_monikers.format_flag}=<fmt>', _same_help
+
     yield('--from-arg=<arg>*',
           'EXPERIMENTAL pass thru to producer script (yikes)')
-    yield f'{_to_format_flag}=<fmt>', _same_help
+
+    # (using '-t' is sad, we would rather have again '-f' like ffmpeg
+    # but that would require custom arg parsing that is way out of scope.
+    # it's basically `[opts] arg` twice. #wish [#459.T])
+    yield '-t', f'{_to_monikers.format_flag}=<fmt>', _same_help
+
     from data_pipes.cli import this_screen_ as this_screen
     yield '-h', '--help', this_screen
-    yield _from_arg_moniker, 'the collection the data comes from'
-    yield _to_arg_moniker, 'the collection the data goes to'
+    yield _from_monikers.arg, 'the collection the data comes from'
+    yield _to_monikers.arg, 'the collection the data goes to'
 
 
-_from_arg_moniker = 'FROM_COLLECTION'
-_from_format_flag = '--from-format'
-
-_to_arg_moniker = 'TO_COLLECTION'
-_to_format_flag = '--to-format'
+_monikers = _nt('Monikers', ('arg', 'format_flag', 'STDIN_STDOUT'))
+_from_monikers = _monikers('FROM_COLLECTION', '--from-format', 'STDIN')
+_to_monikers = _monikers('TO_COLLECTION', '--to-format', 'STDOUT')
 
 
 _same_help = "(or will try to infer from file extension if present)"
@@ -32,8 +41,7 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     written to STDOUT. Only certain formats are available for certain cases;
     for example an output of "-" is available only for single-file formats.
 
-    There is only one particiapting output format at writing, and it
-    only writes to STDOUT.
+    At writing the only participating formats are CSV and json..
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
@@ -66,9 +74,14 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     # shouldn't need RNG ever - don't we want to transfer the same ID's in?
 
     def main():
-        maybe_dash_is_used_as_FROM()
-        maybe_dash_is_used_as_TO()
-        make_sure_STDIN_interactivity_looks_right()
+        try:
+            return main_NEW_WAY()
+        except stop_because_OLD_WAY as exe:
+            e = exe
+        check_all_old(*e.args)
+        return main_OLD_WAY()
+
+    def main_OLD_WAY():
         from_coll = resolve_from_collection()
         to_coll = resolve_to_collection()
         sch, ents = from_coll.to_schema_and_entities(throwing_listener)
@@ -81,61 +94,111 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
                     recv(dct)
         return mon.exitstatus
 
+    def main_NEW_WAY():
+        with open_the_input_collection_for_traversal() as (schema, ents):
+            with open_the_output_collection_for_writing() as receiver:
+                receiver.receive_schema_and_entities(schema, ents, listener)
+        return mon.exitstatus
+
+    # == BEGIN hack bridge to accomodate old way which will go away eventually
+
     def resolve_to_collection():
-        return when_STDOUT() if self.TO_is_STDOUT else when_not_STDOUT()
+        fmt, arg = normalize(to_format, to_collection, stdout, _to_monikers)
+        return chum_chum_zum_zum(fmt, arg)
 
     def resolve_from_collection():
-        return when_STDIN() if self.FROM_is_STDIN else when_not_STDIN()
+        fmt, s = normalize(from_format, from_collection, stdin, _from_monikers)
+        return chum_chum_zum_zum(fmt, s)
 
-    def when_STDOUT():
-        return self.to_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            stdout, mon.listener)
+    def chum_chum_zum_zum(fmt, arg):
+        _ = collib.collection_via_path(arg, throwing_listener, format_name=fmt)
+        return _._impl
 
-    def when_STDIN():
-        return self.from_SA.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            stdin, mon.listener)
-
-    def when_not_STDOUT():
-        return meta_collection.collection_via_path(
-            to_collection, tl, format_name=to_format)._impl
-
-    def when_not_STDIN():
-        return meta_collection.collection_via_path(
-            from_collection, tl, format_name=from_format)._impl
-
-    def make_sure_STDIN_interactivity_looks_right():
-        if self.FROM_is_STDIN:
-            if not stdin.isatty():
-                return
-            error(f"when {_from_arg_moniker} is '-' STDIN must be a pipe")
-        if stdin.isatty():
+    def check_all_old(input_or_output):
+        expect_is_none = ('output', 'input').index(input_or_output)
+        two, two_ = REMEMBER_THESE_PEEKS
+        is_none_ = two_ is None
+        assert bool(expect_is_none) == is_none_
+        if is_none_:
+            if (use_to_format := to_format) is None:
+                use_to_format = hack_infer_format(to_collection)
+            two_ = use_to_format, to_collection
+        fmt, arg = two
+        fmt_, arg_ = two_
+        is_old, is_old_ = is_old_way[fmt], is_old_way[fmt_]
+        if all((is_old, is_old_)):
             return
-        error(f"STDIN cannot be a pipe unless {_from_arg_moniker} is '-'")
+        s, s_ = (('old' if b else 'new') for b in (is_old, is_old_))
+        msgs, pcs = [], []
+        pcs.append(f"can't convert from {fmt} (which is currently {s} way)")
+        pcs.append(f"to {fmt_} (which is currently {s_} way)")
+        msgs.append(' '.join(pcs))
+        msgs.append(f"(from collection: {arg})")
+        msgs.append(f"(to collection: {arg_})")
+        long_msg = '. '.join(msgs)
+        raise RuntimeError(long_msg)
 
-    def maybe_dash_is_used_as_FROM():
-        dash_ham('FROM_is_STDIN', 'from_SA', _from_arg_moniker,
-                 _from_format_flag, from_collection, from_format)
-
-    def maybe_dash_is_used_as_TO():
-        dash_ham('TO_is_STDOUT', 'to_SA', _to_arg_moniker,
-                 _to_format_flag, to_collection, to_format)
-
-    def dash_ham(yn_attr, sa_attr, arg_moniker, format_flag, coll_path, fmt):
-        memo(yn_attr, yn := '-' == coll_path)
-        if not yn:
-            return
+    def CHECK_FOR_OLD_WAY(fmt, arg, input_or_output):
         if fmt is None:
-            error(f"{arg_moniker} of '-' requires '{format_flag}'")
-        memo(sa_attr, meta_collection.storage_adapter_via_format_name(fmt, tl))
+            fmt = hack_infer_format(arg)
+        offset = ('input', 'output').index(input_or_output)
+        REMEMBER_THESE_PEEKS[offset] = fmt, arg
+        if is_old_way[fmt]:
+            raise stop_because_OLD_WAY(input_or_output)
+
+    def hack_infer_format(arg):
+        from os.path import splitext
+        return cha_via_cha[splitext(arg)[1]]
+
+    REMEMBER_THESE_PEEKS = [None, None]
+
+    cha_via_cha = {
+        '.csv': 'csv',
+        '.json': 'json',
+        '.md': 'markdown-table',
+        '.py': 'producer-script',
+    }
+
+    is_old_way = {
+        'csv': False,
+        'json': False,
+        'markdown-table': True,
+        'producer-script': True,
+    }
+
+    class stop_because_OLD_WAY(RuntimeError):
+        pass
+
+    # == END old way will go away
+
+    def open_the_input_collection_for_traversal():
+        fmt, s = normalize(from_format, from_collection, stdin, _from_monikers)
+        CHECK_FOR_OLD_WAY(fmt, s, 'input')  # delete just this line in the futu
+        return collib.OPEN_FOR_READING_THE_NEW_WAY(fmt, s, throwing_listener)
+
+    def open_the_output_collection_for_writing():
+        fmt, arg = normalize(to_format, to_collection, stdout, _to_monikers)
+        CHECK_FOR_OLD_WAY(fmt, arg, 'output')  # delete just this line in the f
+        return collib.OPEN_FOR_WRITING_THE_NEW_WAY(fmt, arg, throwing_listener)
+
+    def normalize(fmt, arg, sin_sout, o):
+        if '-' == arg:
+            if sin_sout.isatty() and 'STDIN' == o.STDIN_STDOUT:
+                # (oops this one is asymmetrical)
+                error(f"when {o.arg} is '-', {o.STDIN_STDOUT} must be a pipe")
+            use_coll_ID = sin_sout
+        elif sin_sout.isatty():
+            use_coll_ID = arg
+        else:
+            error(f"{o.STDIN_STDOUT} cannot be a pipe unless {o.arg} is '-'")
+        return fmt, use_coll_ID
 
     # == Listeners and related
 
     def throwing_listener(sev, *rest):
-        mon.listener(sev, *rest)
+        listener(sev, *rest)
         if 'error' == sev:
             raise stop()
-
-    tl = throwing_listener
 
     def error(msg):
         stderr.write(''.join((msg, '\n')))  # ich muss sein [#605.2]
@@ -153,10 +216,12 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         pass
 
     # == Smalls and go!
+
     from data_pipes import meta_collection_ as func
-    meta_collection = func()
+    collib = func()
 
     mon = monitor_via_(stderr)
+    listener = mon.listener
     try:
         return main()
     except stop:

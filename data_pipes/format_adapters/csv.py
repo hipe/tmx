@@ -9,63 +9,6 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 # STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's a placeholder stub"
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, rng=None):
-
-    if hasattr(collection_path, 'fileno'):
-        fh = collection_path
-        assert 'r' == fh.mode[0]
-        assert 0 == fh.fileno()
-        return _collection_implementation_via_read_only_stream(fh, listener)
-
-    def when_path(args, monitor):  # #here1
-        xx('where')
-        assert(0 == len(args))
-
-        class ContextManagerWhenPath:
-
-            def __enter__(self):
-                self._close_me = None
-                opened = (opn or open)(collection_path)
-                self._close_me = opened
-                return _traverse_via_upstream(opened, monitor.listener)
-
-            def __exit__(self, *_3):
-                if self._close_me is None:
-                    return
-                self._close_me.close()
-                self._close_me = None
-
-        return ContextManagerWhenPath()
-
-    return _CollectionImplementation(when_path)
-
-
-def _collection_implementation_via_read_only_stream(stdin, _monitor):
-    def when_IO(args, monitor):  # #here1
-        assert(0 == len(args))
-
-        class ContextManagerWhenSTDIN:
-            def __enter__(self):
-                return _traverse_via_upstream(stdin, monitor.listener)
-
-            def __exit__(self, *_3):
-                pass
-        return ContextManagerWhenSTDIN()
-    return _CollectionImplementation(when_IO)
-
-
-class _CollectionImplementation:
-
-    def __init__(self, f):
-        raise RuntimeError('away this')
-        self._GONE_multi_depth_value_dictionaries_as_storage_adapter = f
-
-
-def _traverse_via_upstream(*_):
-    raise RuntimeError('GONE')
-
-
 def SCHEMA_AND_ENTITIES_VIA_LINES(lines, listener):
 
     def main():
