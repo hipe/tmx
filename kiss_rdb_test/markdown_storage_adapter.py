@@ -33,25 +33,28 @@ def pretend_file_via_path_and_lines():
 
 # ==
 
-def collection_implementation_via_pretend_file(pfile, listener=None):
+def collection_via_pretend_file(pfile, listener=None):
 
     # Provide a new definition of `open` that uses our fixture lines
     def opn(path):
         assert pfile.path == path
         return pfile
 
-    return collection_implementation_via(pfile.path, listener, opn)
+    return collection_via(pfile.path, listener, opn)
 
 
-def collection_implementation_via(path, listener=None, opn=None):
+def collection_via(path, listener=None, opn=None):
 
     if listener is None:
         listener = throwing_listener
 
     from kiss_rdb.storage_adapters_.markdown_table import \
-        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as ci_via
+        _I_am_a_legacy_of_the_past_who_will_go_away as ci_via
 
-    return ci_via(path, listener, opn=opn)
+    ci = ci_via(path, listener, opn=opn)
+    from kiss_rdb.magnetics_.collection_via_path import \
+        NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+    return func(ci)
 
 
 def complete_schema_via_row_ASTs(row1, row2):
@@ -79,19 +82,25 @@ def row_AST_via_line():
 
 @lazy_function
 def tagged_row_ASTs_or_lines_via_lines():
-    def tagged_row_ASTs_or_lines_via_lines(lines, listener):
-        def opn(path):
-            assert pretend_path == path
-            return pfile
-        pfile = build_pfile(pretend_path, lines)
-        ci = build_ci(pretend_path, listener, opn=opn)
-        return ci._raw_sexps()
+    def tagged_row_ASTs_or_lines_via_lines(lines, listener):  # #here1
+        if hasattr(lines, 'fileno'):
+            use_coll_id = lines
+            opn = None
+        else:
+            assert hasattr(lines, '__next__')
 
-    pretend_path = __file__
-    from .common_initial_state import \
-        pretend_file_via_path_and_lines as build_pfile
+            def opn(path):
+                assert pretend_path == path
+                return pfile
+            pretend_path = __file__
+            from .common_initial_state import \
+                pretend_file_via_path_and_lines as func
+            pfile = func(pretend_path, lines)
+            use_coll_id = pretend_path
+        ci = md_ci_via(use_coll_id, listener, opn=opn)
+        return ci._raw_sexps()
     from kiss_rdb.storage_adapters_.markdown_table import \
-        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as build_ci
+        _I_am_a_legacy_of_the_past_who_will_go_away as md_ci_via
     return tagged_row_ASTs_or_lines_via_lines
 
 

@@ -516,11 +516,12 @@ def _unsanititized_pass(
 
 def _unordered_notecards_via_collection(collection, listener):
     from pho.magnetics_.notecard_via_definition import notecard_via_definition
-    for iid in collection.to_identifier_stream(listener):
+    for iid in collection.TO_IDENTIFIER_STREAM(listener):
         iid_s = iid.to_string()
-        dct = collection.retrieve_entity(iid_s, listener)
-        if dct is None:
+        ent = collection.retrieve_entity(iid_s, listener)
+        if ent is None:
             xx(f'maybe this decode error thing in {repr(iid_s)}')
+        dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
         nc = notecard_via_definition(**dct, listener=listener)
         if nc is None:
             return

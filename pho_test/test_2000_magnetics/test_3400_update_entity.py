@@ -2,7 +2,7 @@ from modality_agnostic.test_support.common import lazy
 from unittest import TestCase, main as unittest_main
 
 
-def in_memory_collection(orig_f):
+def in_memory_collection(orig_f):  # #decorator
     def use_f():
         return in_memory_collection_via_entity_dictionaries(orig_f())
     return use_f
@@ -423,26 +423,46 @@ def notecards_via_collection(coll):
     return _Notecards(coll)
 
 
-# == FROM will move to kiss one day probaly
+# == FROM will move to kiss one day probaly  #[#873.16] coll impl
 
-class in_memory_collection_via_entity_dictionaries:
+def in_memory_collection_via_entity_dictionaries(ent_dcts):
+    def do_retrieve_entity(eid, listener):
+        if eid not in ents:
+            ddct = ddct_via_eid[eid]  # ddct = two-deep dictionary
+            if ddct is None:
+                return whine_not_found(listener, eid)
+            ents[eid] = _MinimalEntity(ddct)
+        return ents[eid]
 
-    def __init__(self, ent_dcts):
-        coll_dct = {}
-        for ent_dct in ent_dcts:
-            eid = ent_dct['identifier_string']
-            assert(eid not in coll_dct)
-            coll_dct[eid] = ent_dct
-        self._dct = coll_dct
-
-    def retrieve_entity(self, eid_s, listener):
-        ent_dct = self._dct.get(eid_s)
-        if ent_dct is not None:
-            return ent_dct
-
+    def whine_not_found(listener, eid):
         def structer():
-            return {'reason': f"not found (hello from test) '{eid_s}'"}
+            return {'reason': f"not found (hello from test) '{eid}'"}
         listener('error', 'structure', 'entity_not_found', structer)
+
+    def no_clobber():
+        seen = set()
+        for ddct in ent_dcts:
+            k = ddct['identifier_string']
+            if k in seen:
+                raise RuntimeError(f"Oops, clobber: '{k}'")
+            seen.add(k)
+            yield k, ddct
+
+    ddct_via_eid = {k: v for k, v in no_clobber()}
+    ents = {}
+
+    class custom_collection:  # #class-as-namespace
+        retrieve_entity = do_retrieve_entity
+    return custom_collection
+
+
+class _MinimalEntity:
+    def __init__(self, ddct):
+        self._ddct = ddct
+
+    def to_dictionary_two_deep_as_storage_adapter_entity(self):
+        return self._ddct
+
 
 # == TO here
 

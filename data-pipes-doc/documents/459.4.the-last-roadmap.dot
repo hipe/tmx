@@ -15,8 +15,23 @@ n2->n3_C
 n2->n3_B
 n2->n3_A
 n2[label="did you dismantle\nthe idea of\na collection?"]
-n1->n2
-n1[label="fieldify\nall remaining\nnon-fielded\nSA's"]
+n1_900->n2
+n1_770->n2
+n1_752->n2
+n1_900[label="no more\nCI_VIA_SINGLE_FILE\nanywhere"]
+n1_770[label="no more 'fileno'\netc inspection\nin SA's"]
+n1_752[label="no more methods\nnamed _as_storage_adapter"]
+n1_750->n1_900
+n1_750->n1_770
+n1_750->n1_752
+n1_750[label="exit criteria"]
+n1_500->n1_750
+n1_050->n1_750
+n1_500[label="[about 12\nmore things]"]
+n1_050[label="demonstrate the\nCM principle for traversal"]
+n1->n1_500
+n1->n1_050
+n1[label="in some\norder.."]
 n1_C->n1
 n1_B->n1
 n1_A->n1

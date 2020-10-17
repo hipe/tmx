@@ -60,11 +60,9 @@ class _Parser:
         self._symbols = symbol_collection
 
     def parse(self, token_scanner, listener, stop_ASAP=False):
-
         def symz(symbol_name):
             return do(symbol_name, None)
-        do = self._symbols.retrieve_entity_as_storage_adapter_collection
-
+        do = self._symbols.retrieve_entity
         return _parse(token_scanner, stop_ASAP, self._gnode, symz, listener)
 
 
@@ -809,11 +807,38 @@ class _RegexTerminal:
 
 
 def _THING_FROM_THING(symbol_table):
-    from kiss_rdb.magnetics.via_collection import (
-            CACHING_COLLECTION_VIA_COLLECTION,
-            collection_via_DICTIONARY_OF_DEREFERENCERS)
-    _inner_coll = collection_via_DICTIONARY_OF_DEREFERENCERS(symbol_table)
-    return CACHING_COLLECTION_VIA_COLLECTION(_inner_coll)
+    return _caching_collection(_coll_via_deref_dict(symbol_table))
+
+
+# == BEGIN [#873.16] other collection implementations
+#    moved here #history-B.4
+
+def _caching_collection(upstream_collection):
+    def do_retrieve_entity(k, listener):
+        if k not in cache:
+            entity = upstream_collection.retrieve_entity(k, listener)
+            if entity is None:
+                raise RuntimeError('cover me - probably do NOT cache this')
+                return
+            cache[k] = entity
+        return cache[k]
+    cache = {}
+
+    class coll:  # #class-as-namespace
+        retrieve_entity = do_retrieve_entity
+    return coll
+
+
+def _coll_via_deref_dict(dct):
+    def do_retrieve_entity(key, listener):
+        return dct[key]()  # ..
+
+    class coll:  # #class-as-namespace
+        retrieve_entity = do_retrieve_entity
+    return coll
+
+
+# == END
 
 
 # #[#510.2] blank slates (the four below)
@@ -953,5 +978,6 @@ def xx():
 class _MyRuntimeError(RuntimeError):
     pass
 
+# #history-B.4
 # #history-A.1
 # #born.

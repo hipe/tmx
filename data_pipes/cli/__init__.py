@@ -100,7 +100,7 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
     count = 0
 
     from kiss_rdb import collectionerer
-    _ = collectionerer().splay_storage_adapters__()
+    _ = collectionerer().SPLAY_STORAGE_ADAPTERS()
 
     for (k, ref) in _:
         _storage_adapter = ref()

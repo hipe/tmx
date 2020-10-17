@@ -10,22 +10,15 @@ several different *separate* responsibilities:
 """
 
 
-class collection_via_directory_and_schema:
+class collection_implementation_via_directory_and_schema:
 
-    def __init__(
-            self, collection_directory, collection_schema,
-            random_number_generator=None, filesystem=None):
-
-        if random_number_generator is not None:
-            self._random_number_generator = random_number_generator
-
-        if filesystem is not None:
-            self._filesystem = filesystem
-
-        self._schema_pather = collection_schema.build_pather_(
-                collection_directory)
-
-        self._schema = collection_schema
+    def __init__(self, directory, schema, fs=None, rng=None):
+        if rng is not None:
+            self._random_number_generator = rng
+        if fs is not None:
+            self._filesystem = fs
+        self._schema_pather = schema.build_pather_(directory)
+        self._schema = schema
 
     def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
 
@@ -62,7 +55,7 @@ class collection_via_directory_and_schema:
                 return _delete_entity(
                         lmef, indexy_file, iden, self._filesystem, listener)
 
-    def create_entity_as_storage_adapter_collection(self, dct, listener):
+    def create_entity_as_storage_adapter_collection(self, idnr, dct, listener):
         """
         create is the most complicated per [#864.C] this table.
 
@@ -259,6 +252,22 @@ class collection_via_directory_and_schema:
     def BUSINESS_SCHEMA(self):
         from . import business_schema_via_definition as lib
         return lib.DEFAULT_BUSINESS_SCHEMA
+
+    def PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_(_):
+        return _produce_identifier_function()
+
+
+def _produce_identifier_function():
+    def my_iden_via_s(s, listener):
+        iden = iden_via_s(s, listener)
+        if iden is None:
+            return
+        assert iden.number_of_digits in (2, 3, 4)  # a canon case has 4
+        return iden
+
+    from kiss_rdb.magnetics_.identifier_via_string import \
+        identifier_via_string_ as iden_via_s
+    return my_iden_via_s
 
 
 # ==

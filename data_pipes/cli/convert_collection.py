@@ -112,7 +112,7 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
 
     def chum_chum_zum_zum(fmt, arg):
         _ = collib.collection_via_path(arg, throwing_listener, format_name=fmt)
-        return _._impl
+        return _.COLLECTION_IMPLEMENTATION
 
     def check_all_old(input_or_output):
         expect_is_none = ('output', 'input').index(input_or_output)

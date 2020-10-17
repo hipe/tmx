@@ -10,7 +10,7 @@
 # this..), and in part thanks to python's `difflib`, we are able to get as
 # far as turning our edit into one or more "patchfiles" (lines in memory)
 # relatively straightforwardly with "pure programming" and without too many
-# hack; that is, without having to make system calls or (if we want not to)
+# hacks; that is, without having to make system calls or (if we want not to)
 # read the filesystem.
 #
 # HOWEVER, when it comes time to actually applying the change to the collection
@@ -37,13 +37,13 @@
 # - semaphores!? concurrency yikes
 
 
-def new_file_lines__(file_edit, coll, order, emi, **body_of_text):
-    for block in _new_file_blocks(file_edit, coll, order, emi, **body_of_text):
+def new_file_lines__(file_edit, ci, order, emi, **body_of_text):
+    for block in _new_file_blocks(file_edit, ci, order, emi, **body_of_text):
         for line in block.to_lines():
             yield line
 
 
-def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  # noqa: E501 #testpoint
+def _new_file_blocks(edit_via_attr_via_eid, ci, order, emi, **body_of_text):  # noqa: E501 #testpoint
     # This is the center of the whole algorithm :#here5:
     #
     # We take a stream of existing entities and a stack of edits and output
@@ -68,10 +68,10 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  
     stop = emi.stop
     listener = emi.listener
 
-    body_of_text = coll.body_of_text_via_(**body_of_text)
+    body_of_text = ci.body_of_text_via_(**body_of_text)
 
     def p(eid):
-        return coll.identifier_via_string_(eid, listener)
+        return ci.identifier_via_string_(eid, listener)
 
     idens = tuple(p(eid) for eid in edit_via_attr_via_eid.keys())
     assert(emi.OK)
@@ -87,7 +87,7 @@ def _new_file_blocks(edit_via_attr_via_eid, coll, order, emi, **body_of_text):  
 
     prev_doc_iden = None
 
-    itr = _document_sections_via_BoT(body_of_text, coll, emi.monitor)
+    itr = _document_sections_via_BoT(body_of_text, ci, emi.monitor)
     for entb in itr:
 
         if entb.is_pass_thru_block:
@@ -301,7 +301,7 @@ def _prepare_edit(edit_via_dattr, order_offset_via_dattr):  # asserts for now
     return creates, updates_and_deletes
 
 
-def file_units_of_work_via__(entities_units_of_work, coll, emi):
+def file_units_of_work_via__(entities_units_of_work, ci, emi):
     # (we assert the beginning term of each uow below)
 
     file_units_of_work = []
@@ -339,8 +339,8 @@ def file_units_of_work_via__(entities_units_of_work, coll, emi):
 
     for entity_cud_type, eid, *rest in entities_units_of_work:
 
-        _assert(iden := coll.identifier_via_string_(eid, listener))
-        _assert(path := coll.path_via_identifier_(iden, listener))
+        _assert(iden := ci.identifier_via_string_(eid, listener))
+        _assert(path := ci.path_via_identifier_(iden, listener))
         dct = dictionary_via_path()
         dct = dictionary_via_eid(dct)  # #here7
 
@@ -594,10 +594,10 @@ def _line_index_via_lines(line_cache):
 
 # == Read Existing Blocks
 
-def _document_sections_via_BoT(bot, coll, mon):
+def _document_sections_via_BoT(bot, ci, mon):
 
-    docu = coll.eno_document_via_(body_of_text=bot, listener=mon.listener)
-    itr = coll.document_sections_(docu, bot.path, mon)
+    docu = ci.eno_document_via_(body_of_text=bot, listener=mon.listener)
+    itr = ci.document_sections_(docu, bot.path, mon)
     itr = _add_line_starts(itr)
     line_index = _line_index_via_lines(bot.lines)
     itr = _add_line_ends(len(line_index.line_cache), itr)
@@ -608,8 +608,8 @@ def _document_sections_via_BoT(bot, coll, mon):
     for typ, eid, vendor_sect, beg, end in itr:
         if 'entity_section' != typ:
             break
-        iden = coll.identifier_via_string_(eid, mon.listener)
-        ent = coll.read_only_entity_via_section_(vendor_sect, iden, mon)
+        iden = ci.identifier_via_string_(eid, mon.listener)
+        ent = ci.read_only_entity_via_section_(vendor_sect, iden, mon)
         entb = _existing_entity_block(beg, end, ent, line_index)
 
         # if the previous entity had some slot B or slot C comments, take them

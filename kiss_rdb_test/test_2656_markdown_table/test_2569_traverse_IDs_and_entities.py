@@ -123,7 +123,7 @@ def build_empty_collection():
 def build_collection_via_path_and_big_string(path, big_string):
     import kiss_rdb_test.markdown_storage_adapter as msa
     pfile = msa.pretend_file_via_path_and_big_string(path, big_string)
-    return msa.collection_implementation_via_pretend_file(pfile)
+    return msa.collection_via_pretend_file(pfile)
 
 
 if __name__ == '__main__':

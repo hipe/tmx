@@ -376,8 +376,7 @@ def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
     flat_map = func(fsfs, build_near_sync_keyer=custom_near)
 
     # Resolve the sync agent
-    ci = collection_impl_via(mixed_near)
-    sa = ci.SYNC_AGENT_FOR_DATA_PIPES()
+    sa = sync_agent_via_mixed_near(mixed_near)
 
     return sa.NEW_SEXPS_VIA(flat_map, listener)
 
@@ -400,7 +399,17 @@ def these_2_via_these_2(sorted_far_dcts, two_keyerers):
     return near_keyerer, fsfs
 
 
-def collection_impl_via(mixed_near):
+def sync_agent_via_mixed_near(mixed_near):
+    opn, path = opn_and_path_via(mixed_near)
+
+    from kiss_rdb.storage_adapters_.markdown_table import \
+        _I_am_a_legacy_of_the_past_who_will_go_away as func
+
+    ci = func(path, throwing_listener, opn=opn)
+    return ci.SYNC_AGENT_FOR_DATA_PIPES()
+
+
+def opn_and_path_via(mixed_near):
     if isinstance(mixed_near, str):
         path = publicly_shared_fixture_file(mixed_near)
         opn = None
@@ -415,9 +424,7 @@ def collection_impl_via(mixed_near):
         from data_pipes_test.common_initial_state import \
             passthru_context_manager
         path = 'my-fake-path'
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as create_CI
-    return create_CI(path, throwing_listener, opn=opn)
+    return opn, path
 
 
 def value_via_module_path(module_path):  # moved here at #history-B.1

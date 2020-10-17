@@ -80,8 +80,8 @@ def _stowaway_subject_function():
 def subject_function():
     def entities_via_lines_and_listener(lines, listener):
         pfile = msa.pretend_file_via_path_and_lines(__file__, lines)
-        ci = msa.collection_implementation_via_pretend_file(pfile)
-        return ci.to_entity_stream_as_storage_adapter_collection(listener)
+        ci = msa.collection_via_pretend_file(pfile)
+        return ci.TO_ENTITY_STREAM(listener)
 
     import kiss_rdb_test.markdown_storage_adapter as msa
     return entities_via_lines_and_listener

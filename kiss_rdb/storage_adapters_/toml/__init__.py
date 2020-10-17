@@ -3,39 +3,33 @@ STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = False
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-        schema_file_scanner, collection_path, opn, rng, listener):
+def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
 
-    schema = __schema_via(schema_file_scanner, listener)
-    if schema is None:
-        return
-
-    if opn:
-        fs = opn.THE_WORST_HACK_EVER_FILESYSTEM_
-    else:
-        fs = None
-
-    from .collection_via_directory import collection_via_directory_and_schema
-    return collection_via_directory_and_schema(
-            collection_directory=collection_path, collection_schema=schema,
-            random_number_generator=rng, filesystem=fs)
-
-
-def __schema_via(schema_file_scanner, listener):
-
-    # parse the schema file using our own .. meta-schema we define here:
     dct = schema_file_scanner.flush_to_config(
-            listener,
-            storage_schema='required')
+            listener, storage_schema='allowed')
     if dct is None:
         return
 
-    # ok good job
-    from .schema_via_file_lines import Schema_
-    schema = Schema_(**dct)
+    from .schema_via_file_lines import Schema_ as func
+    schema = func(**dct)
     # something about above being null (Case5918)
 
-    return schema
+    def funcser_via_coll_args(directory, listener, opn=None, rng=None):
+        fs = opn.THE_WORST_HACK_EVER_FILESYSTEM_ if opn else None
+        ci = _CI_via(directory, schema, fs, rng)
+        from kiss_rdb.magnetics_.collection_via_path import \
+            NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+        return func(ci)
+
+    class first_ns:  # #class-as-namespace
+        FUNCTIONSER_VIA_COLLECTION_ARGS = funcser_via_coll_args
+    return first_ns
 
 
+def _CI_via(directory, schema, fs, rng):
+    from .collection_via_directory import \
+        collection_implementation_via_directory_and_schema as func
+    return func(directory, schema, fs, rng)
+
+# #history-B.4
 # #born late

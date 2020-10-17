@@ -33,7 +33,7 @@ class _CommonFunctions:
             import os.path as os_path
             coll_path = os_path.join(s, coll_path)
         return self.collectioner.collection_via_path(
-                coll_path, listener, opn, rng)
+                coll_path, listener, opn=opn, rng=rng)
 
     @property
     def collectioner(self):
@@ -269,14 +269,16 @@ def get(ctx, collection, internal_identifier):
     if coll is None:
         return mon.errno
 
-    dct = coll.retrieve_entity(internal_identifier, mon.listener)
-    if dct is None:
+    ent = coll.retrieve_entity(internal_identifier, mon.listener)
+    if ent is None:
         return mon.max_errno or 404  # (Case6064)  ##here1
 
-    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
+    dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+
     fp = click.utils._default_text_stdout()
-    _dump = dictionary_dumper_as_JSON_via_output_stream(fp)
-    _dump(dct)
+    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream as func
+    dump = func(fp)
+    dump(dct)
     fp.write('\n')
 
     return success_exit_code_
@@ -331,7 +333,7 @@ def traverse(ctx, collection):
     if coll is None:
         return mon.errno
 
-    _iids = coll.to_identifier_stream(mon.listener)
+    _iids = coll.TO_IDENTIFIER_STREAM(mon.listener)
 
     echo = click.echo
     for iid in _iids:

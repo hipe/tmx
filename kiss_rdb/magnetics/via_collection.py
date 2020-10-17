@@ -543,29 +543,7 @@ placeholder_for_say_subfeature = repr
 
 # == Assorted Small Collection Implementations
 
-class CACHING_COLLECTION_VIA_COLLECTION:  # 1x
-
-    def __init__(self, impl):
-        self._cache = {}
-        self._impl = impl
-
-    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
-        if key in self._cache:
-            return self._cache[key]
-        entity = self._impl.retrieve_entity_as_storage_adapter_collection(key, listener)  # noqa: E501
-        assert(entity)  # cover this - probably you do NOT want to cache fails
-        self._cache[key] = entity
-        return entity
-
-
-class collection_via_DICTIONARY_OF_DEREFERENCERS:  # 1x
-
-    def __init__(self, dct):
-        self._special_dictionary = dct
-
-    def retrieve_entity_as_storage_adapter_collection(self, key, listener):
-        return self._special_dictionary[key]()  # ..
-
+# (lost those two wrappers around dictionaries etc at #history-B.4)
 
 class collection_via_DICTIONARY:
 
@@ -579,6 +557,7 @@ class collection_via_DICTIONARY:
         return self._dictionary.keys()
 
 
+# #history-B.4
 # #history-A.5
 # #history-A.4
 # #history-A.3 (as referenced)

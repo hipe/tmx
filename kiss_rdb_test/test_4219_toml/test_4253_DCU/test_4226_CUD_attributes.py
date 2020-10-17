@@ -24,7 +24,7 @@ a collecton façade here, it's not.
 
 class CommonCase(unittest.TestCase):
 
-    def _same_because_sho_madjozi_not_found_in_entity(self):
+    def same_because_sho_madjozi_not_found_in_entity(self):
         _actual = self.two_parts[1]
         self.assertEqual(_actual, " because 'sho_madjozi' not found in entity")
 
@@ -185,7 +185,7 @@ class Case4221_cannot_delete_because_attributes_not_found(CommonCase):
         self.assertEqual(_actual, "can't delete")
 
     def test_200_detail(self):
-        self._same_because_sho_madjozi_not_found_in_entity()
+        self.same_because_sho_madjozi_not_found_in_entity()
 
     @shared_subject
     def two_parts(self):
@@ -208,7 +208,7 @@ class Case4221_cannot_delete_because_attributes_not_found(CommonCase):
 
 class Case4222_cannot_delete_because_attributes_not_exact_match(CommonCase):  # noqa: E501
 
-    def test_100_context(self):
+    def test_100_content(self):
         _actual = self.three_parts[0]
         self.assertEqual(_actual, "can't delete attributes")
 
@@ -234,41 +234,24 @@ class Case4222_cannot_delete_because_attributes_not_exact_match(CommonCase):  # 
 class Case4223_cannot_update_because_attributes_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        act = self.two_parts[0]
+        self.assertEqual(act, "can't update")
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.same_because_sho_madjozi_not_found_in_entity()
 
     @shared_subject
     def two_parts(self):
         _rsn = self.reason_via_expect_cannot_update_error()
         return _split_because_hack(_rsn)
 
-    @shared_subject
-    def end_state(self):
-        class identifier_lol:
-            def to_primitive():
-                return 'thing_1'
-        es = self._canon.end_state_via_(self, self.given_run, False)
-        es['identifier'] = identifier_lol
-        return es
-
     def given_request_tuples(self):
-        return (('update_attribute', 'thing_1', 'q'),)
+        return (('update_attribute', 'sho_madjozi', 'q'),)
 
     def given_entity_body_lines(self):
         return """
         aa = bb
         """
-
-    @property
-    def _canon_case(self):
-        return self._canon.case_of_update_but_attribute_not_found
-
-    @property
-    def _canon(self):
-        from kiss_rdb_test import storage_adapter_canon as lib
-        return lib
 
 
 class Case4224_cannot_update_because_attributes_not_exact_match(CommonCase):  # noqa: E501

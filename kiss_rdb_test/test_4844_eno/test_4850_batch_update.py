@@ -37,8 +37,9 @@ class CommonCase(unittest.TestCase):
         fixture_directory_for = functions_for('eno').fixture_directory_for
         directory = fixture_directory_for('050-canon-main')
         coll = collection_via_collection_path_(directory, rng)
+        ci = coll.COLLECTION_IMPLEMENTATION
 
-        eidr = coll.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+        eidr = ci.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
         eidr = eidr.to_dictionary()
 
         def o(*ent_cud):
@@ -57,7 +58,7 @@ class CommonCase(unittest.TestCase):
         o['order'] = ('parent', 'heading', 'body', 'children')
         o['listener'] = listener
 
-        bpf = coll.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
+        bpf = ci.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
         return bpf, tuple(emissions)
 
 

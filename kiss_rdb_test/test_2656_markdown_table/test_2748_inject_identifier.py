@@ -56,9 +56,12 @@ class CommonCase(unittest.TestCase):
         opn.RECEIVE_DIFF_LINES = recv_diff_lines
         recv_diff_lines.value = None
 
-        func = subject_module().COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
+        func = subject_module()._I_am_a_legacy_of_the_past_who_will_go_away
         ci = func(fname, opn=opn, iden_clser=self.given_identity_class)
-        return ci, recv_diff_lines.value
+        from kiss_rdb.magnetics_.collection_via_path import \
+            NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+        coll = func(ci)
+        return coll, recv_diff_lines.value
 
     do_debug = False
 
@@ -108,8 +111,8 @@ class Case2744_fail_to_parse_one_identifier(CommonCase):
         return build_iden
 
     def given_performance(self, listener):
-        ci, _ = self.build_collection_plus()
-        itr = ci.to_identifier_stream_as_storage_adapter_collection(listener)
+        coll, _ = self.build_collection_plus()
+        itr = coll.TO_IDENTIFIER_STREAM(listener)
         return tuple(itr)
 
     def expected_emissions(_):
@@ -143,9 +146,9 @@ class Case2746_INSERT_when_out_of_order(CommonCase):
         return build_this_other_identifier_class(*args)
 
     def given_performance(self, listener):
-        ci, NEATO = self.build_collection_plus()
+        coll, _ = self.build_collection_plus()
         dct = {'t_i_t_l_e': 'Prisoner of Azkaban', 'year': '1999'}
-        return ci.create_entity_as_storage_adapter_collection(dct, listener)
+        return create_entity(coll, dct, listener)
 
     def expected_emissions(_):
         yield 'error', 'expression', 'disorder', 'as', 'the_emi'
@@ -174,9 +177,9 @@ class Case2748_INSERT_okay(CommonCase):
         return build_this_other_identifier_class(*args)
 
     def given_performance(self, listener):
-        ci, NEATO = self.build_collection_plus()
+        coll, NEATO = self.build_collection_plus()
         dct = {'title': 'Prisoner of Azkaban', 'anno': '1999'}
-        return ci.create_entity_as_storage_adapter_collection(dct, listener)
+        return create_entity(coll, dct, listener)
 
     def expected_emissions(_):
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
@@ -224,6 +227,10 @@ class MyCustomClass:
 _correct_order = (
     "Philosopher's Stone", 'Chamber of Secrets', 'Prisoner of Azkaban',
     'Goblet of Fire', 'Order of the Phoenix')
+
+
+def create_entity(coll, dct, listener):
+    return coll.create_entity(dct, listener)
 
 
 @lazy

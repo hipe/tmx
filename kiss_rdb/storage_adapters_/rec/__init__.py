@@ -19,12 +19,23 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, rng=None):
-    return _FakeCollection(collection_path)
+def FUNCTIONSER_VIA_COLLECTION_ARGS(x, listener, adapter_variant=None):
+    if adapter_variant:
+        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant
+
+    class ns:  # #class-as-namespace
+        EDIT_FUNCTIONS_ARE_AVAILABLE = False
+        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = False
+        PRODUCE_IDENTIFIER_FUNCTION = None
+        COLL_IMPL_YUCK_ = _CI_THAT_DOES_NOTHING_BUT_HAS_NAME
+    return ns
 
 
-class _FakeCollection:
+class _CI_THAT_DOES_NOTHING_BUT_HAS_NAME:
+    collection_path = None  # (Case3425DP)
+
+
+class _FakeCollection_USE_ME:
 
     def __init__(self, collection_path):
         self.collection_path = collection_path  # (Case3425DP)

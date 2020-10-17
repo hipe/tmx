@@ -588,6 +588,9 @@ class _Fake_Stub_or_Mock_STDIN:
     def fileno(_):  # #provision [#608.15]: implement this correctly
         return 0
 
+    def writable(_):
+        return False
+
     def readable(_):
         return True
 

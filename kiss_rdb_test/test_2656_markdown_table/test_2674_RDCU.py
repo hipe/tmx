@@ -56,39 +56,12 @@ class CommonCase(unittest.TestCase):
                 tc.assertEqual(len(stack), 0)
             tc.check_open_file_num_times = check_open_file_num_times
 
-        return msa().collection_implementation_via(pfile.path, opn=opn)
-
-    def identifier_via_primitive(self, eid):
-        return subject_module()._identifier(eid)
+        return msa().collection_via(pfile.path, opn=opn)
 
     do_debug = False
 
 
-class Case2606_entity_not_found_because_identifier_too_deep(CommonCase):
-
-    def test_100_result_is_none(self):
-        self.canon_case.confirm_result_is_none(self)
-
-    def test_200_emitted_accordingly(self):
-        # at #history-B.1 this changed because freeform identifiers now
-        # so there is no longer a complaint about identifier depth
-
-        actual = self.end_state['payloader']()['reason']
-        self.assertIn("'AB23' not found", actual)
-
-    @shared_subject
-    def end_state(self):
-        return self.canon_case.build_end_state(self)
-
-    def given_collection(self):
-        return collection_one_shot(pretend_file_empty())
-
-    def given_identifier_string(self):
-        return 'AB23'
-
-    @property
-    def canon_case(self):
-        return canon.case_of_entity_not_found_because_identifier_too_deep
+# (Case2606) not found because too deep gone b.c freeform idens #history-B.4
 
 
 class Case2609_entity_not_found(CommonCase):
@@ -368,7 +341,7 @@ class Case2713_update_but_attribute_not_found(CommonCase):
     def end_state(self):
         return self.canon_case.build_end_state(self)
 
-    def request_tuple_for_update_that_will_fail_because_attr(self):
+    def given_request_tuple_for_update_that_will_fail_because_attr(self):
         return 'B9H', (('update_attribute', 'thing_1', 'no see'),)
 
     def given_collection(self):
@@ -527,7 +500,7 @@ def collection_one_shot(pretend_file):
         assert pretend_file.path == path
         return pretend_file
 
-    return msa().collection_implementation_via(pretend_file.path, opn=opn)
+    return msa().collection_via(pretend_file.path, opn=opn)
 
 
 def reusable_pretend_filer(pretend_file_one_shot):
@@ -724,5 +697,6 @@ This is near [#867.Z] we can't use seek(0) etc on files. just line-by-line
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #history-B.1
 # #born.

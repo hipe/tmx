@@ -37,7 +37,8 @@ def CLI_(sin, sout, serr, argv, rscser):
     mc = func()
     coll = mc.collection_via_path(coll_path, listener)
 
-    _ents = coll._impl.to_entity_stream_as_storage_adapter_collection(listener)
+    ci = coll.COLLECTION_IMPLEMENTATION
+    _ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
 
     from data_pipes.magnetics.entities_via_filter_by_tags import \
         stats_future_and_results_via_entity_stream_and_query, prepare_query

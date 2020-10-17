@@ -86,16 +86,17 @@ class _Notecards:  # #testpoint
         return prepare_edit_(eid_tup, mixed, self, listener)
 
     def retrieve_notecard(self, ncid, listener):
-        ent_dct = self._coll.retrieve_entity(ncid, listener)
-        return self._notecard_via_any_entity(ent_dct, listener)
+        ent = self._coll.retrieve_entity(ncid, listener)
+        return self._notecard_via_any_entity(ent, listener)
 
     def retrieve_notecard_via_identifier(self, iden, listener):
-        ent_dct = self._coll.retrieve_entity_via_identifier(iden, listener)
-        return self._notecard_via_any_entity(ent_dct, listener)
+        ent = self._coll.retrieve_entity_via_identifier(iden, listener)
+        return self._notecard_via_any_entity(ent, listener)
 
-    def _notecard_via_any_entity(self, ent_dct, listener):
-        if ent_dct is None:
+    def _notecard_via_any_entity(self, ent, listener):
+        if ent is None:
             return
+        ent_dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
         nid_s, core_attributes = _validate_entity_dictionary_names(** ent_dct)
         return self.entity_via_definition_(nid_s, core_attributes, listener)
 

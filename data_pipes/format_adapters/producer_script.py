@@ -119,25 +119,49 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.py',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-        collection_path, listener=None, opn=None, rng=None):
+def FUNCTIONSER_VIA_CCI(cci, listener):
+    # frontier for experiment in runtime capability probing. BUT..
 
-    if hasattr(collection_path, 'fileno'):
-        fh = collection_path
-        assert 'r' == fh.mode[0]
-        assert 0 == fh.fileno()
+    x = cci.mixed_collection_identifier
+    if cci.arg_looks_like_file_handle:
+        if cci.arg_looks_like_writable_file_handle:
+            raise ValueError("'producer script' is not a writable format")
+        assert cci.arg_looks_like_readable_file_handle
+        return _functionser_via_STDIN(x, listener)
+    assert cci.arg_looks_like_string
+    return _functionser_via_path(x, listener)
 
-        class collection_impl_via_read_only_stream:  # #class-as-namespace
-            def to_schema_and_entities(this_listener):
-                return _to_schema_and_entities(fh, this_listener)
-        return collection_impl_via_read_only_stream
 
-    assert not opn
+def _functionser_via_STDIN(x, listener):
+    class ci:  # #class-as-namespace
+        def to_schema_and_entities(listen):
+            return _to_schema_and_entities(x, listen)
+    return _functionser_via_CI(ci)
 
-    mod = producer_script_module_via_path(collection_path, listener)
+
+def _functionser_via_path(x, listener):
+    mod = producer_script_module_via_path(x, listener)
     if mod is None:
         return
-    return _collection_implementation_via_module(mod)
+    return _functionser_via_module(mod, listener)
+
+
+def _functionser_via_module(mod, listener):
+    ci = _collection_implementation_via_module(mod)
+    return _functionser_via_CI(ci)
+
+
+def _functionser_via_CI(ci):  # produces NONWORKING STUB collections
+    def produce_read_functions():
+        return __file__
+
+    class ns:  # #class-as-namespace
+        EDIT_FUNCTIONS_ARE_AVAILABLE = False
+        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = True
+        PRODUCE_READ_ONLY_FUNCTIONS = produce_read_functions
+        PRODUCE_IDENTIFIER_FUNCTION = None
+        COLL_IMPL_YUCK_ = ci
+    return ns
 
 
 def _to_schema_and_entities(stdin, listener):
@@ -158,7 +182,7 @@ class _ReallyLightweightEntity:
         self.path = path
 
 
-def _collection_implementation_via_module(mod):  # #testpoint
+def _collection_implementation_via_module(mod):
 
     def _to_schema_and_entities(listener):
         from_args = ()  # gone at #history-B.3 or before

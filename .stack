@@ -16,4 +16,4 @@ refactor every write_help_into
 filesystem_functions does nothing
 magnetize storage adapter impl uber alles so resource management is abstracted
 magnetize two storage adapters: csv, json
-away COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
+data-pipes-doc/documents/459.4.the-last-roadmap.dot

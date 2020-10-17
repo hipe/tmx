@@ -162,13 +162,19 @@ def BIG_FLEX(
                 mixed_writes.append(s)
 
             def receive_serr_write(s):
-                assert()
+                stop_because_unexpected('SERR', s)
     else:
         def receive_sout_write(s):
-            assert()
+            stop_because_unexpected('SOUT', s)
 
         def receive_serr_write(s):
             mixed_writes.append(s)
+
+    def stop_because_unexpected(w, s):
+        header = f"unexpected {w}: "
+        recv = lib.build_write_receiver_for_debugging(header, lambda: True)
+        recv(s)
+        raise RuntimeError('failed')
 
     sout_recvs = [receive_sout_write]
     serr_recvs = [receive_serr_write]

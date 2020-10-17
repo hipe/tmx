@@ -30,11 +30,10 @@ class CommonCase(unittest.TestCase):
     def resolve_collection(self, listener):
         path = self.given_path()
         if path is not None:
-            return msa.collection_implementation_via(path, listener)
+            return msa.collection_via(path, listener)
 
         assert (pfile := self.given_pretend_file())
-        return msa.collection_implementation_via_pretend_file(
-                pfile, listener)
+        return msa.collection_via_pretend_file(pfile, listener)
 
     def given_path(self):
         pass
@@ -148,13 +147,13 @@ class Case2516_file_has_multiple_tables(CommonCase):
 class Case2519_empty_collection_found(CommonCase):
 
     def test_100_try_to_traverse_andd_you_get_none(self):
-        ci = self.given_collection()  # ci = collection implementation
+        coll = self.given_collection()
 
         # canon_case = canon.case_of_empty_collection_found
         # canon_case.confirm_collection_is_not_none(self)
 
         listener = em.throwing_listener
-        ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
+        ents = coll.TO_ENTITY_STREAM(listener)
         for ent in ents:
             self.fail("should have been no entities")
 
@@ -193,18 +192,18 @@ class Case2522_non_empty_collection_found(CommonCase):
             """)
 
 
-def traverse_and_flatten(ci, listener):
-    return tuple(traverse_entities(ci, listener))
+def traverse_and_flatten(coll, listener):
+    return tuple(traverse_entities(coll, listener))
 
 
-def traverse(ci, listener):
+def traverse(coll, listener):
     # since getting rid of random access, we need to trip this
-    for ent in traverse_entities(ci, listener):
+    for ent in traverse_entities(coll, listener):
         pass
 
 
-def traverse_entities(ci, listener):
-    itr = ci.to_entity_stream_as_storage_adapter_collection(listener)
+def traverse_entities(coll, listener):
+    itr = coll.TO_ENTITY_STREAM(listener)
     return itr or ()  # new at writing
 
 

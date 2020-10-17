@@ -201,11 +201,11 @@ def three_via_depth_(depth):
 def identifier_via_string_(id_s, listener):
     digits = []
 
-    s_a = tuple(id_s)
-    if not len(s_a):
+    assert isinstance(id_s, str)  # [#022]
+    if not len(id_s):
         xx('might let this slip thru - needs coverage tho')
 
-    for s in s_a:
+    for s in id_s:
         nd = native_digit_via_character_(s, listener)
         if nd is None:
             return  # (Case4282)

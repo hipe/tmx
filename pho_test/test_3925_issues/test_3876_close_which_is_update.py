@@ -20,7 +20,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case3869_not_found(CommonCase):
+class Case3869PH_not_found(CommonCase):
 
     def test_050_emits(self):
         assert self.end_state

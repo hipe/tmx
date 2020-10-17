@@ -172,9 +172,10 @@ def parse_query_(query, listener):
 # ==
 
 def issues_collection_via_(readme, listener, opn=None):
-    ci = _coll_impl_via(readme, listener, opn)
-    if ci is None:
+    coll = _collection_via(readme, listener, opn)
+    if coll is None:
         return
+    ci = coll.COLLECTION_IMPLEMENTATION
 
     class issues_collection:  # #class-as-namespace
         def to_graph_lines(listener=listener):
@@ -190,22 +191,23 @@ def issues_collection_via_(readme, listener, opn=None):
                 raise RuntimeError(f"This is fine but hello: {body_keys!r}")
             return schema, ents
 
+        collection = coll
         collection_implementation = ci
-
     return issues_collection
 
 
-def _coll_impl_via(readme, listener, opn=None):
+def _collection_via(readme, listener, opn=None):
     if opn is None:
         opn = _build_real_open(listener)
-    func = _md_table_lib().COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE
-    return func(readme, listener, opn=opn, iden_clser=build_identifier_parser_,
+
+    import kiss_rdb.storage_adapters_.markdown_table as sa_mod
+
+    from kiss_rdb import \
+        single_file_collection_via_storage_adapter_and_path as func
+
+    return func(sa_mod, readme, listener, opn=opn,
+                iden_clser=build_identifier_parser_,
                 file_grows_downwards=False)
-
-
-def _md_table_lib():
-    import kiss_rdb.storage_adapters_.markdown_table as module
-    return module
 
 
 def _build_real_open(listener):

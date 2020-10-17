@@ -137,17 +137,11 @@ class _open_raw_traversal_stream:  # #[#459.3] class as context manager
 
 
 def _main(opened, do_field_names, listener):
-    # FOR NOW, VIOLATE THINGS
-
-    from kiss_rdb.storage_adapters_.markdown_table \
-        import COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE as func
-
-    def opn(path):
-        assert hello == path
-        return opened
-
-    hello = '/dev/null/hello-from-producer-script'
-    ci = func(hello, listener, opn)
+    import kiss_rdb.storage_adapters_.markdown_table as sa
+    from kiss_rdb import \
+        single_file_collection_via_storage_adapter_and_path as func
+    coll = func(sa, opened, listener)
+    ci = coll.COLLECTION_IMPLEMENTATION
 
     action_stack = [
         ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc

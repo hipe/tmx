@@ -34,12 +34,13 @@ class CommonCase(unittest.TestCase):
             _new_file_blocks, emitter_via_monitor__
 
         coll = collection_via_collection_path_('/dev/null')
-        mon = coll.monitor_via_listener_(listener)
+        ci = coll.COLLECTION_IMPLEMENTATION
+        mon = ci.monitor_via_listener_(listener)
         emi = emitter_via_monitor__(mon)
         edits, order = self.given_edit()
         lines = (*self.given_lines(), *ugh)
 
-        blks = _new_file_blocks(edits, coll, order, emi, lines=lines)
+        blks = _new_file_blocks(edits, ci, order, emi, lines=lines)
 
         catch_this = emi.stopper_exception_class
         try:

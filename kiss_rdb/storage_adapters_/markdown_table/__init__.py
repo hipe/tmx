@@ -22,10 +22,34 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
+def FUNCTIONSER_VIA_COLLECTION_ARGS(*args, **kwargs):
+    ci = _I_am_a_legacy_of_the_past_who_will_go_away(*args, **kwargs)
+    if not ci:
+        raise RuntimeError('where')
+    from kiss_rdb.magnetics_.collection_via_path import \
+        NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+    return func(ci)
+
+
+def _I_am_a_legacy_of_the_past_who_will_go_away(  # #testpoint, [pho]
         collection_path, listener=None, opn=None, iden_clser=None, rng=None,
-        file_grows_downwards=True):
+        file_grows_downwards=True, adapter_variant=None):
     del rng  # ..
+
+    if adapter_variant is not None:
+        if 'THE_ADAPTER_VARIANT_FOR_STREAMING' != adapter_variant:
+            raise RuntimeError('where')
+
+    def same_iden():
+        if iden_clser:
+            def iden_via_string(eid, listener):  # (Case3869PH)
+                return iden_clser(listener)(eid)
+            return iden_via_string
+
+        def default_iden_via_s(eid, _listener):
+            assert 0 < len(eid) < 20  # #meh
+            return _identifier(eid)
+        return default_iden_via_s
 
     if hasattr(collection_path, 'fileno'):
         fh = collection_path
@@ -41,13 +65,15 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         assert 1 == fh.fileno()  # until it isn't..
         from ._output_lines_via_far_collection import \
             pass_thru_collection_for_write_ as func
-        return func(fh, listener)
+        ci = func(fh, listener)
+        ci.PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_ = same_iden
+        return ci
 
     class single_traversal_collection:  # #class-as-namespace
         def update_entity_as_storage_adapter_collection(iden, edit, listener):
             return cud('update', listener, iden, edit)
 
-        def create_entity_as_storage_adapter_collection(dct, listener):
+        def create_entity_as_storage_adapter_collection(_, dct, listener):
             return cud('create', listener, dct)
 
         def delete_entity_as_storage_adapter_collection(iden, listener):
@@ -76,9 +102,11 @@ def COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
         def _raw_sexps():  # #testpoint
             return eek(lambda: to_raw_sexps(listener))
 
+        PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_ = same_iden
+
     def cud(typ, listener, *cud_args):
-        from ._flat_map_via_edit import cud_ as func
         yn = file_grows_downwards
+        from ._flat_map_via_edit import cud_ as func
         return func(all_sxs, use_filename, opn, typ, cud_args, listener, yn)
 
     def entities(listener):
@@ -163,17 +191,15 @@ def _to_schema_and_ents(ci, listener):
 # == RETRIEVE
 
 def _retrieve(ents, iden, listener):
-    if iden.has_depth_ and 3 < iden.number_of_digits:  # will go away
-        return _when_identifier_too_deep(listener, iden, 3)
-    needle_eid = iden.to_string()
     count = 0
     for ent in ents:
-        if (eid := ent.nonblank_identifier_primitive) is None:
+        curr_iden = ent.identifier
+        if curr_iden is None:
             continue
-        if needle_eid == eid:
+        if iden == curr_iden:
             return ent
         count += 1
-    tup = emission_components_for_entity_not_found_(iden.to_string(), count)
+    tup = emission_components_for_entity_not_found_(_str_via_iden(iden), count)
     listener(* tup)
 
 
@@ -186,13 +212,6 @@ def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
         yield f"'{eid}' not found (saw {count} entit{ies})"  # (Case2609)
     assert isinstance(eid, str)  # #[#022]
     return 'error', 'structure', 'entity_not_found', lambda: {'reason': rsn()}
-
-
-def _when_identifier_too_deep(listener, iden, max_depth):  # will go away
-    eid, depth = iden.to_string(), iden.number_of_digits  # (Case2606)
-    msg = (f"can't retrieve '{eid}' because that identifier depth "
-           f"({depth}) exceeds the max for this format ({max_depth})")
-    listener('error', 'structure', 'entity_not_found', lambda: {'reason': msg})
 
 
 def whine_about_file_not_found_(listener, e):
@@ -796,6 +815,13 @@ def _message_via_wordruns(orig_f):  # #decorator
     def use_f():
         return ' '.join(orig_f())
     return use_f
+
+
+def _str_via_iden(iden):
+    if hasattr(iden, 'to_string'):
+        return iden.to_string()
+    assert isinstance(iden, str)  # ..
+    return iden
 
 
 # == Action Stacks (experiment)

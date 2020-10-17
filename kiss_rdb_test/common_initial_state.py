@@ -1,4 +1,4 @@
-from modality_agnostic.test_support.common import memoize_into
+from modality_agnostic.test_support.common import memoize_into, lazy
 import os.path as os_path
 
 
@@ -10,19 +10,6 @@ class OneWriteReference:  # :[#510.5] (again)
         assert(self._is_first_call)
         self._is_first_call = False
         self.value = x
-
-
-def lazy(f):  # #[#510.8]
-    class EvaluateLazily:
-        def __init__(self):
-            self._has_been_evaluated = False
-
-        def __call__(self):
-            if not self._has_been_evaluated:
-                self._has_been_evaluated = True
-                self._value = f()
-            return self._value
-    return EvaluateLazily()
 
 
 # ==

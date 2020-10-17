@@ -1,95 +1,146 @@
-from os import path as os_path, unlink as os_unlink
-
-
-def _throwing_listenerer(*args):  # used as default argument
+def _listener(*args):  # used as default argument
     from modality_agnostic import listening
     return listening.throwing_listener(*args)
 
 
-def _encode_identifier(f):  # #decorator
-    def use_f(self, identifier_string, *rest):
-        from kiss_rdb.magnetics_.identifier_via_string import (
-            identifier_via_string_)
-        iden = identifier_via_string_(identifier_string, rest[-1])
-        if iden is None:
-            return
-        return f(self, iden, *rest)
-    return use_f
+def collectioner_via_storage_adapters_module(mod_name, mod_dir, *more):
+    class collectioner:  # #class-as-namespace
+        def collection_via_path(collection_path, listener=_listener, **kw):
+            return _COLLECTION_VIA_PATH(collection_path, listener, saidx, **kw)
+
+        def OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, listener):
+            return _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, saidx, listener)
+
+        def OPEN_FOR_READING_THE_NEW_WAY(fmt, x, listener):
+            return _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, saidx, listener)
+
+        def SPLAY_STORAGE_ADAPTERS():
+            return saidx._splay_storage_adapters()
+
+    pairs = ((more[i], more[i+1]) for i in range(0, len(more), 2))
+    saidx = _storage_adapter_index(((mod_name, mod_dir), *pairs))
+    return collectioner
 
 
-class _Collection:  # #tespoint
-    """Clients don't interact with the remote collection directly, rather they
+def NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci):
+    # temporrary bridge
 
-    do so through this façade that bundles common logic mostly having to do
-    with decoding identifiers, so that the implementatons don't have to.
+    fxer = NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci)
+    coll = COLLECTION_VIA_FUNCTIONSER(fxer)
+    return coll
 
-    NOTE This is fairly likely to change
-    """
 
-    def __init__(self, impl):
-        self._impl = impl  # #testpoint
+def NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci):
+    class ns:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS():
+            return ci
 
-    # ==
+        def PRODUCE_READ_ONLY_FUNCTIONS():
+            return ci
 
-    @_encode_identifier
-    def update_entity(self, *a):
-        return self._impl.update_entity_as_storage_adapter_collection(*a)
+        def PRODUCE_IDENTIFIER_FUNCTION():
+            return ci.PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_()
+        EDIT_FUNCTIONS_ARE_AVAILABLE = True
+        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = True
+        COLL_IMPL_YUCK_ = ci
+    return ns
 
-    def create_entity(self, *a):
-        return self._impl.create_entity_as_storage_adapter_collection(*a)
 
-    @_encode_identifier
-    def delete_entity(self, *a):
-        return self._impl.delete_entity_as_storage_adapter_collection(*a)
+def _COLLECTION_VIA_PATH(
+        x, listener, saidx,
+        format_name=None, rng=None, opn=None, adapter_variant=None):
 
-    @_encode_identifier
-    def retrieve_entity(self, iden, listener):
-        return self.retrieve_entity_via_identifier(iden, listener)
+    cci = _classify_collection_identifier_for_NEW_WAY(x)
+    sa = _resolve_storage_adapter(cci, format_name, saidx, listener, opn)
+    if sa is None:
+        return
 
-    def retrieve_entity_via_identifier(self, iden, listener):
-        # de = document entity. to remain agnostic we result in dictionaries
-        de = self._impl.retrieve_entity_as_storage_adapter_collection(
-                iden, listener)
-        if de is None:
-            return  # (Case4130)
-        # (Case4292):
-        return de.to_dictionary_two_deep_as_storage_adapter_entity()
+    # Re-pack keywords idk
+    kw = {'rng': rng, 'opn': opn, 'adapter_variant': adapter_variant}
 
-    def to_identifier_stream(self, listener):
-        return self._impl.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
+    return _collection_via(sa, cci, listener, kw)
 
-    def DIG_FOR_CAPABILITY(self, dig_path, listener):
-        # (moved here from elsewhere at #history-A.1)
 
-        dig_path = tuple(dig_path)
-        assert(dig_path)
-        assert all('_' != k[0] for k, _ in dig_path)  # make sure no names..
+def _single_file_collection_via_storage_adapter_and_path(sa, x, listener, kw):
+    cci = _classify_collection_identifier_for_NEW_WAY(x)
+    key = _key_via_storage_adapter_module(sa)
+    sa = _StorageAdapter(sa, key)
+    return _collection_via(sa, cci, listener, kw)
 
-        ci = self._impl
 
-        def say_collection():
-            # NOTE big hack, experiment, b.c got rid of `collection_identity`
-            # #todo doesn't belong here
-            re = re_lib()
-            use_class = ci if isinstance(ci, type) else ci.__class__
-            class_name = re.match("^<class '([^']+)'>$", str(use_class))[1]
-            pcs = tuple(class_name.split('.'))
-            s = 'storage_adapters'
-            i = next(i for i in reversed(range(0, len(pcs))) if s in pcs[i])
-            adapter_key, variant_moniker = pcs[i+1:i+3]
-            adapter_moniker = adapter_key.replace('_', '-')
-            return (f"the '{adapter_moniker}' format adapter"
-                    f" (variant: {variant_moniker})")
+def _collection_via(sa, cci, listener, kw):
+    fxerer, sa = sa._shhh_split_into_two()
+    if fxerer is None:
+        fxerer = sa.module  # (Case1422)
 
-        from kiss_rdb.magnetics.via_collection import DIGGY_DIG
-        capa_via_ci = DIGGY_DIG(ci, dig_path, say_collection, listener)
-        if capa_via_ci is None:
-            return
-        return capa_via_ci()
+    # Let SA's that don't participate in the thing not see it (defaults 👀)
+    kw = {k: v for k, v in kw.items() if v is not None}
 
-    @property
-    def COLLECTION_IMPLEMENTATION(self):  # track where we do this bad thing
-        return self._impl
+    if hasattr(fxerer, 'FUNCTIONSER_VIA_CCI'):  # experiment
+        fxer = fxerer.FUNCTIONSER_VIA_CCI(cci, listener, **kw)
+    else:
+        x = cci.mixed_collection_identifier
+        fxer = fxerer.FUNCTIONSER_VIA_COLLECTION_ARGS(x, listener, **kw)
+
+    if fxer is None:
+        return  # (Case2823DP)
+    return COLLECTION_VIA_FUNCTIONSER(fxer, sa)
+
+
+def COLLECTION_VIA_FUNCTIONSER(fxer, sa=None):  # data-pipes
+
+    if (can_edit := fxer.EDIT_FUNCTIONS_ARE_AVAILABLE):
+        edit_funcs = fxer.PRODUCE_EDIT_FUNCTIONS()
+
+    if (can_read := fxer.READ_ONLY_FUNCTIONS_ARE_AVAILABLE):
+        read_funcs = fxer.PRODUCE_READ_ONLY_FUNCTIONS()
+
+    def parse_identifier(orig_f):  # #decorator
+        def use_f(eid, *rest):
+            if (iden := parse_EID(eid, rest[-1])) is None:
+                return
+            return orig_f(iden, *rest)
+        return use_f
+
+    class collection_NEW_WAY:  # #class-as-namespace
+        if can_edit:
+            @parse_identifier
+            def update_entity(iden, x, listener):
+                return edit_funcs.update_entity_as_storage_adapter_collection(
+                    iden, x, listener)
+
+            def create_entity(x, listener):
+                return edit_funcs.create_entity_as_storage_adapter_collection(
+                    parse_EID, x, listener)
+
+            @parse_identifier
+            def delete_entity(iden, listener):
+                return edit_funcs.delete_entity_as_storage_adapter_collection(
+                    iden, listener)
+
+        if can_read:
+            @parse_identifier
+            def retrieve_entity(iden, listener):
+                return read_funcs.\
+                  retrieve_entity_as_storage_adapter_collection(iden, listener)
+
+            def TO_IDENTIFIER_STREAM(listener):
+                return read_funcs.\
+                  to_identifier_stream_as_storage_adapter_collection(listener)
+
+            def TO_ENTITY_STREAM(listener):
+                return read_funcs.\
+                  to_entity_stream_as_storage_adapter_collection(listener)
+
+        def to_noun_phrase():
+            ci = collection_NEW_WAY.COLLECTION_IMPLEMENTATION
+            return _noun_phrase_via_collection_implementation(ci)
+
+        COLLECTION_IMPLEMENTATION = fxer.COLL_IMPL_YUCK_
+        storage_adapter = sa
+
+    parse_EID = (f := fxer.PRODUCE_IDENTIFIER_FUNCTION) and f()
+    return collection_NEW_WAY
 
 
 # == NEW WAY
@@ -98,7 +149,7 @@ class _Collection:  # #tespoint
 #    Eventually hook-ins so SA can totally circumvent all of this up front
 
 
-def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, mcoll, listener):
+def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, saidx, listener):
     def main():
         sa = resolve_storage_adapter()
         lines_via_two = sa.module.LINES_VIA_SCHEMA_AND_ENTITIES
@@ -118,11 +169,11 @@ def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, mcoll, listener):
         return build_cm()
 
     def resolve_receiver_and_closer():
-        if o.arg_looks_like_file_handle:
-            if o.arg_looks_like_writable_file_handle:
+        if cci.arg_looks_like_file_handle:
+            if cci.arg_looks_like_writable_file_handle:
                 return receiver_and_closer_when_writable_file_handle()
             raise stop_because_not_open_for_writing()
-        if o.arg_looks_like_string:
+        if cci.arg_looks_like_string:
             return receiver_and_closer_by_open_and_close_file()
         raise stop_because_unrecognized_identifier_shape()
 
@@ -136,6 +187,7 @@ def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, mcoll, listener):
             os_unlink(x)  # YIKES
         fp = open(x, 'x')  # crazy experiment
         build_receiver = build_build_receiver(fp)
+        from os import unlink as os_unlink
         return build_receiver, close
 
     def receiver_and_closer_when_writable_file_handle():
@@ -154,9 +206,9 @@ def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, mcoll, listener):
         xx()
 
     def resolve_storage_adapter():
-        return _resolve_storage_ad_NEW_WAY(o, fmt, x, mcoll, throwing_listener)
+        return _resolve_storage_adapter(cci, fmt, saidx, throwing_listener)
 
-    o = _classify_collection_identifier_for_NEW_WAY(x)
+    cci = _classify_collection_identifier_for_NEW_WAY(x)
     throwing_listener, stop = _throwing_listener_and_stop(listener)
     try:
         return main()
@@ -175,7 +227,7 @@ def _build_receiver_NEW_WAY(writable_fp, lines_via_schema_and_entities):
     return receiver
 
 
-def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, mcoll, listener):
+def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, saidx, listener):
     def main():
         sa = resolve_storage_adapter()
         two_via_lines = sa.module.SCHEMA_AND_ENTITIES_VIA_LINES  # ..
@@ -193,10 +245,10 @@ def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, mcoll, listener):
         return build_cm()
 
     def resolve_lines_and_closer_function():
-        if o.arg_looks_like_string:
+        if cci.arg_looks_like_string:
             return lines_and_closer_by_opening_and_closing_file
-        if o.arg_looks_like_file_handle:
-            if o.arg_looks_like_readable_file_handle:
+        if cci.arg_looks_like_file_handle:
+            if cci.arg_looks_like_readable_file_handle:
                 return lines_and_closer_by_pass_thru_and_no_close
             raise stop_because_not_open_for_reading()
         raise stop_because_unrecognized_identifier_shape()
@@ -217,11 +269,11 @@ def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, mcoll, listener):
         xx()
 
     def resolve_storage_adapter():
-        return _resolve_storage_ad_NEW_WAY(o, fmt, x, mcoll, throwing_listener)
+        return _resolve_storage_adapter(cci, fmt, saidx, throwing_listener)
 
     # ==
 
-    o = _classify_collection_identifier_for_NEW_WAY(x)
+    cci = _classify_collection_identifier_for_NEW_WAY(x)
     throwing_listener, stop = _throwing_listener_and_stop(listener)
     try:
         return main()
@@ -229,31 +281,48 @@ def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, mcoll, listener):
         pass
 
 
-def _resolve_storage_ad_NEW_WAY(cic, fmt, x, mcoll, listener):
-    # mostly redundant with #here4 (fresh vers)
+def _resolve_storage_adapter(cci, fmt, saidx, listener, opn=None):
 
-    def main():
-        if fmt:
-            return resolve_storage_adapter_via_format_name()
-        if cic.arg_looks_like_string:
-            return resolve_storage_adapter_via_path_extension()
-        xx(f"this is a coarse experiment for now. can't resolve SA from {x!r}")
+    # If a format name was passed, use that
+    if fmt:
+        return saidx.storage_adapter_via_format_name(fmt, listener)
 
-    def resolve_storage_adapter_via_path_extension():
+    if not cci.arg_looks_like_string:
+        xx()
+
+    x = cci.mixed_collection_identifier
+
+    # If collection path looks like a file, use extension to find the SA
+    from os.path import splitext, join as os_path_join
+    if len(ext := splitext(x)[1]):
         def csckr():
             return ({'path': x},)
-        ext = os_path.splitext(x)[1]
-        if not len(ext):
-            xx(f"we are not ready to tackle directories yet ({x!r})")
-        return mcoll.storage_adapter_via_extname(ext, listener, csckr)
+        return saidx.storage_adapter_via_extname(ext, listener, csckr)
 
-    def resolve_storage_adapter_via_format_name():
-        return mcoll.storage_adapter_via_format_name(fmt, listener)
+    # Otherwise, assume it's a directory and try to open a schema file
+    from kiss_rdb import SCHEMA_FILE_ENTRY_ as tail
+    schema_path = os_path_join(x, tail)
+    try:
+        opened = (opn or open)(schema_path)
+    except FileNotFoundError as e:
+        return _emit_about_no_schema_file(listener, e)
+    except NotADirectoryError:
+        return _emit_about_no_extname(listener, x)
 
-    return main()
+    def storage_adapter_by(o):
+        o.resolve_first_field_line()
+        o.check_that_first_field_line_has_a_particular_name()
+        return o.resolve_storage_adapter_given_name()
 
-
-# cstacker = a function that makes a [#XXX.X] context stack
+    with opened as opened:
+        reso = _crazy_schema_thing(opened, storage_adapter_by, saidx, listener)
+        if reso is None:
+            return
+        sfs, sa = reso.schema_file_scanner, reso.storage_adapter
+        frr = sa.module.FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(sfs, listener)
+    if frr is None:
+        return
+    return _StorageAdapterPlus(frr, sa)
 
 
 def _storage_adapter_via(original_method):  # #decorator
@@ -265,10 +334,9 @@ def _storage_adapter_via(original_method):  # #decorator
     return use_method
 
 
-class collectioner_via_storage_adapters_module:  # "_MetaCollection"
-    # this is the thing that wraps the module that holds storage adapters
+class _storage_adapter_index:
 
-    def __init__(self, module_name, module_directory, *more_of_same):
+    def __init__(self, name_and_directory_s):
         # module_name = mod.__name__
         # module_directory = mod.__path__._path[0]
         # --
@@ -281,9 +349,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
 
         adapters, hubs = {}, []
 
-        itr = iter((module_name, module_directory, *more_of_same))
-        for mod_name in itr:
-            mod_dir = next(itr)
+        for mod_name, mod_dir in name_and_directory_s:
             hub_offset = len(hubs)
             hubs.append(mod_name)  # #here3
             for entry in listdir(mod_dir):
@@ -299,68 +365,6 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         self._hubs = tuple(hubs)
         self._key_via_extname = None
         self._key_via_format_name = None
-
-    def OPEN_FOR_WRITING_THE_NEW_WAY(self, fmt, x, listener):
-        return _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, self, listener)
-
-    def OPEN_FOR_READING_THE_NEW_WAY(self, fmt, x, listener):
-        return _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, self, listener)
-
-    def collection_via_path(  # #here4
-            self, collection_path,
-            listener=_throwing_listenerer, opn=None,
-            # (parameter order is API-fixed above, not guaranteed below)
-            rng=None, adapter_variant=None, format_name=None):
-
-        # If they passed a storage adapter format name, use that
-        if format_name is not None:  # #here1
-            sa = self.storage_adapter_via_format_name(format_name, listener)
-
-        # Otherwise, if the collection path looks like a file, use extension
-        elif len(ext := os_path.splitext(collection_path)[1]):
-            def cstacker():
-                return ({'path': collection_path},)
-            sa = self.storage_adapter_via_extname(ext, listener, cstacker)
-
-        # Otherwise, assume it is a directory and try to open a schema file
-        else:
-            return self._collection_via_directory(
-                collection_path, listener, adapter_variant, rng, opn)
-
-        if sa is None:  # (Case3419DP)
-            return
-
-        ci = sa.module.COLLECTION_IMPLEMENTATION_VIA_SINGLE_FILE(
-            collection_path, listener=listener, opn=opn, rng=rng)
-
-        return _wrap_collection(ci)
-
-    def _collection_via_directory(
-            self, coll_path, listener, adapter_var, rng, opn):
-
-        from kiss_rdb import SCHEMA_FILE_ENTRY_ as schema_rec
-        schema_path = os_path.join(coll_path, schema_rec)
-        try:
-            opened = (opn or open)(schema_path)
-        except FileNotFoundError as e:
-            return _emit_about_no_schema_file(listener, e)
-        except NotADirectoryError:
-            return _emit_about_no_extname(listener, coll_path)
-
-        def do_this(o):
-            o.resolve_first_field_line()
-            o.check_that_first_field_line_has_a_particular_name()
-            return o.resolve_storage_adapter_given_name()
-
-        with opened as opened:
-            reso = _crazy_schema_thing(opened, do_this, self, listener)
-            if reso is None:
-                return
-            sfc, sa = (reso.schema_file_scanner, reso.storage_adapter)
-            ci = sa.module.COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-                schema_file_scanner=sfc, collection_path=coll_path,
-                opn=opn, rng=rng, listener=listener)
-            return _wrap_collection(ci)
 
     @_storage_adapter_via
     def storage_adapter_via_extname(self, extname, listener):
@@ -424,7 +428,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
                 dct[en] = key
         self._key_via_extname = dct
 
-    def splay_storage_adapters__(self):
+    def _splay_storage_adapters(self):
         def build_dereferencer(key):  # (Case3498DP)
             def f():
                 return self._dereference(key)
@@ -449,7 +453,7 @@ class collectioner_via_storage_adapters_module:  # "_MetaCollection"
         return sa
 
 
-def _crazy_schema_thing(opened, main, meta_collection, listener):
+def _crazy_schema_thing(opened, main, saidx, listener):
 
     def resolve_storage_adapter_given_name():
         def cstacker():
@@ -460,7 +464,7 @@ def _crazy_schema_thing(opened, main, meta_collection, listener):
                 return True
             return _emit_about_not_directory_based(listener, sa, cstacker)
 
-        sa = meta_collection.storage_adapter_via_key(
+        sa = saidx.storage_adapter_via_key(
             reso.field.field_value_string, listener, cstacker, validate)
         if sa is None:
             raise stop()
@@ -561,7 +565,7 @@ def _classify_collection_identifier_for_NEW_WAY(x):
         return locals()
 
     class lazy_classifier:
-        pass
+        mixed_collection_identifier = x
 
     def build_method(f):
         return property(lambda _: f())
@@ -572,6 +576,15 @@ def _classify_collection_identifier_for_NEW_WAY(x):
 
 
 # == models
+
+class _StorageAdapterPlus:
+
+    def __init__(self, functionserer, sa):
+        self._two = functionserer, sa
+
+    def _shhh_split_into_two(self):
+        return self._two
+
 
 class _StorageAdapter:  # move this to its own file if it gets big
 
@@ -585,13 +598,17 @@ class _StorageAdapter:  # move this to its own file if it gets big
             return
         return _wrap_collection(coll)
 
+    def _shhh_split_into_two(self):
+        return None, self
+
     is_loaded = True
 
 
 def _wrap_collection(impl):
     if impl is None:
         return
-    return _Collection(impl)
+    raise RuntimeError('xx')
+    # return _Collection(impl)
 
 
 class _NOT_YET_LOADED:  # #as-namespace-only
@@ -727,6 +744,29 @@ def _say_extname_collision(en, first_key, second_key):
         return _reason
 
 
+def _noun_phrase_via_collection_implementation(ci):
+    # moved here #history-B.4. bounces around a lot
+
+    cls = ci if isinstance(ci, type) else ci.__class__
+    pcs = cls.__module__.split('.')
+    pcs.append(cls.__name__)
+
+    def match(pc):
+        return ('storage_adapter' in pc) or ('format_adapter' in pc)
+
+    i = next(i for i in reversed(range(0, len(pcs))) if match(pcs[i]))
+    adapter_key, variant_moniker = pcs[i+1:i+3]
+    adapter_moniker = adapter_key.replace('_', '-')
+    pcs = ("the '", adapter_moniker, "' format adapter")
+    pcs = (*pcs, " (variant: ", variant_moniker, ')')
+    return ''.join(pcs)
+
+
+def _key_via_storage_adapter_module(sa_mod):
+    name = sa_mod.__name__
+    return name[name.rindex('.')+1:]
+
+
 # == Smalls
 
 def _throwing_listener_and_stop(listener):
@@ -761,6 +801,7 @@ _this_shape = ('error', 'structure')
 _EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
 _EC_for_not_found = (*_this_shape, 'cannot_load_collection')
 
+# #history-B.4
 # #history-A.2: massive refactor for clarity
 # #history-A.1
 # #born.

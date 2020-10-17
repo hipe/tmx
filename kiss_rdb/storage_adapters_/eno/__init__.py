@@ -49,31 +49,42 @@ def CREATE_COLLECTION(collection_path, listener, is_dry):
     return CreateCollection().execute(collection_path, listener, is_dry)
 
 
-def COLLECTION_IMPLEMENTATION_VIA_SCHEMA(
-        schema_file_scanner, collection_path, listener, rng=None, opn=None):
-
+def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     # #open [#873.S] at birth of this storage adapter, we are hard-coding it
     # to support only one storage schema. but when the day comes, abstract
     # the things out of the sibling spot in the toml adapter
 
     dct = schema_file_scanner.flush_to_config(
-            listener,
-            storage_schema='allowed')
+            listener, storage_schema='allowed')
 
     if 'storage_schema' in dct:
-        assert('32x32x32' == dct['storage_schema'])
+        assert '32x32x32' == dct['storage_schema']
 
-    return eno_collection_via_(collection_path, rng, opn)
+    def funcser_via_coll_args(directory, _listener, rng=None):
+        ci = _collection_implementation(directory, rng)
+        from kiss_rdb.magnetics_.collection_via_path import \
+            NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+        return func(ci)
+
+    class first_ns:  # #class-as-namespace
+        FUNCTIONSER_VIA_COLLECTION_ARGS = funcser_via_coll_args
+    return first_ns
 
 
-def eno_collection_via_(directory, rng=None, opn=None):  # #testpoint
+def eno_collection_via_(directory, opn=None, rng=None):  # #testpoint
+    ci = _collection_implementation(directory, rng, opn)
+    from kiss_rdb.magnetics_.collection_via_path import \
+        NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
+    return func(ci)
 
-    class StatelessCollectionImplementation:  # #class-as-namespace
+
+def _collection_implementation(directory, rng=None, opn=None):
+    class collection_implementation:  # #class-as-namespace
 
         # -- the big collection API operations (or experimental similar)
 
         def create_entity_as_storage_adapter_collection(
-                attr_vals, listener, is_dry=False):
+                _, attr_vals, listener, is_dry=False):
             # (not used by our main application client but here for developmen)
 
             bpf = self._big_patchfile_for_create_entity(attr_vals, listener)
@@ -162,6 +173,13 @@ def eno_collection_via_(directory, rng=None, opn=None):  # #testpoint
                         return
                     yield iden
 
+        def PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_():
+            def wee(eid, listener):
+                from kiss_rdb.magnetics_.identifier_via_string import \
+                    identifier_via_string_ as func
+                return func(eid, listener)
+            return wee
+
         # -- protected magnetics
 
         read_only_entity_via_section_ = _read_only_entity
@@ -210,8 +228,7 @@ def eno_collection_via_(directory, rng=None, opn=None):  # #testpoint
             return directory
 
     injection = injection()
-
-    return (self := StatelessCollectionImplementation)
+    return (self := collection_implementation)
 
 
 def _read_only_entity(sect_el, ID, mon):

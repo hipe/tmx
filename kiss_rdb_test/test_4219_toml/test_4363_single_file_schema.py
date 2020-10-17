@@ -1,7 +1,6 @@
-from kiss_rdb_test.common_initial_state import functions_for, unindent
 from kiss_rdb_test.CUD import \
-        wrap_collection, filesystem_recordings_of, \
-        build_filesystem_expecting_num_file_rewrites
+        filesystem_recordings_of, build_filesystem_expecting_num_file_rewrites
+from kiss_rdb_test.common_initial_state import functions_for, unindent
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import unittest
@@ -20,7 +19,7 @@ class Case4359_traversal_OK(CommonCase):
         def f(id_obj):
             return id_obj.to_string()  # ..
 
-        these = self.given_collection().to_identifier_stream(_no_listener)
+        these = self.given_collection().TO_IDENTIFIER_STREAM(no_listener)
         assert(these)
         _actual = (f(o) for o in these)
 
@@ -32,9 +31,7 @@ class Case4359_traversal_OK(CommonCase):
 
     # NOTE not memoized
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=None)
+        return build_collection()
 
 
 # Case4360 retrieve fail
@@ -43,23 +40,16 @@ class Case4359_traversal_OK(CommonCase):
 class Case4361_retrieve_OK(CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
-        dct = self._result_value()
-
+        ent = self.build_end_state()
+        dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
         self.assertEqual(dct['identifier_string'], '68')
         dct = dct['core_attributes']
         self.assertEqual(dct, {'xx': 'xx of 68'})
 
     # NOTE not memoized
-    def _result_value(self):
-        _col = _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=None)
-
-        _col = wrap_collection(_col)
-
-        _listener = _no_listener
-        # _listener = debugging_listener
-        return _col.retrieve_entity('68', _listener)
+    def build_end_state(self):
+        coll = build_collection(dir_path_most_common())
+        return coll.retrieve_entity('68', no_listener)
 
 
 # Case4362 delete fail
@@ -91,9 +81,9 @@ class Case4364_delete_OK_CAPTURE_GREEDY_COMMENTS_ISSUE(CommonCase):
         return filesystem_recordings_of(self, 'delete', '68')
 
     def given_collection(self):  # (same as #here1)
-        return wrap_collection(_build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
+        return build_collection(
+                dir_path=dir_path_most_common(),
+                filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
 # Case4365 update fail
@@ -126,9 +116,9 @@ class Case4366_update_OK(CommonCase):
             ))
 
     def given_collection(self):  # (same as #here1)
-        return wrap_collection(_build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
+        return build_collection(
+                dir_path=dir_path_most_common(),
+                filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
 # Case4367 create fail
@@ -172,10 +162,10 @@ class Case4368_create_into_existing_file(CommonCase):
             assert(pool_size == 1022)  # 1024 - 2
             return 64  # (as iid) 42 per [#867.S] CLI
 
-        return wrap_collection(_build_collection(
-                dir_path=_dir_path_most_common(),
+        return build_collection(
+                dir_path=dir_path_most_common(),
                 random_number_generator=random_number_generator,
-                filesystem=build_filesystem_expecting_num_file_rewrites(1)))
+                filesystem=build_filesystem_expecting_num_file_rewrites(1))
 
 
 # == assertion support
@@ -187,15 +177,15 @@ def _last_1_of_path(path):
 
 # == setup support
 
-def _build_collection(dir_path, **injections):
-    return _main_module().collection_via_directory_and_schema(
-            collection_directory=dir_path,
-            collection_schema=_always_same_schema(),
-            **injections)
-
+def build_collection(dir_path=None, **injections):
+    if dir_path is None:
+        dir_path = dir_path_most_common()
+    schema = _always_same_schema()
+    from kiss_rdb_test.toml_support import build_collection as func
+    return func(dir_path, schema, injections)
 
 @lazy
-def _dir_path_most_common():
+def dir_path_most_common():
     return functions_for('toml').fixture_directory_for('056-single-file')
 
 
@@ -205,7 +195,7 @@ def _always_same_schema():
     return Schema_(storage_schema='32^2')
 
 
-def _main_module():
+def subject_module():
     from kiss_rdb.storage_adapters_.toml import collection_via_directory as _
     return _
 
@@ -215,7 +205,7 @@ def _throwing_listener():
     return listening.throwing_listener
 
 
-_no_listener = None
+no_listener = None
 
 
 if __name__ == '__main__':

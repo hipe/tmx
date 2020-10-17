@@ -80,7 +80,7 @@ class CommonCase(CLI_support.CLI_Test_Case_Methods, unittest.TestCase):
     (part of #here2)
     """
 
-    might_debug = False
+    might_debug = True
     """
     EXPERIMENTAL: on the one hand you can think of this as a nasty
     optimization, but on the other hand we see it as a coarse exercising of

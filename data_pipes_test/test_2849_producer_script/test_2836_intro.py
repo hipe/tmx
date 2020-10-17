@@ -36,7 +36,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case2823_this_path_fails_because_absolute_path_too_crazy(CommonCase):
+class Case2823DP_this_path_fails_because_absolute_path_too_crazy(CommonCase):
 
     def test_100_fails(self):
         _msg = self._fail_against('/egads/ohai.py')

@@ -191,9 +191,9 @@ _these_N_IDs = (
 
 
 def build_flattened_collection_for_traversal_case(tc):  # similar to #here1
-    _sc = tc.given_collection()
-    _ents = _sc.to_entity_stream_as_storage_adapter_collection(None)
-    return tuple(_ents)
+    coll = tc.given_collection()
+    ents = coll.TO_ENTITY_STREAM(None)
+    return tuple(ents)
 
 
 class case_of_entity_not_found_because_identifier_too_deep:
@@ -261,10 +261,14 @@ class case_of_retrieve_OK:  # #as-namespace-only
 
     def build_end_state(tc):
         # we have to deconstruct and duplicate "build end state" b.c no emissio
-        iden = tc.identifier_via_primitive(_ID_primitive_via_TC(tc))
+        eid = _ID_primitive_via_TC(tc)
         coll = tc.given_collection()
-        wat = _do_retrieve(coll, iden, None)
-        return {'result_value': wat, 'collection': coll, 'identifier': iden}
+        wat = _do_retrieve(coll, eid, None)
+        dct = {}
+        dct['result_value'] = wat
+        dct['collection'] = coll
+        dct['identifier_primitive'] = eid
+        return dct
 
 
 class case_of_delete_but_entity_not_found:  # #as-namespace-only
@@ -292,39 +296,30 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
 class _common_delete:  # as-namespace-only
 
     def confirm_result_is_the_deleted_entity(tc):
-        sct = tc.end_state
-        deleted_ent = sct['result_value']
-        _actual = deleted_ent.identifier
-        _expected = sct['identifier']
-        tc.assertEqual(_actual, _expected)
+        es = tc.end_state
+        deleted_ent = es['result_value']
+        act = deleted_ent.identifier.to_primitive()
+        exp = es['identifier_primitive']
+        tc.assertEqual(act, exp)
         tc.CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(deleted_ent)
 
     def confirm_emitted_accordingly(tc):
         es = tc.end_state
         tc.assertSequenceEqual(
                 es['channel'], ('info', 'structure', 'deleted_entity'))
-        _iid_s = es['identifier'].to_primitive()
+        act_eid = es['identifier_primitive']
         message = _message_from(es)
-        _assert_says_identifier_probably(tc, message, _iid_s)
+        _assert_says_identifier_probably(tc, message, act_eid)
         tc.assertRegex(message, r'\bdeleted\b')
 
-    def build_end_state_for_delete(tc, iid_s):
-        return _end_state_for_delete_via_string(tc, iid_s, _expecting_OK)
+    def build_end_state_for_delete(tc, eid):
+        return _end_state_for_delete_via_string(tc, eid, _expecting_OK)
 
 
 class case_of_delete_OK_resulting_in_non_empty_collection(_common_delete):
     # #as-namespace-only
 
-    def confirm_entity_no_longer_in_collection(tc):
-        raise RuntimeError("stopped using at #history-B.1 but sketch might wo")
-        es = tc.end_state
-        iden = es['identifier']
-        coll = es['collection']
-        expecting = (('error', 'structure', 'entity_not_found', 'as', 'ezzy'),)
-        listener, done = _em().listener_and_done_via(expecting, tc)
-        x = _do_retrieve(coll, iden, listener)
-        done()
-        assert(x is None)
+    pass  # lost only thing at #history-B.4
 
 
 class case_of_delete_OK_resulting_in_empty_collection(_common_delete):
@@ -370,9 +365,9 @@ def _create_OK_confirm_in_collection(tc):
 
     es = tc.end_state
     ent_one = es['result_value']
-    iden = ent_one.identifier
+    eid = ent_one.identifier.to_primitive()
     coll = es['collection']
-    ent_two = _do_retrieve(coll, iden, None)
+    ent_two = _do_retrieve(coll, eid, None)
     if ent_one != ent_two:
         dct_one = _yes_value_dict(ent_one)
         dct_two = _yes_value_dict(ent_two)
@@ -426,11 +421,11 @@ class case_of_update_but_entity_not_found:  # #as-namespace-only
         es = tc.end_state
         tc.assertSequenceEqual(
             es['channel'], ('error', 'structure', 'entity_not_found'))
-        reason = _reason_from(es)
-        _assert_says_cannot_verb(tc, reason, 'update')
-        _iid_s = es['identifier'].to_primitive()
-        _assert_says_identifier_probably(tc, reason, _iid_s)
-        tc.assertIn(' not found ', reason)  # ..
+        act = _reason_from(es)
+        _assert_says_cannot_verb(tc, act, 'update')
+        eid = es['identifier_primitive']
+        _assert_says_identifier_probably(tc, act, eid)
+        tc.assertIn(' not found ', act)  # ..
 
     def build_end_state(tc):
         s, tup = tc.request_tuple_for_update_that_will_fail_because_no_ent()
@@ -443,20 +438,16 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
 
     def confirm_emitted_accordingly(tc):
         es = tc.end_state
-        tc.assertSequenceEqual(
-                es['channel'], ('error', 'structure', 'cannot_update'))
-        reason = _reason_from(es)
-
-        _assert_says_cannot_verb(tc, reason, 'update')
-
-        _assert_says_identifier_probably(
-                tc, reason, es['identifier'].to_primitive())
-
-        tc.assertRegex(reason, r'\b(?:has no existing value|not found in entity)\b')  # noqa: E501
+        exp = 'error', 'structure', 'cannot_update'
+        tc.assertSequenceEqual(es['channel'], exp)
+        s = _reason_from(es)
+        _assert_says_cannot_verb(tc, s, 'update')
+        _assert_says_identifier_probably(tc, s, es['identifier_primitive'])
+        tc.assertRegex(s, r'\b(?:has no existing value|not found in entity)\b')
 
     def build_end_state(tc):
-        iid_s, tup = tc.request_tuple_for_update_that_will_fail_because_attr()
-        return _end_state_for_update(tc, tup, iid_s, _expecting_not_OK)
+        eid, tup = tc.given_request_tuple_for_update_that_will_fail_because_attr()  # noqa: E501
+        return _end_state_for_update(tc, tup, eid, _expecting_not_OK)
 
 
 class case_of_update_OK:  # #as-namespace-only
@@ -490,15 +481,15 @@ class case_of_update_OK:  # #as-namespace-only
 
     def confirm_retrieve_after_shows_updated_value(tc):
         es = tc.end_state
-        identi = es['identifier']
+        eid = es['identifier_primitive']
         coll = es['collection']
-        ent = _do_retrieve(coll, identi, None)
+        ent = _do_retrieve(coll, eid, None)
         _ = _ID_primitive_via_TC(tc)
         _same_confirmation_of_after_update(tc, ent, _)
 
     def build_end_state(tc):
-        iid_s, tup = tc.request_tuple_for_update_that_will_succeed()
-        return _end_state_for_update(tc, tup, iid_s, _expecting_OK)
+        eid, tup = tc.request_tuple_for_update_that_will_succeed()
+        return _end_state_for_update(tc, tup, eid, _expecting_OK)
 
 
 # == support that helps make asssertions of states
@@ -527,7 +518,7 @@ def _same_confirmation_of_before_update(tc, ent, ID_s):
     tc.assertEqual(dct_['core_attributes'], dct)  # OOF extreme laziness
 
 
-def _assert_says_identifier_probably(tc, reason, iid_s):
+def _assert_says_identifier_probably(tc, reason, eid):
     # do the "in" test first just to get a friendly errmsg, then check count
 
     these = _find_all_identifer_looking_strings(reason)
@@ -535,7 +526,7 @@ def _assert_says_identifier_probably(tc, reason, iid_s):
     if leng:
         tc.assertEqual(1, leng)
         return
-    needle = f"'{iid_s}'"
+    needle = f"'{eid}'"
     tc.assertIn(needle, reason)
 
 
@@ -588,20 +579,18 @@ yes_value_dictionary_of = _yes_value_dict
 
 # -- update
 
-def _end_state_for_update(tc, tup, iid_s, expecting_OK):
+def _end_state_for_update(tc, tup, eid, expecting_OK):
     def run(listener):
-        return coll.update_entity_as_storage_adapter_collection(
-                identifier, tup, listener)
-    identifier = tc.identifier_via_primitive(iid_s)
+        return coll.update_entity(eid, tup, listener)
     coll = tc.given_collection()
-    return _end_state_plus(tc, run, coll, identifier, expecting_OK)
+    return _end_state_plus(tc, run, coll, eid, expecting_OK)
 
 
 # -- create
 
 def _end_state_for_create(tc, dct, expecting_OK, with_coll=None):
     def run(listener):
-        return coll.create_entity_as_storage_adapter_collection(dct, listener)
+        return coll.create_entity(dct, listener)
     coll = tc.given_collection()
     if with_coll is not None:
         with_coll(coll)
@@ -612,31 +601,28 @@ def _end_state_for_create(tc, dct, expecting_OK, with_coll=None):
 
 # -- delete
 
-def _end_state_for_delete_via_string(tc, iid_s, expecting_OK):
+def _end_state_for_delete_via_string(tc, eid, expecting_OK):
     def run(listener):
-        return coll.delete_entity_as_storage_adapter_collection(iden, listener)
-    iden = tc.identifier_via_primitive(iid_s)
+        return coll.delete_entity(eid, listener)
     coll = tc.given_collection()
-    return _end_state_plus(tc, run, coll, iden, expecting_OK)
+    return _end_state_plus(tc, run, coll, eid, expecting_OK)
 
 
 # -- retrive
 
-def _end_state_for_retrieve_via_string(tc, iid_s, expecting_OK):
-    iden = tc.identifier_via_primitive(iid_s)
-    coll = tc.given_collection()
-
+def _end_state_for_retrieve_via_string(tc, eid, expecting_OK):
     def run(listener):
-        return _do_retrieve(coll, iden, listener)
-    return _end_state_plus(tc, run, coll, iden, expecting_OK)
+        return _do_retrieve(coll, eid, listener)
+    coll = tc.given_collection()
+    return _end_state_plus(tc, run, coll, eid, expecting_OK)
 
 
-def _do_retrieve(coll, identi, listener):
-    return coll.retrieve_entity_as_storage_adapter_collection(identi, listener)
+def _do_retrieve(coll, eid, listener):
+    return coll.retrieve_entity(eid, listener)
 
 
 def _do_to_ID_stream(coll, listener):
-    return coll.to_identifier_stream_as_storage_adapter_collection(listener)
+    return coll.TO_IDENTIFIER_STREAM(listener)
 
 
 # -- support
@@ -653,10 +639,10 @@ def build_end_state_expecting_failure_via(tc, additionally=None):
     # eventually #open [#867.J] re-redund this
 
 
-def _end_state_plus(tc, run, coll, identifier, expecting_OK):
+def _end_state_plus(tc, run, coll, eid, expecting_OK):
     es = end_state_via_(tc, run, expecting_OK)
     es['collection'] = coll
-    es['identifier'] = identifier
+    es['identifier_primitive'] = eid
     return es
 
 
@@ -696,6 +682,7 @@ _expecting_not_OK = False
 _expecting_OK = True
 
 
+# #history-B.4
 # :#here3: at #history-B.1, [#871.1] messes up some doo-hahs and not others
 # #history-B.1
 # #born.

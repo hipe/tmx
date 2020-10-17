@@ -49,10 +49,10 @@ woah boy.
 |[#873.S]                   | #trak | eno has fixed storage schema for now
 |[#873.R]                   | #open | unify error monitor
 |[#873.Q]                   | #open | unify how we render markdown
-|[#873.P]                   | #hole |
+|[#873.16]                  | #trak | track collection implementations outside of here and there
 |[#873.O]                   | #open | this one markdown producer script needs several passes of rewrites
 |[#873.N]                   |       | stream-based vs. memory-hog based markdown table parsing
-|[#873.M]                   | #hole |
+|[#873.M]                   | #trak | wrapping classes changed to..
 |[#873.12]                  |       | #experimental. we may remove this API point. capability functions
 |[#873.K]                   | #spec | eno: the assumption of a document-meta section makes life easier
 |[#873.J]                   | #open | debugging `print` statements for kiss-rdb commit

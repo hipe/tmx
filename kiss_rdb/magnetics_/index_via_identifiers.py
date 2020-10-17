@@ -211,16 +211,11 @@ class _CLI:
         if coll is None:
             return
 
-        sa_coll = coll._impl
-
-        _ids = sa_coll.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
-
-        _lines = _lines_of_index_via_identifiers(
-                _ids, sa_coll.number_of_digits_, listener)
-
-        for line in _lines:
+        num_digits = coll.COLLECTION_IMPLEMENTATION.number_of_digits_
+        idens = coll.TO_IDENTIFIER_STREAM(listener)
+        lines = _lines_of_index_via_identifiers(idens, num_digits, listener)
+        for line in lines:
             self.stdout.write(line)
-
         return 0
 
     def parse_command_name(self):

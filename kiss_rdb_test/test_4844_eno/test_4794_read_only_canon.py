@@ -19,7 +19,6 @@ class CommonCase(unittest.TestCase):
     def given_collection(self):
         return stateless_collection()
 
-    identifier_via_primitive = storage_adapter_canon.identifier_via_string
     do_debug = False
 
 

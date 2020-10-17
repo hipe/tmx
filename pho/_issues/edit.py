@@ -4,7 +4,7 @@ def open_issue(readme, dct, listener, opn=None):
     if tup is None:
         return
     typ, iden, read_fh, schema, ic = tup  # #here1
-    ci = ic.collection_implementation
+    coll = ic.collection
 
     # This algorithm is necessarily two-pass: you have to traverse the whole
     # collection once to provision the identifier (you don't know what it will
@@ -39,17 +39,26 @@ def open_issue(readme, dct, listener, opn=None):
         return
 
     # Either create or update
+
+    def dct_via_ent(ent):
+        if ent is None:
+            return None
+        return ent.to_dictionary_two_deep_as_storage_adapter_entity()
+
     do_create = ('tagged_hole', 'major_hole', 'minor_hole').index(typ)
     if do_create:
         use_dct = {k: v for k, v in dct.items()}
         use_dct[iden_key] = iden.to_string()  # reparse it again ick/meh
-        x = ci.create_entity_as_storage_adapter_collection(use_dct, listener)
-        t = (None, x) if x else x
+        ent = coll.create_entity(use_dct, listener)
+        edct = dct_via_ent(ent)
+        t = (None, edct)
     else:
         use_dct = {k: '' for k in allowed_keys}
         use_dct.update(dct)
         edt = tuple(('update_attribute', k, v) for k, v in use_dct.items())
-        t = ci.update_entity_as_storage_adapter_collection(iden, edt, listener)
+        eid = iden.to_string()  # meh
+        two = coll.update_entity(eid, edt, listener)
+        t = tuple(dct_via_ent(ent) for ent in two)
 
     read_fh.close()
     return t
@@ -226,15 +235,12 @@ def _increment_identifier(iden, maj_or_min):
 
 def close_issue(readme, eid, listener, opn=None):
     def main():
-        iden = parse_identifier()
+        eid = pre_parse_identifier()
         ic = _issues_collection_via(readme, listener, opn)
-        ci = ic.collection_implementation
+        coll = ic.collection
         edit = (('update_attribute', 'main_tag', '#hole'),
                 ('update_attribute', 'content', ''))
-        two = ci.update_entity_as_storage_adapter_collection(
-            iden, edit, throwing_listener)
-        if two is None:
-            return
+        two = coll.update_entity(eid, edit, throwing_listener)
         before, after = two
 
         def lines():
@@ -242,12 +248,12 @@ def close_issue(readme, eid, listener, opn=None):
             yield f"AFTER:  {after.to_line()}"
         listener('info', 'expression', 'closed_issue', lines)
 
-    def parse_identifier():
+    def pre_parse_identifier():
         # Give eid's w/o leading '[', '#' a '#' so we can use cust iden class
 
-        use_eid = eid if (len(eid) and eid[0] in ('[', '#')) else f"#{eid}"
-        from . import build_identifier_parser_ as func
-        return func(throwing_listener)(use_eid)
+        if len(eid) and eid[0] in ('[', '#'):
+            return eid
+        return f'#{eid}'
 
     class stop(RuntimeError):
         pass

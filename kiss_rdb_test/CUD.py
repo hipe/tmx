@@ -19,10 +19,11 @@ def expect_big_success(tc):
     run = _run_given_edit_tuples_and_MDE(tc, mde)
     result_value = run(_throwing_listener)
     tc.assertTrue(result_value is True)
-    _expected_lines = tuple(_unindent(tc.expect_entity_body_lines()))
-    _blocks = mde.to_body_block_stream_as_MDE_()
-    _actual_lines = tuple(__lines_via_blocks(_blocks))
-    tc.assertSequenceEqual(_actual_lines, _expected_lines)
+    exp = tuple(_unindent(tc.expect_entity_body_lines()))
+    blocks = mde.to_body_block_stream_as_MDE_()
+    lines = (line for block in blocks for line in block.to_line_stream())
+    act = tuple(lines)
+    tc.assertSequenceEqual(act, exp)
 
 
 def emission_payload_expecting_error_given_edit_tuples(tc, which):
@@ -61,7 +62,7 @@ def filesystem_recordings_of(tc, verb, *args):
     result_value = run(_throwing_listener)
     # result value will vary depending on the edit. seems strange to toss it
     tc.assertIsNotNone(result_value)
-    return coll._impl._filesystem.FINISH_AS_HACKY_SPY()
+    return coll.COLLECTION_IMPLEMENTATION._filesystem.FINISH_AS_HACKY_SPY()
 
 
 def run_for(coll, verb, *args):
@@ -129,26 +130,6 @@ def _default_business_schema():
     return lib.DEFAULT_BUSINESS_SCHEMA
 
 
-# == support
-
-def wrap_collection(coll):
-    """tiny discussion: in the old days before #history-A.2, there was only
-
-    one collection class. After the split for adapter injection, some test
-    cases tested a thing that ended up belonging to the wrapper, and others
-    the remote injection. Now, test cases use this to proto-fit to which one.
-    """
-
-    from kiss_rdb.magnetics_.collection_via_path import _Collection
-    return _Collection(coll)
-
-
-def __lines_via_blocks(blocks):  # #c/p
-    for block in blocks:
-        for line in block.to_line_stream():
-            yield line
-
-
 # == delegations
 
 def filesystem_expecting_no_rewrites():
@@ -186,6 +167,7 @@ def em():
 
 # ==
 
+# #history-B.4
 # #history-A.2
 # #history-A.1 dissolved methods modules into a toolkit of functions
 # #abstracted.

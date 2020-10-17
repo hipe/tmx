@@ -66,8 +66,12 @@ class CommonCase(unittest.TestCase):
         self.assertEqual(dct[key], expected_value)
 
     def _sneak_in_confirmation_of_no_result_value(self):
-        es = self.end_state
-        self.assertIsNone(es['result_value'])  # NOTE sneak this in somehwere
+        act = self.end_state_result
+        self.assertIsNone(act)  # NOTE sneak this in somehwere
+
+    @property
+    def end_state_result(self):
+        return self.end_state['end_state_result']
 
     def emits_error_context(self, **expect_dct):
         dct = self.end_state['payload']
@@ -106,10 +110,10 @@ class CommonCase(unittest.TestCase):
             return fs.open_file_for_reading(path_arg)
 
         # Execute
-        rv = collectioner().collection_via_path(path, listener, opn)
+        rv = self.given_run(listener, path, opn)
 
         # Finish by assembling the result structure
-        dct = {'result_value': rv}
+        dct = {'end_state_result': rv}
         if len(emissions):
             dct['did_emit'] = True
             emi, = emissions
@@ -118,6 +122,15 @@ class CommonCase(unittest.TestCase):
         else:
             dct['did_emit'] = False
         return dct
+
+    def given_run(self, listener, *coll_args):
+        x = self.load_collection(*coll_args, listener)
+        if x is not None:
+            raise RuntimeError("ohai")
+        return x
+
+    def load_collection(self, path, opn, listener):
+        return collectioner().collection_via_path(path, listener, opn=opn)
 
     do_debug = False
 
@@ -338,16 +351,71 @@ class Case1421_schema_indicates_SA_thats_single_file_only(CommonCase):
                 ('file', same_schema_path, these_lines))
 
 
-class Case1422_directory_based_money(CommonCase):
+class Case1422_single_file_based_money(CommonCase):
 
-    def test_100_full_round_trip_works(self):
-        ae = self.assertEqual
-        es = self.build_end_state()
-        self.assertFalse(es['did_emit'])
-        rv = es['result_value']
-        rv = unwrap_collection(rv)
-        ae(rv['message for the test'], 'hello from storage adapter 1')
-        ae(rv['also this'], "it's me, this one test")
+    # full overhaul at #history-B.4 for magnetic fields
+
+    def test_100_you_can_touch_the_module(self):
+        coll = self.end_state_result[0]
+        assert 'storo_adapto_2' == coll.storage_adapter.key
+        mod = coll.storage_adapter.module
+        act = mod.OHAI
+        assert "hello from storo adapto 2" == act
+
+    def test_200_create_produces_adapters_choice_but_should_be_an_entity(self):
+        wat = self.end_state_result[1]
+        ohai, k, v = wat
+        assert 'ohai_i_am_adapto_2_who_created_this_guy' == ohai
+        assert 'felloo1' == k
+        assert 'furry' == v['fim']
+
+    def test_300_retrieve_produces_the_entity_which_in_reality_should_be(self):
+        wat = self.end_state_result[2]
+        ohai, whatev = wat
+        assert 'this_is_supposed_to_be_wrapped' == ohai
+        assert 'furry' == whatev['fim']
+
+    def given_fake_filesystem(self):
+        return build_fake_filesystem(('file', 'abc/xyz.xtc'))
+
+    def given_run(self, listener, *coll_args):
+        return tuple(self.result_value_values_from_run(coll_args, listener))
+
+    def result_value_values_from_run(self, coll_args, listener):
+        coll = self.load_collection(*coll_args, listener)
+        if coll is None:
+            return
+        yield coll
+        wat = coll.create_entity({'fim': 'furry'}, listener)
+        if not wat:
+            return
+        k = wat[1]
+        yield wat
+        wat = coll.retrieve_entity(k, listener)
+        yield wat
+
+
+class Case1423_directory_based_money(CommonCase):
+
+    def test_100_you_can_touch_the_module(self):
+        coll = self.end_state_result[0]
+        assert 'storo_adapto_1' == coll.storage_adapter.key
+        mod = coll.storage_adapter.module
+        act = mod.OHAI
+        assert "hello from storo adapto 1" == act
+
+    def test_200_create_produces_adapters_choice_but_should_be_an_entity(self):
+        wat = self.end_state_result[1]
+        ohai, k, v = wat
+        assert 'ohai_i_am_adapto_2_who_created_this_guy' == ohai
+        assert 'Q001' == k
+        assert 'furry' == v['fim']
+
+    def test_300_retrieve_produces_the_entity_which_in_reality_should_be(self):
+        wat = self.end_state_result[2]
+        ohai, whatev = wat
+        assert 'this_is_supposed_to_be_wrapped' == ohai
+        assert 'furry' == whatev['fim']
 
     def given_fake_filesystem(self):
 
@@ -358,32 +426,30 @@ class Case1422_directory_based_money(CommonCase):
             yield ''
             yield '# comment 2'
             yield ''
-            yield 'valley_for_storo_1: it\'s me, this one test'
+            yield 'idens_must_start_with_letter: Q'
             yield ''
-            yield 'valley_for_storo_1_B: true'
+            yield 'number_of_digits_in_idens: 3'
             yield ''
 
         return build_fake_filesystem(
                 ('directory', 'abc/xyz'),
                 ('file', same_schema_path, these_lines))
 
+    def given_run(self, listener, *coll_args):
+        return tuple(self.result_value_values_from_run(coll_args, listener))
 
-class Case1423_single_file_based_money(CommonCase):
-
-    def test_100_the_SA_can_emit(self):
-        es = self.end_state
-        self.assertSequenceEqual(
-                es['channel'], ('info', 'structure', 'hi_from_SA_2'))
-        self.assertEqual(es['payload']['message'], 'SA2')
-
-    def test_200_the_SA_can_result(self):
-        _rv = self.end_state['result_value']
-        _rv = unwrap_collection(_rv)
-        self.assertEqual(_rv, (
-            "hello from storo adapto 2. you know you want this - abc/xyz.xtc"))
-
-    def given_fake_filesystem(self):
-        return build_fake_filesystem(('file', 'abc/xyz.xtc'))
+    def result_value_values_from_run(self, coll_args, listener):
+        coll = self.load_collection(*coll_args, listener)
+        if coll is None:
+            return
+        yield coll
+        wat = coll.create_entity({'fim': 'furry'}, listener)
+        if not wat:
+            return
+        yield wat
+        k = wat[1]
+        wat = coll.retrieve_entity(k, listener)
+        yield wat
 
 
 # == Support Test Assertions
@@ -400,22 +466,20 @@ def message_about_no_schema_for(coll_path):
 
 @lazy
 def collectioner():
-    from kiss_rdb.magnetics_.collection_via_path import (
-            collectioner_via_storage_adapters_module)
 
     # #wish look into module reflection
 
     import os.path as os_path
     dn = os_path.dirname
-    _ = os_path.join(dn(dn(__file__)), 'fixture_code', '_1416_SAs', '_33_SAs')
+    md = os_path.join(dn(dn(__file__)), 'fixture_code', '_1416_SAs', '_33_SAs')
 
-    return collectioner_via_storage_adapters_module(
-            module_name='kiss_rdb_test.fixture_code._1416_SAs._33_SAs',
-            module_directory=_)
+    from kiss_rdb.magnetics_.collection_via_path import \
+        collectioner_via_storage_adapters_module as func
+    return func('kiss_rdb_test.fixture_code._1416_SAs._33_SAs', md)
 
 
 def unwrap_collection(coll):
-    return coll._impl  # ick/meh
+    return coll
 
 
 same_schema_path = 'abc/xyz/schema.rec'
@@ -424,5 +488,6 @@ same_schema_path = 'abc/xyz/schema.rec'
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #history-B.1
 # #born.

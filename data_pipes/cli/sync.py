@@ -128,8 +128,20 @@ def _stdout_lines_from_sync(  # #testpoint
         def capability_path():
             yield 'SYNC_AGENT_FOR_DATA_PIPES', 'sync-related function'
 
-        _ = self.near_coll.DIG_FOR_CAPABILITY(capability_path(), listener)
-        set_or_stop('sync_agent', _)
+        # un-abstracted this from library class (simplify it) at #history-B.4
+
+        dig_path = tuple(capability_path())
+        assert dig_path
+        assert all('_' != k[0] for k, _ in dig_path)  # make sure no names..
+
+        coll = self.near_coll
+        say_collection = coll.to_noun_phrase
+        ci = coll.COLLECTION_IMPLEMENTATION
+        from kiss_rdb.magnetics.via_collection import DIGGY_DIG as func
+        x = func(ci, dig_path, say_collection, listener)
+
+        x = x and x()
+        set_or_stop('sync_agent', x)
 
     def resolve_near_collection():
         from kiss_rdb import collectionerer
@@ -171,6 +183,7 @@ if '__main__' == __name__:
     import sys as o
     exit(CLI_(o.stdin, o.stdout, o.stderr, o.argv, lambda: xx()))
 
+# #history-B.4
 # #history-B.1: blind rewrite
 # #history-A.4
 # #history-A.3: no more formal parameters. cheap arg parse not older API's

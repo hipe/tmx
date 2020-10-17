@@ -29,8 +29,7 @@ class CommonCase(unittest.TestCase):
         if coll is None:
             return (), None  # (Case2449)
 
-        ci = coll.COLLECTION_IMPLEMENTATION
-        ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
+        ents = coll.TO_ENTITY_STREAM(listener)
 
         dcts, k = [], None
         for first_ent in ents:

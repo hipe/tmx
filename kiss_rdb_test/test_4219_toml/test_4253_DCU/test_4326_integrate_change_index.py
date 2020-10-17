@@ -1,7 +1,7 @@
 from kiss_rdb_test.common_initial_state import \
         functions_for, unindent_with_dot_hack, unindent as _unindent
 from kiss_rdb_test.CUD import \
-        run_for, wrap_collection, filesystem_recordings_of, \
+        run_for, filesystem_recordings_of, \
         filesystem_expecting_no_rewrites, \
         build_filesystem_expecting_num_file_rewrites
 from kiss_rdb_test import storage_adapter_canon
@@ -56,7 +56,7 @@ class CommonCase(unittest.TestCase):
 
     def flush_filesystem_recordings(self):
         coll = self.end_state['collection']
-        return coll._filesystem.FINISH_AS_HACKY_SPY()
+        return coll.COLLECTION_IMPLEMENTATION._filesystem.FINISH_AS_HACKY_SPY()
 
     def listener(self):
         pass
@@ -65,8 +65,6 @@ class CommonCase(unittest.TestCase):
     def debug_IO(self):
         import sys
         return sys.stderr
-
-    identifier_via_primitive = storage_adapter_canon.identifier_via_string
 
     do_debug = False
 
@@ -80,7 +78,7 @@ class Case4315_collection_can_be_built_with_noent_dir(CommonCase):
         self._canon_case.confirm_collection_is_not_none(self)
 
     def given_collection(self):
-        return _collection_with_noent_dir()
+        return collection_with_noent_dir()
 
     @property
     def _canon_case(self):
@@ -109,7 +107,7 @@ class Case4317_identifier_with_invalid_chars(CommonCase):
         return self.build_common_components_for_failed_delete('AbC')
 
     def given_collection(self):
-        return _wrapped_collection_with_NO_filesystem()
+        return collection_with_NO_filesystem()
 
 
 class Case4318_identifier_too_short_or_long(CommonCase):
@@ -128,7 +126,7 @@ class Case4318_identifier_too_short_or_long(CommonCase):
         return 'AB23'
 
     def given_collection(self):
-        return _collection_with_NO_filesystem()
+        return collection_with_NO_filesystem()
 
     @property
     def _canon_case(self):
@@ -155,7 +153,7 @@ class Case4319_some_top_directory_not_found(CommonCase):
         return self.build_common_components_for_failed_delete('ABC')
 
     def given_collection(self):
-        return wrap_collection(_collection_with_noent_dir())
+        return collection_with_noent_dir()
 
 
 class Case4320_delete_but_file_not_found(CommonCase):
@@ -174,8 +172,8 @@ class Case4320_delete_but_file_not_found(CommonCase):
         self.assertIn('no such file', _actual)
 
     def test_700_reason(self):
-        _tail = _last_three_path_parts(self.right_half)
-        self.assertEqual(_tail, 'entities/B/4.toml')
+        tail = last_three_path_parts(self.right_half)
+        self.assertEqual(tail, 'entities/B/4.toml')
 
     @shared_subject
     def end_components(self):
@@ -191,9 +189,7 @@ class Case4320_delete_but_file_not_found(CommonCase):
         return 'B42'
 
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=None)
+        return build_collection()
 
     @property
     def _canon_case(self):
@@ -224,9 +220,8 @@ class Case4322_entity_not_found(CommonCase):
         return 'B7J'
 
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=filesystem_expecting_no_rewrites())
+        fs = filesystem_expecting_no_rewrites()
+        return build_collection(filesystem=fs)
 
     @property
     def _canon_case(self):
@@ -241,7 +236,7 @@ class Case4322_entity_not_found(CommonCase):
 class Case4326_retrieve_no_ent_in_file(CommonCase):  # #midpoint
 
     def test_100_emits_error_structure(self):
-        coll = _wrapped_collection_with_NO_filesystem()
+        coll = collection_with_NO_filesystem()
         run = run_for(coll, 'retrieve', 'B9F')
         listener, emissions = em().listener_and_emissions_for(self, limit=1)
         self.assertIsNone(run(listener))
@@ -268,7 +263,7 @@ class Case4327_retrieve_OK(CommonCase):
         return 'B9H'
 
     def given_collection(self):
-        return _collection_with_NO_filesystem()
+        return collection_with_NO_filesystem()
 
     @property
     def _canon_case(self):
@@ -301,7 +296,7 @@ class Case4329_delete_OK(CommonCase):
 
     def test_200_path_is_path(self):
         path = self.entity_file_rewrite().path
-        tail = _last_3_of_path(path)
+        tail = last_3_of_path(path)
         self.assertEqual(tail, 'entities/B/7.toml')
 
     def test_300_entities_file_lines_look_good(self):
@@ -331,7 +326,7 @@ class Case4329_delete_OK(CommonCase):
         return self._canon_case.build_end_state_for_delete(self, 'B7F')
 
     def given_collection(self):
-        return _build_collection_expecting_common_number_of_rewrites()
+        return build_collection_expecting_common_number_of_rewrites()
 
     @property
     def _canon_case(self):
@@ -366,8 +361,7 @@ class Case4330_delete_that_leaves_file_empty(CommonCase):
         return filesystem_recordings_of(self, 'delete', 'B8H')
 
     def given_collection(self):
-        _ = _build_collection_expecting_common_number_of_rewrites()
-        return wrap_collection(_)
+        return build_collection_expecting_common_number_of_rewrites()
 
 
 # Case4331: delete when index file is left empty! (delete the last entity)
@@ -417,7 +411,7 @@ class Case4332_update_OK(CommonCase):
 
         # --
 
-        self.assertEqual(_last_three_path_parts(path), 'entities/B/9.toml')
+        self.assertEqual(last_three_path_parts(path), 'entities/B/9.toml')
         _expected = tuple(_unindent(self._expecting_these()))
 
         self.assertSequenceEqual(lines, _expected)
@@ -449,9 +443,8 @@ class Case4332_update_OK(CommonCase):
         return 'B9H'
 
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=build_filesystem_expecting_num_file_rewrites(1))
+        fs = build_filesystem_expecting_num_file_rewrites(1)
+        return build_collection(filesystem=fs)
 
     @property
     def _canon_case(self):
@@ -490,16 +483,15 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(CommonCase): 
     @shared_subject
     def end_state(self):
         def run(listener):
-            _itr = coll.to_identifier_stream_as_storage_adapter_collection(listener)  # noqa: E501
-            for _ in _itr:
+            idens = coll.TO_IDENTIFIER_STREAM(listener)
+            for iden in idens:
                 self.fail()
         coll = self.given_collection()
         return canon.end_state_via_(self, run, expecting_OK=False)
 
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_of_no_ent(),
-                filesystem=None)
+        dp = dir_path_of_no_ent()
+        return build_collection(dp)
 
     @property
     def _canon_case(self):
@@ -514,9 +506,7 @@ class Case4335_traverse_IDs_ok(CommonCase):
         _.confirm_all_IDs_in_any_order_no_repeats(self)
 
     def given_collection(self):
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                filesystem=None)
+        return build_collection()
 
 
 class Case4336_create_into_existing_file(CommonCase):
@@ -532,7 +522,7 @@ class Case4336_create_into_existing_file(CommonCase):
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
-        self.assertEqual(_last_3_of_path(efr.path), 'entities/2/H.toml')
+        self.assertEqual(last_3_of_path(efr.path), 'entities/2/H.toml')
 
         # (below values used to be primitives but becamse strings #history-B.1)
         expect = tuple(_unindent("""
@@ -567,14 +557,9 @@ class Case4336_create_into_existing_file(CommonCase):
         return self._canon_case.build_end_state(self)
 
     def given_collection(self):
-
-        random_number_generator = _random_number_generator_for(494)
-        # "2HG" as int per [#867.S] CLI
-
-        return _build_collection(
-                dir_path=_dir_path_most_common(),
-                random_number_generator=random_number_generator,
-                filesystem=build_filesystem_expecting_num_file_rewrites(2))
+        rng = random_number_generator_for(494)  # "2HG" as int per [#867.S] CLI
+        fs = build_filesystem_expecting_num_file_rewrites(2)
+        return build_collection(random_number_generator=rng, filesystem=fs)
 
     @property
     def _canon_case(self):
@@ -609,7 +594,7 @@ class Case4338_create_into_noent_file(CommonCase):
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
-        self.assertEqual(_last_3_of_path(efr.path), 'entities/2/J.toml')
+        self.assertEqual(last_3_of_path(efr.path), 'entities/2/J.toml')
 
         expect = tuple(_unindent("""
         [item.2J3.attributes]
@@ -643,90 +628,72 @@ class Case4338_create_into_noent_file(CommonCase):
         return res
 
     def given_collection(self):
-        random_number_generator = _random_number_generator_for(512)  # 2J2 but
-
-        return wrap_collection(_build_collection(
-                dir_path=_dir_path_most_common(),
-                random_number_generator=random_number_generator,
-                filesystem=build_filesystem_expecting_num_file_rewrites(2)))
+        rng = random_number_generator_for(512)  # 2J2 but
+        fs = build_filesystem_expecting_num_file_rewrites(2)
+        return build_collection(random_number_generator=rng, filesystem=fs)
 
 
-def _last_3_of_path(path):
+def last_3_of_path(path):
     import re
     return re.search(r'/([^/]+/[^/]+/[^/]+)$', path)[1]
 
 
 @lazy
-def _collection_with_expecting_no_rewrites():
-    return _build_collection(
-            dir_path=_dir_path_most_common(),
-            filesystem=filesystem_expecting_no_rewrites())
+def collection_with_noent_dir():
+    dp = dir_path_of_no_ent()
+    return build_collection(dp, filesystem='no filesystem xyz121')
 
 
 @lazy
-def _collection_with_noent_dir():
-    return _build_collection(
-            dir_path=_dir_path_of_no_ent(),
-            filesystem='no filesystem xyz121')
-
-
-@lazy
-def _wrapped_collection_with_NO_filesystem():
-    return wrap_collection(_collection_with_NO_filesystem())
-
-
-@lazy
-def _collection_with_NO_filesystem():
-    return _build_collection(
-            dir_path=_dir_path_most_common(),
-            filesystem='no filesystem xyz122')
+def collection_with_NO_filesystem():
+    return build_collection(filesystem='no filesystem xyz122')
 
 
 @lazy
 def _entities_file_path_for_2J():
     import os.path as os_path
-    return os_path.join(_dir_path_most_common(), 'entities', '2', 'J.toml')
+    return os_path.join(dir_path_most_common(), 'entities', '2', 'J.toml')
 
 
 @lazy
-def _dir_path_most_common():
+def dir_path_most_common():
     return fixture_directory_for('050-rumspringa')
 
 
 @lazy
-def _dir_path_of_no_ent():
+def dir_path_of_no_ent():
     return fixture_directory_for('000-no-ent')
 
 
 fixture_directory_for = functions_for('toml').fixture_directory_for
 
 
-def _last_three_path_parts(path):
+def last_three_path_parts(path):
     import re
     return re.search(r'[^/]+(?:/[^/]+){2}$', path)[0]
 
 
-def _random_number_generator_for(random_number):
+def random_number_generator_for(random_number):
     def random_number_generator(pool_size):
-        assert(32760 == pool_size)
+        assert 32760 == pool_size
         counter.increment()
-        assert(1 == counter.value)
+        assert 1 == counter.value
         return random_number
     counter = Counter()
     return random_number_generator
 
 
-def _build_collection_expecting_common_number_of_rewrites():
-    return _build_collection(
-            dir_path=_dir_path_most_common(),
-            filesystem=build_filesystem_expecting_num_file_rewrites(2))
+def build_collection_expecting_common_number_of_rewrites():
+    fs = build_filesystem_expecting_num_file_rewrites(2)
+    return build_collection(filesystem=fs)
 
 
-def _build_collection(dir_path, **injections):
-    return _subject_module().collection_via_directory_and_schema(
-            collection_directory=dir_path,
-            collection_schema=_always_same_schema(),
-            **injections)
+def build_collection(dir_path=None, **injections):
+    if dir_path is None:
+        dir_path = dir_path_most_common()
+    schema = _always_same_schema()
+    from kiss_rdb_test.toml_support import build_collection as func
+    return func(dir_path, schema, injections)
 
 
 @lazy
@@ -759,7 +726,7 @@ class _ThreeComponents(_TwoComponents):
         self.error_category = cc
 
 
-def _subject_module():
+def subject_module():
     from kiss_rdb.storage_adapters_.toml import collection_via_directory as _
     return _
 

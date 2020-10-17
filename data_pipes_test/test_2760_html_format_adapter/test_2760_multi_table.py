@@ -52,7 +52,7 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
 
         # get busy
 
-        from_ci, to_ci = (o._impl for o in (from_coll, to_coll))  # ..
+        from_ci, to_ci = (o.COLLECTION_IMPLEMENTATION for o in (from_coll, to_coll))  # noqa: E501
 
         sch, ents = from_ci.to_schema_and_entities(None)
         with to_ci.open_pass_thru_receiver_as_storage_adapter(None) as recv:
@@ -80,11 +80,12 @@ def fake_producer_script_via_dictionary_tuple(dct_tup):
     fake_producer_script.__file__ = __file__
 
     from data_pipes.format_adapters.producer_script import \
-        _collection_implementation_via_module
+        _functionser_via_module as func
+    fxr = func(fake_producer_script, None)
 
-    ci = _collection_implementation_via_module(fake_producer_script)
-    from kiss_rdb.magnetics_.collection_via_path import _Collection  # ..
-    return _Collection(ci)
+    from kiss_rdb.magnetics_.collection_via_path import \
+        COLLECTION_VIA_FUNCTIONSER as func
+    return func(fxr)
 
 
 class Case2757_does_scrape_work(CommonCase):
