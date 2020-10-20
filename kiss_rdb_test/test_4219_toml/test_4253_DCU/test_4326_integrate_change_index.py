@@ -734,8 +734,8 @@ def subject_module():
 # ==
 
 def _throwing_listener():
-    from modality_agnostic import listening
-    return listening.throwing_listener
+    from modality_agnostic import throwing_listener as func
+    return func
 
 
 def _no_listener(*chan, payloader):

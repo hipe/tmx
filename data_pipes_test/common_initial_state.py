@@ -30,8 +30,8 @@ class ProducerCaseMethods:
         return None
 
     def use_listener(self):
-        from modality_agnostic import listening as _
-        return _.throwing_listener
+        from modality_agnostic import throwing_listener as func
+        return func
 
 
 def PS_via_mixed(mixed):

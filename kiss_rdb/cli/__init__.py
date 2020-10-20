@@ -64,14 +64,10 @@ _empty_mapping = {}  # OCD
 def _express_error_structure(echo_error_line, channel_tail, struct):
     # (Case6080)
 
-    from script_lib.magnetics.expression_via_structured_emission import (
-            express_structured_emission)
-
-    dim_pool = {k: struct[k] for k in struct.keys()}  # "diminishing pool"
-
-    dim_pool.pop('errno', None)  # get rid of it, if any. was handled #here2
-
-    express_structured_emission(echo_error_line, channel_tail, dim_pool)
+    from script_lib.magnetics.expression_via_structured_emission import \
+        lines_via_channel_tail_and_details as func
+    for line in func(channel_tail, struct):
+        echo_error_line(line)
 
 
 def _express_info_structure(info_category, dct):  # (Case6129)

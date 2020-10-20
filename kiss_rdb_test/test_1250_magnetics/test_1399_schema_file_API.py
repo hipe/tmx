@@ -326,8 +326,8 @@ class Case1407_flush_as_config_money(CommonCase):
 
 
 def _throwing_listener():
-    from modality_agnostic import listening
-    return listening.throwing_listener
+    from modality_agnostic import throwing_listener as func
+    return func
 
 
 same_path = 'xx/yy.file'

@@ -19,8 +19,8 @@ class func:  # error_monitor_via_stderr
         self._stderr = stderr
 
     def listener(self, *a):
-        from modality_agnostic import listening
-        em = listening.emission_via_args(a)
+        from modality_agnostic import emission_via_tuple as func
+        em = func(a)
         if self._interceptor is not None:
             tf = self._interceptor(em)
             if tf is True:
@@ -39,14 +39,15 @@ class func:  # error_monitor_via_stderr
         self.__express_when_shape_is_structure(em)
 
     def __express_when_shape_is_structure(self, em):
-        dct = em.flush_payloader()
-        if 'errno' in dct:
-            _new_errno = dct.pop('errno')  # it's bad to mutate it but w/e
-            self.see_exitstatus(_new_errno)
+        dct = em.payloader()
+        if (errno := dct.get('errno', None)) is not None:
+            self.see_exitstatus(errno)
 
-        from script_lib.magnetics.expression_via_structured_emission import (
-                express_structured_emission)
-        express_structured_emission(self._write_line, em.channel_tail, dct)
+        write_line = self._write_line
+        from script_lib.magnetics.expression_via_structured_emission import \
+            lines_via_channel_tail_and_details as func
+        for line in func(em.to_channel_tail(), dct):
+            write_line(line)
 
     def __express_when_shape_is_expression(self, em):
         write_line = self._write_line

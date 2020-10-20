@@ -39,7 +39,7 @@ def _build_expectation_stack_function():  # :[#509]
 
         def receive_emission(emi):
             if not len(stack):
-                msg = repr(emi._to_debugging_tuple())
+                msg = repr(emi.to_debugging_tuple_())
                 fail(''.join((f'expecting no{more()} emissions, had: ', msg)))
             chan_exp_typ, exp_chan, store_as_name = parse_expect(stack.pop())
             if 'channel_head' == chan_exp_typ:
@@ -133,42 +133,24 @@ def debugging_listener():
 
 
 def _echo_emi_for_debugging(stderr, emi, nl='\n'):
-    pcs = (nl, 'DEBUG EMI: ', repr(emi._to_debugging_tuple()), '\n')
+    pcs = (nl, 'DEBUG EMI: ', repr(emi.to_debugging_tuple_()), '\n')
     stderr.write(''.join(pcs))
 
 
-def throwing_listener(*emission):
-    tup = _Emission(emission[:-1], emission[-1])._to_debugging_tuple()
-    raise RuntimeError(f"unexpected {repr(tup)}")
+def throwing_listener(sev, *rest):
+    if sev not in ('error', 'fatal'):
+        return
+    from modality_agnostic import throwing_listener
+    throwing_listener(sev, *rest)
 
 
 def _listener_via_receivers(emission_receivers):
     def listener(*emission):
-        *chan, payloader = emission
-        emi = _Emission(tuple(chan), payloader)
+        emi = emi_via(emission)
         for receive_emission in emission_receivers:
             receive_emission(emi)
+    from modality_agnostic import emission_via_tuple as emi_via
     return listener
-
-
-class _Emission:
-
-    def __init__(self, channel, payloader):
-        self.channel = channel
-        self.payloader = payloader
-
-    def _to_debugging_tuple(self):
-        lines = self.to_messages()
-        return (*self.channel, *lines)
-
-    def to_messages(self):
-        if 'expression' == (shape := self.channel[1]):
-            return tuple(self.payloader())
-        assert('structure' == shape)
-        sct = self.payloader()
-        if 'reason' in sct:
-            return (sct['reason'],)
-        return (sct['message'],)
 
 
 # == Memoizers

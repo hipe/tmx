@@ -1,6 +1,6 @@
 def _listener(*args):  # used as default argument
-    from modality_agnostic import listening
-    return listening.throwing_listener(*args)
+    from modality_agnostic import throwing_listener as func
+    func(*args)
 
 
 def collectioner_via_storage_adapters_module(mod_name, mod_dir, *more):

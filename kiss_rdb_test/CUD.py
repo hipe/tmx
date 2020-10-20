@@ -5,11 +5,8 @@
 - #open [#867.Z] not yet fully divorced from toml
 """
 
-from modality_agnostic import listening
+from modality_agnostic import throwing_listener as _throwing_listener
 from modality_agnostic.test_support.common import lazy
-
-
-_throwing_listener = listening.throwing_listener
 
 
 # == functions (public & private because the boundary is plastic)

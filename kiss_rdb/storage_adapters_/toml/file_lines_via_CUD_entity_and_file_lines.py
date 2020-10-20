@@ -26,8 +26,6 @@ def _do_do_verb(existing_file_lines, listener, client_args, f, do_future):
     from modality_agnostic import ModalityAgnosticErrorMonitor
     monitor = ModalityAgnosticErrorMonitor(listener)
 
-    # monitor.DEBUGGING_TURN_ON()
-
     # convert the stream of file lines into a stream of blocks
 
     blocks = __block_stream_via_file_lines(

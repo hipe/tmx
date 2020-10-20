@@ -1,4 +1,4 @@
-from modality_agnostic.test_support.common import lazy
+from modality_agnostic.test_support.common import throwing_listener, lazy
 import unittest
 
 
@@ -26,8 +26,7 @@ class CommonCase(unittest.TestCase):
         return self.run_expecting_success_against(self.given_tokens())
 
     def run_expecting_success_against(self, tokens):
-        from modality_agnostic import listening
-        listener = listening.throwing_listener
+        listener = throwing_listener
         return self._do_run(listener, tokens)
 
     def _do_run(self, listener, tokens):  # can't call it `run` b.c unittest

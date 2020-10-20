@@ -55,9 +55,8 @@ import sys
 def cached_doc_via_url_via_temporary_directory(tmpdir):
 
     def cached_doc(url, listener):
-
-        from modality_agnostic import listening as _
-        emit = _.emitter_via_listener(listener)
+        from modality_agnostic import emitter_via_listener as func
+        emit = func(listener)
 
         import re
         from os import path as p

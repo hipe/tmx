@@ -4,48 +4,6 @@ def emission_details_via_file_not_found_error(file_not_found):
             'errno': file_not_found.errno}
 
 
-class listening:  # #class-as-namespace
-
-    def emitter_via_listener(listener):
-        # at #history-B.1 removed all but one client
-        def emit(*chan_args_tmpl):
-            def emit_lines():
-                if args is None:
-                    msg = tmpl
-                else:
-                    _use_args = args if isinstance(args, tuple) else (args,)
-                    msg = tmpl.format(*_use_args)
-                yield msg
-            (*chan), tmpl, args = chan_args_tmpl
-            listener(*chan, emit_lines)
-        return emit
-
-    # at #history-B.3 got rid of 2 methods that make emitters
-
-    def throwing_listener(channel_head, *rest):
-        """Experimental. Raise an exception derived from the emission IFF it's
-
-        an `error`, otherwise ignore. Use this only as a sort of `assert`.
-        """
-
-        if 'info' == channel_head:
-            return
-        raise Exception(listening.reason_via_error_emission(*rest))
-
-    def emission_via_args(args):
-        error_or_info, *rest = args
-        _i = ('error', 'notice', 'info', 'debug').index(error_or_info)
-        return (_InfoEmission if _i else _ErrorEmission)(*rest)
-
-    def reason_via_error_emission(shape, error_category, *rest):
-        _ee = _ErrorEmission(shape, error_category, *rest)
-        return _ee._flush_to_reason_()
-
-    def message_via_info_emission(shape, info_category, payloader):
-        _ = _InfoEmission(shape, info_category, payloader)
-        return _.flush_some_message()
-
-
 class ModalityAgnosticErrorMonitor:  # :[#507.9]
     """Construct the error monitor with one listener. It has two attributes:
 
@@ -72,131 +30,57 @@ class ModalityAgnosticErrorMonitor:  # :[#507.9]
 
         self.listener = my_listener
 
-    def DEBUGGING_TURN_ON(self):  # this will bork IFF destructive payloads
-        assert(not self._debug)
-        from sys import stderr
 
-        def f(a):
-            stderr.write(listening.emission_via_args(a).flush_to_trace_line())
-        self._debug = f
+# == Listening
+
+    # at #history-B.3 got rid of 2 methods that make emitters
+    # #history-B.8 buried the rest of them, and some trace renderers
 
 
-# == "views" on the emission
+def throwing_listener(sev, *rest):
+    if sev not in ('fatal', 'error'):
+        return
+    emi = emission_via_args(sev, *rest)
+    tup = emi.to_debugging_tuple_()
+    raise RuntimeError(f"unexpected {repr(tup)}")
 
-def _flush_to_trace_line(em):  # called below, 1x
 
-    def main():
-        _tup = tuple(flush_to_trace_line_pieces())
-        return f'{_tup}\n'
+def emission_via_args(*args):
+    return emission_via_tuple(args)
 
-    def flush_to_trace_line_pieces():
-        yield (em.severity, em.shape, * em.channel_tail)  # _to_channel_ ..
-        if 'structure' == em.shape:
-            tups = tuples_when_structure()
-        else:
-            assert('expression' == em.shape)
-            tups = (('paragraph_string', ' '.join(em.flush_payloader())),)
-        for tup in tups:
-            yield tup
 
-    def tuples_when_structure():
-        sct = em.flush_payloader()
-        key = em._message_key_
-        if key in sct:
-            yield (key, sct[key])
-            return
-        yield ('keys', tuple(sct.keys()))
+class emission_via_tuple:  # moved here at #history-B.4
 
-    return main()
+    def __init__(self, args):
+        *channel, self.payloader = args
+        self.channel = tuple(channel)
+
+    def to_debugging_tuple_(self):
+        lines = self.to_messages()
+        return (*self.channel, *lines)
+
+    def to_messages(self):
+        if 'expression' == self.shape:
+            return tuple(self.payloader())
+        assert 'structure' == self.shape
+        sct = self.payloader()
+        if 'reason' in sct:
+            return (sct['reason'],)
+        return (sct['message'],)
+
+    def to_channel_tail(self):
+        return self.channel[2:]
+
+    @property
+    def shape(self):
+        return self.channel[1]
+
+    @property
+    def severity(self):
+        return self.channel[0]
 
 
 # ==
-
-class _Emission:
-    # experiment: a short-lived & highly stateful auxiliary for assisting in
-    # emission reflection. do not pass around as an emission. (call that Event)
-    # moved here at #history-B.4
-
-    def __init__(self, *a):
-        shape, *chan_tail, payloader = a
-        assert(shape in ('structure', 'expression'))
-        self.shape = shape
-        self.channel_tail = chan_tail
-        self._payloader_HOT = payloader
-
-    @property
-    def _has_channel_tail_(self):
-        return len(self.channel_tail)
-
-    def _prefix_via_channel_tail_(self):
-        _what_kind = self.channel_tail[0].replace('_', ' ')  # #[#608.7]
-        return f'{_what_kind}:'
-
-    def flush_some_message(self):
-        if 'structure' == self.shape:
-            return self._flush_to_some_message_when_structure()
-        assert('expression' == self.shape)
-        return ' '.join(self.flush_payloader())
-
-    def flush_to_trace_line(self):
-        return _flush_to_trace_line(self)
-
-    def flush_to_raw_lines(self):
-        if 'structure' == self.shape:
-            return (self._flush_to_some_message_when_structure(),)
-        assert('expression' == self.shape)
-        return self.flush_payloader()
-
-    def _flush_to_some_message_when_structure(self):
-        sct = self.flush_payloader()
-        msg = self._message_via_struct_(sct)
-        if msg is not None:
-            return msg
-        _these = ', '.join(sct.keys())
-        return f"(unknown {self._message_key_}, keys: ({_these}))"
-
-    def flush_payloader(self):  # near [#511.3] expression with yield
-        return self.release_payloader()()
-
-    def release_payloader(self):
-        f = self._payloader_HOT
-        del self._payloader_HOT
-        return f
-
-    @property
-    def is_error_emission(self):
-        return 'error' == self.severity
-
-
-class _ErrorEmission(_Emission):
-
-    def _flush_to_reason_(self):
-        return ' '.join(self.__to_pieces())
-
-    def __to_pieces(self):
-        if self._has_channel_tail_:
-            yield self._prefix_via_channel_tail_()
-        yield self.flush_some_message()
-
-    def _message_via_struct_(self, sct):
-        ks = set(sct.keys()) & {'reason', 'reason_tail'}
-        if len(ks):
-            key, = ks
-            return sct[key]
-
-    _message_key_ = 'reason'
-    severity = 'error'
-
-
-class _InfoEmission(_Emission):
-
-    def _message_via_struct_(self, sct):
-        if 'message' in sct:
-            return sct['message']
-
-    _message_key_ = 'message'
-    severity = 'info'
-
 
 class write_only_IO_proxy:
     """A sort-of proxy (façade?) of a filehandle open for writing defined..
@@ -297,11 +181,7 @@ def lazy(orig_f):  # #decorator, #[#510.8]
     meh = []
     return use_f
 
-
-class Exception(RuntimeError):
-    pass
-
-
+# #history-B.8
 # #history-B.7
 # #history-B.6: archived few lines (elsewhere) that load resource from string
 # #history-B.5: as referenced

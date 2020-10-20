@@ -18,8 +18,7 @@ def build_state_the_bernstein_way(fixture_document_path, producer_module):
         item name.
     """
 
-    from modality_agnostic import listening as _
-    listener = _.throwing_listener
+    from modality_agnostic import throwing_listener as listener
 
     # (normally we would pass the below two arguments as named parameters but
     # in this case we can't because the parameter name will change based on

@@ -33,8 +33,11 @@ A simple case as a regression-point: (Case5918)
 # this is the most apotheotic extant implementation (at writing) of #[#008.11]
 
 
-def express_structured_emission(echo, channel_tail, dim_pool):
+def lines_via_channel_tail_and_details(channel_tail, details):
+
     # dim_pool = "diminishing pool"
+    dim_pool = {k: v for k, v in details.items()}
+    dim_pool.pop('errno', None)  # all 3 clients at writing
 
     # (cut-out for `collection_path` meh)
     if 'path' not in dim_pool:
@@ -42,26 +45,24 @@ def express_structured_emission(echo, channel_tail, dim_pool):
             if '_path' == k[-5:]:
                 dim_pool['path'] = dim_pool.pop(k)
                 break
-
-    for line in __lines(channel_tail, dim_pool):
-        echo(line)
-
-
-def __lines(channel_tail, dim_pool):  # dim_pool = "diminishing pool"
     slots = _Slots()
     channel_tail = list(channel_tail)
-    __fix_this_one_smell(channel_tail, dim_pool)
-    __occupy_slot_A(slots, channel_tail)
+    _fix_this_one_smell(channel_tail, dim_pool)
+    _occupy_slot_A(slots, channel_tail)
     present = set(dim_pool.keys()) & set(_func_via_key)
     funcs_present = {_func_via_key[k]: None for k in present}.keys()
     funcs_present = sorted(funcs_present)  # necessary for #here1
     for func_name in funcs_present:
         _functions[func_name](slots, dim_pool)
-    __we_are_explicitly_ignoring_these_components(dim_pool)
-    assert(not len(dim_pool))
+    _we_are_explicitly_ignoring_these_components(dim_pool)
+
+    if False and len(dim_pool):  # keep it around for now
+        splay = ', '.join(dim_pool.keys())
+        raise RuntimeError(f"Oops, sorry, please handle these: ({splay})")
+
     if slots.do_reduce_redundancy:
-        __reduce_redundancy(slots)
-    return __lines_via_prepared(slots)
+        _reduce_redundancy(slots)
+    return _lines_via_prepared(slots)
 
 
 # forward-declare functions we define below
@@ -128,15 +129,15 @@ class _Slots:
 _slots = ('slot_A', 'slot_B', 'slot_C', 'slot_D', 'multiple_lines')
 
 
-def __lines_via_prepared(slots):
-    _first_line = ''.join(__pieces_for_first_line(slots))
+def _lines_via_prepared(slots):
+    _first_line = ''.join(_pieces_for_first_line(slots))
     yield _first_line
     if slots.slot_is_occupied('multiple_lines'):
         for line in slots['multiple_lines']:
             yield line
 
 
-def __pieces_for_first_line(slots):
+def _pieces_for_first_line(slots):
     def y():
         if y.is_subsequent:
             return True
@@ -164,7 +165,7 @@ def __pieces_for_first_line(slots):
         yield slots['slot_C']
 
     if slots.slot_is_occupied('slot_D'):
-        assert(not slots.did_express_path_on_multi_lines)
+        assert not slots.did_express_path_on_multi_lines
         o = slots['slot_D']
         if y():
             yield o.separator_before_path
@@ -188,7 +189,7 @@ def _define(i):
 
 # define the functions
 
-def __occupy_slot_A(slots, channel_tail):
+def _occupy_slot_A(slots, channel_tail):
     deny = {'stop'}
     these = [s.split('_') for s in channel_tail if s not in deny]  # b.c #here2
     if not len(these):
@@ -223,7 +224,7 @@ def _reason_stuff(slots, dim_pool):
         s = content_s
         y = False
     else:
-        assert('expecting' == k)
+        assert 'expecting' == k
         s = f'expecting {content_s}'
         y = False
     slots.occupy_slot('slot_C', s)
@@ -234,7 +235,7 @@ def _reason_stuff(slots, dim_pool):
 def _pathish_stuff(slots, dim_pool):
 
     if slots.did_express_path_on_multi_lines:  # #here1
-        assert('filename' not in dim_pool)
+        assert 'filename' not in dim_pool
         return
 
     k, = tuple(k for k in ('filename', 'path') if k in dim_pool)  # assertion
@@ -289,13 +290,13 @@ def _lines_for_context_for_parse_error(dim_pool):
 
 # mishmash
 
-def __we_are_explicitly_ignoring_these_components(dim_pool):
+def _we_are_explicitly_ignoring_these_components(dim_pool):
     # (Case6064)
     dim_pool.pop('did_traverse_whole_file', None)
     dim_pool.pop('identifier_string', None)
 
 
-def __reduce_redundancy(slots):
+def _reduce_redundancy(slots):
     if slots['slot_A'] is None:
         return
     import re
@@ -306,7 +307,7 @@ def __reduce_redundancy(slots):
         slots['slot_A'].pop()  # #here2
 
 
-def __fix_this_one_smell(channel_tail, dim_pool):  # #point-1
+def _fix_this_one_smell(channel_tail, dim_pool):  # #point-1
     # we went thru a phase where we weirdly wanted every emission be one of
     # a very small set of error categories. It was wrong to put a
     # sub-categorization *in* the payload. #wish [#873.B]

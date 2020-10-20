@@ -41,8 +41,7 @@ def expect_everything(orig_f):
         _existing_lines = unindent(self.given_big_string())
 
         # resolve listener
-        from modality_agnostic import listening
-        listener = listening.throwing_listener
+        from modality_agnostic import throwing_listener as listener
 
         # work
 

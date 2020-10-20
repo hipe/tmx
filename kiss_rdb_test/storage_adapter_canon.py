@@ -117,7 +117,11 @@ class case_of_collection_not_found:  # #as-namespace-only
 
     def confirm_expression_looks_right(tc):
         reason = _reason_from(tc.end_state)
-        tc.assertRegex(reason, r'^cannot load collection: [\[a-zA-Z0-9]')
+        if -1 == (i := reason.find(' because ')):
+            i = reason.index(':')  # ..
+        head = reason[:i]
+        exp = 'cannot load collection', 'collection does not exist'
+        tc.assertIn(head, exp)
 
 
 def _confirm_collection_is_not_none(tc):
@@ -213,7 +217,7 @@ class case_of_entity_not_found_because_identifier_too_deep:
 
         reason = _reason_from(es)
 
-        import re
+        re = _re_lib()
         md = re.search(r'\bneed(?:ed)? (\d+), had (\d+)', reason)
         if md is not None:
             two = md.groups()
@@ -531,8 +535,7 @@ def _assert_says_identifier_probably(tc, reason, eid):
 
 
 def _find_all_identifer_looking_strings(message):
-    import re
-    return tuple(re.findall(r"'([^']+)'", message))  # #history-B.1
+    return tuple(_re_lib().findall(r"'([^']+)'", message))  # #history-B.1
 
 
 def _assert_says_cannot_verb(tc, reason, verb):
@@ -552,14 +555,18 @@ def _message_from(es):
     return _message_or_reason_from('info', es)
 
 
-def _message_or_reason_from(which, es):
-    from modality_agnostic import listening as lib
-    severity, *rest = *es['channel'], es['payloader']
-    if 'error' == which:
-        assert('error' == severity)
-        return lib.reason_via_error_emission(*rest)
-    assert('info' == severity)
-    return lib.message_via_info_emission(*rest)
+def _message_or_reason_from(_which, es):
+    from modality_agnostic import emission_via_args as func
+    emi = func(*es['channel'], es['payloader'])
+    is_expression = ('structure', 'expression').index(emi.shape)
+    if is_expression:
+        return ' '.join(emi.to_messages())
+    # at #history-A.5 we broke tests by simplifying the emissions class such
+    # that it no longer does its own clever expression enhancements. so:
+    from script_lib.magnetics.expression_via_structured_emission import \
+        lines_via_channel_tail_and_details as func
+    lines = tuple(func(emi.to_channel_tail(), emi.payloader()))
+    return ' '.join(lines)
 
 
 def _confirm_collection_empty(tc, coll):
@@ -657,8 +664,7 @@ def end_state_via_(tc, run, expecting_OK):
 
 
 def identifier_via_string(_, s):  # #method
-    from modality_agnostic import listening
-    listener = listening.throwing_listener
+    from modality_agnostic import throwing_listener as listener
     from kiss_rdb.magnetics_ import identifier_via_string as lib
     return lib.identifier_via_string_(s, listener)
 
@@ -678,10 +684,16 @@ def _em():
     return em
 
 
+def _re_lib():
+    import re as module
+    return module
+
+
 _expecting_not_OK = False
 _expecting_OK = True
 
 
+# #history-B.5
 # #history-B.4
 # :#here3: at #history-B.1, [#871.1] messes up some doo-hahs and not others
 # #history-B.1
