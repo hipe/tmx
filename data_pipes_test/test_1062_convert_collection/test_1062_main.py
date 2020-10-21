@@ -3,6 +3,10 @@ from modality_agnostic.test_support.common import \
 import unittest
 
 
+class CommonCase_OFF:  # #[#459.M]
+    pass
+
+
 class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 
     # == Assert Exitcode (assertions then readers)
@@ -219,7 +223,7 @@ class Case1059_too_many_args(CommonCase):
         return ('no-see', '--fing-foo', 'da-da')
 
 
-class Case1062DP_one_arg_which_is_stdin(CommonCase):  # #midpoint
+class Case1062DP_one_arg_which_is_stdin(CommonCase_OFF):  # #midpoint
 
     def test_100_succeeds(self):
         self.expect_success_exitcode()
@@ -251,7 +255,7 @@ class Case1062DP_one_arg_which_is_stdin(CommonCase):  # #midpoint
                 '-', '--to-format', 'markdown-table')
 
 
-class Case1065_one_arg_which_is_token(CommonCase):
+class Case1065_one_arg_which_is_token(CommonCase_OFF):
 
     def test_100_succeeds(self):
         self.expect_success_exitcode()

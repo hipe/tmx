@@ -9,7 +9,36 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 # STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's a placeholder stub"
 
 
-def SCHEMA_AND_ENTITIES_VIA_LINES(lines, listener):
+def FUNCTIONSER_FOR_SINGLE_FILES():
+
+    class edit_funcs:  # #class-as-namespace
+        lines_via_schema_and_entities = _lines_via_schema_and_entities
+
+    class read_funcs:  # #class-as-namespace
+        schema_and_entities_via_lines = _schema_and_entities_via_lines
+
+    class fml:  # #[#459.M]
+        def SYNC_AGENT_FOR_DATA_PIPES():
+            class sync_agent:
+                NEW_LINES_VIA = ('aefs',)
+            return sync_agent
+
+    class fxr:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
+            return edit_funcs
+
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
+            return read_funcs
+
+        def PRODUCE_IDENTIFIER_FUNCTION():
+            return _string_based_idens
+
+        COLL_IMPL_YUCK_ = fml
+        pass
+    return fxr
+
+
+def _schema_and_entities_via_lines(lines, listener):  # #testpoint:KS
 
     def main():
         make_sure_there_is_at_least_one_line()
@@ -111,7 +140,7 @@ def SCHEMA_AND_ENTITIES_VIA_LINES(lines, listener):
         pass
 
 
-def LINES_VIA_SCHEMA_AND_ENTITIES(schema, ents, listener):
+def _lines_via_schema_and_entities(schema, ents, listener):  # #testpoint:KS
 
     def titleize(k):  # .. #here2
         words = k.split('_')
@@ -160,6 +189,12 @@ def _build_untitleizer():  # inverse of #here2
     rx = re.compile('(?<![A-Z])[A-Z](?=[a-z])')
 
     return untitleize
+
+
+def _string_based_idens(x, _listener):  # #[#877.4] this might become default
+    assert isinstance(x, str)
+    assert len(x)
+    return x
 
 
 # == Whiners

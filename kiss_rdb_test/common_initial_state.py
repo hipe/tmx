@@ -26,6 +26,22 @@ def TSLO_via(identifier_string, meta_or_attributes):
     return lib.TSLO_via(identifier_string, meta_or_attributes)
 
 
+@lazy
+def didactic_collectioner():
+    import kiss_rdb_test.fixture_code._1416_SAs._33_SAs as mod
+    path = mod.__path__
+    paths = path._path
+    if 1 < len(paths):
+        fs_path, = tuple(set(paths))  # assert they are all the same
+    else:
+        fs_path, = paths
+    from kiss_rdb.magnetics_.collection_via_path import \
+        collectioner_via_storage_adapters_module as func
+    return func(path._name, fs_path)
+
+
+# ==
+
 def pretend_file_via_path_and_big_string(path, big_string):
     return pretend_file_via_path_and_lines(path, unindent(big_string))
 

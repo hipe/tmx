@@ -11,19 +11,30 @@ n3_A->n4
 n3_C[label="select"]
 n3_B[label="filter\nby tags"]
 n3_A[label="convert"]
-n2->n3_C
-n2->n3_B
-n2->n3_A
-n2[label="did you dismantle\nthe idea of\na collection?"]
+n2_50->n3_C
+n2_50->n3_B
+n2_50->n3_A
+n2_50[label="did you dismantle\nthe idea of\na collection?"]
+n2_26->n2_50
+n2_25->n2_50
+n2_17->n2_50
+n2_26[label="away _NEW_WAY\n"]
+n2_25[label="please try and make\nCOLL_IMPL_YUCK_
+and COLLECTION_IMPLEMENTATION\nnot a thing"]
+n2_17[label="maybe no more methods\nnamed _as_storage_adapter"]
+n2->n2_26
+n2->n2_25
+n2->n2_17
+n2[label="then.."]
 n1_900->n2
+n1_880->n2
 n1_770->n2
-n1_752->n2
 n1_900[label="no more\nCI_VIA_SINGLE_FILE\nanywhere"]
+n1_880[label="away TO_IDENTIFIER_STREAM"]
 n1_770[label="no more 'fileno'\netc inspection\nin SA's"]
-n1_752[label="no more methods\nnamed _as_storage_adapter"]
 n1_750->n1_900
+n1_750->n1_880
 n1_750->n1_770
-n1_750->n1_752
 n1_750[label="exit criteria"]
 n1_500->n1_750
 n1_050->n1_750

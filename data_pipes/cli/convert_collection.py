@@ -82,8 +82,14 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         return main_OLD_WAY()
 
     def main_OLD_WAY():
-        from_coll = resolve_from_collection()
-        to_coll = resolve_to_collection()
+        # Resolve "from" collection
+        fmt, x = normalize(from_format, from_collection, stdin, _from_monikers)
+        from_coll = resolve_collection(fmt, x)
+
+        # Resolve "to" collection
+        fmt, x = normalize(to_format, to_collection, stdout, _to_monikers)
+        to_coll = resolve_collection(fmt, x)
+
         sch, ents = from_coll.to_schema_and_entities(throwing_listener)
         with to_coll.open_pass_thru_receiver_as_storage_adapter(mon.listener) as recv:  # noqa: E501
             if True:
@@ -101,18 +107,6 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         return mon.exitstatus
 
     # == BEGIN hack bridge to accomodate old way which will go away eventually
-
-    def resolve_to_collection():
-        fmt, arg = normalize(to_format, to_collection, stdout, _to_monikers)
-        return chum_chum_zum_zum(fmt, arg)
-
-    def resolve_from_collection():
-        fmt, s = normalize(from_format, from_collection, stdin, _from_monikers)
-        return chum_chum_zum_zum(fmt, s)
-
-    def chum_chum_zum_zum(fmt, arg):
-        _ = collib.collection_via_path(arg, throwing_listener, format_name=fmt)
-        return _.COLLECTION_IMPLEMENTATION
 
     def check_all_old(input_or_output):
         expect_is_none = ('output', 'input').index(input_or_output)
@@ -133,14 +127,15 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         pcs.append(f"can't convert from {fmt} (which is currently {s} way)")
         pcs.append(f"to {fmt_} (which is currently {s_} way)")
         msgs.append(' '.join(pcs))
-        msgs.append(f"(from collection: {arg})")
-        msgs.append(f"(to collection: {arg_})")
-        long_msg = '. '.join(msgs)
+        oong_msg = '. '.join(msgs)
         raise RuntimeError(long_msg)
 
     def CHECK_FOR_OLD_WAY(fmt, arg, input_or_output):
         if fmt is None:
-            fmt = hack_infer_format(arg)
+            if hasattr(arg, 'fileno'):
+                fmt = 'json'  # the default, when STDIN or STDOUT
+            else:
+                fmt = hack_infer_format(arg)
         offset = ('input', 'output').index(input_or_output)
         REMEMBER_THESE_PEEKS[offset] = fmt, arg
         if is_old_way[fmt]:
@@ -163,7 +158,7 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
         'csv': False,
         'json': False,
         'markdown-table': True,
-        'producer-script': True,
+        'producer-script': False,
     }
 
     class stop_because_OLD_WAY(RuntimeError):
@@ -172,14 +167,20 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     # == END old way will go away
 
     def open_the_input_collection_for_traversal():
-        fmt, s = normalize(from_format, from_collection, stdin, _from_monikers)
-        CHECK_FOR_OLD_WAY(fmt, s, 'input')  # delete just this line in the futu
-        return collib.OPEN_FOR_READING_THE_NEW_WAY(fmt, s, throwing_listener)
+        fmt, x = normalize(from_format, from_collection, stdin, _from_monikers)
+        CHECK_FOR_OLD_WAY(fmt, x, 'input')  # delete just this line in the futu
+        coll = resolve_collection(fmt, x)
+        return coll.open_schema_and_entity_traversal(throwing_listener)
 
     def open_the_output_collection_for_writing():
-        fmt, arg = normalize(to_format, to_collection, stdout, _to_monikers)
-        CHECK_FOR_OLD_WAY(fmt, arg, 'output')  # delete just this line in the f
-        return collib.OPEN_FOR_WRITING_THE_NEW_WAY(fmt, arg, throwing_listener)
+        fmt, x = normalize(to_format, to_collection, stdout, _to_monikers)
+        CHECK_FOR_OLD_WAY(fmt, x, 'output')  # delete just this line in the fut
+        coll = resolve_collection(fmt, x)
+        return coll.open_collection_to_write_given_traversal(throwing_listener)
+
+    def resolve_collection(fmt, arg):
+        return collib.collection_via_path(
+            arg, throwing_listener, format_name=fmt)
 
     def normalize(fmt, arg, sin_sout, o):
         if '-' == arg:
@@ -187,6 +188,8 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
                 # (oops this one is asymmetrical)
                 error(f"when {o.arg} is '-', {o.STDIN_STDOUT} must be a pipe")
             use_coll_ID = sin_sout
+            if fmt is None:
+                fmt = 'json'
         elif sin_sout.isatty():
             use_coll_ID = arg
         else:

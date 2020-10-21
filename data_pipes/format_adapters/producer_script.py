@@ -119,85 +119,57 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.py',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def FUNCTIONSER_VIA_CCI(cci, listener):
-    # frontier for experiment in runtime capability probing. BUT..
+def CUSTOM_FUNCTIONSER(script_path, opn, listen):
 
-    x = cci.mixed_collection_identifier
-    if cci.arg_looks_like_file_handle:
-        if cci.arg_looks_like_writable_file_handle:
-            raise ValueError("'producer script' is not a writable format")
-        assert cci.arg_looks_like_readable_file_handle
-        return _functionser_via_STDIN(x, listener)
-    assert cci.arg_looks_like_string
-    return _functionser_via_path(x, listener)
+    # As covered, fail at façade build time (not operation time) if bad path
+    if isinstance(script_path, str):
+        mod = producer_script_module_via_path_(script_path, listen)
+        if mod is None:
+            return
+    else:
+        script_path.open_traversal_stream  # assert it looks like a PS module
+        mod = script_path
+        del script_path
 
+    class fxr:  # #class-as-namespace
+        PRODUCE_EDIT_FUNCTIONS_CUSTOMLY = None  # PS is not a writable format
 
-def _functionser_via_STDIN(x, listener):
-    class ci:  # #class-as-namespace
-        def to_schema_and_entities(listen):
-            return _to_schema_and_entities(x, listen)
-    return _functionser_via_CI(ci)
+        def PRODUCE_READ_FUNCTIONS_CUSTOMLY():
+            return _produce_read_functions(mod, opn, listen)
 
-
-def _functionser_via_path(x, listener):
-    mod = producer_script_module_via_path(x, listener)
-    if mod is None:
-        return
-    return _functionser_via_module(mod, listener)
-
-
-def _functionser_via_module(mod, listener):
-    ci = _collection_implementation_via_module(mod)
-    return _functionser_via_CI(ci)
-
-
-def _functionser_via_CI(ci):  # produces NONWORKING STUB collections
-    def produce_read_functions():
-        return __file__
-
-    class ns:  # #class-as-namespace
-        EDIT_FUNCTIONS_ARE_AVAILABLE = False
-        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = True
-        PRODUCE_READ_ONLY_FUNCTIONS = produce_read_functions
         PRODUCE_IDENTIFIER_FUNCTION = None
-        COLL_IMPL_YUCK_ = ci
-    return ns
+        COLL_IMPL_YUCK_ = None
+    return fxr
 
 
-def _to_schema_and_entities(stdin, listener):
-    def ents():
-        lineno = 0
-        for line in stdin:
-            lineno += 1
-            dct = loads(line)
-            yield _ReallyLightweightEntity(dct, lineno, '<stdin>')
-    from json import loads
-    return None, ents()
+def _produce_read_functions(mod, opn, listen):
+    def main():
+        class read_funcs:  # #class-as-namespace
+            open_schema_and_entity_traversal_as_storage_adapter_collection = se
+        return read_funcs
 
+    def se(listener):
+        from contextlib import contextmanager
 
-class _ReallyLightweightEntity:
-    def __init__(self, dct, lineno, path):
-        self.core_attributes_dictionary_as_storage_adapter_entity = dct
-        self.lineno = lineno
-        self.path = path
-
-
-def _collection_implementation_via_module(mod):
-
-    def _to_schema_and_entities(listener):
-        from_args = ()  # gone at #history-B.3 or before
-
-        def ents():
+        @contextmanager
+        def cm():
             opened = mod.open_traversal_stream(listener, *from_args)
-            for dct, lineno in dct_and_linenos(opened):
-                yield _Entity(dct, lineno, module_path)
+            raw_dcts = opened.__enter__()
+            try:
+                yield None, entities_via_raw_dicts(raw_dcts)  # schema, ents
+                # (in antiquity producer scripts had concept of a schema but..)
+            finally:
+                opened.__exit__()
 
-        return None, ents()
+        from_args = ()  # gone at #history-B.3 or before
+        return cm()
 
-    def dct_and_linenos(opened):
-        lineno = 0
-        with opened as orig_dcts:
-            lineno += 1
+    def entities_via_raw_dicts(raw_dcts):
+        for dct, lineno in dct_and_linenos(raw_dcts):
+            yield _ErsatzEntity(dct, lineno, module_path)
+
+    def dct_and_linenos(orig_dcts):
+        if True:  # (we used to open the cm here)
             m = 'multi_depth_value_dictionary_stream_via_traversal_stream'
             if hasattr(mod, m):  # see #here2
                 out_dcts = getattr(mod, m)(orig_dcts)
@@ -207,25 +179,23 @@ def _collection_implementation_via_module(mod):
 
                 key_and_dcts = mod.stream_for_sync_via_stream(orig_dcts)
                 out_dcts = (key_and_dct[1] for key_and_dct in key_and_dcts)
+            lineno = 0
             for dct in out_dcts:
+                lineno += 1  # #provision [#435.B] for now
                 yield dct, lineno
 
     module_path = mod.__file__
-
-    class collection_impl_via_module:  # #class-as-namespace
-        to_schema_and_entities = _to_schema_and_entities
-
-    return collection_impl_via_module
+    return main()
 
 
-class _Entity:
+class _ErsatzEntity:
     def __init__(self, dct, lineno, path):
         self.core_attributes_dictionary_as_storage_adapter_entity = dct
         self.lineno = lineno
         self.path = path
 
 
-def producer_script_module_via_path(script_path, listener):
+def producer_script_module_via_path_(script_path, listener):
     assert isinstance(script_path, str)  # #[#022]
 
     from os import path as os_path

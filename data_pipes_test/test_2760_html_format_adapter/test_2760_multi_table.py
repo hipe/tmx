@@ -18,6 +18,10 @@ from modality_agnostic.test_support.common import \
 import unittest
 
 
+class CommonCase_OFF:  # #[#459.M]
+    pass
+
+
 class CommonCase(ProducerCaseMethods, unittest.TestCase):
 
     def build_bespoke_sections(self):
@@ -66,7 +70,7 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
     do_debug = False
 
 
-def fake_producer_script_via_dictionary_tuple(dct_tup):
+def fake_producer_script_via_dictionary_tuple(dct_tup):  # covered here
 
     class fake_producer_script:  # #class-as-namespace
         # [#459.17] producer script fake modules (see nearby other)
@@ -79,13 +83,23 @@ def fake_producer_script_via_dictionary_tuple(dct_tup):
 
     fake_producer_script.__file__ = __file__
 
-    from data_pipes.format_adapters.producer_script import \
-        _functionser_via_module as func
-    fxr = func(fake_producer_script, None)
+    import data_pipes.format_adapters.producer_script as sa_mod
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
+    return func(sa_mod, fake_producer_script, None)
 
-    from kiss_rdb.magnetics_.collection_via_path import \
-        COLLECTION_VIA_FUNCTIONSER as func
-    return func(fxr)
+
+class Case2756_test_test(CommonCase):
+
+    def test_050_works(self):
+        these = {'foo': 'bar'}, {'foo': 'baz'}
+        coll = fake_producer_script_via_dictionary_tuple(these)
+
+        with coll.open_schema_and_entity_traversal(None) as (schema, ents):
+            assert schema is None
+            ents = tuple(ents)
+
+        act = tuple(ent.core_attributes_dictionary_as_storage_adapter_entity for ent in ents)  # noqa: E501
+        self.assertSequenceEqual(act, these)
 
 
 class Case2757_does_scrape_work(CommonCase):
@@ -139,7 +153,7 @@ class Case2757_does_scrape_work(CommonCase):
         return html_fixture('0170-hugo-docs.html')
 
 
-class Case2760DP_generate(CommonCase):
+class Case2760DP_generate(CommonCase_OFF):
 
     def test_100_outputs_more_than_one_line(self):
         self.assertLessEqual(1, len(self.output_lines))
@@ -189,8 +203,6 @@ class Case2760DP_generate(CommonCase):
         _exp = (False, False, False)
         self.assertSequenceEqual(_act, _exp)
 
-    # == FROM use dangerous_memoize_in_child_classes if etc
-
     @shared_subject
     def tables(self):
         return tuple(table_via_lines(tu) for tu in self.bespoke_sections[1:-1])
@@ -202,8 +214,6 @@ class Case2760DP_generate(CommonCase):
     @shared_subject
     def output_lines(self):
         return self.build_output_lines()
-
-    # == TO
 
 
 @lazy

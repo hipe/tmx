@@ -1,0 +1,152 @@
+digraph g {
+rankdir=LR
+label="fig 857.D) sophisticated intertwinement of resolution of SA and schema"
+
+
+subgraph cluster_02 {
+label="subgraph B) getting from SA & parsed schema to a collection"
+
+
+
+n40[label="<c1>Create the high-level\n
+\"collection\" façade with:|
+<c2>functions pursuant entirely\n
+to the functionser|
+<c3>the function for pass-thru writing if\n
+it's available, else failure case #9|
+<c4>the function for opening a traversal\n
+stream from the line stream if it's\n
+available, else failure case #9 again|
+<c5>the functions above to whatever\n
+extent their components are present
+" shape=record]
+
+
+
+n24:c3->n40:c4
+n24:c2->n40:c3
+n24[label="<c1>case of resource shape:|
+<c2>writable? (for now, ignore\n
+whether it's readable)|
+<c3>readable?|
+<c4>strange failure case #2 again
+" shape=record]
+
+
+
+n23:c3->n40:c5
+n23:c2->n24:c1
+n23[label="<c1>case of collection\n
+identifier shape:|
+<c2>resource?|
+<c3>string?|
+<c4>strange failure case #2 again
+" shape=record]
+
+
+
+n21:c3->n40:c2
+n21[label="<c1>case of collection\n
+identifier shape:|
+<c2>resource?\n
+failure case #2 again|
+<c3>string? ok|
+<c4>strange failure case #2 again
+" shape=record]
+
+
+
+n20->n21:c1[label="directory-based"]
+n20->n23:c1[label="file-based"]
+n20[label="directory-based\nor file-based?" shape=diamond]
+}
+
+
+subgraph cluster_01 {
+label="subgraph A) resolving the SA and any schema"
+
+
+
+n13:c1->n7:c1
+n13[label="<c1>directory-based? (assert\n
+(not also file-based)|
+<c2>file-based? (assert\n
+not also directory-based)\n
+DONE! SA, no schema|
+<c3>strange. failure case #8
+" shape=record]
+
+
+
+
+n9->n13:c1
+subgraph cluster_01_02 {
+label="Now you have an SA"
+n11[label="DONE! SA & schema" shape=rect]
+n10[label="DONE! SA, no schema" shape=rect]
+n9[label="then"]
+}
+
+
+
+n8:c1->n10:c1
+n8[label="<c1>extension associated\n
+with an available SA?|
+<c2>failure case #3
+" shape=record]
+
+
+
+n7:c6->n11
+subgraph cluster_01_01{
+label="Load and parse the schema file:"
+n7[label="<c1>(note whether or not you already have\n
+an SA. we will revisit this below.)|
+<c1_5>schema file no ent? failure case #4|
+<c2>fail to begin to parse as\nrecfile? failure case #5|
+<c3>no attr? failure case #6|
+<c4>(if no SA yet: attr value not associated with an\n
+available SA? failure case #1 again)\n
+OK, procede|
+<c5>Now you have an SA. BUT that's\n
+not all: SA fails to parse remainder\n
+of schema file? failure case #7|
+<c6>Now you have an SA and a\n
+business-parsed schema
+" shape=record]
+}
+
+
+
+n6->n8:c1[label="yes"]
+n6->n7:c1[label="no"]
+n6[label="has extension?" shape=diamond]
+
+
+n4:c2->n6
+n4[label="<c1>case of collection\nidentifier shape:|
+<c2>string?|
+<c3>failure case #2
+" shape=record]
+
+
+n3:c1->n9
+n3[label="<c1>format name\n
+associated with\n
+an available SA?|
+failure case #1" shape=record]
+
+
+n2->n3:c1[label="yes"]
+n2->n4:c1[label="no"]
+n2[label="format\nname?" shape=diamond]
+n1->n2
+n1[label=start shape=rect]
+
+}
+
+}
+
+/*
+# #born
+*/

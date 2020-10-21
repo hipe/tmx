@@ -329,12 +329,11 @@ def traverse(ctx, collection):
     if coll is None:
         return mon.errno
 
-    _iids = coll.TO_IDENTIFIER_STREAM(mon.listener)
-
     echo = click.echo
-    for iid in _iids:
+    with coll.open_identifier_traversal(mon.listener) as idens:
         # (Case5934)
-        echo(iid.to_string())
+        for iden in idens:
+            echo(iden.to_string())
 
     if len(mon.error_categories_seen):
         return mon.errno()

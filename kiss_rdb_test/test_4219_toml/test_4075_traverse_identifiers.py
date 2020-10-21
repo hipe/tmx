@@ -286,7 +286,7 @@ class Case4080_first_touch_of_multi_line(CommonCase):  # #mutli-line-case
 
     def given_lines(self):
 
-        # DISCUSSION: below migh be too much, but it's exactly what we had
+        # DISCUSSION: below might be too much, but it's exactly what we had
         # in a file when we made it a file, and it's representative & useful
         # this way
 

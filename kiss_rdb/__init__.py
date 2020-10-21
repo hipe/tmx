@@ -42,13 +42,13 @@ def hub_mod_name_and_mod_dir():
     return '.'.join(pcs), path_join(dn(dn(__file__)), *pcs)
 
 
-def single_file_collection_via_storage_adapter_and_path(sa, x, listener, **kw):
+def collection_via_storage_adapter_and_path(sa_mod, x, listener, **kw):
     """If you have the SA already and don't want to load the whole hub"""
     # (Case3459DP)
 
     from .magnetics_.collection_via_path import \
-        _single_file_collection_via_storage_adapter_and_path as func
-    return func(sa, x, listener, kw)
+        collection_via_storage_adapter_module_and_path_ as func
+    return func(sa_mod, x, listener, kw)
 
 
 # == Higher-Level Module Support: Specific Presentation Stuff

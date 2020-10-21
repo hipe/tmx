@@ -14,6 +14,9 @@ json stream via STDIN?
 Let's whack out a quick json thru putter
 refactor every write_help_into
 filesystem_functions does nothing
+you broke almost every or every producer script at some point. cover them all in one file
 magnetize storage adapter impl uber alles so resource management is abstracted
-magnetize two storage adapters: csv, json
 data-pipes-doc/documents/459.4.the-last-roadmap.dot
+resolve every [#459.M]
+remove this file: TEMPORARY_NOT_THESE
+Add this back to mono-repo.test-these.list (at the end): pho_test

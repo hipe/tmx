@@ -24,7 +24,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.P] | #open | tmpfile is hardcoded
 |                  [#459.O] | #hole |
 |                  [#459.N] | #open | producer scripts shouldn't have knowledge of near format
-|                  [#459.M] | #hole |
+|                  [#459.M] | #trak | temporary for one commmit: places where..
 |                  [#459.L] | #wish | we want regex escape
 |                  [#459.11]|       | [the magnetic that loads a function via a string]
 |                  [#459.J] | #open | visible seams to clean up when things are stable
@@ -45,6 +45,11 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#448]   |       | markdown table-targeted synchronization
 |                  [#447.B] | #edit | edit documentation
 |                  [#447]   |       | the collection synchronization algorithm
+|                  [#436]   |       | [reserved for html format provisions]
+|                  [#435.B] |       | one line per json object (unlike json format)
+|                  [#435]   |       | [producer script format provisions]
+|                  [#434]   |       | [reserved for json format provisions]
+|                  [#433]   |       | [reserved for CSV format provisions]
 |                  [#432.2] | #open | be like kiss-rdb, track kiss-rdb bridge
 
 

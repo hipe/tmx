@@ -199,12 +199,8 @@ def issues_collection_via_(readme, listener, opn=None):
 def _collection_via(readme, listener, opn=None):
     if opn is None:
         opn = _build_real_open(listener)
-
     import kiss_rdb.storage_adapters_.markdown_table as sa_mod
-
-    from kiss_rdb import \
-        single_file_collection_via_storage_adapter_and_path as func
-
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
     return func(sa_mod, readme, listener, opn=opn,
                 iden_clser=build_identifier_parser_,
                 file_grows_downwards=False)

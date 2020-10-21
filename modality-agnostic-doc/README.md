@@ -54,7 +54,7 @@ only in modeling interfaces for this purpose.
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |
-|[#504]                     | #hole |
+|[#504]                     |       | [placeholder for [#008.2] state-machine and "case" suport]
 |[#503.B]                   |       | does wicked require that the file exist? yes
 |[#503]                     |       | [wicked]
 |[#502]                     | #open | parameter modeling thoery & API

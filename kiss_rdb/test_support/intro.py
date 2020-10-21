@@ -34,7 +34,7 @@ class CommonestCase:
 
         # Perform
         mod = self.given_module()
-        schema, act_ents = mod.SCHEMA_AND_ENTITIES_VIA_LINES(given_lines, lsn)
+        schema, act_ents = mod._schema_and_entities_via_lines(given_lines, lsn)
 
         return _EndStateSchemaAndEntitySTREAM(schema, act_ents)
 
@@ -48,7 +48,7 @@ class CommonestCase:
 
         # Perform
         mod = self.given_module()
-        act_itr = mod.LINES_VIA_SCHEMA_AND_ENTITIES(schema, given_ents, None)
+        act_itr = mod._lines_via_schema_and_entities(schema, given_ents, None)
 
         # Prepare the expectation for assertion
         scnlib = _scnlib()

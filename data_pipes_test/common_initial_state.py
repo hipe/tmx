@@ -36,9 +36,9 @@ class ProducerCaseMethods:
 
 def PS_via_mixed(mixed):
     if isinstance(mixed, str):
-        from data_pipes.format_adapters.producer_script import (
-                producer_script_module_via_path)
-        return producer_script_module_via_path(mixed, None)
+        from data_pipes.format_adapters.producer_script import \
+                producer_script_module_via_path_ as func
+        return func(mixed, None)
     return FakeProducerScript(**mixed)
 
 
@@ -61,6 +61,7 @@ class FakeProducerScript:  # [#459.17] a fake producer script
     HELLO_I_AM_A_PRODUCER_SCRIPT__ = None
 
 
+@lazy
 def production_collectioner():
     from data_pipes import meta_collection_ as func
     return func()

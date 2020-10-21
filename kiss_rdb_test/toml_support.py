@@ -1,11 +1,12 @@
 def build_collection(dir_path, schema, inj):
-    if len(inj):
-        inj = {_short_name_via_long_name[k]: v for k, v in inj.items()}
-    func = subject_module().collection_implementation_via_directory_and_schema
-    ci = func(dir_path, schema, **inj)
-    from kiss_rdb.magnetics_.collection_via_path import \
-        NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-    return func(ci)
+    kw = {_short_name_via_long_name[k]: v for k, v in inj.items()}
+    kw['toml_schema'] = schema  # let's go
+
+    sa_mod = _subject_module()
+
+    lib = _lib_module()
+    return lib.collection_via_storage_adapter_and_path(
+        sa_mod, dir_path, _throwing_listener, **kw)
 
 
 _short_name_via_long_name = {
@@ -14,8 +15,17 @@ _short_name_via_long_name = {
 }
 
 
-def subject_module():
-    from kiss_rdb.storage_adapters_.toml import collection_via_directory as mod
-    return mod
+def _throwing_listener(*x):
+    raise RuntimeError('no')
+
+
+def _lib_module():
+    import kiss_rdb as module
+    return module
+
+
+def _subject_module():
+    import kiss_rdb.storage_adapters_.toml as module
+    return module
 
 # #born 21 months later

@@ -7,7 +7,30 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.json',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def SCHEMA_AND_ENTITIES_VIA_LINES(lines, listener):
+def FUNCTIONSER_FOR_SINGLE_FILES():
+
+    class edit_funcs:  # #class-as-namespace
+        lines_via_schema_and_entities = _lines_via_schema_and_entities
+
+    class read_funcs:  # #class-as-namespace
+        schema_and_entities_via_lines = _schema_and_entities_via_lines
+
+    class fxr:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
+            return edit_funcs
+
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
+            return read_funcs
+
+        def PRODUCE_IDENTIFIER_FUNCTION():
+            return _string_based_idens
+
+        COLL_IMPL_YUCK_ = None
+        pass
+    return fxr
+
+
+def _schema_and_entities_via_lines(lines, listener):  # #testpoint:KS
     scn = _scnlib().scanner_via_iterator(lines)
     if scn.empty:
         xx("cover me: line stream was empty (no lines)")
@@ -121,7 +144,8 @@ def _one_or_more_dictionaries_via_JSON_line_stream(scn, LISTENER):
         pass
 
 
-def LINES_VIA_SCHEMA_AND_ENTITIES(schema, given_ents, listener):
+def _lines_via_schema_and_entities(schema, given_ents, listener):
+    # #testpoint:KS
 
     def json_lines_via_entity(ent):
         # NOTE skipping the idea of identifiers for now
@@ -166,6 +190,12 @@ def LINES_VIA_SCHEMA_AND_ENTITIES(schema, given_ents, listener):
     # Last item only: smunge that ']' on to there
     line = ''.join((last_line_of_previous, ']\n'))
     yield line
+
+
+def _string_based_idens(x, _listener):  # #[#877.4] this might become default
+    assert isinstance(x, str)
+    assert len(x)
+    return x
 
 
 _JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary_as_storage_adapter_entity',))  # noqa: E501

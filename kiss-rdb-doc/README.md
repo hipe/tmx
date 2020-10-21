@@ -31,8 +31,10 @@ woah boy.
 |Id                         | Main Tag | Content |
 |---------------------------|:------|:----|
 |[#899.Z]                   | #eg   | eg
+|[#877.4]                   | #trak | do we want to make string identifiers the default?
 |[#877.C]                   |       | [other pretend file]
 |[#877.B]                   |       | [pretend file]
+|[#877]                     |       | now, a third node for internal & external tracking
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
 |[#874.5]                   | #open | clean up the interface to this emitter
 |[#874.4]                   |       | multi-tablism  (see also #multi-tablism)
@@ -108,6 +110,7 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.D]                   |       | logic diagram for resolving storage adapters and..
 |[#857.C]                   |       | injectable custom identifier classes (near schema)
 |[#857.2]                   |       | sentences via jumble
 |[#857.1]                   |       | backend roadmap

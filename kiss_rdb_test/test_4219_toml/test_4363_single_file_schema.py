@@ -15,19 +15,10 @@ CommonCase = unittest.TestCase
 class Case4359_traversal_OK(CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
-
-        def f(id_obj):
-            return id_obj.to_string()  # ..
-
-        these = self.given_collection().TO_IDENTIFIER_STREAM(no_listener)
-        assert(these)
-        _actual = (f(o) for o in these)
-
-        _expected = ('24', '68')
-
-        _actual = tuple(_actual)
-
-        self.assertSequenceEqual(_actual, _expected)
+        coll = self.given_collection()
+        with coll.open_identifier_traversal(no_listener) as idens:
+            act = tuple(iden.to_string() for iden in idens)
+        self.assertSequenceEqual(act, ('24', '68'))
 
     # NOTE not memoized
     def given_collection(self):

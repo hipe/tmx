@@ -49,7 +49,7 @@ def piece_rows_via_jumble(itr):
         if (row := flush_final_piece_row()):
             yield row
 
-    # == State Machine
+    # == State Machine #[#008.2]
 
     def start_state():
         yield if_capitalized, push_sentence_state_the_first_time

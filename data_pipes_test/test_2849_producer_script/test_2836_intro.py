@@ -8,6 +8,10 @@ import modality_agnostic.test_support.common as em
 import unittest
 
 
+class CommonCase_OFF:  # #[#459.M]
+    pass
+
+
 class CommonCase(unittest.TestCase):
 
     # -- assertion support
@@ -68,10 +72,9 @@ class Case2829_here_is_a_low_level_doo_hah(CommonCase):
         listener = None  # or throwing listener
         _path = executable_fixture('exe_130_edit_add.py')
 
-        from data_pipes.format_adapters.producer_script import (
-                producer_script_module_via_path)
-
-        ps = producer_script_module_via_path(_path, listener)
+        from data_pipes.format_adapters.producer_script import \
+            producer_script_module_via_path_ as func
+        ps = func(_path, listener)
 
         def recv_far_stream(normal_far_st):
             _one = next(normal_far_st)
@@ -156,7 +159,7 @@ class Case2838_file_not_found(CommonCase):
 # Case2841 was "no metadata row", archived #history-A.1
 
 
-class Case2844DP_bad_natural_key(CommonCase):
+class Case2844DP_bad_natural_key(CommonCase_OFF):
 
     def test_100_emits(self):
         emi = self.build_end_state().actual_emission_index['this_emi']
@@ -173,7 +176,7 @@ class Case2844DP_bad_natural_key(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-class Case2847_extra_cel(CommonCase):
+class Case2847_extra_cel(CommonCase_OFF):
     """(may be partially or wholly redundant with (Case3353DP))
     (may be #overloaded. is first coverage of an oblique thing.)
     """
@@ -194,7 +197,7 @@ class Case2847_extra_cel(CommonCase):
                 'near_collection': _same_near_collection()}
 
 
-class Case2850_RUM(CommonCase):
+class Case2850_RUM(CommonCase_OFF):
 
     def test_100_RUM(self):
         _ = self.build_end_state()
@@ -216,6 +219,7 @@ def _chimi_churri_far_path():
 
 
 def _same_near_collection():
+    return '/no-ent/never-actually-load.csv'  # only duruing [#459.M]
     """NOTE - this is horrible "lookahead" to need to rely on this other FA
 
     to test our own. but meh.

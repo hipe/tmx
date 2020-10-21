@@ -138,8 +138,7 @@ class _open_raw_traversal_stream:  # #[#459.3] class as context manager
 
 def _main(opened, do_field_names, listener):
     import kiss_rdb.storage_adapters_.markdown_table as sa
-    from kiss_rdb import \
-        single_file_collection_via_storage_adapter_and_path as func
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
     coll = func(sa, opened, listener)
     ci = coll.COLLECTION_IMPLEMENTATION
 

@@ -117,8 +117,8 @@ def _stdout_lines_from_sync(  # #testpoint
 
     def producer_script_normally():
         from data_pipes.format_adapters.producer_script import \
-                producer_script_module_via_path
-        return producer_script_module_via_path(producer_script, listener)
+                producer_script_module_via_path_ as func
+        return func(producer_script, listener)
 
     def make_sure_the_sync_agent_can_do_the_thing():
         if do_diff and not self.sync_agent.SYNC_AGENT_CAN_PRODUCE_DIFF_LINES:
@@ -144,8 +144,9 @@ def _stdout_lines_from_sync(  # #testpoint
         set_or_stop('sync_agent', x)
 
     def resolve_near_collection():
-        from kiss_rdb import collectionerer
-        near_coll = collectionerer().collection_via_path(
+        from data_pipes import meta_collection_ as func
+        mcoll = func()
+        near_coll = mcoll.collection_via_path(
                 collection_path=near_coll_path,
                 adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
                 format_name=near_format, opn=opn, listener=listener)

@@ -51,7 +51,7 @@ class func:  # error_monitor_via_stderr
 
     def __express_when_shape_is_expression(self, em):
         write_line = self._write_line
-        payloader = em.release_payloader()
+        payloader = em.payloader
 
         if payloader is None:
             _ = em.channel_tail[0].replace('_', ' ')  # #[#608.7]

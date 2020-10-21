@@ -40,8 +40,7 @@ but still we can use it as a guide.
 from kiss_rdb_test.filesystem_spy import build_fake_filesystem
 import modality_agnostic.test_support.common as em
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
-        lazy
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
@@ -105,8 +104,10 @@ class CommonCase(unittest.TestCase):
         listener, emissions = em.listener_and_emissions_for(self, limit=1)
 
         # Prepare the `opn` argument
-        def opn(path_arg):
-            # (path_arg is never coll path it's schema file path under path)
+        def opn(path_arg, mode=None):
+            if mode:
+                msg = "we assume you aren't actually writing.."
+                return pass_thru_cm((msg, path))
             return fs.open_file_for_reading(path_arg)
 
         # Execute
@@ -369,14 +370,15 @@ class Case1422_single_file_based_money(CommonCase):
         assert 'felloo1' == k
         assert 'furry' == v['fim']
 
-    def test_300_retrieve_produces_the_entity_which_in_reality_should_be(self):
-        wat = self.end_state_result[2]
-        ohai, whatev = wat
-        assert 'this_is_supposed_to_be_wrapped' == ohai
-        assert 'furry' == whatev['fim']
+    def test_300_retrieve_produces_the_entity(self):
+        ent = self.end_state_result[2]
+        assert 'felloo1' == ent.identifier
+        v = ent.core_attributes_dictionary_as_storage_adapter_entity['fim']
+        assert 'furry' == v
 
     def given_fake_filesystem(self):
-        return build_fake_filesystem(('file', 'abc/xyz.xtc'))
+        lines = iter(('see but ignore\n',))
+        return build_fake_filesystem(('file', 'abc/xyz.xtc', lambda: lines))
 
     def given_run(self, listener, *coll_args):
         return tuple(self.result_value_values_from_run(coll_args, listener))
@@ -464,22 +466,18 @@ def message_about_no_schema_for(coll_path):
 
 # == Support Test Setup
 
-@lazy
 def collectioner():
-
-    # #wish look into module reflection
-
-    import os.path as os_path
-    dn = os_path.dirname
-    md = os_path.join(dn(dn(__file__)), 'fixture_code', '_1416_SAs', '_33_SAs')
-
-    from kiss_rdb.magnetics_.collection_via_path import \
-        collectioner_via_storage_adapters_module as func
-    return func('kiss_rdb_test.fixture_code._1416_SAs._33_SAs', md)
+    from kiss_rdb_test.common_initial_state import didactic_collectioner as fun
+    return fun()
 
 
 def unwrap_collection(coll):
     return coll
+
+
+def pass_thru_cm(x):  # #[#510.12] (lol)
+    from contextlib import nullcontext as func
+    return func(x)
 
 
 same_schema_path = 'abc/xyz/schema.rec'

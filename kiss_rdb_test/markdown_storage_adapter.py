@@ -52,6 +52,8 @@ def collection_via(path, listener=None, opn=None):
         _I_am_a_legacy_of_the_past_who_will_go_away as ci_via
 
     ci = ci_via(path, listener, opn=opn)
+
+    raise RuntimeError('turn this model on its head')
     from kiss_rdb.magnetics_.collection_via_path import \
         NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
     return func(ci)

@@ -97,7 +97,9 @@ class collection_implementation_via_directory_and_schema:
                 provision_ID_randomly_via_identifiers as _)
 
             def identifierser():
-                return indexy_file.to_identifier_stream(listener)
+                with indexy_file.open_idens_(listener) as idens:
+                    for iden in idens:
+                        yield iden
 
             tup = _.provision_new_identifier_(
                     random_number_generator=self._random_number_generator,
@@ -241,10 +243,8 @@ class collection_implementation_via_directory_and_schema:
     def _open_locked_mutable_entities_file(self, path):
         return self._filesystem.open_locked_file(path)
 
-    def to_identifier_stream_as_storage_adapter_collection(self, listener):
-        return self._schema_pather.to_identifier_stream(listener)
-
-    to_identifier_stream = to_identifier_stream_as_storage_adapter_collection
+    def open_identifier_traversal_as_storage_adapter_collection(self, listen):
+        return self._schema_pather.open_identifier_traversal(listen)
 
     def _file_path_pieces_via_identifier(self, iid):
         return self._schema_pather.file_path_pieces_via__(iid)

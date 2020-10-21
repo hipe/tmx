@@ -38,6 +38,7 @@ def CLI_(sin, sout, serr, argv, rscser):
     coll = mc.collection_via_path(coll_path, listener)
 
     ci = coll.COLLECTION_IMPLEMENTATION
+    raise RuntimeError("The below is the old way. New way will be easy for you my friend")  # noqa: E501
     _ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
 
     from data_pipes.magnetics.entities_via_filter_by_tags import \

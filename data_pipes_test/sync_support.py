@@ -7,7 +7,7 @@ def build_end_state_of_sync(tc):
     listener, done = em().listener_and_done_via(tc.expect_emissions(), tc)
     near, far = _normalize_these(**tc.given())
     nf = tc.given_near_format_name()
-    lines = tuple(_corralpoint(near, far, listener, near_format=nf))
+    lines = tuple(_do_sync(near, far, listener, near_format=nf))
     return _LinesAndEmissionsAsEndState(lines, done())
 
 
@@ -20,7 +20,7 @@ def OUTPUT_LINES_VIA_SYNC__(tc):
     far = tc.given_producer_script()
     near = tc.given_near_collection_mixed__()
     nf = None if isinstance(near, str) else tc.given_near_format_name()
-    lines = _corralpoint(near, far, listener, near_format=nf)
+    lines = _do_sync(near, far, listener, near_format=nf)
     return tuple(lines)
 
 
@@ -150,9 +150,9 @@ def _minimal_example_of_using_the_flat_map_for_collection_sync(
         assert()
 
 
-# == Corralpoints
+# == Perfomances ("run" support)
 
-def _corralpoint(near, far, listener, near_format):  # #corralpoint
+def _do_sync(near, far, listener, near_format):
     do_diff, cached_document_path, opn = False, None, None
 
     if not isinstance(far, str):
@@ -173,7 +173,6 @@ def _corralpoint(near, far, listener, near_format):  # #corralpoint
             return passthru_context_manager(near_line_iterator)
 
     from data_pipes.cli.sync import _stdout_lines_from_sync as func
-
     return func(
         near, far, listener, do_diff, near_format, cached_document_path, opn)
 

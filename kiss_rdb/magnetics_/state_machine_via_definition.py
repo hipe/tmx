@@ -1,5 +1,50 @@
+"""Temporary Discussion of this module (at #history-B.4):
+
+The conceptual homeland for all things "state machine" is in a different
+package ("modality agnostic"), tracked [#504] (as a shadowy outline).
+
+This, however, is the oldest physical file we've found dedicated to the cause.
+The reason we haven't moved this file (and so module) from here to there is
+only for lack of want of these particular facilities by any other applied use
+case of state machines.
+
+Indeed, our current favorite way to do state machines is merely a pattern,
+rather than any particular classes/functions. The pattern is implemented
+directly with plain old python code and eschews drawing in external code as
+an added dependency and coupling.
+
+(All the other 🆒 🆕 ways we've come up with between then and now are tracked
+with an identifer already in this file: [#!008.2].)
+
+(It also bears mentioning somewhere that the topmost facilities in this file
+sort of resemble a flat map. The pattern seems to be: make a flat map that
+produces an output stream from an input stream, internally using a state
+machine. SO if we had to rename this file now we might call it
+"flat map via state machine".)
+
+BUT THEN: the mandate of this file gets more interesting: At this moment we
+are creating an experimental new "case" facility. In the spirit of what we
+just explained above, we don't want to commit the sin of early abstraction
+and give "case" its own file yet. Except that there's support code for "case"
+that is only used on a deviation from normal execution (error .. cases), and
+we want that OUT of the asset code.
+
+Now, "case" on its own feels like too small a mechanism to deserve its own
+file, however: conceptually (or maybe just practially) "case" seems like a
+fundamental, auxiliary component to any state machine. So we are comfortable
+bundling the two in one file (and the client having to know that "case" is
+conceptually subordinate to "state machine").
+
+TL;DR: this file is home to "case" support for an imagined future where this
+file goes to live in [ma] as a generic support module for all things "case"
+and state machine (at which point most of this comment block should be removed)
+"""
+
+
 import re
 
+
+# == Flat Map via State Machine
 
 def _items_via_parse_state_and_all_lines(ps, all_lines):
     """main parse loop.
@@ -123,6 +168,7 @@ def _build_enhanced_listener(listener, ps):
         # our listener peaks at every emission that comes through it, and
         # for those emissions that look a certain way, it adds to their
         # components more context about the parse state, like line number.
+        # (nowadays we might prefer [#510.14] context stacks for this)
 
         if 'error' == a[0] and 'structure' == a[1] and 'input_error' == a[2]:  # noqa: E501
             def use_struct():
@@ -139,6 +185,8 @@ def _build_enhanced_listener(listener, ps):
             listener(*a)
     return enhanced_listener
 
+
+# == State Machine
 
 class StateMachine:  # #[#008.2] a state machine
     """DISCUSSION
@@ -430,7 +478,79 @@ class _EnderUnattachedTransition:
     DOES_TEST_FOR_EOS = True
 
 
-# -- expression (EN)
+# == Case
+#    (born #history-B.4)
+
+def _explain_case_failure(conditions_seen, when_X_is, num_args, actual_x=None):
+    two_arg_form = (1, 2).index(num_args)
+
+    if two_arg_form:
+        conditions_seen = (s.replace('_', ' ') for s in conditions_seen)
+
+    import text_lib.magnetics.via_words as ox
+    allowed = tuple(ox.keys_map(conditions_seen))
+
+    md = re.match('when_(.+)_is$', when_X_is.__name__)  # fail to match OK
+
+    def jumble():
+        yield 'Expecting'
+        if md:
+            yield md[1].replace('_', ' '), 'to be'
+        yield ox.oxford_OR(allowed)
+        if two_arg_form:
+            yield 'Had:', repr(actual_x)
+
+    rows = ox.piece_rows_via_jumble(jumble())
+    msgs = tuple(''.join(row) for row in rows)
+    return (' '.join(msgs),) if len(msgs[0]) < 66 else msgs  # meh
+
+
+def re_emit_case_error_CRAZILY(listener, stack, emi_tup):  # EXPERIMENTAL
+    """We are preoccupied with whether or not we can derive [#510.14]
+
+    context-stack-like metadata from a call stack (we can). We haven't yet
+    stopped to think if we should.
+    """
+
+    whens = list(_whens_via_stack_until_main(stack))
+    if not len(whens):
+        return listener(*emi_tup)
+
+    # To be proper, we should do this work inside the "lineser" but meh
+    from modality_agnostic import emission_via_tuple as func
+    emi = func(emi_tup)
+
+    if 'expression' != emi.shape:
+        xx("have fun with hacking reason like you did message. it's easy")
+
+    # Downcase the first letter of the first messages
+    msgs = list(emi.to_messages())
+    msg = msgs[0]
+    msgs[0] = ''.join((msg[0].lower(), msg[1:]))  # downcase the first letter
+
+    # Prefix "When " to the first of the "when" phrases, and big flex
+    whens[0] = ' '.join(('When', whens[0]))
+    prefix = ''.join((' and '.join(whens), ', '))
+
+    # Synthesize (by making the first message longer, not prepending a message)
+    msgs[0] = ''.join((prefix, msgs[0]))
+    msgs = tuple(msgs)
+
+    listener(*emi.channel, lambda: msgs)
+
+
+def _whens_via_stack_until_main(stack):
+    itr = (fi.function for fi in stack)
+    while True:
+        fname = next(itr)  # ..
+        if 'main' == fname:
+            break
+        if (md := re.match('when_(.+)', fname)) is None:
+            continue
+        yield md[1].replace('_', ' ')
+
+
+# == Whiners
 
 def _when_transition_not_found(ps, sm):
 
@@ -458,11 +578,16 @@ def _normalize(name):
     return _dash_or_space.sub('_', name)
 
 
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
+
+
 _not_ok = False
 _stop = (_not_ok, None)
 _ok = True
 _nothing = (_ok, None)
 
+# #history-B.4
 # #history-A.3: massive overhaul: inject actions class (for mutli-line)
 # #tombstone-A.2: archive ability to mutate state machines (no longer needed)
 # #history-A.1: introduced experimental dup-and-mutate behavior

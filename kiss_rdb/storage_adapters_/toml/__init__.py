@@ -3,8 +3,7 @@ STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = False
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
-
+def ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     dct = schema_file_scanner.flush_to_config(
             listener, storage_schema='allowed')
     if dct is None:
@@ -14,16 +13,30 @@ def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     schema = func(**dct)
     # something about above being null (Case5918)
 
-    def funcser_via_coll_args(directory, listener, opn=None, rng=None):
-        fs = opn.THE_WORST_HACK_EVER_FILESYSTEM_ if opn else None
-        ci = _CI_via(directory, schema, fs, rng)
-        from kiss_rdb.magnetics_.collection_via_path import \
-            NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-        return func(ci)
+    if schema is None:
+        return
+    return {'toml_schema': schema}
 
-    class first_ns:  # #class-as-namespace
-        FUNCTIONSER_VIA_COLLECTION_ARGS = funcser_via_coll_args
-    return first_ns
+
+def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
+        path, listener, toml_schema, opn=None, fs=None, rng=None):
+
+    if opn and fs is None:
+        fs = opn.THE_WORST_HACK_EVER_FILESYSTEM_
+
+    ci = _CI_via(path, toml_schema, fs, rng)
+
+    class fxr:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY():
+            return ci
+
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY():
+            return ci
+
+        def PRODUCE_IDENTIFIER_FUNCTION():
+            return ci.PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_()
+        COLL_IMPL_YUCK_ = ci
+    return fxr
 
 
 def _CI_via(directory, schema, fs, rng):

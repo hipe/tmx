@@ -483,9 +483,9 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(CommonCase): 
     @shared_subject
     def end_state(self):
         def run(listener):
-            idens = coll.TO_IDENTIFIER_STREAM(listener)
-            for iden in idens:
-                self.fail()
+            with coll.open_identifier_traversal(listener) as idens:
+                for iden in idens:
+                    self.fail()
         coll = self.given_collection()
         return canon.end_state_via_(self, run, expecting_OK=False)
 

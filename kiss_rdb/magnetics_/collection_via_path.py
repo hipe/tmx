@@ -6,94 +6,178 @@ def _listener(*args):  # used as default argument
 def collectioner_via_storage_adapters_module(mod_name, mod_dir, *more):
     class collectioner:  # #class-as-namespace
         def collection_via_path(collection_path, listener=_listener, **kw):
-            return _COLLECTION_VIA_PATH(collection_path, listener, saidx, **kw)
-
-        def OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, listener):
-            return _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, saidx, listener)
-
-        def OPEN_FOR_READING_THE_NEW_WAY(fmt, x, listener):
-            return _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, saidx, listener)
+            return _collection_via_path(collection_path, listener, saidx, kw)
 
         def SPLAY_STORAGE_ADAPTERS():
             return saidx._splay_storage_adapters()
+
+        def storage_adapter_via_key(k):  # ..
+            return saidx.storage_adapter_via_key(k, _listener)
 
     pairs = ((more[i], more[i+1]) for i in range(0, len(more), 2))
     saidx = _storage_adapter_index(((mod_name, mod_dir), *pairs))
     return collectioner
 
 
-def NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci):
-    # temporrary bridge
-
-    fxer = NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci)
-    coll = COLLECTION_VIA_FUNCTIONSER(fxer)
-    return coll
-
-
-def NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_(ci):
-    class ns:  # #class-as-namespace
-        def PRODUCE_EDIT_FUNCTIONS():
-            return ci
-
-        def PRODUCE_READ_ONLY_FUNCTIONS():
-            return ci
-
-        def PRODUCE_IDENTIFIER_FUNCTION():
-            return ci.PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_()
-        EDIT_FUNCTIONS_ARE_AVAILABLE = True
-        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = True
-        COLL_IMPL_YUCK_ = ci
-    return ns
-
-
-def _COLLECTION_VIA_PATH(
-        x, listener, saidx,
-        format_name=None, rng=None, opn=None, adapter_variant=None):
-
-    cci = _classify_collection_identifier_for_NEW_WAY(x)
-    sa = _resolve_storage_adapter(cci, format_name, saidx, listener, opn)
-    if sa is None:
+def _collection_via_path(x, listener, saidx, kw):
+    cci = _classify_collection_identifier(x)
+    format_name = kw.pop('format_name', None)  # #here1
+    opn = kw.get('opn', None)
+    two = _parse_schema_and_resolve_SA(cci, format_name, saidx, listener, opn)
+    if two is None:
         return
-
-    # Re-pack keywords idk
-    kw = {'rng': rng, 'opn': opn, 'adapter_variant': adapter_variant}
-
+    ada_opts, sa = two
+    if ada_opts:
+        # We're currently munging our own namespace and a business namespace.
+        # Either we shouldn't do this, or we should allow it. we don't know yet
+        if len(inter := set(kw.keys()).intersection(set(ada_opts.keys()))):
+            xx(''.join(("clober ok? (", ', '.join(inter), ')')))
+        kw.update(ada_opts)
     return _collection_via(sa, cci, listener, kw)
 
 
-def _single_file_collection_via_storage_adapter_and_path(sa, x, listener, kw):
-    cci = _classify_collection_identifier_for_NEW_WAY(x)
-    key = _key_via_storage_adapter_module(sa)
-    sa = _StorageAdapter(sa, key)
+def collection_via_storage_adapter_module_and_path_(sa_mod, x, listener, kw):
+    cci = _classify_collection_identifier(x)
+    key = _key_via_storage_adapter_module(sa_mod)
+    sa = _StorageAdapter(sa_mod, key)
     return _collection_via(sa, cci, listener, kw)
 
 
 def _collection_via(sa, cci, listener, kw):
-    fxerer, sa = sa._shhh_split_into_two()
-    if fxerer is None:
-        fxerer = sa.module  # (Case1422)
+    # exactly [#857.D] (subgraph B)
 
-    # Let SA's that don't participate in the thing not see it (defaults 👀)
-    kw = {k: v for k, v in kw.items() if v is not None}
+    def main():
+        return when_directory_based() if is_dir_based() else when_file_based()
 
-    if hasattr(fxerer, 'FUNCTIONSER_VIA_CCI'):  # experiment
-        fxer = fxerer.FUNCTIONSER_VIA_CCI(cci, listener, **kw)
+    def when_file_based():
+        if hasattr(sa.module, 'CUSTOM_FUNCTIONSER'):  # (not in flowchart grap)
+            return build_collection('custom')
+
+        def when_collection_identifier_is():
+            yield 'string', when_file_based_and_string
+            yield 'file_resource', when_file_is_resource
+        return case(cci.narrative_shape_type, when_collection_identifier_is)
+
+    def when_directory_based():
+        def when_collection_identifier_is():
+            yield 'string', do_directory_based
+        return case(cci.narrative_shape_type, when_collection_identifier_is)
+
+    def when_file_is_resource():
+        def when_file_resource_is():
+            yield 'writable', when_file_is_writable
+            yield 'readable', when_file_is_readable_not_writable
+        return case(cci.narrative_writable_or_readable, when_file_resource_is)
+
+    # == Consequences
+
+    def do_directory_based():
+        return build_collection('when_directory')
+
+    def when_file_is_writable():
+        return build_collection('for_pass_through_writing')
+
+    def when_file_is_readable_not_writable():
+        return build_collection('for_traversal_via_lines')
+
+    def when_file_based_and_string():
+        return build_collection('when_file_path')
+
+    def build_collection(which):
+        return _build_collection(which, cci, sa, kw, crazy_listener)
+
+    # == Conditionals
+
+    def is_dir_based():
+        return _is_directory_based(sa.module)
+
+    # ==
+
+    def crazy_listener(sev, *rest):
+        if 'error' != sev:
+            return listener(sev, *rest)
+        stack = _stack_function()()
+        _re_emit_case_error_CRAZILY(listener, stack, (sev, *rest))
+
+    case = _build_case_function(crazy_listener)
+    throwing_listener, stop = _throwing_listener_and_stop(listener)
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def _build_collection(which, cci, sa, kw, crazy_listener):
+
+    # Determine the function categories we need, and binding strategy
+    is_file_based, is_directory_based, is_custom = True, False, False
+    is_directory_based, is_custom = False, False
+    if 'when_file_path' == which:
+        read, write = 'want', 'want'
+    elif 'when_directory' == which:
+        is_file_based, is_directory_based = False, True
+        read, write = 'want', 'want'
+    elif 'for_traversal_via_lines' == which:
+        read, write = 'need', None
+    elif 'for_pass_through_writing' == which:
+        read, write = None, 'need'
     else:
-        x = cci.mixed_collection_identifier
-        fxer = fxerer.FUNCTIONSER_VIA_COLLECTION_ARGS(x, listener, **kw)
+        assert 'custom' == which
+        is_file_based, is_custom = False, True
+        read, write = 'want', 'want'
 
-    if fxer is None:
-        return  # (Case2823DP)
-    return COLLECTION_VIA_FUNCTIONSER(fxer, sa)
+    # Determine what the capabilities are and prepare binding strategies
+    # (ALL of this binding logic is VERY experimental)
 
+    mod = sa.module
+    x = cci.mixed_collection_identifier
+    opn = kw.get('opn')
+    bind_editors, bind_readers = None, None
 
-def COLLECTION_VIA_FUNCTIONSER(fxer, sa=None):  # data-pipes
+    if is_file_based:
+        fxr = mod.FUNCTIONSER_FOR_SINGLE_FILES()
+        edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE
+        read_funcser = fxr.PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE
+        bind_editors = _bind_editors_for_single_file
+        bind_readers = _bind_readers_for_single_file
+    elif is_directory_based:
+        fxr = mod.FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
+            x, crazy_listener, **kw)
+        edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY
+        read_funcser = fxr.PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY
+    else:
+        # Get custom bindings from the SA lazily, only as-needed per category
+        assert is_custom
+        if (fxr := mod.CUSTOM_FUNCTIONSER(x, opn, crazy_listener)) is None:
+            return
+        edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_CUSTOMLY
+        read_funcser = fxr.PRODUCE_READ_FUNCTIONS_CUSTOMLY
 
-    if (can_edit := fxer.EDIT_FUNCTIONS_ARE_AVAILABLE):
-        edit_funcs = fxer.PRODUCE_EDIT_FUNCTIONS()
+    # See if any required capabilities are missing, and apply the bindings
+    do_edit, do_read, missing = False, False, []
+    if write:
+        if edit_funcser:
+            do_edit = True
+            edit_funcs = edit_funcser()  # or maybe lazy
+            if bind_editors:
+                edit_funcs = bind_editors(which, x, edit_funcs, opn)
+        elif 'need' == write:
+            missing.append('write')
+    if read:
+        if read_funcser:
+            do_read = True
+            read_funcs = read_funcser()  # or maybe lazy
+            if bind_readers:
+                read_funcs = bind_readers(which, x, read_funcs, opn)
+        elif 'need' == read:
+            missing.append('read')
 
-    if (can_read := fxer.READ_ONLY_FUNCTIONS_ARE_AVAILABLE):
-        read_funcs = fxer.PRODUCE_READ_ONLY_FUNCTIONS()
+    if missing:
+        xx(f"fun! {sa.key} does not define {', '.join(missing)}")
+
+    assert read or write  # per the rule table above
+
+    # Money
 
     def parse_identifier(orig_f):  # #decorator
         def use_f(eid, *rest):
@@ -103,7 +187,7 @@ def COLLECTION_VIA_FUNCTIONSER(fxer, sa=None):  # data-pipes
         return use_f
 
     class collection_NEW_WAY:  # #class-as-namespace
-        if can_edit:
+        if do_edit:
             @parse_identifier
             def update_entity(iden, x, listener):
                 return edit_funcs.update_entity_as_storage_adapter_collection(
@@ -118,189 +202,239 @@ def COLLECTION_VIA_FUNCTIONSER(fxer, sa=None):  # data-pipes
                 return edit_funcs.delete_entity_as_storage_adapter_collection(
                     iden, listener)
 
-        if can_read:
+        if do_edit and not is_directory_based:  # oh man. maybe one day
+            def open_collection_to_write_given_traversal(listener):
+                return edit_funcs._open_coll_for_passthru_write(listener)
+
+        if do_read:
             @parse_identifier
             def retrieve_entity(iden, listener):
-                return read_funcs.\
-                  retrieve_entity_as_storage_adapter_collection(iden, listener)
+                return read_funcs.retrieve_entity_as_storage_adapter_collection(iden, listener)  # noqa: E501
 
             def TO_IDENTIFIER_STREAM(listener):
-                return read_funcs.\
-                  to_identifier_stream_as_storage_adapter_collection(listener)
+                raise RuntimeError("CHANGE IT PlEASE")
 
-            def TO_ENTITY_STREAM(listener):
-                return read_funcs.\
-                  to_entity_stream_as_storage_adapter_collection(listener)
+            def open_identifier_traversal(listener):
+                return read_funcs.open_identifier_traversal_as_storage_adapter_collection(listener)  # noqa: E501
+
+            def open_entity_traversal(listener):
+                raise RuntimeError("let's party - probably just derive from below")  # noqa: E501
+                # return _open_entity_traversal_NEW_NEW_WAY(listener)
+
+            def open_schema_and_entity_traversal(listener):
+                return read_funcs.open_schema_and_entity_traversal_as_storage_adapter_collection(listener)  # noqa: E501
 
         def to_noun_phrase():
-            ci = collection_NEW_WAY.COLLECTION_IMPLEMENTATION
-            return _noun_phrase_via_collection_implementation(ci)
+            # (more complicated before #history-B.5, lost thing about variant)
+            # (moved to this file at #history-B.4)
+            sa_slug = sa.key.replace('_', '-')
+            return ''.join(("the '", sa_slug, "' format adapter"))
 
-        COLLECTION_IMPLEMENTATION = fxer.COLL_IMPL_YUCK_
+        COLLECTION_IMPLEMENTATION = fxr.COLL_IMPL_YUCK_
         storage_adapter = sa
 
-    parse_EID = (f := fxer.PRODUCE_IDENTIFIER_FUNCTION) and f()
+    parse_EID = (f := fxr.PRODUCE_IDENTIFIER_FUNCTION) and f()
     return collection_NEW_WAY
 
 
-# == NEW WAY
-#    NOTE lots of redundancies with #here4 during transition to magnetic field
-#    collection overhaul. Also this has lots holes the other doesn't for now.
-#    Eventually hook-ins so SA can totally circumvent all of this up front
+def _bind_editors_for_single_file(which, x, funcs, opn):
 
+    def use_create(iden_via, dct, listen):
+        # mode 'r+': must exist. open for read & write. pointer at beginning
+        with do_open_writable_filehandle('r+') as fp:
+            return funcs.CREATE_NEW_WAY(fp, iden_via, dct, listen)
 
-def _OPEN_FOR_WRITING_THE_NEW_WAY(fmt, x, saidx, listener):
-    def main():
-        sa = resolve_storage_adapter()
-        lines_via_two = sa.module.LINES_VIA_SCHEMA_AND_ENTITIES
-        lines_via_two
-        from contextlib import contextmanager
+    def pass_thru_write(listener):
+        lv = funcs.lines_via_schema_and_entities
 
-        @contextmanager
-        def build_cm():
-            build_receiver, close = resolve_receiver_and_closer()
-            recv = build_receiver(lines_via_two)
+        @_contextmanager()
+        def cm():
+            # mode 'x': cannot first exist. create a new file and open it for w
+            opened = do_open_writable_filehandle('x')
             ok = False
             try:
-                yield recv
+                fp = opened.__enter__()
+
+                class traversal_receiver:  # #class-as-namespace, crazy flex
+                    def receive_schema_and_entities(schema, ents, listen):
+                        return _do_passthru_write(fp, schema, ents, lv, listen)
+                yield traversal_receiver
                 ok = True
             finally:
-                close(ok)
-        return build_cm()
-
-    def resolve_receiver_and_closer():
-        if cci.arg_looks_like_file_handle:
-            if cci.arg_looks_like_writable_file_handle:
-                return receiver_and_closer_when_writable_file_handle()
-            raise stop_because_not_open_for_writing()
-        if cci.arg_looks_like_string:
-            return receiver_and_closer_by_open_and_close_file()
-        raise stop_because_unrecognized_identifier_shape()
-
-    def receiver_and_closer_by_open_and_close_file():
-        def close(was_OK):
-            if was_OK:
-                fp.close()
-                return
-            fp.seek(0)  # OCD
-            fp.truncate(0)  # WHY
-            os_unlink(x)  # YIKES
-        fp = open(x, 'x')  # crazy experiment
-        build_receiver = build_build_receiver(fp)
-        from os import unlink as os_unlink
-        return build_receiver, close
-
-    def receiver_and_closer_when_writable_file_handle():
-        build_receiver = build_build_receiver(x)
-        return build_receiver, lambda _: None
-
-    def build_build_receiver(writable_fp):
-        def build_receiver(lines_via_two):
-            return _build_receiver_NEW_WAY(writable_fp, lines_via_two)
-        return build_receiver
-
-    def stop_because_not_open_for_writing():
-        xx()
-
-    def stop_because_unrecognized_identifier_shape():
-        xx()
-
-    def resolve_storage_adapter():
-        return _resolve_storage_adapter(cci, fmt, saidx, throwing_listener)
-
-    cci = _classify_collection_identifier_for_NEW_WAY(x)
-    throwing_listener, stop = _throwing_listener_and_stop(listener)
-    try:
-        return main()
-    except stop:
-        pass
-
-
-def _build_receiver_NEW_WAY(writable_fp, lines_via_schema_and_entities):
-    def receive_schema_and_entities(schema, ents, listener):
-        for line in lines_via_schema_and_entities(schema, ents, listener):
-            writable_fp.write(line)
-
-    class receiver:  # #class-as-namespace
-        pass
-    receiver.receive_schema_and_entities = receive_schema_and_entities
-    return receiver
-
-
-def _OPEN_FOR_READING_THE_NEW_WAY(fmt, x, saidx, listener):
-    def main():
-        sa = resolve_storage_adapter()
-        two_via_lines = sa.module.SCHEMA_AND_ENTITIES_VIA_LINES  # ..
-        resolve_lines_and_closer = resolve_lines_and_closer_function()
-        from contextlib import contextmanager
-
-        @contextmanager
-        def build_cm():
-            lines, close = resolve_lines_and_closer()
-            try:
-                schema, ents = two_via_lines(lines, listener)
-                yield schema, ents
-            finally:
-                close()
-        return build_cm()
-
-    def resolve_lines_and_closer_function():
-        if cci.arg_looks_like_string:
-            return lines_and_closer_by_opening_and_closing_file
-        if cci.arg_looks_like_file_handle:
-            if cci.arg_looks_like_readable_file_handle:
-                return lines_and_closer_by_pass_thru_and_no_close
-            raise stop_because_not_open_for_reading()
-        raise stop_because_unrecognized_identifier_shape()
-
-    def lines_and_closer_by_opening_and_closing_file():
-        if True:  # TRY/EXCEPT eventually
-            fp = open(x, 'r')  # we once had `opn` but no more. now use fake fp
-
-        return fp, fp.close
-
-    def lines_and_closer_by_pass_thru_and_no_close():
-        return x, lambda: None
-
-    def stop_because_not_open_for_reading():
-        xx()
-
-    def stop_because_unrecognized_identifier_shape():
-        xx()
-
-    def resolve_storage_adapter():
-        return _resolve_storage_adapter(cci, fmt, saidx, throwing_listener)
+                if not ok:
+                    xx("read me - maybe clean up")  # (before #history-B.5 we
+                    # ..used to fp.seek(0), fp.truncate(0), os_unlink(x))
+                opened.__exit__()
+        return cm()
 
     # ==
 
-    cci = _classify_collection_identifier_for_NEW_WAY(x)
+    if 'when_file_path' == which:
+        def do_open_writable_filehandle(mode):
+            return (opn or open)(x, mode)  # ..
+    else:
+        def do_open_writable_filehandle(_):
+            return _null_context(x)
+        assert 'for_pass_through_writing' == which
+
+    class use_edit_funcs:  # #class-as-namespace
+        create_entity_as_storage_adapter_collection = use_create
+        _open_coll_for_passthru_write = pass_thru_write
+    return use_edit_funcs
+
+
+def _do_passthru_write(fp, schema, ents, lines_via_two, listener):
+    total = 0
+    for line in lines_via_two(schema, ents, listener):
+        total += fp.write(line)
+    return total
+
+
+def _bind_readers_for_single_file(which, x, funcs, opn):
+    # (A lot of this could be tightened but: for now, redundancy for clarity)
+
+    # Does the single-file SA want to implement its own random access?
+    if hasattr(funcs, 'RETRIEVE_NEW_WAY'):
+        def use_retrieve(iden, listener):
+            with do_open_readable_filehandle() as fp:
+                return funcs.RETRIEVE_NEW_WAY(fp, iden, listener)
+    else:
+        def use_retrieve(iden, listener):
+            with do_open_readable_filehandle() as fp:
+                return retrieve_in_linear_time(fp, iden, listener)
+
+    def retrieve_in_linear_time(fp, iden, listener):
+        _schema, ents = sch_ents_via_fp_er()(fp, listener)
+        # .. probably return if ents is None ..
+
+        for ent in ents:
+            curr_iden = ent.identifier
+            if iden == curr_iden:
+                return ent
+            xx()
+
+    def sch_en(listener):
+        sch_ents_via_two = sch_ents_via_fp_er()
+
+        @_contextmanager()
+        def cm():
+            opened = do_open_readable_filehandle()
+            fp = opened.__enter__()
+            try:
+                yield sch_ents_via_two(fp, listener)
+            finally:
+                opened.__exit__()
+        return cm()
+
+    def sch_ents_via_fp_er():
+        return funcs.schema_and_entities_via_lines
+
+    # ==
+
+    if 'when_file_path' == which:
+        def do_open_readable_filehandle():
+            return (opn or open)(x)  # ..
+    else:
+        assert 'for_traversal_via_lines' == which  # (Case1062DP)
+
+        def do_open_readable_filehandle():
+            # STDIN or an open filehandle (-looking-thing) was passed in.
+            # The contract is: because we didn't open it, we don't close it.
+
+            return _null_context(x)
+
+    class use_read_funcs:  # #class-as-namespace
+        retrieve_entity_as_storage_adapter_collection = use_retrieve
+        open_schema_and_entity_traversal_as_storage_adapter_collection = sch_en
+    return use_read_funcs
+
+
+def _parse_schema_and_resolve_SA(cci, fmt, saidx, listener, opn=None):
+    # to sort this out, we made flowchart [#857.D]. direct translation here:
+
+    def main():
+        when_format_name_is_given() if fmt else when_no_format_name_given()
+
+    def when_no_format_name_given():
+        def when_collection_identifier_is():
+            yield 'string', when_string_shaped_identifier
+        case(cci.narrative_shape_type, when_collection_identifier_is)
+
+    def when_format_name_is_given():
+        def when_collection_is():
+            yield directory_based, load_and_parse_schema_file
+            yield file_based, _no_op  # done: SA no schema
+        self.SA = saidx.storage_adapter_via_format_name(fmt, crazy_listener)
+        case(when_collection_is)
+
+    def when_string_shaped_identifier():
+        when_has_extension() if has_extension() else when_has_no_extension()
+
+    def when_has_no_extension():
+        load_and_parse_schema_file()
+
+    def when_has_extension():
+        self.SA = saidx.storage_adapter_via_extname(
+            self.extension, throwing_listener, cstacker)
+
+    # == Conditionals
+
+    def directory_based():
+        self.dir_based = _is_directory_based(self.SA.module)
+        return self.dir_based
+
+    def file_based():
+        assert not self.dir_based
+        return True
+
+    def has_extension():
+        from os.path import splitext
+        self.extension = splitext(cci.mixed_collection_identifier)[1]
+        return len(self.extension)
+
+    # == Workhorse
+
+    def load_and_parse_schema_file():
+        x = cci.mixed_collection_identifier
+        two = _SA_opts_via_parse_schema(x, saidx, opn, throwing_listener)
+        assert two  # otherwise a stop should have been raised above
+        sa, self.adapter_opts = two
+        if self.SA:
+            xx('lol think about this a little')
+        else:
+            self.SA = sa
+
+    # == Mechanics
+
+    def crazy_listener(sev, *rest):
+        if 'error' != sev:
+            return listener(sev, *rest)
+        stack = _stack_function()()
+        _re_emit_case_error_CRAZILY(listener, stack, (sev, *rest))
+
+    def cstacker():
+        xx()
+
+    # ==
+
+    case = _build_case_function(crazy_listener)
     throwing_listener, stop = _throwing_listener_and_stop(listener)
+
+    class self:  # #class-as-namespace
+        SA, adapter_opts = None, None
+
     try:
-        return main()
+        main()
+        return self.adapter_opts, self.SA
     except stop:
         pass
 
 
-def _resolve_storage_adapter(cci, fmt, saidx, listener, opn=None):
+def _SA_opts_via_parse_schema(x, saidx, opn, listener):
+    # again we try to hew as close as possible to flowchart [#857.D]
 
-    # If a format name was passed, use that
-    if fmt:
-        return saidx.storage_adapter_via_format_name(fmt, listener)
-
-    if not cci.arg_looks_like_string:
-        xx()
-
-    x = cci.mixed_collection_identifier
-
-    # If collection path looks like a file, use extension to find the SA
-    from os.path import splitext, join as os_path_join
-    if len(ext := splitext(x)[1]):
-        def csckr():
-            return ({'path': x},)
-        return saidx.storage_adapter_via_extname(ext, listener, csckr)
-
-    # Otherwise, assume it's a directory and try to open a schema file
     from kiss_rdb import SCHEMA_FILE_ENTRY_ as tail
+    from os.path import join as os_path_join
     schema_path = os_path_join(x, tail)
     try:
         opened = (opn or open)(schema_path)
@@ -319,11 +453,13 @@ def _resolve_storage_adapter(cci, fmt, saidx, listener, opn=None):
         if reso is None:
             return
         sfs, sa = reso.schema_file_scanner, reso.storage_adapter
-        frr = sa.module.FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(sfs, listener)
-    if frr is None:
-        return
-    return _StorageAdapterPlus(frr, sa)
+        dct = sa.module.ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(sfs, listener)
+        if dct is None:
+            return
+        return sa, dct
 
+
+# == Storage Adapter Index
 
 def _storage_adapter_via(original_method):  # #decorator
     def use_method(self, needle, listener, cstacker=None, validate=None):
@@ -546,10 +682,24 @@ def _crazy_schema_thing(opened, main, saidx, listener):
         pass
 
 
-def _classify_collection_identifier_for_NEW_WAY(x):
+def _classify_collection_identifier(x):
     # exists only to DRY up any logic to be shared between the two new ways
 
     def these():
+        def narrative_writable_or_readable():  # assume
+            if arg_looks_like_writable_file_handle():
+                return 'writable'
+            if arg_looks_like_readable_file_handle():
+                return 'readable'
+            return 'neither_writable_nor_readable'  # idk
+
+        def narrative_shape_type():
+            if arg_looks_like_string():
+                return 'string'
+            if arg_looks_like_file_handle():
+                return 'file_resource'
+            return type(x).__name__  # ick/meh. not covered
+
         def arg_looks_like_writable_file_handle():  # assume ..
             return x.writable()
 
@@ -577,15 +727,6 @@ def _classify_collection_identifier_for_NEW_WAY(x):
 
 # == models
 
-class _StorageAdapterPlus:
-
-    def __init__(self, functionserer, sa):
-        self._two = functionserer, sa
-
-    def _shhh_split_into_two(self):
-        return self._two
-
-
 class _StorageAdapter:  # move this to its own file if it gets big
 
     def __init__(self, module, key):
@@ -593,15 +734,11 @@ class _StorageAdapter:  # move this to its own file if it gets big
         self.key = key
 
     def CREATE_COLLECTION(self, collection_path, listener, is_dry):
+        xx()
         coll = self.module.CREATE_COLLECTION(collection_path, listener, is_dry)
         if coll is None:
             return
         return _wrap_collection(coll)
-
-    def _shhh_split_into_two(self):
-        return None, self
-
-    is_loaded = True
 
 
 def _wrap_collection(impl):
@@ -611,11 +748,46 @@ def _wrap_collection(impl):
     # return _Collection(impl)
 
 
-class _NOT_YET_LOADED:  # #as-namespace-only
-    is_loaded = False
+# == The Case Experiment (will move to [#504] soon as we want it elsewhere)
+
+def _build_case_function(listener=_listener):
+    def case(*one_or_two_args):
+        num_args = len(one_or_two_args)
+        if 1 == num_args:
+            def test_this_condition(condition):
+                if condition():
+                    return True
+                conditions_seen.append(condition.__name__)
+
+            def explain():
+                return do_explain(conditions_seen, when_X_is, num_args)
+
+            when_X_is, = one_or_two_args
+        else:
+            def test_this_condition(condition):
+                if act_x == condition:
+                    return True
+                conditions_seen.append(condition)
+
+            def explain():
+                return do_explain(conditions_seen, when_X_is, num_args, act_x)
+
+            act_x, when_X_is = one_or_two_args
+        conditions_seen = []
+
+        for condition, consequence in when_X_is():
+            if test_this_condition(condition):
+                return consequence()
+
+        def do_explain(conditions_seen, when_X_is, num_args, instance_x=None):
+            func = _case_lib()._explain_case_failure
+            return func(conditions_seen, when_X_is, num_args, instance_x)
+
+        listener('error', 'expression', 'no_case_matched', explain)
+    return case
 
 
-# == whiners
+# == Whiners
 
 def _emit_about_nonworking_stub(listener, sa, cstacker=None):
     def structurer():  # #not-covered, kind of crazy
@@ -626,7 +798,7 @@ def _emit_about_nonworking_stub(listener, sa, cstacker=None):
             def f(s):
                 return f"the {moniker} storage adapter is"
             msg = mod.STORAGE_ADAPTER_UNAVAILABLE_REASON
-            use_msg = re_lib().sub(r"^[Ii]t( is|'s)\b", f, msg)
+            use_msg = _re_lib().sub(r"^[Ii]t( is|'s)\b", f, msg)
             dct['reason_tail'] = use_msg
         else:
             dct['reason_tail'] = repr(sa.key)
@@ -744,30 +916,21 @@ def _say_extname_collision(en, first_key, second_key):
         return _reason
 
 
-def _noun_phrase_via_collection_implementation(ci):
-    # moved here #history-B.4. bounces around a lot
-
-    cls = ci if isinstance(ci, type) else ci.__class__
-    pcs = cls.__module__.split('.')
-    pcs.append(cls.__name__)
-
-    def match(pc):
-        return ('storage_adapter' in pc) or ('format_adapter' in pc)
-
-    i = next(i for i in reversed(range(0, len(pcs))) if match(pcs[i]))
-    adapter_key, variant_moniker = pcs[i+1:i+3]
-    adapter_moniker = adapter_key.replace('_', '-')
-    pcs = ("the '", adapter_moniker, "' format adapter")
-    pcs = (*pcs, " (variant: ", variant_moniker, ')')
-    return ''.join(pcs)
-
-
 def _key_via_storage_adapter_module(sa_mod):
     name = sa_mod.__name__
     return name[name.rindex('.')+1:]
 
 
 # == Smalls
+
+def _is_directory_based(mod):
+    db = mod.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES
+    sfb = mod.STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES
+    if db:
+        assert not sfb
+        return True
+    assert sfb
+
 
 def _throwing_listener_and_stop(listener):
 
@@ -786,9 +949,37 @@ def _flatten_context_stack(context_stack):  # #[#510.14]
     return {k: v for row in context_stack for k, v in row.items()}
 
 
+def _no_op():
+    pass
+
+
 # == Libs
 
-def re_lib():
+def _re_emit_case_error_CRAZILY(listener, stack, emi_tup):
+    _case_lib().re_emit_case_error_CRAZILY(listener, stack, emi_tup)
+
+
+def _case_lib():
+    import kiss_rdb.magnetics_.state_machine_via_definition as module  # will r
+    return module
+
+
+def _stack_function():
+    from inspect import stack as func
+    return func
+
+
+def _null_context(x):
+    from contextlib import nullcontext as func
+    return func(x)
+
+
+def _contextmanager():
+    from contextlib import contextmanager as decorator
+    return decorator
+
+
+def _re_lib():
     import re
     return re
 
@@ -801,6 +992,7 @@ _this_shape = ('error', 'structure')
 _EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
 _EC_for_not_found = (*_this_shape, 'cannot_load_collection')
 
+# #history-B.5
 # #history-B.4
 # #history-A.2: massive refactor for clarity
 # #history-A.1

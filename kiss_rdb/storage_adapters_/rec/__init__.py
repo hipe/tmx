@@ -24,8 +24,8 @@ def FUNCTIONSER_VIA_COLLECTION_ARGS(x, listener, adapter_variant=None):
         assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant
 
     class ns:  # #class-as-namespace
-        EDIT_FUNCTIONS_ARE_AVAILABLE = False
-        READ_ONLY_FUNCTIONS_ARE_AVAILABLE = False
+        PRODUCE_EDIT_FUNCTIONS = None
+        PRODUCE_READ_ONLY_FUNCTIONS = None
         PRODUCE_IDENTIFIER_FUNCTION = None
         COLL_IMPL_YUCK_ = _CI_THAT_DOES_NOTHING_BUT_HAS_NAME
     return ns

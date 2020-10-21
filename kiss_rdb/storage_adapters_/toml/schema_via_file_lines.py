@@ -29,24 +29,24 @@ class _IndexyFileWhenDeepTree:
     def __init__(self, fh):
         self.handle = fh
 
-    def to_identifier_stream(self, listener_NOT_USED):
+    def open_idens_(self, listener_NOT_USED):
         # if there's an error in your index file it's considered corruption
         # and we just raise the exception
 
-        from kiss_rdb.magnetics_ import identifiers_via_index as _
-        return _.identifiers_via_lines_of_index(self.handle)
+        from kiss_rdb.magnetics_.identifiers_via_index import \
+            identifiers_via_lines_of_index as func
+        idens = func(self.handle)
+        from contextlib import nullcontext as func
+        return func(idens)
 
     is_of_single_file_schema = False
 
 
 class _IndexyFileWhenSingleFile:
 
-    def __init__(self, fh, to_identifier_stream):
+    def __init__(self, fh, open_iden_trav):
+        self.open_idens_ = open_iden_trav
         self.handle = fh
-        self._to_id_stream = to_identifier_stream
-
-    def to_identifier_stream(self, listener):
-        return self._to_id_stream(listener)  # hi.
 
     is_of_single_file_schema = True
 
@@ -82,7 +82,7 @@ class _SchemaPather:
         if self._is_single_file_schema:
             def wrapper(filehandle):
                 return _IndexyFileWhenSingleFile(
-                        filehandle, self.to_identifier_stream)
+                        filehandle, self.open_identifier_traversal)
             path = self._entities_file
         else:
             wrapper = _IndexyFileWhenDeepTree
@@ -99,7 +99,7 @@ class _SchemaPather:
                     self._dir_path, ENTITY_INDEX_FILENAME_)
         return self._index_file_value
 
-    def to_identifier_stream(self, listener):
+    def open_identifier_traversal(self, listener):
 
         # == moved here now #history-A.1
         from kiss_rdb.magnetics_.identifier_via_string import (
@@ -115,11 +115,9 @@ class _SchemaPather:
         check_depth = self._check_depth
         # ==
 
-        from . import entities_via_collection as _
-        return _.identifiers_via__(
-                paths_function=self._to_entities_file_paths,
-                id_via_string=id_via_string,
-                listener=listener)
+        from .entities_via_collection import open_identifier_traveral__ as func
+        pathser = self._to_entities_file_paths
+        return func(pathser, id_via_string, listener)
 
     def _to_entities_file_paths(self, when_no_entries):
         _name = self._storage_schema.name_of_paths_function

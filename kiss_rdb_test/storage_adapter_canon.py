@@ -142,10 +142,9 @@ class case_of_traverse_IDs_from_non_empty_collection:  # #as-namespace-only
 
     def confirm_all_IDs_in_any_order_no_repeats(tc):  # similar to #here1
         coll = tc.given_collection()
-        _iids = _do_to_ID_stream(coll, throwing_listener)
-        _string_tup = tuple(iid.to_primitive() for iid in _iids)  # see #here2
-        _actual_sorted = sorted(_string_tup)
-        tc.assertSequenceEqual(_actual_sorted, _these_N_IDs)
+        with coll.open_identifier_traversal(throwing_listener) as idens:
+            eids = tuple(iden.to_primitive() for iden in idens)
+        tc.assertSequenceEqual(sorted(eids), _these_N_IDs)
 
 
 class case_of_traverse_IDs_from_empty_collection:  # #as-namespace-only
@@ -196,8 +195,8 @@ _these_N_IDs = (
 
 def build_flattened_collection_for_traversal_case(tc):  # similar to #here1
     coll = tc.given_collection()
-    ents = coll.TO_ENTITY_STREAM(None)
-    return tuple(ents)
+    with coll.open_entity_traversal(None) as ents:
+        return tuple(ents)
 
 
 class case_of_entity_not_found_because_identifier_too_deep:
@@ -570,9 +569,9 @@ def _message_or_reason_from(_which, es):
 
 
 def _confirm_collection_empty(tc, coll):
-    itr = _do_to_ID_stream(coll, throwing_listener)
-    for iden in itr:
-        tc.fail("collection was not empty.")
+    with coll.open_identifier_traversal(throwing_listener) as idens:
+        for iden in idens:
+            tc.fail("collection was not empty.")
 
 
 def _yes_value_dict(ent):
@@ -626,10 +625,6 @@ def _end_state_for_retrieve_via_string(tc, eid, expecting_OK):
 
 def _do_retrieve(coll, eid, listener):
     return coll.retrieve_entity(eid, listener)
-
-
-def _do_to_ID_stream(coll, listener):
-    return coll.TO_IDENTIFIER_STREAM(listener)
 
 
 # -- support
