@@ -73,108 +73,19 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
 
     # shouldn't need RNG ever - don't we want to transfer the same ID's in?
 
-    def main():
-        try:
-            return main_NEW_WAY()
-        except stop_because_OLD_WAY as exe:
-            e = exe
-        check_all_old(*e.args)
-        return main_OLD_WAY()
-
-    def main_OLD_WAY():
-        # Resolve "from" collection
-        fmt, x = normalize(from_format, from_collection, stdin, _from_monikers)
-        from_coll = resolve_collection(fmt, x)
-
-        # Resolve "to" collection
-        fmt, x = normalize(to_format, to_collection, stdout, _to_monikers)
-        to_coll = resolve_collection(fmt, x)
-
-        sch, ents = from_coll.to_schema_and_entities(throwing_listener)
-        with to_coll.open_pass_thru_receiver_as_storage_adapter(mon.listener) as recv:  # noqa: E501
-            if True:
-                for ent in ents:
-                    assert ent.path
-                    assert ent.lineno
-                    dct = ent.core_attributes_dictionary_as_storage_adapter_entity  # noqa: E501
-                    recv(dct)
-        return mon.exitstatus
-
-    def main_NEW_WAY():
+    def main():  # (this logic is repeated 1x in a test :[#459.M])
         with open_the_input_collection_for_traversal() as (schema, ents):
             with open_the_output_collection_for_writing() as receiver:
                 receiver.receive_schema_and_entities(schema, ents, listener)
         return mon.exitstatus
 
-    # == BEGIN hack bridge to accomodate old way which will go away eventually
-
-    def check_all_old(input_or_output):
-        expect_is_none = ('output', 'input').index(input_or_output)
-        two, two_ = REMEMBER_THESE_PEEKS
-        is_none_ = two_ is None
-        assert bool(expect_is_none) == is_none_
-        if is_none_:
-            if (use_to_format := to_format) is None:
-                use_to_format = hack_infer_format(to_collection)
-            two_ = use_to_format, to_collection
-        fmt, arg = two
-        fmt_, arg_ = two_
-        is_old, is_old_ = is_old_way[fmt], is_old_way[fmt_]
-        if all((is_old, is_old_)):
-            return
-        s, s_ = (('old' if b else 'new') for b in (is_old, is_old_))
-        msgs, pcs = [], []
-        pcs.append(f"can't convert from {fmt} (which is currently {s} way)")
-        pcs.append(f"to {fmt_} (which is currently {s_} way)")
-        msgs.append(' '.join(pcs))
-        oong_msg = '. '.join(msgs)
-        raise RuntimeError(long_msg)
-
-    def CHECK_FOR_OLD_WAY(fmt, arg, input_or_output):
-        if fmt is None:
-            if hasattr(arg, 'fileno'):
-                fmt = 'json'  # the default, when STDIN or STDOUT
-            else:
-                fmt = hack_infer_format(arg)
-        offset = ('input', 'output').index(input_or_output)
-        REMEMBER_THESE_PEEKS[offset] = fmt, arg
-        if is_old_way[fmt]:
-            raise stop_because_OLD_WAY(input_or_output)
-
-    def hack_infer_format(arg):
-        from os.path import splitext
-        return cha_via_cha[splitext(arg)[1]]
-
-    REMEMBER_THESE_PEEKS = [None, None]
-
-    cha_via_cha = {
-        '.csv': 'csv',
-        '.json': 'json',
-        '.md': 'markdown-table',
-        '.py': 'producer-script',
-    }
-
-    is_old_way = {
-        'csv': False,
-        'json': False,
-        'markdown-table': True,
-        'producer-script': False,
-    }
-
-    class stop_because_OLD_WAY(RuntimeError):
-        pass
-
-    # == END old way will go away
-
     def open_the_input_collection_for_traversal():
         fmt, x = normalize(from_format, from_collection, stdin, _from_monikers)
-        CHECK_FOR_OLD_WAY(fmt, x, 'input')  # delete just this line in the futu
         coll = resolve_collection(fmt, x)
         return coll.open_schema_and_entity_traversal(throwing_listener)
 
     def open_the_output_collection_for_writing():
         fmt, x = normalize(to_format, to_collection, stdout, _to_monikers)
-        CHECK_FOR_OLD_WAY(fmt, x, 'output')  # delete just this line in the fut
         coll = resolve_collection(fmt, x)
         return coll.open_collection_to_write_given_traversal(throwing_listener)
 

@@ -3,7 +3,7 @@ def open_issue(readme, dct, listener, opn=None):
     tup = _provision_identifier(readme, listener, opn)
     if tup is None:
         return
-    typ, iden, read_fh, schema, ic = tup  # #here1
+    typ, iden, schema, ic, fh = tup  # #here1
     coll = ic.collection
 
     # This algorithm is necessarily two-pass: you have to traverse the whole
@@ -24,7 +24,7 @@ def open_issue(readme, dct, listener, opn=None):
     # However, opening and closing the same file twice in one operation is
     # a bridge too far for us. So:
 
-    read_fh.seek(0)
+    fh.seek(0)  # #here3
 
     # Validate the keys of the create or update dict
     iden_key, *allowed_keys = schema.field_name_keys  # assume [#871.1]
@@ -35,7 +35,7 @@ def open_issue(readme, dct, listener, opn=None):
     # Validate content
     ok = _validate_content(dct, allowed_keys, listener)
     if not ok:
-        read_fh.close()  # YUCK
+        fh.close()  # YUCK #here2
         return
 
     # Either create or update
@@ -60,7 +60,7 @@ def open_issue(readme, dct, listener, opn=None):
         two = coll.update_entity(eid, edt, listener)
         t = tuple(dct_via_ent(ent) for ent in two)
 
-    read_fh.close()
+    fh.close()  # #here2
     return t
 
 
@@ -186,38 +186,38 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
     class stop(RuntimeError):
         pass
 
-    whine = _md_table_lib().whine_about_file_not_found_
-    read_fh = None
-    try:
-        read_fh = (opn or open)(readme, 'r')
-        # the 'r' (although default (?)) is necessary for magic
-    except FileNotFoundError as e:
-        fnf_err = e
-    if read_fh is None:
-        whine(listener, fnf_err)
+    tl = _build_throwing_listener(stop, listener)
+
+    # This spaghetti was cooked down to a reduction sauce over hours:
+    # Open the file and leave it open because you rewind it #here3. With this
+    # open filehandle, traverse the collection just far enough to get the
+    # schema and the first example row. Then, WHILE STILL INSIDE THE TRAVERSAL,
+    # do our main work which is to come up with a provisioned identifer
+    # (while remembering what provision strategy (type name string) we used)
+
+    if (fh := _open_file(readme, 'r', opn, listener)) is None:
         return
 
-    stopping_listener = _build_throwing_listener(stop, listener)
-
+    do_close = True  # normally we DON'T close it. default is to assume failure
     try:
-        ic = _issues_collection_via(read_fh, stopping_listener, opn)
-        if (two := ic.to_schema_and_entities()) is None:
-            raise stop()
-        cs, ents = two
-        assert 'main_tag' == cs.field_name_keys[1]  # or w/e
-        main_tag_key = 'main_tag'
-        end_iden = (eg_iden := next(ents).identifier)
-        assert not end_iden.has_sub_component
-        res_tup = main()
-        if res_tup is None:
-            read_fh.close()
+        ic = _issues_collection_via(fh, tl, opn)
+        coll = ic.collection
+        with coll.open_schema_and_RAW_entity_traversal(tl) as (sch, ents):
+            assert 'main_tag' == sch.field_name_keys[1]  # or w/e
+            main_tag_key = 'main_tag'
+            end_iden = (eg_iden := next(ents).identifier)
+            assert not end_iden.has_sub_component
+            two = main()
+        if two is None:
             return
-        return (*res_tup, read_fh, cs, ic)  # #here1
+        typ, iden = two
+        do_close = False
+        return (typ, iden, sch, ic, fh)  # #here1
     except stop:
-        read_fh.close()
-    except AssertionError as e:
-        read_fh.close()
-        raise e
+        pass
+    finally:
+        if do_close:
+            fh.close()  # #here2
 
 
 def _increment_identifier(iden, maj_or_min):
@@ -266,6 +266,15 @@ def close_issue(readme, eid, listener, opn=None):
         pass
 
 
+def _open_file(path, mode, opn, listener):
+    try:
+        return (opn or open)(path,  mode)
+    except FileNotFoundError as e:
+        exc = e
+    from kiss_rdb.magnetics_.collection_via_path import emit_about_no_ent as fu
+    fu(listener, exc)
+
+
 def _build_throwing_listener(stop, listener):
     def throwing_listener(sev, *rest):
         listener(sev, *rest)
@@ -279,11 +288,6 @@ def _build_throwing_listener(stop, listener):
 def _issues_collection_via(readme, listener, opn):
     from pho._issues import issues_collection_via_ as func
     return func(readme, listener, opn)
-
-
-def _md_table_lib():
-    import kiss_rdb.storage_adapters_.markdown_table as module
-    return module
 
 
 # == Smalls

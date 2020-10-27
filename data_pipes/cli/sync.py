@@ -102,10 +102,12 @@ def _stdout_lines_from_sync(  # #testpoint
                 m = 'DIFF_LINES_VIA'
             else:
                 m = 'NEW_LINES_VIA'
-            call_me = getattr(self.sync_agent, m)
-            olines = call_me(flat_map, listener)
-            for line in olines:
-                yield line
+            with self.sync_agent.open_sync_session() as sess:
+                if sess is None:
+                    return
+                olines = getattr(sess, m)(flat_map, listener)
+                for line in olines:
+                    yield line
 
     def resolve_the_producer_script():
         if isinstance(producer_script, str):
@@ -127,20 +129,7 @@ def _stdout_lines_from_sync(  # #testpoint
     def resolve_the_sync_agent_of_the_near_collection():
         def capability_path():
             yield 'SYNC_AGENT_FOR_DATA_PIPES', 'sync-related function'
-
-        # un-abstracted this from library class (simplify it) at #history-B.4
-
-        dig_path = tuple(capability_path())
-        assert dig_path
-        assert all('_' != k[0] for k, _ in dig_path)  # make sure no names..
-
-        coll = self.near_coll
-        say_collection = coll.to_noun_phrase
-        ci = coll.COLLECTION_IMPLEMENTATION
-        from kiss_rdb.magnetics.via_collection import DIGGY_DIG as func
-        x = func(ci, dig_path, say_collection, listener)
-
-        x = x and x()
+        x = self.near_coll.dig_for_edit_agent(capability_path(), listener)
         set_or_stop('sync_agent', x)
 
     def resolve_near_collection():

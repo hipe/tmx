@@ -28,7 +28,7 @@ only in modeling interfaces for this purpose.
 |[#511.3]                   |       | provision: expression with yield
 |[#510.14]                  |       | track context stack stuff
 |[#510.13]                  |       | track counters
-|[#510.12]                  |       | find the pass-thru context manager
+|[#510.12]                  | #hole |
 |[#510.11]                  |       | find the empty context manager
 |[#510.10]                  |       | track "module via path"
 |[#510.9]                   |       | track mutexers (1 at writing)
@@ -40,9 +40,9 @@ only in modeling interfaces for this purpose.
 |[#510.3]                   |       | track custom states
 |[#510.2]                   |       | track blank states
 |[#509]                     |       | [listener via expectations]
-|[#508.4]                   | #trak | track pretend files
 |[#508.3]                   | #trak | track this named temporary file pattern
 |[#508.2]                   | #trak | track chunker
+|[#507.11]                  | #trak | why/how we mock/fake/stub pretend files as line-based
 |[#507.10]                  | #trak | at least 2 custom child class memoizers
 |[#507.9]                   |       | [ modality agnostic error monitor ]
 |[#507.H]                   | #hole |
@@ -54,7 +54,7 @@ only in modeling interfaces for this purpose.
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |
-|[#504]                     |       | [placeholder for [#008.2] state-machine and "case" suport]
+|[#504]                     |       | [placeholder for [#008.2] state-machine and "case" support]
 |[#503.B]                   |       | does wicked require that the file exist? yes
 |[#503]                     |       | [wicked]
 |[#502]                     | #open | parameter modeling thoery & API

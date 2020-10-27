@@ -9,7 +9,6 @@ class CommonCase(unittest.TestCase):
     @property
     @shared_subj_in_child_classes
     def end_state_custom_index(self):
-        print("MAKING CUSTOM INDEX")
         from pho_test.graph_support import build_custom_index as func
         return func(self.end_state_output_lines)
 
@@ -34,7 +33,7 @@ class CommonCase(unittest.TestCase):
     @shared_subj_in_child_classes
     def end_state(self):
         from pho_test.issues_support import build_end_state_for as func
-        return func(self, self.given_run, allow_rewind=False)
+        return func(self, self.given_run)
 
     def given_run(self, readme, opn, listener):
         func = subject_module().issues_collection_via_
@@ -55,6 +54,9 @@ class CommonCase(unittest.TestCase):
             sout.flush()
             result_lines.append(line)
         return tuple(result_lines)
+
+    def expected_num_rewinds(_):
+        return 0
 
     do_debug = False
 

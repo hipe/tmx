@@ -56,9 +56,10 @@ class Case3419DP_strange_format_adapter_name(CommonCase):
     def test_150_this_particular_terminal_channel_name(self):
         self.assertEqual(self._channel_tail_component(), 'unrecognized_format_name')  # noqa: E501
 
-    def test_200_says_not_found(self):  # COPY-PASTED
-        _ = self.two_sentences[0]
-        self.assertEqual(_, "unrecognized format name 'zig-zag'")
+    def test_200_says_not_found(self):
+        act = self.two_sentences[0]
+        exp = "When format name is given, unrecognized format name 'zig-zag'"
+        self.assertEqual(act, exp)
 
     def test_300_says_did_you_mean(self):  # COPY-PASTED
         _ = self.two_sentences[1]  # #here (next line)
@@ -123,12 +124,12 @@ class Case3425DP_no_functions(CommonCase):
 
     def test_200_says_not_found(self):
         act = self.two_sentences[0]
-        rxs = r"^the 'rec' fo.+ has no .+ 'SYNC_AGENT_FOR_DATA_PIPES'"
+        rxs = r"^the 'csv' fo.+ has no .+ 'SYNC_AGENT_FOR_DATA_PIPES'"
         self.assertRegex(act, rxs)
 
     def test_300_says_did_you_mean(self):
         act = self.two_sentences[1]
-        self.assertIn("there's 'collection_path'", act)
+        self.assertIn("there's 'lines_via_schema_and_entities'", act)
 
     @shared_subject
     def two_sentences(self):
@@ -143,6 +144,7 @@ class Case3425DP_no_functions(CommonCase):
             top_fixture_directories_directory as direc
         near_path = os_path.join(
                 direc(), '2969-rec', '0100-example-from-documentation.rec')
+        near_path = '/fake/file/cha-cha.csv'  # above breaks at #history-B.4
         return {'producer_script_path': 'no see 32o4iu32boiwr3si',
                 'near_collection': near_path}
 
@@ -286,6 +288,7 @@ def _same_existent_markdown_file():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #history-A.2
 # #history-A.1
 # #born.

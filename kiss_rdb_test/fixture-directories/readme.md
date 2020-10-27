@@ -13,7 +13,7 @@ can be ignorant of the underlying storage substrate (while still streaming).
 
 We can leverage this fact to avoid "fixture hell" by writing the fixture
 data directly from within the test cases (usually in cooperation with
-`unindent`).
+`unindent` and our [#507.11] "mock filehandle").
 
 As such you'll see that we can often avoid using this directory entirely
 if we want; and typically we just throw one or two files in here (per S.A.)

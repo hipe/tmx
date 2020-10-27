@@ -140,28 +140,16 @@ def _main(opened, do_field_names, listener):
     import kiss_rdb.storage_adapters_.markdown_table as sa
     from kiss_rdb import collection_via_storage_adapter_and_path as func
     coll = func(sa, opened, listener)
-    ci = coll.COLLECTION_IMPLEMENTATION
+    with coll.open_schema_and_entity_traversal(listener) as (sch, ents):
+        for x in _do_this(sch, ents, do_field_names):
+            yield x
 
-    action_stack = [
-        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
-        ('table_schema_line_ONE_of_two', xx),
-        ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
-        ('table_schema_line_ONE_of_two',),
-        ('head_line',),
-        ('beginning_of_file',)]
 
-    sxs = ci.sexps_via_action_stack(action_stack, listener)
-    sx = next(sxs)
-    assert 'table_schema_line_TWO_of_two' == sx[0]
-    complete_schema = sx[2]
+def _do_this(complete_schema, ents, do_field_names):
     ks = complete_schema.field_name_keys
     if do_field_names:
         yield ks
-    for sx in sxs:
-        typ, ast, _lineno = sx
-        assert 'business_row_AST' == typ
+    for ast in ents:
         dct = ast.core_attributes_dictionary_as_storage_adapter_entity
         dct['name'] = ast.nonblank_identifier_primitive  # yikes
         yield dct

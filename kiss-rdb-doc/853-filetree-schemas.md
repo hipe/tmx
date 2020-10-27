@@ -5,7 +5,7 @@ date: 2018-12-19T04:47:00-05:00
 
 ## why constrain ourselves?
 
-recall from our README that a central design tenet is to be human readable
+recall from our README that a central design tenet is to be human-readable
 and easy to work with and easy to understand.
 with these principles in mind
 (and without knowing yet what we mean by "entity"),

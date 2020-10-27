@@ -32,8 +32,8 @@ woah boy.
 |---------------------------|:------|:----|
 |[#899.Z]                   | #eg   | eg
 |[#877.4]                   | #trak | do we want to make string identifiers the default?
-|[#877.C]                   |       | [other pretend file]
-|[#877.B]                   |       | [pretend file]
+|[#877.C]                   | #hole |
+|[#877.B]                   | #hole |
 |[#877]                     |       | now, a third node for internal & external tracking
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
 |[#874.5]                   | #open | clean up the interface to this emitter
@@ -41,8 +41,8 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
-|[#873.Z]                   | #prov | rather than file seek(0) etc, better to read line-by-line, no rewind
-|[#873.Y]                   | #todo | this tempfile logic is repeated
+|[#873.Z]                   | #prov | whether and how we seek(0)
+|[#873.Y]                   | #open | this tempfile logic is repeated
 |[#873.24]                  | #trak | this one md line parser
 |[#873.23]                  | #trak | parsing unified diff files the old way and the new way
 |[#873.V]                   | #open | google sheets: learn & document this one thing
@@ -93,7 +93,8 @@ woah boy.
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
-|[#867.E]                   | #prov | markdown provision: example row always
+|[#867.5.2]                 | #trak | track places you have to skip example row b.c not done for you
+|[#867.5.1]                 | #prov | markdown provision: you must always employ an example row
 |[#867.D]                   | #open | these datetime forms not supported in python toml
 |[#867.C]                   | #open | known error cases yet to cover (not comprehensive)
 |[#867.B]                   | #watc | API for getters?
@@ -110,6 +111,8 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.6]                   | #open | no more opn or something
+|[#857.E]                   | #prov | #provision: entity identifiers (eid's) are either integers or strings for now
 |[#857.D]                   |       | logic diagram for resolving storage adapters and..
 |[#857.C]                   |       | injectable custom identifier classes (near schema)
 |[#857.2]                   |       | sentences via jumble

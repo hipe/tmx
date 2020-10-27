@@ -1,3 +1,4 @@
+from kiss_rdb_test.markdown_storage_adapter import collection_via_real_path
 from kiss_rdb_test.common_initial_state import functions_for
 import modality_agnostic.test_support.common as em
 from modality_agnostic.test_support.common import \
@@ -21,16 +22,17 @@ class CommonCase(unittest.TestCase):
         return EndState(attr_dcts, k)
 
     def my_run(self, path, listener):
-        from kiss_rdb import collectionerer
-        coll = collectionerer().collection_via_path(
-                collection_path=path,
-                adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
-                listener=listener)
+        coll = collection_via_real_path(path, listener)
         if coll is None:
             return (), None  # (Case2449)
+        with coll.open_entity_traversal(listener) as ents:
+            return _signature_via_ents(ents)
 
-        ents = coll.TO_ENTITY_STREAM(listener)
+    do_debug = False
 
+
+def _signature_via_ents(ents):
+    if True:
         dcts, k = [], None
         for first_ent in ents:
             def p(ent):
@@ -42,8 +44,6 @@ class CommonCase(unittest.TestCase):
             for ent in ents:
                 dcts.append(p(ent))
         return tuple(dcts), k
-
-    do_debug = False
 
 
 class Case2449_fail(CommonCase):

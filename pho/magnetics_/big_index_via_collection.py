@@ -515,9 +515,15 @@ def _unsanititized_pass(
 
 
 def _unordered_notecards_via_collection(collection, listener):
+    with collection.open_identifier_traversal(listener) as idens:
+        for nc in _notecards_via(idens, collection, listener):
+            yield nc
+
+
+def _notecards_via(idens, collection, listener):
     from pho.magnetics_.notecard_via_definition import notecard_via_definition
-    for iid in collection.TO_IDENTIFIER_STREAM(listener):
-        iid_s = iid.to_string()
+    for iden in idens:
+        iid_s = iden.to_string()
         ent = collection.retrieve_entity(iid_s, listener)
         if ent is None:
             xx(f'maybe this decode error thing in {repr(iid_s)}')

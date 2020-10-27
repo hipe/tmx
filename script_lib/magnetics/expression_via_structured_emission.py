@@ -38,13 +38,6 @@ def lines_via_channel_tail_and_details(channel_tail, details):
     # dim_pool = "diminishing pool"
     dim_pool = {k: v for k, v in details.items()}
     dim_pool.pop('errno', None)  # all 3 clients at writing
-
-    # (cut-out for `collection_path` meh)
-    if 'path' not in dim_pool:
-        for k, v in dim_pool.items():
-            if '_path' == k[-5:]:
-                dim_pool['path'] = dim_pool.pop(k)
-                break
     slots = _Slots()
     channel_tail = list(channel_tail)
     _fix_this_one_smell(channel_tail, dim_pool)

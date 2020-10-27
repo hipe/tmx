@@ -22,8 +22,8 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
         def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
             return read_funcs
 
-        def PRODUCE_IDENTIFIER_FUNCTION():
-            return _string_based_idens
+        def PRODUCE_IDENTIFIER_FUNCTIONER():
+            return _build_identifier_builder
 
         COLL_IMPL_YUCK_ = None
         pass
@@ -192,10 +192,12 @@ def _lines_via_schema_and_entities(schema, given_ents, listener):
     yield line
 
 
-def _string_based_idens(x, _listener):  # #[#877.4] this might become default
-    assert isinstance(x, str)
-    assert len(x)
-    return x
+def _build_identifier_builder(_listener, _cstacker=None):
+    def iden_via_primitive(x):  # #[#877.4] this might become default
+        assert isinstance(x, str)
+        assert len(x)
+        return x
+    return iden_via_primitive
 
 
 _JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary_as_storage_adapter_entity',))  # noqa: E501

@@ -548,6 +548,7 @@ placeholder_for_say_subfeature = repr
 class collection_via_DICTIONARY:
 
     def __init__(self, dct):
+        raise RuntimeError("this has a forbidden method now")  # #soon
         self._dictionary = dct
 
     def retrieve_entity_as_storage_adapter_collection(self, natural_key):

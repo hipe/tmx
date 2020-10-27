@@ -12,8 +12,8 @@ def OPEN_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
         return
 
     if 'stdin_as_argument' == typ:
-        from data_pipes import ThePassThruContextManager
-        return ThePassThruContextManager(stdin)
+        from contextlib import nullcontext
+        return nullcontext(stdin)
 
     assert('path_as_argument' == typ)
     return open(arg_value)

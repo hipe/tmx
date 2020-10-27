@@ -9,7 +9,10 @@ class CommonCase(unittest.TestCase):
     @shared_subj_in_children
     def end_state(self):
         from pho_test.issues_support import build_end_state_for as func
-        return func(self, self.given_run, allow_rewind=True)
+        return func(self, self.given_run)
+
+    def expected_num_rewinds(_):
+        return 0
 
     do_debug = False
 
@@ -169,6 +172,9 @@ class Case3886_money_insert(MoneyCase):
     def expected_emissions(_):
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
 
+    def expected_num_rewinds(_):
+        return 2  # #soon
+
 
 class Case3888_money_update(MoneyCase):
 
@@ -195,6 +201,9 @@ class Case3888_money_update(MoneyCase):
 
     def expected_emissions(_):
         yield 'info', 'structure', 'updated_entity', 'as', 'the_emi'
+
+    def expected_num_rewinds(_):
+        return 2  # #soon
 
 
 def open_issue():

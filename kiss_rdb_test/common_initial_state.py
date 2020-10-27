@@ -40,32 +40,142 @@ def didactic_collectioner():
     return func(path._name, fs_path)
 
 
+# == Pretend resources
+
+
+"""
+Why and How
+
+In production our line-based collection façades are built from either
+pathnames or already-open file resources (e.g STDIN, STDOUT, an open file)
+
+In tests we represent files in a number of other ways: big strings, tuples
+of lines, generators of lines. (See more at md RDCU test file tagged [#507.11])
+
+It's tempting to bend our [#857.D] flowchart to accomodate all these other
+shapes but it's a smell to write production code (logic not structure)
+to accomodate only test scenarios
+
+In the very old days we had the concept of a "mock filesystem" we would
+inject. Then this got simplified to be an overidden `open` function that
+got injected (always called `opn`)
+
+But: EXPERIMENTALLY new in the coming edition, when the façade builder is
+passed what looks like an open filehandle, it's passed thru in a null
+context manager and it's expected to read from it and (MAYBE) write to
+it as appropriate without closing it
+
+This newly supported argument type provides an easier, clearer way of
+getting our fixture data in to the SUT. (We don't have to mock the "whole
+filesystem" by implementing an `opn` function, we just pass in the mock
+filehandle. (Still we use `opn` when we are testing with pathnames for
+whatever reason.)
+
+So, all this code-mess here is a mediation between all the different
+ways we represent files in tests and the two ways we represent them in
+production. (#[#873.Z] whether and how we seek(0))
+
+
+About the names
+
+We use the word "pretend" to avoid the more stringent meanings associated
+with "mock", "fake", "stub" (and "dummy"?), because this test double might
+match those definitions to greater or lesser degrees based on what the
+arguments are and how it's used. (We avoid the term "double" because we
+find "pretend" to be more transparent and less ambiguous.)
+
+
+Development & Future
+
+There is ongoing tension between how much of this to abstract upwards.
+We move new argument-handling routes up to the library package only as we
+want them in other packages (at writing [dp])
+
+
+A Small Note About Parameter Order
+
+It may pain you that the agument order here is sometimes reverse what it is in
+the library function (when it's (path, lines) here and there it's (lines, path)
+but this inconsistency is by hard-fought design: in our test files it reads
+better to have the pathname on top, before the lines, also when passing in
+`opn` the lines argument becomes optional. However in the library file it is
+the lines argument that's required and the pathname that is optional (e.g
+when mocking STDIN).)
+"""
+
+
+def pretend_resource_and_controller_via_KV_pairs(itr):
+    k, f = next(itr)
+    assert 'pretend_file' == k
+    dct = {k: v for layer in (f(), itr) for k, v in layer}
+    dct['lines'] = _lines_via_big_string(dct.pop('big_string'))
+    return _pretend_resource(**dct)
+
+
+def _pretend_resource_via_mixed(x):
+    typ = type(x).__name__
+    if 'dct' == typ:
+        return _pretend_resource(**x)
+    if 'tuple' == typ:
+        if 2 == len(x) and '\n' not in x[0]:  # 😢
+            return _pretend_resource_via_two(*x)
+        return _pretend_resource(iter(x), f"{__file__}:xyzz1")
+    if 'str' == typ:
+        return _pretend_resource_via_string(x)
+
+
+pretend_resource_and_controller_via_mixed = _pretend_resource_via_mixed
+
+
+def _pretend_resource_via_two(pretend_path, x):
+
+    typ = type(x).__name__
+    if 'str' == typ:
+        itr = _lines_via_big_string(x)
+    elif 'generator' == typ:
+        itr = x
+    else:
+        raise RuntimeError(f"easy for you my friend: '{typ}'")
+    return _pretend_resource(itr, pretend_path)
+
+
+def _pretend_resource_via_string(x):
+    if '\n' in x:
+        raise RuntimeError("easy for you my friend, have fun")
+
+    # façader will open and close it as a real filesystem file
+    return x, None  # #here1
+
+
+def _lines_via_big_string(big_string):
+    from .common_initial_state import unindent as func
+    return func(big_string)
+
+
+def _pretend_resource(lines, pretend_path, expect_num_rewinds=None, **kw):
+    # The fork-in-the-road (we might push up): controller or no controller
+    # based on the presence of one option
+
+    assert hasattr(lines, '__next__')  # [#022]
+    if expect_num_rewinds is None:
+        fh = fake_file_via_path_and_lines(pretend_path, lines, **kw)
+        return fh, None  # #here1
+    from kiss_rdb_test.filesystem_spy import \
+        mock_filehandle_and_mutable_controller_via as func
+    return func(expect_num_rewinds, lines, pretend_path=pretend_path, **kw)
+
+
+def fake_file_via_path_and_big_string(path, big_string):
+    return fake_file_via_path_and_lines(path, unindent(big_string))
+
+
+def fake_file_via_path_and_lines(path, lines, **kw):
+    if isinstance(lines, tuple):
+        lines = iter(lines)
+    from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+    return func(lines, path, **kw)
+
 # ==
-
-def pretend_file_via_path_and_big_string(path, big_string):
-    return pretend_file_via_path_and_lines(path, unindent(big_string))
-
-
-class pretend_file_via_path_and_lines:  # :[#877.B] #[#504.8]
-    # (LIKE [#510.12] pass-thru etc but plus a `path` param)
-    # if you find yourself wishing it had a path property, unify with [#877.C]
-
-    def __init__(self, path, lines):
-        self._lines = lines
-        self.path = path
-
-    def __enter__(self):
-        x = self._lines
-        del self._lines
-        return x
-
-    def __exit__(self, typ, err, stack):
-        pass
-
-    def release_lines__(self):
-        rv = self._lines
-        del self._lines
-        return rv
 
 
 def unindent_with_dot_hack(big_s):
@@ -189,7 +299,6 @@ def top_fixture_directories_directory():
 @lazy
 def _top_test_dir():
     return os_path.dirname(os_path.abspath(__file__))
-
 
 # #history-A.1
 # #born.

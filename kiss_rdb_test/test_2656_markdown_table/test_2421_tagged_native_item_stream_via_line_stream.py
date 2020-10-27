@@ -1,5 +1,7 @@
 from kiss_rdb_test.common_initial_state import functions_for
 import modality_agnostic.test_support.common as em
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes as shared_subj_in_children
 import unittest
 
 
@@ -15,19 +17,19 @@ class CommonCase(unittest.TestCase):
         self._expect_did_succeed(True)
 
     def _expect_did_succeed(self, yn):
-        _act = self.snapshot().did_succeed
-        self.assertEqual(_act, yn)
+        act = self.end_state.did_succeed
+        self.assertEqual(act, yn)
 
     def _failed_talking_bout(self, s):
-        act_s_a = self.snapshot().error_messages
+        act_s_a = self.end_state.error_messages
         self.assertEqual(act_s_a, (s,))
 
     def _expect_all_normal_transitions(self):
         self._expect_these_transitions(_all_possible_transitions)
 
     def _expect_these_transitions(self, these):
-        _act = tuple((tup[0] for tup in self.snapshot().STATE_AND_COUNTS))
-        self.assertEqual(_act, these)
+        act = tuple((tup[0] for tup in self.end_state.STATE_AND_COUNTS))
+        self.assertEqual(act, these)
 
     def _expect_this_many_head_and_tail_lines(self, hl, tl):
         self._expect_this_many('head_line', hl)
@@ -37,45 +39,35 @@ class CommonCase(unittest.TestCase):
         self._expect_this_many('business_row_AST', n)
 
     def _expect_this_many(self, k, n):
-        _act = self.snapshot().COUNT_VIA_STATE[k]
-        self.assertEqual(_act, n)
+        act = self.end_state.COUNT_VIA_STATE[k]
+        self.assertEqual(act, n)
 
+    @property
+    @shared_subj_in_children
+    def end_state(self):
+        return self.build_end_state()
 
-def lazyer(snapshotter):  # [#510.6] experiment
-    def decorator(test_context_method):
-
-        # when the test context requests the snapshot..
-        def memoized_snapshot(ignore_test_context):  # (ignore else dangerous)
-            return lazy_valuer()  # ..dereference this memoized value
-
-        # build the memoized value (once) by passing 1 function into another
-        def build_snapshot():
-            return snapshotter(test_context_method)
-
-        from modality_agnostic.test_support.common import lazy
-        lazy_valuer = lazy(build_snapshot)
-
-        return memoized_snapshot
-    return decorator
-
-
-@lazyer
-def failure_snapshot(f):
-    if True:
-        fixture_file = f(None)
-        listener, emissions = em.listener_and_emissions_for(None)
+    def build_end_state_expecting_failure(self):
+        fixture_file = self.fixture_file()
+        listener, emissions = em.listener_and_emissions_for(self)
         tuples = _common_execute(fixture_file, listener)
         emi, = emissions
         msgs = emi.to_messages()
-        return _Snapshot(tuples, msgs)
+        return _EndState(tuples, msgs)
 
-
-@lazyer
-def success_snapshot(f):  # local decorator
-    if True:
-        fixture_file = f(None)
+    def build_end_state_expecting_success(self):
+        fixture_file = self.fixture_file()
         tuples = _common_execute(fixture_file, 'listener03')
-        return _Snapshot(tuples)
+        return _EndState(tuples)
+
+    def fixture_file(self):
+        x = self.given_markdown()
+        # FOR NOW
+        assert isinstance(x, str)
+        assert '\n' not in x
+        return x
+
+    do_debug = False
 
 
 class Case2420_fail_too_many_rows(CommonCase):
@@ -91,8 +83,10 @@ class Case2420_fail_too_many_rows(CommonCase):
         _exp = 'row cannot have more cels than the schema row has. (had 5, needed 3.)'  # noqa: E501
         self._failed_talking_bout(_exp)
 
-    @failure_snapshot
-    def snapshot(self):
+    def build_end_state(self):
+        return self.build_end_state_expecting_failure()
+
+    def given_markdown(_):
         return '0090-cel-overflow.md'
 
 
@@ -113,8 +107,10 @@ class Case2422_minimal_working(CommonCase):
     def test_040_expect_all_the_rows_came_thru(self):
         self._expect_this_many_rows(2)
 
-    @success_snapshot
-    def snapshot(self):
+    def build_end_state(self):
+        return self.build_end_state_expecting_success()
+
+    def given_markdown(_):
         return '0100-hello.md'
 
 
@@ -125,8 +121,7 @@ def _common_execute(fixture_file, listener):
         return tuple(tagged_row_ASTs_or_lines_via(lines, listener))
 
 
-class _Snapshot:
-
+class _EndState:
     def __init__(self, tuples, error_messages=None):
         if error_messages is None:
             self.did_succeed = True
@@ -193,11 +188,13 @@ def _calculate_state_statistics(wat, tuples):
 
 
 _all_possible_transitions = (
+        'beginning_of_file',
         'head_line',
         'table_schema_line_ONE_of_two',
         'table_schema_line_TWO_of_two',
         'business_row_AST',
-        'other_line')
+        'other_line',
+        'end_of_file')
 
 
 def subject_function():

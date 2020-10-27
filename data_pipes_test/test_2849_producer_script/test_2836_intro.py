@@ -8,10 +8,6 @@ import modality_agnostic.test_support.common as em
 import unittest
 
 
-class CommonCase_OFF:  # #[#459.M]
-    pass
-
-
 class CommonCase(unittest.TestCase):
 
     # -- assertion support
@@ -159,7 +155,7 @@ class Case2838_file_not_found(CommonCase):
 # Case2841 was "no metadata row", archived #history-A.1
 
 
-class Case2844DP_bad_natural_key(CommonCase_OFF):
+class Case2844DP_bad_natural_key(CommonCase):
 
     def test_100_emits(self):
         emi = self.build_end_state().actual_emission_index['this_emi']
@@ -176,7 +172,7 @@ class Case2844DP_bad_natural_key(CommonCase_OFF):
                 'near_collection': _same_near_collection()}
 
 
-class Case2847_extra_cel(CommonCase_OFF):
+class Case2847_extra_cel(CommonCase):
     """(may be partially or wholly redundant with (Case3353DP))
     (may be #overloaded. is first coverage of an oblique thing.)
     """
@@ -197,7 +193,7 @@ class Case2847_extra_cel(CommonCase_OFF):
                 'near_collection': _same_near_collection()}
 
 
-class Case2850_RUM(CommonCase_OFF):
+class Case2850_RUM(CommonCase):
 
     def test_100_RUM(self):
         _ = self.build_end_state()
@@ -219,7 +215,6 @@ def _chimi_churri_far_path():
 
 
 def _same_near_collection():
-    return '/no-ent/never-actually-load.csv'  # only duruing [#459.M]
     """NOTE - this is horrible "lookahead" to need to rely on this other FA
 
     to test our own. but meh.

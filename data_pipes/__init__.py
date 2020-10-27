@@ -49,19 +49,6 @@ class TheEmptyIteratorContextManager:  # :[#510.11] the empty iterator CM
         return False
 
 
-class ThePassThruContextManager:  # :[#510.12] the pass-thru context manager
-
-    def __init__(self, x):
-        self._mixed = x
-
-    def __enter__(self):
-        x = self._mixed
-        del self._mixed
-        return x
-
-    def __exit__(self, *_3):
-        return False
-
 # #history-A.3: rewrite: gain context managers, lose indirection hubs
 # #history-A.2: sunset header filter
 # #history-A.1 (as referenced, can be temporary)

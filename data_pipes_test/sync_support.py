@@ -166,11 +166,11 @@ def _do_sync(near, far, listener, near_format):
         assert hasattr(near, '__next__')
         near_line_iterator = near
         near = '/dev/null/hello-from-DP-we-will-hack-this'
-        from .common_initial_state import passthru_context_manager
 
-        def opn(path):
+        def opn(path, mode):
             assert near == path
-            return passthru_context_manager(near_line_iterator)
+            from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+            return func(near_line_iterator, near)
 
     from data_pipes.cli.sync import _stdout_lines_from_sync as func
     return func(

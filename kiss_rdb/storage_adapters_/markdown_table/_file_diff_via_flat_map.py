@@ -1,3 +1,24 @@
+def sync_agent_builder_(opener, all_sxs_er_er):
+
+    def do_open_sync_session():
+        from contextlib import contextmanager as cm
+
+        @cm
+        def cm():
+            if (opened := opener()) is None:
+                yield None
+                return
+            with opened as fh:
+                all_sxs_er = all_sxs_er_er(fh)
+                yield sync_agent_(all_sxs_er, fh.name)
+        return cm()
+
+    class sync_agent_builder:  # #class-as-namespace
+        open_sync_session = do_open_sync_session
+        SYNC_AGENT_CAN_PRODUCE_DIFF_LINES = True
+    return sync_agent_builder
+
+
 def sync_agent_(all_sexpser, coll_path):
     all_sexpser = _experiment_2(all_sexpser)
 
@@ -42,7 +63,6 @@ def sync_agent_(all_sexpser, coll_path):
         return _new_sexps(orig_sxs, flat_map, listener)
 
     class sync_agent:  # #class-as-namespace
-        SYNC_AGENT_CAN_PRODUCE_DIFF_LINES = True
         DIFF_LINES_VIA = _experiment_1(_diff_lines_via)  # (Case2641) (2/2)
         NEW_LINES_VIA = _new_lines_via
         NEW_SEXPS_VIA = _experiment_3(_new_sexps_via)

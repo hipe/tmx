@@ -17,6 +17,9 @@ class CommonCase(unittest.TestCase):
         assert es.end_result is None
         return es
 
+    def expected_num_rewinds(_):
+        return 0
+
     do_debug = False
 
 

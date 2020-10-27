@@ -193,8 +193,8 @@ class _CaseState:
 # == These
 
 def subject_function():
-    from kiss_rdb_test.markdown_storage_adapter import row_AST_via_line
-    return row_AST_via_line
+    from kiss_rdb_test.markdown_storage_adapter import row_AST_via_line as func
+    return func
 
 
 if __name__ == '__main__':

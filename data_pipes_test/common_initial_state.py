@@ -10,7 +10,8 @@ class ProducerCaseMethods:
         cached_doc_path = self.cached_document_path()
         listener = self.use_listener()
         if isinstance(cached_doc_path, tuple):
-            opened = passthru_context_manager(cached_doc_path)  # (Case3392)
+            from contextlib import nullcontext
+            opened = nullcontext(cached_doc_path)  # (Case3392)
         else:
             opened = ps.open_traversal_stream(listener, cached_doc_path)
         with opened as dcts:
@@ -56,9 +57,19 @@ class FakeProducerScript:  # [#459.17] a fake producer script
     def open_traversal_stream(self, listener, cached_document_path):
         x = self._dictionaries
         del self._dictionaries
-        return passthru_context_manager(x)
+        from contextlib import nullcontext
+        return nullcontext(x)
 
     HELLO_I_AM_A_PRODUCER_SCRIPT__ = None
+
+
+def collection_via(path, listener, opn=None):
+    ext = path[-3:]
+    if '.md' != ext:
+        raise RuntimeError(f"expected '.md' had {ext!r} where?")
+    import kiss_rdb.storage_adapters_.markdown_table as sa_mod
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
+    return func(sa_mod, path, listener, opn=opn)
 
 
 @lazy
@@ -87,11 +98,6 @@ def fixture_files_directory():
 @lazy
 def _top_test_dir():
     return os_path.dirname(__file__)
-
-
-def passthru_context_manager(x):
-    from data_pipes import ThePassThruContextManager as cm
-    return cm(x)
 
 # #history-A.2: no more sync-side entity mapping
 # #history-A.1: upgraded to python 3.7, things changed

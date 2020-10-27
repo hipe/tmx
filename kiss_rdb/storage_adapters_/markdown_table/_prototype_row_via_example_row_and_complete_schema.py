@@ -188,7 +188,7 @@ def _when_extra(bads, goods, u_or_c, cs):
             yield ('"', re.match('^# (.+)', h)[1], '"') if h else "the table"
             if len(ks := set(cs.field_name_keys) - set(goods)):
                 yield "Did you mean", ox.oxford_OR(ox.keys_map(ks)), '?'
-            yield 'in', dct['collection_path'], ':', dct['lineno']
+            yield 'in', dct['path'], ':', dct['lineno']
         dct = {k: v for row in cs.table_cstack_ for k, v in row.items()}
         ox = _ox()
         sentencz = (''.join(pcs) for pcs in ox.piece_rows_via_jumble(jumble()))

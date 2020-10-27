@@ -1,8 +1,62 @@
-def pass_thru_collection_for_write_(stdout, _listener):
-    class collection_impl_for_write:  # #class-as-namespace
-        def open_pass_thru_receiver_as_storage_adapter(_listener):
-            return _open_pass_thru_receiver(stdout, _listener)
-    return collection_impl_for_write
+def lines_via_schema_and_entities_(schema, ents, listener):
+    # DISCUSSION: at #history-B.4 the collection API changed (radically)
+    # from "old way" to "new way"
+    #
+    # Old way took as an argument an open filehandle for output (eg STDOUT)
+    # and resulted in a context manager that produced an entity receiver,
+    # and upon receipt of each entity, the state machine landed on actions
+    # that wrote the appropriate lines to the argument filepointer. Also it
+    # did cleverness on CM entry and exit to write header & footer
+    #
+    # New way yields each output line, rather than us writing lines "whenever
+    # we want". This is a fundamentally different "output paradigm" (it's
+    # streaming on-demand rather than blitting), one that typically requires
+    # more complexity on our end
+    #
+    # Traces of the old way still exit below, where we retrofit our
+    # blitting client (state machine) to act like a streaming one
+
+    actions = _actions()
+
+    # Write these placeholder header things
+    for line in actions.output_file_head_placeholder_NOT_IN_FSA():
+        yield f"{line}\n"  # #here4
+
+    # Cleverness to mediate between old way and new way
+    line_cache = []
+    sout = _MINIMAL_stdout_proxy(_check_lines(line_cache.append))
+    recv = _build_receiver(sout, actions, listener)
+    if schema:
+        xx("wow do you really want to ignore this schema!?")
+    for ent in ents:
+        dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+        recv(dct)
+        # flat-map pattern heh
+        for line in line_cache:
+            yield line
+        line_cache.clear()
+
+    # Write these placeholder footer things
+    for line in actions.output_file_tail_placeholder_NOT_IN_FSA():
+        yield f"{line}\n"  # #here4
+
+
+def _check_lines(recv_line):
+    def receive_piece(piece):
+        assert re.match(r'[^\n]*\n\Z', piece)  # #here4
+        recv_line(piece)
+    re = _re_lib()
+    return receive_piece
+
+
+def _MINIMAL_stdout_proxy(receive_piece):  # compare [ma] write_only_IO_proxy
+    def do_write(piece):
+        receive_piece(piece)
+        return len(piece)
+
+    class minimal_IO_proxy_for_write:  # #class-as-namespace
+        write = do_write
+    return minimal_IO_proxy_for_write
 
 
 def _THIS_STATE_MACHINE():
@@ -100,30 +154,6 @@ def _actions():
     memory.output_table_header = _build_output_schema_rows(memory)
 
     return actions
-
-
-def _open_pass_thru_receiver(sout, _listener):
-    class context_manager:
-
-        def __enter__(self):
-            use_sout = sout.__enter__()  # should be same
-            assert sout == use_sout  # ..
-
-            for line in actions.output_file_head_placeholder_NOT_IN_FSA():
-                use_sout.write(f"{line}\n")  # #here4
-
-            return _build_receiver(sout, actions, _listener)
-
-        def __exit__(self, *_4):
-
-            for line in actions.output_file_tail_placeholder_NOT_IN_FSA():
-                sout.write(f"{line}\n")  # #here4
-
-            return sout.__exit__(*_4)
-
-    actions = _actions()
-
-    return context_manager()
 
 
 def _build_receiver(sout, actions, _listener):
@@ -273,8 +303,8 @@ def _build_build_complete_schema_via_first_dictionary():
 
     from . import complete_schema_via_, schema_row_builder_
     row_AST_via = schema_row_builder_()
+    re = _re_lib()
 
-    import re
     return build_complete_schema_via_first_dictionary
 
 
@@ -338,6 +368,15 @@ def _build_args_via_dict_via_func():
     return args_via_dict_via_func
 
 
+def _re_lib():
+    import re
+    return re
+
+
+def xx(msg=None):
+    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+
+# #history-B.4
 # #history-B.1: blind rewrite
 # #history-A.3: full rewrite (unification, multi-table, state machine)
 # #history-A.2: move out of scripts directory. no longer an excutable.

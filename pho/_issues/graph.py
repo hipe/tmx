@@ -393,10 +393,6 @@ def _build_a_flat_list_of_the_associations(ic, allow, listener):
         _, __ = (idn.to_string() for idn in (above, iden))
         xx(f"Collection out of order. Had {_} then {__}")  # provision #here4
 
-    itr = _classified_row_ASTs_via_issues_collection(ic)
-    if itr is None:
-        raise _Stop()
-
     then = (noticeables_stack := []).append  # #here1
     then(('has_notices', has_notices := []))
     then(('no_tags', no_tags := []))
@@ -412,7 +408,10 @@ def _build_a_flat_list_of_the_associations(ic, allow, listener):
     class self:  # #class-as-namesapce
         above_iden = None
 
-    fla = main()
+    with _open_classified_row_ASTs_via_issues_collection(ic) as itr:
+        if itr is None:
+            raise _Stop()
+        fla = main()
     if fla is None:
         raise _Stop()
     return fla
@@ -499,7 +498,23 @@ def _build_tag_classifier(allow, cstacker):
     return classified_deep_taggings_via
 
 
-def _classified_row_ASTs_via_issues_collection(ic):
+def _open_classified_row_ASTs_via_issues_collection(ic):
+    from contextlib import contextmanager as cm
+
+    @cm
+    def cm():
+        with ic.open_schema_and_issue_traversal() as (schema, ents):
+            # Maybe the readme file doesn't begin its parse OK
+            if ents is None:
+                yield None
+                return
+            ks = schema.field_name_keys[1:]
+            del schema
+            yield _classified_row_ASTs_via_issues_collection(ks, ents)
+    return cm()
+
+
+def _classified_row_ASTs_via_issues_collection(ks, ents):
     def main():
         for ent in ents:
             attr_rows = keys_and_values_via_ent(ent)
@@ -521,14 +536,6 @@ def _classified_row_ASTs_via_issues_collection(ic):
         one_string = ' '.join(pcs)
         top_thing = top_thing_via_string(one_string)
         yield 'doc_pairs', top_thing.doc_pairs
-
-    # See if the readme file begins to parse OK
-    if (sch_ents := ic.to_schema_and_entities()) is None:
-        return
-
-    schema, ents = sch_ents
-    ks = schema.field_name_keys[1:]
-    del schema
 
     from tag_lyfe.magnetics.tagging_subtree_via_string import \
         doc_pairs_via_string as top_thing_via_string

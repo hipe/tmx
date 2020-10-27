@@ -21,12 +21,19 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
         path, listener, opn,
         idens_must_start_with_letter, number_of_digits_in_idens):
 
-    def create(parse_EID, x, listener):
+    def create(iden_er_er, x, listener):
+
+        # "Provision" a new identifier by building up our complicated string
         num = len(dict_as_datastore) + 1
         fmt = f'%0{number_of_digits_in_idens}d'
         pcs = (idens_must_start_with_letter, (fmt % num))
         parse_me = ''.join(pcs)
-        d = parse_EID(parse_me, listener)
+
+        # Parse the indentifer ("eid") into an identifer object ("iden")
+
+        iden_er = iden_er_er(listener, None)
+        d = iden_er(parse_me)
+
         assert(d)
         assert d not in dict_as_datastore
         dict_as_datastore[d] = x
@@ -42,16 +49,21 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
     class read_ns:  # #class-as-namespace
         retrieve_entity_as_storage_adapter_collection = retrieve
 
-    def produce_iden_func():
-        def iden_via_EID(eid, listener):
+    def build_build_build_identifier():
+        def build_build_identifier(_listener, _cstacker=None):
+            return build_identifier
+
+        def build_identifier(eid):
             if (md := rx.match(eid)) is None:
                 raise RuntimeError(f"have fun covering this: {eid!r}")
             return int(md[1])
+
         import re
         char = re.match('([A-Z])$', idens_must_start_with_letter)[0]
         num = int(number_of_digits_in_idens)
         rx = re.compile(''.join((char, '([0-9]{', str(num), '})$')))
-        return iden_via_EID
+
+        return build_build_identifier
 
     def lambdize(x):
         return lambda: x
@@ -61,7 +73,7 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
     class fxr:  # #class-as-namespace
         PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY = lambdize(edit_ns)
         PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY = lambdize(read_ns)
-        PRODUCE_IDENTIFIER_FUNCTION = produce_iden_func
+        PRODUCE_IDENTIFIER_FUNCTIONER = build_build_build_identifier
         COLL_IMPL_YUCK_ = __file__
     return fxr
 

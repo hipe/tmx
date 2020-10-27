@@ -51,7 +51,7 @@ class CommonCase(unittest.TestCase):
     def end_state(self):
         mcoll = collectioner()
         sa = mcoll.storage_adapter_via_key('storo_adapto_2')
-        fxer = sa.module.FUNCTIONSER_FOR_SINGLE_FILES()
+        fxer = sa.module.FUNCTIONSER_FOR_SINGLE_FILES(opn=None)
         funcs = fxer.PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE()
         func = funcs.schema_and_entities_via_lines
         coll_via_opened_lines = build_coll_via_opened_lines(func)

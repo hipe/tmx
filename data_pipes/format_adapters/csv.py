@@ -9,19 +9,18 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 # STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's a placeholder stub"
 
 
-def FUNCTIONSER_FOR_SINGLE_FILES():
+def FUNCTIONSER_FOR_SINGLE_FILES(
+        adapter_variant=None
+        ):
+    if adapter_variant:
+        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant  # away s
+        del adapter_variant
 
     class edit_funcs:  # #class-as-namespace
         lines_via_schema_and_entities = _lines_via_schema_and_entities
 
     class read_funcs:  # #class-as-namespace
         schema_and_entities_via_lines = _schema_and_entities_via_lines
-
-    class fml:  # #[#459.M]
-        def SYNC_AGENT_FOR_DATA_PIPES():
-            class sync_agent:
-                NEW_LINES_VIA = ('aefs',)
-            return sync_agent
 
     class fxr:  # #class-as-namespace
         def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
@@ -30,11 +29,10 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
         def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
             return read_funcs
 
-        def PRODUCE_IDENTIFIER_FUNCTION():
-            return _string_based_idens
+        def PRODUCE_IDENTIFIER_FUNCTIONER():
+            return _build_identifier_builder
 
-        COLL_IMPL_YUCK_ = fml
-        pass
+        COLL_IMPL_YUCK_ = None
     return fxr
 
 
@@ -191,10 +189,12 @@ def _build_untitleizer():  # inverse of #here2
     return untitleize
 
 
-def _string_based_idens(x, _listener):  # #[#877.4] this might become default
-    assert isinstance(x, str)
-    assert len(x)
-    return x
+def _build_identifier_builder(_listener, _cstacker=None):
+    def iden_via_primitive(x):  # #[#877.4] this might become default
+        assert isinstance(x, str)
+        assert len(x)
+        return x
+    return iden_via_primitive
 
 
 # == Whiners

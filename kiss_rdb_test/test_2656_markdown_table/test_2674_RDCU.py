@@ -1,14 +1,22 @@
-from kiss_rdb_test import storage_adapter_canon
+from kiss_rdb_test.markdown_storage_adapter import \
+        collection_via_resource
+from kiss_rdb_test.storage_adapter_canon import \
+        produce_agent as produce_storage_adapter_canon_agent
+from kiss_rdb_test.common_initial_state import \
+        pretend_resource_and_controller_via_KV_pairs
 from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes as shared_subj_in_children, \
         dangerous_memoize as shared_subject
 import unittest
 import re
 
 
-canon = storage_adapter_canon.produce_agent()
+canon = produce_storage_adapter_canon_agent()
 
 
 class CommonCase(unittest.TestCase):
+
+    # == Assertion components
 
     def reason(self):  # must be used with _flush_reason_early
         return self.end_state['reason']
@@ -20,44 +28,77 @@ class CommonCase(unittest.TestCase):
         file_patch, = tuple(func(lines))
         return file_patch
 
-    def build_end_state_complicatedly(self):
-        es = self.canon_case.build_end_state(self)  # #here1
-        self.check_open_file_num_times()
-        return self.include_diff_lines_in_end_state(es)
+    # == Build End state
 
-    def include_diff_lines_in_end_state(self, es):
-        es['diff_lines'] = self.omg_diff_lines
+    @property
+    @shared_subj_in_children
+    def end_state(self):
+        self.opn = None
+
+        fp, done = self.build_collection_resource_and_done()
+
+        if self.is_expecting_diff_lines:
+            self.before_expecting_diff_lines()
+
+        self.collection = collection_via_resource(fp, opn=self.opn)
+        es = self.given_run()
+
+        if self.do_flush_reason_early:
+            _flush_reason_early(es)  # not sure if still nec
+
+        if done:
+            done(self)
+
+        if self.is_expecting_diff_lines:
+            self.after_expecting_diff_line(es)
+
         return es
 
-    def mutable_collection(tc, pfile, num_times_read_file=1):
-        # Hack the collection so it's mutli-shot, and add assertion of how
-        # many times the file was traversed alond with a MASSIVE HACK to
-        # get diff lines back from the collection.
+    def given_run(self):
+        return self.canon_case.build_end_state(self)
 
-        def opn(path):
-            assert pfile.path == path
-            return stack.pop()
+    def given_collection(self):
+        x = self.collection
+        del self.collection
+        return x
 
-        if 1 == num_times_read_file:
-            stack = [pfile]
-        else:
-            pfiler = pretend_filer_via_pfile(pfile)
-            stack = [pfiler() for _ in range(0, num_times_read_file)]
+    def build_collection_resource_and_done(self):
+        itr = self.given_collection_via()
+        fh, mc = pretend_resource_and_controller_via_KV_pairs(itr)
+        return fh, (mc and mc.done)
+
+    @property
+    def canon_case(self):
+        return self.target_canon_case()
+
+    # == Diff Lines (sort of like an injection)
+
+    def before_expecting_diff_lines(self):  # this changes at #open [#857.6]
+
+        assert self.opn is None
 
         def recv_diff_lines(diff_lines):
-            tc.omg_diff_lines = tuple(diff_lines)
-            return True  # important: tell it u succeeded in applying the patch
+            self._diff_lines = diff_lines
+            return True
+
+        self._diff_lines = None
+
+        def opn(*_):
+            raise RuntimeError('no longer used, on its way out')
 
         opn.RECEIVE_DIFF_LINES = recv_diff_lines
-        tc.omg_diff_lines = None
+        self.opn = opn
 
-        if 1 < num_times_read_file:
-            def check_open_file_num_times():
-                tc.assertEqual(len(stack), 0)
-            tc.check_open_file_num_times = check_open_file_num_times
+    def after_expecting_diff_line(self, es):
+        if self._diff_lines is None:
+            raise AssertionError("expected diff lines, had none")
+        es['diff_lines'] = self._diff_lines
+        del self._diff_lines
 
-        return msa().collection_via(pfile.path, opn=opn)
+    # ==
 
+    is_expecting_diff_lines = False
+    do_flush_reason_early = False
     do_debug = False
 
 
@@ -72,18 +113,13 @@ class Case2609_entity_not_found(CommonCase):
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
 
-    @shared_subject
-    def end_state(self):
-        return self.canon_case.build_end_state(self)
-
     def given_identifier_string(self):
         return 'AB2'
 
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_entity_not_found
 
 
@@ -92,18 +128,13 @@ class Case2612_retrieve_OK(CommonCase):
     def test_100_the_entity_is_retrieved_and_looks_OK(self):
         self.canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
-    @shared_subject
-    def end_state(self):
-        return self.canon_case.build_end_state(self)
-
     def given_identifier_string(self):
         return 'B9H'
 
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_retrieve_OK
 
 
@@ -115,18 +146,14 @@ class Case2641_delete_but_entity_not_found(CommonCase):
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
 
-    @shared_subject
-    def end_state(self):
-        return self.canon_case.build_end_state(self)
-
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
     def given_identifier_string(self):
         return 'AB2'
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_delete_but_entity_not_found
 
 
@@ -152,17 +179,17 @@ class Case2644_delete_OK_resulting_in_non_empty_collection(CommonCase):
         self.assertEqual(dct['thing_B'], "hey i'm B9H")
         self.assertEqual(len(dct), 2)
 
-    @shared_subject
-    def end_state(self):
-        es = self.canon_case.build_end_state_for_delete(self, 'B9H')
-        return self.include_diff_lines_in_end_state(es)
+    def given_run(self):
+        return self.canon_case.build_end_state_for_delete(self, 'B9H')
 
-    def given_collection(self):
-        return self.mutable_collection(pretend_file_ordinary())
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_delete_OK_resulting_in_non_empty_collection
+
+    is_expecting_diff_lines = True
 
 
 class Case2647_delete_OK_resulting_in_empty_collection(CommonCase):
@@ -187,17 +214,17 @@ class Case2647_delete_OK_resulting_in_empty_collection(CommonCase):
         self.assertEqual(dct['thing_A'], 'zz')
         self.assertEqual(len(dct), 2)
 
-    @shared_subject
-    def end_state(self):
-        es = self.canon_case.build_end_state_for_delete(self, 'B9K')
-        return self.include_diff_lines_in_end_state(es)
+    def given_run(self):
+        return self.canon_case.build_end_state_for_delete(self, 'B9K')
 
-    def given_collection(self):
-        return self.mutable_collection(pretend_file_one_shot_one_entity())
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_one_entity
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_delete_OK_resulting_in_empty_collection
+
+    is_expecting_diff_lines = True
 
 
 class Case2676_create_but_something_is_invalid(CommonCase):
@@ -223,25 +250,23 @@ class Case2676_create_but_something_is_invalid(CommonCase):
     def test_640_also_says_line_number(self):
         self.assertEqual(self.reason()[-12:], 'versal.md:2)')
 
-    @shared_subject
-    def end_state(self):
-        return _flush_reason_early(self.canon_case.build_end_state(self))
-
     def dictionary_for_create_with_something_invalid_about_it(self):
         return {'i_de_n_ti_fier_zz': 'B9I',
                 'thing_1': '123.45',  # was other primitives B4 #history-B.1
                 'thing_A': 'True',
                 'thing_C': 'false'}
 
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_create_but_something_is_invalid
 
+    do_flush_reason_early = True
 
-class Case2679_create_OK_into_empty_collection(CommonCase):
+
+class Case2679_create_OK_into_empty_collection(CommonCase):  # #here2
 
     def test_100_result_is_created_entity(self):
         self.canon_case.confirm_result_is_the_created_entity(self)
@@ -257,16 +282,15 @@ class Case2679_create_OK_into_empty_collection(CommonCase):
         line, = run.lines  # with one line
         self.assertEqual(line, '+| 123 ||3.14||\n')
 
-    @shared_subject
-    def end_state(self):
-        return self.build_end_state_complicatedly()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_empty
+        yield 'pretend_writable', True
+        yield 'expect_num_rewinds', 1  # #soon why not two
 
-    def given_collection(self):
-        return self.mutable_collection(pretend_file_empty(), 2)
-
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_create_OK_into_empty_collection
+
+    is_expecting_diff_lines = True
 
 
 class Case2682_create_OK_into_non_empty_collection(CommonCase):
@@ -289,18 +313,14 @@ class Case2682_create_OK_into_non_empty_collection(CommonCase):
             " | -2.719 | x4\n")
         self.assertSequenceEqual(lines, expect)
 
-    @shared_subject
-    def end_state(self):
-        es = self.canon_case.build_end_state(self)
-        # self.check_open_file_num_times()
-        return self.include_diff_lines_in_end_state(es)
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary_take_2
+        yield 'pretend_writable', True
 
-    def given_collection(self):
-        return self.mutable_collection(pretend_file_one_shot_ordinary_take_2())
-
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_create_OK_into_non_empty_collection
+
+    is_expecting_diff_lines = True
 
 
 class Case2710_update_but_entity_not_found(CommonCase):
@@ -314,19 +334,17 @@ class Case2710_update_but_entity_not_found(CommonCase):
     def test_600_reason_contains_number_of_lines(self):
         self.assertIn('(saw 3 entities)', self.reason())
 
-    @shared_subject
-    def end_state(self):
-        return _flush_reason_early(self.canon_case.build_end_state(self))
-
     def request_tuple_for_update_that_will_fail_because_no_ent(self):
         return 'NSE', (('update_attribute', 'thing_1', 'no see'),)
 
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_update_but_entity_not_found
+
+    do_flush_reason_early = True
 
 
 class Case2713_update_but_attribute_not_found(CommonCase):
@@ -337,18 +355,14 @@ class Case2713_update_but_attribute_not_found(CommonCase):
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
 
-    @shared_subject
-    def end_state(self):
-        return self.canon_case.build_end_state(self)
-
     def given_request_tuple_for_update_that_will_fail_because_attr(self):
         return 'B9H', (('update_attribute', 'thing_1', 'no see'),)
 
-    def given_collection(self):
-        return collection_one_shot_ordinary()
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_update_but_attribute_not_found
 
 
@@ -461,11 +475,6 @@ class Case2716_update_OK(CommonCase):
 
         return {'the_whole_line': line, 'cels': cels}
 
-    @shared_subject
-    def end_state(self):
-        es = self.canon_case.build_end_state(self)
-        return self.include_diff_lines_in_end_state(es)
-
     def request_tuple_for_update_that_will_succeed(self):
         return 'B9H', (
             ('delete_attribute', 'thing_A'),
@@ -475,12 +484,14 @@ class Case2716_update_OK(CommonCase):
     def given_identifier_string(self):
         return 'B9H'
 
-    def given_collection(self):
-        return self.mutable_collection(pretend_file_ordinary())
+    def given_collection_via(self):
+        yield 'pretend_file', pretend_file_ordinary
+        yield 'pretend_writable', True
 
-    @property
-    def canon_case(self):
+    def target_canon_case(self):
         return canon.case_of_update_OK
+
+    is_expecting_diff_lines = True
 
 
 # == Test Assertion Support
@@ -489,71 +500,11 @@ def _flush_reason_early(es):
     sct = es['payloader']()  # see in storage_adapter_canon
     es['payloader'] = lambda: sct
     es['reason'] = sct['reason']
-    return es
-
-
-# == Pretend Files & Fixture Collections (decorators & not interm.) Support
-
-def collection_one_shot(pretend_file):
-
-    def opn(path):
-        assert pretend_file.path == path
-        return pretend_file
-
-    return msa().collection_via(pretend_file.path, opn=opn)
-
-
-def reusable_pretend_filer(pretend_file_one_shot):
-    def use_f():
-        if use_f.is_first_call:
-            use_f.is_first_call = False
-            use_f.call = pretend_filer_via_pfile(pretend_file_one_shot())
-        return use_f.call()
-    use_f.is_first_call = True
-    return use_f
-
-
-def pretend_filer_via_pfile(o):
-    def call():
-        return cls(path=path, lines=lines)
-    cls, path, lines = o.__class__, o.path, tuple(o.release_lines__())
-    return call
-
-
-def _build_pretend_file_one_shot_decorator():
-    # Assert explicitly that you only access the pretend file once.  #here2
-
-    def decorator(orig_f):  # #decorator
-        def use_f():
-            assert use_f.is_first_call
-            use_f.is_first_call = False
-            return build(orig_f)
-        use_f.is_first_call = True
-        return use_f
-
-    def build(orig_f):
-        path, big_string = normalize_args(** {k: v for k, v in orig_f()})
-        return msa().pretend_file_via_path_and_big_string(path, big_string)
-
-    def normalize_args(pretend_path, big_string):
-        return pretend_path, big_string
-
-    return decorator
-
-
-pretend_file_one_shot = _build_pretend_file_one_shot_decorator()
 
 
 # == Fixtures
 
-# -- "Ordinary" Collection
-
-def collection_one_shot_ordinary():
-    return collection_one_shot(pretend_file_ordinary())
-
-
-@pretend_file_one_shot
-def pretend_file_one_shot_ordinary():
+def pretend_file_ordinary():
     # making this line up with the legacy collection perfectly is tricky
     # because in non-tabular formats, adding an arbitrary field to an
     # arbitrary entity is cheap and easy, but tables are .. tabular. SO:
@@ -575,11 +526,7 @@ def pretend_file_one_shot_ordinary():
     # 👉 leave this identifier out: 'NSE' (for No Such Entity)
 
 
-pretend_file_ordinary = reusable_pretend_filer(pretend_file_one_shot_ordinary)
-
-
-@pretend_file_one_shot
-def pretend_file_one_shot_ordinary_take_2():
+def pretend_file_ordinary_take_2():
     # new at #history-B.1 writing, identifier must be in argument dict
 
     yield 'pretend_path', 'pretend-file/2682-for-create.md'
@@ -594,8 +541,7 @@ def pretend_file_one_shot_ordinary_take_2():
         """)
 
 
-@pretend_file_one_shot
-def pretend_file_one_shot_one_entity():
+def pretend_file_one_entity():
     yield 'pretend_path', 'pretend-file/XXXX-one-entity.md'
     yield 'big_string', (
         """
@@ -606,8 +552,7 @@ def pretend_file_one_shot_one_entity():
         """)
 
 
-@pretend_file_one_shot
-def pretend_file_one_shot_empty():
+def pretend_file_empty():
     yield 'pretend_path', 'pretend-file/XXXX-empty-collection.md'
     yield 'big_string', (
         # leftmost field must be in the argument dict or error not under test
@@ -617,15 +562,7 @@ def pretend_file_one_shot_empty():
         """)
 
 
-pretend_file_empty = reusable_pretend_filer(pretend_file_one_shot_empty)
-
-
 # == Support
-
-def msa():
-    import kiss_rdb_test.markdown_storage_adapter as msa
-    return msa
-
 
 def subject_module():
     import kiss_rdb.storage_adapters_.markdown_table as module
@@ -664,6 +601,10 @@ stateless: it only holds a `path`, a function to `open` the path, and (for
 edits) we expose testpoints that produces diff patches, so we only have to test
 against generated patches rather than testing against a mutated filesystem.
 
+(At #history-B.5 writing this is not entirely true - now we read from
+STDIN-like file resources (read-only and no rewind) which complicates
+things here. #[#873.Z] whether and how we seek(0))
+
 Now, just because we've decided that multiple-operation "should work" as-is
 by collections in production, doesn't mean they will under test. They didn't
 at writing because our pretend files themselves have an in-built (implicit)
@@ -673,7 +614,7 @@ What we regard as the current best-practice way of representing fixtures in
 these stories (for this adapter) is in-file as big-strings: in-file to avoid
 the (mental, human) cost of jumping to a real file just to read a few lines,
 and big-string rather than lines because it's easier to read and big strings
-trivially isomorph with lines here.
+trivially isomorph with lines here :[#507.11].
 
 Because our design default is always streaming not memory-hog, big strings
 are parsed line-by-line on-demand. To support this while being ignorant of it,
@@ -697,6 +638,7 @@ This is near [#867.Z] we can't use seek(0) etc on files. just line-by-line
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.5
 # #history-B.4
 # #history-B.1
 # #born.

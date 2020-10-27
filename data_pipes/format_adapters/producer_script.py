@@ -119,36 +119,46 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.py',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def CUSTOM_FUNCTIONSER(script_path, opn, listen):
+def CUSTOM_FUNCTIONSER(cci, listen):
+    read_funcs = _read_funcs_via_classified_collection_identifier(cci, listen)
 
     # As covered, fail at façade build time (not operation time) if bad path
-    if isinstance(script_path, str):
-        mod = producer_script_module_via_path_(script_path, listen)
-        if mod is None:
-            return
-    else:
-        script_path.open_traversal_stream  # assert it looks like a PS module
-        mod = script_path
-        del script_path
+    if read_funcs is None:
+        return
 
     class fxr:  # #class-as-namespace
         PRODUCE_EDIT_FUNCTIONS_CUSTOMLY = None  # PS is not a writable format
 
         def PRODUCE_READ_FUNCTIONS_CUSTOMLY():
-            return _produce_read_functions(mod, opn, listen)
+            return read_funcs
 
-        PRODUCE_IDENTIFIER_FUNCTION = None
+        PRODUCE_IDENTIFIER_FUNCTIONER = None
         COLL_IMPL_YUCK_ = None
     return fxr
 
 
-def _produce_read_functions(mod, opn, listen):
-    def main():
-        class read_funcs:  # #class-as-namespace
-            open_schema_and_entity_traversal_as_storage_adapter_collection = se
-        return read_funcs
+def _read_funcs_via_classified_collection_identifier(cci, listener):
+    x = cci.mixed_collection_identifier
 
-    def se(listener):
+    # If the collection identifier looks like STDIN, do that
+    if cci.arg_looks_like_file_handle:
+        if cci.arg_looks_like_writable_file_handle:
+            raise ValueError("'producer script' is not a writable format")
+        assert cci.arg_looks_like_readable_file_handle
+        return _functions_for_read_via_STDIN(x)
+
+    # Now the cci must be a filesystem path to a module or an actual module
+    if cci.arg_looks_like_string:
+        if (mod := producer_script_module_via_path_(x, listener)) is None:
+            return
+    else:
+        x.open_traversal_stream  # assert it looks like a PS module
+        mod = x
+    return _functions_for_read_via_module(mod, listener)
+
+
+def _functions_for_read_via_module(mod, listen):
+    def open_schema_and_entity_trav(listener):
         from contextlib import contextmanager
 
         @contextmanager
@@ -181,11 +191,42 @@ def _produce_read_functions(mod, opn, listen):
                 out_dcts = (key_and_dct[1] for key_and_dct in key_and_dcts)
             lineno = 0
             for dct in out_dcts:
-                lineno += 1  # #provision [#435.B] for now
+                lineno += 1  # #provision [#435.B] one line per entity for now
                 yield dct, lineno
 
     module_path = mod.__file__
-    return main()
+
+    # ==
+    class read_funcs_for_module:  # #class-as-namespace
+        pass
+    o = read_funcs_for_module
+    o.open_schema_and_entity_traversal_as_storage_adapter_collection = \
+        open_schema_and_entity_trav
+    return read_funcs_for_module
+
+
+def _functions_for_read_via_STDIN(stdin):
+    def open_schema_and_entity_trav(listener):
+        from contextlib import nullcontext as func  # we don't close stdin
+        return func((None, entities()))
+
+    def entities():
+        lineno = 0
+        for line in stdin:
+            lineno += 1  # #provision [#435.B] one line per entity for now
+            dct = json_loads(line)
+            assert isinstance(dct, dict)
+            yield _ErsatzEntity(dct, lineno, '<stdin>')
+
+    from json import loads as json_loads
+
+    # ==
+    class read_funcs_for_STDIN:
+        pass
+    o = read_funcs_for_STDIN
+    o.open_schema_and_entity_traversal_as_storage_adapter_collection = \
+        open_schema_and_entity_trav
+    return read_funcs_for_STDIN
 
 
 class _ErsatzEntity:
@@ -274,7 +315,7 @@ def producer_script_module_via_path_(script_path, listener):
 
     return main()
 
-
+# #history-B.4: become "magnetic field" collection adapter
 # #history-B.3
 # #history-A.2: collection conversion
 # #history-A.1: storage adapter not format adapter

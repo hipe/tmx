@@ -253,12 +253,12 @@ class collection_implementation_via_directory_and_schema:
         from . import business_schema_via_definition as lib
         return lib.DEFAULT_BUSINESS_SCHEMA
 
-    def PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_(_):
-        return _produce_identifier_function()
+    def PRODUCE_IDENTIFIER_FUNCTIONER_(_):
+        return _produce_identifier_function
 
 
-def _produce_identifier_function():
-    def my_iden_via_s(s, listener):
+def _produce_identifier_function(listener, cstacker=None):
+    def my_iden_via_s(s):
         iden = iden_via_s(s, listener)
         if iden is None:
             return
@@ -511,8 +511,8 @@ def _whine_about_no_path(pieces, iden, verb):
 # ==
 
 def _pass_thru_context_manager(x):
-    from data_pipes import ThePassThruContextManager
-    return ThePassThruContextManager(x)
+    from contextlib import nullcontext
+    return nullcontext(x)
 
 
 def xx(msg=None):

@@ -10,16 +10,12 @@ the branch boundaries are being detected and emitted.
 
 from data_pipes_test.common_initial_state import \
         production_collectioner, \
-        html_fixture, ProducerCaseMethods, passthru_context_manager
+        html_fixture, ProducerCaseMethods
 from kiss_rdb_test.markdown_table_parsers import \
         table_via_lines, nonblank_line_runs_via_lines
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import unittest
-
-
-class CommonCase_OFF:  # #[#459.M]
-    pass
 
 
 class CommonCase(ProducerCaseMethods, unittest.TestCase):
@@ -41,6 +37,7 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
             yield use
 
     def build_output_lines(self):
+        lsn = None  # throwing_listener
 
         # Make the "from" collection (around the dictionaries)
         dct_tup = _these_dictionaries()
@@ -54,17 +51,11 @@ class CommonCase(ProducerCaseMethods, unittest.TestCase):
         to_coll = collectioner.collection_via_path(
                 fake_sout, format_name='markdown-table')
 
-        # get busy
-
-        from_ci, to_ci = (o.COLLECTION_IMPLEMENTATION for o in (from_coll, to_coll))  # noqa: E501
-
-        sch, ents = from_ci.to_schema_and_entities(None)
-        with to_ci.open_pass_thru_receiver_as_storage_adapter(None) as recv:
-            if True:
-                for ent in ents:
-                    assert ent.path
-                    assert ent.lineno
-                    recv(ent.core_attributes_dictionary_as_storage_adapter_entity)  # noqa: E501
+        # == begin [#459.M] redundancy between test and production
+        with from_coll.open_schema_and_entity_traversal(lsn) as (schema, ents):
+            with to_coll.open_collection_to_write_given_traversal(lsn) as rcv:
+                rcv.receive_schema_and_entities(schema, ents, lsn)
+        # ==
         return tuple(lines)
 
     do_debug = False
@@ -79,7 +70,8 @@ def fake_producer_script_via_dictionary_tuple(dct_tup):  # covered here
             return dcts
 
         def open_traversal_stream(listener):
-            return passthru_context_manager(dct_tup)
+            from contextlib import nullcontext as func
+            return func(dct_tup)
 
     fake_producer_script.__file__ = __file__
 
@@ -153,7 +145,7 @@ class Case2757_does_scrape_work(CommonCase):
         return html_fixture('0170-hugo-docs.html')
 
 
-class Case2760DP_generate(CommonCase_OFF):
+class Case2760DP_generate(CommonCase):
 
     def test_100_outputs_more_than_one_line(self):
         self.assertLessEqual(1, len(self.output_lines))

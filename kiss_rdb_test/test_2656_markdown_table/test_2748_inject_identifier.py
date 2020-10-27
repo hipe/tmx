@@ -1,3 +1,5 @@
+from kiss_rdb_test.markdown_storage_adapter import \
+        collection_via_mixed_test_resource as coll_via
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subj_in_children, lazy
 import unittest
@@ -18,6 +20,9 @@ class CommonCase(unittest.TestCase):
     def end_emission(self):
         return self.end_state.emission
 
+    def end_state_diff_lines(self):
+        return self.end_state.the_more.dlx
+
     # == Build End State
 
     @property
@@ -31,37 +36,45 @@ class CommonCase(unittest.TestCase):
     def build_end_state_commonly(self):
         exps = self.expected_emissions()
         listener, done = em().listener_and_done_via(exps, self)
-        performance_result = self.given_performance(listener)
+        performance_result, more = self.given_performance(listener)
         ems, this_emission = done(), None
         if len(ems):
             this_emission = ems.pop('the_emi')  # ..
             assert not ems  # ..
-        return end_state()(performance_result, this_emission)
+        return end_state()(performance_result, this_emission, more)
 
-    def build_collection_plus(self):
-        from kiss_rdb_test.common_initial_state import \
-            pretend_file_via_path_and_lines as func
+    def build_collection_and_more(self):
+        # (the hacky logic here about capturing diff lines in overly redundant
+        # w that of the previous test file but leaving it while #open [#857.6])
+        pfile, opn, more = self.build_fake_file_and()
+        iden_er_er = self.given_identity_class
+        coll = coll_via(pfile.name, opn=opn, iden_er_er=iden_er_er)
+        return coll, more
+
+    def build_fake_file_and(self):
+        # #open [#857.6] something will change
         fname = 'fake/file'  # must be relative not abs for path relativizer
+        from kiss_rdb_test.common_initial_state import \
+            fake_file_via_path_and_lines as func
         pfile = func(fname, self.given_table())
 
-        def opn(path):
+        def opn(path, MODE=None):
+            if MODE:
+                assert 'r+' == MODE  # idk
             assert fname == path
             return pfile
 
         def recv_diff_lines(diff_lines):
-            assert recv_diff_lines.value is None
-            recv_diff_lines.value = tuple(diff_lines)
+            assert more.dlx is None
+            more.dlx = tuple(diff_lines)
             return True  # important! tell it you succeeded
 
-        opn.RECEIVE_DIFF_LINES = recv_diff_lines
-        recv_diff_lines.value = None
+        more = recv_diff_lines
+        more.dlx = None
 
-        func = subject_module()._I_am_a_legacy_of_the_past_who_will_go_away
-        ci = func(fname, opn=opn, iden_clser=self.given_identity_class)
-        from kiss_rdb.magnetics_.collection_via_path import \
-            NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-        coll = func(ci)
-        return coll, recv_diff_lines.value
+        opn.RECEIVE_DIFF_LINES = recv_diff_lines
+
+        return pfile, opn, more
 
     do_debug = False
 
@@ -111,9 +124,10 @@ class Case2744_fail_to_parse_one_identifier(CommonCase):
         return build_iden
 
     def given_performance(self, listener):
-        coll, _ = self.build_collection_plus()
-        itr = coll.TO_IDENTIFIER_STREAM(listener)
-        return tuple(itr)
+        coll, more = self.build_collection_and_more()
+        with coll.open_identifier_traversal(listener) as idens:
+            rv = tuple(idens)
+        return rv, more
 
     def expected_emissions(_):
         yield 'info', 'structure', 'ohai', 'as', 'the_emi'
@@ -146,9 +160,10 @@ class Case2746_INSERT_when_out_of_order(CommonCase):
         return build_this_other_identifier_class(*args)
 
     def given_performance(self, listener):
-        coll, _ = self.build_collection_plus()
+        coll, more = self.build_collection_and_more()
         dct = {'t_i_t_l_e': 'Prisoner of Azkaban', 'year': '1999'}
-        return create_entity(coll, dct, listener)
+        rv = create_entity(coll, dct, listener)
+        return rv, more
 
     def expected_emissions(_):
         yield 'error', 'expression', 'disorder', 'as', 'the_emi'
@@ -164,10 +179,31 @@ class Case2748_INSERT_okay(CommonCase):
         act = str(ent.identifier)
         self.assertEqual(act, '👉___Prisoner of Azkaban___👈')
 
+    def test_030_diff_lines(self):
+        exp = (
+            '--- ',  # 0
+            '+++ ',  # 1
+            '@@ -',  # 2
+            ' |  ',  # 3
+            ' |  ',  # 4
+            ' |  ',  # 5
+            '+|  ',  # 6
+            ' |  ',
+        )
+        lines = self.end_state_diff_lines()
+        act = tuple(line[:4] for line in lines)
+        self.assertSequenceEqual(act, exp)
+
+        # (the spacing of the generated line was weird until we added
+        # and example row just now. this is out of scope tho.)
+        act = lines[6]
+        exp = '+|  Prisoner of Azkaban|1999|\n'
+        self.assertEqual(act, exp)
+
     def given_table(_):
         return ("|                 title|anno|\n",
                 "|:---------------------|----|\n",
-                "|                      |    |\n",
+                "|  eg |YYYY|\n",
                 "|   Philosopher's Stone|1997|\n",
                 "|  Chamber of Secrets  |1998|\n",
                 #   Prisoner of Azkaban |1999|\n",
@@ -177,9 +213,10 @@ class Case2748_INSERT_okay(CommonCase):
         return build_this_other_identifier_class(*args)
 
     def given_performance(self, listener):
-        coll, NEATO = self.build_collection_plus()
+        coll, more = self.build_collection_and_more()
         dct = {'title': 'Prisoner of Azkaban', 'anno': '1999'}
-        return create_entity(coll, dct, listener)
+        rv = create_entity(coll, dct, listener)
+        return rv, more
 
     def expected_emissions(_):
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
@@ -236,7 +273,7 @@ def create_entity(coll, dct, listener):
 @lazy
 def end_state():
     from collections import namedtuple as nt
-    return nt('EndState', ('end_result', 'emission'))
+    return nt('EndState', ('end_result', 'emission', 'the_more'))
 
 
 def em():

@@ -1,6 +1,8 @@
 from modality_agnostic.test_support.common import lazy
 
 
+# == Filesystem
+
 @lazy
 def filesystem_expecting_no_rewrites():
 
@@ -70,7 +72,7 @@ class build_fake_filesystem:
         assert('file' == shape)  # we could cover etc but we don't plan on need
 
         _lines = _lines_via_strings_with_optimistic_peek(rec[2]())
-        return _FakeFile(_lines, path)
+        return mock_filehandle(_lines, path)
 
     def stat_via_path(self, path):
         rec = self._lookup(path)
@@ -96,34 +98,155 @@ class build_fake_filesystem:
         return self._tups[0][1]
 
 
-# == model-ishes
+# == Mock open filehandle
 
-class _FakeFile:  # :[#877.C]
-    # basically [#877.B] pretend file but takes iterator, and modified
-    # so that the object passed into the block has the `path` property
-    # We want an excuse to unify the two.
+def mock_filehandle_and_mutable_controller_via(
+        expect_num_rewinds, lines, isatty=False, **kw):
 
-    def __init__(self, lines, path):
-        self._lines = lines
-        self.name = path  # be like `_io.TextIOWrapper`
-        self._is_opened_mutex = None
+    # HUGELY experimental, QUITE opaque right now. The way you alter the
+    # behavior of the double is by hacking the state by passing a function
+    # in place of the `lines` iterator argument. We implement rewind by
+    # writing our own `__next__`
 
-    def __enter__(self):
-        return self
+    these = _expect_num_rewinds(lines, expect_num_rewinds, isatty)
+    do_next, do_seek, done = these
 
-    def __exit__(self, typ, err, stack):
-        pass
+    def use_lines(state):
+        state.next = do_next
+        state.done = done  # my API not theirs
+        memo.mc = state
+        return state
+    memo = use_lines  # ick/meh
+    memo.mc = None
+    fh = mock_filehandle(use_lines, **kw)
+    assert not hasattr(fh, 'seek')
+    assert memo.mc
+    fh.seek = do_seek
+    return fh, memo.mc
 
-    def __iter__(self):
-        return self
 
-    def __next__(self):
-        return next(self._lines)
+def _expect_num_rewinds(lines, expect_num_rewinds, isatty):
+    if isatty:
+        raise RuntimeError("can't rewind a TTY")
 
-    def close(self):
-        del self._is_opened_mutex
-        return None
+    if not 0 < expect_num_rewinds:
+        raise RuntimeError("if you expect 0 rewinds, just don't")
 
+    def use_next():
+        return next(state.current_line_iterator)
+
+    # Read all the lines of memory into a cache
+
+    def check():
+        check.count += 1
+        if 20 < check.count:  # or whatever, some sane number
+            xx('Maybe not read all these into memory at some sane limit')
+        return True
+    check.count = 0
+
+    lines_cache = tuple(s for s in lines if check())
+
+    # Add a `seek` method
+
+    def use_seek(offset):
+        assert 0 == offset
+        if expect_num_rewinds == state.num_rewinds_so_far:
+            msg = ("one more rewind requested when max of "
+                   f"{expect_num_rewinds} already reached")
+            raise RuntimeError(msg)
+        state.num_rewinds_so_far += 1
+        state.current_line_iterator = iter(lines_cache)
+        return 0
+
+    def done(tc):
+        tc.assertEqual(state.num_rewinds_so_far, expect_num_rewinds)
+
+    class state:  # #class-as-namespace
+        current_line_iterator = None
+        num_rewinds_so_far = -1  # YIKES BE CARFEUL ADvance tHe tHing NOW
+
+    use_seek(0)
+    assert 0 == state.num_rewinds_so_far
+    return use_next, use_seek, done
+
+
+def mock_filehandle(  # :[#507.11] the one
+        lines, pretend_path=None,
+        pretend_writable=False,
+        isatty=False,
+        ):
+
+    if pretend_path is None and isatty:
+        pretend_path = '<stdout>' if pretend_writable else '<stdin>'
+
+    class mock_filehandle:
+
+        # == Look like context manager
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, typ, err, stack):
+            state.close()
+
+        # == Iterate
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if state.is_closed:
+                raise ValueError("I/O operation on closed file.")  # covered
+            return state.next()
+
+        # ==
+
+        def close(_):
+            return state.close()
+
+        # == Assorted fixed properties
+
+        name = pretend_path
+
+        def isatty(_):
+            return isatty
+
+        def writable(_):
+            return pretend_writable
+
+        def readable(_):
+            return True
+
+        def fileno(_):
+            if isatty:
+                return 1 if pretend_writable else 0  # 2 is stderr but why
+            return 12345
+
+    class state:  # #class-as-namespace
+
+        def close():
+            if state.is_open:
+                state.is_open, state.is_closed = False, True
+                return
+            raise RuntimeError("for now we whine about mutiple closes")  # covd
+            # (in real life, it's okay)
+
+        is_open, is_closed = True, False
+
+    if hasattr(lines, '__next__'):
+        def do_next():
+            return next(lines)
+        state.next = do_next
+    elif callable(lines):
+        state = lines(state)
+        assert hasattr(state, 'next')
+    else:
+        raise TypeError(f"`lines` must be iterator or callable, had {lines!r}")
+
+    return mock_filehandle()
+
+
+# == Small model-ishes
 
 class _RecordOfFileRewrite:
 
@@ -170,5 +293,10 @@ def _lines_via_strings_with_optimistic_peek(lines):
     for line in lines:
         yield f'{line}\n'
 
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
+
+# #pending-rename: "mock filehandle" (or filesystem) and move it to [ma]
 # #history-A.1: introduce fake filesystem
 # #abstracted.

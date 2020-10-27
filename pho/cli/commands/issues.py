@@ -537,14 +537,9 @@ def _error_monitor(serr):
     return func(serr, default_error_exitstatus=4)
 
 
-def _pass_thru_context_manager(lines):  # #[#510.12] pass-thru context manager
-    class cm:
-        def __enter__(_):
-            return lines
-
-        def __exit__(self, *_3):
-            pass
-    return cm()
+def _pass_thru_context_manager(lines):
+    from contextlib import nullcontext as func
+    return func(lines)
 
 
 def _monadic_no_op(_):

@@ -62,9 +62,10 @@ class Case2437_endcap_is_required(CommonCase):
 
     def test_rumskalla(self):
         listener, emissions = em.listener_and_emissions_for(self, limit=2)
-        _line = "|I don't|have an|endcap\n"
-        itr = subject_function()((_line,), listener)
-        assert itr is None  # new at writing
+        line = "|I don't|have an|endcap\n"
+        lines = (line,)
+        with subject_function()(lines, listener) as ents:
+            assert ents is None
         emi, *_ = emissions
         actual = emi.to_messages()
         expected = ('header row 1 must have "endcap" (trailing pipe)',)
@@ -78,13 +79,9 @@ def _stowaway_subject_function():
 
 @lazy
 def subject_function():
-    def entities_via_lines_and_listener(lines, listener):
-        pfile = msa.pretend_file_via_path_and_lines(__file__, lines)
-        ci = msa.collection_via_pretend_file(pfile)
-        return ci.TO_ENTITY_STREAM(listener)
-
-    import kiss_rdb_test.markdown_storage_adapter as msa
-    return entities_via_lines_and_listener
+    from kiss_rdb_test.markdown_storage_adapter \
+        import open_entities_via_lines_and_listener as func
+    return func
 
 
 if __name__ == '__main__':

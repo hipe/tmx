@@ -15,7 +15,8 @@ our manifestation of regression-friendliness at this level.
 
 ## storage support
 
-  - 0001-1249  models
+  - 0001-0624  test support (for whole package)
+  - 0625-1249  models
   - 1250-2499  [#019.3] magnetics
 
 

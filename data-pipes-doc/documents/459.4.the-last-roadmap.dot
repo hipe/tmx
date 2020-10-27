@@ -29,26 +29,26 @@ n2[label="then.."]
 n1_900->n2
 n1_880->n2
 n1_770->n2
-n1_900[label="no more\nCI_VIA_SINGLE_FILE\nanywhere"]
+n1_900[label="no more\nCI_VIA_SINGLE_FILE\nanywhere" style=filled]
 n1_880[label="away TO_IDENTIFIER_STREAM"]
-n1_770[label="no more 'fileno'\netc inspection\nin SA's"]
+n1_770[label="no more 'fileno'\netc inspection\nin SA's" style=filled]
 n1_750->n1_900
 n1_750->n1_880
 n1_750->n1_770
 n1_750[label="exit criteria"]
 n1_500->n1_750
 n1_050->n1_750
-n1_500[label="[about 12\nmore things]"]
-n1_050[label="demonstrate the\nCM principle for traversal"]
+n1_500[label="[about 12\nmore things]" style=filled]
+n1_050[label="demonstrate the\nCM principle for traversal" style=filled]
 n1->n1_500
 n1->n1_050
-n1[label="in some\norder.."]
+n1[label="in some\norder.." style=filled]
 n1_C->n1
 n1_B->n1
 n1_A->n1
-n1_C[label="markdown"]
-n1_B[label="producer script"]
-n1_A[label="rec"]
+n1_C[label="markdown" style=filled]
+n1_B[label="producer script" style=filled]
+n1_A[label="rec" style=filled]
 }
 /*
 # #born

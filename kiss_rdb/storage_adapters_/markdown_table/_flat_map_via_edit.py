@@ -1,7 +1,7 @@
 def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener, grow_downwards):
     flat_map, state = _these_two_for[typ](*cud_args, grow_downwards, listener)
-    from ._file_diff_via_flat_map import sync_agent_ as sync_agent_via
-    sa = sync_agent_via(all_sexpser, coll_path)
+    from ._file_diff_via_flat_map import sync_agent_ as func
+    sa = func(all_sexpser, coll_path)
     diff_lines = sa.DIFF_LINES_VIA(flat_map, listener)
     if diff_lines is None:
         return
@@ -45,9 +45,9 @@ def _(needle_iden, edit, grow_downwards, listener, state):
         if above(iden, needle_iden):
             return _pass_through
         if above(needle_iden, iden):
-            xtra = f"Or it's out of order. (stopped at {iden.to_string()!r})"
-            direc = _no_ent(needle_iden.to_string(), state.item_count,
-                            'update', xtra)
+            eid_s = _string_via_iden(iden)
+            xtra = f"Or it's out of order. (stopped at {eid_s!r})"
+            direc = _no_ent(needle_iden, state.item_count, 'update', xtra)
             return (direc,)
         assert needle_iden == iden
         state.recv_iden = _pass_thru_remaining_items  # done
@@ -57,7 +57,7 @@ def _(needle_iden, edit, grow_downwards, listener, state):
     def at_end():  # exactly as delete #here4
         if state.result_value is not None:
             return _no_directives
-        return (_no_ent(needle_iden.to_string(), state.item_count, 'update'),)
+        return (_no_ent(needle_iden, state.item_count, 'update'),)
 
     def recv_before_AST(ast):
         state.result_value = [ast, None]
@@ -72,7 +72,7 @@ def _(needle_iden, edit, grow_downwards, listener, state):
 
 
 @_implement('create')
-def _(dct, grow_downwards, listener, state):
+def _(dct, _iden_er_er, grow_downwards, listener, state):
 
     def recv_sch(sch):
         ks = sch.field_name_keys
@@ -130,22 +130,23 @@ def _(needle_iden, _grow_downwards, listener, state):
     def at_end():  # exactly as update #here4
         if state.result_value is not None:
             return _no_directives
-        direc = _no_ent(str(needle_iden), state.item_count, 'delete')
+        direc = _no_ent(needle_iden, state.item_count, 'delete')
         return (direc,)
 
     def edited(ast):
         assert needle_iden == ast.identifier
         eek = tuple(None for _ in range(0, ast.cell_count))
         lol = ((), (), eek)
-        _emit_edited(listener, lol, needle_iden.to_string(), 'deleted')
+        _emit_edited(listener, lol, _string_via_iden(needle_iden), 'deleted')
 
     yield 'recv_iden', receive_identifier
     yield 'recv_end', at_end, 'emit_edited', edited
 
 
-def _no_ent(eid, count, verb_stem_phrz, xtra=None):
+def _no_ent(iden, count, verb_stem_phrz, xtra=None):
+    eid_s = _string_via_iden(iden)
     from . import emission_components_for_entity_not_found_ as func
-    tup = func(eid, count, verb_stem_phrz)
+    tup = func(eid_s, count, verb_stem_phrz)
     if xtra is None:
         return tup
     rsn_head = (dct := tup[-1]())['reason']
@@ -204,13 +205,7 @@ def _build_flat_map(state, grow_down, recv_end,
         # with custom iden cls: (Case2746)
 
         prev = state.previous_sync_key
-        if isinstance(prev, str):
-            def str_via(s):
-                return f"'{s}'"
-        else:
-            def str_via(o):
-                return o.to_string()
-
+        str_via = _string_via_iden
         a, b = ((lambda o: lambda: str_via(o))(oo) for oo in (prev, iden))
 
         def experiment():
@@ -348,6 +343,15 @@ def _chunk_forever(n, flat):
 
 def _chunk(n, flat):
     return (flat[i*n:(i+1)*n] for i in range((len(flat)+1)//n))
+
+
+# == Smalls
+
+def _string_via_iden(iden):  # [#857.E] idens can be strings
+    assert iden
+    if isinstance(iden, str):
+        return iden
+    return iden.to_string()
 
 
 # == Delegations

@@ -6,13 +6,14 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 # == As Functionser (experimental)
 
-def FUNCTIONSER_FOR_SINGLE_FILES():
+def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #open [#857.6] opn will go away
 
     class edit_ns:  # #class-as-namespace
-        def CREATE_NEW_WAY(fp, iden_via, dct, listener):
+        def CREATE_NEW_WAY(fp, iden_er_er, dct, listener):
             msg, _path = fp
             assert "we assume you aren't actually writing.." == msg
-            return _do_create(iden_via, dct, listener)
+            iden_er = iden_er_er(listener)
+            return _do_create(iden_er, dct, listener)
 
     class read_ns:  # #class-as-namespace
         def schema_and_entities_via_lines(fp, listener):
@@ -26,10 +27,11 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
                 do_populate_dict = False
 
             if do_populate_dict:
+                iden_via_s = _build_identifier_builder(listener)
                 for line in fp:
                     name_from_line = line[:-1]
                     dct = {'my_name_from_line': name_from_line}
-                    _do_create(_string_based_idens, dct, listener)
+                    _do_create(iden_via_s, dct, listener)
 
             def ents():
                 for k, v in dict_as_datastore.items():
@@ -39,7 +41,7 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
     def _do_create(iden_via_EID, x, listener):
         d = len(dict_as_datastore) + 1
         k = ''.join(('felloo', str(d)))
-        assert iden_via_EID(k, listener)
+        assert iden_via_EID(k)
         dict_as_datastore[k] = x
         return 'ohai_i_am_adapto_2_who_created_this_guy', k, x
 
@@ -47,7 +49,6 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
         assert iden in dict_as_datastore
         return 'this_is_supposed_to_be_wrapped', dict_as_datastore[iden]
 
-    print("ONCE.")
     dict_as_datastore = {}
 
     def lambdize(x):  # gets around warning 😢
@@ -56,15 +57,20 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
     class fxr:  # #class-as-namespace
         PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE = lambdize(edit_ns)
         PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE = lambdize(read_ns)
-        PRODUCE_IDENTIFIER_FUNCTION = lambdize(_string_based_idens)
+
+        def PRODUCE_IDENTIFIER_FUNCTIONER():
+            return _build_identifier_builder
+
         COLL_IMPL_YUCK_ = None
     return fxr
 
 
-def _string_based_idens(x, _listener):
-    assert isinstance(x, str)
-    assert len(x)
-    return x
+def _build_identifier_builder(_listener, _cstacker=None):
+    def iden_via_primitive(x):  # #[#877.4] this might become default
+        assert isinstance(x, str)
+        assert len(x)
+        return x
+    return iden_via_primitive
 
 
 class _MinimalEntity:

@@ -87,7 +87,11 @@ class write_only_IO_proxy:
 
     ..with a set of callbacks defining what to do at each IO operation.
 
-    Born (#history-B.2) entirely as an abstration from four separate projects
+    Reminder: this is in the production plane because one app uses it to
+    implement a dry-run (where normally a file is opened and written to).
+    (Typically we see proxies (mocks/fakes/stubs) like this only used in tests)
+
+    Born (#history-B.2) entirely as an abstraction from four separate projects
     that all did something similar, it eliminated an amount of redundant code
     we are so proud of that we mention it here.
 
@@ -130,6 +134,9 @@ class write_only_IO_proxy:
 
     def writable(_):
         return True  # (Case1068DP)
+
+    def readable(_):  # (Case1062DP)
+        return False
 
     def fileno(_):  # #provision [#608.15]: implement this correctly
         return 1

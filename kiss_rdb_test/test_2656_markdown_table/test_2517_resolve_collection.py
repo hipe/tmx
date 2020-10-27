@@ -12,10 +12,6 @@ toml_fixture_directory_for = functions_for('toml').fixture_directory_for
 md_fixture_path = functions_for('markdown').fixture_path
 
 
-pretend_file_via_path_and_big_string = msa.pretend_file_via_path_and_big_string
-pretend_file_via_path_and_lines = msa.pretend_file_via_path_and_lines
-
-
 # [2500 (2517) 2535)
 
 
@@ -30,10 +26,9 @@ class CommonCase(unittest.TestCase):
     def resolve_collection(self, listener):
         path = self.given_path()
         if path is not None:
-            return msa.collection_via(path, listener)
-
-        assert (pfile := self.given_pretend_file())
-        return msa.collection_via_pretend_file(pfile, listener)
+            return msa.collection_via_real_path(path, listener)
+        x = self.given_pretend_file()
+        return msa.collection_via_mixed_test_resource(x, listener)
 
     def given_path(self):
         pass
@@ -115,13 +110,13 @@ class Case2516_file_has_multiple_tables(CommonCase):
         return self.build_end_state_expecting_failure(traverse_and_flatten)
 
     def given_pretend_file(self):
-        return pretend_file_via_path_and_big_string(
+        return (
             'pretend-file/2516-multiple-tables.md',
             """
             # .
             |aa|bb|cc|
             |---|---|---
-            |eg|[#867.E]
+            |eg|[#867.5.1]
             |x1|x2|x3
             |x4|x5|x6|
 
@@ -153,9 +148,9 @@ class Case2519_empty_collection_found(CommonCase):
         # canon_case.confirm_collection_is_not_none(self)
 
         listener = em.throwing_listener
-        ents = coll.TO_ENTITY_STREAM(listener)
-        for ent in ents:
-            self.fail("should have been no entities")
+        with coll.open_entity_traversal(listener) as ents:
+            for ent in ents:
+                self.fail("should have been no entities")
 
     def given_collection(self):
         return self.resolve_collection(None)
@@ -169,8 +164,7 @@ class Case2519_empty_collection_found(CommonCase):
             |aa|bb|cc|
             |---|---|---
             """)
-        pretend_path = 'pretend-file/2519-empty-collection.md'
-        return pretend_file_via_path_and_lines(pretend_path, lines)
+        return 'pretend-file/2519-empty-collection.md', lines
 
 
 class Case2522_non_empty_collection_found(CommonCase):
@@ -183,7 +177,7 @@ class Case2522_non_empty_collection_found(CommonCase):
         return self.resolve_collection(None)
 
     def given_pretend_file(self):
-        return pretend_file_via_path_and_big_string(
+        return (
             'pretend-file/2522-non-empty-collection.md',
             """
             |aa|bb|cc|
@@ -193,18 +187,21 @@ class Case2522_non_empty_collection_found(CommonCase):
 
 
 def traverse_and_flatten(coll, listener):
-    return tuple(traverse_entities(coll, listener))
+    with open_ent_trav(coll, listener) as ents:
+        return tuple(ents)
 
 
 def traverse(coll, listener):
     # since getting rid of random access, we need to trip this
-    for ent in traverse_entities(coll, listener):
-        pass
+    with open_ent_trav(coll, listener) as ents:
+        if ents is None:
+            return
+        for ent in ents:
+            pass
 
 
-def traverse_entities(coll, listener):
-    itr = coll.TO_ENTITY_STREAM(listener)
-    return itr or ()  # new at writing
+def open_ent_trav(coll, listener):
+    return coll.open_entity_traversal(listener)
 
 
 reason_via_end_state = canon.reason_via_end_state

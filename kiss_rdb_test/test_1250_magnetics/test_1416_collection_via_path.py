@@ -475,7 +475,7 @@ def unwrap_collection(coll):
     return coll
 
 
-def pass_thru_cm(x):  # #[#510.12] (lol)
+def pass_thru_cm(x):
     from contextlib import nullcontext as func
     return func(x)
 

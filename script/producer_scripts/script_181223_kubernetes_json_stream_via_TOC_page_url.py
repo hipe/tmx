@@ -47,7 +47,7 @@ def _do_CLI(stdin, stdout, stderr, url, rscr):
 _do_CLI.__doc__ = _doc
 
 
-def multi_depth_value_dictionary_stream_via_traversal_stream(dct):
+def multi_depth_value_dictionary_stream_via_traversal_stream(dcts):
     from kiss_rdb.storage_adapters.markdown import markdown_link_via
     for dct in dcts:
         if '_is_branch_node' in dct:
@@ -56,18 +56,9 @@ def multi_depth_value_dictionary_stream_via_traversal_stream(dct):
         yield {'document': markdown_link_via(**dct)}
 
 
-class open_traversal_stream:  # write our own [#510.12] pass-thru context manag
-
-    def __init__(self, listener, url, cache_path=None):
-        self._generator = _build_traversal_stream(listener, url, cache_path)
-
-    def __enter__(self):
-        gen = self._generator
-        del self._generator
-        return gen
-
-    def __exit__(self, *_3):
-        pass
+def open_traversal_stream(listener, url, cache_path=None):
+    from contextlib import nullcontext as func
+    return func(_build_traversal_stream(listener, url, cache_path))
 
 
 def _build_traversal_stream(listener, url, cached_path=None):

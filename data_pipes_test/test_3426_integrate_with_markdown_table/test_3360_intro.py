@@ -1,3 +1,4 @@
+from data_pipes_test.common_initial_state import collection_via
 from kiss_rdb_test.common_initial_state import publicly_shared_fixture_file
 from modality_agnostic.test_support.common import \
         throwing_listener, dangerous_memoize as shared_subject
@@ -377,8 +378,9 @@ def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
 
     # Resolve the sync agent
     sa = sync_agent_via_mixed_near(mixed_near)
-
-    return sa.NEW_SEXPS_VIA(flat_map, listener)
+    with sa.open_sync_session() as sess:
+        for sx in sess.NEW_SEXPS_VIA(flat_map, listener):
+            yield sx
 
 
 def these_2_via_these_2(sorted_far_dcts, two_keyerers):
@@ -401,12 +403,8 @@ def these_2_via_these_2(sorted_far_dcts, two_keyerers):
 
 def sync_agent_via_mixed_near(mixed_near):
     opn, path = opn_and_path_via(mixed_near)
-
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        _I_am_a_legacy_of_the_past_who_will_go_away as func
-
-    ci = func(path, throwing_listener, opn=opn)
-    return ci.SYNC_AGENT_FOR_DATA_PIPES()
+    coll = collection_via(path, throwing_listener, opn=opn)
+    return coll.dig_for_edit_agent('SYNC_AGENT_FOR_DATA_PIPES')
 
 
 def opn_and_path_via(mixed_near):
@@ -417,13 +415,18 @@ def opn_and_path_via(mixed_near):
         assert isinstance(mixed_near, tuple)
         assert isinstance(mixed_near[0], str)
 
-        def opn(my_path):
+        def opn(my_path, mode):
+            assert 'r+' == mode
             assert my_path == path
-            return passthru_context_manager(iter(mixed_near))
 
-        from data_pipes_test.common_initial_state import \
-            passthru_context_manager
-        path = 'my-fake-path'
+            if isinstance(mixed_near, tuple):
+                lines = iter(mixed_near)
+            else:
+                raise RuntimeError('easy')
+
+            from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+            return func(lines, path)
+        path = 'my-fake-path.md'
     return opn, path
 
 

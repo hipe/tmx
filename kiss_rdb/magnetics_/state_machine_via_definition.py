@@ -520,11 +520,15 @@ def re_emit_case_error_CRAZILY(listener, stack, emi_tup):  # EXPERIMENTAL
     from modality_agnostic import emission_via_tuple as func
     emi = func(emi_tup)
 
-    if 'expression' != emi.shape:
-        xx("have fun with hacking reason like you did message. it's easy")
+    # Resolve messages
+    sct_not_expr = ('expression', 'structure').index(emi.shape)
+    if sct_not_expr:  # (Case3419DP)
+        sct = emi.payloader()
+        msgs = [sct['reason']]  # #here2
+    else:
+        msg = emi.to_messages()
 
     # Downcase the first letter of the first messages
-    msgs = list(emi.to_messages())
     msg = msgs[0]
     msgs[0] = ''.join((msg[0].lower(), msg[1:]))  # downcase the first letter
 
@@ -536,7 +540,17 @@ def re_emit_case_error_CRAZILY(listener, stack, emi_tup):  # EXPERIMENTAL
     msgs[0] = ''.join((prefix, msgs[0]))
     msgs = tuple(msgs)
 
-    listener(*emi.channel, lambda: msgs)
+    # Pop it back in
+    if sct_not_expr:
+        def use_payloader():
+            return sct
+        assert 1 == len(msgs)
+        sct['reason'], = msgs  # #here2
+    else:
+        def use_payloader():
+            return msgs
+
+    listener(*emi.channel, use_payloader)
 
 
 def _whens_via_stack_until_main(stack):

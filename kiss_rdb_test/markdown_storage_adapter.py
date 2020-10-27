@@ -1,16 +1,18 @@
 # == Decorators used here (experimental, might abstract)
 
-def lazy_load_function_from(module_name):  # #decorator, #[#510.6]
+def _lazy_load_function_from(module_name, name=None):  # #decorator, #[#510.6]
     def decorator(orig_f):
         def use_f(*a):
             from importlib import import_module
-            return getattr(import_module(module_name), attr)(*a)
-        attr = orig_f.__name__
+            mod = import_module(module_name)
+            func = getattr(mod, attr)
+            return func(*a)
+        attr = (name or orig_f.__name__)
         return use_f
     return decorator
 
 
-def lazy_function(orig_f):  # #decorator, #[#510.6]
+def _lazy_function(orig_f):  # #decorator, #[#510.6]
     def use_f(*a, **kw):
         if not len(really_use_f):
             really_use_f.append(orig_f())
@@ -19,95 +21,106 @@ def lazy_function(orig_f):  # #decorator, #[#510.6]
     return use_f
 
 
-# ==
+# == Used as Default Arguments
 
-@lazy_load_function_from('kiss_rdb_test.common_initial_state')
-def pretend_file_via_path_and_big_string():
+@_lazy_load_function_from(
+        'modality_agnostic.test_support.common',
+        'throwing_listener')
+def throwing_listener():
     pass
 
 
-@lazy_load_function_from('kiss_rdb_test.common_initial_state')
-def pretend_file_via_path_and_lines():
-    pass
+_throwing_listener = throwing_listener
 
 
-# ==
+# == Resolve Collections
 
-def collection_via_pretend_file(pfile, listener=None):
-
-    # Provide a new definition of `open` that uses our fixture lines
-    def opn(path):
-        assert pfile.path == path
-        return pfile
-
-    return collection_via(pfile.path, listener, opn)
+def open_entities_via_lines_and_listener(lines, listener):
+    coll = _collection_via_mixed(lines, listener)
+    return coll.open_entity_traversal(listener)
 
 
-def collection_via(path, listener=None, opn=None):
-
-    if listener is None:
-        listener = throwing_listener
-
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        _I_am_a_legacy_of_the_past_who_will_go_away as ci_via
-
-    ci = ci_via(path, listener, opn=opn)
-
-    raise RuntimeError('turn this model on its head')
-    from kiss_rdb.magnetics_.collection_via_path import \
-        NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-    return func(ci)
+def collection_via_real_path(path, listener):
+    # please away this: adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING'
+    from kiss_rdb import collectionerer as func
+    mcoll = func()
+    return mcoll.collection_via_path(path, listener)
 
 
-def complete_schema_via_row_ASTs(row1, row2):
-    from kiss_rdb.storage_adapters_.markdown_table import \
-            complete_schema_via_ as build_complete_schemca
-    return build_complete_schemca(row1, row2)
+def _collection_via_mixed(
+        x, listener=_throwing_listener, opn=None, iden_er_er=None):
+    fh, _mc = _asset_resource_and_controller_via_testing_resource(x)
+    return _collection_via_resource(fh, listener, opn, iden_er_er=iden_er_er)
 
 
-@lazy_function
-def row_AST_via_line():
-    def row_AST_via_line(line, listener):
-        row_AST_via_line = _build_row_AST_via_line(listener, context_stack)
-        try:
-            return row_AST_via_line(line, 0)
-        except _Stop:
-            pass
-
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        _build_row_AST_via_line, _Stop
-
-    context_stack = ({'path': __file__},)
-
-    return row_AST_via_line
+collection_via_mixed_test_resource = _collection_via_mixed
 
 
-@lazy_function
+def _collection_via_resource(
+        x, listener=_throwing_listener, opn=None, iden_er_er=None):
+    sa_mod = _adapter_module()
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
+    return func(sa_mod, x, listener, opn=opn, iden_er_er=iden_er_er)
+
+
+collection_via_resource = _collection_via_resource
+
+
+# == Resolve Smaller Components
+
+@_lazy_function
 def tagged_row_ASTs_or_lines_via_lines():
-    def tagged_row_ASTs_or_lines_via_lines(lines, listener):  # #here1
-        if hasattr(lines, 'fileno'):
-            use_coll_id = lines
-            opn = None
-        else:
-            assert hasattr(lines, '__next__')
-
-            def opn(path):
-                assert pretend_path == path
-                return pfile
-            pretend_path = __file__
-            from .common_initial_state import \
-                pretend_file_via_path_and_lines as func
-            pfile = func(pretend_path, lines)
-            use_coll_id = pretend_path
-        ci = md_ci_via(use_coll_id, listener, opn=opn)
-        return ci._raw_sexps()
-    from kiss_rdb.storage_adapters_.markdown_table import \
-        _I_am_a_legacy_of_the_past_who_will_go_away as md_ci_via
+    def tagged_row_ASTs_or_lines_via_lines(fp, listener):
+        assert hasattr(fp, '__next__')  # [#022]
+        sxs_er = func(fp, iden_er_er)
+        sxs = sxs_er(listener)
+        try:
+            for sx in sxs:
+                yield sx
+        except stop:
+            pass
+    sa = _adapter_module()
+    func = sa._build_sexps_via_listener
+    iden_er_er = sa._build_identifier_builder
+    stop = sa._Stop
     return tagged_row_ASTs_or_lines_via_lines
 
 
-@lazy_load_function_from('modality_agnostic.test_support.common')
-def throwing_listener():
+@_lazy_function
+def row_AST_via_line():
+    def use_func(line, listener):
+        asset_func = build_asset_func(listener, context_stack)
+        try:
+            return asset_func(line, 0)  # catch stop?
+        except stop:
+            pass
+    context_stack = ({'ohai': __file__},)
+    mod = _adapter_module()
+    build_asset_func = mod._build_row_AST_via_line
+    stop = mod._Stop
+    return use_func
+
+
+# == Libs
+
+def complete_schema_via_row_ASTs(row1, row2):
+    func = _adapter_module().complete_schema_via_
+    return func(row1, row2)
+
+
+@_lazy_load_function_from(
+        'kiss_rdb_test.common_initial_state',
+        'pretend_resource_and_controller_via_mixed')
+def _asset_resource_and_controller_via_testing_resource():
     pass
+
+
+def _adapter_module():
+    import kiss_rdb.storage_adapters_.markdown_table as module
+    return module
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
 # #abstracted

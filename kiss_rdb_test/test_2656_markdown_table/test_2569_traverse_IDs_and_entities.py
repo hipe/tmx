@@ -15,7 +15,8 @@ import unittest
 canon = storage_adapter_canon.produce_agent()
 
 
-CommonCase = unittest.TestCase
+class CommonCase(unittest.TestCase):
+    do_debug = False
 
 
 class Case2557_traverse_whole_collection_as_IDs(CommonCase):
@@ -70,7 +71,7 @@ def build_same_collection_anew_BUT_FOR_FIELDS():
         """
         | i De nTi Fier zz | thing 1  | thing-2 | Thing_A |thing-B|
         |---|---|---|---|---
-        |eg|[#867.E]
+        |eg|[#867.5.1]
         | B9H  |     |     |  hi i'm B9H   | hey i'm B9H |
         | B8H | hi i'm B8H | hey i'm B8H
         | 2HJ
@@ -92,7 +93,7 @@ def build_same_collection_anew_BUT_FOR_IDs():
         xxxyy
         | i De nTi Fier zz | thing-1  | thing-2 |
         |---|---|---|
-        |eg|[#867.E]
+        |eg|[#867.5.1]
         | B8H
         | 2HJ|xx|yy|
         | B9G
@@ -114,16 +115,16 @@ def build_empty_collection():
 
         |aa|bb|cc|
         |---|---|---
-        |eg|[#867.E]
+        |eg|[#867.5.1]
 
         goodbye
         """)
 
 
 def build_collection_via_path_and_big_string(path, big_string):
-    import kiss_rdb_test.markdown_storage_adapter as msa
-    pfile = msa.pretend_file_via_path_and_big_string(path, big_string)
-    return msa.collection_via_pretend_file(pfile)
+    from kiss_rdb_test.markdown_storage_adapter import \
+        collection_via_mixed_test_resource as func
+    return func((path, big_string))
 
 
 if __name__ == '__main__':

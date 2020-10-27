@@ -175,24 +175,30 @@ def issues_collection_via_(readme, listener, opn=None):
     coll = _collection_via(readme, listener, opn)
     if coll is None:
         return
-    ci = coll.COLLECTION_IMPLEMENTATION
+
+    def do_open_etc(listener):
+        from contextlib import contextmanager as cm
+
+        @cm
+        def cm():
+            with coll.open_schema_and_RAW_entity_traversal(listener) as (sch, enx):  # noqa: E501
+                if enx is None:
+                    return
+                body_ks = sch.field_name_keys[1:]
+                if ('main_tag', 'content') != body_ks:
+                    raise RuntimeError(f"This is fine but hello: {body_ks!r}")
+                yield sch, enx
+        return cm()
 
     class issues_collection:  # #class-as-namespace
         def to_graph_lines(listener=listener):
             from .graph import to_graph_lines_ as func
             return func(issues_collection, listener)
 
-        def to_schema_and_entities(listener=listener):
-            if (sch_ents := ci.to_schema_and_entities(listener)) is None:
-                return
-            schema, ents = sch_ents
-            body_keys = schema.field_name_keys[1:]
-            if ('main_tag', 'content') != body_keys:
-                raise RuntimeError(f"This is fine but hello: {body_keys!r}")
-            return schema, ents
+        def open_schema_and_issue_traversal(listener=listener):
+            return do_open_etc(listener)
 
         collection = coll
-        collection_implementation = ci
     return issues_collection
 
 
@@ -202,7 +208,7 @@ def _collection_via(readme, listener, opn=None):
     import kiss_rdb.storage_adapters_.markdown_table as sa_mod
     from kiss_rdb import collection_via_storage_adapter_and_path as func
     return func(sa_mod, readme, listener, opn=opn,
-                iden_clser=build_identifier_parser_,
+                iden_er_er=build_identifier_parser_,
                 file_grows_downwards=False)
 
 

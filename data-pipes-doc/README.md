@@ -24,7 +24,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.P] | #open | tmpfile is hardcoded
 |                  [#459.O] | #hole |
 |                  [#459.N] | #open | producer scripts shouldn't have knowledge of near format
-|                  [#459.M] | #trak | temporary for one commmit: places where..
+|                  [#459.M] | #trak | logical redundancy between asset and test
 |                  [#459.L] | #wish | we want regex escape
 |                  [#459.11]|       | [the magnetic that loads a function via a string]
 |                  [#459.J] | #open | visible seams to clean up when things are stable

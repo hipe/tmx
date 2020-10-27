@@ -14,7 +14,6 @@ older one. At #history-B.1 we unified the strains.
 :[#873.N]:
 """
 
-
 STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
 STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
 STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.md',)
@@ -22,175 +21,91 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's not yet needed as a storage adapter"
 
 
-def FUNCTIONSER_VIA_COLLECTION_ARGS(*args, **kwargs):
-    ci = _I_am_a_legacy_of_the_past_who_will_go_away(*args, **kwargs)
-    if not ci:
-        raise RuntimeError('where')
-    from kiss_rdb.magnetics_.collection_via_path import \
-        NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-    return func(ci)
+def _build_identifier_builder(_listener, _cstacker=None):  # #testpoint
+    def iden_via_primitive(x):  # #[#877.4] this might become default
+        assert isinstance(x, str)
+        assert len(x)
+        return x
+    return iden_via_primitive
 
 
-def _I_am_a_legacy_of_the_past_who_will_go_away(  # #testpoint, [pho]
-        collection_path, listener=None, opn=None, iden_clser=None, rng=None,
-        file_grows_downwards=True, adapter_variant=None):
-    del rng  # ..
+def FUNCTIONSER_FOR_SINGLE_FILES(
+        opn=None,
+        iden_er_er=_build_identifier_builder,
+        file_grows_downwards=True,
+        adapter_variant=None):
+    # #open [#857.6] `opn` will change
 
-    if adapter_variant is not None:
-        if 'THE_ADAPTER_VARIANT_FOR_STREAMING' != adapter_variant:
-            raise RuntimeError('where')
+    if adapter_variant:  # #soon
+        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant
+        del adapter_variant
 
-    def same_iden():
-        if iden_clser:
-            def iden_via_string(eid, listener):  # (Case3869PH)
-                return iden_clser(listener)(eid)
-            return iden_via_string
+    assert iden_er_er  # who is passing None in?
 
-        def default_iden_via_s(eid, _listener):
-            assert 0 < len(eid) < 20  # #meh
-            return _identifier(eid)
-        return default_iden_via_s
+    class edit_funcs:  # #class-as-namespace
 
-    if hasattr(collection_path, 'fileno'):
-        fh = collection_path
-        del collection_path
-        mode = fh.mode[0]
-        use_filename = fh.name
-        was_passed_open_filehandle = True
-    else:
-        use_filename = collection_path
-        was_passed_open_filehandle = False
+        def SYNC_AGENT_FOR_DATA_PIPES(opener):
+            def all_sxs_er_er(fp):
+                return _build_sexps_via_listener(fp, iden_er_er)
+            from ._file_diff_via_flat_map import sync_agent_builder_ as func
+            return func(opener, all_sxs_er_er)
 
-    if was_passed_open_filehandle and 'w' == mode:
-        assert 1 == fh.fileno()  # until it isn't..
-        from ._output_lines_via_far_collection import \
-            pass_thru_collection_for_write_ as func
-        ci = func(fh, listener)
-        ci.PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_ = same_iden
-        return ci
+        def UPDATE_NEW_WAY(fp, iden, edit_x, listener):
+            return cud('update', fp, listener, iden, edit_x)
 
-    class single_traversal_collection:  # #class-as-namespace
-        def update_entity_as_storage_adapter_collection(iden, edit, listener):
-            return cud('update', listener, iden, edit)
+        def CREATE_NEW_WAY(fp, iden_er_er, dct, listener):
+            return cud('create', fp, listener, dct, iden_er_er)
 
-        def create_entity_as_storage_adapter_collection(_, dct, listener):
-            return cud('create', listener, dct)
+        def DELETE_NEW_WAY(fp, iden, listener):
+            return cud('delete', fp, listener, iden)
 
-        def delete_entity_as_storage_adapter_collection(iden, listener):
-            return cud('delete', listener, iden)
+        def lines_via_schema_and_entities(schema, ents, listener):
+            from ._output_lines_via_far_collection import \
+                lines_via_schema_and_entities_ as func
+            return func(schema, ents, listener)
 
-        def retrieve_entity_as_storage_adapter_collection(iden, listener):
-            ents = entities(listener)
-            return _retrieve(ents, iden, listener)
-
-        def SYNC_AGENT_FOR_DATA_PIPES():
-            from ._file_diff_via_flat_map import sync_agent_ as func
-            return func(all_sxs, use_filename)
-
-        def to_identifier_stream_as_storage_adapter_collection(listener):
-            return eek(lambda: (ent.identifier for ent in entities(listener)))
-
-        def to_entity_stream_as_storage_adapter_collection(listener):
-            return eek(lambda: entities(listener))
-
-        def to_schema_and_entities(listener):
-            return _to_schema_and_ents(single_traversal_collection, listener)
-
-        def sexps_via_action_stack(astack, listener):  # (Case3459DP)
-            return eek(lambda: sexps_via_action_stack(astack, listener))
-
-        def _raw_sexps():  # #testpoint
-            return eek(lambda: to_raw_sexps(listener))
-
-        PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_ = same_iden
-
-    def cud(typ, listener, *cud_args):
+    def cud(typ, fp, listener, *cud_args):
+        all_sxser = _build_sexps_via_listener(fp, iden_er_er)
+        use_filename = fp.name
         yn = file_grows_downwards
         from ._flat_map_via_edit import cud_ as func
-        return func(all_sxs, use_filename, opn, typ, cud_args, listener, yn)
+        return func(all_sxser, use_filename, opn, typ, cud_args, listener, yn)
 
-    def entities(listener):
-        sxs = sexps_via_action_stack(_action_stack_for_entities(), listener)
-        ents = (sexp[1] for sexp in sxs)
-        for _ in ents:
-            break  # skip example row (Case2451)
-        return (ent for ent in ents if ent.nonblank_identifier_primitive)
+    class read_funcs:  # #class-as-namespace
 
-    def all_sxs(listener):
-        return eek(lambda: checked_sxs(listener))
+        def RETRIEVE_NEW_WAY(fp, iden, listener):
+            return _retrieve(fp, iden, listener, iden_er_er)
 
-    def checked_sxs(listener):
-        astack = [('beginning_of_file', lambda o: o.turn_yield_on())]
-        return sexps_via_action_stack(astack, listener)
+        def schema_and_entities_via_lines(fp, listener):
+            return _schema_and_entities_via_lines(fp, listener, iden_er_er)
 
-    def sexps_via_action_stack(astack, listener):
-        use_astack = _action_stack_for_check_single_table()
-        _merge_stack_in_to_stack(use_astack, astack)
-        sxs = to_raw_sexps(listener)
-        return _sexps_via_stack(sxs, use_astack, cstack, listener)
+    class fxr:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
+            return edit_funcs
 
-    def to_raw_sexps(listener):
-        tagged = _tagged_lines_via_lines(to_lines(listener))
-        return _line_sexps_via(tagged, cstack, listener, iden_clser)
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
+            return read_funcs
 
-    def to_lines(listener):
-        if was_passed_open_filehandle:
-            return to_lines_when_opened_filehandle()
-        opened = None
-        try:
-            opened = (opn or open)(collection_path)
-        except FileNotFoundError as e:
-            fnf_err = e
-        if opened is None:
-            whine_about_file_not_found_(listener, fnf_err)
-            raise _Stop()
-        return lines_via_opened(opened)
+        class CUSTOM_FUNCTIONS_VERY_EXPERIMENTAL:  # noqa: E501
+            def open_schema_and_RAW_entity_traversal(fp, listener):
+                return _schema_and_RAW_entities(fp, listener, iden_er_er)
+            open_schema_and_RAW_entity_traversal.is_reader = True
 
-    def lines_via_opened(opened):
-        with opened as lines:
-            for line in lines:
-                yield line
+        def PRODUCE_IDENTIFIER_FUNCTIONER():
+            return iden_er_er
 
-    def to_lines_when_opened_filehandle():
-        for line in fh:  # we don't use a context manager b.c don't close it
-            yield line
+        COLL_IMPL_YUCK_ = None
 
-    def eek(build_iter):  # catch stop while building an iter so none not empty
-        try:
-            return eek2(build_iter())
-        except _Stop:
-            return
-
-    def eek2(itr):  # catch a mid-traversal stop
-        try:
-            for x in itr:
-                yield x
-        except _Stop:
-            return
-
-    cstack = ({'collection_path': use_filename},)  # context_stack
-
-    return single_traversal_collection
-
-
-def _to_schema_and_ents(ci, listener):
-    astack = [
-        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
-        ('table_schema_line_ONE_of_two',),
-        ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
-        ('table_schema_line_ONE_of_two',), ('head_line',),
-        ('beginning_of_file',)]
-    if (sxs := ci.sexps_via_action_stack(astack, listener)) is None:
-        return
-    for sr2_sx in sxs:
-        return sr2_sx[2], (sx[1] for sx in sxs)
+    return fxr
 
 
 # == RETRIEVE
 
-def _retrieve(ents, iden, listener):
+def _retrieve(fp, iden, listener, iden_er_er):
+    _sch, ents = _schema_and_entities_via_lines(fp, listener, iden_er_er)
+    if ents is None:
+        return
+
     count = 0
     for ent in ents:
         curr_iden = ent.identifier
@@ -200,7 +115,7 @@ def _retrieve(ents, iden, listener):
             return ent
         count += 1
     tup = emission_components_for_entity_not_found_(_str_via_iden(iden), count)
-    listener(* tup)
+    listener(*tup)
 
 
 def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
@@ -214,11 +129,80 @@ def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
     return 'error', 'structure', 'entity_not_found', lambda: {'reason': rsn()}
 
 
-def whine_about_file_not_found_(listener, e):
-    from modality_agnostic import \
-        emission_details_via_file_not_found_error as func
-    listener('error', 'structure', 'cannot_load_collection',
-             'no_such_file_or_directory', lambda: func(e))
+# == New Way
+
+def _schema_and_entities_via_lines(fp, listener, iden_er_er):
+    # Exclude any eg row. Exclude ents with empty identif. (both (Case2451))
+
+    sch, ents = _schema_and_RAW_entities(fp, listener, iden_er_er)
+    if ents is None:
+        return sch, ents
+
+    assert hasattr(ents, '__next__')
+
+    for _ in ents:
+        break
+
+    return sch, (ent for ent in ents if ent.nonblank_identifier_primitive)
+
+
+def _schema_and_RAW_entities(fp, listener, iden_er_er):
+    # Include example row. Include "entities" with empty identifier
+
+    astack = _action_stack_for_schema_and_entities()
+    sxs = _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er)
+
+    # See if you get as far as parsing the two schema rows
+    sr2_sx = None
+    try:
+        for sr2_sx in sxs:
+            break
+    except _Stop:
+        pass
+
+    # If you didn't get that far, you still owe the client a two-tuple
+    if sr2_sx is None:
+        return None, None
+
+    # Now you can give the client the schema and the zero or more entities
+    def entities():
+        try:
+            for sx in sxs:
+                yield sx[1]
+        except _Stop:
+            pass
+
+    return sr2_sx[2], entities()
+
+
+# == Stream SEXP's
+
+def _build_sexps_via_listener(fp, iden_er_er):  # #testpoint
+    def all_sexps_via_listener(listener):
+        memo.count += 1
+        if 1 < memo.count:
+            xx("something changed at #history-B.4")
+        astack = _action_stack_for_all()
+        return _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er)  # noqa: E501
+    memo = all_sexps_via_listener
+    memo.count = 0
+    return all_sexps_via_listener
+
+
+def _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er):  # th
+    context_stack = ({'path': fp.name},)
+
+    # Resolve tagged lines via lines
+    tagged_lines = _tagged_lines_via_lines(fp)
+
+    # Resolve line sexps via tagged lines
+    raw_sxs = _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er)  # noqa: E501
+
+    # Merge the argument stack into the one we always use
+    use_astack = _action_stack_for_check_single_table()
+    _merge_stack_in_to_stack(use_astack, astack)
+
+    return _sexps_via_stack(raw_sxs, use_astack, context_stack, listener)
 
 
 # == **EXPERIMENTAL** "Action Stacks":
@@ -231,16 +215,19 @@ def whine_about_file_not_found_(listener, e):
 #    currently it's written assuming a straight sequence of symbols rather than
 #    the looping that happens in documents with multiple tables. Still neat tho
 
-def _action_stack_for_entities():
+def _action_stack_for_schema_and_entities():
     return [
         ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
         ('table_schema_line_ONE_of_two',),
         ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST', lambda o: o.turn_yield_on()),
-        ('table_schema_line_TWO_of_two',),
-        ('table_schema_line_ONE_of_two',),
-        ('head_line',),
+        ('business_row_AST',),
+        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
+        ('table_schema_line_ONE_of_two',), ('head_line',),
         ('beginning_of_file',)]
+
+
+def _action_stack_for_all():
+    return [('beginning_of_file', lambda o: o.turn_yield_on())]
 
 
 def _action_stack_for_check_single_table():
@@ -477,7 +464,7 @@ def _cell_AST(span, line):
     return document_cell()
 
 
-def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
+def complete_schema_via_(ast1, ast2, table_cstack=None, iden_er=None):
     def key_via_cell(cell):
         s = normal_field_name_via_string(cell.value_string)
         assert(len(s))  # ..
@@ -494,7 +481,7 @@ def complete_schema_via_(ast1, ast2, table_cstack=None, iden_cls=None):
         offset_via_key_ = offset_via_key
         field_name_keys = keys  # (Case3459DP)
         rows_ = (ast1, ast2)
-        identifier_class_ = (iden_cls or _identifier)  # #here5
+        identifier_class_ = (iden_er or _identifier)  # #here5
         table_cstack_ = table_cstack
 
     complete_schema.row_AST_via_three_ = _build_row_AST_via_three(complete_schema)  # noqa: E501
@@ -626,7 +613,7 @@ in practice we are not so lenient given:
 """
 
 
-def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
+def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
 
     def stop_because(reason):
         sct = _flatten_context_stack((*build_cstack(), {'reason': reason}))
@@ -641,9 +628,9 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
     def build_cstack():
         return (*(context_stack or ()), {'line': line, 'lineno': peek_lineno()})  # noqa: E501
 
-    iden_cls = None
-    if iden_clser:
-        iden_cls = iden_clser(throwing_listener, build_cstack)  # VERY EXPERIM
+    iden_er = None
+    if iden_er_er:
+        iden_er = iden_er_er(throwing_listener, build_cstack)  # VERY EXPERIM
 
     def peek_lineno():
         return counter_count() + 1
@@ -711,7 +698,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_clser=None):
 
         cstck = (*context_stack, table_context_frame)
         complete_schema = complete_schema_via_(
-            tsl1of2_ast, tsl2of2_ast, cstck, iden_cls)
+            tsl1of2_ast, tsl2of2_ast, cstck, iden_er)
 
         yield 'table_schema_line_TWO_of_two', line, complete_schema  # #here3
 
@@ -902,6 +889,7 @@ def _scnlib():
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.4
 # #history-B.1: blind rewrite. absorb four modules
 # #history-A.4: no more format adapter
 # #history-A.3: no more sync-side entity mapping

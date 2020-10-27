@@ -51,7 +51,7 @@ def _collection_via(sa, cci, listener, kw):
 
     def when_file_based():
         if hasattr(sa.module, 'CUSTOM_FUNCTIONSER'):  # (not in flowchart grap)
-            return build_collection('custom')
+            return build_collection('custom_IO')
 
         def when_collection_identifier_is():
             yield 'string', when_file_based_and_string
@@ -65,23 +65,27 @@ def _collection_via(sa, cci, listener, kw):
 
     def when_file_is_resource():
         def when_file_resource_is():
-            yield 'writable', when_file_is_writable
-            yield 'readable', when_file_is_readable_not_writable
+            yield 'readable_only', when_file_is_readable_not_writable
+            yield 'writable_only', when_file_is_writable_not_readable
+            yield 'readable_writable', when_file_is_readable_and_writable
         return case(cci.narrative_writable_or_readable, when_file_resource_is)
 
     # == Consequences
 
     def do_directory_based():
-        return build_collection('when_directory')
+        return build_collection('directory_based_IO')
 
-    def when_file_is_writable():
-        return build_collection('for_pass_through_writing')
+    def when_file_is_readable_and_writable():
+        return build_collection('readable_writable_based_IO')
+
+    def when_file_is_writable_not_readable():
+        return build_collection('write_only_based_IO')
 
     def when_file_is_readable_not_writable():
-        return build_collection('for_traversal_via_lines')
+        return build_collection('read_only_based_IO')
 
     def when_file_based_and_string():
-        return build_collection('when_file_path')
+        return build_collection('path_based_IO')
 
     def build_collection(which):
         return _build_collection(which, cci, sa, kw, crazy_listener)
@@ -109,85 +113,125 @@ def _collection_via(sa, cci, listener, kw):
 
 def _build_collection(which, cci, sa, kw, crazy_listener):
 
-    # Determine the function categories we need, and binding strategy
-    is_file_based, is_directory_based, is_custom = True, False, False
-    is_directory_based, is_custom = False, False
-    if 'when_file_path' == which:
-        read, write = 'want', 'want'
-    elif 'when_directory' == which:
-        is_file_based, is_directory_based = False, True
-        read, write = 'want', 'want'
-    elif 'for_traversal_via_lines' == which:
-        read, write = 'need', None
-    elif 'for_pass_through_writing' == which:
-        read, write = None, 'need'
-    else:
-        assert 'custom' == which
-        is_file_based, is_custom = False, True
-        read, write = 'want', 'want'
+    # "Idiom" determines function categories ([R][W]) and binding strategy
+    idi = _IO_idiom_via_type(which)
 
     # Determine what the capabilities are and prepare binding strategies
     # (ALL of this binding logic is VERY experimental)
 
-    mod = sa.module
-    x = cci.mixed_collection_identifier
     opn = kw.get('opn')
+
+    # Let SA's specify defaults in function definitions (Case2609):
+    nnkw = {k: v for k, v in kw.items() if v is not None}
+
+    x = cci.mixed_collection_identifier
+    mod = sa.module
     bind_editors, bind_readers = None, None
 
-    if is_file_based:
-        fxr = mod.FUNCTIONSER_FOR_SINGLE_FILES()
+    if idi.is_file_based:
+        fxr = mod.FUNCTIONSER_FOR_SINGLE_FILES(**nnkw)
         edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE
         read_funcser = fxr.PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE
         bind_editors = _bind_editors_for_single_file
         bind_readers = _bind_readers_for_single_file
-    elif is_directory_based:
+        ssm = None
+        if idi.is_open_resource:
+            ssm = _seek_state_machine(x, crazy_listener)
+
+    elif idi.is_directory_based:
         fxr = mod.FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
             x, crazy_listener, **kw)
         edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY
         read_funcser = fxr.PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY
     else:
         # Get custom bindings from the SA lazily, only as-needed per category
-        assert is_custom
-        if (fxr := mod.CUSTOM_FUNCTIONSER(x, opn, crazy_listener)) is None:
+        assert idi.is_custom
+        fxr = mod.CUSTOM_FUNCTIONSER(cci, crazy_listener, **nnkw)
+        if fxr is None:
             return
         edit_funcser = fxr.PRODUCE_EDIT_FUNCTIONS_CUSTOMLY
         read_funcser = fxr.PRODUCE_READ_FUNCTIONS_CUSTOMLY
 
     # See if any required capabilities are missing, and apply the bindings
+
     do_edit, do_read, missing = False, False, []
-    if write:
+    if idi.write:
         if edit_funcser:
             do_edit = True
             edit_funcs = edit_funcser()  # or maybe lazy
             if bind_editors:
-                edit_funcs = bind_editors(which, x, edit_funcs, opn)
-        elif 'need' == write:
+                edit_funcs = bind_editors(idi, ssm, x, edit_funcs, opn)
+        elif 'need' == idi.write:
             missing.append('write')
-    if read:
+    if idi.read:
         if read_funcser:
             do_read = True
             read_funcs = read_funcser()  # or maybe lazy
             if bind_readers:
-                read_funcs = bind_readers(which, x, read_funcs, opn)
-        elif 'need' == read:
+                read_funcs = bind_readers(idi, ssm, x, read_funcs, opn)
+        elif 'need' == idi.read:
             missing.append('read')
 
     if missing:
         xx(f"fun! {sa.key} does not define {', '.join(missing)}")
 
-    assert read or write  # per the rule table above
+    assert idi.read or idi.write  # per the rule table above
+
+    # Similar to above, crazy experimental custom API
+
+    has_custom_functions = False
+    if (cfuncs := getattr(fxr, 'CUSTOM_FUNCTIONS_VERY_EXPERIMENTAL', None)):
+        def tuple_via_attr(attr):
+            orig_f = getattr(cfuncs, attr)
+            assert orig_f.is_reader
+
+            def use_f(*args):
+                @_contextmanager()
+                def cm():
+                    if (opened := opener(args[-1])) is None:
+                        yield None  # 😩
+                        return
+                    with opened as fh:
+                        yield orig_f(fh, *args)
+
+                return cm()
+            return attr, use_f
+
+        opener = _build_opener(idi, ssm, x, opn)  # redundant with #here5
+
+        import inspect as ins
+        attrs = (tup[0] for tup in ins.getmembers(cfuncs, ins.isfunction))
+        customs = tuple(tuple_via_attr(attr) for attr in attrs)
+        has_custom_functions = len(customs)
 
     # Money
 
     def parse_identifier(orig_f):  # #decorator
         def use_f(eid, *rest):
-            if (iden := parse_EID(eid, rest[-1])) is None:
+            iden_er = iden_er_er(rest[-1])
+            if (iden := iden_er(eid)) is None:
                 return
             return orig_f(iden, *rest)
         return use_f
 
+    iden_er_er = None
+    # The identifier function can be defined by the functionser..
+    if (f := fxr.PRODUCE_IDENTIFIER_FUNCTIONER):
+        iden_er_er = f()
+
+    # .. but then it can be overridden with an injection
+    if (f := kw.get('iden_er_er')):
+        assert iden_er_er  # not necessary at all. just hello from (Case2744)
+        iden_er_er = f
+
     class collection_NEW_WAY:  # #class-as-namespace
         if do_edit:
+            def dig_for_edit_agent(agent_path, listener=_listener):
+                if isinstance(agent_path, str):
+                    agent_path = ((agent_path, agent_path),)
+                return edit_funcs.dig_for_edit_agent_as_storage_adapter_collection(  # noqa: E501
+                    agent_path, collection_NEW_WAY, listener)
+
             @parse_identifier
             def update_entity(iden, x, listener):
                 return edit_funcs.update_entity_as_storage_adapter_collection(
@@ -195,14 +239,14 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
 
             def create_entity(x, listener):
                 return edit_funcs.create_entity_as_storage_adapter_collection(
-                    parse_EID, x, listener)
+                    iden_er_er, x, listener)
 
             @parse_identifier
             def delete_entity(iden, listener):
                 return edit_funcs.delete_entity_as_storage_adapter_collection(
                     iden, listener)
 
-        if do_edit and not is_directory_based:  # oh man. maybe one day
+        if do_edit and not idi.is_directory_based:  # oh man. maybe one day
             def open_collection_to_write_given_traversal(listener):
                 return edit_funcs._open_coll_for_passthru_write(listener)
 
@@ -218,13 +262,24 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
                 return read_funcs.open_identifier_traversal_as_storage_adapter_collection(listener)  # noqa: E501
 
             def open_entity_traversal(listener):
-                raise RuntimeError("let's party - probably just derive from below")  # noqa: E501
-                # return _open_entity_traversal_NEW_NEW_WAY(listener)
+                @_contextmanager()
+                def cm():
+                    cm = collection_NEW_WAY.open_schema_and_entity_traversal(listener)  # noqa: E501
+                    two = cm.__enter__()
+                    try:
+                        # It's suppsed to be guaranteed that the above gives
+                        # you a two-tuple. BUT neither component is guaranteed
+                        # (IFF the second one is None it failed)
+                        schema, ents = two
+                        yield ents
+                    finally:
+                        cm.__exit__(None, None, None)
+                return cm()
 
             def open_schema_and_entity_traversal(listener):
                 return read_funcs.open_schema_and_entity_traversal_as_storage_adapter_collection(listener)  # noqa: E501
 
-        def to_noun_phrase():
+        def _to_noun_phrase():
             # (more complicated before #history-B.5, lost thing about variant)
             # (moved to this file at #history-B.4)
             sa_slug = sa.key.replace('_', '-')
@@ -233,16 +288,35 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         COLLECTION_IMPLEMENTATION = fxr.COLL_IMPL_YUCK_
         storage_adapter = sa
 
-    parse_EID = (f := fxr.PRODUCE_IDENTIFIER_FUNCTION) and f()
+    if has_custom_functions:
+        for attr, use_f in customs:
+            setattr(collection_NEW_WAY, attr, use_f)
     return collection_NEW_WAY
 
 
-def _bind_editors_for_single_file(which, x, funcs, opn):
+def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
 
-    def use_create(iden_via, dct, listen):
-        # mode 'r+': must exist. open for read & write. pointer at beginning
-        with do_open_writable_filehandle('r+') as fp:
-            return funcs.CREATE_NEW_WAY(fp, iden_via, dct, listen)
+    # mode 'r+': must exist. open for read & write. pointer at beginning
+    mode = 'r+'
+    opener = _build_opener(idi, ssm, x, opn, mode)
+    open_writable = _build_binder(opener)
+
+    def use_dig_for_agent(dig_path, coll, listener):
+        if (agenter := _dig(funcs, coll, dig_path, listener)) is None:
+            return
+        return agenter(lambda: opener(listener))
+
+    @open_writable
+    def use_update(fh, iden, edit_x, listen):
+        return funcs.UPDATE_NEW_WAY(fh, iden, edit_x, listen)
+
+    @open_writable
+    def use_create(fh, iden_er_er, dct, listen):
+        return funcs.CREATE_NEW_WAY(fh, iden_er_er, dct, listen)
+
+    @open_writable
+    def use_delete(fh, iden, listen):
+        return funcs.DELETE_NEW_WAY(fh, iden, listen)
 
     def pass_thru_write(listener):
         lv = funcs.lines_via_schema_and_entities
@@ -250,35 +324,25 @@ def _bind_editors_for_single_file(which, x, funcs, opn):
         @_contextmanager()
         def cm():
             # mode 'x': cannot first exist. create a new file and open it for w
-            opened = do_open_writable_filehandle('x')
-            ok = False
-            try:
-                fp = opened.__enter__()
+            opened = opener(listener, 'x')
+            if opened is None:
+                return
 
+            with opened as fh:
                 class traversal_receiver:  # #class-as-namespace, crazy flex
                     def receive_schema_and_entities(schema, ents, listen):
-                        return _do_passthru_write(fp, schema, ents, lv, listen)
+                        return _do_passthru_write(fh, schema, ents, lv, listen)
                 yield traversal_receiver
-                ok = True
-            finally:
-                if not ok:
-                    xx("read me - maybe clean up")  # (before #history-B.5 we
-                    # ..used to fp.seek(0), fp.truncate(0), os_unlink(x))
-                opened.__exit__()
+            # (before #history-B.5 we ..used to fp.seek(0), fp.truncate(0), os_unlink(x))  # noqa: E501
         return cm()
 
     # ==
 
-    if 'when_file_path' == which:
-        def do_open_writable_filehandle(mode):
-            return (opn or open)(x, mode)  # ..
-    else:
-        def do_open_writable_filehandle(_):
-            return _null_context(x)
-        assert 'for_pass_through_writing' == which
-
     class use_edit_funcs:  # #class-as-namespace
+        dig_for_edit_agent_as_storage_adapter_collection = use_dig_for_agent
+        update_entity_as_storage_adapter_collection = use_update
         create_entity_as_storage_adapter_collection = use_create
+        delete_entity_as_storage_adapter_collection = use_delete
         _open_coll_for_passthru_write = pass_thru_write
     return use_edit_funcs
 
@@ -290,18 +354,21 @@ def _do_passthru_write(fp, schema, ents, lines_via_two, listener):
     return total
 
 
-def _bind_readers_for_single_file(which, x, funcs, opn):
+def _bind_readers_for_single_file(idi, ssm, x, funcs, opn):
     # (A lot of this could be tightened but: for now, redundancy for clarity)
+
+    opener = _build_opener(idi, ssm, x, opn)
+    open_readable = _build_binder(opener)  # #here5
 
     # Does the single-file SA want to implement its own random access?
     if hasattr(funcs, 'RETRIEVE_NEW_WAY'):
-        def use_retrieve(iden, listener):
-            with do_open_readable_filehandle() as fp:
-                return funcs.RETRIEVE_NEW_WAY(fp, iden, listener)
+        @open_readable
+        def use_retrieve(fh, iden, listener):
+            return funcs.RETRIEVE_NEW_WAY(fh, iden, listener)
     else:
-        def use_retrieve(iden, listener):
-            with do_open_readable_filehandle() as fp:
-                return retrieve_in_linear_time(fp, iden, listener)
+        @open_readable
+        def use_retrieve(fh, iden, listener):
+            return retrieve_in_linear_time(fh, iden, listener)
 
     def retrieve_in_linear_time(fp, iden, listener):
         _schema, ents = sch_ents_via_fp_er()(fp, listener)
@@ -313,17 +380,27 @@ def _bind_readers_for_single_file(which, x, funcs, opn):
                 return ent
             xx()
 
+    def iden_trav(listener):  # for now you get it "for free" and no cust
+        @_contextmanager()
+        def cm():
+            opened = sch_en(listener)
+            sch, ents = opened.__enter__()
+            try:
+                yield ents and (e.identifier for e in ents)
+            finally:
+                opened.__exit__(None, None, None)
+        return cm()
+
     def sch_en(listener):
         sch_ents_via_two = sch_ents_via_fp_er()
 
         @_contextmanager()
         def cm():
-            opened = do_open_readable_filehandle()
-            fp = opened.__enter__()
-            try:
-                yield sch_ents_via_two(fp, listener)
-            finally:
-                opened.__exit__()
+            opened = opener(listener)
+            if opened is None:
+                return
+            with opened as fh:
+                yield sch_ents_via_two(fh, listener)
         return cm()
 
     def sch_ents_via_fp_er():
@@ -331,23 +408,175 @@ def _bind_readers_for_single_file(which, x, funcs, opn):
 
     # ==
 
-    if 'when_file_path' == which:
-        def do_open_readable_filehandle():
-            return (opn or open)(x)  # ..
-    else:
-        assert 'for_traversal_via_lines' == which  # (Case1062DP)
-
-        def do_open_readable_filehandle():
-            # STDIN or an open filehandle (-looking-thing) was passed in.
-            # The contract is: because we didn't open it, we don't close it.
-
-            return _null_context(x)
-
     class use_read_funcs:  # #class-as-namespace
         retrieve_entity_as_storage_adapter_collection = use_retrieve
+        open_identifier_traversal_as_storage_adapter_collection = iden_trav
         open_schema_and_entity_traversal_as_storage_adapter_collection = sch_en
     return use_read_funcs
 
+
+# == Binding
+#    "binding" is what allows the methods of single-file-based SA's to have
+#    that "fh" as the first argument, but we as the outer shell "collection"
+#    façade bury that resource management away as an abstraction
+
+def _build_binder(opener):
+    def decorator(orig_f):
+        def use_f(*args):
+            opened = opener(args[-1])
+            if opened is None:
+                return
+            with opened as fh:
+                return orig_f(fh, *args)
+        return use_f
+    return decorator
+
+
+def _build_opener(idi, ssm, x, opn, *mode):
+    if idi.is_open_resource:
+        return _build_opener_for_open_resource(ssm.prepared_file_handle)
+
+    assert idi.is_file_based and not idi.is_open_resource
+
+    def opener(listener, *other_mode):
+        use_mode = other_mode if len(other_mode) else mode
+        try:
+            return (opn or open)(x, *use_mode)  # ..
+        except FileNotFoundError as e:  # #here4
+            exe = e
+        emit_about_no_ent(listener, exe)
+    return opener
+
+
+def _build_opener_for_open_resource(file_handle_er):
+    def opener(_listener, *mode):
+        return _null_context(file_handle_er())  # (Case1062DP)
+    return opener
+
+
+# == "Seek State Machine": rewind open filehandles as necessary
+
+def _seek_state_machine(fp, listener):
+    """
+    Consider what happens when we apply these operations to a markdown file:
+    - traverse (ents/ids): traverse whole file to ensure no multi-table
+    - retrieve: (same as above) and to ensure no dups (imagine)
+    - delete: (same as above)
+    - update: (same as above)
+    - create: traverse whole file once to index idens, then 2nd time to rewrite
+
+    Note each operation does a full traversal (or might want to), and at
+    least one operation requires more than one traversal. (In reality it
+    seems like it depends on the implementation.. These may all be one-shot)
+
+    If we were passed an open resource, the contract is: we don't close it.
+
+    However, if the façade is used for more than one operation or the operation
+    requires more than one traversal, the file pointer will be at the end of
+    the file and the file (and so collection) will appear empty.
+
+    So for sessions requiring multiple traversals, it will be necessary to
+    rewind the file pointer to the beginning of input in between traversals.
+
+    However, non-interactive terminals (STDIN/STDOUT/STDERR) can't be
+    meaningfully rewound..  (#[#873.Z] whether and how we seek(0))
+    """
+
+    class sm:
+        def __init__(self):
+            self._is_first_call = True
+
+        def prepared_file_handle(self):
+            if self._is_first_call:
+                self._is_first_call = False
+                return fp
+            if fp.isatty():
+                xx("can't rewind a TTY.. ")
+            fp.seek(0)  # ..
+            return fp
+    return sm()
+
+
+# == IO Idioms
+
+def _define_IO_idioms():
+    # there are (say) 3 functionser types and then these N idioms. it's interna
+
+    def directory_based_IO():
+        yield 'is_directory_based', True, 'read', 'want', 'write', 'want'
+
+    def path_based_IO():
+        yield 'is_file_based', True, 'read', 'want', 'write', 'want'
+
+    def readable_writable_based_IO():
+        yield 'is_open_resource', True
+        need_or_want = 'need'  # not sure
+        yield 'read', need_or_want, 'write', need_or_want
+
+    def write_only_based_IO():
+        yield 'is_open_resource', True, 'write', 'need'
+
+    def read_only_based_IO():
+        yield 'is_open_resource', True, 'read', 'need'
+
+    def custom_IO():
+        yield 'is_custom', True, 'read', 'want', 'write', 'want'
+
+    return locals()
+
+
+def _IO_idiom_via_type(typ):
+    memo = _IO_idiom_via_type
+    if memo.func is None:
+        memo.func = _build_IO_idiom_via_type()
+    return memo.func(typ)
+
+
+_IO_idiom_via_type.func = None
+
+
+def _build_IO_idiom_via_type():
+    def dereference(k):
+        if k not in memo:
+            memo[k] = build_idiom(k)
+        return memo[k]
+
+    def build_idiom(k):
+        def_func = def_func_via_k[k]
+        cel_iters = (iter(row) for row in def_func())
+        dct = {k: next(cel_iter) for cel_iter in cel_iters for k in cel_iter}
+        return _Idiom(**dct)
+
+    def_func_via_k = {k: f for k, f in _define_IO_idioms().items()}
+    memo = {}
+    return dereference
+
+
+class _Idiom:
+    def __init__(
+            self, read=None, write=None,
+            is_directory_based=None, is_file_based=None, is_open_resource=None,
+            is_custom=None):
+        (locs := {k: v for k, v in locals().items()}).pop('self')
+        assert read or write
+        if is_open_resource:
+            locs['is_file_based'] = True
+        for attr, v in locs.items():
+            setattr(self, attr, v)
+
+
+# == Dig
+
+def _dig(funcs, coll, key_desc_pairs, listener):
+    key_desc_pairs = tuple(key_desc_pairs)
+    assert len(key_desc_pairs)
+    assert all('_' != k[0] for k, _ in key_desc_pairs)  # make sure no names..
+    say_collection = coll._to_noun_phrase
+    from kiss_rdb.magnetics.via_collection import DIGGY_DIG as func
+    return func(funcs, key_desc_pairs, say_collection, listener)
+
+
+# == Resolving schema & storage adapter (from collection path)
 
 def _parse_schema_and_resolve_SA(cci, fmt, saidx, listener, opn=None):
     # to sort this out, we made flowchart [#857.D]. direct translation here:
@@ -410,7 +639,7 @@ def _parse_schema_and_resolve_SA(cci, fmt, saidx, listener, opn=None):
         if 'error' != sev:
             return listener(sev, *rest)
         stack = _stack_function()()
-        _re_emit_case_error_CRAZILY(listener, stack, (sev, *rest))
+        _re_emit_case_error_CRAZILY(throwing_listener, stack, (sev, *rest))
 
     def cstacker():
         xx()
@@ -438,7 +667,7 @@ def _SA_opts_via_parse_schema(x, saidx, opn, listener):
     schema_path = os_path_join(x, tail)
     try:
         opened = (opn or open)(schema_path)
-    except FileNotFoundError as e:
+    except FileNotFoundError as e:  # #here4
         return _emit_about_no_schema_file(listener, e)
     except NotADirectoryError:
         return _emit_about_no_extname(listener, x)
@@ -687,10 +916,12 @@ def _classify_collection_identifier(x):
 
     def these():
         def narrative_writable_or_readable():  # assume
-            if arg_looks_like_writable_file_handle():
-                return 'writable'
             if arg_looks_like_readable_file_handle():
-                return 'readable'
+                if arg_looks_like_writable_file_handle():
+                    return 'readable_writable'
+                return 'readable_only'
+            if arg_looks_like_writable_file_handle():
+                return 'writable_only'
             return 'neither_writable_nor_readable'  # idk
 
         def narrative_shape_type():
@@ -865,9 +1096,14 @@ def _emit_about_empty_schema_file(listener, reason_head, parse_state):
 def _emit_about_no_schema_file(listener, file_not_found):
     def structurer():  # (Case1413)
         return func(file_not_found)
-    from modality_agnostic import \
-        emission_details_via_file_not_found_error as func
+    func = _emission_details_via_file_not_found_error
     listener(*_EC_for_cannot_load, 'no_schema_file', structurer)
+
+
+def emit_about_no_ent(listener, e):  # [pho]
+    func = _emission_details_via_file_not_found_error
+    listener('error', 'structure', 'cannot_load_collection',
+             'no_such_file_or_directory', lambda: func(e))
 
 
 def _emit_about_no_extname(listener, path):
@@ -919,6 +1155,12 @@ def _say_extname_collision(en, first_key, second_key):
 def _key_via_storage_adapter_module(sa_mod):
     name = sa_mod.__name__
     return name[name.rindex('.')+1:]
+
+
+def _emission_details_via_file_not_found_error(exc):
+    from modality_agnostic import \
+        emission_details_via_file_not_found_error as func
+    return func(exc)
 
 
 # == Smalls

@@ -44,12 +44,19 @@ def field_line(var_name, string_value):
 # == END
 
 
+def eno_collection_via_(directory, rng=None):  # #testpoint
+    import sys
+    sa_mod = sys.modules[__name__]
+    from kiss_rdb import collection_via_storage_adapter_and_path as func
+    return func(sa_mod, directory, None, rng=rng)
+
+
 def CREATE_COLLECTION(collection_path, listener, is_dry):
     from ._create_collection import CreateCollection
     return CreateCollection().execute(collection_path, listener, is_dry)
 
 
-def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
+def ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     # #open [#873.S] at birth of this storage adapter, we are hard-coding it
     # to support only one storage schema. but when the day comes, abstract
     # the things out of the sibling spot in the toml adapter
@@ -60,22 +67,27 @@ def FUNCTIONSERER_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     if 'storage_schema' in dct:
         assert '32x32x32' == dct['storage_schema']
 
-    def funcser_via_coll_args(directory, _listener, rng=None):
-        ci = _collection_implementation(directory, rng)
-        from kiss_rdb.magnetics_.collection_via_path import \
-            NEW_FUNCTIONSER_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-        return func(ci)
-
-    class first_ns:  # #class-as-namespace
-        FUNCTIONSER_VIA_COLLECTION_ARGS = funcser_via_coll_args
-    return first_ns
+    return dct
 
 
-def eno_collection_via_(directory, opn=None, rng=None):  # #testpoint
-    ci = _collection_implementation(directory, rng, opn)
-    from kiss_rdb.magnetics_.collection_via_path import \
-        NEW_COLLECTION_VIA_OLD_COLLECTION_IMPLEMENTATION_ as func
-    return func(ci)
+def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
+        directory, listener, storage_schema=None, rng=None):
+
+    del storage_schema
+    ci = _collection_implementation(directory, rng)
+
+    class fxr:  # #class-as-namespace
+        def PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY():
+            return ci
+
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY():
+            return ci
+
+        def PRODUCE_IDENTIFIER_FUNCTIONER():
+            return ci.PRODUCE_IDENTIFIER_FUNCTIONER_()
+
+        COLL_IMPL_YUCK_ = ci
+    return fxr
 
 
 def _collection_implementation(directory, rng=None, opn=None):
@@ -159,26 +171,32 @@ def _collection_implementation(directory, rng=None, opn=None):
                 return
             return self.read_only_entity_via_section_(sect_el, iden, mon)
 
-        def to_identifier_stream_as_storage_adapter_collection(listener):
+        def open_identifier_traversal_as_storage_adapter_collection(listener):
+            from contextlib import nullcontext
+            return nullcontext(self.to_idens(listener))
+
+        def to_idens(listener):
             mon = self.monitor_via_listener_(listener)
             listener = mon.listener  # overwrite argument
             for path in self.to_file_paths_():
                 docu = self.eno_document_via_(path=path, listener=listener)
                 if docu is None:
                     return
-                _ = self._entity_section_els_via_document(docu, path, mon)
-                for eid, __ in _:
+                k_scts = self._entity_section_els_via_document(docu, path, mon)
+                for eid, _sect in k_scts:
                     iden = self.identifier_via_string_(eid, listener)  # #here4
                     if iden is None:
                         return
                     yield iden
 
-        def PRODUCE_IDENTIFIER_FUNCTION_OLD_TO_NEW_():
-            def wee(eid, listener):
+        def PRODUCE_IDENTIFIER_FUNCTIONER_():
+            def iden_er_er(listener, cstacker=None):
+                def iden_er(eid):
+                    return func(eid, listener)
                 from kiss_rdb.magnetics_.identifier_via_string import \
                     identifier_via_string_ as func
-                return func(eid, listener)
-            return wee
+                return iden_er
+            return iden_er_er
 
         # -- protected magnetics
 
@@ -321,8 +339,8 @@ def _retrieve_entity_section_element(ID, path, injection, coll, mon):
     count = 0
 
     _ = coll._entity_section_els_via_document(docu, path, mon)
-    for ID_s, sect_el in _:
-        if target_ID_s == ID_s:
+    for eid, sect_el in _:
+        if target_ID_s == eid:
             return sect_el
         count += 1
 
@@ -383,9 +401,9 @@ def _document_sections(document, path, mon):
 
     def change_from_start_to_main():
         be_in_state('main')
-        state.length_of_first_identifier = len(ID_s)
-        state.first_identifier_string = ID_s
-        state.previous_identifier_string = ID_s
+        state.length_of_first_identifier = len(eid)
+        state.first_identifier_string = eid
+        state.previous_identifier_string = eid
         yield_this_section_next()
 
     def see_nonfirst_section():
@@ -394,15 +412,15 @@ def _document_sections(document, path, mon):
         # in other adaptations we do no such checks on RETRIEVE at all, but
         # here it feels too easy (and fast) not to. but see #here4
 
-        if len(ID_s) != state.length_of_first_identifier:
-            _when_inconsistent_depth(mon.listener, ID_s, sect_el, state, path)
+        if len(eid) != state.length_of_first_identifier:
+            _when_inconsistent_depth(mon.listener, eid, sect_el, state, path)
             return
 
-        if not (state.previous_identifier_string < ID_s):
-            _when_out_of_order(mon.listener, ID_s, sect_el, state, path)
+        if not (state.previous_identifier_string < eid):
+            _when_out_of_order(mon.listener, eid, sect_el, state, path)
             return
 
-        state.previous_identifier_string = ID_s
+        state.previous_identifier_string = eid
         yield_this_section_next()
 
     def on_doc_meta():
@@ -412,7 +430,7 @@ def _document_sections(document, path, mon):
     def yield_this_section_next():
         assert(not state.has_thing_to_yield)
         state.has_thing_to_yield = True
-        state.yield_me = typ, ID_s, sect_el
+        state.yield_me = typ, eid, sect_el
 
     def be_in_state(typ):
         state.current_state = state_machine[typ]
@@ -431,7 +449,7 @@ def _document_sections(document, path, mon):
         state.has_thing_to_yield = False
         return x
 
-    for typ, ID_s, sect_el in _tokenized_sections(document, path, mon.listener):  # noqa: E501
+    for typ, eid, sect_el in _tokenized_sections(document, path, mon.listener):  # noqa: E501
         try_to_transition_to(typ)
 
         if not mon.OK:
@@ -464,7 +482,7 @@ def _tokenized_sections(document, path, listener):
     for section_el in _section_elements(document, path, listener):
         key = section_el.string_key()
         scn = StringScanner(key, listener)
-        if (s := scn.scan_required(first_word)) is None:  # noqa #here5
+        if (s := scn.scan_required(first_word)) is None:
             return
         if 'document-meta' == s:
             if scn.skip_required(eos) is None:
@@ -474,7 +492,7 @@ def _tokenized_sections(document, path, listener):
         if not scn.skip_required(colon):
             return
 
-        if (ID_s := scn.scan_required(identifier)) is None:  # noqa #here5
+        if (eid := scn.scan_required(identifier)) is None:
             return
 
         if not scn.skip_required(colon):
@@ -486,7 +504,7 @@ def _tokenized_sections(document, path, listener):
         if scn.skip_required(eos) is None:
             return
 
-        yield 'entity_section', ID_s, section_el
+        yield 'entity_section', eid, section_el
 
 
 def _section_elements(document, path, listener):
@@ -562,10 +580,10 @@ def _when_section_not_found(listener, count, target_ID_s, path):
     listener('error', 'structure', 'entity_not_found', _details(deets))
 
 
-def _when_out_of_order(listener, ID_s, section, state, path):
+def _when_out_of_order(listener, eid, section, state, path):
     def deets():
         _ = state.previous_identifier_string
-        _ = f"entities are out of order. '{ID_s}' can't come after '{_}'."
+        _ = f"entities are out of order. '{eid}' can't come after '{_}'."
         yield 'reason_tail', _
         yield 'lineno', section._instruction['line'] + 1  # #here1
         yield 'path', path
@@ -573,7 +591,7 @@ def _when_out_of_order(listener, ID_s, section, state, path):
     listener('error', 'structure', 'eno_file_integrity_error', _details(deets))
 
 
-def _when_inconsistent_depth(listener, ID_s, section, state, path):
+def _when_inconsistent_depth(listener, eid, section, state, path):
     def deets():
         yield 'reason_tail', ''.join(reason_pieces())
         yield 'lineno', section._instruction['line'] + 1  # #here1
@@ -583,7 +601,7 @@ def _when_inconsistent_depth(listener, ID_s, section, state, path):
         yield f"first identifier ('{state.first_identifier_string}') "
         yield "establishes an identifier depth of "
         yield str(state.length_of_first_identifier)
-        yield f". This section ('{ID_s}') has a depth of {len(ID_s)}."
+        yield f". This section ('{eid}') has a depth of {len(eid)}."
 
     listener('error', 'structure', 'eno_file_integrity_error', _details(deets))
 
@@ -664,11 +682,17 @@ _THREE = 3  # hardcoded depth for now
 _entites_fn = 'entities'
 
 
-# :#here5: at #history-A.1 we started using the new ':=' NAMEDEXPR feature
-# but pyflakes (used by flake8)'s latest stable release does not yet
-# recognize this (but its master does at writing). we wrestled with trying to
-# get poetry to let us use the github url for pyflakes AND have flake8 use
-# that, but it became a huge timesink.. #todo
+""" :#here5:
+At #history-B.4 the world changed to using context managers for transacting
+with collections. For this particular storage adapter, the impact was only
+superficial (we eventually discovered):
 
+We rely on a vendor lib to parse eno documents, and that vendor lib parses
+each eno document into one big tree (memory-hog-not-streaming, DOM-like)
+"all at once" so we don't have to think about resource management the same way
+we do when we stream over the lines of each file ourselves.
+"""
+
+# #history-B.4
 # #history-A.1 spike first sketch of read-only
 # #born as nonworking stub
