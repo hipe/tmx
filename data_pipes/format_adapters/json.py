@@ -24,9 +24,6 @@ def FUNCTIONSER_FOR_SINGLE_FILES():
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
             return _build_identifier_builder
-
-        COLL_IMPL_YUCK_ = None
-        pass
     return fxr
 
 
@@ -150,7 +147,7 @@ def _lines_via_schema_and_entities(schema, given_ents, listener):
     def json_lines_via_entity(ent):
         # NOTE skipping the idea of identifiers for now
 
-        dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+        dct = ent.core_attributes_dictionary
         big_s = json_dumps(dct, indent=2)
 
         # Split on newlines but keep the newlines #[#610]
@@ -200,7 +197,7 @@ def _build_identifier_builder(_listener, _cstacker=None):
     return iden_via_primitive
 
 
-_JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary_as_storage_adapter_entity',))  # noqa: E501
+_JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary',))
 _MinimalSchema = _nt('MinimalSchema', ('field_name_keys',))
 
 

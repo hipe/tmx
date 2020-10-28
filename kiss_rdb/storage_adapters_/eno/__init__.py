@@ -86,7 +86,7 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
         def PRODUCE_IDENTIFIER_FUNCTIONER():
             return ci.PRODUCE_IDENTIFIER_FUNCTIONER_()
 
-        COLL_IMPL_YUCK_ = ci
+        CUSTOM_FUNCTIONS_OLD_WAY = ci  # #open [#877.B] (Case1476)
     return fxr
 
 
@@ -95,7 +95,7 @@ def _collection_implementation(directory, rng=None, opn=None):
 
         # -- the big collection API operations (or experimental similar)
 
-        def create_entity_as_storage_adapter_collection(
+        def create_entity_via_identifier(
                 _, attr_vals, listener, is_dry=False):
             # (not used by our main application client but here for developmen)
 
@@ -160,7 +160,7 @@ def _collection_implementation(directory, rng=None, opn=None):
             return REMOVE_IDENTIFIER_FROM_INDEX_(
                     eid, directory, _THREE, listener)
 
-        def retrieve_entity_as_storage_adapter_collection(iden, listener):
+        def retrieve_entity_via_identifier(iden, listener):
             mon = _monitor_via_listener(listener)
             path = self.path_via_identifier_(iden, listener)
             if path is None:
@@ -171,7 +171,7 @@ def _collection_implementation(directory, rng=None, opn=None):
                 return
             return self.read_only_entity_via_section_(sect_el, iden, mon)
 
-        def open_identifier_traversal_as_storage_adapter_collection(listener):
+        def open_identifier_traversal(listener):
             from contextlib import nullcontext
             return nullcontext(self.to_idens(listener))
 
@@ -257,11 +257,11 @@ def _read_only_entity(sect_el, ID, mon):
 
     class ReadOnlyEntity:  # #class-as-namespace
 
-        def to_dictionary_two_deep_as_storage_adapter_entity():
+        def to_dictionary_two_deep():
             return {'identifier_string': ID.to_string(),
                     'core_attributes': dct}
 
-        core_attributes_dictionary_as_storage_adapter_entity = dct
+        core_attributes_dictionary = dct
         identifier = ID
 
         VENDOR_SECTION_ = section

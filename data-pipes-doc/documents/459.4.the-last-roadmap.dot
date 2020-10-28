@@ -18,24 +18,24 @@ n2_50[label="did you dismantle\nthe idea of\na collection?"]
 n2_26->n2_50
 n2_25->n2_50
 n2_17->n2_50
-n2_26[label="away _NEW_WAY\n"]
+n2_26[label="away _NEW_WAY\n" style=filled]
 n2_25[label="please try and make\nCOLL_IMPL_YUCK_
-and COLLECTION_IMPLEMENTATION\nnot a thing"]
-n2_17[label="maybe no more methods\nnamed _as_storage_adapter"]
+and COLLECTION_IMPLEMENTATION\nnot a thing" style=filled]
+n2_17[label="maybe no more methods\nnamed _as_storage_adapter" style=filled]
 n2->n2_26
 n2->n2_25
 n2->n2_17
-n2[label="then.."]
+n2[label="then.." style=filled]
 n1_900->n2
 n1_880->n2
 n1_770->n2
 n1_900[label="no more\nCI_VIA_SINGLE_FILE\nanywhere" style=filled]
-n1_880[label="away TO_IDENTIFIER_STREAM"]
+n1_880[label="away TO_IDENTIFIER_STREAM" style=filled]
 n1_770[label="no more 'fileno'\netc inspection\nin SA's" style=filled]
 n1_750->n1_900
 n1_750->n1_880
 n1_750->n1_770
-n1_750[label="exit criteria"]
+n1_750[label="exit criteria" style=filled]
 n1_500->n1_750
 n1_050->n1_750
 n1_500[label="[about 12\nmore things]" style=filled]

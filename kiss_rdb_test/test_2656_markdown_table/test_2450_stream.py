@@ -36,7 +36,7 @@ def _signature_via_ents(ents):
         dcts, k = [], None
         for first_ent in ents:
             def p(ent):
-                dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+                dct = ent.core_attributes_dictionary
                 dct[k] = ent.nonblank_identifier_primitive  # ..
                 return dct
             k = first_ent.identifier_key__

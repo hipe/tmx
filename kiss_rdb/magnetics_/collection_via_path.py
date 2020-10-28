@@ -224,26 +224,26 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         assert iden_er_er  # not necessary at all. just hello from (Case2744)
         iden_er_er = f
 
-    class collection_NEW_WAY:  # #class-as-namespace
+    class collection_facade:  # #class-as-namespace
         if do_edit:
             def dig_for_edit_agent(agent_path, listener=_listener):
                 if isinstance(agent_path, str):
                     agent_path = ((agent_path, agent_path),)
-                return edit_funcs.dig_for_edit_agent_as_storage_adapter_collection(  # noqa: E501
-                    agent_path, collection_NEW_WAY, listener)
+                return edit_funcs.dig_for_edit_agent(
+                    agent_path, collection_facade, listener)
 
             @parse_identifier
             def update_entity(iden, x, listener):
-                return edit_funcs.update_entity_as_storage_adapter_collection(
+                return edit_funcs.update_entity_via_identifier(
                     iden, x, listener)
 
             def create_entity(x, listener):
-                return edit_funcs.create_entity_as_storage_adapter_collection(
+                return edit_funcs.create_entity_via_identifier(
                     iden_er_er, x, listener)
 
             @parse_identifier
             def delete_entity(iden, listener):
-                return edit_funcs.delete_entity_as_storage_adapter_collection(
+                return edit_funcs.delete_entity_via_identifier(
                     iden, listener)
 
         if do_edit and not idi.is_directory_based:  # oh man. maybe one day
@@ -253,18 +253,18 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         if do_read:
             @parse_identifier
             def retrieve_entity(iden, listener):
-                return read_funcs.retrieve_entity_as_storage_adapter_collection(iden, listener)  # noqa: E501
+                return read_funcs.retrieve_entity_via_identifier(iden, listener)  # noqa: E501
 
             def TO_IDENTIFIER_STREAM(listener):
                 raise RuntimeError("CHANGE IT PlEASE")
 
             def open_identifier_traversal(listener):
-                return read_funcs.open_identifier_traversal_as_storage_adapter_collection(listener)  # noqa: E501
+                return read_funcs.open_identifier_traversal(listener)
 
-            def open_entity_traversal(listener):
+            def open_entity_traversal(listener):  # #todo: use conversion
                 @_contextmanager()
                 def cm():
-                    cm = collection_NEW_WAY.open_schema_and_entity_traversal(listener)  # noqa: E501
+                    cm = collection_facade.open_schema_and_entity_traversal(listener)  # noqa: E501
                     two = cm.__enter__()
                     try:
                         # It's suppsed to be guaranteed that the above gives
@@ -277,7 +277,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
                 return cm()
 
             def open_schema_and_entity_traversal(listener):
-                return read_funcs.open_schema_and_entity_traversal_as_storage_adapter_collection(listener)  # noqa: E501
+                return read_funcs.open_schema_and_entity_traversal(listener)
 
         def _to_noun_phrase():
             # (more complicated before #history-B.5, lost thing about variant)
@@ -285,13 +285,15 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
             sa_slug = sa.key.replace('_', '-')
             return ''.join(("the '", sa_slug, "' format adapter"))
 
-        COLLECTION_IMPLEMENTATION = fxr.COLL_IMPL_YUCK_
+        if (o := getattr(fxr, 'CUSTOM_FUNCTIONS_OLD_WAY', None)):
+            COLLECTION_IMPLEMENTATION = o
+
         storage_adapter = sa
 
     if has_custom_functions:
         for attr, use_f in customs:
-            setattr(collection_NEW_WAY, attr, use_f)
-    return collection_NEW_WAY
+            setattr(collection_facade, attr, use_f)
+    return collection_facade
 
 
 def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
@@ -308,15 +310,15 @@ def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
 
     @open_writable
     def use_update(fh, iden, edit_x, listen):
-        return funcs.UPDATE_NEW_WAY(fh, iden, edit_x, listen)
+        return funcs.UPDATE_VIA_FILEHANDLE(fh, iden, edit_x, listen)
 
     @open_writable
     def use_create(fh, iden_er_er, dct, listen):
-        return funcs.CREATE_NEW_WAY(fh, iden_er_er, dct, listen)
+        return funcs.CREATE_VIA_FILEHANDLE(fh, iden_er_er, dct, listen)
 
     @open_writable
     def use_delete(fh, iden, listen):
-        return funcs.DELETE_NEW_WAY(fh, iden, listen)
+        return funcs.DELETE_VIA_FILEHANDLE(fh, iden, listen)
 
     def pass_thru_write(listener):
         lv = funcs.lines_via_schema_and_entities
@@ -339,10 +341,10 @@ def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
     # ==
 
     class use_edit_funcs:  # #class-as-namespace
-        dig_for_edit_agent_as_storage_adapter_collection = use_dig_for_agent
-        update_entity_as_storage_adapter_collection = use_update
-        create_entity_as_storage_adapter_collection = use_create
-        delete_entity_as_storage_adapter_collection = use_delete
+        dig_for_edit_agent = use_dig_for_agent
+        update_entity_via_identifier = use_update
+        create_entity_via_identifier = use_create
+        delete_entity_via_identifier = use_delete
         _open_coll_for_passthru_write = pass_thru_write
     return use_edit_funcs
 
@@ -361,10 +363,11 @@ def _bind_readers_for_single_file(idi, ssm, x, funcs, opn):
     open_readable = _build_binder(opener)  # #here5
 
     # Does the single-file SA want to implement its own random access?
-    if hasattr(funcs, 'RETRIEVE_NEW_WAY'):
+
+    if (rtrv := getattr(funcs, 'RETRIEVE_VIA_FILEHANDLE', None)):
         @open_readable
         def use_retrieve(fh, iden, listener):
-            return funcs.RETRIEVE_NEW_WAY(fh, iden, listener)
+            return rtrv(fh, iden, listener)
     else:
         @open_readable
         def use_retrieve(fh, iden, listener):
@@ -409,9 +412,9 @@ def _bind_readers_for_single_file(idi, ssm, x, funcs, opn):
     # ==
 
     class use_read_funcs:  # #class-as-namespace
-        retrieve_entity_as_storage_adapter_collection = use_retrieve
-        open_identifier_traversal_as_storage_adapter_collection = iden_trav
-        open_schema_and_entity_traversal_as_storage_adapter_collection = sch_en
+        retrieve_entity_via_identifier = use_retrieve
+        open_identifier_traversal = iden_trav
+        open_schema_and_entity_traversal = sch_en
     return use_read_funcs
 
 
@@ -479,7 +482,7 @@ def _seek_state_machine(fp, listener):
     rewind the file pointer to the beginning of input in between traversals.
 
     However, non-interactive terminals (STDIN/STDOUT/STDERR) can't be
-    meaningfully rewound..  (#[#873.Z] whether and how we seek(0))
+    meaningfully rewound..  (#[#873.26] whether and how we seek(0))
     """
 
     class sm:
@@ -492,7 +495,7 @@ def _seek_state_machine(fp, listener):
                 return fp
             if fp.isatty():
                 xx("can't rewind a TTY.. ")
-            fp.seek(0)  # ..
+            fp.seek(0)  # this IS :[#873.26]
             return fp
     return sm()
 

@@ -10,13 +10,7 @@ learn enough SDK to make WASD
 have full on eno
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
-json stream via STDIN?
-Let's whack out a quick json thru putter
 refactor every write_help_into
 filesystem_functions does nothing
-you broke almost every or every producer script at some point. cover them all in one file
 data-pipes-doc/documents/459.4.the-last-roadmap.dot
 see #!soon
-away adapter_variant
-CREATE_NEW_WAY and DELETE_NEW_WAY something else ? result in diffs?
-you could eliminate all trace of TO_IDENTIFIER_STREAM

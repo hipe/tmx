@@ -14,6 +14,12 @@ import re
 _url = 'https://github.com/sindresorhus/awesome-electron#boilerplates'
 
 
+def _formals():
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
+
+
 def _my_CLI(sin, sout, serr, is_for_sync, rscr):
     mon = rscr().monitor
     with open_traversal_stream(mon.listener) as dcts:
@@ -110,10 +116,7 @@ def _ps_lib():
 
 
 if __name__ == '__main__':
-    formals = (
-        ('-s', '--for-sync',
-         'translate to a stream suitable for use in [#447] syncing'),
-        ('-h', '--help', 'this screen'))
+    formals = _formals()
     kwargs = {'description_valueser': lambda: {'_this_one_url': _url}}
     import sys as o
     from script_lib.cheap_arg_parse import cheap_arg_parse as func

@@ -14,7 +14,9 @@ broadly there are 3 steps to this:
 """
 
 
-raise RuntimeError("worked at #history-B.2. comment out if u're feeling lucky")
+from os import path as os_path
+
+
 # at #history-B.2 increased expected number of tables from 4 to 6
 # at #history-A.2 [#676] worked but:
 # NOTE - this writes tempfiles so take that into account when you cover
@@ -27,73 +29,81 @@ _doc = __doc__  # grab the above as our UI docstring before below
 # be a very weak development dependency, and we want to hold off on any
 # dependencies for now..)
 
+
 """
 dependencies (TODO):
-    - beautifulsoup4   4.6.0
     - matplotlib       2.1.2
     - numpy            1.14.1
-    - requests         2.18.4
 """
 
 
 url = 'https://en.wikipedia.org/wiki/Woody_Allen_filmography'
 
+
+# [#007.3]
+
 tmp_numbers_file = 'tmp.woody-allen.numbers.list'
 tmp_html_file = 'tmp.woody-allen.page.html'
+_here = 'z/_CACHED_FOR_SCRAPING_'  # #[#007.3]
+tmp_numbers_file = os_path.join(_here, tmp_numbers_file)
+tmp_html_file = os_path.join(_here, tmp_html_file)
+_fixture_html = 'data_pipes_test/fixture-files/500-html/5881-woody-allen.html'
 
 
-def _CLI(stdin, stdout, stderr, argv):
-    formals = (('--use-numpy', 'do the full monty. requires things'),
-               ('-h', '--help', 'this screen'))
+def _formals():
+    yield '--use-numpy', 'do the full monty. requires things'
+    yield '-t', '--test', 'test self'
+    yield '-h', '--help', 'this screen'
+
+
+def _CLI(stdin, stdout, stderr, argv):  # #testpoint
     from script_lib.cheap_arg_parse import cheap_arg_parse as func
-    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
+    return func(_do_CLI, stdin, stdout, stderr, argv, _formals())
 
 
-def _do_CLI(sin, sout, serr, do_use_numpy, rscer):
-
+def _do_CLI(sin, sout, serr, do_use_numpy, do_test, rscer):
     def main():
-        ok = resolve_html_file()
-        if not ok:
-            return exitstatus
+        self.use_path = procure_html_file_on_the_filesystem()
+        write_the_numbers_file_to_the_workspace()
+        return _display_thing(client, ws, do_use_numpy)
 
-        ok = resolve_numbers()
-        if not ok:
-            return exitstatus
+    def write_the_numbers_file_to_the_workspace():
+        if ws.tmp_numbers_file_exists:
+            return client.info('(using {})', ws.tmp_numbers_file)
+        return _write_numbers_file(ws, client)
 
-        return _display_thing(client, do_use_numpy)
-
-    def resolve_numbers():
-        if client.path_exists(tmp_numbers_file):
-            client.info('(using {})', tmp_numbers_file)
-            return True
-        else:
-            return _write_numbers_file(client)
-
-    def resolve_html_file():
-        if client.path_exists(tmp_html_file):
-            client.info('(using {})', tmp_html_file)
-            return True
-        else:
-            return _write_html_file(client)
+    def procure_html_file_on_the_filesystem():
+        if ws.tmp_html_file_exists:
+            client.info('(using {})', ws.tmp_html_file)
+            return ws.tmp_html_file
+        if _write_html_file(client, ws):
+            return tmp_html_file
+        raise stop()
 
     client = _Client(sout, serr)
-    exitstatus = 5
+    ws = _MutableWorkspace('for_test' if do_test else 'for_production')
+    self = main  # watch the world burn
 
-    return main()
+    class stop(RuntimeError):
+        pass
+    try:
+        return main()
+    except stop:
+        return 5
 
 
 _do_CLI.__doc__ = _doc
 
 
-def _display_thing(client, do_thing):
+def _display_thing(client, ws, do_thing):
 
-    float_a = tuple(__floats_via_file())
+    float_a = tuple(_floats_via_file(ws))
     if do_thing:
-        return __display_thing_using_numpy(client, float_a)
-    return __display_thing_simply(client, float_a)
+        return _display_thing_using_numpy(client, float_a)
+    return _display_thing_simply(client, float_a)
 
 
-def __display_thing_using_numpy(client, float_a):
+def _display_thing_using_numpy(client, float_a):
     """(adapted from K.-Michael Aye's work stack overflow)"""
 
     import numpy as np
@@ -109,7 +119,7 @@ def __display_thing_using_numpy(client, float_a):
     return _exitstatus_for_success
 
 
-def __display_thing_simply(client, float_a):
+def _display_thing_simply(client, float_a):
     io = client.stdout
     count = 0
     for f in float_a:
@@ -119,24 +129,23 @@ def __display_thing_simply(client, float_a):
     return _exitstatus_for_success
 
 
-def __floats_via_file():
-
+def _floats_via_file(ws):
     import json
-    with open(tmp_numbers_file) as fp:
-        for line in fp:
+    with ws.open_tmp_numbers_file_for_reading() as fh:
+        for line in fh:
             _row = json.loads(line)
             yield float(_row['year'])
 
 
-def _write_numbers_file(client):
+def _write_numbers_file(ws, client):
     from bs4 import BeautifulSoup
-    with open(tmp_html_file) as fp:
-        soup = BeautifulSoup(fp, 'html.parser')
+    with ws.open_tmp_html_file_for_reading() as fh:
+        soup = BeautifulSoup(fh, 'html.parser')
 
     tables = soup.find_all(None, 'wikitable')
     ln = len(tables)
     exp = 6
-    if ln is not exp:
+    if exp != ln:
         client.error('expected {} had {} tables', exp, ln)
         return False
 
@@ -151,7 +160,7 @@ def _write_numbers_file(client):
         """there's always only ever one movie per table row. however, when
 
         there's multiple movies in a year, this little dance happens:
-        there's one row whose year cel has a greater-than-one `rowspan`.
+        there's one row whose year cell has a greater-than-one `rowspan`.
         then, the N-1 subsequent rows will each have a number of cels that
         is *one less* than normal number (because they each don't-need-and-
         must-not-have their own year cel).
@@ -186,17 +195,18 @@ def _write_numbers_file(client):
 
     import json
     count = 0
-    with open(tmp_numbers_file, 'w') as fp:
+
+    with ws.open_tmp_numbers_file_for_writing() as fh:
         for (year_f, movie_name) in f():
             _json = json.dumps({'year': year_f, 'movie_title': movie_name})
-            fp.write(_json + '\n')
+            fh.write(_json + '\n')
             count += 1
 
-    client.info("wrote {} lines to {}", count, tmp_numbers_file)
+    client.info("wrote {} lines to {}", count, ws.tmp_numbers_file)
     return True
 
 
-def _write_html_file(client):
+def _write_html_file(client, ws):
     import requests
     with open(tmp_html_file, 'w') as fh:
         r = requests.get(url)
@@ -209,7 +219,7 @@ def _write_html_file(client):
             client.error('bad status code: {}', status_code)
             ok = False
     if not ok:
-        client.remove_file(tmp_html_file)
+        ws.remove_file(tmp_html_file)
     return ok
 
 
@@ -220,14 +230,6 @@ class _Client:
         self.stdout = stdout
         self.stderr = stderr
 
-    def remove_file(self, path):
-        import os
-        os.remove(path)
-
-    def path_exists(self, path):
-        import os
-        return os.path.exists(path)
-
     def error(self, fmt, *args):
         self._same(fmt, args)
 
@@ -236,6 +238,127 @@ class _Client:
 
     def _same(self, fmt, args):
         self.stderr.write(fmt.format(*args)+'\n')
+
+
+def ting_ting(orig_f):  # #decorator
+    def use_f(self):
+        orig_f(self)
+        if self._is_for_production:
+            attr = ''.join((attr_head, '__when_production'))
+        else:
+            attr = ''.join((attr_head, '__when_testing'))
+        return getattr(self, attr)()
+    attr_head = orig_f.__name__
+    return use_f
+
+
+class _MutableWorkspace:  # HUGE EXPERIMENT so code-heavy 😢
+
+    def __init__(self, which):
+        self._is_for_production = ('for_test', 'for_production').index(which)
+        self._init()
+
+    @ting_ting
+    def _init(self):
+        self.tmp_numbers_file = tmp_numbers_file
+
+    def _init__when_testing(self):
+        self.tmp_html_file = _fixture_html
+        self._fake_filesystem_lol = {}
+
+    def _init__when_production(self):
+        self.tmp_html_file = tmp_html_file
+
+    # ==
+
+    @ting_ting
+    def open_tmp_numbers_file_for_writing(self):
+        pass
+
+    def open_tmp_numbers_file_for_writing__when_testing(self):
+        lines = []
+
+        class fh_proxy:  # #class-as-namespace
+            def write(chars):
+                assert fh_proxy._is_open
+                lines.append(chars)  # ..
+                return len(chars)
+            _is_open = True
+
+        @_context_manager
+        def cm():
+            yield fh_proxy
+            fh_proxy._is_open = False
+            self._fake_filesystem_lol[tmp_numbers_file] = tuple(lines)
+        return cm()
+
+    def open_tmp_numbers_file_for_writing__when_production(self):
+        return open(tmp_numbers_file, 'w')
+
+    # ==
+
+    @ting_ting
+    def open_tmp_numbers_file_for_reading(self):
+        pass
+
+    def open_tmp_numbers_file_for_reading__when_testing(self):
+        @_context_manager
+        def cm():
+            yield iter(self._fake_filesystem_lol[tmp_numbers_file])
+        return cm()
+
+    def open_tmp_numbers_file_for_reading__when_production(self):
+        return open(tmp_numbers_file)
+
+    # ==
+
+    @property
+    @ting_ting
+    def tmp_numbers_file_exists(self):
+        pass
+
+    def tmp_numbers_file_exists__when_testing(self):
+        return tmp_numbers_file in self._fake_filesystem_lol
+
+    def tmp_numbers_file_exists__when_production(self):
+        return self.path_exists(tmp_numbers_file)
+
+    # ==
+
+    def open_tmp_html_file_for_reading(self):
+        return open(self.tmp_html_file, 'r')
+
+    # ==
+
+    @property
+    @ting_ting
+    def tmp_html_file_exists(self):
+        pass
+
+    def tmp_html_file_exists__when_testing(self):
+        return True
+
+    def tmp_html_file_exists__when_production(self):
+        return self.path_exists(tmp_html_file)
+
+    # ==
+
+    def remove_file(self, path):
+        import os
+        os.remove(path)
+
+    def path_exists(self, path):
+        import os
+        return os.path.exists(path)
+
+
+def _context_manager(orig_f):
+    from contextlib import contextmanager as decorator
+    return decorator(orig_f)
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
 
 _exitstatus_for_success = 0

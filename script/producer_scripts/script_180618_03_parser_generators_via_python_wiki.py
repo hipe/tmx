@@ -9,10 +9,14 @@ generate a stream of JSON from {url}
 
 
 _domain = 'https://wiki.python.org'
-
 _url = _domain + '/moin/LanguageParsing'
-
 _first_selector = ('div', {'id': 'content'})
+
+
+def _formals():
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
 
 
 def _my_CLI(sin, sout, serr, is_for_sync, rscer):
@@ -109,9 +113,7 @@ def _ps_lib():
 
 
 if __name__ == '__main__':
-    formals = (('-s', '--for-sync',
-                'translate to a stream suitable for use in [#447] syncing'),
-               ('-h', '--help', 'this screen'))
+    formals = _formals()
     kwargs = {'description_valueser': lambda: {'url': _url}}
     import sys as o
     from script_lib.cheap_arg_parse import cheap_arg_parse as func

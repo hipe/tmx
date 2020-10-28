@@ -23,7 +23,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case5472_help_screen(CommonCase):
+class Case5870_help_screen(CommonCase):
 
     def test_050_does_not_dereference_your_custom_parser(self):
         assert self.end_state_lines
@@ -51,7 +51,7 @@ class Case5472_help_screen(CommonCase):
         yield '-h', '--help', 'thizzo scrizzo'
 
 
-class Case5474_money(CommonCase):
+class Case5872_money(CommonCase):
 
     def test_050_yes_parse(self):
         vals = self.build_end_state_expecting_success()

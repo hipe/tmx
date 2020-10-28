@@ -137,7 +137,6 @@ def _stdout_lines_from_sync(  # #testpoint
         mcoll = func()
         near_coll = mcoll.collection_via_path(
                 collection_path=near_coll_path,
-                adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING',
                 format_name=near_format, opn=opn, listener=listener)
         set_or_stop('near_coll', near_coll)
 

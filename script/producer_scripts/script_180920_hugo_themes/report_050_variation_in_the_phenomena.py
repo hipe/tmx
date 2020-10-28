@@ -30,6 +30,7 @@ also:
 class Report:
 
     def __init__(self, dispatcher, modality, listener):
+        raise RuntimeError('hello')  # #open [#882.1] producer script not cover
         assert('CLI' == modality)
         dispatcher.receive_subscription_to_phenomenon_variation(self)
 

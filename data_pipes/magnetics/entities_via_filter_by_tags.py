@@ -66,7 +66,7 @@ def stats_future_and_results_via_entity_stream_and_query(ents, q):
         return dct.keys()
 
     for entity in ents:
-        dct = entity.core_attributes_dictionary_as_storage_adapter_entity
+        dct = entity.core_attributes_dictionary
         taggings = None
         _use_keys = these_keys_via_dictionary(dct)
         for k in _use_keys:

@@ -460,7 +460,7 @@ class _MinimalEntity:
     def __init__(self, ddct):
         self._ddct = ddct
 
-    def to_dictionary_two_deep_as_storage_adapter_entity(self):
+    def to_dictionary_two_deep(self):
         return self._ddct
 
 

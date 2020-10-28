@@ -12,10 +12,12 @@ for the function we used to call "procure".
 # == Dig
 
 def DIGGY_DIG(top_object, dig_path, say_collection, listener):
-    # this is EXPERIMENTAL until we decide if top fellow should be
-    # a collection and not an object..
+    """This is EXPERIMENTAL until we decide if top fellow should be
 
-    current_item = _collection_implementation_via_object(top_object)
+    a collection and not an object..
+    """
+
+    current_item = _collection_via_object(top_object)
 
     dig_path = tuple(dig_path)  # we need that length
     final = len(dig_path) - 1
@@ -31,7 +33,7 @@ def DIGGY_DIG(top_object, dig_path, say_collection, listener):
             kwargs = _empty_hash
 
         key_and_item = key_and_entity_via_collection(
-            collection_implementation=current_item,
+            collection=current_item,
             needle_function=dig_step_key,
             item_noun_phrase=dig_step_desc,
             say_collection=say_collection,  # ..
@@ -65,7 +67,7 @@ def _subfeatures_via_item_default_function(natural_key, _item):
 # == Key and Entity via Collection (can do fuzzy, e.g for CLI tab completion)
 
 def key_and_entity_via_collection(
-            collection_implementation,
+            collection,
             needle_function,
             listener,
             item_noun_phrase=None,
@@ -84,24 +86,23 @@ def key_and_entity_via_collection(
     essential function of [#874.2] collection API. currently an ad-hoc spike.
     """
 
-    _ui_tuple = (
+    ui_tup = (
             channel_tail_component_on_not_found,
             say_needle,
             item_noun_phrase,
             say_collection,
-            listener)
+            listener)  # #here1
 
-    _use_this = _procure_when_splay if do_splay else _procure_when_no_splay
-    return _use_this(
-            collection_implementation=collection_implementation,
-            needle_function=needle_function,
-            subfeatures_via_item=subfeatures_via_item,
-            ui_tuple=_ui_tuple)
+    func = _procure_when_splay if do_splay else _procure_when_no_splay
+    return func(collection, needle_function, subfeatures_via_item, ui_tup)
 
 
-def _procure_when_splay(
-        collection_implementation, needle_function,
-        subfeatures_via_item, ui_tuple):
+def _procure_when_splay(coll, needle_func, subfeats_via_item, ui_tup):
+    with coll.open_schema_and_entity_traversal() as (_, ents):
+        return _do_procure_splay(ents, needle_func, subfeats_via_item, ui_tup)
+
+
+def _do_procure_splay(ents, needle_function, subfeatures_via_item, ui_tuple):
 
     matching_pairs = []  # every natural-key/native object pair that you match
     negative_memory = []  # every feature value that you don't match
@@ -109,11 +110,10 @@ def _procure_when_splay(
 
     feature_does_match = _normalize_needle_function(needle_function)
 
-    ci = collection_implementation
-    eids = ci.to_identifier_primitive_stream_as_storage_adapter_collection()
+    for ent in ents:
+        eid = ent.nonblank_identifier_primitive
+        x = ent.mixed_value
 
-    for eid in eids:
-        x = ci.retrieve_entity_via_primitive_as_storage_adapter_collection(eid)
         _features = subfeatures_via_item(eid, x)
 
         for feat_x in _features:
@@ -132,34 +132,27 @@ def _procure_when_splay(
     return _when_ambiguous(needle_function, ui_tuple, positive_memory)
 
 
-def _procure_when_no_splay(
-        collection_implementation,
-        needle_function,
-        subfeatures_via_item,
-        ui_tuple,
-        ):
+def _procure_when_no_splay(coll, needle_func, subfeatures_via_item, ui_tuple):
 
     # (this is a partial modernization for #history-A.4, but is not complete)
 
-    natural_key = needle_function  # ..
-    x = collection_implementation.retrieve_entity_as_storage_adapter_collection(natural_key)  # noqa: E501 ..
+    natural_key = needle_func  # ..
+    x = coll.retrieve_entity(natural_key)
     if x is None:
         raise Exception('cover me')  # [#876] (next line worked once0
-        return _when_not_found(needle_function, ui_tuple)
-    return (natural_key, x)
+        return _when_not_found(needle_func, ui_tuple)
+    return natural_key, x
 
 
-def _ui_thing(f):
-
-    def g(needle_x, ui_tuple, *one_extra):
-
+def _ui_thing(orig_f):
+    def use_f(needle_x, ui_tuple, *one_extra):
         (
             channel_tail_component_on_not_found,
             say_needle,
             item_NP,
             say_coll,
             listener,
-        ) = ui_tuple
+        ) = ui_tuple  # #here1
 
         if say_needle is None:
             say_needle = __needle_sayer_via(needle_x)
@@ -177,8 +170,8 @@ def _ui_thing(f):
         if channel_tail_component_on_not_found is not None:
             these.append(channel_tail_component_on_not_found)
 
-        return f(say_needle, item_NP, say_coll, err, * one_extra)
-    return g
+        return orig_f(say_needle, item_NP, say_coll, err, * one_extra)
+    return use_f
 
 
 def __needle_sayer_via(needle_x):
@@ -193,9 +186,7 @@ def __needle_sayer_via(needle_x):
 
 @_ui_thing
 def _when_ambiguous(say_needle, item_noun_phrase, say_coll, err, posi_mem):
-
     # (Case1431)
-
     f = placeholder_for_say_subfeature
     these = (f(x) for x in posi_mem)
     from text_lib.magnetics import via_words as ox
@@ -297,33 +288,54 @@ def _say(say_x):
         return say_x  # or more "type safety" than this mabye ..
 
 
-def _collection_implementation_via_object(obj):
+def _collection_via_object(obj):
     """the collection adaptation for arbitarary objects
 
-    the idea is that you're using an arbitarary object as the collection,
+    The idea is that you're using an arbitrary object as the collection,
     and the names of its attributes as keys. (be careful)
-    .#open [#873.L] modernize this API
+
+    >>> class Foo:
+    ...     def __init__(self):
+    ...         self.bar = 'baz'
+
+    >>> foo = Foo()
+    >>> foo.biffo = 'boffo'
+
+    >>> coll = _collection_via_object(foo)
+    >>> with coll.open_schema_and_entity_traversal() as (_, ents):
+    ...     ents = tuple(ents)
+    ...     ks = tuple(ent.nonblank_identifier_primitive for ent in ents)
+    ...     vs = tuple(ent.mixed_value for ent in ents)
+
+    >>> ks
+    ('bar', 'biffo')
+
+    >>> vs
+    ('baz', 'boffo')
     """
 
-    class collection_implementation:  # #class-as-namespace
+    class collection_via_object:  # #class-as-namespace
         # (got rid of `get` (soft dereference) at #history-A.4)
 
-        def retrieve_entity_via_primitive_as_storage_adapter_collection(eid):
+        def retrieve_entity(eid, _listener=None):
+            _listener and xx()
             if hasattr(obj, eid):
                 return getattr(obj, eid)
             # needs listener support #cover-me [#876]
             desc = repr(obj) if isinstance(obj, type) else repr(obj.__class__)
             raise RuntimeError(f"no '{eid}' in {desc}")
 
-        def to_identifier_primitive_stream_as_storage_adapter_collection():
-            return (k for k in dir(obj) if '_' != k[0])  # 👀
+        def open_schema_and_entity_traversal(_listener=None):
+            dct = obj.__dict__  # (Case3425DP)
+            use_dct = {k: dct[k] for k in dct.keys() if '_' != k[0]}
+            return _conversions().open_two_via_items(use_dct.items())
 
-    return collection_implementation
+    return collection_via_object
 
 
 # == Collection Implementation via Pairs (CACHED)
 
-class collection_implementation_via_pairs_cached:
+class collection_via_pairs_cached:
     """the collection adaptation for streams of pairs.
 
     imagine an iterator (we will say "stream" here) of name-value pairs. the
@@ -386,11 +398,12 @@ class collection_implementation_via_pairs_cached:
 
     # (got rid of `get` at #history-A.4)
 
-    def retrieve_entity_via_primitive_as_storage_adapter_collection(self, key):
+    def retrieve_entity(self, key, listener=None):
+        listener and xx()
         return self._state._dereference(key)
 
-    def to_identifier_primitive_stream_as_storage_adapter_collection(self):
-        return self._state._iter()
+    def open_schema_and_entity_traversal(self, _listener=None):
+        return self._state._open_two()
 
     def _receive_new_state(self, x):
         self._state = x
@@ -404,12 +417,15 @@ class _OpenState:
         self._cache = {}
 
     def _two_argument_get(self, natural_key, default_x):
-
         found, x = self._lookup(natural_key)
         if found:
             return x
         else:
             return default_x
+
+    def _open_two(self):
+        items = ((k, self._dereference(k)) for k in self._keys())
+        return _conversions().open_two_via_items(items)
 
     def _dereference(self, natural_key):
 
@@ -457,7 +473,7 @@ class _OpenState:
         else:
             return (found)
 
-    def _iter(self):
+    def _keys(self):
         """assume we are partway though, even though we won't always be.
 
         """
@@ -530,12 +546,11 @@ class _ClosedState:
     def _two_argument_get(self, natural_key, default_x):
         return self._cache.get(natural_key, default_x)
 
+    def _open_two(self):
+        return _conversions().open_two_via_items(self._cache.items())
+
     def _dereference(self, natural_key):
         return self._cache[natural_key]
-
-    def _iter(self):
-        # NOTE - currently this may not be covered unless you run the whole fil
-        return iter(self._cache)
 
 
 placeholder_for_say_subfeature = repr
@@ -546,17 +561,64 @@ placeholder_for_say_subfeature = repr
 # (lost those two wrappers around dictionaries etc at #history-B.4)
 
 class collection_via_DICTIONARY:
+    """
+    Build a collection from a dictionary:
+    >>> subject_function = collection_via_DICTIONARY
+    >>> coll = subject_function({'a': 'b', 'c': 'd'})
+
+    Retrieve an item:
+    >>> coll.retrieve_entity('a')
+    'b'
+
+    Hackishly reproduce `.get(key, None)` by using the ignoring listener
+    >>> coll.retrieve_entity('e', lambda *_: None)
+
+    Flex mode:
+    >>> with coll.open_schema_and_entity_traversal() as (sch, ents):
+    ...     ents = tuple(ents)
+    >>> len(ents)
+    2
+
+    """
 
     def __init__(self, dct):
-        raise RuntimeError("this has a forbidden method now")  # #soon
-        self._dictionary = dct
+        self._dict = dct
 
-    def retrieve_entity_as_storage_adapter_collection(self, natural_key):
-        return self._dictionary[natural_key]
+    def retrieve_entity(self, eid, listener=None):
+        if listener is None:
+            return self._dict[eid]
+        if eid in self._dict:
+            return self._dict[eid]
+        listener('error', 'emission', 'entity_not_found', lambda: xx())
 
-    def to_identifier_stream_as_storage_adapter_collection(self):  # ..
-        return self._dictionary.keys()
+    def open_schema_and_entity_traversal(self, listener=None):
+        return _conversions().open_two_via_items(self._dict.items())
 
+
+# == Conversions
+
+def _conversions():
+    return _conversions_ohai
+
+
+class _conversions_ohai:  # #class-as-namespace
+    def open_two_via_items(items):
+        def these():
+            for k, v in items:
+                yield _MinimalEntity(k, v)
+        from contextlib import nullcontext as func
+        return func((None, these()))
+
+
+class _MinimalEntity:
+    def __init__(self, k, x):
+        assert k
+        self.nonblank_identifier_primitive = k
+        self.mixed_value = x
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
 # #history-B.4
 # #history-A.5

@@ -69,7 +69,7 @@ class _EZ_Entity:
         return self._dct['aa']
 
     @property
-    def core_attributes_dictionary_as_storage_adapter_entity(self):
+    def core_attributes_dictionary(self):
         return self._dct
 
 

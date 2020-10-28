@@ -269,7 +269,7 @@ def get(ctx, collection, internal_identifier):
     if ent is None:
         return mon.max_errno or 404  # (Case6064)  ##here1
 
-    dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+    dct = ent.to_dictionary_two_deep()
 
     fp = click.utils._default_text_stdout()
     from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream as func

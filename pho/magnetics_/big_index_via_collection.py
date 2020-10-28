@@ -527,7 +527,7 @@ def _notecards_via(idens, collection, listener):
         ent = collection.retrieve_entity(iid_s, listener)
         if ent is None:
             xx(f'maybe this decode error thing in {repr(iid_s)}')
-        dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+        dct = ent.to_dictionary_two_deep()
         nc = notecard_via_definition(**dct, listener=listener)
         if nc is None:
             return

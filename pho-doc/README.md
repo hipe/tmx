@@ -70,7 +70,7 @@ when you click create
 |[#882.D]                   | #hole |
 |[#882.C]                   | #hole |
 |[#882.B]                   | #hole |
-|[#882.A]                   | #hole |
+|[#882.1]                   | #open | ideally there should be no producer scripts not covered
 |[#882]                     |       | (internal tracking)
 |[#881.3]                   |       | a roadmaps table lol
 |[#881.2]                   |       | roadmap-2.dot

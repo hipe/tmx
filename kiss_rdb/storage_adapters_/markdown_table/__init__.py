@@ -33,51 +33,47 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
         opn=None,
         iden_er_er=_build_identifier_builder,
         file_grows_downwards=True,
-        adapter_variant=None):
+        ):
     # #open [#857.6] `opn` will change
-
-    if adapter_variant:  # #soon
-        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant
-        del adapter_variant
 
     assert iden_er_er  # who is passing None in?
 
     class edit_funcs:  # #class-as-namespace
 
         def SYNC_AGENT_FOR_DATA_PIPES(opener):
-            def all_sxs_er_er(fp):
-                return _build_sexps_via_listener(fp, iden_er_er)
+            def all_sxs_er_er(fh):
+                return _build_sexps_via_listener(fh, iden_er_er)
             from ._file_diff_via_flat_map import sync_agent_builder_ as func
             return func(opener, all_sxs_er_er)
 
-        def UPDATE_NEW_WAY(fp, iden, edit_x, listener):
-            return cud('update', fp, listener, iden, edit_x)
+        def UPDATE_VIA_FILEHANDLE(fh, iden, edit_x, listener):
+            return cud('update', fh, listener, iden, edit_x)
 
-        def CREATE_NEW_WAY(fp, iden_er_er, dct, listener):
-            return cud('create', fp, listener, dct, iden_er_er)
+        def CREATE_VIA_FILEHANDLE(fh, iden_er_er, dct, listener):
+            return cud('create', fh, listener, dct, iden_er_er)
 
-        def DELETE_NEW_WAY(fp, iden, listener):
-            return cud('delete', fp, listener, iden)
+        def DELETE_VIA_FILEHANDLE(fh, iden, listener):
+            return cud('delete', fh, listener, iden)
 
         def lines_via_schema_and_entities(schema, ents, listener):
             from ._output_lines_via_far_collection import \
                 lines_via_schema_and_entities_ as func
             return func(schema, ents, listener)
 
-    def cud(typ, fp, listener, *cud_args):
-        all_sxser = _build_sexps_via_listener(fp, iden_er_er)
-        use_filename = fp.name
+    def cud(typ, fh, listener, *cud_args):
+        all_sxser = _build_sexps_via_listener(fh, iden_er_er)
+        use_filename = fh.name
         yn = file_grows_downwards
         from ._flat_map_via_edit import cud_ as func
         return func(all_sxser, use_filename, opn, typ, cud_args, listener, yn)
 
     class read_funcs:  # #class-as-namespace
 
-        def RETRIEVE_NEW_WAY(fp, iden, listener):
-            return _retrieve(fp, iden, listener, iden_er_er)
+        def RETRIEVE_VIA_FILEHANDLE(fh, iden, listener):
+            return _retrieve(fh, iden, listener, iden_er_er)
 
-        def schema_and_entities_via_lines(fp, listener):
-            return _schema_and_entities_via_lines(fp, listener, iden_er_er)
+        def schema_and_entities_via_lines(fh, listener):
+            return _schema_and_entities_via_lines(fh, listener, iden_er_er)
 
     class fxr:  # #class-as-namespace
         def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
@@ -87,22 +83,19 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
             return read_funcs
 
         class CUSTOM_FUNCTIONS_VERY_EXPERIMENTAL:  # noqa: E501
-            def open_schema_and_RAW_entity_traversal(fp, listener):
-                return _schema_and_RAW_entities(fp, listener, iden_er_er)
+            def open_schema_and_RAW_entity_traversal(fh, listener):
+                return _schema_and_RAW_entities(fh, listener, iden_er_er)
             open_schema_and_RAW_entity_traversal.is_reader = True
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
             return iden_er_er
-
-        COLL_IMPL_YUCK_ = None
-
     return fxr
 
 
 # == RETRIEVE
 
-def _retrieve(fp, iden, listener, iden_er_er):
-    _sch, ents = _schema_and_entities_via_lines(fp, listener, iden_er_er)
+def _retrieve(fh, iden, listener, iden_er_er):
+    _sch, ents = _schema_and_entities_via_lines(fh, listener, iden_er_er)
     if ents is None:
         return
 
@@ -131,10 +124,10 @@ def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
 
 # == New Way
 
-def _schema_and_entities_via_lines(fp, listener, iden_er_er):
+def _schema_and_entities_via_lines(fh, listener, iden_er_er):
     # Exclude any eg row. Exclude ents with empty identif. (both (Case2451))
 
-    sch, ents = _schema_and_RAW_entities(fp, listener, iden_er_er)
+    sch, ents = _schema_and_RAW_entities(fh, listener, iden_er_er)
     if ents is None:
         return sch, ents
 
@@ -146,11 +139,11 @@ def _schema_and_entities_via_lines(fp, listener, iden_er_er):
     return sch, (ent for ent in ents if ent.nonblank_identifier_primitive)
 
 
-def _schema_and_RAW_entities(fp, listener, iden_er_er):
+def _schema_and_RAW_entities(fh, listener, iden_er_er):
     # Include example row. Include "entities" with empty identifier
 
     astack = _action_stack_for_schema_and_entities()
-    sxs = _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er)
+    sxs = _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er)
 
     # See if you get as far as parsing the two schema rows
     sr2_sx = None
@@ -177,23 +170,23 @@ def _schema_and_RAW_entities(fp, listener, iden_er_er):
 
 # == Stream SEXP's
 
-def _build_sexps_via_listener(fp, iden_er_er):  # #testpoint
+def _build_sexps_via_listener(fh, iden_er_er):  # #testpoint
     def all_sexps_via_listener(listener):
         memo.count += 1
         if 1 < memo.count:
             xx("something changed at #history-B.4")
         astack = _action_stack_for_all()
-        return _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er)  # noqa: E501
+        return _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er)  # noqa: E501
     memo = all_sexps_via_listener
     memo.count = 0
     return all_sexps_via_listener
 
 
-def _sexps_via_lines_and_action_stack(fp, astack, listener, iden_er_er):  # th
-    context_stack = ({'path': fp.name},)
+def _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er):  # th
+    context_stack = ({'path': fh.name},)
 
     # Resolve tagged lines via lines
-    tagged_lines = _tagged_lines_via_lines(fp)
+    tagged_lines = _tagged_lines_via_lines(fh)
 
     # Resolve line sexps via tagged lines
     raw_sxs = _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er)  # noqa: E501
@@ -345,9 +338,9 @@ def _build_row_AST_via_three(schema=None):
 
         class row_AST_entity(row_AST):
 
-            def to_dictionary_two_deep_as_storage_adapter_entity(self):
+            def to_dictionary_two_deep(self):
                 s = self.nonblank_identifier_primitive
-                d = self.core_attributes_dictionary_as_storage_adapter_entity
+                d = self.core_attributes_dictionary
                 return {'identifier_string': s, 'core_attributes': d}
 
             @property
@@ -359,7 +352,7 @@ def _build_row_AST_via_three(schema=None):
                 return get_lazy_item(nonblank_identifier_string)
 
             @property
-            def core_attributes_dictionary_as_storage_adapter_entity(_):
+            def core_attributes_dictionary(_):
                 return get_lazy_item(core_attrs_dict)
 
             @property

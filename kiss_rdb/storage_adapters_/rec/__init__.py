@@ -19,22 +19,12 @@ STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.rec',)
 STORAGE_ADAPTER_IS_AVAILABLE = True
 
 
-def FUNCTIONSER_FOR_SINGLE_FILES(
-        adapter_variant=None):
-
-    if adapter_variant:
-        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant
-
-    class ns:  # #class-as-namespace
+def FUNCTIONSER_FOR_SINGLE_FILES():
+    class fxr:  # #class-as-namespace
         PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE = None
         PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE = None
         PRODUCE_IDENTIFIER_FUNCTIONER = None
-        COLL_IMPL_YUCK_ = _CI_THAT_DOES_NOTHING_BUT_HAS_NAME
-    return ns
-
-
-class _CI_THAT_DOES_NOTHING_BUT_HAS_NAME:
-    collection_path = None  # (Case3425DP)
+    return fxr
 
 
 class _FakeCollection_USE_ME:

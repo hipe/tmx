@@ -20,7 +20,7 @@ class collection_implementation_via_directory_and_schema:
         self._schema_pather = schema.build_pather_(directory)
         self._schema = schema
 
-    def update_entity_as_storage_adapter_collection(self, iden, tup, listener):
+    def update_entity_via_identifier(self, iden, tup, listener):
 
         path = self._path_that_must_already_exist_for(iden, listener, 'update')
         if path is None:
@@ -31,7 +31,7 @@ class collection_implementation_via_directory_and_schema:
 
     # == BEGIN create and delete are more complicated
 
-    def delete_entity_as_storage_adapter_collection(self, iden, listener):
+    def delete_entity_via_identifier(self, iden, listener):
 
         # certainly, the entities file must first exist
 
@@ -55,7 +55,7 @@ class collection_implementation_via_directory_and_schema:
                 return _delete_entity(
                         lmef, indexy_file, iden, self._filesystem, listener)
 
-    def create_entity_as_storage_adapter_collection(self, idnr, dct, listener):
+    def create_entity_via_identifier(self, idnr, dct, listener):
         """
         create is the most complicated per [#864.C] this table.
 
@@ -202,7 +202,7 @@ class collection_implementation_via_directory_and_schema:
         else:
             xx('eek you want mkdir -p')
 
-    def retrieve_entity_as_storage_adapter_collection(self, iden, listener):
+    def retrieve_entity_via_identifier(self, iden, listener):
         """NOTICE
 
         to retrieve one entity; this opens a file, reads some or all of the
@@ -243,7 +243,7 @@ class collection_implementation_via_directory_and_schema:
     def _open_locked_mutable_entities_file(self, path):
         return self._filesystem.open_locked_file(path)
 
-    def open_identifier_traversal_as_storage_adapter_collection(self, listen):
+    def open_identifier_traversal(self, listen):
         return self._schema_pather.open_identifier_traversal(listen)
 
     def _file_path_pieces_via_identifier(self, iid):

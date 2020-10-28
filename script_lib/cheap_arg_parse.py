@@ -416,7 +416,7 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
         fp = do_parse_formal_option(definition)
         offset = len(formal_opts)
         if fp.customer:
-            custom_options.append(offset)  # (Case5474)
+            custom_options.append(offset)  # (Case5872)
         if fp.is_required:
             required_options.append(offset)  # (Case5495)
         if (k := fp.short_char):

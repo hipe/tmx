@@ -117,7 +117,7 @@ class _Notecard:
         self.next_identifier_string = next
         self.annotated_entity_revisions = annotated_entity_revisions
 
-    def to_dictionary_two_deep_as_storage_adapter_entity(self):
+    def to_dictionary_two_deep(self):
         core_attrs = self.to_core_attributes()
         return {
                 'identifier_string': self.identifier_string,

@@ -168,8 +168,8 @@ def cached_document_via(cached_path, url, noun_phrase, listener):
 
 
 def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
-    from data_pipes.format_adapters.html.magnetics import (
-            cached_doc_via_url_via_temporary_directory as cachelib)
+    from data_pipes.format_adapters.html.magnetics import \
+            cached_doc_via_url_via_temporary_directory as cachelib
 
     def lineser():
         yield f'(reading {noun_phrase} from filesystem - {cached_path})'
@@ -178,9 +178,10 @@ def _cached_doc_via_filesystem(cached_path, noun_phrase, listener):
 
 
 def _cached_doc_via_url(url, listener):
-    from data_pipes.format_adapters.html.magnetics import (
-            cached_doc_via_url_via_temporary_directory as cachelib)
-    return cachelib(_TEMPORARY_DIR)(url, listener)
+    from data_pipes.format_adapters.html.magnetics.\
+        cached_doc_via_url_via_temporary_directory import \
+        cached_doc_via_url_via_temporary_directory as func
+    return func(_TEMPORARY_DIR)(url, listener)
 
 
 def pop_property(obj, attr):
@@ -189,7 +190,7 @@ def pop_property(obj, attr):
     return x
 
 
-_TEMPORARY_DIR = 'z'  # #[#007.3]
+_TEMPORARY_DIR = 'z/_CACHED_FOR_SCRAPING_'  # #[#007.3]
 
 
 # #history-A.5: sunset this as an entrypoint script

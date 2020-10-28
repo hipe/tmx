@@ -419,11 +419,11 @@ def _express_expecting_any(which):
 ''':[#605.1] EXPERIMENTAL:
 
 as an alternative take on a lot of the above, we offer these modular
-components. There is one "Write Only IO Facade" that dispatches messages
+components. There is one "Write Only IO Façade" that dispatches messages
 to its receiver:
 
     +----------------+
-    |  IO Facade     |
+    |  IO Façade     |
     | +----------+   |
     | |          | <-|<- write
     | | receiver |   |
@@ -439,7 +439,7 @@ the following two ways
 either:
 
     +-----------------+
-    |   IO Facade     |
+    |   IO Façade     |
     | +-----------+   |
     | | recording | <-|<- write
     | | receiver  | <-|<- flush
@@ -448,7 +448,7 @@ either:
 
 or:
     +--------------------------------+
-    |             IO Facade          |
+    |             IO Façade          |
     | +-----------+                  |
     | | debugging |<+                |
     | | receiver  |  | +----------+  |

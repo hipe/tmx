@@ -12,14 +12,18 @@ import re
 _my_desc = __doc__
 
 
+def _formals():
+    yield '-h', '--help', 'this screen'
+    yield 'themes-dir', 'ohai «help for themes_dir»'
+
+
 def _CLI(stdin, stdout, stderr, argv):
     from script_lib.cheap_arg_parse import \
         require_interactive, cheap_arg_parse as func
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
-    formals = (('-h', '--help', 'this screen'),
-               ('themes-dir', 'ohai «help for themes_dir»'))
-    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
+
+    return func(_do_CLI, stdin, stdout, stderr, argv, _formals())
 
 
 def _do_CLI(sin, sout, serr, themes_dir, rscr):

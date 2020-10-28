@@ -96,7 +96,7 @@ class _Notecards:  # #testpoint
     def _notecard_via_any_entity(self, ent, listener):
         if ent is None:
             return
-        ent_dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+        ent_dct = ent.to_dictionary_two_deep()
         nid_s, core_attributes = _validate_entity_dictionary_names(** ent_dct)
         return self.entity_via_definition_(nid_s, core_attributes, listener)
 

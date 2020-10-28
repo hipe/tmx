@@ -32,14 +32,17 @@ import re
 _my_desc = __doc__
 
 
+def _formals():
+    yield '-h', '--help', 'this screen'
+    yield 'themes-dir', 'ohai «help for themes_dir»'
+
+
 def _CLI(stdin, stdout, stderr, argv):
     from script_lib.cheap_arg_parse import \
         require_interactive, cheap_arg_parse as func
     if not require_interactive(stderr, stdin, argv):
         return _exitstatus_for_failure
-    formals = (('-h', '--help', 'this screen'),
-               ('themes-dir', 'ohai «help for themes_dir»'))
-    return func(_do_CLI, stdin, stdout, stderr, argv, formals)
+    return func(_do_CLI, stdin, stdout, stderr, argv, _formals())
 
 
 def _do_CLI(stdin, stdout, stderr, themes_dir, rscr):
@@ -67,7 +70,6 @@ _do_CLI.__doc__ = _my_desc
 
 
 def relevant_themes_collection_metadata_via_themes_dir(themes_dir, listener):
-
     from os import path as os_path
     _path = os_path.join(themes_dir, '_script', 'generateThemeSite.sh')
     parse = _MadParseBashScript()

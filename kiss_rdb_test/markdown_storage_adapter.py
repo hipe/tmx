@@ -41,7 +41,6 @@ def open_entities_via_lines_and_listener(lines, listener):
 
 
 def collection_via_real_path(path, listener):
-    # please away this: adapter_variant='THE_ADAPTER_VARIANT_FOR_STREAMING'
     from kiss_rdb import collectionerer as func
     mcoll = func()
     return mcoll.collection_via_path(path, listener)

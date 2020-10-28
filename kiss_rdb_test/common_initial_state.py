@@ -73,7 +73,7 @@ whatever reason.)
 
 So, all this code-mess here is a mediation between all the different
 ways we represent files in tests and the two ways we represent them in
-production. (#[#873.Z] whether and how we seek(0))
+production. (#[#873.26] whether and how we seek(0))
 
 
 About the names

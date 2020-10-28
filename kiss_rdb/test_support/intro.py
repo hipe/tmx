@@ -80,11 +80,11 @@ _Schema = _nt('MinimalSchema', ('field_name_keys',))
 class _JustEnoughEntity:
 
     def __init__(self, dct):
-        self.core_attributes_dictionary_as_storage_adapter_entity = dct
+        self.core_attributes_dictionary = dct
 
     def __eq__(self, otr):
-        od = otr.core_attributes_dictionary_as_storage_adapter_entity
-        return self.core_attributes_dictionary_as_storage_adapter_entity == od
+        cad = otr.core_attributes_dictionary
+        return self.core_attributes_dictionary == cad
 
 
 # == Low-level and likely to abstract

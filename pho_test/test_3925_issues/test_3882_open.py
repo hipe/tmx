@@ -173,7 +173,7 @@ class Case3886_money_insert(MoneyCase):
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
 
     def expected_num_rewinds(_):
-        return 2  # #soon
+        return 1
 
 
 class Case3888_money_update(MoneyCase):
@@ -203,7 +203,7 @@ class Case3888_money_update(MoneyCase):
         yield 'info', 'structure', 'updated_entity', 'as', 'the_emi'
 
     def expected_num_rewinds(_):
-        return 2  # #soon
+        return 1
 
 
 def open_issue():

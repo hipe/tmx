@@ -528,7 +528,7 @@ def _classified_row_ASTs_via_issues_collection(ks, ents):
         if ent.identifier is None:
             yield 'notice_message', "Row{s} {doesnt_dont} have an identifier {on}"  # noqa: E501
             return
-        dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+        dct = ent.core_attributes_dictionary
         pcs = tuple(dct[k] for k in ks if k in dct)
         if not len(pcs):
             yield 'notice_message', "Strange - {num}totally blank issue{s}{idens}"  # noqa: E501  #here3

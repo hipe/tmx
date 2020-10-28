@@ -22,6 +22,12 @@ _domain = 'https://gohugo.io'  # no trailing slash because #here1
 _url = _domain + '/documentation/'
 
 
+def _formals():
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
+
+
 def _my_CLI(sin, sout, serr, is_for_sync, rscer):
     mon = rscer().monitor
     with open_traversal_stream(mon.listener) as dcts:
@@ -142,11 +148,8 @@ _okay = True
 
 
 if __name__ == '__main__':
-    formals = (
-        ('-s', '--for-sync',
-         'translate to a stream suitable for use in [#447] syncing'),
-        ('-h', '--help', 'this screen'))
     kwargs = {'description_valueser': lambda: {'hugo_docs_url': _url}}
+    formals = _formals()
     import sys as o
     from script_lib.cheap_arg_parse import cheap_arg_parse as func
     exit(func(_my_CLI, o.stdin, o.stdout, o.stderr, o.argv, formals, **kwargs))

@@ -9,16 +9,19 @@
 
 
 _domain = 'https://devcenter.heroku.com'
-
 _url = _domain + '/categories/add-on-documentation'
-
 _first_selector = ('ul', {'class': 'list-icons'})
-
 _my_doc_string = __doc__
 
 
+def _formals():
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
+
+
 def _my_CLI(sin, sout, serr, is_for_sync, rscer):
-    mon = rscer().listener
+    mon = rscer().monitor
     with open_traversal_stream(mon.listener) as dcts:
         if is_for_sync:
             dcts = stream_for_sync_via_stream(dcts)
@@ -65,9 +68,7 @@ def _ps_lib():
 
 
 if __name__ == '__main__':
-    formals = (('-s', '--for-sync',
-                'translate to a stream suitable for use in [#447] syncing'),
-               ('-h', '--help', 'this screen'))
+    formals = _formals()
     kwargs = {'description_valueser': lambda: {'url': _url}}
     import sys as o
     from script_lib.cheap_arg_parse import cheap_arg_parse as func

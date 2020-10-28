@@ -33,7 +33,7 @@ woah boy.
 |[#899.Z]                   | #eg   | eg
 |[#877.4]                   | #trak | do we want to make string identifiers the default?
 |[#877.C]                   | #hole |
-|[#877.B]                   | #hole |
+|[#877.B]                   | #open | CUSTOM_FUNCTIONS_OLD_WAY .. not sure what do
 |[#877]                     |       | now, a third node for internal & external tracking
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
 |[#874.5]                   | #open | clean up the interface to this emitter
@@ -41,7 +41,7 @@ woah boy.
 |[#874.3]                   |       | the API (interface) for entity
 |[#874.2]                   |       | the API (interface) for collection
 |[#874]                     |       | largely an issue group for massive re-architecting - all on top of stack
-|[#873.Z]                   | #prov | whether and how we seek(0)
+|[#873.26]                  | #prov | whether and how we seek(0)
 |[#873.Y]                   | #open | this tempfile logic is repeated
 |[#873.24]                  | #trak | this one md line parser
 |[#873.23]                  | #trak | parsing unified diff files the old way and the new way
@@ -111,6 +111,7 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.G]                   | #open | turn diffing/patching into a "for free" feature for single-file collections
 |[#857.6]                   | #open | no more opn or something
 |[#857.E]                   | #prov | #provision: entity identifiers (eid's) are either integers or strings for now
 |[#857.D]                   |       | logic diagram for resolving storage adapters and..

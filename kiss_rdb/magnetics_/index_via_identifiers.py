@@ -211,11 +211,18 @@ class _CLI:
         if coll is None:
             return
 
+        self.listener = listener
+        self.collection = coll
+        with coll.open_identifier_traversal(listener) as idens:
+            return self.with_idens(idens)
+
+    def with_idens(self, idens):
+        coll, listener = self.collection, self.listener
         num_digits = coll.COLLECTION_IMPLEMENTATION.number_of_digits_
-        idens = coll.TO_IDENTIFIER_STREAM(listener)
         lines = _lines_of_index_via_identifiers(idens, num_digits, listener)
+        write = self.stdout.write
         for line in lines:
-            self.stdout.write(line)
+            write(line)
         return 0
 
     def parse_command_name(self):

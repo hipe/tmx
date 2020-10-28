@@ -23,19 +23,21 @@ _raw_url = (
         '/webmaven/python-parsing-tools/master/README.md')
 
 
+def _formals():
+    yield ('-p', '--prepared-for-sync',
+           'map certain fields from far to near (1 rename, 1 split)')
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
+
+
 def _CLI(sin, sout, serr, argv):
-    formals = (
-        ('-p', '--prepared-for-sync',
-         'map certain fields from far to near (1 rename, 1 split)'),
-        ('-s', '--for-sync',
-         'translate to a stream suitable for use in [#447] syncing'),
-        ('-h', '--help', 'this screen'))
     kwargs = {'description_valueser': lambda: {'raw_url': _raw_url}}
     from script_lib.cheap_arg_parse import cheap_arg_parse as func
-    return func(_do_CLI, sin, sout, serr, argv, formals, **kwargs)
+    return func(_do_CLI, sin, sout, serr, argv, _formals(), **kwargs)
 
 
-def _do_CLI(mon, sin, sout, serr, do_prepare, is_for_sync, rscer):
+def _do_CLI(sin, sout, serr, do_prepare, is_for_sync, rscer):
     mon = rscer().monitor
     listener = mon.listener
 
@@ -150,7 +152,7 @@ def _do_this(complete_schema, ents, do_field_names):
     if do_field_names:
         yield ks
     for ast in ents:
-        dct = ast.core_attributes_dictionary_as_storage_adapter_entity
+        dct = ast.core_attributes_dictionary
         dct['name'] = ast.nonblank_identifier_primitive  # yikes
         yield dct
 

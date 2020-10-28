@@ -1,4 +1,6 @@
 from kiss_rdb_test.common_initial_state import unindent_with_dot_hack
+from modality_agnostic.test_support.common import \
+    dangerous_memoize as shared_subject
 import unittest
 
 
@@ -34,7 +36,7 @@ class CommonCase(unittest.TestCase):
 
         depth, identifiers = self._depth_and_identifiers()
 
-        _actual_itr = _subject_module()._lines_of_index_via_identifiers(
+        _actual_itr = subject_module()._lines_of_index_via_identifiers(
                 identifiers, depth, listener=None)
 
         if False:  # debugging
@@ -95,11 +97,13 @@ class CommonCase(unittest.TestCase):
 
         return depth, _identifiers
 
+    do_debug = False
+
 
 class Case1452_simplified_typical_NO_rerack_at_first(CommonCase):
 
     def test_050_load_module(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_module())
 
     def test_100_write_file(self):
         self.writes_file()
@@ -235,14 +239,41 @@ class Case1474_shallowest(CommonCase):
                 'D4')
 
 
+class Case1476_CLI_tool(CommonCase):
+
+    def test_050_exit_code_says_success(self):
+        act = self.end_state[1]
+        self.assertEqual(act, 0)
+
+    def test_100_lines_look_good(self):
+        act = self.end_state[0]
+        self.assertIn(len(act), range(3, 10))
+        act = act[-1]
+        exp = '9 (                            G H J)\n'
+        self.assertEqual(act, exp)
+
+    @shared_subject
+    def end_state(self):
+        from script_lib.test_support.expect_STDs import \
+            spy_on_write_and_lines_for as func
+        sout, sout_lines = func(self, 'DBG: ')
+
+        yikes = 'kiss_rdb_test/fixture-directories/4844-eno/050-canon-main'
+        argv = '[me]', 'generate', yikes
+
+        cli = subject_module()._CLI
+        ec = cli(None, sout, None, argv).execute()
+        return tuple(sout_lines), ec
+
+
 def _other_subject_mod():
     from kiss_rdb.magnetics_ import identifiers_via_index as _
     return _
 
 
-def _subject_module():
-    from kiss_rdb.magnetics_ import index_via_identifiers as _
-    return _
+def subject_module():
+    from kiss_rdb.magnetics_ import index_via_identifiers as module
+    return module
 
 
 if __name__ == '__main__':

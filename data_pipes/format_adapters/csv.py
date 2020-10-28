@@ -9,12 +9,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 # STORAGE_ADAPTER_UNAVAILABLE_REASON = "it's a placeholder stub"
 
 
-def FUNCTIONSER_FOR_SINGLE_FILES(
-        adapter_variant=None
-        ):
-    if adapter_variant:
-        assert 'THE_ADAPTER_VARIANT_FOR_STREAMING' == adapter_variant  # away s
-        del adapter_variant
+def FUNCTIONSER_FOR_SINGLE_FILES():
 
     class edit_funcs:  # #class-as-namespace
         lines_via_schema_and_entities = _lines_via_schema_and_entities
@@ -31,8 +26,6 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
             return _build_identifier_builder
-
-        COLL_IMPL_YUCK_ = None
     return fxr
 
 
@@ -158,7 +151,7 @@ def _lines_via_schema_and_entities(schema, ents, listener):  # #testpoint:KS
     yield line_via_fixed_number_of_cell_strings(labels)
 
     def cell_pcs_via_ent(ent):
-        dct = ent.core_attributes_dictionary_as_storage_adapter_entity
+        dct = ent.core_attributes_dictionary
         for k in ks:
             s = dct[k]
             assert isinstance(s, str)
@@ -312,7 +305,7 @@ def _spans_of_old(throwing_listener):
 # == Models
 
 _MinimalSchema = _nt('MiniamSchema', ('field_name_keys',))
-_MinimalEntity = _nt('MinimalEntity', ('core_attributes_dictionary_as_storage_adapter_entity',))  # noqa: E501
+_MinimalEntity = _nt('MinimalEntity', ('core_attributes_dictionary',))
 
 
 def _AST_definitions():

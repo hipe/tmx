@@ -1,8 +1,5 @@
 #!/usr/bin/env python3 -W default::Warning::0
 
-
-raise RuntimeError("worked at #history-B.2. comment out if u're feeling lucky")
-
 """A sort of producer script sourced from kubernetes documentation.
 
 At birth this scraped a url like:
@@ -14,19 +11,21 @@ a punchlist somehow.
 """
 
 _doc = __doc__
-
 _eg_url = 'https://kubernetes.io/docs/concepts/'
 
 
 # (worked "visually" (mostly) at #history-A.2)
 
 
+def _formals():
+    yield '-h', '--help', 'this screen'
+    yield 'url', 'example: https://some-k8s-site.com/docs/foo-bar/'
+
+
 def _CLI(stdin, stdout, stderr, argv):
-    formals = (('-h', '--help', 'this screen'),
-               ('url', 'example: https://some-k8s-site.com/docs/foo-bar/'))
     kwargs = {'description_valueser': lambda: {'eg_url': _eg_url}}
     from script_lib.cheap_arg_parse import cheap_arg_parse as func
-    return func(_do_CLI, stdin, stdout, stderr, argv, formals, **kwargs)
+    return func(_do_CLI, stdin, stdout, stderr, argv, _formals(), **kwargs)
 
 
 def _do_CLI(stdin, stdout, stderr, url, rscr):

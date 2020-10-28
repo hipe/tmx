@@ -56,6 +56,7 @@ _doc = __doc__
 
 
 def _CLI_for_all(stdin, stdout, stderr, argv):
+    raise RuntimeError('hello')  # #open [#882.1] producer script not cover
 
     def do_CLI_for_all(sin, sout, serr, htd, rscr):
         mon = rscr().monitor

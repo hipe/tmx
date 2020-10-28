@@ -519,7 +519,7 @@ def _same_confirmation_of_before_update(tc, ent, eid):
     tc.assertEqual(len(dct), 2)  # to confirm deletes in after
 
     # we might move this to its own test
-    dct_ = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+    dct_ = ent.to_dictionary_two_deep()
     tc.assertEqual(dct_['identifier_string'], eid)
     tc.assertEqual(dct_['core_attributes'], dct)  # OOF extreme laziness
 
@@ -578,7 +578,7 @@ def _confirm_collection_empty(tc, coll):
 
 
 def _yes_value_dict(ent):
-    return ent.core_attributes_dictionary_as_storage_adapter_entity
+    return ent.core_attributes_dictionary
 
 
 yes_value_dictionary_of = _yes_value_dict

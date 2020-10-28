@@ -285,7 +285,7 @@ class Case2679_create_OK_into_empty_collection(CommonCase):  # #here2
     def given_collection_via(self):
         yield 'pretend_file', pretend_file_empty
         yield 'pretend_writable', True
-        yield 'expect_num_rewinds', 1  # #soon why not two
+        yield 'expect_num_rewinds', 1  # rewinds 1x b.c confirms coll empty 1st
 
     def target_canon_case(self):
         return canon.case_of_create_OK_into_empty_collection
@@ -603,7 +603,7 @@ against generated patches rather than testing against a mutated filesystem.
 
 (At #history-B.5 writing this is not entirely true - now we read from
 STDIN-like file resources (read-only and no rewind) which complicates
-things here. #[#873.Z] whether and how we seek(0))
+things here. #[#873.26] whether and how we seek(0))
 
 Now, just because we've decided that multiple-operation "should work" as-is
 by collections in production, doesn't mean they will under test. They didn't

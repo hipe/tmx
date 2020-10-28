@@ -133,7 +133,6 @@ def CUSTOM_FUNCTIONSER(cci, listen):
             return read_funcs
 
         PRODUCE_IDENTIFIER_FUNCTIONER = None
-        COLL_IMPL_YUCK_ = None
     return fxr
 
 
@@ -200,8 +199,7 @@ def _functions_for_read_via_module(mod, listen):
     class read_funcs_for_module:  # #class-as-namespace
         pass
     o = read_funcs_for_module
-    o.open_schema_and_entity_traversal_as_storage_adapter_collection = \
-        open_schema_and_entity_trav
+    o.open_schema_and_entity_traversal = open_schema_and_entity_trav
     return read_funcs_for_module
 
 
@@ -224,14 +222,13 @@ def _functions_for_read_via_STDIN(stdin):
     class read_funcs_for_STDIN:
         pass
     o = read_funcs_for_STDIN
-    o.open_schema_and_entity_traversal_as_storage_adapter_collection = \
-        open_schema_and_entity_trav
+    o.open_schema_and_entity_traversal = open_schema_and_entity_trav
     return read_funcs_for_STDIN
 
 
 class _ErsatzEntity:
     def __init__(self, dct, lineno, path):
-        self.core_attributes_dictionary_as_storage_adapter_entity = dct
+        self.core_attributes_dictionary = dct
         self.lineno = lineno
         self.path = path
 

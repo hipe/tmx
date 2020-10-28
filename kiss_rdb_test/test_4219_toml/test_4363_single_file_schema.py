@@ -32,7 +32,7 @@ class Case4361_retrieve_OK(CommonCase):
 
     def test_100_EVERYTHING(self):  # NOTE subject not memoized
         ent = self.build_end_state()
-        dct = ent.to_dictionary_two_deep_as_storage_adapter_entity()
+        dct = ent.to_dictionary_two_deep()
         self.assertEqual(dct['identifier_string'], '68')
         dct = dct['core_attributes']
         self.assertEqual(dct, {'xx': 'xx of 68'})

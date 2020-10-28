@@ -49,14 +49,11 @@ anticipated issues:
     is needed.
 """
 
-import sys
-
 
 def cached_doc_via_url_via_temporary_directory(tmpdir):
 
     def cached_doc(url, listener):
-        from modality_agnostic import emitter_via_listener as func
-        emit = func(listener)
+        emit = _build_emitter(listener)
 
         import re
         from os import path as p
@@ -112,14 +109,23 @@ def __make_cached_doc(cache_path, url, emit):
         os.remove(cache_path)
 
 
+# == Models
+
 class Cached_HTTP_Document:
     def __init__(self, path):
         self.cache_path = path
 
 
-cached_doc_via_url_via_temporary_directory.Cached_HTTP_Document = Cached_HTTP_Document  # noqa: E501
+# == Emission
 
+def _build_emitter(listener):   # (a couple commits ago this was in [ma])
+    def emit(*args):
+        *chan, fmt, fmt_args = args
+        if not isinstance(fmt_args, tuple):
+            fmt_args = (fmt_args,)
+        assert 'expression' == chan[1]
+        listener(*chan, lambda: (fmt.format(*fmt_args),))
 
-sys.modules[__name__] = cached_doc_via_url_via_temporary_directory
+    return emit
 
 # #abstracted.

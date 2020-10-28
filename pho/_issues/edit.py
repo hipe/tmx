@@ -24,7 +24,8 @@ def open_issue(readme, dct, listener, opn=None):
     # However, opening and closing the same file twice in one operation is
     # a bridge too far for us. So:
 
-    fh.seek(0)  # #here3
+    # fh.seek(0)  # #here3
+    # ☝️ ACTUALLY [#873.26] vendor does this automatically now #history-B.4
 
     # Validate the keys of the create or update dict
     iden_key, *allowed_keys = schema.field_name_keys  # assume [#871.1]
@@ -43,7 +44,7 @@ def open_issue(readme, dct, listener, opn=None):
     def dct_via_ent(ent):
         if ent is None:
             return None
-        return ent.to_dictionary_two_deep_as_storage_adapter_entity()
+        return ent.to_dictionary_two_deep()
 
     do_create = ('tagged_hole', 'major_hole', 'minor_hole').index(typ)
     if do_create:
@@ -154,8 +155,7 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
         return 'empty_collection', None
 
     def tagged_as_hole(ent):
-        s = ent.core_attributes_dictionary_as_storage_adapter_entity.\
-            get(main_tag_key)
+        s = ent.core_attributes_dictionary.get(main_tag_key)
         if s is None:
             return
         return rx.match(s)
@@ -295,5 +295,6 @@ def _issues_collection_via(readme, listener, opn):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.4
 # #history-B.3
 # #born

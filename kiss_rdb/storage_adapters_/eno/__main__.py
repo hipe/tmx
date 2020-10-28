@@ -50,7 +50,7 @@ def _do_crazy_CLI(sout, serr, argv):
         iden = identifier_via_string_(entity_id, listener)
         if iden is None:
             return 3
-        ent = coll.retrieve_entity_as_storage_adapter_collection(
+        ent = coll.retrieve_entity_via_identifier(
                 iden, listener)
         if not ent:
             return 3
@@ -61,6 +61,7 @@ def _do_crazy_CLI(sout, serr, argv):
     def TRAVERSE_IDENTIFIERS():
         if len(bash_argv):
             return unexpected()
+        raise RuntimeError('hello')  # #soon
         idens = coll.to_identifier_stream_as_storage_adapter_collection(None)
         for iden in idens:
             serr.write(f'NEATO: {iden.to_string()}\n')
@@ -170,6 +171,7 @@ def _do_CLI(sin, sout, serr, file_path, rscr):
         with open(file_path) as fh:
             big_string = fh.read()
 
+    mon = rscr().monitor
     from enolib import parse as enolib_parse
     doc = enolib_parse(big_string)
 

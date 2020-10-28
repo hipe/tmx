@@ -44,10 +44,10 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
         return 'this_is_supposed_to_be_wrapped', dict_as_datastore[iden]
 
     class edit_ns:  # #class-as-namespace
-        create_entity_as_storage_adapter_collection = create
+        create_entity_via_identifier = create
 
     class read_ns:  # #class-as-namespace
-        retrieve_entity_as_storage_adapter_collection = retrieve
+        retrieve_entity_via_identifier = retrieve
 
     def build_build_build_identifier():
         def build_build_identifier(_listener, _cstacker=None):
@@ -74,7 +74,6 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
         PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY = lambdize(edit_ns)
         PRODUCE_READ_ONLY_FUNCTIONS_FOR_DIRECTORY = lambdize(read_ns)
         PRODUCE_IDENTIFIER_FUNCTIONER = build_build_build_identifier
-        COLL_IMPL_YUCK_ = __file__
     return fxr
 
 # #history-B.5

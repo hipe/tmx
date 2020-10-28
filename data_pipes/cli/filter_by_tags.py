@@ -39,6 +39,7 @@ def CLI_(sin, sout, serr, argv, rscser):
 
     ci = coll.COLLECTION_IMPLEMENTATION
     raise RuntimeError("The below is the old way. New way will be easy for you my friend")  # noqa: E501
+    # #soon
     _ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
 
     from data_pipes.magnetics.entities_via_filter_by_tags import \
@@ -64,7 +65,7 @@ def CLI_(sin, sout, serr, argv, rscser):
             first = False
         else:
             sout.write(',\n')
-        dump(entity.to_dictionary_two_deep_as_storage_adapter_entity())
+        dump(entity.to_dictionary_two_deep())
     if not first:
         sout.write('\n')
     for line in __summarize_search_stats(future()):

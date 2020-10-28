@@ -30,7 +30,7 @@ class CommonCase(unittest.TestCase):
         listener, emissions = em.listener_and_emissions_for(self, limit=1)
 
         _x = _subject_module().key_and_entity_via_collection(
-                collection_implementation=_coll,
+                collection=_coll,
                 needle_function=_needle,
                 listener=listener,
                 **kwargs)
@@ -45,7 +45,7 @@ class CommonCase(unittest.TestCase):
         _needle = self._needle_function()
 
         return _subject_module().key_and_entity_via_collection(
-                collection_implementation=_coll,
+                collection=_coll,
                 needle_function=_needle,
                 listener=None,
                 **kwargs)
@@ -180,7 +180,7 @@ def _the_empty_collection():
 
 
 def _collection_via_pairs(pairs):
-    return _subject_module().collection_implementation_via_pairs_cached(pairs)
+    return _subject_module().collection_via_pairs_cached(pairs)
 
 
 @lazy

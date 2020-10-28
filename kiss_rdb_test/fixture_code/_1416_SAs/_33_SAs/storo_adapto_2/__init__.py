@@ -9,7 +9,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #open [#857.6] opn will go away
 
     class edit_ns:  # #class-as-namespace
-        def CREATE_NEW_WAY(fp, iden_er_er, dct, listener):
+        def CREATE_VIA_FILEHANDLE(fp, iden_er_er, dct, listener):
             msg, _path = fp
             assert "we assume you aren't actually writing.." == msg
             iden_er = iden_er_er(listener)
@@ -60,8 +60,6 @@ def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #open [#857.6] opn will go away
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
             return _build_identifier_builder
-
-        COLL_IMPL_YUCK_ = None
     return fxr
 
 
@@ -90,7 +88,7 @@ class _MinimalEntity:
         return self._key
 
     @property
-    def core_attributes_dictionary_as_storage_adapter_entity(self):
+    def core_attributes_dictionary(self):
         return self._dct
 
 

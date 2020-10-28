@@ -11,10 +11,16 @@
 import soupsieve as sv
 
 
-_domain = 'http://www.bogotobogo.com'
+_domain = 'https://www.bogotobogo.com'
 domain = _domain  # expose it
 _url = _domain + '/python/pytut.php'  # ..
 _my_doc_string = __doc__
+
+
+def _formals():
+    yield ('-s', '--for-sync',
+           'translate to a stream suitable for use in [#447] syncing')
+    yield '-h', '--help', 'this screen'
 
 
 def _my_CLI(sin, sout, serr, is_for_sync, rscer):
@@ -292,9 +298,7 @@ def xx(s):
 
 
 if __name__ == '__main__':
-    formals = (('-s', '--for-sync',
-                'translate to a stream suitable for use in [#447] syncing'),
-               ('-h', '--help', 'this screen'))
+    formals = _formals()
     kwargs = {'description_valueser': lambda: {'domain': _domain}}
     import sys as o
     from script_lib.cheap_arg_parse import cheap_arg_parse as func
