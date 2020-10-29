@@ -578,7 +578,7 @@ def _confirm_collection_empty(tc, coll):
 
 
 def _yes_value_dict(ent):
-    return ent.core_attributes_dictionary
+    return ent.core_attributes
 
 
 yes_value_dictionary_of = _yes_value_dict

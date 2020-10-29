@@ -155,7 +155,7 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
         return 'empty_collection', None
 
     def tagged_as_hole(ent):
-        s = ent.core_attributes_dictionary.get(main_tag_key)
+        s = ent.core_attributes.get(main_tag_key)
         if s is None:
             return
         return rx.match(s)

@@ -88,7 +88,7 @@ class _MinimalEntity:
         return self._key
 
     @property
-    def core_attributes_dictionary(self):
+    def core_attributes(self):
         return self._dct
 
 

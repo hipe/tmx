@@ -373,7 +373,7 @@ class Case1422_single_file_based_money(CommonCase):
     def test_300_retrieve_produces_the_entity(self):
         ent = self.end_state_result[2]
         assert 'felloo1' == ent.identifier
-        v = ent.core_attributes_dictionary['fim']
+        v = ent.core_attributes['fim']
         assert 'furry' == v
 
     def given_fake_filesystem(self):

@@ -261,7 +261,7 @@ def _read_only_entity(sect_el, ID, mon):
             return {'identifier_string': ID.to_string(),
                     'core_attributes': dct}
 
-        core_attributes_dictionary = dct
+        core_attributes = dct
         identifier = ID
 
         VENDOR_SECTION_ = section

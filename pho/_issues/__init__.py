@@ -26,7 +26,7 @@ def _jsonerer(sout, do_time):
             dct['mtime'] = rec.mtime.strftime(strftime_fmt)
         ent = rec.row_AST
         dct['identifier'] = ent.nonblank_identifier_primitive
-        dct2 = ent.core_attributes_dictionary
+        dct2 = ent.core_attributes
         for k, v in dct2.items():
             assert k not in dct
             dct[k] = v
@@ -111,7 +111,7 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
 
 def _build_matcher(query_string, body_keys):
     def match_yn(row_AST):
-        dct = row_AST.core_attributes_dictionary
+        dct = row_AST.core_attributes
         for k in body_keys:
             if (cel_content := dct.get(k)) is None:
                 continue

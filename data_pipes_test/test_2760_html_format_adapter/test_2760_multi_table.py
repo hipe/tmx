@@ -90,7 +90,7 @@ class Case2756_test_test(CommonCase):
             assert schema is None
             ents = tuple(ents)
 
-        act = tuple(ent.core_attributes_dictionary for ent in ents)
+        act = tuple(ent.core_attributes for ent in ents)
         self.assertSequenceEqual(act, these)
 
 

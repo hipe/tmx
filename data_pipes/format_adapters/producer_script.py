@@ -228,7 +228,7 @@ def _functions_for_read_via_STDIN(stdin):
 
 class _ErsatzEntity:
     def __init__(self, dct, lineno, path):
-        self.core_attributes_dictionary = dct
+        self.core_attributes = dct
         self.lineno = lineno
         self.path = path
 

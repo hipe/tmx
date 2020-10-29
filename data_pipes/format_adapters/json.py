@@ -147,7 +147,7 @@ def _lines_via_schema_and_entities(schema, given_ents, listener):
     def json_lines_via_entity(ent):
         # NOTE skipping the idea of identifiers for now
 
-        dct = ent.core_attributes_dictionary
+        dct = ent.core_attributes
         big_s = json_dumps(dct, indent=2)
 
         # Split on newlines but keep the newlines #[#610]
@@ -197,7 +197,7 @@ def _build_identifier_builder(_listener, _cstacker=None):
     return iden_via_primitive
 
 
-_JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes_dictionary',))
+_JustEnoughEntity = _nt('JustEnoughEntity', ('core_attributes',))
 _MinimalSchema = _nt('MinimalSchema', ('field_name_keys',))
 
 

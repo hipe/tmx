@@ -58,24 +58,74 @@ def build_end_state_actively_for(tc):
 
 
 def build_end_state_passively_for(tc):
+
+    # Set up run partitioning [#459.19]. Here we experiment with state machine:
+
+    def beginning_state():
+        yield True, start_first_run
+
+    def main_state():
+        yield if_same_source(), add_to_existing_run
+        yield True, rollover
+
+    class state_machine:  # #class-as-namespace
+        state = beginning_state
+
+    def recv_write(which, s):
+        state_machine.which, state_machine.string = which, s
+        itr = state_machine.state()
+        while True:
+            yn, consequence = next(itr)
+            if yn:
+                break
+        consequence()
+
+    def if_same_source():
+        return runs[-1][0] == state_machine.which  # #here2
+
+    def rollover():
+        convert_last_run()
+        start_new_run()
+
+    def start_first_run():
+        start_new_run()
+        state_machine.state = main_state
+
+    def start_new_run():
+        runs.append((state_machine.which, [state_machine.string]))  # #here2
+
+    def add_to_existing_run():
+        runs[-1][1].append(state_machine.string)
+
+    def convert_last_run():
+        which, lines = runs[-1]  # #here2
+        runs[-1] = _LineRun(which, tuple(lines))
+
+    runs = []
+
+    # Make pretend stdin, stdout, stderr
     sin = _stdin_for(tc)
-    func = spy_on_write_and_lines_for
-    sout, sout_lines = func(tc, 'DBG SOUT: ', isatty=True)
-    serr, serr_lines = func(tc, 'DBG SERR: ', isatty=True)
+    sout = _std_writable(tc, recv_write, 'SOUT', 'stdout', isatty=False)
+    serr = _std_writable(tc, recv_write, 'SERR', 'stderr', isatty=False)
+
+    # Perform
     argv = tc.given_argv()
-    ec = tc.given_CLI()(sin, sout, serr, argv, None)
+    cli = tc.given_CLI()
+    ec = cli(sin, sout, serr, argv, None)
 
-    if len(sout_lines):
-        if len(serr_lines):
-            raise RuntimeError("oo fun, compound output")
-        else:
-            run = _LineRun('stdout', tuple(sout_lines))
-    elif len(serr_lines):
-        run = _LineRun('stderr', tuple(serr_lines))
-    else:
-        run = _LineRun('neither', ())
+    if len(runs):
+        convert_last_run()
+    runs = tuple(runs)
+    return _end_state_via_runs(runs, ec)
 
-    return _end_state_via_runs((run,), ec)
+
+def _std_writable(tc, recv_write, WHICH, which, **kw):
+    def recv(s):
+        _assert_line(s)
+        recv_write(which, s)
+    dbg_head = f"DBG {WHICH}: "
+    dwr = build_write_receiver_for_debugging(dbg_head, lambda: tc.do_debug)
+    return spy_on_write_via_receivers((dwr, recv), **kw)
 
 
 def _stdin_for(tc):
@@ -130,10 +180,23 @@ def _end_state_via_runs(runs, ec):
 
             lines = run.lines  # client might want to be indifferent to which
 
+            def only_line_run(which):
+                assert run.which == which
+                return run
+
             def first_line_run(which):
                 assert run.which == which
                 return run
+
+            has_runs = True
+        elif 0 == leng:
+            has_runs = False
         else:
+            def only_line_run(which):
+                itr = (run for run in runs if which == run.which)
+                only, = itr
+                return only
+
             def first_line_run(which):
                 return next(run for run in runs if which == run.which)
 
@@ -141,6 +204,7 @@ def _end_state_via_runs(runs, ec):
                 backwards = (runs[i] for i in reversed(range(0, len(runs))))
                 return next(run for run in backwards if which == run.which)
 
+            has_runs = True
         exitcode = ec
     return end_state
 
@@ -180,8 +244,7 @@ def stdout_and_stderr_and_done_via(expectation_defs, tc):  # tc = test context
         if not len(stack):
             return fail(_message_for_extra_line(which, s))
 
-        if not re.search(r'$\n\Z', s):  # #[#605.2]
-            raise RuntimeError("life is easier if `write()`s end in newlines")
+        _assert_line(s)
 
         arity, exp_which, content_asserter = stack[-1]  # #here1
 
@@ -250,7 +313,6 @@ def stdout_and_stderr_and_done_via(expectation_defs, tc):  # tc = test context
         is_first_debugging_message = True
 
     from modality_agnostic import write_only_IO_proxy as proxy
-    import re
     return proxy(recv_sout_write), proxy(recv_serr_write), done
 
 
@@ -497,10 +559,8 @@ def build_write_receiver_for_debugging(dbg_msg_head, do_debug_function):
 
 def build_write_receiver_for_recording_and_lines():
     def recv(s):
-        if not re.match(r'[^\r\n]*\n\Z', s):  # [#605.2]
-            raise RuntimeError(f"we need whole lines - {s!r}")
+        _assert_line(s)
         lines.append(s)
-    import re
     return recv, (lines := [])
 
 
@@ -614,6 +674,18 @@ def _receiver_via_option_key(self):
     locs = locals()
     return {k: locs[k] for k in (set(locs.keys()) - {'locs', 'self'})}
 
+
+def _build_assert_line():  # #[#605.2]
+    def assert_line(s):
+        if rx.match(s):
+            return
+        raise RuntimeError(f"we need whole lines - {s!r}")
+    import re
+    rx = re.compile(r'[^\r\n]*\n\Z')
+    return assert_line
+
+
+_assert_line = _build_assert_line()
 
 # #history-B.3
 # #history-B.2 unification and simplifcation, became almost full rewrite

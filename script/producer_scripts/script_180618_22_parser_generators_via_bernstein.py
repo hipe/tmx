@@ -152,7 +152,7 @@ def _do_this(complete_schema, ents, do_field_names):
     if do_field_names:
         yield ks
     for ast in ents:
-        dct = ast.core_attributes_dictionary
+        dct = ast.core_attributes
         dct['name'] = ast.nonblank_identifier_primitive  # yikes
         yield dct
 

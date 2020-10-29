@@ -313,7 +313,7 @@ class _AppendableTableBlock:
         return self._table_start_line_object.identifier_for_storage_adapter()
 
     @property
-    def core_attributes_dictionary(self):
+    def core_attributes(self):
         _ = self.to_dictionary_two_deep()
         return _['core_attributes']
 

@@ -13,4 +13,9 @@ there are todo's
 refactor every write_help_into
 filesystem_functions does nothing
 data-pipes-doc/documents/459.4.the-last-roadmap.dot
+use collection composition to do the thing
 see #!soon
+rscser not monitor_via_ (in [dp])
+re-assess this in light of pass thru fellow dictionary_dumper_as_JSON_via_output_stream
+restore filter by tags and alow it to work the new way
+implement the "select" function that does the cool thing

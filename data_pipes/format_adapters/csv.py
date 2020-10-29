@@ -151,7 +151,7 @@ def _lines_via_schema_and_entities(schema, ents, listener):  # #testpoint:KS
     yield line_via_fixed_number_of_cell_strings(labels)
 
     def cell_pcs_via_ent(ent):
-        dct = ent.core_attributes_dictionary
+        dct = ent.core_attributes
         for k in ks:
             s = dct[k]
             assert isinstance(s, str)
@@ -305,7 +305,7 @@ def _spans_of_old(throwing_listener):
 # == Models
 
 _MinimalSchema = _nt('MiniamSchema', ('field_name_keys',))
-_MinimalEntity = _nt('MinimalEntity', ('core_attributes_dictionary',))
+_MinimalEntity = _nt('MinimalEntity', ('core_attributes',))
 
 
 def _AST_definitions():

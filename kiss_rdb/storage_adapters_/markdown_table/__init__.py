@@ -340,7 +340,7 @@ def _build_row_AST_via_three(schema=None):
 
             def to_dictionary_two_deep(self):
                 s = self.nonblank_identifier_primitive
-                d = self.core_attributes_dictionary
+                d = self.core_attributes
                 return {'identifier_string': s, 'core_attributes': d}
 
             @property
@@ -352,7 +352,7 @@ def _build_row_AST_via_three(schema=None):
                 return get_lazy_item(nonblank_identifier_string)
 
             @property
-            def core_attributes_dictionary(_):
+            def core_attributes(_):
                 return get_lazy_item(core_attrs_dict)
 
             @property

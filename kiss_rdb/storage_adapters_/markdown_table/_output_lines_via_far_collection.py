@@ -29,7 +29,7 @@ def lines_via_schema_and_entities_(schema, ents, listener):
     if schema:
         xx("wow do you really want to ignore this schema!?")
     for ent in ents:
-        dct = ent.core_attributes_dictionary
+        dct = ent.core_attributes
         recv(dct)
         # flat-map pattern heh
         for line in line_cache:

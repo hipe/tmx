@@ -185,7 +185,7 @@ def _build_directives_processer(eg_row, cs, listener):
                 exi_row, counts = sx[1], None
                 if 'update_item' == typ:
                     assert isinstance(edit := directive[1], tuple)
-                    exi_dct = exi_row.core_attributes_dictionary
+                    exi_dct = exi_row.core_attributes
                     dct, counts = _dct_via_edit(edit, exi_dct, cs, listener)
                 else:
                     assert 'merge_with_item' == typ
