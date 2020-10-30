@@ -286,7 +286,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
             return ''.join(("the '", sa_slug, "' format adapter"))
 
         if (o := getattr(fxr, 'CUSTOM_FUNCTIONS_OLD_WAY', None)):
-            COLLECTION_IMPLEMENTATION = o
+            custom_functions = o
 
         storage_adapter = sa
 
@@ -328,8 +328,8 @@ def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
             # mode 'x': cannot first exist. create a new file and open it for w
             opened = opener(listener, 'x')
             if opened is None:
+                yield None
                 return
-
             with opened as fh:
                 class traversal_receiver:  # #class-as-namespace, crazy flex
                     def receive_schema_and_entities(schema, ents, listen):

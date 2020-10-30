@@ -3,18 +3,25 @@ label="\n
 fig. 459.4: the last roadmap"
 rankdir=BT
 n5[label="change it\nto a thing"]
-n4->n5
-n4[label="choose\na roadmap"]
+n4_9->n5
+n4_9[label="choose\na roadmap"]
+n4_4->n4_9
+n4_2->n4_9
+n4_4[label="chain in a\nsingle process"]
+n4_2[label="chain in multiple\nprocesses"]
+n4->n4_4
+n4->n4_2
+n4[label="these"]
 n3_C->n4
 n3_B->n4
 n3_A->n4
-n3_C[label="select"]
-n3_B[label="filter\nby tags"]
-n3_A[label="convert"]
+n3_C[label="select" style=filled]
+n3_B[label="filter\nby tags" style=filled]
+n3_A[label="convert" style=filled]
 n2_50->n3_C
 n2_50->n3_B
 n2_50->n3_A
-n2_50[label="did you dismantle\nthe idea of\na collection?"]
+n2_50[label="did you dismantle\nthe idea of\na collection?" style=filled]
 n2_26->n2_50
 n2_25->n2_50
 n2_17->n2_50

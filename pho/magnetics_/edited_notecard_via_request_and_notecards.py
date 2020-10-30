@@ -95,7 +95,7 @@ def prepare_edit_(eid_tup, mixed, busi_coll, listener):
 def _prepare_for_create(mixed, busi_coll, listener):
 
     # Reserve a new entity identifier for the entity to create
-    eidr = busi_coll.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
+    eidr = busi_coll.IMPLEMENTATION_.custom_functions\
         .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
     if eidr is None:
         return  # full
@@ -139,7 +139,7 @@ def _prepare_for_create(mixed, busi_coll, listener):
 def _prepare_for_delete(bent, busi_coll, listener):
 
     # Make the patch to remove the identifier from the index
-    ifc = busi_coll.IMPLEMENTATION_.COLLECTION_IMPLEMENTATION\
+    ifc = busi_coll.IMPLEMENTATION_.custom_functions\
         .REMOVE_IDENTIFIER_FROM_INDEX(bent.identifier_string, listener)
     if ifc is None:
         return  # full

@@ -22,7 +22,7 @@ def _hack_an_alias_to_cc(*_5):  # #wish [#608.11]
     return _load('.convert_collection')(*_5)
 
 
-def _CLI(sin, sout, serr, argv, enver):
+def _CLI(sin, sout, serr, argv, rscser):
     """Data Pipes is an experimental potpourri of higher-level operations
 
     that operate on top of collections, sort of in the spirit of ReactiveX
@@ -42,7 +42,7 @@ def _CLI(sin, sout, serr, argv, enver):
         return es
 
     if vals.get('help'):
-        return write_help_into_(serr, _CLI.__doc__, foz)
+        return foz.write_help_into(serr, _CLI.__doc__)
 
     # The Ultra-Sexy Mounting of an Alternation Component:
     cmd_tup = vals.pop('command')
@@ -53,12 +53,10 @@ def _CLI(sin, sout, serr, argv, enver):
     ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
     ch_argv = (ch_pn, * cmd_tup[1:])
 
-    def env_and_related():
-        class resources:  # #class-as-namespace
-            monitor = monitor_via_(serr)
-        return resources
+    def my_rscser():
+        return _build_my_resources(serr, rscser)
 
-    return cmd_funcer()(sin, sout, serr, ch_argv, env_and_related)
+    return cmd_funcer()(sin, sout, serr, ch_argv, my_rscser)
 
 
 # == Select
@@ -80,18 +78,23 @@ def _command_called_select(sin, sout, serr, argv, rscser):
     if vals is None:
         return es
     if vals.get('help'):
-        return write_help_into_(serr, _command_called_select.__doc__, foz)
+        return foz.write_help_into(serr, _command_called_select.__doc__)
 
     coll_ref, field_name = (vals[k] for k in 'collection field_name'.split())
 
     # == BEGIN
 
-    listener = (mon := rscser().monitor).listener
+    listener = (mon := rscser().build_monitor()).listener
 
     input_coll = resolve_input_collection_(sin, coll_ref, listener)
     if input_coll is None:
         return mon.exitstatus
 
+    funky = _build_funky(field_name)
+    return apply_function_commonly_(sout, serr, input_coll, funky, mon)
+
+
+def _build_funky(field_name):
     def funky(schema, input_ents):
         if schema:
             missing_keys = set((field_name,)) - set(schema.field_name_keys)
@@ -116,13 +119,12 @@ def _command_called_select(sin, sout, serr, argv, rscser):
 
         out_schema = _MinimalSchema((field_name,))
         return out_schema, out_ents(), summarizer
+    return funky
 
-    return _GO_DAVID_HOGG_WILD(sout, serr, input_coll, funky, mon)
 
-
-def _GO_DAVID_HOGG_WILD(sout, serr, input_coll, funky, mon):
+def apply_function_commonly_(sout, serr, input_coll, funky, mon):
     def exit_early():
-        return mon.exitstatu
+        return mon.returncode
     listener = mon.listener
 
     with _OPEN_APPLY_FUNCTION_TO_COLLECTION(input_coll, funky, listener) as _3:
@@ -157,11 +159,6 @@ def _OPEN_APPLY_FUNCTION_TO_COLLECTION(coll, funky, listener):
 
 # ==
 
-def monitor_via_(serr):  # #todo
-    from script_lib.magnetics.error_monitor_via_stderr import func
-    return func(serr, default_error_exitstatus=4)
-
-
 def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
     """if the user passes the string "help" for the argument, display
 
@@ -194,6 +191,24 @@ def SPLAY_FORMAT_ADAPTERS(stdout, stderr):
         count += 1
     o(f'({count} total.)\n')
     return 0  # _exitstatus_for_success
+
+
+def _build_my_resources(serr, rscser):
+    # there's a design issue here. this is how we would get env vars in from
+    # the "real world". in tests it's easiest to just pass in None here.
+    # maybe in production too.. so this "service" of producing a monitor ends
+    # up being un-DRY. #[#605.6] a resourceser. Also [sl] implements diff intrf
+
+    if rscser:
+        xx('see above')
+
+    from script_lib.magnetics.error_monitor_via_stderr import func
+    mon = func(serr, default_error_exitstatus=4)
+
+    class my_resources:  # #class-as-namespace
+        def build_monitor():
+            return mon  # for now it's always built b.c it's the only thing
+    return my_resources
 
 
 def resolve_input_collection_(sin, coll_path, listener):
@@ -250,12 +265,6 @@ def _load(key):
     from importlib import import_module
     mod = import_module(key, __name__)
     return mod.CLI_
-
-
-def write_help_into_(serr, doc, foz):
-    for line in foz.help_lines(doc):
-        serr.write(line)
-    return 0
 
 
 def formals_via_(itr, prog_name, subcommands=None):

@@ -148,33 +148,7 @@ def _strings_via_big_string(big_string):
     return (md[1] for md in re.finditer('([^\n]*)\n', big_string))
 
 
-class filesystem_functions:  # as namespace
-    """with this you "inject" the "filesystem" *as* a dependency into your
-
-    application. the sub-components of your application don't interact with
-    the filesystem directly, but rather all of their interactions with it
-    happen through the "filesystem" conduit they were passed (this façade).
-
-    for small scripts, using this would probably be obfuscating overkill. but
-    for applications of any significant complexity, this has these objectives:
-
-      - use of this tacitly encourages the filesystem to be conceived of and
-        modeled around as just another datastore, rather than as a ubiquitous
-        service to be taken for granted. this can encourage modularity and
-        flexibility in your components, in case (for example) you were to
-        rearchitect to target a different datastore other than the local
-        filesystem.
-
-      - more specifically, [something about heroku]
-
-      - for some use cases it can be most practical to mock a filesystem
-        rather than use a mock filesystem tree. [citation needed]
-    """
-
-    open = open  # simply, *our* open is the *real* open
-
-    def open(*x):
-        xx('not used')
+# (buried `filesystem_functions` and justification documentation #history-B.4)
 
 
 def xx(s):
@@ -197,6 +171,7 @@ SUCCESS = 0
 _eol = '\n'
 
 
+# #history-B.4
 # #history-A.5
 # #history-A.4
 # #history-A.3: "cheap arg parse" moves to dedicated file

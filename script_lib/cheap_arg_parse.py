@@ -110,7 +110,7 @@ def _positional_popper(vals):
 def _rscr(serr, enver):  # rough prototype, needs more design. #history-B.2
     from .magnetics.error_monitor_via_stderr import func
 
-    class experimental_resources:  # #class-as-namespace
+    class experimental_resources:  # #class-as-namespace :[#605.6]
         monitor = func(serr)
     return experimental_resources
 
@@ -325,6 +325,12 @@ def _build_option_parser(values, bash_argv, foz):
 
 # == Render Help
 
+def _write_help_into(foz, serr, doc):
+    for line in foz.help_lines(doc):
+        serr.write(line)
+    return 0
+
+
 def _help_lines(foz, doc=None, description_valueser=None):
     # absorbed a whole file at #history-B.2
 
@@ -451,6 +457,7 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
         cls.parse_alternation_fuzzily = _parse_alternation_fuzzily
         cls.nonterminal_parse = _stop_and_invite(_nonterminal_parse)
         cls.terminal_parse = _stop_and_invite(_terminal_parse)
+        cls.write_help_into = _write_help_into
         cls.help_lines = _help_lines
         cls.invite_line = property(lambda _: _invite_line(prog_namer()))
         cls.program_name = property(lambda _: prog_namer())

@@ -19,7 +19,7 @@ def build_CLI_(definition):
         if vals is None:
             return es
         if vals.get('help'):
-            return _write_help_into(serr, hub.to_doc_bigstring(), foz)
+            return foz.write_help_into(serr, hub.to_doc_bigstring())
         cmd_tup = vals.pop('command')
         cmd_name, cmd_funcer, es = foz.parse_alternation_fuzzily(serr, cmd_tup[0])  # noqa: E501
         if not cmd_name:
@@ -41,7 +41,7 @@ def _dispatch(fozzer, busi_func, hub):
         if vals is None:
             return es
         if vals.get('help'):
-            return _write_help_into(serr, busi_func.__doc__, foz)
+            return foz.write_help_into(serr, busi_func.__doc__)
         a, b = foz.sparse_tuples_in_grammar_order_via_consume_values(vals)
         return busi_func(sin, sout, serr, hub, *a, *b)
 
@@ -108,12 +108,6 @@ _help_option = '-h', '--help', 'This screen'
 
 
 # ==
-
-def _write_help_into(serr, doc, foz):
-    for line in foz.help_lines(doc):
-        serr.write(line)
-    return 0
-
 
 def _error_monitor_via_stdin(sin):
     from script_lib.magnetics.error_monitor_via_stderr import func

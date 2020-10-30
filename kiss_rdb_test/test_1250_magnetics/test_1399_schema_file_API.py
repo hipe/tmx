@@ -24,8 +24,8 @@ recutils project, we would strongly consider refactoring the implementaton.)
 
 """
 
-
-from kiss_rdb_test.filesystem_spy import build_fake_filesystem
+from modality_agnostic.test_support.mock_filehandle import \
+        build_fake_filesystem
 import modality_agnostic.test_support.common as em
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes

@@ -45,6 +45,7 @@ the related API that preceded this one.)
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
 |[#606]                     | #open | [the unified diff parser]
+|[#605.6]                   | #open | [resourceser] needs specification/objective/scope. currently inconsistent & not DRY
 |[#605.5]                   | #trak | end state with runs (diff stdout & stderr) moves
 |[#605.4]                   | #trak | mock STDIN that plays back lines
 |[#605.3]                   | #prov | #provision: coding life is easier if we say you need 5: sin, sout, serr, argv, enver

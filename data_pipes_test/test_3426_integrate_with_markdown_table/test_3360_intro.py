@@ -423,8 +423,8 @@ def opn_and_path_via(mixed_near):
                 lines = iter(mixed_near)
             else:
                 raise RuntimeError('easy')
-
-            from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+            from modality_agnostic.test_support.mock_filehandle import \
+                mock_filehandle as func
             return func(lines, path)
         path = 'my-fake-path.md'
     return opn, path

@@ -38,7 +38,7 @@ def CLI(sin, sout, serr, argv, enver):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, CLI.__doc__, foz)
+        return foz.write_help_into(serr, CLI.__doc__)
 
     # The Ultra-Sexy Mounting of an Alternation Component:
     cmd_tup = vals.pop('command')
@@ -71,7 +71,7 @@ def _subcommand_open(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_open.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_open.__doc__)
 
     env_stack = env_stacker()
     if (readme := _resolve_readme(serr, env_stack)) is None:
@@ -110,7 +110,7 @@ def _subcommand_close(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_close.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_close.__doc__)
 
     env_stack = env_stacker()
     if (readme := _resolve_readme(serr, env_stack)) is None:
@@ -145,7 +145,7 @@ def _subcommand_top(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_top.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_top.__doc__)
 
     easy_defaults = {'format': 'table', 'number': 3, 'query': ('#open',)}
     easy_defaults.update(vals)
@@ -185,7 +185,7 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_list.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_list.__doc__)
 
     return _top_or_list(sin, sout, serr, vals, foz, env_stacker)
 
@@ -396,7 +396,7 @@ def _subcommand_find_readmes(sin, sout, serr, argv, env_and_vals_er):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_find_readmes.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_find_readmes.__doc__)
 
     path = vals.get('path', '.')
     args = ('find', path, '-maxdepth', '2', '-name', 'README.md')
@@ -433,7 +433,7 @@ def _subcommand_which(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_which.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_which.__doc__)
 
     env_stack = env_stacker()
     if (readme := _resolve_readme(serr, env_stack)) is None:
@@ -461,7 +461,7 @@ def _subcommand_use(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_use.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_use.__doc__)
 
     readme = vals['readme']
     from shlex import quote
@@ -498,7 +498,7 @@ def _subcommand_graph(sin, sout, serr, argv, env_stacker):
         return es
 
     if vals.get('help'):
-        return _write_help_into(serr, _subcommand_graph.__doc__, foz)
+        return foz.write_help_into(serr, _subcommand_graph.__doc__)
 
     env_stack = env_stacker()
     if (readme := _resolve_readme(serr, env_stack)) is None:
@@ -515,12 +515,6 @@ def _subcommand_graph(sin, sout, serr, argv, env_stacker):
         sout.write(line)
 
     return mon.exitstatus
-
-
-def _write_help_into(serr, doc, foz):
-    for line in foz.help_lines(doc):
-        serr.write(line)
-    return 0
 
 
 def _build_int_matcher():

@@ -1,13 +1,14 @@
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import modality_agnostic.test_support.common as em
-import doctest
 import unittest
 
 
 def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
-    tests.addTests(doctest.DocTestSuite(_subject_module()))
-    return tests
+    from doctest import DocTestSuite as func
+    suite = func(subject_module())
+    tests.addTests(suite)
+    return tests  # (necessary (return our argument))
 
 
 class CommonCase(unittest.TestCase):
@@ -29,7 +30,7 @@ class CommonCase(unittest.TestCase):
 
         listener, emissions = em.listener_and_emissions_for(self, limit=1)
 
-        _x = _subject_module().key_and_entity_via_collection(
+        _x = subject_module().key_and_entity_via_collection(
                 collection=_coll,
                 needle_function=_needle,
                 listener=listener,
@@ -44,7 +45,7 @@ class CommonCase(unittest.TestCase):
         _coll = self._collection()
         _needle = self._needle_function()
 
-        return _subject_module().key_and_entity_via_collection(
+        return subject_module().key_and_entity_via_collection(
                 collection=_coll,
                 needle_function=_needle,
                 listener=None,
@@ -57,7 +58,7 @@ class Case1428_anything_against_none(CommonCase):
 
     def test_050_subject_module_loads(self):
         # (currently redudant and pointless because of doctest integ but meh.)
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_module())
 
     def test_100_result_is_none(self):
         self._result_is_none()
@@ -180,11 +181,11 @@ def _the_empty_collection():
 
 
 def _collection_via_pairs(pairs):
-    return _subject_module().collection_via_pairs_cached(pairs)
+    return subject_module().collection_via_pairs_cached(pairs)
 
 
 @lazy
-def _subject_module():
+def subject_module():
     import kiss_rdb.magnetics.via_collection as x
     return x
 

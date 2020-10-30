@@ -175,19 +175,50 @@ def _collection_implementation(directory, rng=None, opn=None):
             from contextlib import nullcontext
             return nullcontext(self.to_idens(listener))
 
-        def to_idens(listener):
+        def open_schema_and_entity_traversal(listener):
+            # (There are never files to close. there are no resources to manage
+
+            from contextlib import contextmanager as cm
+
+            @cm
+            def cm():
+                yield None, each_entity()  # ..
+
+            def each_entity():
+                for (eid, sect) in self._items_ish(mon):
+                    iden = iden_via(eid, listener)  # #here4
+                    if iden is None:
+                        return
+                    ent = ent_via(sect, iden, mon)
+                    if ent is None:
+                        return
+                    yield ent
+
+            ent_via = self.read_only_entity_via_section_
+            iden_via = self.identifier_via_string_
             mon = self.monitor_via_listener_(listener)
-            listener = mon.listener  # overwrite argument
+            listener = mon.listener  # #overwrite
+            return cm()
+
+        def to_idens(listener):
+            iden_via = self.identifier_via_string_
+            mon = self.monitor_via_listener_(listener)
+            for (eid, sect) in self._items_ish(mon):
+                iden = iden_via(eid, listener)  # #here4
+                if iden is None:
+                    return
+                yield iden
+
+        def _items_ish(mon):
+            listener = mon.listener
             for path in self.to_file_paths_():
                 docu = self.eno_document_via_(path=path, listener=listener)
                 if docu is None:
                     return
                 k_scts = self._entity_section_els_via_document(docu, path, mon)
-                for eid, _sect in k_scts:
-                    iden = self.identifier_via_string_(eid, listener)  # #here4
-                    if iden is None:
-                        return
-                    yield iden
+                for eid, sect in k_scts:
+                    yield eid, sect
+
 
         def PRODUCE_IDENTIFIER_FUNCTIONER_():
             def iden_er_er(listener, cstacker=None):

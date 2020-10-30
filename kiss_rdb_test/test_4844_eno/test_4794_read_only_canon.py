@@ -1,12 +1,21 @@
-from kiss_rdb_test.common_initial_state import functions_for
 from kiss_rdb_test import storage_adapter_canon
+from kiss_rdb_test.common_initial_state import \
+        end_state_named_tuple, functions_for, spy_on_write_and_lines_for
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes,\
-        lazy
+        dangerous_memoize as shared_subject, lazy
 import unittest
 
 
 canon = storage_adapter_canon.produce_agent()
+
+
+def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
+    module = import_toolkit_module()
+    from doctest import DocTestSuite as func
+    suite = func(module)
+    tests.addTests(suite)
+    return tests  # (necessary (return our argument))
 
 
 class CommonCase(unittest.TestCase):
@@ -46,7 +55,57 @@ class Case4791_traverse_IDs(CommonCase):
         _.confirm_all_IDs_in_any_order_no_repeats(self)
 
 
-# Case4794 - traverse entities  # #midpoint
+class Case4794_traverse_whole_document_tree_for_debugging(CommonCase):
+    # SKRRRT
+
+    def test_050_toolkit_module_loads(self):
+        assert self.subject_module.HELLO_I_AM_ENO_TOOLKIT_
+        # (we don't trust that the above method will stay a property)
+
+    def test_075_werk_werk_werk(self):
+        es = self.end_state
+        assert 0 == es.returncode
+
+    def test_100_every_line_looks_like_this(self):
+        exp = set("""
+            ATTRIBUTE END_OF_FILE ENTITY IDENTITY_LINE
+            LINE PASS_THRU_BLOCK PATH WS
+        """.split())
+        act = self.custom_index.line_types
+        self.assertEqual(act, exp)
+
+    def test_200_every_line_looks_like_this(self):
+        act = self.custom_index.indents
+        exp = set((0, 2, 4, 6))
+        self.assertEqual(act, exp)
+
+    @shared_subject
+    @end_state_named_tuple('indents', 'line_types')
+    def custom_index(self):
+        indents, line_types = set(), set()
+        import re
+        lines = self.end_state.output_lines
+        for line in lines:
+            md = re.match(r'([ ]*)([A-Z]+(?:[ ][A-Z]+)*)(?::|[ ]\(|$)', line)
+            if not md:
+                raise RuntimeError(f"oops - {line!r}")
+            ws, header = md.groups()
+            indents.add(len(ws))
+            line_types.add(header.replace(' ', '_'))
+        return indents, line_types
+
+    @shared_subject
+    @end_state_named_tuple('returncode', 'output_lines')
+    def end_state(self):
+        sout, sout_lines = spy_on_write_and_lines_for(self, 'DBG SOUT: ')
+        coll = stateless_collection()
+        func = self.subject_module._the_main_experiment
+        rc = func(sout, None, coll)
+        return rc, tuple(sout_lines)
+
+    @shared_subject
+    def subject_module(self):
+        return import_toolkit_module()
 
 
 class Case4797_entity_not_found_because_identifier_too_deep(CommonCase):
@@ -129,37 +188,53 @@ class Case4809_non_empty_collection_found(CommonCase):
         canon.case_of_non_empty_collection_found.confirm_collection_is_not_none(self)  # noqa: E501
 
     def given_collection(self):
-        listener = _debugging_listener
-        # listener = None
+        coll_path = main_dir()
+
+        listener = None
+        if self.do_debug:
+            listener = import_debugging_listener()
 
         from kiss_rdb import collectionerer
         return collectionerer().collection_via_path(
-                collection_path=_main_dir(),
+                collection_path=coll_path,
                 format_name=None,
                 listener=listener)
 
 
+# == Fixture collections, directories & fixture loading support
+
 @lazy
 def stateless_collection():
-    return collection_via_collection_path_(_main_dir())
+    coll_path = main_dir()
+    return coll_via_path(coll_path)
 
 
 @lazy
-def _main_dir():
+def main_dir():
     return fixture_directory_for('050-canon-main')
 
 
-def collection_via_collection_path_(dir_path):
-    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
-    return eno_collection_via_(dir_path)
-
-
-def _debugging_listener(*args):
-    import modality_agnostic.test_support.common as em
-    em.debugging_listener()(*args)
+def coll_via_path(coll_path):
+    from kiss_rdb_test.eno_support import coll_via_path as func
+    return func(coll_path)
 
 
 fixture_directory_for = functions_for('eno').fixture_directory_for
+
+
+# == Subject modules & similar
+
+def import_toolkit_module():
+    from kiss_rdb_test.eno_support import import_sub_module as func
+    return func('toolkit')
+
+
+# == Dispatchers
+
+def import_debugging_listener():
+    from modality_agnostic.test_support.common import \
+        debugging_listener as funcer
+    return funcer()
 
 
 if __name__ == '__main__':

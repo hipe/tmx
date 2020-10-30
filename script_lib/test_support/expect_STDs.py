@@ -206,6 +206,7 @@ def _end_state_via_runs(runs, ec):
 
             has_runs = True
         exitcode = ec
+        returncode = ec  # meh
     return end_state
 
 

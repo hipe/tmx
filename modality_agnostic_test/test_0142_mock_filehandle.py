@@ -69,7 +69,7 @@ def subject_function():
 
 
 def subject_module():
-    import kiss_rdb_test.filesystem_spy as module
+    import modality_agnostic.test_support.mock_filehandle as module
     return module
 
 

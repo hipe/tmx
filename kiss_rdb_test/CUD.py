@@ -59,7 +59,7 @@ def filesystem_recordings_of(tc, verb, *args):
     result_value = run(_throwing_listener)
     # result value will vary depending on the edit. seems strange to toss it
     tc.assertIsNotNone(result_value)
-    return coll.COLLECTION_IMPLEMENTATION._filesystem.FINISH_AS_HACKY_SPY()
+    return coll.custom_functions._filesystem.FINISH_AS_HACKY_SPY()
 
 
 def run_for(coll, verb, *args):
@@ -154,8 +154,8 @@ def _models_lib():
 
 
 def _fs_lib():
-    from . import filesystem_spy as _
-    return _
+    import modality_agnostic.test_support.mock_filehandle as module
+    return module
 
 
 def em():

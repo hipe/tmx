@@ -42,10 +42,14 @@ NOTEs about its adapation to CLI:
 """
 
 
-def stats_future_and_results_via_entity_stream_and_query(ents, q):
+def entities_and_statser_via_entities_and_query(ents, q):
+    result_ents = _this_old_hack(ents, q)
+    statser = next(result_ents)  # we consider this bad now..
+    return result_ents, statser
 
-    from tag_lyfe.magnetics.tagging_subtree_via_string import \
-        doc_pairs_via_string
+
+def _this_old_hack(ents, q):
+    # This pattern is discouraged now but we're still attached to it..
 
     count_of_items_that_did_not_match = 0
     count_of_items_that_matched = 0
@@ -64,6 +68,9 @@ def stats_future_and_results_via_entity_stream_and_query(ents, q):
 
     def these_keys_via_dictionary(dct):
         return dct.keys()
+
+    from tag_lyfe.magnetics.tagging_subtree_via_string import \
+        doc_pairs_via_string
 
     for entity in ents:
         dct = entity.core_attributes

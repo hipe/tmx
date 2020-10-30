@@ -56,7 +56,7 @@ class CommonCase(unittest.TestCase):
 
     def flush_filesystem_recordings(self):
         coll = self.end_state['collection']
-        return coll.COLLECTION_IMPLEMENTATION._filesystem.FINISH_AS_HACKY_SPY()
+        return coll.custom_functions._filesystem.FINISH_AS_HACKY_SPY()
 
     def listener(self):
         pass

@@ -57,12 +57,12 @@ def CLI_(sin, sout, serr, argv, _rscer):
 CLI_.__doc__ = _desc
 
 
-def _do_CLI(sin, sout, serr, near_fmt, do_diff, near_coll, ps_path, rscr):
+def _do_CLI(sin, sout, serr, near_fmt, do_diff, near_coll, ps_path, vrscser):
     if 'help' == near_fmt:
         from data_pipes.cli import SPLAY_FORMAT_ADAPTERS
         return SPLAY_FORMAT_ADAPTERS(sout, serr)
 
-    mon = rscr().monitor
+    mon = vrscser().monitor  # [#605.6]
     sout_lines = _stdout_lines_from_sync(
             near_coll, ps_path, mon.listener, do_diff, near_fmt)
     for line in sout_lines:

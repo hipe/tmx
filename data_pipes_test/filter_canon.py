@@ -1,14 +1,15 @@
 def _build_end_state(cc, tc):
     from data_pipes.magnetics.entities_via_filter_by_tags import \
-        stats_future_and_results_via_entity_stream_and_query, prepare_query
+        entities_and_statser_via_entities_and_query as func, \
+        prepare_query
 
-    itr = stats_future_and_results_via_entity_stream_and_query(
-            tc.given_collection(), prepare_query(cc.query()))
+    q = prepare_query(cc.query())
+    coll = tc.given_collection()
+    ents, statser = func(coll, q)
+    result_list = tuple(ents)
+    stats = statser()  # after above
 
-    future = next(itr)
-    flush_first = tuple(itr)
-
-    return {'stats': future(), 'result_list': flush_first}
+    return {'stats': stats, 'result_list': result_list}
 
 
 class _Case:

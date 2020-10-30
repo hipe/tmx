@@ -1,4 +1,5 @@
-from kiss_rdb_test.common_initial_state import unindent_with_dot_hack
+from kiss_rdb_test.common_initial_state import \
+        unindent_with_dot_hack, spy_on_write_and_lines_for
 from modality_agnostic.test_support.common import \
     dangerous_memoize as shared_subject
 import unittest
@@ -254,9 +255,7 @@ class Case1476_CLI_tool(CommonCase):
 
     @shared_subject
     def end_state(self):
-        from script_lib.test_support.expect_STDs import \
-            spy_on_write_and_lines_for as func
-        sout, sout_lines = func(self, 'DBG: ')
+        sout, sout_lines = spy_on_write_and_lines_for(self, 'DBG: ')
 
         yikes = 'kiss_rdb_test/fixture-directories/4844-eno/050-canon-main'
         argv = '[me]', 'generate', yikes

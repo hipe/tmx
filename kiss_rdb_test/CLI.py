@@ -381,7 +381,7 @@ def tree_via_lines(lines):
 
 
 def build_filesystem_expecting_num_file_rewrites(expected_num):
-    from kiss_rdb_test import filesystem_spy as fs_lib
+    import modality_agnostic.test_support.mock_filehandle as fs_lib
     return fs_lib.build_filesystem_expecting_num_file_rewrites(expected_num)
 
 

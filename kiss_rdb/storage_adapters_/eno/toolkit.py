@@ -1,3 +1,21 @@
+"""
+Experimental re-framing of this file (at #history-B.4):
+
+This module used to be the __main__.py which had an initial novelty but
+started to show strain. 👉 Doesn't lend itself well to testing 👉 Can't be
+loaded easily as a module. So it experienced "erosion" and became way broken.
+
+Now the new way:
+- We almost called this "utilities". It's "tooling".
+- It's meant to help inspect, troubleshoot, maybe integrity check, mainbe maint
+- Be able to load as a module (for complex testing if you wish)
+- Be able to run as a standalone CLI for now
+- For now, library assets, CLI and doctests where you can all in this file
+- It's not visible in the main UI for now
+- Get the doctests to run from unittests, hopefully early
+"""
+
+
 def _CLI_for_crazy_visual_test(sin, sout, serr, argv):
     try:
         return _do_crazy_CLI(sout, serr, argv)
@@ -8,7 +26,7 @@ def _CLI_for_crazy_visual_test(sin, sout, serr, argv):
 def _do_crazy_CLI(sout, serr, argv):
 
     bash_argv = list(reversed(argv))
-    prog_name = bash_argv.pop()
+    long_prog_name = bash_argv.pop()
 
     def bash_argv_pop(moniker):
         if len(bash_argv):
@@ -21,6 +39,8 @@ def _do_crazy_CLI(sout, serr, argv):
         return usage()
 
     def usage():
+        from os.path import basename
+        prog_name = basename(long_prog_name)
         serr.write(f"usage: {prog_name}")
         _ = test_names_alternation()
         serr.write(f' <collection-path> {_} [test-specific args..]\n')
@@ -30,41 +50,33 @@ def _do_crazy_CLI(sout, serr, argv):
         _ = ' | '.join(f'"{k}"' for k in tests.keys())
         return f'{{{_}}}'
 
-    def test(f):  # #decorator
+    def command(f):  # #decorator
         tests[f.__name__] = f
         return f
 
     tests = {}
 
-    @test
+    @command
     def BIG_THING():
         return _the_main_experiment(sout, serr, coll)
 
-    @test
+    @command
     def RETRIEVE_ENTITY():
         entity_id = bash_argv_pop('<entity-id>')
-        from kiss_rdb.magnetics_.identifier_via_string import \
-            identifier_via_string_
-
         listener = _listener_via_IO(serr)
-        iden = identifier_via_string_(entity_id, listener)
-        if iden is None:
-            return 3
-        ent = coll.retrieve_entity_via_identifier(
-                iden, listener)
+        ent = _retrieve(entity_id, coll, listener)
         if not ent:
             return 3
         serr.write('(retrieve OK)\n')
         return 0
 
-    @test
+    @command
     def TRAVERSE_IDENTIFIERS():
         if len(bash_argv):
             return unexpected()
-        raise RuntimeError('hello')  # #soon
-        idens = coll.to_identifier_stream_as_storage_adapter_collection(None)
-        for iden in idens:
-            serr.write(f'NEATO: {iden.to_string()}\n')
+        with _open_traverse_idens(coll) as idens:
+            for iden in idens:
+                serr.write(f'NEATO: {iden.to_string()}\n')
         return 0
 
     if 0 == len(bash_argv) or '-' == (coll_path := bash_argv.pop())[0]:
@@ -82,18 +94,30 @@ def _do_crazy_CLI(sout, serr, argv):
     return tests[test_name]()
 
 
-def _the_main_experiment(sout, serr, coll):
-
+def _the_main_experiment(sout, serr, coll):  # #testpoint
     from kiss_rdb.storage_adapters_.eno._blocks_via_path import \
-        _existing_entity_blocks_via_BoT
+        _document_sections_via_BoT as sects_via
 
-    mon = coll.monitor_via_listener_(_listener_via_IO(serr))
-    for path in coll.to_file_paths_():
+    serr = sout  # (oops) Write to stdout not stderr (changed now)
+    del sout
+
+    cf = coll.custom_functions
+
+    mon = cf.monitor_via_listener_(_listener_via_IO(serr))
+
+    for path in cf.to_file_paths_():
         serr.write(f'PATH: {path}\n')
 
-        body_of_text = coll.body_of_text_via_(path=path)
+        body_of_text = cf.body_of_text_via_(path=path)
 
-        for entb in _existing_entity_blocks_via_BoT(body_of_text, coll, mon):
+        for entb in sects_via(body_of_text, cf, mon):
+
+            if entb.is_pass_thru_block:
+                serr.write(f"  PASS THRU BLOCK (type: {entb.block_type_name})\n")  # noqa: E501
+                for line in entb.to_lines():
+                    serr.write(f'    LINE: {line}')
+                continue
+
             serr.write('  ENTITY:\n')
 
             for line in entb.to_lines():
@@ -101,7 +125,7 @@ def _the_main_experiment(sout, serr, coll):
                 break
             # (SKIPPING rest of lines from above)
 
-            for attr_block in entb.to_attribute_block_stream():
+            for attr_block in entb.attribute_blocks:
                 serr.write('    ATTRIBUTE:\n')
 
                 # lines = tuple(attr_block.to_lines())
@@ -140,24 +164,7 @@ class _Stop_On_CLI_Error(RuntimeError):
         self.exitstatus = exitstatus
 
 
-def _CLI(sin, sout, serr, argv):
-    raise RuntimeError("we made this unreachable at #history-A.1 but etc")
-
-    # == BEGIN experiment (take this out and it still works)
-    from os import PathLike
-
-    class Xx(PathLike):
-        def __fspath__(self):
-            return _experiment()
-
-    argv[0] = Xx()
-    # == END
-
-    formals = (('-h', '--help', 'this screen'),
-               ('file', 'some eno file'))
-    from script_lib.cheap_arg_parse import cheap_arg_parse as func
-    return func(_do_CLI, _do_CLI, sin, sout, serr, argv, formals)
-
+# ==
 
 def _do_CLI(sin, sout, serr, file_path, rscr):
     """ad-hoc develoment utility for seeing a parsed eno document as a dump.
@@ -210,16 +217,6 @@ def _do_CLI(sin, sout, serr, file_path, rscr):
     return mon.exitstatus
 
 
-def _experiment():
-    here = __file__
-    _tail = here[here.index('kiss_rdb'):]  # not robust
-    from os.path import dirname
-    _inner = dirname(_tail)
-    from os import sep as path_separator
-    _mod_name = _inner.replace(path_separator, '.')
-    return f'py -m {_mod_name}'
-
-
 def _profile_via(el):
     for m in ('yields_empty', 'yields_field', 'yields_fieldset',
               'yields_fieldset', 'yields_section'):
@@ -227,9 +224,57 @@ def _profile_via(el):
             yield m
 
 
+# ==
+
+def _retrieve(eid, coll, listener=None):
+    """
+    >>> coll = _collection_via_dict({'a': 'B', 'c': 'D'})
+    >>> _retrieve('c', coll)
+    'D'
+
+    >>> _retrieve('e', coll, lambda *_: None)
+
+    """
+    return coll.retrieve_entity(eid, listener)
+
+
+def _open_traverse_idens(coll):
+    """
+    >>> coll = _collection_via_dict({'a': 'B', 'c': 'D'})
+    >>> with _open_traverse_idens(coll) as idens:
+    ...     result = tuple(iden.to_primitive() for iden in idens)
+    >>> result
+    ('a', 'c')
+    """
+
+    def two_opener():
+        return coll.open_schema_and_entity_traversal(None)
+
+    from kiss_rdb.magnetics.via_collection import conversions_ as liber
+    return liber().open_traverse_identifiers_via_two_opener(two_opener)
+
+
+def _collection_via_dict(dct):
+    from kiss_rdb.magnetics.via_collection import \
+        collection_via_dictionary as func
+    return func(dct)
+
+
+# ==
+
+def xx(msg=None):
+    raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
+
+
+# ==
+
+HELLO_I_AM_ENO_TOOLKIT_ = True  # #tespoint (only)
+
+
 if '__main__' == __name__:
     import sys as o
     exit(_CLI_for_crazy_visual_test(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-B.4
 # #history-A.1
 # #born.

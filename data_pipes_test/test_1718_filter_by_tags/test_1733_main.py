@@ -1,5 +1,5 @@
+from data_pipes_test.cli_support import CLI_Case
 from modality_agnostic.test_support.common import \
-        dangerous_memoize_in_child_classes as shared_subj_in_child_classes, \
         dangerous_memoize as shared_subject
 import unittest
 
@@ -39,29 +39,15 @@ class Case1730_integrate_filter_by_tags(unittest.TestCase):
         return my_case
 
 
-class CLI_Case(unittest.TestCase):
-
-    @property
-    @shared_subj_in_child_classes
-    def end_state(self):
-        from script_lib.test_support.expect_STDs import \
-                build_end_state_passively_for as func
-        return func(self)
-
-    def given_stdin(_):
-        pass
+class CommonCase(CLI_Case, unittest.TestCase):
 
     def given_argv(self):
-        return 'ohai mami', * self.given_argv_tail()
-
-    def given_CLI(_):
-        from data_pipes.cli import _CLI as func
-        return func
+        return '[me]', 'filter-by-tags', * self.given_argv_tail()
 
     do_debug = False
 
 
-class Case1733_filter_by_tags_help(CLI_Case):
+class Case1733_filter_by_tags_help(CommonCase):
 
     def test_100_expect_requires_these_particular_arguments(self):
         exp = '<query> [<query> [..]]'
@@ -76,7 +62,55 @@ class Case1733_filter_by_tags_help(CLI_Case):
         return self.build_command_help_screen_subtree()
 
     def given_argv_tail(self):
-        return 'filter-by-tags', '-h'
+        return ('-h',)
+
+
+class Case1735_minimally_illustrative(CommonCase):
+
+    def test_050_return_code_is_good(self):
+        self.exits_with_success_returncode()
+
+    def test_100_outputs_only_the_matched_entities(self):
+        self.expect_expected_output_lines()
+
+    def test_200_summary_lines(self):
+        self.expect_expected_errput_lines()
+
+    def expected_errput_lines(self):
+        yield '(2 match(es) of 3 item(s) seen.)\n'
+
+    def expected_output_lines(self):
+        yield '[{\n'
+        yield '  "aa": "BB #choo-chii",\n'
+        yield '  "cc": "DD"\n'
+        yield '},\n'
+        yield '{\n'
+        yield '  "ii": "JJ",\n'
+        yield '  "kk": "#choo-chii LL"\n'
+        yield '}]\n'
+
+    def given_argv_tail(self):
+        return '-', '#choo-chii'
+
+    def given_stdin(self):
+        lines = self.given_input_lines()
+        from modality_agnostic.test_support.mock_filehandle import \
+            mock_filehandle as func
+        return func(lines, '<stdin>')
+
+    def given_input_lines(self):
+        yield '[{\n'
+        yield '  "aa": "BB #choo-chii",\n'
+        yield '  "cc": "DD"\n'
+        yield '},\n'
+        yield '{\n'
+        yield '  "ee": "FF",\n'
+        yield '  "gg": "HH"\n'
+        yield '},\n'
+        yield '{\n'
+        yield '  "ii": "JJ",\n'
+        yield '  "kk": "#choo-chii LL"\n'
+        yield '}]\n'
 
 
 def block_stream_via_file_lines(lines):

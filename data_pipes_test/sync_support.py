@@ -169,7 +169,8 @@ def _do_sync(near, far, listener, near_format):
 
         def opn(path, mode):
             assert near == path
-            from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+            from modality_agnostic.test_support.mock_filehandle import \
+                mock_filehandle as func
             return func(near_line_iterator, near)
 
     from data_pipes.cli.sync import _stdout_lines_from_sync as func

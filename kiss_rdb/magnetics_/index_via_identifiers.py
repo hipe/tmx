@@ -218,7 +218,7 @@ class _CLI:
 
     def with_idens(self, idens):
         coll, listener = self.collection, self.listener
-        num_digits = coll.COLLECTION_IMPLEMENTATION.number_of_digits_
+        num_digits = coll.custom_functions.number_of_digits_
         lines = _lines_of_index_via_identifiers(idens, num_digits, listener)
         write = self.stdout.write
         for line in lines:

@@ -60,7 +60,7 @@ class _Notecards:  # #testpoint
         edit = self._prepare_edit(eid_tup, mixed, listener)
         if edit is None:
             return
-        ci = self._coll.COLLECTION_IMPLEMENTATION
+        cf = self._coll.custom_functions
 
         # The below list is the keys in order from neighbor [#822.M], minus
         # one of them. Whenever it gets annoying, load that module & change to:
@@ -74,7 +74,7 @@ class _Notecards:  # #testpoint
 
         bent = edit.main_business_entity  # fail earlier if this isn't here
 
-        return ci.BIG_PATCHFILE_FOR_BATCH_UPDATE(
+        return cf.BIG_PATCHFILE_FOR_BATCH_UPDATE(
             index_file_change=ifc_dct,
             entities_units_of_work=edit.units_of_work,
             result_document_entityer=lambda: bent,

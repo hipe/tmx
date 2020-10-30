@@ -45,15 +45,14 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    from data_pipes.cli import formals_via_ as func, \
-        write_help_into_, monitor_via_
+    from data_pipes.cli import formals_via_ as func
     foz = func(_formals(), lambda: prog_name)
     vals, es = foz.terminal_parse(stderr, bash_argv)
     if vals is None:
         return es
 
     if vals.get('help'):
-        return write_help_into_(stderr, CLI_.__doc__, foz)
+        return foz.write_help_into(stderr, CLI_.__doc__)
 
     from_collection = vals.pop('from_collection')
     to_collection = vals.pop('to_collection')
@@ -134,7 +133,7 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     from data_pipes import meta_collection_ as func
     collib = func()
 
-    mon = monitor_via_(stderr)
+    mon = rscer().build_monitor()
     listener = mon.listener
     try:
         return main()

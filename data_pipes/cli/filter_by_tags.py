@@ -6,7 +6,8 @@ def _help_lines():
 
 def _formals():
     yield '-h', '--help', 'this screen'
-    yield '<collection>', 'usually a filesystem path to the collection'
+    yield '<collection>', 'usually a filesystem path to the collection', \
+          "if it's '-' we expect etc"
     yield '<query> [<query> [..]]', 'elements of your tag query'
 
 
@@ -15,66 +16,70 @@ def CLI_(sin, sout, serr, argv, rscser):
     of its cels., E.g.: "#critical" or \\( "#open" and not "#cosmetic" \\)
     """
 
-    prog_name = (bash_argv := list(reversed(argv))).pop()
-    from data_pipes.cli import formals_via_ as func, \
-        write_help_into_, monitor_via_
+    def main():
+        parse_args()
+        resolve_source_collection()
+        resolve_query()
+        return work()
 
-    foz = func(_formals(), lambda: prog_name)
-    vals, es = foz.terminal_parse(serr, bash_argv)
-    if vals is None:
-        return es
+    def work():
+        funky = _build_funky(self.query)
+        func = _nearby_lib().apply_function_commonly_
+        return func(sout, serr, self.coll, funky, mon)
 
-    if vals.get('help'):
-        return write_help_into_(serr, CLI_.__doc__, foz)
+    def resolve_query():
+        func = _work_module().prepare_query
+        self.query = func(self.query_pieces, throwing_listener)
 
-    coll_path = vals.get('collection')
-    query = vals.get('query')
+    def resolve_source_collection():
+        func = _nearby_lib().resolve_input_collection_
+        self.coll = func(sin, self.coll_path, throwing_listener)
 
-    mon = monitor_via_(serr)
+    def parse_args():
+        prog_name = (bash_argv := list(reversed(argv))).pop()
+        from data_pipes.cli import formals_via_ as func
+        foz = func(_formals(), lambda: prog_name)
+        vals, rc = foz.terminal_parse(serr, bash_argv)
+        if vals is None:
+            raise stop(rc)
+        if vals.get('help'):
+            foz.write_help_into(serr, CLI_.__doc__)
+            raise stop(0)
+        self.coll_path = vals['collection']
+        self.query_pieces = vals['query']
+
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise stop(6)
+
+    mon = rscser().build_monitor()
     listener = mon.listener
 
-    from data_pipes import meta_collection_ as func
-    mc = func()
-    coll = mc.collection_via_path(coll_path, listener)
+    self = main  # #watch-the-world-burn
 
-    ci = coll.COLLECTION_IMPLEMENTATION
-    raise RuntimeError("The below is the old way. New way will be easy for you my friend")  # noqa: E501
-    # #soon
-    _ents = ci.to_entity_stream_as_storage_adapter_collection(listener)
-
-    from data_pipes.magnetics.entities_via_filter_by_tags import \
-        stats_future_and_results_via_entity_stream_and_query, prepare_query
-
-    q = prepare_query(query, listener)
-    if q is None:
-        return mon.errno
-
-    itr = stats_future_and_results_via_entity_stream_and_query(_ents, q)
-    future = next(itr)
-
-    from kiss_rdb.cli import (click, success_exit_code_)
-    from kiss_rdb import dictionary_dumper_as_JSON_via_output_stream
-
-    sout = click.utils._default_text_stdout()
-    serr = click.utils._default_text_stderr()
-
-    dump = dictionary_dumper_as_JSON_via_output_stream(sout)
-    first = True
-    for entity in itr:
-        if first:
-            first = False
-        else:
-            sout.write(',\n')
-        dump(entity.to_dictionary_two_deep())
-    if not first:
-        sout.write('\n')
-    for line in __summarize_search_stats(future()):
-        serr.write(line)
-
-    return success_exit_code_
+    class stop(RuntimeError):
+        def __init__(self, rc=None):
+            self.returncode = rc
+    try:
+        return main()
+    except stop as exc:
+        return mon.returncode if (rc := exc.returncode) is None else rc
 
 
-def __summarize_search_stats(o):  # deleted coverage at #history-A.3
+def _build_funky(query):
+    def funky(same_schema, in_ents):
+        func = _work_module().entities_and_statser_via_entities_and_query
+        out_ents, statser = func(in_ents, query)
+
+        class summary:
+            def to_lines():
+                return _summarize_search_stats(statser())
+        return same_schema, out_ents, lambda: summary
+    return funky
+
+
+def _summarize_search_stats(o):  # (Case1735)
 
     did_not_match = o['count_of_items_that_did_not_match']
     matched = o['count_of_items_that_matched']
@@ -103,6 +108,20 @@ def __summarize_search_stats(o):  # deleted coverage at #history-A.3
         yield o(f'all {total} item(s) matched')
     else:
         yield o(f'{matched} match(es) of {total} item(s) seen')
+
+
+def _work_module():
+    import data_pipes.magnetics.entities_via_filter_by_tags as module
+    return module
+
+
+def _nearby_lib():
+    import data_pipes.cli as module
+    return module
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
 # #history-B.3
 # #re-housed #abstracted

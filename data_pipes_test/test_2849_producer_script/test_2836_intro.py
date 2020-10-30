@@ -97,7 +97,7 @@ class Case2832_RUMSKALLA:
 
         _coll = _build_collection(_path, _no_cheat)
 
-        ps = _coll.COLLECTION_IMPLEMENTATION.PRODUCER_SCRIPT_MODULE
+        ps = _coll.custom_functions.PRODUCER_SCRIPT_MODULE
 
         self.assertTrue(ps.stream_for_sync_is_alphabetized_by_key_for_sync)
 

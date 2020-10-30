@@ -50,7 +50,7 @@ def DIGGY_DIG(top_object, dig_path, say_collection, listener):
         offset += 1
 
         assert(isinstance(current_item, dict))  # retrofitting for #history-A.4
-        current_item = collection_via_DICTIONARY(current_item)
+        current_item = collection_via_dictionary(current_item)
 
     return current_item
 
@@ -560,10 +560,10 @@ placeholder_for_say_subfeature = repr
 
 # (lost those two wrappers around dictionaries etc at #history-B.4)
 
-class collection_via_DICTIONARY:
+class collection_via_dictionary:
     """
     Build a collection from a dictionary:
-    >>> subject_function = collection_via_DICTIONARY
+    >>> subject_function = collection_via_dictionary
     >>> coll = subject_function({'a': 'b', 'c': 'd'})
 
     Retrieve an item:
@@ -601,7 +601,20 @@ def _conversions():
     return _conversions_ohai
 
 
+conversions_ = _conversions
+
+
 class _conversions_ohai:  # #class-as-namespace
+
+    def open_traverse_identifiers_via_two_opener(twoer):
+        from contextlib import contextmanager as cm
+
+        @cm
+        def cm():
+            with twoer() as (sch, ents):
+                yield (ent.identifier for ent in ents)
+        return cm()
+
     def open_two_via_items(items):
         def these():
             for k, v in items:
@@ -615,6 +628,18 @@ class _MinimalEntity:
         assert k
         self.nonblank_identifier_primitive = k
         self.mixed_value = x
+
+    @property
+    def identifier(self):
+        return _MinimalIdentifier(self.nonblank_identifier_primitive)
+
+
+class _MinimalIdentifier:
+    def __init__(self, k):
+        self._key = k
+
+    def to_primitive(self):
+        return self._key
 
 
 def xx(msg=None):

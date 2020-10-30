@@ -30,17 +30,20 @@ class CommonCase(unittest.TestCase):
                 lines = tuple(f())
             emissions.append((chan, lines))
 
-        from kiss_rdb.storage_adapters_.eno._blocks_via_path import \
-            _new_file_blocks, emitter_via_monitor__
+        from kiss_rdb_test.eno_support import import_sub_module as func
+        mod = func('_blocks_via_path')
+        blocks_via = mod._new_file_blocks
+        emitter_via = mod.emitter_via_monitor__
 
-        coll = collection_via_collection_path_('/dev/null')
-        ci = coll.COLLECTION_IMPLEMENTATION
-        mon = ci.monitor_via_listener_(listener)
-        emi = emitter_via_monitor__(mon)
+        from kiss_rdb_test.eno_support import coll_via_path as func
+        coll = func('/dev/null')
+        cf = coll.custom_functions
+        mon = cf.monitor_via_listener_(listener)
+        emi = emitter_via(mon)
         edits, order = self.given_edit()
         lines = (*self.given_lines(), *ugh)
 
-        blks = _new_file_blocks(edits, ci, order, emi, lines=lines)
+        blks = blocks_via(edits, cf, order, emi, lines=lines)
 
         catch_this = emi.stopper_exception_class
         try:
@@ -309,11 +312,6 @@ class Case4835_create_append_at_end(CommonCase):  # DO ME
 
     def given_lines(self):
         yield '# entity: ABA: attributes\n'
-
-
-def collection_via_collection_path_(dir_path):
-    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
-    return eno_collection_via_(dir_path, rng=None)
 
 
 ABC_line = '# entity: ABC: attributes\n'

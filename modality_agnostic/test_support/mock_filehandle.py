@@ -60,6 +60,8 @@ def _build_filesystem_via_two_funcs(INJECTED_FELLOW, finish):
 
 class build_fake_filesystem:
     # (currently separate from the recording filesystem. just for reads)
+    # (buried the similar-feeling (but for production)
+    # `filesystem_functions` at #history-B.4, just as a note.)
 
     def __init__(self, *tups):
         self._tups = tups
@@ -297,6 +299,6 @@ def _lines_via_strings_with_optimistic_peek(lines):
 def xx(msg=None):
     raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
-# #pending-rename: "mock filehandle" (or filesystem) and move it to [ma]
+# #history-B.4: tombstone
 # #history-A.1: introduce fake filesystem
 # #abstracted.

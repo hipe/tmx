@@ -57,9 +57,13 @@ def dictionary_dumper_as_JSON_via_output_stream(fp):  # (Case6080)
     """JSON is chosen as a convenience for us not you. Don't get too attached
 
     because we might switch this default dumping format to something else.
-    NOTE ths does *not* output a trailing newline.
+    NOTE this does *not* output a trailing newline.
 
     Everywhere this is used is near our "oneline" #wish [#873.C].
+
+    See also the "json" format adapter in [dp] that starts each attribute
+    on its own line (probably) and caps the very first and very last entity
+    with '[' and ']'.
     """
 
     def dump(dct):

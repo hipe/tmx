@@ -105,6 +105,10 @@ class func:  # error_monitor_via_stderr
         self._max_non_default_error_status_seen = new_errno
         self.exitstatus = new_errno
 
+    @property
+    def returncode(self):
+        return self.exitstatus
+
 
 def _line_writer_via_IO(io):  # (move this to wherever)
     def write_line(s):

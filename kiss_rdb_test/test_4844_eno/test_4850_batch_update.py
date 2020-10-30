@@ -36,10 +36,13 @@ class CommonCase(unittest.TestCase):
 
         fixture_directory_for = functions_for('eno').fixture_directory_for
         directory = fixture_directory_for('050-canon-main')
-        coll = collection_via_collection_path_(directory, rng)
-        ci = coll.COLLECTION_IMPLEMENTATION
 
-        eidr = ci.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+        from kiss_rdb_test.eno_support import coll_via_path as func
+        coll = func(directory, rng=rng)
+
+        cf = coll.custom_functions
+
+        eidr = cf.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
         eidr = eidr.to_dictionary()
 
         def o(*ent_cud):
@@ -58,7 +61,7 @@ class CommonCase(unittest.TestCase):
         o['order'] = ('parent', 'heading', 'body', 'children')
         o['listener'] = listener
 
-        bpf = ci.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
+        bpf = cf.BIG_PATCHFILE_FOR_BATCH_UPDATE(**o)
         return bpf, tuple(emissions)
 
 
@@ -135,11 +138,6 @@ class Case4850_SOMETHING(CommonCase):
         bpf = self.build_big_patchfile()
         one, two, three = bpf.patches
         return tuple(o.diff_lines for o in (one, two, three))
-
-
-def collection_via_collection_path_(dir_path, rng):
-    from kiss_rdb.storage_adapters_.eno import eno_collection_via_
-    return eno_collection_via_(dir_path, rng=rng)
 
 
 if __name__ == '__main__':

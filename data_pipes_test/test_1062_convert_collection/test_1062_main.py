@@ -263,11 +263,9 @@ class Case1065_one_arg_which_is_token(CommonCase):
         return self.stdin_that_IS_interactive()
 
     def given_argv_tail(self):
-        from kiss_rdb_test import fixture_executables as mod
-        these = mod.__path__._path
-        fixtures_dir, = tuple(set(these))  # sometimes there's 2 idk
-        from os.path import join
-        producer_script = join(fixtures_dir, 'exe_140_khong_micro.py')
+        from data_pipes_test.common_initial_state import \
+            executable_fixture as func
+        producer_script = func('exe_140_khong_micro.py')
         return producer_script, '-', '--to-format', 'markdown-table'
 
 

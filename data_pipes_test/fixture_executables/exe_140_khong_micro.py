@@ -32,7 +32,6 @@ if __name__ == '__main__':
     exit(exit_code_via_path(__file__))
 
 
-# #pending-rename: this is only used by [dp]
 # #history-A.2: moved from another subproject to here
 # #history-A.1: no more sync-side entity mapping
 # #born.

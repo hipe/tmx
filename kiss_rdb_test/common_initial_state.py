@@ -12,7 +12,7 @@ class OneWriteReference:  # :[#510.5] (again)
         self.value = x
 
 
-# ==
+# == Business-y
 
 def MDE_via_lines_and_table_start_line_object(lines, tslo, listener):
     import kiss_rdb.storage_adapters_.toml.entities_via_collection as ents_lib
@@ -40,8 +40,37 @@ def didactic_collectioner():
     return func(path._name, fs_path)
 
 
-# == Pretend resources
+# == Assertion support
 
+def end_state_named_tuple(*attrs):  # #decorator
+    # (This is the second writing of this. The first writing is somewhere in
+    # some code added in the last week or two. This is a blind rewrite. We
+    # aren't going to bother looking for the original now because of how
+    # straightforwardly memorable this is, in terms of its input, its result,
+    # and even its implementation (w/ namedtuple) AND SO how trivial it will
+    # be to unify later. When the need emerges, put this in [ma] t.s. probably)
+
+    """
+    NOTE this does NOT memoize. Typically (but not necessarily), a memoizing
+    decorator is seen above it.
+    """
+
+    def decorator(orig_f):
+        def use_f(tc):
+            values = orig_f(tc)
+            if not ptr:
+                ptr.append(build_class())
+            return ptr[0](*values)
+        return use_f
+
+    def build_class():
+        from collections import namedtuple as nt
+        return nt('DerivedEndState', attrs)
+    ptr = []
+    return decorator
+
+
+# == Pretend resources (performance support)
 
 """
 Why and How
@@ -104,6 +133,15 @@ when mocking STDIN).)
 """
 
 
+def spy_on_write_and_lines_for(tc, debug_prefix):
+    # (this pretend resource for capturing output is at top.
+    # the rest in this sections are for mocking input)
+
+    from script_lib.test_support.expect_STDs import \
+        spy_on_write_and_lines_for as func
+    return func(tc, debug_prefix, isatty=None)
+
+
 def pretend_resource_and_controller_via_KV_pairs(itr):
     k, f = next(itr)
     assert 'pretend_file' == k
@@ -160,7 +198,7 @@ def _pretend_resource(lines, pretend_path, expect_num_rewinds=None, **kw):
     if expect_num_rewinds is None:
         fh = fake_file_via_path_and_lines(pretend_path, lines, **kw)
         return fh, None  # #here1
-    from kiss_rdb_test.filesystem_spy import \
+    from modality_agnostic.test_support.mock_filehandle import \
         mock_filehandle_and_mutable_controller_via as func
     return func(expect_num_rewinds, lines, pretend_path=pretend_path, **kw)
 
@@ -172,8 +210,10 @@ def fake_file_via_path_and_big_string(path, big_string):
 def fake_file_via_path_and_lines(path, lines, **kw):
     if isinstance(lines, tuple):
         lines = iter(lines)
-    from kiss_rdb_test.filesystem_spy import mock_filehandle as func
+    from modality_agnostic.test_support.mock_filehandle import \
+        mock_filehandle as func
     return func(lines, path, **kw)
+
 
 # ==
 

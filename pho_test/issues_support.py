@@ -28,7 +28,8 @@ def build_end_state_for(tc, run):
     assert -1 < expect_num_rewinds
 
     pw = True  # might become a per-case option
-    import kiss_rdb_test.filesystem_spy as lib  # will move
+
+    import modality_agnostic.test_support.mock_filehandle as lib
     if expect_num_rewinds:
         fh, mc = lib.mock_filehandle_and_mutable_controller_via(
                 expect_num_rewinds, lines, pretend_path=readme,
