@@ -1,6 +1,22 @@
 from collections import namedtuple as _nt
 
 
+IS_CHAINABLE = True
+MUST_BE_ENDPOINT_OF_PIPELINE = True
+
+
+def NONTERMINAL_PARSE_ARGS(serr, bash_argv):
+    prog_name = bash_argv.pop()
+    from data_pipes.cli import formals_via_ as func
+    foz = func(_formals(), lambda: prog_name)
+    vals, rc = foz.nonterminal_parse(serr, bash_argv)
+
+    # #track [#459.O]: resulting in *three* args below
+    if vals is None:
+        return None, None, rc
+    return vals, foz, None
+
+
 def _formals():
 
     # (using '-f' is nice because it looks and means like ffmpeg)
@@ -28,7 +44,7 @@ _to_monikers = _monikers('TO_COLLECTION', '--to-format', 'STDOUT')
 _same_help = "(or will try to infer from file extension if present)"
 
 
-def CLI_(stdin, stdout, stderr, argv, rscer):
+def BUILD_COLLECTION_MAPPER(stderr, vals, foz, rscser):
     """Harness the power of pipes…"""
 
     # ..
@@ -44,46 +60,34 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     At writing the only participating formats are CSV and json..
     """
 
-    prog_name = (bash_argv := list(reversed(argv))).pop()
-    from data_pipes.cli import formals_via_ as func
-    foz = func(_formals(), lambda: prog_name)
-    vals, es = foz.terminal_parse(stderr, bash_argv)
-    if vals is None:
-        return es
-
     if vals.get('help'):
-        return foz.write_help_into(stderr, CLI_.__doc__)
+        doc = BUILD_COLLECTION_MAPPER.__doc__
+        rc = foz.write_help_into(stderr, doc)
+        return None, rc
 
-    from_collection = vals.pop('from_collection')
     to_collection = vals.pop('to_collection')
 
     to_format_default = None
     if '-' == to_collection:
         to_format_default = 'json'  # experiment
 
-    from_format = vals.pop('from_format', None)
     to_format = vals.pop('to_format', to_format_default)
-
-    from_args = vals.pop('from_arg', ())
-    if len(from_args):
-        raise RuntimeError('gone now')
-
     assert not vals
 
-    # shouldn't need RNG ever - don't we want to transfer the same ID's in?
+    def collection_mapper_via_sout(sout):
+        def map_collection(schema, ents):
+            try:
+                return do_map_collection(sout, schema, ents)
+            except stop:
+                return 9876
+        return map_collection
 
-    def main():  # (this logic is repeated 1x in a test :[#459.M])
-        with open_the_input_collection_for_traversal() as (schema, ents):
-            with open_the_output_collection_for_writing() as receiver:
-                receiver.receive_schema_and_entities(schema, ents, listener)
-        return mon.exitstatus
+    def do_map_collection(sout, schema, ents):
+        with open_the_output_collection_for_writing(sout) as receiver:
+            receiver.receive_schema_and_entities(schema, ents, listener)
+        return mon.returncode
 
-    def open_the_input_collection_for_traversal():
-        fmt, x = normalize(from_format, from_collection, stdin, _from_monikers)
-        coll = resolve_collection(fmt, x)
-        return coll.open_schema_and_entity_traversal(throwing_listener)
-
-    def open_the_output_collection_for_writing():
+    def open_the_output_collection_for_writing(stdout):
         fmt, x = normalize(to_format, to_collection, stdout, _to_monikers)
         coll = resolve_collection(fmt, x)
         return coll.open_collection_to_write_given_traversal(throwing_listener)
@@ -93,18 +97,8 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
             arg, throwing_listener, format_name=fmt)
 
     def normalize(fmt, arg, sin_sout, o):
-        if '-' == arg:
-            if sin_sout.isatty() and 'STDIN' == o.STDIN_STDOUT:
-                # (oops this one is asymmetrical)
-                error(f"when {o.arg} is '-', {o.STDIN_STDOUT} must be a pipe")
-            use_coll_ID = sin_sout
-            if fmt is None:
-                fmt = 'json'
-        elif sin_sout.isatty():
-            use_coll_ID = arg
-        else:
-            error(f"{o.STDIN_STDOUT} cannot be a pipe unless {o.arg} is '-'")
-        return fmt, use_coll_ID
+        from data_pipes.cli import normalize_collection_reference_ as func
+        return func(sin_sout, fmt, arg, o.STDIN_STDOUT, o.arg, error)
 
     # == Listeners and related
 
@@ -120,25 +114,15 @@ def CLI_(stdin, stdout, stderr, argv, rscer):
     class stop(RuntimeError):
         pass
 
-    # == Our `self` and writing to it
-
-    def memo(attr, mixed):
-        setattr(self, attr, mixed)
-
-    class self:  # #class-as-namespace
-        pass
-
     # == Smalls and go!
 
     from data_pipes import meta_collection_ as func
     collib = func()
 
-    mon = rscer().build_monitor()
+    mon = rscser().produce_monitor()
     listener = mon.listener
-    try:
-        return main()
-    except stop:
-        return 9876
+
+    return collection_mapper_via_sout, None
 
 
 # #history-B.1: rewrote

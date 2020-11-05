@@ -7,11 +7,11 @@ n4_9->n5
 n4_9[label="choose\na roadmap"]
 n4_4->n4_9
 n4_2->n4_9
-n4_4[label="chain in a\nsingle process"]
-n4_2[label="chain in multiple\nprocesses"]
+n4_4[label="chain in a\nsingle process" style=filled]
+n4_2[label="chain in multiple\nprocesses" style=filled]
 n4->n4_4
 n4->n4_2
-n4[label="these"]
+n4[label="these" style=filled]
 n3_C->n4
 n3_B->n4
 n3_A->n4

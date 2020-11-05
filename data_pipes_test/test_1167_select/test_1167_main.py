@@ -13,7 +13,7 @@ class CommonCase(CLI_Case, unittest.TestCase):
 class Case1167_select_help(CommonCase):
 
     def test_050_exits_with_success_returncode(self):
-        self.exits_with_success_returncode()
+        self.expect_success_returncode()
 
     def test_100_this_string_is_in_first_line_of_description(self):
         act = self.end_state.lines[2]
@@ -26,7 +26,7 @@ class Case1167_select_help(CommonCase):
 class Case1169_minimally_illustrative(CommonCase):
 
     def test_050_return_code_is_good(self):
-        self.exits_with_success_returncode()
+        self.expect_success_returncode()
 
     def test_100_outputs_only_the_matched_entities(self):
         self.expect_expected_output_lines()

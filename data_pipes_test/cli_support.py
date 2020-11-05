@@ -2,12 +2,20 @@ from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subj_in_child_classes
 
 
-class CLI_Case:
+class CLI_Case:  # :[#459.F]
 
     # Assertion support
 
-    def exits_with_success_returncode(self):
-        self.assertEqual(self.end_state.returncode, 0)
+    def expect_failure_returncode(self):
+        self.assertNotEqual(self.returncode_checked(), 0)
+
+    def expect_success_returncode(self):
+        self.assertEqual(self.returncode_checked(), 0)
+
+    def returncode_checked(self):
+        act = self.end_state.returncode
+        self.assertIsInstance(act, int)
+        return act
 
     def expect_expected_output_lines(self):
         self.expect_expected_lines('stdout', 'expected_output_lines')
@@ -17,7 +25,7 @@ class CLI_Case:
 
     def expect_expected_lines(self, which, attr):
         es = self.end_state
-        act_lines = es.only_line_run(which).lines
+        act_lines = tuple(es.all_lines_on(which))
         exp_lines = tuple(getattr(self, attr)())
         self.assertSequenceEqual(act_lines, exp_lines)
 
@@ -31,8 +39,14 @@ class CLI_Case:
         return func(self)
 
     def given_CLI(_):
-        from data_pipes.cli import _CLI as func
-        return func
+        def use_CLI(sin, sout, serr, argv, rscser):
+            def use_rscser():
+                return resources_via(serr)
+            rscser.HELLO_FROM_SCRIPT_LIB_THIS_DOES_NOTHING
+            return my_CLI(sin, sout, serr, argv, use_rscser)
+        from data_pipes.cli import \
+            _CLI as my_CLI, _build_my_resources as resources_via
+        return use_CLI
 
     def given_stdin(self):
         itr = self.given_input_lines()

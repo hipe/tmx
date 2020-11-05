@@ -1,22 +1,10 @@
+from data_pipes_test.cli_support import CLI_Case
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
-class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
-
-    # == Assert Exitcode (assertions then readers)
-
-    def expect_failure_exitcode(self):
-        self.assertNotEqual(self.exitcode_checked(), 0)
-
-    def expect_success_exitcode(self):
-        self.assertEqual(self.exitcode_checked(), 0)
-
-    def exitcode_checked(self):
-        act = self.end_state.exitcode
-        self.assertIsInstance(act, int)
-        return act
+class CommonCase(CLI_Case, unittest.TestCase):
 
     # == High-Level Custom Assertions
 
@@ -108,18 +96,6 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
     def stderr_lines(self):
         return self.end_state.stderr_lines
 
-    # == Build End State
-
-    @property
-    @shared_subject_in_child_classes
-    def end_state(self):
-        # (before #history-B.3 this was the UGLIEST support code for click)
-
-        from script_lib.test_support.expect_STDs import \
-            build_end_state_passively_for as func
-
-        return func(self)
-
     # == Givens (defaults & convenience readers)
 
     def stdin_that_is_NOT_interactive(self):
@@ -131,9 +107,9 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
     def given_argv(self):
         return 'ohai mami', 'convert-collection', *self.given_argv_tail()
 
-    def given_CLI(_):
-        from data_pipes.cli import _CLI as func
-        return func
+    def given_argv_tail(self):
+        rows = self.given_argv_tail_pieces()
+        return (s for row in rows for s in row)
 
     do_debug = False
 
@@ -141,7 +117,7 @@ class CommonCase(unittest.TestCase):  # #[#459.F] CLI integ tests have redundan
 class Case1050_help(CommonCase):
 
     def test_100_succeeds(self):
-        self.expect_success_exitcode()
+        self.expect_success_returncode()
 
     def test_200_content(self):
         lines = self.end_state.first_line_run('stderr').lines
@@ -158,7 +134,7 @@ class Case1050_help(CommonCase):
 class Case1053_no_args(CommonCase):
 
     def test_100_fails(self):
-        self.expect_failure_exitcode()
+        self.expect_failure_returncode()
 
     def test_200_whines(self):
         exp = "Expecting FROM_COLLECTION"
@@ -177,7 +153,7 @@ class Case1053_no_args(CommonCase):
 class Case1056_args_and_stdin(CommonCase):
 
     def test_100_fails(self):
-        self.expect_failure_exitcode()
+        self.expect_failure_returncode()
 
     def test_200_content(self):
         # exp = 'parameter error: when piping from STDIN, <script> must be "-"
@@ -200,7 +176,7 @@ class Case1056_args_and_stdin(CommonCase):
 class Case1059_too_many_args(CommonCase):
 
     def test_100_fails(self):
-        self.expect_failure_exitcode()
+        self.expect_failure_returncode()
 
     def test_200_content(self):
         act = self.reason_stderr_line
@@ -216,13 +192,14 @@ class Case1059_too_many_args(CommonCase):
         return self.stdin_that_IS_interactive()
 
     def given_argv_tail(self):
-        return ('no-see', '--fing-foo', 'da-da')
+        # because #open [#459.V], put opts before args for now:
+        return '--fing-foo', 'no-see-1', 'no-see-2'
 
 
 class Case1062DP_one_arg_which_is_stdin(CommonCase):  # #midpoint
 
     def test_100_succeeds(self):
-        self.expect_success_exitcode()
+        self.expect_success_returncode()
 
     def test_200_header_row_and_second_one(self):
         act = self.end_state_file_table.table_lines
@@ -246,15 +223,17 @@ class Case1062DP_one_arg_which_is_stdin(CommonCase):  # #midpoint
                 '{ "lesson": "[choo chah](foo fa)" }\n',
                 '{ "lesson": "[boo bah](loo la)" }\n')
 
-    def given_argv_tail(self):
-        return ('-', '--from-format', 'producer-script',
-                '-', '--to-format', 'markdown-table')
+    def given_argv_tail_pieces(self):
+        # because #open [#459.V], put opts before args for now:
+        yield '--from-format', 'producer-script'
+        yield '--to-format', 'markdown-table'
+        yield '-', '-'
 
 
 class Case1065_one_arg_which_is_token(CommonCase):
 
     def test_100_succeeds(self):
-        self.expect_success_exitcode()
+        self.expect_success_returncode()
 
     def test_200_same_business_lines(self):
         self.expect_choo_cha_boo_bah()
@@ -262,17 +241,20 @@ class Case1065_one_arg_which_is_token(CommonCase):
     def given_stdin(self):
         return self.stdin_that_IS_interactive()
 
-    def given_argv_tail(self):
+    def given_argv_tail_pieces(self):
         from data_pipes_test.common_initial_state import \
             executable_fixture as func
         producer_script = func('exe_140_khong_micro.py')
-        return producer_script, '-', '--to-format', 'markdown-table'
+
+        # because #open [#459.V], put opts before args for now:
+        yield '--to-format', 'markdown-table'
+        yield producer_script, '-'
 
 
 class Case1068DP_convert_from_CSV_to_json(CommonCase):
 
     def test_100_succeeds(self):
-        self.expect_success_exitcode()
+        self.expect_success_returncode()
 
     def test_200_outputs_correctly(self):
         self.expect_expected_output_lines()
@@ -299,13 +281,10 @@ class Case1068DP_convert_from_CSV_to_json(CommonCase):
 class Case1071_convert_from_json_to_CSV(CommonCase):
 
     def test_100_succeeds(self):
-        self.expect_success_exitcode()
+        self.expect_success_returncode()
 
     def test_200_outputs_correctly(self):
         self.expect_expected_output_lines()
-
-    def given_argv_tail(self):
-        return '-f', 'json', '-', '-t', 'csv', '-'
 
     def given_stdin(self):
         yield '[{\n'
@@ -321,6 +300,10 @@ class Case1071_convert_from_json_to_CSV(CommonCase):
         yield 'Field A, Field B\n'
         yield 'ting 1, ting 2\n'
         yield 'ting 3, ting 4\n'
+
+    def given_argv_tail(self):
+        # because #open [#459.V], put opts before args for now:
+        return '-f', 'json', '-t', 'csv', '-', '-'
 
 
 if __name__ == '__main__':

@@ -319,11 +319,9 @@ def _build_stream_join(sep):
     def stream_join(itr):  # :[#612.4] near [#611] things we do with scanners
         scn = func(itr)
         yield scn.next()  # ..
-        while True:  # ..
+        while scn.more:
             yield sep
             yield scn.next()
-            if scn.empty:
-                break
 
     func = _scnlib().scanner_via_iterator
     return stream_join

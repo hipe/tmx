@@ -108,15 +108,27 @@ def build_end_state_passively_for(tc):
     sout = _std_writable(tc, recv_write, 'SOUT', 'stdout', isatty=False)
     serr = _std_writable(tc, recv_write, 'SERR', 'stderr', isatty=False)
 
-    # Perform
+    # Prepare args for performance
     argv = tc.given_argv()
+    if tc.do_debug:
+        print(f"\nARGV: {argv!r}")
+
+    # Perform
     cli = tc.given_CLI()
-    ec = cli(sin, sout, serr, argv, None)
+    ec = cli(sin, sout, serr, argv, _do_not_use_rscser)
 
     if len(runs):
         convert_last_run()
     runs = tuple(runs)
     return _end_state_via_runs(runs, ec)
+
+
+def _do_not_use_rscser():
+    # #open [#605.6] no spec for a resourcer yet. we don't know who should do
+    raise RuntimeError("hack the resourceser yourself for now")
+
+
+_do_not_use_rscser.HELLO_FROM_SCRIPT_LIB_THIS_DOES_NOTHING = True
 
 
 def _std_writable(tc, recv_write, WHICH, which, **kw):
@@ -192,6 +204,13 @@ def _end_state_via_runs(runs, ec):
         elif 0 == leng:
             has_runs = False
         else:
+            def all_lines_on(which):  # adding this method makes us reconsider
+                for run in runs:
+                    if which != run.which:
+                        continue
+                    for line in run.lines:
+                        yield line
+
             def only_line_run(which):
                 itr = (run for run in runs if which == run.which)
                 only, = itr

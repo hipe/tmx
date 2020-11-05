@@ -7,10 +7,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
-    """NOTE - many of these are abstraction candidates
-
-    #track #[#459.F] CLI integ tests have redundant setup
-    """
+    # whenever you're adding or modying here, check with [#459.F] for DRY
 
     # -- assertions
 

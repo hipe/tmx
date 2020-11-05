@@ -36,6 +36,9 @@ so it holds for "all".)
 # data_pipes_test/fixture_executables/exe_130_edit_add.py
 
 
+IS_CHAINABLE = False
+
+
 _desc = __doc__
 
 
@@ -59,8 +62,8 @@ CLI_.__doc__ = _desc
 
 def _do_CLI(sin, sout, serr, near_fmt, do_diff, near_coll, ps_path, vrscser):
     if 'help' == near_fmt:
-        from data_pipes.cli import SPLAY_FORMAT_ADAPTERS
-        return SPLAY_FORMAT_ADAPTERS(sout, serr)
+        from data_pipes.cli import SPLAY_FORMAT_ADAPTERS__ as func
+        return func(sout, serr)
 
     mon = vrscser().monitor  # [#605.6]
     sout_lines = _stdout_lines_from_sync(

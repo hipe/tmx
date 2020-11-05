@@ -68,7 +68,7 @@ class Case1733_filter_by_tags_help(CommonCase):
 class Case1735_minimally_illustrative(CommonCase):
 
     def test_050_return_code_is_good(self):
-        self.exits_with_success_returncode()
+        self.expect_success_returncode()
 
     def test_100_outputs_only_the_matched_entities(self):
         self.expect_expected_output_lines()

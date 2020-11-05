@@ -17,12 +17,14 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
 |                  [#463]   |       | functional pipelines (2 files)
+|                 [#459.V]  | #open | ordering of opts vs args got more strict because pipeline
+|                 [#459.U]  | #open | help screen needs fixing, probaly in [sl]
 |                 [#459.T]  | #wish | parse like ffmpeg so -f format opt works at both
 |                 [#459.19] |       | track algorithm: partitioning
 |                  [#459.R] |       | near sync keyer (builder) in flux
 |                 [#459.17] | #trak | producer script moudules that aren't modules
 |                  [#459.P] | #open | tmpfile is hardcoded
-|                  [#459.O] | #hole |
+|                  [#459.O] | #trak | this one thing
 |                  [#459.N] | #open | producer scripts shouldn't have knowledge of near format
 |                  [#459.M] | #trak | logical redundancy between asset and test
 |                  [#459.L] | #wish | we want regex escape
@@ -31,7 +33,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.I] | #open | tests we haven't written but still want
 |                  [#459.H] | #wish | would we really want a moin moin adaption?
 |                  [#459.G] | #trak | whether in-memory should be official format
-|                  [#459.F] | #trak | CLI integration tests have redundant setup
+|                  [#459.F] | #trak | watch for redundancy in CLI testing across files
 |                  [#459.E] | #trak | [record mapper]
 |                  [#459.4] |       | [the last roadmap]
 |                  [#459.C] |       | [the new way]
