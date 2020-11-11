@@ -388,6 +388,11 @@ def _build_row_AST_via_three(schema=None):
 
         def core_attrs_dict():
             def keys_and_values():
+                # == BEGIN experiment - adding the ID column here at what cost?
+                #    answer: #provision [#857.9] maybe EID, maybe not
+                if (x := ent.nonblank_identifier_primitive) is not None:
+                    yield identifier_key, x
+                # == END
                 for k in non_identifier_attr_keys:
                     cell = ent.cell_at_offset(offset_via_key[k])
                     if cell is None:

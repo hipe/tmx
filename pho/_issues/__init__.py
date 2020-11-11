@@ -65,11 +65,17 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
         counts.files += 1
         ic = issues_collection_via_(readme, listener, opn)
 
+        opened = ic.collection.open_schema_and_entity_traversal(listener)
+        with opened as (sch, ents):
+            # #todo name this issue about resource management
+            for rec in records_via(sch, ents, readme):
+                yield rec
+
+    def records_via(sch, ents, readme):
         # If some kind of failure (eg {file|table} not found), None not iter
-        if (sch_ents := ic.to_schema_and_entities()) is None:
+        if ents is None:
             return
 
-        sch, ents = sch_ents
         body_keys = sch.field_name_keys[1:]  # [#871.1]
 
         # If there is no filter and no sort, you are done
@@ -90,7 +96,7 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
         from kiss_rdb.vcs_adapters.git import blame_index_via_path as func
         vcs_index = func(readme, listener, opn)
         if vcs_index is None:
-            xx()
+            xx("maybe the file isn't in version control?")
 
         mtime = vcs_index.datetime_for_lineno  # #here5 (below)
         unordered = (rec(mtime(ent.lineno), ent, readme) for ent in ents)

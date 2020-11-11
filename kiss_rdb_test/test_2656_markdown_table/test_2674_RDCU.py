@@ -177,7 +177,9 @@ class Case2644_delete_OK_resulting_in_non_empty_collection(CommonCase):
         dct = canon.yes_value_dictionary_of(ent)
         self.assertEqual(dct['thing_A'], "hi i'm B9H")
         self.assertEqual(dct['thing_B'], "hey i'm B9H")
-        self.assertEqual(len(dct), 2)
+
+        # #provision [#857.9] for now, maybe EID is included, maybe not
+        # self.assertEqual(len(dct), 2)
 
     def given_run(self):
         return self.canon_case.build_end_state_for_delete(self, 'B9H')
@@ -212,7 +214,9 @@ class Case2647_delete_OK_resulting_in_empty_collection(CommonCase):
         dct = canon.yes_value_dictionary_of(ent)
         self.assertEqual(dct['thing_1'], 'xx')
         self.assertEqual(dct['thing_A'], 'zz')
-        self.assertEqual(len(dct), 2)
+
+        # #provision [#857.9] for now, maybe EID is included, maybe not
+        # self.assertEqual(len(dct), 2)
 
     def given_run(self):
         return self.canon_case.build_end_state_for_delete(self, 'B9K')

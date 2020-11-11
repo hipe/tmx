@@ -2,9 +2,9 @@ digraph g {
 label="\n
 fig. 459.4: the last roadmap"
 rankdir=BT
-n5[label="change it\nto a thing"]
+n5[label="change it\nto a thing" style=filled]
 n4_9->n5
-n4_9[label="choose\na roadmap"]
+n4_9[label="choose\na roadmap" style=filled]
 n4_4->n4_9
 n4_2->n4_9
 n4_4[label="chain in a\nsingle process" style=filled]

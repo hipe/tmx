@@ -111,6 +111,8 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.9]                   | #prov | whether or not the EID is an attribute is currently up in the air, up to SA
+|[#857.8]                   | #prov | "update" (sometimes "create") results in before and after ENTITY (not dct)
 |[#857.G]                   | #open | turn diffing/patching into a "for free" feature for single-file collections
 |[#857.6]                   | #open | no more opn or something
 |[#857.E]                   | #prov | #provision: entity identifiers (eid's) are either integers or strings for now

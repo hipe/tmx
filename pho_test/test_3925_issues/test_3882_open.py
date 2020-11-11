@@ -30,7 +30,8 @@ class ProviCase(CommonCase):
     # ==
 
     def given_run(self, readme, opn, listener):
-        return provision_identifier()(readme, listener, opn)
+        with opn(readme, 'r+') as fh:
+            return provision_identifier()(opn, fh, listener)
 
 
 class Case3878_range_of_allowed_ints_established_by_eg_and_last(ProviCase):

@@ -115,7 +115,7 @@ def _metrics_and_line_cache(path, opn):
 
 def _tagged_items(path):
     cwd, entry = _split_path(path)
-    args = (_GIT_EXE, 'blame', entry)
+    args = _GIT_EXE, 'blame', entry
 
     import subprocess as sp
     opened = sp.Popen(

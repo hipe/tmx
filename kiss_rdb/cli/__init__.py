@@ -332,8 +332,18 @@ def traverse(ctx, collection):
     echo = click.echo
     with coll.open_identifier_traversal(mon.listener) as idens:
         # (Case5934)
-        for iden in idens:
-            echo(iden.to_string())
+        itr = iter(idens)
+        for iden in itr:
+            if isinstance(iden, str):
+                def str_via(x):
+                    return x
+            else:
+                def str_via(x):
+                    return x.to_string()
+            echo(str_via(iden))
+
+        for iden in itr:
+            echo(str_via(iden))
 
     if len(mon.error_categories_seen):
         return mon.errno()

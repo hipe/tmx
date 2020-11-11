@@ -109,6 +109,10 @@ def scanner_via_list(tup):
 # ==
 
 def MUTATE_add_advance_observer(scn, on_advance):
+    if scn.empty:
+        assert not hasattr(scn, 'advance')
+        return  # #cover-me
+
     def use_advance():
         x = orig_advance()
         on_advance()

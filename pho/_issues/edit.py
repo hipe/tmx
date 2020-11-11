@@ -1,9 +1,17 @@
 def open_issue(readme, dct, listener, opn=None):
-
-    tup = _provision_identifier(readme, listener, opn)
-    if tup is None:
+    opened = _open_file(readme, 'r+', opn, listener)  # #here2
+    if opened is None:
         return
-    typ, iden, schema, ic, fh = tup  # #here1
+    with opened as fh:
+        tup = _provision_identifier(opn, fh, listener)
+        if tup is None:
+            return
+        typ, iden, schema, ic = tup  # #here1
+        return _do_open_issue(fh, typ, iden, schema, ic, dct, listener)
+
+
+def _do_open_issue(fh, typ, iden, schema, ic, dct, listener):
+
     coll = ic.collection
 
     # This algorithm is necessarily two-pass: you have to traverse the whole
@@ -31,38 +39,29 @@ def open_issue(readme, dct, listener, opn=None):
     iden_key, *allowed_keys = schema.field_name_keys  # assume [#871.1]
     extra_keys = set(dct.keys()) - set(allowed_keys)
     if extra_keys:
-        xx(f"strange key(s): {extra_keys!r}")
+        xx(f"key(s) in new ent not in MD table schema: {extra_keys!r}")
 
     # Validate content
     ok = _validate_content(dct, allowed_keys, listener)
     if not ok:
-        fh.close()  # YUCK #here2
         return
 
     # Either create or update
-
-    def dct_via_ent(ent):
-        if ent is None:
-            return None
-        return ent.to_dictionary_two_deep()
-
     do_create = ('tagged_hole', 'major_hole', 'minor_hole').index(typ)
     if do_create:
         use_dct = {k: v for k, v in dct.items()}
         use_dct[iden_key] = iden.to_string()  # reparse it again ick/meh
-        ent = coll.create_entity(use_dct, listener)
-        edct = dct_via_ent(ent)
-        t = (None, edct)
+        after_ent = coll.create_entity(use_dct, listener)
+        before_and_after = None, after_ent  # #provision [#857.8]: two entities
     else:
         use_dct = {k: '' for k in allowed_keys}
         use_dct.update(dct)
         edt = tuple(('update_attribute', k, v) for k, v in use_dct.items())
         eid = iden.to_string()  # meh
-        two = coll.update_entity(eid, edt, listener)
-        t = tuple(dct_via_ent(ent) for ent in two)
 
-    fh.close()  # #here2
-    return t
+        # assume #provision [#857.8]: two entities
+        before_and_after = coll.update_entity(eid, edt, listener)
+    return before_and_after
 
 
 def _validate_content(dct, allowed_keys, listener):
@@ -88,7 +87,7 @@ def _validate_content(dct, allowed_keys, listener):
     listener('error', 'expression', 'cell_content_error', lineser)
 
 
-def _provision_identifier(readme, listener, opn):  # #testpoint
+def _provision_identifier(away_soon, fh, listener):  # #testpoint
 
     def main():
         typ, iden = traverse_whole_collection()
@@ -120,13 +119,13 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
         last_iden_with_real_major_hole_above_it = None
         last_iden_with_real_minor_hole_above_it = None
         above_iden, branch, ent = eg_iden, False, None
+
         for ent in ents:
             iden = ent.identifier
             if tagged_as_hole(ent):
                 last_iden_tagged_as_hole = iden
             was_under_branch = branch
             jump_distance, branch = compare(above_iden, iden, branch)
-            above_iden = iden
             assert -1 < jump_distance
             if 0 == jump_distance:
                 # The header node at the bottom of a bunch of compound issues
@@ -141,8 +140,12 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
                 # compound to simple (so was): major hole
                 if was_under_branch and branch:
                     last_iden_with_real_minor_hole_above_it = iden
+                elif branch:  # new at writing. experiment.
+                    # begining of the world to compound: minor hole
+                    last_iden_with_real_minor_hole_above_it = iden
                 else:
                     last_iden_with_real_major_hole_above_it = iden
+            above_iden = iden
 
         if (iden := last_iden_tagged_as_hole):
             return 'last_iden_tagged_as_hole', iden
@@ -171,8 +174,12 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
                 jump_distance = major_dist(above_iden, iden)
                 is_under_branch = False
         elif iden.has_sub_component:
-            jump_distance = major_dist(above_iden, iden)
-            is_under_branch = True
+            if above_iden.has_sub_component:
+                jump_distance = minor_dist(above_iden, iden)
+                is_under_branch = True
+            else:
+                jump_distance = major_dist(above_iden, iden)
+                is_under_branch = True
         else:
             jump_distance = major_dist(above_iden, iden)
         return jump_distance, is_under_branch
@@ -189,35 +196,40 @@ def _provision_identifier(readme, listener, opn):  # #testpoint
     tl = _build_throwing_listener(stop, listener)
 
     # This spaghetti was cooked down to a reduction sauce over hours:
-    # Open the file and leave it open because you rewind it #here3. With this
+    # The file was opened #here2.
+    # Leave it open because we rewind it #here3. With this
     # open filehandle, traverse the collection just far enough to get the
     # schema and the first example row. Then, WHILE STILL INSIDE THE TRAVERSAL,
     # do our main work which is to come up with a provisioned identifer
     # (while remembering what provision strategy (type name string) we used)
 
-    if (fh := _open_file(readme, 'r', opn, listener)) is None:
-        return
-
-    do_close = True  # normally we DON'T close it. default is to assume failure
     try:
-        ic = _issues_collection_via(fh, tl, opn)
+        ic = _issues_collection_via(fh, tl, away_soon)
         coll = ic.collection
         with coll.open_schema_and_RAW_entity_traversal(tl) as (sch, ents):
             assert 'main_tag' == sch.field_name_keys[1]  # or w/e
             main_tag_key = 'main_tag'
-            end_iden = (eg_iden := next(ents).identifier)
-            assert not end_iden.has_sub_component
+
+            # Resolve a first entity row, assuming it's an e.g row, and:
+            first_ent = None
+            for first_ent in ents:
+                break
+            if first_ent is None:
+                xx("no example row")  # #cover-me
+            eg_iden = first_ent.identifier
+
+            if eg_iden.has_sub_component:
+                pass  # hi. visually. #cover-me
+            else:
+                pass  # hi.
+
             two = main()
         if two is None:
             return
         typ, iden = two
-        do_close = False
-        return (typ, iden, sch, ic, fh)  # #here1
+        return typ, iden, sch, ic  # #here1
     except stop:
         pass
-    finally:
-        if do_close:
-            fh.close()  # #here2
 
 
 def _increment_identifier(iden, maj_or_min):
@@ -285,9 +297,9 @@ def _build_throwing_listener(stop, listener):
 
 # == Delegations & Hops
 
-def _issues_collection_via(readme, listener, opn):
+def _issues_collection_via(x, listener, opn=None):
     from pho._issues import issues_collection_via_ as func
-    return func(readme, listener, opn)
+    return func(x, listener, opn)
 
 
 # == Smalls
