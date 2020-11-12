@@ -6,7 +6,7 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 
 # == As Functionser (experimental)
 
-def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #open [#857.6] opn will go away
+def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #watch [#857.6] we don't love opn
 
     class edit_ns:  # #class-as-namespace
         def CREATE_VIA_FILEHANDLE(fp, iden_er_er, dct, listener):

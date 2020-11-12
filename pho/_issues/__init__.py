@@ -209,24 +209,11 @@ def issues_collection_via_(readme, listener, opn=None):
 
 
 def _collection_via(readme, listener, opn=None):
-    if opn is None:
-        opn = _build_real_open(listener)
     import kiss_rdb.storage_adapters_.markdown_table as sa_mod
     from kiss_rdb import collection_via_storage_adapter_and_path as func
     return func(sa_mod, readme, listener, opn=opn,
                 iden_er_er=build_identifier_parser_,
                 file_grows_downwards=False)
-
-
-def _build_real_open(listener):
-    def opn(path, *mode):
-        return open(path, *mode)
-
-    def recv_diff_lines(itr):
-        return _real_apply_diff(itr, listener)
-
-    opn.RECEIVE_DIFF_LINES = recv_diff_lines  # needs improvement
-    return opn
 
 
 def _real_apply_diff(itr, listener):

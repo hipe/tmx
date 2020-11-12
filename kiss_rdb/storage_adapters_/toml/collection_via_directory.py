@@ -179,8 +179,11 @@ class collection_implementation_via_directory_and_schema:
                         listener=listener)
 
             if res is not None:
-                assert(res is True)
-                res = mde  # (Case6129)
+                assert res is True  # (Case4336)
+
+                # Implement exactly [#857.10]: custom result struct from create
+                cls = _custom_structs().for_create
+                res = cls(created_entity=mde, emit_edited=None)
 
         return res
 
@@ -311,7 +314,10 @@ def _update_entity(locked_ents_file, identifier, cuds, coll, listener):
     if res is None:
         return
     assert(res is True)
-    return tuple(before_and_after)
+
+    # implement exactly [#857.8]: custom structure for result of update
+    bef, aft = before_and_after
+    return _custom_structs().for_update(bef, aft, emit_edited=None)
 
 
 def _delete_entity(locked_ents_file, indexy_file, identifier, fs, listener):
@@ -471,6 +477,26 @@ def _retrieve_entity(identifier, file_path, listener):
 CLI to be the one covering this. also this test case covers legitamate work
 that's only in CLI so etc
 """
+
+
+# == Model-esque:
+
+def _custom_structs():  # #[#510.8] lazy
+    o = _custom_structs
+    if o.value is None:
+        o.value = _build_custom_structs()
+    return o.value
+
+
+_custom_structs.value = None
+
+
+def _build_custom_structs():
+    from collections import namedtuple as _nt
+    these = ('emit_edited',)
+    ur = _nt('UpdateResult', ('before_entity', 'after_entity', *these))
+    cr = _nt('CreateResult', ('created_entity', *these))
+    return _nt('These', ('for_update', 'for_create'))(ur, cr)
 
 
 # == whiners

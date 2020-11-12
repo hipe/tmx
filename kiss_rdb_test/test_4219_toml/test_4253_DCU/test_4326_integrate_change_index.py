@@ -75,13 +75,13 @@ class CommonCase(unittest.TestCase):
 class Case4315_collection_can_be_built_with_noent_dir(CommonCase):
 
     def test_100(self):
-        self._canon_case.confirm_collection_is_not_none(self)
+        self.canon_case.confirm_collection_is_not_none(self)
 
     def given_collection(self):
         return collection_with_noent_dir()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_empty_collection_found
 
 
@@ -113,14 +113,14 @@ class Case4317_identifier_with_invalid_chars(CommonCase):
 class Case4318_identifier_too_short_or_long(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'AB23'
@@ -129,7 +129,7 @@ class Case4318_identifier_too_short_or_long(CommonCase):
         return collection_with_NO_filesystem()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_entity_not_found_because_identifier_too_deep
 
 
@@ -162,10 +162,10 @@ class Case4320_delete_but_file_not_found(CommonCase):
         self.assertEqual(self.error_category, 'entity_not_found')
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_complaint(self):
         _actual = self.left_half
@@ -183,7 +183,7 @@ class Case4320_delete_but_file_not_found(CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'B42'
@@ -192,17 +192,17 @@ class Case4320_delete_but_file_not_found(CommonCase):
         return build_collection()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_delete_but_entity_not_found
 
 
 class Case4322_entity_not_found(CommonCase):
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def test_600_message_sadly_has_no_context_yet(self):
         sct = self.end_state['payloader']()
@@ -214,7 +214,7 @@ class Case4322_entity_not_found(CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'B7J'
@@ -224,7 +224,7 @@ class Case4322_entity_not_found(CommonCase):
         return build_collection(filesystem=fs)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_entity_not_found
 
 
@@ -253,11 +253,11 @@ class Case4326_retrieve_no_ent_in_file(CommonCase):  # #midpoint
 class Case4327_retrieve_OK(CommonCase):
 
     def test_100_entity_is_retrieved_and_looks_ok(self):
-        self._canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
+        self.canon_case.confirm_entity_is_retrieved_and_looks_ok(self)
 
     @property
     def end_state(self):  # NOTE  not memoized
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_identifier_string(self):
         return 'B9H'
@@ -266,7 +266,7 @@ class Case4327_retrieve_OK(CommonCase):
         return collection_with_NO_filesystem()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_retrieve_OK
 
 
@@ -275,11 +275,11 @@ class Case4327_retrieve_OK(CommonCase):
 
 class Case4329_delete_OK(CommonCase):
 
-    def test_100_result_is_the_deleted_entity(self):
-        self._canon_case.confirm_result_is_the_deleted_entity(self)
+    def test_100_result_is_a_custom_structure(self):
+        self.canon_case.confirm_result_is_the_structure_for_delete(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     def CONFIRM_THIS_LOOKS_LIKE_THE_DELETED_ENTITY(self, table_block):
         _expected = tuple(_unindent("""
@@ -323,13 +323,13 @@ class Case4329_delete_OK(CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state_for_delete(self, 'B7F')
+        return self.canon_case.build_end_state_for_delete(self, 'B7F')
 
     def given_collection(self):
         return build_collection_expecting_common_number_of_rewrites()
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_delete_OK_resulting_in_non_empty_collection
 
 
@@ -373,28 +373,27 @@ class Case4332_update_OK(CommonCase):
     "thing_C" instead of "thing_2" (numbers come before letters lexically)
 
     .#open [#867.H] it "thinks of" {whitespace|comments} as being
-
     associated with the attribute not the entity block so the behavior
     here in terms of where blank lines end up is not what would probably
     be expected..
     """
 
-    def test_100_result_is_a_two_tuple_of_before_and_after_entities(self):
-        self._canon_case.confirm_result_is_before_and_after_entities(self)
+    def test_100_result_is_custom_structure(self):
+        self.canon_case.confirm_result_is_custom_structure_for_update(self)
 
     def test_200_the_before_entity_has_the_before_values(self):
-        self._canon_case.confirm_the_before_entity_has_the_before_values(self)
+        self.canon_case.confirm_the_before_entity_has_the_before_values(self)
 
     def test_300_the_after_entity_has_the_after_values(self):
-        self._canon_case.confirm_the_after_entity_has_the_after_values(self)
+        self.canon_case.confirm_the_after_entity_has_the_after_values(self)
 
     def test_400_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     """ABOUT THIS:
 
     def test_500_retrieve_afterwards_shows_updated_value(self):
-       self._canon_case.confirm_retrieve_after_shows_updated_value(self)
+       self.canon_case.confirm_retrieve_after_shows_updated_value(self)
 
     ☝️ that sure would be cool. but out of scope. Either ☞ use the real FS
     ☞ mock our fake FS ☞ just live with the fact that we aren't fully
@@ -431,7 +430,7 @@ class Case4332_update_OK(CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def request_tuple_for_update_that_will_succeed(self):
         return 'B9H', (
@@ -447,20 +446,20 @@ class Case4332_update_OK(CommonCase):
         return build_collection(filesystem=fs)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_update_OK
 
 
 class Case4334_simplified_typical_traversal_when_no_collection_dir(CommonCase):  # noqa: E501
 
     def test_100_result_is_none(self):
-        self._canon_case.confirm_result_is_none(self)
+        self.canon_case.confirm_result_is_none(self)
 
     def test_200_channel_looks_right(self):
-        self._canon_case.confirm_channel_looks_right(self)
+        self.canon_case.confirm_channel_looks_right(self)
 
     def test_300_expression_looks_right(self):
-        self._canon_case.confirm_expression_looks_right(self)
+        self.canon_case.confirm_expression_looks_right(self)
 
     def test_550_reason(self):
         self.assertEqual(
@@ -494,7 +493,7 @@ class Case4334_simplified_typical_traversal_when_no_collection_dir(CommonCase): 
         return build_collection(dp)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_collection_not_found
 
 
@@ -511,14 +510,14 @@ class Case4335_traverse_IDs_ok(CommonCase):
 
 class Case4336_create_into_existing_file(CommonCase):
 
-    def test_100_result_is_created_entity(self):
-        self._canon_case.confirm_result_is_the_created_entity(self)
+    def test_100_result_is_custom_structure(self):
+        self.canon_case.confirm_result_is_custom_structure_for_create(self)
 
     def test_200_emitted_accordingly(self):
-        self._canon_case.confirm_emitted_accordingly(self)
+        self.canon_case.confirm_emitted_accordingly(self)
 
     # #pending-long-running #pending-mock-filesystem
-    # self._canon_case.confirm_entity_now_in_collection(self)
+    # self.canon_case.confirm_entity_now_in_collection(self)
 
     def test_250_entities_file_rewrite_OK(self):
         efr = self.entity_file_rewrite()
@@ -554,7 +553,7 @@ class Case4336_create_into_existing_file(CommonCase):
 
     @shared_subject
     def end_state(self):
-        return self._canon_case.build_end_state(self)
+        return self.canon_case.build_end_state(self)
 
     def given_collection(self):
         rng = random_number_generator_for(494)  # "2HG" as int per [#867.S] CLI
@@ -562,7 +561,7 @@ class Case4336_create_into_existing_file(CommonCase):
         return build_collection(random_number_generator=rng, filesystem=fs)
 
     @property
-    def _canon_case(self):
+    def canon_case(self):
         return canon.case_of_create_OK_into_non_empty_collection
 
 

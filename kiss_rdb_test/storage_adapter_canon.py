@@ -302,9 +302,10 @@ class case_of_delete_but_entity_not_found:  # #as-namespace-only
 
 class _common_delete:  # as-namespace-only
 
-    def confirm_result_is_the_deleted_entity(tc):
+    def confirm_result_is_the_structure_for_delete(tc):
         es = tc.end_state
-        deleted_ent = es['result_value']
+        sct = es['result_value']
+        deleted_ent = sct.deleted_entity
         act = _EID_via_entity(deleted_ent)
         exp = es['identifier_primitive']
         tc.assertEqual(act, exp)
@@ -383,12 +384,8 @@ def _create_OK_confirm_in_collection(tc):
 
 class case_of_create_OK_into_empty_collection:  # #as-namespace-only
 
-    def confirm_result_is_the_created_entity(tc):
-        sct = tc.end_state
-        dct = _yes_value_dict(sct['result_value'])
-        # tc.assertEqual(dct['thing_2'], '123')  # #here3
-        tc.assertEqual(dct['thing_B'], '3.14')
-        tc.assertIn(len(dct), (1, 2))  # #here3
+    def confirm_result_is_custom_structure_for_create(tc):
+        _assert_custom_structure_for_create(tc, thing_B='3.14')
 
     confirm_emitted_accordingly = _create_OK_emitted_accordingly
 
@@ -404,12 +401,8 @@ class case_of_create_OK_into_empty_collection:  # #as-namespace-only
 
 class case_of_create_OK_into_non_empty_collection:  # #as-namespace-only
 
-    def confirm_result_is_the_created_entity(tc):
-        sct = tc.end_state
-        dct = _yes_value_dict(sct['result_value'])
-        # tc.assertEqual(dct['thing_2'], '-2.718') .. #history-B.1
-        tc.assertEqual(dct['thing_B'], 'false')
-        tc.assertIn(len(dct), (1, 2))  # #here3
+    def confirm_result_is_custom_structure_for_create(tc):
+        _assert_custom_structure_for_create(tc, thing_B='false')
 
     confirm_emitted_accordingly = _create_OK_emitted_accordingly
 
@@ -459,11 +452,8 @@ class case_of_update_but_attribute_not_found:  # #as-namespace-only
 
 class case_of_update_OK:  # #as-namespace-only
 
-    def confirm_result_is_before_and_after_entities(tc):
-        sct = tc.end_state
-        before_ent, after_ent = sct['result_value']
-        tc.assertEqual(before_ent.identifier, after_ent.identifier)
-        tc.assertNotEqual(before_ent, after_ent)
+    def confirm_result_is_custom_structure_for_update(tc):
+        _assert_custom_structure_for_update(tc)  # hi.
 
     def confirm_emitted_accordingly(tc):
         es = tc.end_state
@@ -477,12 +467,12 @@ class case_of_update_OK:  # #as-namespace-only
         tc.assertEqual(message, _exp)
 
     def confirm_the_before_entity_has_the_before_values(tc):
-        before_ent, after_ent = tc.end_state['result_value']
+        before_ent, after_ent = _before_and_after_entities(tc)
         _ = _EID_via_test_case(tc)
         _same_confirmation_of_before_update(tc, before_ent, _)
 
     def confirm_the_after_entity_has_the_after_values(tc):
-        before_ent, after_ent = tc.end_state['result_value']
+        before_ent, after_ent = _before_and_after_entities(tc)
         _ = _EID_via_test_case(tc)
         _same_confirmation_of_after_update(tc, after_ent, _)
 
@@ -528,6 +518,23 @@ def _same_confirmation_of_before_update(tc, ent, eid):
     tc.assertEqual(dct_['core_attributes'], dct)  # OOF extreme laziness
 
 
+def _assert_custom_structure_for_update(tc):  # exactly #provision [#857.8]
+    before_ent, after_ent = _before_and_after_entities(tc)
+    tc.assertEqual(before_ent.identifier, after_ent.identifier)
+    tc.assertNotEqual(before_ent, after_ent)
+
+
+def _assert_custom_structure_for_create(tc, **kw):  # exactly #prov [#857.11]
+    es = tc.end_state
+    sct = es['result_value']
+    ent = sct.created_entity
+    dct = _yes_value_dict(ent)
+    # tc.assertEqual(dct['thing_2'], '-2.718') .. #history-B.1 / #here3
+    for exp_k, exp_v in kw.items():
+        tc.assertEqual(dct[exp_k], exp_v)
+    tc.assertIn(len(dct), (1, 2))  # #here3
+
+
 def _assert_says_identifier_probably(tc, reason, eid):
     # do the "in" test first just to get a friendly errmsg, then check count
 
@@ -539,6 +546,8 @@ def _assert_says_identifier_probably(tc, reason, eid):
     needle = f"'{eid}'"
     tc.assertIn(needle, reason)
 
+
+# Retrieve end state components (for assertions)
 
 def _find_all_identifer_looking_strings(message):
     return tuple(_re_lib().findall(r"'([^']+)'", message))  # #history-B.1
@@ -579,6 +588,12 @@ def _confirm_collection_empty(tc, coll):
     with coll.open_identifier_traversal(throwing_listener) as idens:
         for iden in idens:
             tc.fail("collection was not empty.")
+
+
+def _before_and_after_entities(tc):
+    es = tc.end_state
+    sct = es['result_value']
+    return sct.before_entity, sct.after_entity
 
 
 def _yes_value_dict(ent):
@@ -660,9 +675,25 @@ def end_state_via_(tc, run, expecting_OK):
     expectation = (sev, '?+', 'as', '_the_one_emission')
     listener, done = _em().listener_and_done_via((expectation,), tc)
     x = run(listener)
+
+    # == BEGIN experiment hack accomodate [#857.11] [#857.9] [#857.8]
+    if x and hasattr(x, '_asdict'):  # is it a named tuple?
+        _maybe_call_emitter(x)
+    # == END
+
     e = done()['_the_one_emission']
     # removed discussion of payloader_caution_HOT at #history-B.1
     return {'result_value': x, 'channel': e.channel, 'payloader': e.payloader}
+
+
+def _maybe_call_emitter(cs):  # cs = custom struct
+    dct = cs._asdict()
+    if 'diff_lines' in dct:  # ..
+        dct.pop('diff_lines')
+    call_me = dct.pop('emit_edited')
+    if call_me is None:
+        return  # for historical reasons. idk. at writing, update no
+    call_me(* dct.values())  # whew big flex
 
 
 def identifier_via_string(_, s):  # #method

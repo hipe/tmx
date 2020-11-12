@@ -128,7 +128,9 @@ def new_lines_and_future_deleted_via_existing_lines(
         identifier_string, block_itr, monitor):
 
     def future():
-        return deleted_document_entity
+        # implement [#857.11]: custom struct for delete
+        cls = _custom_structs().for_delete
+        return cls(deleted_document_entity, emit_edited=None)
     deleted_document_entity = None
     yield future
 
@@ -229,6 +231,25 @@ def __check_order(block_itr, listener):
             continue
 
         xx('original doohah out of order')  # #open #[#867.C]
+
+
+# == Model-esque
+
+def _custom_structs():  # #[#510.8] lazy
+    o = _custom_structs
+    if o.value is None:
+        o.value = _build_custom_structs()
+    return o.value
+
+
+_custom_structs.value = None
+
+
+def _build_custom_structs():
+    from collections import namedtuple as _nt
+    these = ('emit_edited',)
+    fd = _nt('DeleteResult', ('deleted_entity', *these))
+    return _nt('These', ('for_delete',))(fd)
 
 
 class _LinesAsBlock:

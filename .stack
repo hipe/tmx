@@ -11,7 +11,6 @@ have full on eno
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
 [#431] could be absorbed into [#406]
-overhaul & re-arch the universe to away RECEIVE_DIFF_LINES
 convert items from this list to open issues (the more recent ones, not older ones)
 audit and clean up open issues (the metadata not the referant) in pho and pipes
 get used to using top/list to see open issues (not this list)

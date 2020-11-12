@@ -111,10 +111,12 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.11]                  | #prov | "delete" results in structure with entity (not dct) and diff lines
+|[#857.10]                  | #prov | "create" results in structure with entity (not dct) and diff lines
 |[#857.9]                   | #prov | whether or not the EID is an attribute is currently up in the air, up to SA
-|[#857.8]                   | #prov | "update" (sometimes "create") results in before and after ENTITY (not dct)
+|[#857.8]                   | #prov | "update" results structure with before and after *entity* (not dct) AND diff lines
 |[#857.G]                   | #open | turn diffing/patching into a "for free" feature for single-file collections
-|[#857.6]                   | #open | no more opn or something
+|[#857.6]                   |       | #watch we don't love `opn` - passing open resources can fix some of it
 |[#857.E]                   | #prov | #provision: entity identifiers (eid's) are either integers or strings for now
 |[#857.D]                   |       | logic diagram for resolving storage adapters and..
 |[#857.C]                   |       | injectable custom identifier classes (near schema)

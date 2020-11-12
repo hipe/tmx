@@ -118,6 +118,13 @@ def _collection_implementation(directory, rng=None, opn=None):
             euow = tuple(p(k, v) for k, v in attr_vals.items())
 
             # Define the result document entity (just what is needed)
+
+            def reser():  # implement exactly [#857.10] custom structure for cr
+                class result_for_created:  # #class-as-namespace
+                    created_entity = doc_ent
+                    emit_edited = None
+                return result_for_created
+
             class doc_ent:  # #class-as-namespace
                 def to_line_stream():
                     return _to_line_stream()
@@ -138,7 +145,7 @@ def _collection_implementation(directory, rng=None, opn=None):
             order = tuple(attr_vals.keys())
 
             return self.BIG_PATCHFILE_FOR_BATCH_UPDATE(
-                    eidr, euow, lambda: doc_ent, order, listener)
+                    eidr, euow, reser, order, listener)
 
         def BIG_PATCHFILE_FOR_BATCH_UPDATE(  # #testpoint (incl. param names)
                 index_file_change, entities_units_of_work,
@@ -218,7 +225,6 @@ def _collection_implementation(directory, rng=None, opn=None):
                 k_scts = self._entity_section_els_via_document(docu, path, mon)
                 for eid, sect in k_scts:
                     yield eid, sect
-
 
         def PRODUCE_IDENTIFIER_FUNCTIONER_():
             def iden_er_er(listener, cstacker=None):

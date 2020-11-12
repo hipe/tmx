@@ -175,12 +175,14 @@ def create(ctx, collection, value):
     listener = mon.listener
 
     attr_values = {name_s: val_s for name_s, val_s in value}  # ..
-    doc_ent = coll.create_entity(attr_values, listener)
+    cs = coll.create_entity(attr_values, listener)  # cs = custom struct
 
     # exact same thing as 2 others #here3
 
-    if doc_ent is None:
+    if cs is None:
         return mon.errno
+
+    doc_ent = cs.created_entity  # provision [#857.10]
 
     sout = click.utils._default_text_stdout()
 
@@ -226,15 +228,16 @@ def update(ctx, collection, internal_identifier, add, change, delete):
     for n in delete:
         cuds.append(('delete_attribute', n))
 
-    before_after = coll.update_entity(internal_identifier, cuds, mon.listener)
+    cs = coll.update_entity(internal_identifier, cuds, mon.listener)
+    # cs = custom struct
 
     # exact same thing as 2 others #here3:
 
-    if before_after is None:
+    if cs is None:
         return mon.errno
 
-    before_ent, after_ent = before_after
-
+    assert cs.before_entity  # provision [#857.8]: custom result from update
+    after_ent = cs.after_entity
     sout = click.utils._default_text_stdout()
 
     # #history-A.2 got rid of manually created message
@@ -294,12 +297,15 @@ def delete(ctx, collection, internal_identifier):
     if coll is None:
         return mon.errno
 
-    doc_ent = coll.delete_entity(internal_identifier, mon.listener)
+    cs = coll.delete_entity(internal_identifier, mon.listener)
+    # cs = custom struct
 
     # exact same thing as 2 others #here3:
 
-    if doc_ent is None:
+    if cs is None:
         return mon.errno
+
+    doc_ent = cs.deleted_entity  # provision [#857.11]: custom result for delet
 
     sout = click.utils._default_text_stdout()
     serr = click.utils._default_text_stderr()

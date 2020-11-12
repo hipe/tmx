@@ -51,17 +51,13 @@ def _do_open_issue(fh, typ, iden, schema, ic, dct, listener):
     if do_create:
         use_dct = {k: v for k, v in dct.items()}
         use_dct[iden_key] = iden.to_string()  # reparse it again ick/meh
-        after_ent = coll.create_entity(use_dct, listener)
-        before_and_after = None, after_ent  # #provision [#857.8]: two entities
+        return coll.create_entity(use_dct, listener)
     else:
         use_dct = {k: '' for k in allowed_keys}
         use_dct.update(dct)
         edt = tuple(('update_attribute', k, v) for k, v in use_dct.items())
         eid = iden.to_string()  # meh
-
-        # assume #provision [#857.8]: two entities
-        before_and_after = coll.update_entity(eid, edt, listener)
-    return before_and_after
+        return coll.update_entity(eid, edt, listener)
 
 
 def _validate_content(dct, allowed_keys, listener):
@@ -252,13 +248,16 @@ def close_issue(readme, eid, listener, opn=None):
         coll = ic.collection
         edit = (('update_attribute', 'main_tag', '#hole'),
                 ('update_attribute', 'content', ''))
-        two = coll.update_entity(eid, edit, throwing_listener)
-        before, after = two
+        ur = coll.update_entity(eid, edit, throwing_listener)
+
+        before, after, _, _ = ur  # [#857.8]
 
         def lines():
             yield f"BEFORE: {before.to_line()}"
             yield f"AFTER:  {after.to_line()}"
         listener('info', 'expression', 'closed_issue', lines)
+
+        return ur
 
     def pre_parse_identifier():
         # Give eid's w/o leading '[', '#' a '#' so we can use cust iden class
@@ -273,7 +272,7 @@ def close_issue(readme, eid, listener, opn=None):
     throwing_listener = _build_throwing_listener(stop, listener)
 
     try:
-        main()  # no result except emissions!
+        return main()
     except stop:
         pass
 

@@ -34,7 +34,7 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
         iden_er_er=_build_identifier_builder,
         file_grows_downwards=True,
         ):
-    # #open [#857.6] `opn` will change
+    # #watch [#857.6] we don't love `opn`
 
     assert iden_er_er  # who is passing None in?
 

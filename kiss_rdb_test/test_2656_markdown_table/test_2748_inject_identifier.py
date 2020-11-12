@@ -12,6 +12,8 @@ class CommonCase(unittest.TestCase):
     def expect_none_result(self):
         self.assertIsNone(self.end_result)
 
+    # == End State Components (used in assertions)
+
     @property
     def end_result(self):
         return self.end_state.end_result
@@ -19,9 +21,6 @@ class CommonCase(unittest.TestCase):
     @property
     def end_emission(self):
         return self.end_state.emission
-
-    def end_state_diff_lines(self):
-        return self.end_state.the_more.dlx
 
     # == Build End State
 
@@ -37,22 +36,28 @@ class CommonCase(unittest.TestCase):
         exps = self.expected_emissions()
         listener, done = em().listener_and_done_via(exps, self)
         performance_result, more = self.given_performance(listener)
+        assert more is None  # #here1
+
+        # == BEGIN #provision [#857.10]: emit the emission default-ly
+        if hasattr(performance_result, '_asdict'):
+            cs = performance_result  # cs = custom structure
+            cs.emit_edited(cs.created_entity)  # ..
+        # == END
+
         ems, this_emission = done(), None
         if len(ems):
             this_emission = ems.pop('the_emi')  # ..
             assert not ems  # ..
-        return end_state()(performance_result, this_emission, more)
+        return end_state()(performance_result, this_emission)
 
     def build_collection_and_more(self):
-        # (the hacky logic here about capturing diff lines in overly redundant
-        # w that of the previous test file but leaving it while #open [#857.6])
-        pfile, opn, more = self.build_fake_file_and()
+        pfile, opn = self.build_fake_file_and()
         iden_er_er = self.given_identity_class
         coll = coll_via(pfile.name, opn=opn, iden_er_er=iden_er_er)
-        return coll, more
+        return coll, None   # "more" is nothing now, #here1
 
     def build_fake_file_and(self):
-        # #open [#857.6] something will change
+        # #watch [#857.6] we don't love opn
         fname = 'fake/file'  # must be relative not abs for path relativizer
         from kiss_rdb_test.common_initial_state import \
             fake_file_via_path_and_lines as func
@@ -64,17 +69,7 @@ class CommonCase(unittest.TestCase):
             assert fname == path
             return pfile
 
-        def recv_diff_lines(diff_lines):
-            assert more.dlx is None
-            more.dlx = tuple(diff_lines)
-            return True  # important! tell it you succeeded
-
-        more = recv_diff_lines
-        more.dlx = None
-
-        opn.RECEIVE_DIFF_LINES = recv_diff_lines
-
-        return pfile, opn, more
+        return pfile, opn
 
     do_debug = False
 
@@ -175,7 +170,7 @@ class Case2748_INSERT_okay(CommonCase):
         assert self.end_emission
 
     def test_020_the_created_entity_uses_the_injected_identifier_class(self):
-        ent = self.end_state.end_result
+        ent = self.end_result.created_entity
         act = str(ent.identifier)
         self.assertEqual(act, '👉___Prisoner of Azkaban___👈')
 
@@ -190,7 +185,8 @@ class Case2748_INSERT_okay(CommonCase):
             '+|  ',  # 6
             ' |  ',
         )
-        lines = self.end_state_diff_lines()
+
+        lines = tuple(self.end_result.diff_lines)  # [#857.10]
         act = tuple(line[:4] for line in lines)
         self.assertSequenceEqual(act, exp)
 
@@ -273,7 +269,7 @@ def create_entity(coll, dct, listener):
 @lazy
 def end_state():
     from collections import namedtuple as nt
-    return nt('EndState', ('end_result', 'emission', 'the_more'))
+    return nt('EndState', ('end_result', 'emission'))
 
 
 def em():

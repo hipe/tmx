@@ -6,9 +6,27 @@ def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener, grow_downwards):
     if diff_lines is None:
         return
     rv = state.result_value
-    if opn.RECEIVE_DIFF_LINES(diff_lines):
-        (f := flat_map.emit_edited) and f(rv)
-        return rv
+    kw = {}
+    kw['diff_lines'] = diff_lines
+    kw['emit_edited'] = flat_map.emit_edited  # often None
+
+    scts = _custom_structs()
+
+    if 'update' == typ:
+        # #provision [#857.8]: update result is NT of before, after, diff lines
+        before_ent, after_ent = rv
+        return scts.for_update(
+            before_entity=before_ent, after_entity=after_ent, **kw)
+
+    if 'create' == typ:
+        # #provision [#857.10]: update result is NT of before, after, diff lz
+        rv.identifier  # sort of [#022]
+        return scts.for_create(created_entity=rv, **kw)
+
+    # #provision [#857.11]: delete result is NT of deleted entity, diff lines
+    assert 'delete' == typ
+    rv.identifier  # sort of [#022]
+    return scts.for_delete(deleted_entity=rv, **kw)
 
 
 def _build_decorator():
@@ -335,6 +353,29 @@ Create and insert the entity in an appropriate place in the table.
     """
 
 
+# == Model-esque
+
+def _custom_structs():  # #[#510.8] custom impl of lazy
+    if (o := _custom_structs).value is None:
+        o.value = _build_custom_structs()
+    return o.value
+
+
+_custom_structs.value = None
+
+
+def _build_custom_structs():
+    from collections import namedtuple as _nt
+    rest = 'diff_lines emit_edited'.split()
+    ur = _nt('UpdateResult', ('before_entity', 'after_entity', *rest))
+    cr = _nt('CreateResult', ('created_entity', *rest))
+    dr = _nt('DeleteResult', ('deleted_entity', *rest))
+    attrs = 'for_update for_create for_delete'.split()
+    return _nt('These', attrs)(for_update=ur, for_create=cr, for_delete=dr)
+
+
+# == Smalls
+
 def _chunk_forever(n, flat):
     rang = range(n)
     while True:
@@ -344,8 +385,6 @@ def _chunk_forever(n, flat):
 def _chunk(n, flat):
     return (flat[i*n:(i+1)*n] for i in range((len(flat)+1)//n))
 
-
-# == Smalls
 
 def _string_via_iden(iden):  # [#857.E] idens can be strings
     assert iden

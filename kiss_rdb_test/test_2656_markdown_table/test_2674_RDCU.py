@@ -33,14 +33,10 @@ class CommonCase(unittest.TestCase):
     @property
     @shared_subj_in_children
     def end_state(self):
-        self.opn = None
+        fh, done = self.build_collection_resource_and_done()
 
-        fp, done = self.build_collection_resource_and_done()
+        self.collection = collection_via_resource(fh)
 
-        if self.is_expecting_diff_lines:
-            self.before_expecting_diff_lines()
-
-        self.collection = collection_via_resource(fp, opn=self.opn)
         es = self.given_run()
 
         if self.do_flush_reason_early:
@@ -50,7 +46,8 @@ class CommonCase(unittest.TestCase):
             done(self)
 
         if self.is_expecting_diff_lines:
-            self.after_expecting_diff_line(es)
+            # #provision [#857.8] [#857.10] [#857.11]
+            es['diff_lines'] = tuple(es['result_value'].diff_lines)  # ..
 
         return es
 
@@ -70,32 +67,6 @@ class CommonCase(unittest.TestCase):
     @property
     def canon_case(self):
         return self.target_canon_case()
-
-    # == Diff Lines (sort of like an injection)
-
-    def before_expecting_diff_lines(self):  # this changes at #open [#857.6]
-
-        assert self.opn is None
-
-        def recv_diff_lines(diff_lines):
-            self._diff_lines = diff_lines
-            return True
-
-        self._diff_lines = None
-
-        def opn(*_):
-            raise RuntimeError('no longer used, on its way out')
-
-        opn.RECEIVE_DIFF_LINES = recv_diff_lines
-        self.opn = opn
-
-    def after_expecting_diff_line(self, es):
-        if self._diff_lines is None:
-            raise AssertionError("expected diff lines, had none")
-        es['diff_lines'] = self._diff_lines
-        del self._diff_lines
-
-    # ==
 
     is_expecting_diff_lines = False
     do_flush_reason_early = False
@@ -159,8 +130,8 @@ class Case2641_delete_but_entity_not_found(CommonCase):
 
 class Case2644_delete_OK_resulting_in_non_empty_collection(CommonCase):
 
-    def test_100_result_is_the_deleted_entity(self):
-        self.canon_case.confirm_result_is_the_deleted_entity(self)
+    def test_100_result_is_a_custom_structure(self):
+        self.canon_case.confirm_result_is_the_structure_for_delete(self)
 
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
@@ -196,8 +167,8 @@ class Case2644_delete_OK_resulting_in_non_empty_collection(CommonCase):
 
 class Case2647_delete_OK_resulting_in_empty_collection(CommonCase):
 
-    def test_100_result_is_the_deleted_entity(self):
-        self.canon_case.confirm_result_is_the_deleted_entity(self)
+    def test_100_result_is_a_custom_structure(self):
+        self.canon_case.confirm_result_is_the_structure_for_delete(self)
 
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
@@ -272,8 +243,8 @@ class Case2676_create_but_something_is_invalid(CommonCase):
 
 class Case2679_create_OK_into_empty_collection(CommonCase):  # #here2
 
-    def test_100_result_is_created_entity(self):
-        self.canon_case.confirm_result_is_the_created_entity(self)
+    def test_100_result_is_custom_structure(self):
+        self.canon_case.confirm_result_is_custom_structure_for_create(self)
 
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
@@ -299,8 +270,8 @@ class Case2679_create_OK_into_empty_collection(CommonCase):  # #here2
 
 class Case2682_create_OK_into_non_empty_collection(CommonCase):
 
-    def test_100_result_is_created_entity(self):
-        self.canon_case.confirm_result_is_the_created_entity(self)
+    def test_100_result_is_custom_structure(self):
+        self.canon_case.confirm_result_is_custom_structure_for_create(self)
 
     def test_200_emitted_accordingly(self):
         self.canon_case.confirm_emitted_accordingly(self)
@@ -374,8 +345,8 @@ class Case2713_update_but_attribute_not_found(CommonCase):
 
 class Case2716_update_OK(CommonCase):
 
-    def test_100_result_is_a_two_tuple_of_before_and_after_entities(self):
-        self.canon_case.confirm_result_is_before_and_after_entities(self)
+    def test_100_result_is_a_custom_structure(self):
+        self.canon_case.confirm_result_is_custom_structure_for_update(self)
 
     def test_200_the_before_entity_has_the_before_values(self):
         self.canon_case.confirm_the_before_entity_has_the_before_values(self)

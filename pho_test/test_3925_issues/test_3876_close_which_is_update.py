@@ -13,9 +13,7 @@ class CommonCase(unittest.TestCase):
             return subject_function()(readme, eid, listener, opn)
         eid = self.given_needle()
         from pho_test.issues_support import build_end_state_for as func
-        es = func(self, run)
-        assert es.end_result is None
-        return es
+        return func(self, run)
 
     def expected_num_rewinds(_):
         return 0
