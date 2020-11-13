@@ -130,6 +130,19 @@ track. (If the test suite X failed, just do `pud -vf X` to see details).
 
 
 
+### running with coverage testing :[#021]
+
+We use the python module called `coverage`. Consult their documentation.
+
+But here's an example that worked at the moment of writing:
+
+```bash
+coverage run --source pho.cli.commands.issues pho_test/test_3925_issues/test_3975_CLI.py -vf
+coverage html
+open htmlcov/index.html
+```
+
+
 
 ### more complicated (and now legacy) test suites
 
@@ -155,10 +168,32 @@ then in your 'main' terminal:
 
 ## <a name=aliases></a>(these aliases)
 
-    alias py='python3 -W error::Warning::0'
-    # (gotta let warnings thru at #history-A.2, for tatsu)
+### alias for executing python:
 
-    alias pud='py -m unittest discover'
+```bash
+alias py='python3 -W error::Warning::0'
+```
+
+- At #history-A.2 we had to let warnings thru for tatsu, but this may
+  change at any moment
+- Wanting to exit with an error at the first warning is peak OCD
+
+
+### alias for executing a directory of tests:
+
+```bash
+alias pud='py -m unittest discover'
+```
+
+
+### alias for our issue-tracking thing:
+
+```bash
+alias pi='py pho/cli/commands/issues.py'
+```
+
+- Can also be reached by `pho issues`, but the above saves a little overhead
+- (run `setup.py` to get the `pho` executble)
 
 
 
@@ -199,7 +234,7 @@ then in your 'main' terminal:
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
 |[#022]                     | #trak | places where we wish we had strongly typed
-|[#021]                     | #wish | the desire for coverage testing (for particular reasons)
+|[#021]                     | #trak | mentions of coverage testing
 |[#020.3]                   | #trak | track this one gripe about contextlib
 |[#020.2]                   | #hm   | track this one gripe about argparse
 |[#020]                     | #trak | track all issues with python itself
@@ -209,7 +244,7 @@ then in your 'main' terminal:
 |[#017.3]                   |       | explain listeners placeholder - use [#511] now instead - see help screen file deleted at #history-B.2
 |[\[#016\]]                 |       | K hong reading notes
 |[\[#015\]]                 |       | [tickler numberspace]
-|[#014]                     |       | [expect tree-like screen]
+|[#014]                     | #hole |
 |[#013]                     |       | modality-agnostic parameter expression
 |[#012]                     |       | generic microservice arch (placeheld)
 |[#011]                     | #hole |

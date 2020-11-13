@@ -112,9 +112,15 @@ class func:  # error_monitor_via_stderr
 
 def _line_writer_via_IO(io):  # (move this to wherever)
     def write_line(s):
-        _len = io.write(f'{s}\n')  # :[#607.B]
-        assert(isinstance(_len, int))  # sort of like ~[#022]
-        return _len
+        if len(s) and '\n' == s[-1]:
+            # life is easier if we allow already-terminated lines. And if we
+            # double-terminate it, it messes the downstream up (Case3974PH)
+            line = s
+        else:
+            line = f'{s}\n'
+        leng = io.write(line)  # #provision [#607.B]: only ever terminated lz
+        assert isinstance(leng, int)  # ~[#022]
+        return leng
     return write_line
 
 

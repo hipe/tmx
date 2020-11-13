@@ -53,8 +53,13 @@ the related API that preceded this one.)
 |[#605.1]                   |       | this one stdout/stderr tracking toolkit
 |[#605]                     |       | [external tracking or whatever you want]
 |[#604.2]                   | #open | known limitation of our arg parsing
-|[#603]                     |       | [the help screen parser] |
+|[#603]                     | #hole |
 |:[#602]                    | #open | track that one issue with argparse (should patch) |
+|[#601.5]                   |       | [CLI canon]  (placeheld)
+|[#601.4]                   |       | [expect help screen]  (placeheld)
+|[#601.3]                   |       | [expect treelike screen]  (placeheld)
+|[#601.2]                   |       | [expect STD's]  (placeheld)
+|[#601]                     |       | (numberspace for testing modules)
 
 
 

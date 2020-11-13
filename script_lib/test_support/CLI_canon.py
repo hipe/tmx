@@ -1,5 +1,10 @@
 """helper for testing CLI in a generic, magnetic-agnostic way
+
+:[#601.5]. Mentee of [#459.6]. When you want to add more, see that one.
 """
+
+from modality_agnostic.test_support.common import \
+        dangerous_memoize_in_child_classes as shared_subj_in_child_classes
 
 
 def _delegate_to_end_state(orig_f):  # #decorator
@@ -13,14 +18,20 @@ class CLI_Canon_Assertion_Methods:
 
     # -- assertion methods
 
-    def invokes(self):
-        self.assertIsNotNone(self.end_state)
+    def expect_failure_returncode(self):
+        self.assertNotEqual(self.end_state.returncode, 0)
 
-    def invocation_fails(self):
-        self.assertFalse(self.end_state.OK)
+    def expect_success_returncode(self):
+        self.expect_returncode(0)
 
-    def invocation_results_in_this_exitstatus(self, es):
-        self.assertEqual(self.end_state.exitstatus, es)
+    def expect_returncode(self, exp):
+        act = self.returncode_checked()
+        self.assertEqual(act, exp)
+
+    def returncode_checked(self):
+        act = self.end_state.returncode
+        self.assertIsInstance(act, int)
+        return act
 
     @_delegate_to_end_state
     def first_line():
@@ -36,75 +47,26 @@ class CLI_Canon_Assertion_Methods:
 
     # -- these
 
+    def help_screen_via_lines(_, lines):
+        from .expect_help_screen import parse_help_screen as func
+        return func(lines)
+
+    @property
+    @shared_subj_in_child_classes
+    def end_state(self):
+        return self.build_end_state()
+
+    def build_end_state(self):
+        return self.build_end_state_using_line_expectations()
+
     def build_end_state_using_line_expectations(self):
-        return _build_end_state_using_line_expectations(self)
-
-
-def _build_end_state_using_line_expectations(tc):  # tech demo
-
-    from . import expect_STDs as lib
-    rcv1 = lib.build_write_receiver_for_debugging('DBG: ', lambda: tc.do_debug)
-    rcv2, lines = lib.build_write_receiver_for_recording_and_lines()
-
-    def recv(s):
-        rcv1(s)
-        rcv2(s)
-
-    def wild_hack_of_tup(tup):
-        if isinstance(tup, str):
-            tup = (tup,)
-        assert(all((k in _keywords) for k in tup))
-        return (*tup, recv)
-
-    exps = tuple(wild_hack_of_tup(tup) for tup in tc.expected_lines())
-    sout, serr, done = lib.stdout_and_stderr_and_done_via(exps, tc)
-
-    argv = tc.long_program_name, *tc.given_argv_tail()
-    children = tc.given_children_CLI_functions()
-    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
-    es = func(None, sout, serr, argv, children)
-    assert(isinstance(es, int))
-    done()
-    return _EndState(es, tuple(lines))
-
-
-_keywords = {'STDERR', 'STDOUT', 'zero_or_one'}
-
-
-class _EndState:
-
-    def __init__(self, es, s_a):
-        self._lines = s_a
-        self.exitstatus = es
-
-    @property
-    def second_line(self):
-        return self._line(1)
-
-    @property
-    def first_line(self):
-        return self._line(0)
-
-    @property
-    def last_line(self):
-        return self._lines[-1]
-
-    def _line(self, offset):
-        return self._lines[offset]
-
-    @property
-    def number_of_lines(self):
-        return len(self._lines)
-
-    @property
-    def OK(self):  # retro-fitting this idiom for posterity (#history-A.1)
-        assert(isinstance(self.exitstatus, int))
-        return 0 == self.exitstatus
+        from .expect_STDs import build_end_state_actively_for as func
+        return func(self)
 
 
 def THESE_TWO_CHILDREN_CLI_METHODS():
 
-    def _the_foo_bar_CLI(stdin, stdout, stderr, argv, enver):  # #[#605.3]
+    def _the_foo_bar_CLI(stdin, stdout, stderr, argv, efx):  # #[#605.3]
         prog_name, *argv_tail = argv
         assert ' ' in prog_name
         if '/' in prog_name:

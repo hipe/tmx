@@ -288,6 +288,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         if (o := getattr(fxr, 'CUSTOM_FUNCTIONS_OLD_WAY', None)):
             custom_functions = o
 
+        mixed_collection_identifier_EXPERIMENTAL = x
         storage_adapter = sa
 
     if has_custom_functions:

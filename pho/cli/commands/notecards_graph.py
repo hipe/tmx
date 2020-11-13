@@ -1,7 +1,7 @@
-def CLI(sin, sout, serr, argv, enver=None):
+def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv, tuple(_params()), enver=enver)
+            _do_CLI, sin, sout, serr, argv, tuple(_params()), efx=efx)
 
 
 def _params():
@@ -33,7 +33,7 @@ def _do_CLI(sin, sout, serr, collection_path, do_veri, resourcer):
     listener = _build_CLI_enhanced_listener(mon)
 
     if collection_path is None:
-        collection_path = _require_collection_path(enver, listener)
+        collection_path = _require_collection_path(efx, listener)
         if collection_path is None:
             return
 
@@ -75,9 +75,9 @@ def _lines_for_express_verification(big_index):
     yield f'{_cto} notecard(s) ok'
 
 
-def _require_collection_path(enver, listener):
+def _require_collection_path(efx, listener):
     from pho.cli import CP_
-    return CP_().require_collection_path(enver, listener)
+    return CP_().require_collection_path(efx, listener)
 
 
 def _build_CLI_enhanced_listener(monitor):  # #[#608.7]

@@ -1,7 +1,7 @@
 import re
 
 
-def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, enver=None):
+def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
     # Trying to be exemplary (if you need to roll your own)
 
     bash_argv = list(reversed(argv))
@@ -42,8 +42,8 @@ def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, enver=None):
 
 
 def cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals,
-                    enver=None, description_valueser=None):
-    assert not enver  # this will take a little work
+                    efx=None, description_valueser=None):
+    assert not efx  # this will take a little work
     bash_argv = list(reversed(argv))
     long_program_name = bash_argv.pop()
 
@@ -61,7 +61,7 @@ def cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals,
         return 0
 
     opts, args = foz.sparse_tuples_in_grammar_order_via_consume_values(vals)
-    flat = (sin, sout, serr, *opts, *args, lambda: _rscr(serr, enver))
+    flat = (sin, sout, serr, *opts, *args, lambda: _rscr(serr, efx))
     return do_CLI(*flat)
 
 
@@ -107,7 +107,7 @@ def _positional_popper(vals):
     return pop_positional_value
 
 
-def _rscr(serr, enver):  # rough prototype, needs more design. #history-B.2
+def _rscr(serr, efx):  # rough prototype, needs more design. #history-B.2
     from .magnetics.error_monitor_via_stderr import func
 
     class experimental_resources:  # #class-as-namespace :[#605.6]

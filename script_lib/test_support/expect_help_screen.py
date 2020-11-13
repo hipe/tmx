@@ -1,6 +1,6 @@
 """Parse a help screen for the purpose of testing
 
-:[603]
+(:[#601.4])
 """
 
 

@@ -1,6 +1,3 @@
-from script_lib.cheap_arg_parse import formals_via_definitions as formals_via
-
-
 def _formals_for_toplevel():
     yield '-r', '--readme=PATH', "or use PHO_README. '-' might read from STDIN"
     yield '-h', '--help', 'This screen'
@@ -18,7 +15,21 @@ def _subcommands():
     yield 'graph', lambda: _subcommand_graph
 
 
-def CLI(sin, sout, serr, argv, enver):
+class _production_external_functions:  # #class-as-namespace
+
+    def apply_patch(diff_lines, is_dry, listener):
+        from text_lib.diff_and_patch import apply_patch_via_lines as func
+        return func(diff_lines, is_dry, listener, cwd=None)  # t/f result
+
+    def enver():
+        from os import environ
+        return environ
+
+    def produce_open_function():
+        return open
+
+
+def CLI(sin, sout, serr, argv, efx):  # efx = external functions
     """my dream as a boy and as a man
     desc line 2
     """
@@ -32,13 +43,13 @@ def CLI(sin, sout, serr, argv, enver):
         pcs[0] = basename(pcs[0])
         return ' '.join(pcs)
 
-    foz = formals_via(_formals_for_toplevel(), prog_name, _subcommands)
+    foz = _formals_via(_formals_for_toplevel(), prog_name, _subcommands)
     vals, es = foz.nonterminal_parse(serr, bash_argv)
     if vals is None:
         return es
 
     if vals.get('help'):
-        return foz.write_help_into(serr, CLI.__doc__)
+        return foz.write_help_into(sout, CLI.__doc__)  # sout !serr (Case3960)
 
     # The Ultra-Sexy Mounting of an Alternation Component:
     cmd_tup = vals.pop('command')
@@ -49,23 +60,39 @@ def CLI(sin, sout, serr, argv, enver):
     ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
     ch_argv = (ch_pn, * cmd_tup[1:])
 
-    def env_and_related():
-        from os import environ
-        return environ, vals
+    # == FROM
+    if efx and not hasattr(efx, 'apply_patch'):
+        # This is still ugly and wrong. If it's a test mock, use it.
+        # But if we got it by being mounted by a parent, ignore it
+        efx = _production_external_functions
 
-    return cmd_funcer()(sin, sout, serr, ch_argv, env_and_related)
+    if efx:
+        class use_efx:  # #class-as-namespace
+            def produce_values_stack():
+                environ = efx.enver()
+                return environ, vals
+            apply_patch = efx.apply_patch
+            produce_open_function = efx.produce_open_function
+
+    else:
+        use_efx = None
+    # == TO
+
+    return cmd_funcer()(sin, sout, serr, ch_argv, use_efx)
 
 
 def _formals_for_open():
+    yield '-n', '--dry-run', 'dry run'
+    yield '-v', '--verbose', 'bold new verbose mode (experimental)'
     yield '-h', '--help', 'this screen'
     yield '<message>', 'any one line of some appropriate length'
 
 
-def _subcommand_open(sin, sout, serr, argv, env_stacker):
+def _subcommand_open(sin, sout, serr, argv, efx):
     """Open an issue"""
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    foz = formals_via(_formals_for_open(), lambda: prog_name)
+    foz = _formals_via(_formals_for_open(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -73,30 +100,55 @@ def _subcommand_open(sin, sout, serr, argv, env_stacker):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_open.__doc__)
 
-    env_stack = env_stacker()
-    if (readme := _resolve_readme(serr, env_stack)) is None:
+    if (readme := _resolve_readme(serr, efx)) is None:
         return 4
 
+    # == BEGIN experiment
+    def listener(chan, *rest):
+        if 'verbose' != chan:
+            return mon.listener(chan, *rest)
+        if not be_verbose:
+            return
+        mon.listener('info', *rest)
+    be_verbose = vals.pop('verbose', False)
+    # == END
+
     dct = {'main_tag': '#open', 'content': vals['message']}
+    is_dry = vals.get('dry_run', False)
+    opn = efx.produce_open_function()
     mon = _error_monitor(serr)
     from pho._issues.edit import open_issue as func
-    bef_aft = func(readme, dct, mon.listener)
-    if bef_aft is not None:
-        before, after = bef_aft
+    cs = func(readme, dct, listener, be_verbose=be_verbose, opn=opn)
+    # cs = custom struct
+    if cs is None:
+        return mon.exitstatus
+
+    dct = cs._asdict()
+    if 'before_entity' in dct:
+        before = dct.pop('before_entity')
+        after = dct.pop('after_entity')
+    else:
+        before = None
+        after = dct.pop('created_entity')
+
+    if True:
         if before:
             serr.write(f"before: {before.to_line()}")
             serr.write(f"after:  {after.to_line()}")
         else:
             serr.write(f"line:   {after.to_line()}")
+
+    efx.apply_patch(cs.diff_lines, is_dry, listener)  # result is t/f
     return mon.exitstatus
 
 
 def _formals_for_close():
+    yield '-n', '--dry-run', 'dry run'
     yield '-h', '--help', 'this screen'
     yield '<identifier>', 'whomst ("123" or "#123" or "[#123]" all OK)'
 
 
-def _subcommand_close(sin, sout, serr, argv, env_stacker):
+def _subcommand_close(sin, sout, serr, argv, efx):
     """Close an open issue..
 
     Actually what this probably does is update *any* issue to become a '#hole'.
@@ -104,7 +156,7 @@ def _subcommand_close(sin, sout, serr, argv, env_stacker):
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    foz = formals_via(_formals_for_close(), lambda: prog_name)
+    foz = _formals_via(_formals_for_close(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -112,15 +164,20 @@ def _subcommand_close(sin, sout, serr, argv, env_stacker):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_close.__doc__)
 
-    env_stack = env_stacker()
-    if (readme := _resolve_readme(serr, env_stack)) is None:
+    if (readme := _resolve_readme(serr, efx)) is None:
         return 4
 
     eid = vals['identifier']
 
+    is_dry = vals.get('dry_run', False)
     mon = _error_monitor(serr)
+    listener = mon.listener
     from pho._issues.edit import close_issue as func
-    func(readme, eid, mon.listener)
+    cs = func(readme, eid, listener, efx.produce_open_function())
+    if cs is None:
+        return mon.exitstatus
+
+    efx.apply_patch(cs.diff_lines, is_dry, listener)  # result is t/f
     return mon.exitstatus
 
 
@@ -128,18 +185,18 @@ def _formals_for_top():
     yield '-M', '--newest-first', 'opposite of default (oldest first)'
     yield '-q', '--quick', 'take away sort by mtime. overrides above'
     yield _batch_opt
-    yield '-f', '--format=FMT', '{json|table} (default: table)'
+    yield '-f', '--format=FMT', 'output format. {json|table} (default: table)'
     yield '-<number>', _build_int_matcher, 'show the top N items (default: 3)'
     yield '-h', '--help', 'this screen'
     yield '[query […]]', "default: '#open'. Currently limited to 1 tag."
 
 
-def _subcommand_top(sin, sout, serr, argv, env_stacker):
+def _subcommand_top(sin, sout, serr, argv, efx):
     "`list` with popular defaults"
 
     bash_argv = list(reversed(argv))
     prog_name = bash_argv.pop()
-    foz = formals_via(_formals_for_top(), lambda: prog_name)
+    foz = _formals_via(_formals_for_top(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -158,7 +215,7 @@ def _subcommand_top(sin, sout, serr, argv, env_stacker):
         vals.pop('oldest_first', None)
         vals.pop('newest_first', None)
 
-    return _top_or_list(sin, sout, serr, vals, foz, env_stacker)
+    return _top_or_list(sin, sout, serr, vals, foz, efx)
 
 
 def _formals_for_list():
@@ -174,12 +231,12 @@ def _formals_for_list():
 _batch_opt = '-b', '--batch', "treat --readme (or PHO_README) as list of paths"
 
 
-def _subcommand_list(sin, sout, serr, argv, env_stacker):
+def _subcommand_list(sin, sout, serr, argv, efx):
     """List issues according to the query"""
 
     bash_argv = list(reversed(argv))
     prog_name = bash_argv.pop()
-    foz = formals_via(_formals_for_list(), lambda: prog_name)
+    foz = _formals_via(_formals_for_list(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -187,10 +244,10 @@ def _subcommand_list(sin, sout, serr, argv, env_stacker):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_list.__doc__)
 
-    return _top_or_list(sin, sout, serr, vals, foz, env_stacker)
+    return _top_or_list(sin, sout, serr, vals, foz, efx)
 
 
-def _top_or_list(sin, sout, serr, vals, foz, env_stacker):
+def _top_or_list(sin, sout, serr, vals, foz, efx):
 
     # Local variables via vals
     sort_by_time = None
@@ -202,8 +259,7 @@ def _top_or_list(sin, sout, serr, vals, foz, env_stacker):
     elif vals.get('newest_first'):
         sort_by_time = 'DESCENDING'
 
-    env_stack = env_stacker()
-    if (readme := _resolve_readme(serr, env_stack)) is None:
+    if (readme := _resolve_readme(serr, efx)) is None:
         return 4
 
     readme_is_dash = '-' == readme
@@ -371,13 +427,6 @@ class _output_adapters:
     simplest = _build_simplest_output_adapter
 
 
-def _resolve_readme(serr, env_stack):
-    readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
-    if readme:
-        return readme
-    serr.write("please use -r or PHO_README for now.\n")
-
-
 def _formals_for_find_readmes():
     yield '-h', '--help', 'This screen'
     yield 'path?', "Filesystem path to search (default: '.')"  # [path] #todo
@@ -390,7 +439,7 @@ def _subcommand_find_readmes(sin, sout, serr, argv, env_and_vals_er):
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    foz = formals_via(_formals_for_find_readmes(), lambda: prog_name)
+    foz = _formals_via(_formals_for_find_readmes(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -422,12 +471,12 @@ def _subcommand_find_readmes(sin, sout, serr, argv, env_and_vals_er):
     return exitstatus
 
 
-def _subcommand_which(sin, sout, serr, argv, env_stacker):
+def _subcommand_which(sin, sout, serr, argv, efx):
     """Which readme is being used? (per env variable 'PHO_README')"""
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
     formals = (('-h', '--help', 'this screen'),)
-    foz = formals_via(formals, lambda: prog_name)
+    foz = _formals_via(formals, lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -435,8 +484,7 @@ def _subcommand_which(sin, sout, serr, argv, env_stacker):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_which.__doc__)
 
-    env_stack = env_stacker()
-    if (readme := _resolve_readme(serr, env_stack)) is None:
+    if (readme := _resolve_readme(serr, efx)) is None:
         serr.write("no readme selected.\n")
         return 4
 
@@ -445,7 +493,7 @@ def _subcommand_which(sin, sout, serr, argv, env_stacker):
     return 0
 
 
-def _subcommand_use(sin, sout, serr, argv, env_stacker):
+def _subcommand_use(sin, sout, serr, argv, efx):
     """Use a different readme (a shellable line. experimental)
 
     EXPERIMENTALLY you can try `$( pi use ./foo/bar/README.md )`
@@ -455,7 +503,7 @@ def _subcommand_use(sin, sout, serr, argv, env_stacker):
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
     formals = (('-h', '--help', 'this screen'), ('<readme>', 'path to file'))
-    foz = formals_via(formals, lambda: prog_name)
+    foz = _formals_via(formals, lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -485,14 +533,14 @@ def _formals_for_graph():
     yield '-h', '--help', 'this screen'
 
 
-def _subcommand_graph(sin, sout, serr, argv, env_stacker):
+def _subcommand_graph(sin, sout, serr, argv, efx):
     """Experimental graph-viz visualization of issues..
 
     Use tags in your issue rows like `#after:[#123.4]` or `#part-of:[#123.4]`
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    foz = formals_via(_formals_for_graph(), lambda: prog_name)
+    foz = _formals_via(_formals_for_graph(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -500,8 +548,7 @@ def _subcommand_graph(sin, sout, serr, argv, env_stacker):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_graph.__doc__)
 
-    env_stack = env_stacker()
-    if (readme := _resolve_readme(serr, env_stack)) is None:
+    if (readme := _resolve_readme(serr, efx)) is None:
         return 4
 
     mon = _error_monitor(serr)
@@ -517,6 +564,17 @@ def _subcommand_graph(sin, sout, serr, argv, env_stacker):
     return mon.exitstatus
 
 
+# == Support
+
+def _resolve_readme(serr, efx):
+    env_stack = efx.produce_values_stack()
+
+    readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
+    if readme:
+        return readme
+    serr.write("please use -r or PHO_README for now.\n")
+
+
 def _build_int_matcher():
     def match(token):
         if (md := re.match('^-([1-9][0-9]*)$', token)) is None:
@@ -526,10 +584,19 @@ def _build_int_matcher():
     return match
 
 
+# == Dispatchers
+
+def _formals_via(defs, prog_namer, sub_commands=None):
+    from script_lib.cheap_arg_parse import formals_via_definitions as func
+    return func(defs, prog_namer, sub_commands)
+
+
 def _error_monitor(serr):
     from script_lib.magnetics.error_monitor_via_stderr import func
     return func(serr, default_error_exitstatus=4)
 
+
+# == Smalls
 
 def _pass_thru_context_manager(lines):
     from contextlib import nullcontext as func
@@ -549,9 +616,8 @@ def xx(msg=None):
 
 
 if '__main__' == __name__:
-    def enver():
-        xx()
+    efx = _production_external_functions
     from sys import stdin, stdout, stderr, argv
-    exit(CLI(stdin, stdout, stderr, argv, enver))
+    exit(CLI(stdin, stdout, stderr, argv, efx))
 
 # #born

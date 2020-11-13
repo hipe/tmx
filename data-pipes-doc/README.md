@@ -33,7 +33,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#459.I] | #open | tests we haven't written but still want
 |                  [#459.H] | #wish | would we really want a moin moin adaption?
 |                  [#459.G] | #trak | whether in-memory should be official format
-|                  [#459.F] | #trak | watch for redundancy in CLI testing across files
+|                  [#459.6] | #trak | watch for redundancy in CLI testing across files
 |                  [#459.E] | #trak | [record mapper]
 |                  [#459.4] | #done | [the last roadmap]
 |                  [#459.C] |       | [the new way]

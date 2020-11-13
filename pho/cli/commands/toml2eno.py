@@ -1,8 +1,9 @@
 import re
 
 
-def CLI(sin, sout, serr, argv, enver=None):
-    # (we have to accept `enver` because our parent does. even tho don't need)
+def CLI(sin, sout, serr, argv, efx=None):
+    # efx = external function.
+    # We don't use it but we must accept it because our parent does
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(_do_CLI, sin, sout, serr, argv, _formals)
 

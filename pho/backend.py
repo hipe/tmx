@@ -19,7 +19,7 @@ def _API_for_production():
     exit(_API(o.stdin, stdout, stderr, o.argv, None))
 
 
-def _API(sin, sout, serr, argv, enver):
+def _API(sin, sout, serr, argv, efx):  # efx = external functions
     argp = _arg_parser(list(reversed(argv)), serr)
     _, es = argp.parse_one_argument()
     assert(not es)  # assume program name is always first element. discard
@@ -35,7 +35,7 @@ def _API(sin, sout, serr, argv, enver):
         serr.write(f'unknown command: "{command_name}"\n')
         return 3
 
-    es = dct[command_name](sin, sout, serr, argp, enver)
+    es = dct[command_name](sin, sout, serr, argp, efx)
 
     if not isinstance(es, int):  # #[#022]
         raise _MyException(f'expected int had: {type(es)}')
@@ -57,7 +57,7 @@ command, _command_function_via_name = _build_command_decorator_and_state()
 
 
 @command
-def update_notecard(sin, sout, serr, argp, enver):
+def update_notecard(sin, sout, serr, argp, efx):
     ncs_path, es = argp.parse_one_argument('notecards path')
     if es:
         return es
@@ -119,7 +119,7 @@ def update_notecard(sin, sout, serr, argp, enver):
 
 
 @command
-def create_notecard(sin, sout, serr, argp, enver):
+def create_notecard(sin, sout, serr, argp, efx):
 
     is_dry = False
 
@@ -170,7 +170,7 @@ def create_notecard(sin, sout, serr, argp, enver):
 
 
 @command
-def delete_notecard(sin, sout, serr, argp, enver):
+def delete_notecard(sin, sout, serr, argp, efx):
     ncs_path, es = argp.parse_one_argument('notecards path')
     if es:
         return es
@@ -200,7 +200,7 @@ def delete_notecard(sin, sout, serr, argp, enver):
 
 
 @command
-def retrieve_random_notecard(sin, sout, serr, argp, enver):
+def retrieve_random_notecard(sin, sout, serr, argp, efx):
     args, es = argp.parse_all_args('notecards path')
     if es:
         return es
@@ -230,7 +230,7 @@ def retrieve_random_notecard(sin, sout, serr, argp, enver):
 
 
 @command
-def retrieve_notecard(sin, sout, serr, argp, enver):
+def retrieve_notecard(sin, sout, serr, argp, efx):
     args, es = argp.parse_all_args('notecard identifier', 'notecards path')
     if es:
         return es
@@ -255,7 +255,7 @@ def _write_entity_as_JSON(sout, nc, listener):
 
 
 @command
-def hello_to_pho(sin, sout, serr, argp, enver):  # a.k.a "ping"
+def hello_to_pho(sin, sout, serr, argp, efx):  # a.k.a "ping"
 
     from pho import HELLO_FROM_PHO
     from time import sleep

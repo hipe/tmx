@@ -7,7 +7,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
-    # whenever you're adding or modying here, check with [#459.F] for DRY
+    # whenever you're adding or modying here, check with [#459.6] for DRY
 
     # -- assertions
 

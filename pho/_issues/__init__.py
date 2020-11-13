@@ -53,6 +53,14 @@ def _readmes_via_opened(opened, do_batch):
                 assert '\n' == readme[-1]  # #here5
                 yield readme[:-1]  # chop/chomp
             return
+
+        if isinstance(readmes, tuple) and 1 == len(readmes):
+            readme, = readmes
+            if not isinstance(readme, str):
+                readme.isatty  # sort of [#022]. (Case3966)
+                yield readme
+                return
+
         for readme in readmes:
             assert '\n' != readme[-1]  # #here5
             yield readme
@@ -67,7 +75,12 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
 
         opened = ic.collection.open_schema_and_entity_traversal(listener)
         with opened as (sch, ents):
+
             # #todo name this issue about resource management
+
+            if ents is None:  # (tested visually, return code is nonzero)
+                return
+
             for rec in records_via(sch, ents, readme):
                 yield rec
 

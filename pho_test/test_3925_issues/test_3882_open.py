@@ -145,7 +145,7 @@ class MoneyCase(CommonCase):
 
     def given_run(self, readme, opn, listener):
         dct = {'main_tag': '#opun'}
-        return open_issue()(readme, dct, listener, opn)
+        return open_issue()(readme, dct, listener, opn=opn)
 
 
 class Case3886_money_insert(MoneyCase):
@@ -171,6 +171,7 @@ class Case3886_money_insert(MoneyCase):
         yield '|[#124]||\n'
 
     def expected_emissions(_):
+        yield 'verbose', 'expression'  # 😕
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
 
     def expected_num_rewinds(_):
@@ -184,23 +185,25 @@ class Case3888_money_update(MoneyCase):
 
     def test_100_expresses(self):
         act = self.end_state.emissions['the_emi'].payloader()['message']
-        self.assertEqual(act, "updated '[#125]' (updated 2 attributes)")
+        exp = "updated '[#125]' (created 1 and updated 1 attribute)"
+        self.assertEqual(act, exp)
 
     def test_150_diff(self):  # it feels too low-level to test this at all
         lines = self.end_state.diff_lines
         act = tuple(line[:2] for line in lines)
         exp = ('--', '++', '@@', ' |', ' |', ' |', '-|', '+|')
         self.assertSequenceEqual(act, exp)
-        self.assertEqual(lines[6], '-|[#125]|#hole| Matey Patatey\n')
+        self.assertEqual(lines[6], '-|[#125]|#hole|\n')
         self.assertEqual(lines[7], '+|[#125]|#opun|\n')
 
     def given_lines(_):
         yield '| IDEn | MAIn TAg | CONTENt |\n'
         yield '|---|---|---|\n'
         yield '|[#126]|#eg| froo froo\n'
-        yield '|[#125]|#hole| Matey Patatey\n'
+        yield '|[#125]|#hole|\n'
 
     def expected_emissions(_):
+        yield 'verbose', 'expression'  # 😕
         yield 'info', 'structure', 'updated_entity', 'as', 'the_emi'
 
     def expected_num_rewinds(_):

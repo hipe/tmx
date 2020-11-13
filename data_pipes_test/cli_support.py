@@ -2,7 +2,11 @@ from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subj_in_child_classes
 
 
-class CLI_Case:  # :[#459.F]
+class CLI_Case:  # :[#459.6]
+    # NOTE this mentors and is upstream to [#601.5]. If you make major changes
+    # here (to interface, to method constituency, to names) consider sunsetting
+    # most of this and using that one instead. Currently we don't subclass to
+    # avoid such a deep inheritance hierarchy.
 
     # Assertion support
 

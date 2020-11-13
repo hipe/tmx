@@ -276,7 +276,8 @@ def _dct_via_edit(edit, exi_dct, cs, listener):
 
     # Any that remain are extra keys
     if len(pool):
-        xx("unrecognized field(s): ({', '.join(pool.keys()})")
+        these = ', '.join(pool.keys())
+        xx(f"unrecognized field(s): {these!r}")
 
     # Update the row with the product dict
     return arg_dct, counts

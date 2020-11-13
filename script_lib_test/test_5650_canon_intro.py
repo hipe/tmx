@@ -38,10 +38,24 @@ class CommonCase(CLI_Canon_Assertion_Methods, unittest.TestCase):
         rx = re.compile(rxs, re.IGNORECASE)
         self.assertRegex(self.last_line, rx)
 
+    def invokes(self):
+        self.assertIsNotNone(self.end_state)
+
     # -- setup hook-outs common to all/most cases in this file
 
-    def given_children_CLI_functions(self):
-        return THESE_TWO_CHILDREN_CLI_METHODS()
+    def given_CLI(self):
+        def cli(sin, sout, serr, argv, rscser):
+            assert rscser is None
+            return func(sin, sout, serr, argv, children)
+        children = THESE_TWO_CHILDREN_CLI_METHODS()
+        from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+        return cli
+
+    def given_stdin(_):
+        pass
+
+    def given_argv(self):
+        return (self.long_program_name, *self.given_argv_tail())
 
     long_program_name = '/fake-fs/foo/bar/ohai-mami'
 
@@ -58,10 +72,10 @@ class CommonCase(CLI_Canon_Assertion_Methods, unittest.TestCase):
 class Case5643_no_args(CommonCase):  # classically case 0
 
     def test_020_fails(self):
-        self.invocation_fails()
+        self.expect_failure_returncode()
 
     def test_030_invocation_results_in_this_exitstatus(self):
-        self.invocation_results_in_this_exitstatus(6)
+        self.expect_returncode(6)
 
     def test_050_first_line_says_expecting_sub_command(self):
         rx = re.compile(r'\bexpecting <?(?:sub-)?command', re.IGNORECASE)
@@ -85,10 +99,10 @@ class Case5647_strange_subparser_name(CommonCase):  # classically case 1.1
         self.invokes()
 
     def test_030_invocation_results_in_failure(self):
-        self.invocation_fails()
+        self.expect_failure_returncode()
 
     def test_040_invocation_has_particular_exitstatus(self):
-        self.invocation_results_in_this_exitstatus(9)
+        self.expect_returncode(9)
 
     def test_060_main_line_says_this(self):
         rxs = 'Unrecognized (?:sub-)?command [\'"]fhqwhgads'
@@ -115,10 +129,10 @@ class Case5653_strange_option(CommonCase):  # classically case 1.2
         self.invokes()
 
     def test_030_invocation_results_in_failure(self):
-        self.invocation_fails()
+        self.expect_failure_returncode()
 
     def test_040_invocation_has_particular_exitstatus(self):
-        self.invocation_results_in_this_exitstatus(17)
+        self.expect_returncode(17)
 
     def test_060_main_line_says_this(self):
         rx = re.compile('Unrecognized option: [\'"]?-x[\'"]?', re.IGNORECASE)
@@ -146,7 +160,7 @@ class Case5656_good_sub_command(CommonCase):  # classically case 1.3
         self.assertEqual(_act, _exp)
 
     def test_results_in_user_exitstatus(self):
-        self.invocation_results_in_this_exitstatus(4321)
+        self.expect_returncode(4321)
 
     def expected_lines(_):
         yield 'STDOUT'

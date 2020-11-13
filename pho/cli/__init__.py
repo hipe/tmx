@@ -1,16 +1,13 @@
 def cli_for_production():
-    def enver():
-        from os import environ
-        return environ
     import sys as o
-    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv, enver))
+    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv, None))
 
 
-def _CLI(sin, sout, serr, argv, enver):
+def _CLI(sin, sout, serr, argv, efx):  # efx = external functions
     def line_contents():
         yield 'experiments in generating documents from "notecards"'
     from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
-    return func(sin, sout, serr, argv, _big_flex(), line_contents, enver)
+    return func(sin, sout, serr, argv, _big_flex(), line_contents, efx)
 
 
 def _lazy(build):  # [#510.8] yet another take on "lazy"
@@ -38,8 +35,8 @@ def _build_memoized_thing():
             yield '(the directory that contains the `entities` directory)'
             yield f'(or set the env var {coll_path_env_var_name})'
 
-        def require_collection_path(_, enver, listener):
-            collection_path = enver().get(coll_path_env_var_name)
+        def require_collection_path(_, efx, listener):
+            collection_path = efx.enver().get(coll_path_env_var_name)
             if collection_path is not None:
                 return collection_path
             whine_about(listener)

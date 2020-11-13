@@ -41,6 +41,7 @@ possible issues:
 
 
 (Case0250)
+(:[#601.2])
 """
 
 
@@ -179,54 +180,75 @@ _downcase = {'STDERR': 'stderr', 'STDOUT': 'stdout'}  # ☝️
 
 
 def _end_state_via_runs(runs, ec):
+
     if 1 == (leng := len(runs)):
         run, = runs
+        actual_which = run.which
+        actual_lines = run.lines
 
-    class end_state:  # #class-as-namespace
+    class end_state:
+        # EXPERIMENTAL: what methods are defined depends on actual params yikes
+
         if 1 == leng:
+
+            # == Methods (and properties that are actually methods)
+
+            @property
+            def first_line(_):
+                return actual_lines[0]
+
+            @property
+            def second_line(_):
+                return actual_lines[1]
+
+            @property
+            def last_line(_):
+                return actual_lines[-1]
+
+            def only_line_run(_, which):
+                assert actual_which == which
+                return run
+
+            def first_line_run(_, which):
+                assert actual_which == which
+                return run
+
+            # == Properties
+
             if 'stderr' == run.which:
-                stderr_lines = run.lines
+                stderr_lines = actual_lines
             else:
                 assert 'stdout' == run.which
-                stdout_lines = run.lines
+                stdout_lines = actual_lines
 
-            lines = run.lines  # client might want to be indifferent to which
-
-            def only_line_run(which):
-                assert run.which == which
-                return run
-
-            def first_line_run(which):
-                assert run.which == which
-                return run
-
+            lines = actual_lines  # client might want to be indiff to which
             has_runs = True
         elif 0 == leng:
             has_runs = False
         else:
-            def all_lines_on(which):  # adding this method makes us reconsider
+            def all_lines_on(_, which):  # adding this makes us reconsider
                 for run in runs:
                     if which != run.which:
                         continue
                     for line in run.lines:
                         yield line
 
-            def only_line_run(which):
+            def only_line_run(_, which):
                 itr = (run for run in runs if which == run.which)
                 only, = itr
                 return only
 
-            def first_line_run(which):
+            def first_line_run(_, which):
                 return next(run for run in runs if which == run.which)
 
-            def last_line_run(which):
+            def last_line_run(_, which):
                 backwards = (runs[i] for i in reversed(range(0, len(runs))))
                 return next(run for run in backwards if which == run.which)
 
             has_runs = True
         exitcode = ec
         returncode = ec  # meh
-    return end_state
+    return end_state()
 
 
 class _LineRun:
@@ -674,6 +696,7 @@ class _Fake_Stub_or_Mock_STDIN:
     def readable(_):
         return True
 
+    name = '<stdin>'
     mode = 'r'
 
 

@@ -24,14 +24,15 @@ def _default_OCP():
 
 
 def cli_for_production():
-    def enver():
-        from os import environ
-        return environ
-    import sys as o
-    exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv, enver))
+    class efx:  # #class-as-namespace  efx = external functions
+        def enver():
+            from os import environ
+            return environ
+    from sys import stdin, stdout, stderr, argv
+    exit(_CLI(stdin, stdout, stderr, argv, efx))
 
 
-def _CLI(sin, sout, serr, argv, enver):
+def _CLI(sin, sout, serr, argv, efx):
     def description():
         yield "(Currently this is just an API for other CLI's"
         yield "(in other environments) to call. BUT: this can be invoked"
@@ -39,7 +40,7 @@ def _CLI(sin, sout, serr, argv, enver):
         yield "design. experimental)"
 
     return cheap_arg_parse_branch(
-            sin, sout, serr, argv, _commands(), description, enver)
+            sin, sout, serr, argv, _commands(), description, efx)
 
 
 def _commands():
@@ -49,12 +50,12 @@ def _commands():
 
 # ==== SYNC CLI COMMAND ====
 
-def _sync_CLI(sin, sout, serr, argv, enver=None):
-    if enver and (s := enver().get('TMX_USE_THIS_PROGRAM_NAME')):
+def _sync_CLI(sin, sout, serr, argv, efx=None):
+    if efx and (s := efx.enver().get('TMX_USE_THIS_PROGRAM_NAME')):
         argv[0] = s
     return cheap_arg_parse(
             _do_sync_CLI, sin, sout, serr, argv,
-            tuple(_formals()), enver=enver)
+            tuple(_formals()), efx=efx)
 
 
 def _formals():
@@ -72,7 +73,7 @@ def _formals():
 
 
 def _do_sync_CLI(
-        monitor, sin, sout, serr, enver,
+        monitor, sin, sout, serr, efx,
         timestamp_file_path, ss_ID_ID, sheet_name,
         cell_range, oauth_token_path, oauth_creds_path, is_dry_run):
 
@@ -137,10 +138,10 @@ def _do_sync_CLI(
 
 # ==== THE IMAGINARY SECOND COMMAND ====
 
-def _qq_mm_CLI(sin, sout, serr, argv, enver=None):
+def _qq_mm_CLI(sin, sout, serr, argv, efx=None):
     return cheap_arg_parse(
             _do_qq_mm_CLI, sin, sout, serr, argv,
-            tuple(_qq_mm_params()), enver=enver)
+            tuple(_qq_mm_params()), efx=efx)
 
 
 def _qq_mm_params():
@@ -148,7 +149,7 @@ def _qq_mm_params():
     yield ('-z', '--xx-yy-option-two', 'desco one', 'desco two')
 
 
-def _do_qq_mm_CLI(monitor, sin, sout, serr, enver, *wat):
+def _do_qq_mm_CLI(monitor, sin, sout, serr, efx, *wat):
     "(stub for an additional command, for development & visual testing)"
 
     write_me()

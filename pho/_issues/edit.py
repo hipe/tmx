@@ -1,4 +1,4 @@
-def open_issue(readme, dct, listener, opn=None):
+def open_issue(readme, dct, listener, be_verbose=False, opn=None):
     opened = _open_file(readme, 'r+', opn, listener)  # #here2
     if opened is None:
         return
@@ -6,7 +6,19 @@ def open_issue(readme, dct, listener, opn=None):
         tup = _provision_identifier(opn, fh, listener)
         if tup is None:
             return
+
+        def lines_for_verbose():
+            # (when someting doesn't work right, turning verbose on can help)
+            yield f'means: {typ}'
+            yield f'identifier: {iden.to_string()}'
+            x = ic.collection.mixed_collection_identifier_EXPERIMENTAL
+            if hasattr(x, 'name'):
+                x = x.name
+            yield f'collection identifier: {x}'
+            yield f'schema field names: {schema.field_name_keys!r}'
+
         typ, iden, schema, ic = tup  # #here1
+        listener('verbose', 'expression', lines_for_verbose)
         return _do_open_issue(fh, typ, iden, schema, ic, dct, listener)
 
 
@@ -19,7 +31,8 @@ def _do_open_issue(fh, typ, iden, schema, ic, dct, listener):
     # be until you've reached the end); and then you have to traverse all the
     # lines of the file again to rewrite it (while doing an update or create).
 
-    # (Side note this is why is "eno" collections we keep an index of ID's.)
+    # (Side note, this is why in "eno" collections we keep an index file of
+    # allocated ID's so we don't have to traverse the whole coll to provision.)
 
     # If we hated the idea of parsing the whole file twice we would cache all
     # the line sexps in to memory; but A) we don't, B) we would have to
@@ -47,17 +60,27 @@ def _do_open_issue(fh, typ, iden, schema, ic, dct, listener):
         return
 
     # Either create or update
+
     do_create = ('tagged_hole', 'major_hole', 'minor_hole').index(typ)
     if do_create:
         use_dct = {k: v for k, v in dct.items()}
         use_dct[iden_key] = iden.to_string()  # reparse it again ick/meh
         return coll.create_entity(use_dct, listener)
-    else:
-        use_dct = {k: '' for k in allowed_keys}
-        use_dct.update(dct)
-        edt = tuple(('update_attribute', k, v) for k, v in use_dct.items())
-        eid = iden.to_string()  # meh
-        return coll.update_entity(eid, edt, listener)
+
+    # If the provision strategy was 'tagged_hole' it means you're updating an
+    # existing row that was tagged with `#hole`. It's convention that when we
+    # turn a row into a `#hole` we blank out the `content` field. Such a field
+    # must get `create_attribute` not `update_attribute` because we are adding
+    # a value to the field where before there was none. If the content field
+    # wasn't already blank it will emit soft failure.
+
+    use_dct = {k: '' for k in allowed_keys}
+    use_dct.update(dct)
+    d_or_u = {k: 'update_attribute' for k in allowed_keys}
+    d_or_u['content'] = 'create_attribute'  # for this one field, assume blank
+    edt = tuple((d_or_u[k], k, use_dct[k]) for k in allowed_keys)
+    eid = iden.to_string()  # meh
+    return coll.update_entity(eid, edt, listener)
 
 
 def _validate_content(dct, allowed_keys, listener):

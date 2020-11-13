@@ -1,7 +1,7 @@
-def CLI(sin, sout, serr, argv, enver=None):
+def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv, tuple(_params()), enver=enver)
+            _do_CLI, sin, sout, serr, argv, tuple(_params()), efx=efx)
 
 
 def _params():
@@ -28,7 +28,7 @@ def _params():
 
 
 def _do_CLI(
-        monitor, sin, sout, serr, enver,
+        monitor, sin, sout, serr, efx,
         collection_path, recursive, force, dry_run, notecard_id, out_path):
 
     """Generate a document or documents.
@@ -125,7 +125,7 @@ def _do_CLI(
         if collection_path is not None:
             return collection_path
         from pho.cli import CP_
-        return CP_().require_collection_path(enver, listener)
+        return CP_().require_collection_path(efx, listener)
 
     main()
     return monitor.exitstatus
