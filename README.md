@@ -233,6 +233,7 @@ alias pi='py pho/cli/commands/issues.py'
 |[#301]-[#399]              |       | (for upload bot)
 |[#201]-[#299]              |       | (for grep dump)
 |[#101]-[#199]              |       | (for game server)
+|[#023.2]                   | #trak | places where we wish we had auto-vivify
 |[#022]                     | #trak | places where we wish we had strongly typed
 |[#021]                     | #trak | mentions of coverage testing
 |[#020.3]                   | #trak | track this one gripe about contextlib

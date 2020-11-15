@@ -42,6 +42,15 @@ dependencies with the `after` assocation. But it's okay, would render #here5.
 """
 
 
+def _stylesheet_lol(tagging_offsets_via_stem):
+
+    if 'app' in tagging_offsets_via_stem:
+        yield 'shape', 'rect'
+
+    if 'done' in tagging_offsets_via_stem:
+        yield 'style', 'filled'
+
+
 _tab_string = '    '
 _group_label_w, _group_label_h = 20, 2  # (psst: try not to make tests
 _node_label_w, _node_label_h = 15, 3  # ..depend on these heuristics 🙃)
@@ -51,6 +60,8 @@ def to_graph_lines_(
         ic, listener,
         targets=(), show_group_nodes=False, show_identifiers=False):
 
+    show_after_label = False  # hardcoded as always off for now
+
     # Output the first line first before any errors for a more responsive UX
     yield 'digraph g {\n'
     yield f'{_tab_string}rankdir=BT;\n'
@@ -59,13 +70,19 @@ def to_graph_lines_(
     allow = {'part-of': 'part_of', 'after': 'after'}
 
     def main():
-        fla = _build_a_flat_list_of_the_associations(ic, allow, listener)
+        # tivl = tags index via lineno
+        fla, tivl = _flat_list_of_assocs_and(ic, allow, listener)
         tka = _index_the_two_kinds_of_associations(fla, listener)
         if targets:
             tlistener = _build_throwing_listener(listener)
             tka = _prune(tka, targets, tlistener)
         roots = _find_all_roots(tka, fla, listener)
-        for line in _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):  # noqa: E501
+
+        lines = _render_lines(
+            show_group_nodes, show_identifiers, show_after_label,
+            roots, tka, tivl, fla)
+
+        for line in lines:  # make it throw inside this scope
             yield line
     try:
         for line in main():
@@ -76,7 +93,9 @@ def to_graph_lines_(
     yield '}\n'
 
 
-def _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):
+def _render_lines(
+        show_group_nodes, show_identifiers, show_after_label,
+        roots, tka, row_tag_index_via_lineno, fla):
 
     def render_branch(k, ind, parent_gvid=None):
         prer = node_prerender(k)
@@ -140,7 +159,14 @@ def _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):
         else:
             v = double_quoted_label(prer, label_renderers.no_EID)
         yield 'label', v
-        # (eventually other tags like style=filled or w/e)
+
+        # For now, all "stylings" come from tags
+        rti = row_tag_index_via_lineno.get(prer.row.lineno)
+        if rti is None:
+            return
+
+        for k, v in _stylesheet_lol(rti.tagging_offsets_via_stem):
+            yield k, v
 
     class node_prerender:
         def __init__(self, k):
@@ -225,9 +251,11 @@ def _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):
     def build_render_line_for_after(custod_gvid, ind):
         def render_line_for_after(otr_k):
             otr_gvnid = graph_viz_node_ID_via_key(otr_k)
-            pcs = ind, otr_gvnid, '->', custod_gvid, '[label="then"];\n'
+            pcs = ind, otr_gvnid, '->', custod_gvid, *assoc_attrs, ';\n'
             return ''.join(pcs)
         return render_line_for_after
+
+    assoc_attrs = ('[label="then"]',) if show_after_label else ()
 
     def graph_viz_node_ID_via_key(k):
         maj_i, minor_i = k
@@ -450,12 +478,13 @@ def _index_the_two_kinds_of_associations(_idx, _listener):
     return _named_tuple('Prepared', locs.keys())(**locs)
 
 
-def _build_a_flat_list_of_the_associations(ic, allow, listener):
+def _flat_list_of_assocs_and(ic, allow, listener):
     def main():
         def cstacker():
             return ({'lineno': o.lineno, 'line': o.row_AST.to_line()},)
 
-        classified_deep_taggings_via = _build_tag_classifier(allow, cstacker)
+        tag_index_via_row = _build_row_tag_indexer(allow, cstacker)
+        row_tag_index_via_lineno = {}
 
         for o in itr:
             if o.notice_message:
@@ -463,13 +492,18 @@ def _build_a_flat_list_of_the_associations(ic, allow, listener):
                 continue
             if not see_row_with_identifer(o):
                 return
-            if not len(o.all_taggings):
+            rti = tag_index_via_row(o)  # rti = row tag index
+            if not rti.has_taggings:
                 no_tags.append(o)
                 continue
-            if not len(o.deep_taggings):
+
+            row_tag_index_via_lineno[o.lineno] = rti
+
+            if not rti.has_deep_taggings:
                 no_deep_tags.append(o)
                 continue
-            for oo in classified_deep_taggings_via(o):
+
+            for oo in rti.classified_deep_taggings:
                 if oo.deep_tag_head_stem_not_recognized:
                     deep_tags_not_recognized.append(oo)
                     continue
@@ -509,9 +543,11 @@ def _build_a_flat_list_of_the_associations(ic, allow, listener):
         if len(notis := _filter_noticeables(noticeables_stack, 'notice')):
             _whine_about_these(listener, notis, ic)
 
-        return _FlatListOfAssociations(
+        fla = _FlatListOfAssociations(
             tuple(good_associations),
             classified_row_offset_via_key, tuple(classified_rows))
+
+        return fla, row_tag_index_via_lineno
 
     def see_row_with_identifer(o):
         assert (iden := o.identifier)
@@ -581,13 +617,43 @@ class _FlatListOfAssociations:
         self.classified_rows = rows
 
 
-def _build_tag_classifier(allow, cstacker):
+def _build_row_tag_indexer(allow, cstacker):
 
-    def classified_deep_taggings_via(row):
-        for dtag in row.deep_taggings:
-            row_itrs = (iter(row) for row in classify_deep_tagging(dtag))
+    class no_taggings:  # #class-as-namespace
+        has_taggings = False
+
+    fields = ('has_deep_taggings', 'classified_deep_taggings',
+              'tagging_offsets_via_stem')
+    row_tag_index = _named_tuple('RowTagIndex', fields)
+    row_tag_index.has_taggings = True
+
+    def tag_index_via_row(row):
+        leng = len(row.all_taggings)
+        if 0 == leng:
+            return no_taggings
+
+        classified_deep_taggings = []
+        tagging_offsets_via_stem = {}
+
+        for i in range(0, leng):
+            tagging = row.all_taggings[i]
+
+            # For this tag head stem, add this offset to the list of offsets
+            stem = tagging.head_stem
+            if (arr := tagging_offsets_via_stem.get(stem)) is None:
+                tagging_offsets_via_stem[stem] = (arr := [])  # #[#023.2]
+            arr.append(i)
+            if not tagging.is_deep:
+                continue
+
+            # Index this deep tagging in an excessively custom way
+            row_itrs = (iter(row) for row in classify_deep_tagging(tagging))
             dct = {k: next(row_itr) for row_itr in row_itrs for k in row_itr}
-            yield _ClassifiedTagging(dtag, row, **dct)
+            cdt = _ClassifiedTagging(tagging, row, **dct)
+            classified_deep_taggings.append(cdt)
+
+        has = len(tup := tuple(classified_deep_taggings))
+        return row_tag_index(has, tup, tagging_offsets_via_stem)
 
     def classify_deep_tagging(dtag):
         # Maybe the head stem of the deep tag isn't of a recognized type
@@ -609,10 +675,8 @@ def _build_tag_classifier(allow, cstacker):
             return  # (Case3906)
 
         # Maybe the identifier doesn't parse. Yes we parse it twice (diff'ly)
-        if (iden := parse_iden(bl._to_string())) is None:
-            emi, = DANGEROUS_emission_cache  # yuck
-            DANGEROUS_emission_cache.clear()
-
+        iden, emi = my_parse_iden(bl._to_string())
+        if iden is None:
             # We've got to activate these payloads right away because the
             # cstacker references the current line & line number at the moment
             # and some clients (our tests) stack up multiple such errors
@@ -625,14 +689,22 @@ def _build_tag_classifier(allow, cstacker):
         yield 'association_type', assoc_typ, 'RHS_identifier', iden
 
     # == BEGIN YIKES set up
-    def DANGEROUS_listener(*emi):
-        DANGEROUS_emission_cache.append(emi)
+    def my_parse_iden(eid):
+        assert 0 == len(yuck)
+        iden = yikes_parse_iden(eid)
+        if iden is not None:
+            return iden, None
+        emi, = yuck
+        yuck.clear()
+        return None, emi
 
-    parse_iden = _build_identifier_parser(DANGEROUS_listener, cstacker)
-    DANGEROUS_emission_cache = []
+    def danger(*emi):
+        yuck.append(emi)
+    yikes_parse_iden = _build_identifier_parser(danger, cstacker)
+    yuck = []
     # == END YIKES
 
-    return classified_deep_taggings_via
+    return tag_index_via_row
 
 
 def _open_classified_row_ASTs_via_issues_collection(ic):

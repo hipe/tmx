@@ -11,6 +11,3 @@ have full on eno
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
 [#431] could be absorbed into [#406]
-graph: away the label attribute that says "then"
-graph: #app -> shape=rect
-graph: #done -> style=filled

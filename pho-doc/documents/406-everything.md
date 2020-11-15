@@ -7,12 +7,12 @@
 |[#876.21]| #open | videogames |
 |[#876.20]| #open | dance #after:[#876.18] |
 |[#876.19]| #open | tech things that excite you #after:[#876.13] #after:[#876.14] #after:[#876.15] #after:[#876.16] #after:[#876.17] #after:[#876.18] |
-|[#876.18]| #open | dance app #after:[#876.5] |
+|[#876.18]| #open | dance app #after:[#876.5] #app
 |[#876.17]| #open | versiony CMS #after:[#876.4] |
-|[#876.16]| #open | physical object index #after:[#876.4] |
-|[#876.15]| #open | search chat logs #after:[#876.4] |
-|[#876.14]| #open | image upload #after:[#876.12]|
-|[#876.13]| #open | the ASCII game #after:[#876.12]|
+|[#876.16]| #open | physical object index #after:[#876.4] #app
+|[#876.15]| #open | search chat logs #after:[#876.4] #app
+|[#876.14]| #open | image upload #after:[#876.12] #app
+|[#876.13]| #open | the ASCII game #after:[#876.12] #app
 |[#876.12]| #open | grok slack bots |
 |[#876.11]| #open | Crate and Crowbar DIM SUM #after:[#876.10]  #part-of:[#876.2] |
 |[#876.10]| #open | youtube channel Extra Credits DIM SUM #after:[#876.9]  #part-of:[#876.2] |

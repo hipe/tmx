@@ -65,6 +65,9 @@ class CommonCase(unittest.TestCase):
             result_lines.append(line)
         return tuple(result_lines)
 
+    def expected_emissions(_):
+        return ()
+
     def expected_num_rewinds(_):
         return 0
 
@@ -372,9 +375,6 @@ class Case3922_money(CommonCase):
         yield '\n'
         yield 'junk'
 
-    def expected_emissions(_):
-        return ()
-
     do_show_group_nodes = True  # became opt-in at #history-B.4
 
 
@@ -411,9 +411,6 @@ class Case3924_show_graph_nodes_became_opt_in(CommonCase):
         yield '|[#123.2]|#part-of:[#123.1]\n'
         yield '|[#123.1]|fatoozie\n'
 
-    def expected_emissions(_):
-        return ()
-
 
 class Case3926_target(CommonCase):
 
@@ -427,9 +424,6 @@ class Case3926_target(CommonCase):
 
     def given_lines(_):
         return these_lines()
-
-    def expected_emissions(_):
-        return ()
 
     given_target_these = '[#125.A]', '[#125.F]'
 
@@ -452,10 +446,26 @@ class Case3928_no_show_node_EIDs(CommonCase):
         yield '|[#123.2]|two #part-of:[#123.3]\n'
         yield '|[#123.1]|one #after:[#123.2] #part-of:[#123.3]\n'
 
-    def expected_emissions(_):
-        return ()
-
     do_show_identifiers = False
+
+
+class Case3930_pseudo_stylesheet(CommonCase):
+    # assert these:
+    #     #done -> style=filled
+    #     #app -> shape=rect
+
+    def test_050_did_output_lines(self):  # fragile test
+        lz = self.end_state_output_lines
+        two, one = lz[4:6]
+        self.assertIn('shape=rect', two)
+        self.assertIn('style=filled', one)
+
+    def given_lines(_):
+        yield '| zingy | main tag | content |\n'
+        yield '|---|---|---|\n'
+        yield '|[#123.3]|three\n'
+        yield '|[#123.2]|two #part-of:[#123.3] #app\n'
+        yield '|[#123.1]|one #after:[#123.2] #part-of:[#123.3] #done\n'
 
 
 def subject_module():
