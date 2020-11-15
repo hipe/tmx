@@ -12,6 +12,5 @@ have full on eno
 there are todo's
 [#431] could be absorbed into [#406]
 graph: away the label attribute that says "then"
-graph: option to make numbers go away
 graph: #app -> shape=rect
 graph: #done -> style=filled

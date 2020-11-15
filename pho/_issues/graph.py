@@ -65,7 +65,7 @@ def to_graph_lines_(
             tlistener = _build_throwing_listener(listener)
             tka = _prune(tka, targets, tlistener)
         roots = _find_all_roots(tka, fla, listener)
-        for line in _render_lines(roots, tka, fla, show_group_nodes):
+        for line in _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):  # noqa: E501
             yield line
     try:
         for line in main():
@@ -76,7 +76,7 @@ def to_graph_lines_(
     yield '}\n'
 
 
-def _render_lines(roots, tka, fla, show_group_nodes):
+def _render_lines(roots, tka, fla, show_group_nodes, show_identifiers):
 
     def render_branch(k, ind, parent_gvid=None):
         prer = node_prerender(k)
@@ -85,7 +85,7 @@ def _render_lines(roots, tka, fla, show_group_nodes):
 
         yield f"{ind}subgraph cluster_{prer.gvid} {{\n"
         ch_ind = ''.join((ind, tab_string))
-        label = prer.to_quoted_escaped_truncated_label_with_leading_EID()
+        label = double_quoted_label(prer, label_renderers.leading)
         yield f"{ch_ind}label={label}\n"
 
         if show_group_nodes:  # #here6
@@ -135,7 +135,10 @@ def _render_lines(roots, tka, fla, show_group_nodes):
             yield render_line_for_after(ch_k)
 
     def attr_pairs_via(prer):
-        v = prer.to_quoted_escaped_truncated_label_with_trailing_EID()
+        if show_identifiers:
+            v = double_quoted_label(prer, label_renderers.trailing)
+        else:
+            v = double_quoted_label(prer, label_renderers.no_EID)
         yield 'label', v
         # (eventually other tags like style=filled or w/e)
 
@@ -145,12 +148,6 @@ def _render_lines(roots, tka, fla, show_group_nodes):
             pool.remove(k)
             self.gvid = graph_viz_node_ID_via_key(k)
             self.key = k
-
-        def to_quoted_escaped_truncated_label_with_leading_EID(self):
-            return double_quoted_label(self, label_renderers.leading)
-
-        def to_quoted_escaped_truncated_label_with_trailing_EID(self):
-            return double_quoted_label(self, label_renderers.trailing)
 
     # lr = label renderer
 
@@ -163,10 +160,15 @@ def _render_lines(roots, tka, fla, show_group_nodes):
         structured_lines = lr.structured_lines_via(words)
         lines = [sl.to_string() for sl in structured_lines]  # and w, cx
 
-        if len(lines):
-            mutate_lines_to_have_iden(lines, prer, lr)
-        else:
-            lines.append(prer.row.identifier.to_string())
+        has_lines, show_EID = len(lines), (lr.offset is not None)
+        # Quad table
+        if show_EID:
+            if has_lines:
+                mutate_lines_to_have_iden(lines, prer, lr)
+            else:
+                lines.append(prer.row.identifier.to_string())
+        elif not has_lines:
+            xx("no node label content and no EID to show, wat do")
 
         return pieces_via_lines(lines)
 
@@ -198,7 +200,8 @@ def _render_lines(roots, tka, fla, show_group_nodes):
     class label_renderer:
         def __init__(self, where, w, max_lines):
             grid = [w for _ in range(0, max_lines)]
-            grid[where] -= notch_w
+            if where is not None:
+                grid[where] -= notch_w
             self.structured_lines_via = fu(grid, 'words')
             self.offset = where
 
@@ -208,6 +211,7 @@ def _render_lines(roots, tka, fla, show_group_nodes):
     class label_renderers:  # #class-as-namespace
         leading = label_renderer(0, _group_label_w, _group_label_h)
         trailing = label_renderer(-1, _node_label_w, _node_label_h)
+        no_EID = label_renderer(None, _node_label_w, _node_label_h)
 
     def words_via_row(row):
         for dp in row.doc_pairs:

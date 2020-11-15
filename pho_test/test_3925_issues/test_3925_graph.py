@@ -39,6 +39,9 @@ class CommonCase(unittest.TestCase):
         func = subject_module().issues_collection_via_
         ic = func(readme, listener, opn)
         kw = {}
+        if self.do_show_identifiers:
+            kw['show_identifiers'] = True
+
         if self.do_show_group_nodes:
             kw['show_group_nodes'] = True
 
@@ -66,6 +69,7 @@ class CommonCase(unittest.TestCase):
         return 0
 
     given_target_these = None
+    do_show_identifiers = True  # on by default because historically not an opt
     do_show_group_nodes = False
     do_debug = False
 
@@ -428,6 +432,30 @@ class Case3926_target(CommonCase):
         return ()
 
     given_target_these = '[#125.A]', '[#125.F]'
+
+
+class Case3928_no_show_node_EIDs(CommonCase):
+
+    def test_050_did_output_lines(self):  # crunchy test
+        lz = self.end_state_output_lines
+        one, two, three = lz[3:6]
+        # nodes don't have EID:
+        self.assertIn('label="two"', two)
+        self.assertIn('label="one"', three)
+        # for now, group label has EID:
+        self.assertIn('label="[#123.3] three"', one)
+
+    def given_lines(_):
+        yield '| zingy | main tag | content |\n'
+        yield '|---|---|---|\n'
+        yield '|[#123.3]|three\n'
+        yield '|[#123.2]|two #part-of:[#123.3]\n'
+        yield '|[#123.1]|one #after:[#123.2] #part-of:[#123.3]\n'
+
+    def expected_emissions(_):
+        return ()
+
+    do_show_identifiers = False
 
 
 def subject_module():

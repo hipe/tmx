@@ -530,6 +530,7 @@ def _subcommand_use(sin, sout, serr, argv, efx):
 
 
 def _formals_for_graph():
+    yield '-i', '--show-identifiers', 'whether or not to output "[#123.4]"'
     yield '-g', '--show-group-nodes', 'without this, prettier groups'
     yield '-t', '--add-target=IDENTIFIER*', 'output only the subgraphs etc'
     yield '-h', '--help', 'this screen'
@@ -562,6 +563,7 @@ def _subcommand_graph(sin, sout, serr, argv, efx):
     kw = {}
     kw['targets'] = vals.get('add_target', ())
     kw['show_group_nodes'] = vals.get('show_group_nodes', False)
+    kw['show_identifiers'] = vals.get('show_identifiers', False)
     from pho._issues.graph import to_graph_lines_ as func
     for line in func(ic, mon.listener, **kw):
         sout.write(line)
