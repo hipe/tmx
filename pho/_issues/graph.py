@@ -61,6 +61,9 @@ def to_graph_lines_(
     def main():
         fla = _build_a_flat_list_of_the_associations(ic, allow, listener)
         tka = _index_the_two_kinds_of_associations(fla, listener)
+        if targets:
+            tlistener = _build_throwing_listener(listener)
+            tka = _prune(tka, targets, tlistener)
         roots = _find_all_roots(tka, fla, listener)
         for line in _render_lines(roots, tka, fla, show_group_nodes):
             yield line
@@ -95,11 +98,16 @@ def _render_lines(roots, tka, fla, show_group_nodes):
 
         cx = sort_keys_in_document_order(children_of[k])
         for ch_k in cx:
+
+            # If the node has children, render it is a branch (group)
             if ch_k in children_of:
                 lines = render_branch(ch_k, ch_ind, prer.gvid)
+
+            # Otherwise render it as terminal
             else:
                 ch_prer = node_prerender(ch_k)
                 lines = render_terminal(ch_prer, ch_ind, *rest)
+
             for line in lines:
                 yield line
         yield f"{ind}}}\n"
@@ -301,6 +309,109 @@ def _find_all_roots(tka, fla, listener):
         raise _Stop()
 
     return result_set_of_roots_found
+
+
+def _prune(tka, targets, tlistener):
+    # Prune a universe of nodes to a subset universe given target nodes.
+    # 👉 The two kinds of associations ("group" and "after") are munged
+    #    into a single, generic concept we call "subordinance":
+    # 👉 Node A is subordinate to node B if A is in the B group OR if A
+    #    comes after B. We then say node B "has" A as one of its subordinates.
+    # 👉 Subordinance applies recursively: if node A has subordinate B, and B
+    #    has C and D, then A has subordinates B, C and D.
+    # 👉 It's not supposed to cycle but it might. We don't check we just "seen"
+    # So, the list of targets expands to a larger set thru subordinance.
+    # This larger set defines all the nodes in the new universe.
+
+    def main():
+        _ = build_befores()
+        subs_of = build_big_indiscriminate_subordinates_index(_)
+        ks = tuple(build_toplevel_allow_list(subs_of))
+        ks = build_expanded_allow_list(ks, subs_of)
+        wow = {k: v for k, v in pruned_node_associations(ks)}
+        hey = {k: v for k, v in pruned_children_of(ks)}
+        o = {}
+        o['node_associations'] = wow
+        o['children_of'] = hey
+        o['participating_keys'] = ks
+        return tka._make(o[k] for k in tka._fields)
+
+    def pruned_node_associations(ks):
+        for k, na in tka.node_associations.items():
+            if k not in ks:
+                continue
+            yield k, prune_node_association(na, ks)
+
+    def prune_node_association(na, ks):
+        afters = tuple(kk for kk in na.afters if kk in ks)
+        use_part_of = na.part_of
+        if use_part_of and use_part_of not in ks:
+            use_part_of = None
+        return na.__class__(part_of=use_part_of, afters=afters)
+
+    def pruned_children_of(ks):
+        for k, arr in tka.children_of.items():
+            if k not in ks:
+                continue
+            yield k, tuple(kk for kk in arr if kk in ks)
+
+    def build_expanded_allow_list(ks, subs_of):
+        def recurse(k):
+            if k in seen:
+                return
+            seen.add(k)
+            subs = subs_of[k]
+            if 0 == len(subs):
+                return
+            for kk in subs:
+                result.add(kk)
+                recurse(kk)
+        result, seen = set(), set()
+        for k in ks:
+            result.add(k)
+            recurse(k)
+        return result
+
+    def build_toplevel_allow_list(subs_of):
+        idener = _build_identifier_parser(tlistener)
+        for s in targets:
+            iden = idener(s)
+            k = iden.key
+            subs = subs_of.get(k)
+            if subs is None:
+                xx(f"not a participating identifier: {iden.to_string()}")
+            if 0 == len(subs):
+                xx(f"{iden.to_string()} has no subordinates")
+            yield k
+
+    def build_big_indiscriminate_subordinates_index(befores):
+        def recurse(k):
+            if k in seen:
+                return
+            seen.add(k)
+            subs = set()
+            for kk in tka.children_of.get(k, ()):
+                subs.add(kk)
+                recurse(kk)
+            for kk in befores.get(k, ()):
+                subs.add(kk)
+                recurse(kk)
+            result[k] = subs
+        result, seen = {}, set()
+        for k in tka.participating_keys:
+            recurse(k)
+        return result
+
+    def build_befores():  # we have afters but not befores
+        res = {}
+        for k, na in tka.node_associations.items():
+            for kk in na.afters:
+                if (arr := res.get(kk)) is None:
+                    res[kk] = (arr := [])
+                arr.append(k)
+        return res
+
+    return main()
 
 
 def _index_the_two_kinds_of_associations(_idx, _listener):
@@ -513,8 +624,7 @@ def _build_tag_classifier(allow, cstacker):
     def DANGEROUS_listener(*emi):
         DANGEROUS_emission_cache.append(emi)
 
-    from . import build_identifier_parser_ as func
-    parse_iden = func(DANGEROUS_listener, cstacker)
+    parse_iden = _build_identifier_parser(DANGEROUS_listener, cstacker)
     DANGEROUS_emission_cache = []
     # == END YIKES
 
@@ -810,9 +920,11 @@ def _s(leng):
 # == Models
 
 class _NodeAssociations:
-    def __init__(self):
-        self.part_of = None
-        self.afters = []
+    def __init__(self, part_of=None, afters=None):
+        if afters is None:
+            afters = []  # (necessary LIKE THIS, not as default argument)
+        self.part_of = part_of
+        self.afters = afters
 
 
 class _ClassifiedTagging:
@@ -883,8 +995,23 @@ def _pcs_join(sep, chunks):
 
 # ==
 
+def _build_throwing_listener(listener):
+    def use_listener(sev, *rest):
+        return listener(sev, *rest)
+        if 'error' == sev:
+            raise _Stop()
+    return use_listener
+
+
 class _Stop(RuntimeError):
     pass
+
+
+# == Delegations
+
+def _build_identifier_parser(listener, cstacker=None):
+    from . import build_identifier_parser_ as func
+    return func(listener, cstacker)
 
 
 def _named_tuple(*a):
@@ -904,6 +1031,8 @@ def xx(msg=None):
 def _test():
     from doctest import testmod as func
     func()
+
+# ==
 
 
 if __name__ == "__main__":

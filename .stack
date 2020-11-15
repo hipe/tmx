@@ -15,5 +15,3 @@ graph: away the label attribute that says "then"
 graph: option to make numbers go away
 graph: #app -> shape=rect
 graph: #done -> style=filled
-graph: target one target node
-graph: option to made groups not have a central node

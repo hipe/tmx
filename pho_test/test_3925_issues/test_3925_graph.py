@@ -41,6 +41,10 @@ class CommonCase(unittest.TestCase):
         kw = {}
         if self.do_show_group_nodes:
             kw['show_group_nodes'] = True
+
+        if (eids := self.given_target_these):
+            kw['targets'] = eids
+
         lines = ic.to_graph_lines(**kw)
         if not self.do_debug:
             return tuple(lines)
@@ -61,6 +65,7 @@ class CommonCase(unittest.TestCase):
     def expected_num_rewinds(_):
         return 0
 
+    given_target_these = None
     do_show_group_nodes = False
     do_debug = False
 
@@ -358,6 +363,19 @@ class Case3922_money(CommonCase):
     def given_lines(_):
         yield 'junk\n'
         yield '\n'
+        for line in these_lines():
+            yield line
+        yield '\n'
+        yield 'junk'
+
+    def expected_emissions(_):
+        return ()
+
+    do_show_group_nodes = True  # became opt-in at #history-B.4
+
+
+def these_lines():
+    if True:
         yield '| fella | main tag | content |\n'
         yield '|---|---|---|\n'
         yield '|[#125.H]|hi #part-of:[#125.F]\n'
@@ -370,13 +388,6 @@ class Case3922_money(CommonCase):
         yield '|[#125.A]|hi\n'
         yield '|[#124.B]|I am a jabronus #obun\n'
         yield '|[#124.A]|I am a jumunkus #after:[#124.B]\n'
-        yield '\n'
-        yield 'junk'
-
-    def expected_emissions(_):
-        return ()
-
-    do_show_group_nodes = True  # became opt-in at #history-B.4
 
 
 class Case3924_show_graph_nodes_became_opt_in(CommonCase):
@@ -398,6 +409,25 @@ class Case3924_show_graph_nodes_became_opt_in(CommonCase):
 
     def expected_emissions(_):
         return ()
+
+
+class Case3926_target(CommonCase):
+
+    def test_050_did_output_lines(self):
+        assert self.end_state_output_lines
+
+    def test_100_tings(self):
+        ci = self.end_state_custom_index
+        assert 2 == len(ci.subgraphs)
+        assert 4 == len(ci.nodes)
+
+    def given_lines(_):
+        return these_lines()
+
+    def expected_emissions(_):
+        return ()
+
+    given_target_these = '[#125.A]', '[#125.F]'
 
 
 def subject_module():
