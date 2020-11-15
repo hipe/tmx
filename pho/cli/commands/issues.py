@@ -530,6 +530,7 @@ def _subcommand_use(sin, sout, serr, argv, efx):
 
 
 def _formals_for_graph():
+    yield '-g', '--show-group-nodes', 'without this, prettier groups'
     yield '-h', '--help', 'this screen'
 
 
@@ -557,8 +558,10 @@ def _subcommand_graph(sin, sout, serr, argv, efx):
     ic = func(readme, mon.listener)
     # ..
 
+    kw = {}
+    kw['show_group_nodes'] = vals.get('show_group_nodes', False)
     from pho._issues.graph import to_graph_lines_ as func
-    for line in func(ic, mon.listener):
+    for line in func(ic, mon.listener, **kw):
         sout.write(line)
 
     return mon.exitstatus

@@ -210,9 +210,9 @@ def issues_collection_via_(readme, listener, opn=None):
         return cm()
 
     class issues_collection:  # #class-as-namespace
-        def to_graph_lines(listener=listener):
+        def to_graph_lines(listener=listener, **kw):
             from .graph import to_graph_lines_ as func
-            return func(issues_collection, listener)
+            return func(issues_collection, listener, **kw)
 
         def open_schema_and_issue_traversal(listener=listener):
             return do_open_etc(listener)

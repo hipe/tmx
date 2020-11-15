@@ -38,7 +38,10 @@ class CommonCase(unittest.TestCase):
     def given_run(self, readme, opn, listener):
         func = subject_module().issues_collection_via_
         ic = func(readme, listener, opn)
-        lines = ic.to_graph_lines()
+        kw = {}
+        if self.do_show_group_nodes:
+            kw['show_group_nodes'] = True
+        lines = ic.to_graph_lines(**kw)
         if not self.do_debug:
             return tuple(lines)
 
@@ -58,6 +61,7 @@ class CommonCase(unittest.TestCase):
     def expected_num_rewinds(_):
         return 0
 
+    do_show_group_nodes = False
     do_debug = False
 
 
@@ -372,6 +376,29 @@ class Case3922_money(CommonCase):
     def expected_emissions(_):
         return ()
 
+    do_show_group_nodes = True  # became opt-in at #history-B.4
+
+
+class Case3924_show_graph_nodes_became_opt_in(CommonCase):
+
+    def test_050_did_output_lines(self):
+        assert self.end_state_output_lines
+
+    def test_100_idk(self):
+        ci = self.end_state_custom_index
+        assert 1 == len(ci.subgraphs)
+        assert 2 == len(ci.nodes)
+
+    def given_lines(_):
+        yield '| zizzy | main tag | content |\n'
+        yield '|---|---|---|\n'
+        yield '|[#123.3]|#part-of:[#123.1]\n'
+        yield '|[#123.2]|#part-of:[#123.1]\n'
+        yield '|[#123.1]|fatoozie\n'
+
+    def expected_emissions(_):
+        return ()
+
 
 def subject_module():
     import pho._issues as module
@@ -381,4 +408,5 @@ def subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #born

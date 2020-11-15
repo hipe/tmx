@@ -47,7 +47,9 @@ _group_label_w, _group_label_h = 20, 2  # (psst: try not to make tests
 _node_label_w, _node_label_h = 15, 3  # ..depend on these heuristics 🙃)
 
 
-def to_graph_lines_(ic, listener):
+def to_graph_lines_(
+        ic, listener,
+        targets=(), show_group_nodes=False, show_identifiers=False):
 
     # Output the first line first before any errors for a more responsive UX
     yield 'digraph g {\n'
@@ -60,7 +62,7 @@ def to_graph_lines_(ic, listener):
         fla = _build_a_flat_list_of_the_associations(ic, allow, listener)
         tka = _index_the_two_kinds_of_associations(fla, listener)
         roots = _find_all_roots(tka, fla, listener)
-        for line in _render_lines(roots, tka, fla):
+        for line in _render_lines(roots, tka, fla, show_group_nodes):
             yield line
     try:
         for line in main():
@@ -71,17 +73,25 @@ def to_graph_lines_(ic, listener):
     yield '}\n'
 
 
-def _render_lines(roots, tka, fla):
+def _render_lines(roots, tka, fla, show_group_nodes):
 
     def render_branch(k, ind, parent_gvid=None):
         prer = node_prerender(k)
+
+        # gvid = graph viz node id
+
         yield f"{ind}subgraph cluster_{prer.gvid} {{\n"
         ch_ind = ''.join((ind, tab_string))
         label = prer.to_quoted_escaped_truncated_label_with_leading_EID()
         yield f"{ch_ind}label={label}\n"
 
-        for line in render_terminal(prer, ch_ind, parent_gvid):
-            yield line
+        if show_group_nodes:  # #here6
+            for line in render_terminal(prer, ch_ind, parent_gvid):
+                yield line
+
+            rest = (prer.gvid,)
+        else:
+            rest = ()
 
         cx = sort_keys_in_document_order(children_of[k])
         for ch_k in cx:
@@ -89,7 +99,7 @@ def _render_lines(roots, tka, fla):
                 lines = render_branch(ch_k, ch_ind, prer.gvid)
             else:
                 ch_prer = node_prerender(ch_k)
-                lines = render_terminal(ch_prer, ch_ind, prer.gvid)
+                lines = render_terminal(ch_prer, ch_ind, *rest)
             for line in lines:
                 yield line
         yield f"{ind}}}\n"
@@ -134,6 +144,8 @@ def _render_lines(roots, tka, fla):
         def to_quoted_escaped_truncated_label_with_trailing_EID(self):
             return double_quoted_label(self, label_renderers.trailing)
 
+    # lr = label renderer
+
     def double_quoted_label(row, lr):
         return ''.join(pieces_for_escaped_surface_label_value(row, lr))
 
@@ -143,6 +155,14 @@ def _render_lines(roots, tka, fla):
         structured_lines = lr.structured_lines_via(words)
         lines = [sl.to_string() for sl in structured_lines]  # and w, cx
 
+        if len(lines):
+            mutate_lines_to_have_iden(lines, prer, lr)
+        else:
+            lines.append(prer.row.identifier.to_string())
+
+        return pieces_via_lines(lines)
+
+    def mutate_lines_to_have_iden(lines, prer, lr):
         line_before_add_eid = lines[lr.offset]
         new_line_slots = [None, None]
         offset_for_eid = lr.offset  # strange but true
@@ -152,6 +172,9 @@ def _render_lines(roots, tka, fla):
         new_line = ' '.join(new_line_slots)
 
         lines[lr.offset] = new_line
+
+    def pieces_via_lines(lines):
+
         itr = iter(lines)
 
         yield '"'
