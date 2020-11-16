@@ -143,7 +143,8 @@ def _render_lines(
 
         # Render the associations
         if parent_gvid is not None:
-            yield ''.join((ind, prer.gvid, '->', parent_gvid, ';\n'))  # ..
+            line = ''.join((ind, prer.gvid, '->', parent_gvid, ';\n'))  # ..
+            assoc_line_cache.append(line)
 
         if (na := node_associations.get(prer.key)) is None:
             return  # not all parents custode associations of their own
@@ -151,7 +152,7 @@ def _render_lines(
         render_line_for_after = build_render_line_for_after(prer.gvid, ind)
 
         for ch_k in na.afters:
-            yield render_line_for_after(ch_k)
+            assoc_line_cache.append(render_line_for_after(ch_k))
 
     def attr_pairs_via(prer):
         if show_identifiers:
@@ -268,17 +269,22 @@ def _render_lines(
     sort_keys_in_document_order = fla.sort_keys_in_document_order
     row_via_key, tab_string = fla.row_via_key, _tab_string
 
+    assoc_line_cache = []
+
     for root in sort_keys_in_document_order(roots):
         for line in render_branch(root, tab_string):
             yield line
 
-    if not len(pool):  # if every node was participating in group-age, done
-        return
+    # pool is empty if every node was part of a group
 
     for k in sort_keys_in_document_order(pool):
         prer = node_prerender(k)
         for line in render_terminal(prer, tab_string):
             yield line
+
+    # Render all assocs after everything else because if not it messes up group
+    for line in assoc_line_cache:
+        yield line
 
 
 def _find_all_roots(tka, fla, listener):
