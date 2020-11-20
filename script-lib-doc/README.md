@@ -53,7 +53,7 @@ the related API that preceded this one.)
 |[#605.1]                   |       | this one stdout/stderr tracking toolkit
 |[#605]                     |       | [external tracking or whatever you want]
 |[#604.2]                   | #open | known limitation of our arg parsing
-|[#603]                     | #hole |
+|[#603.2]                   | #open | jagged and flattening help screen desc blocks (see `dp bs -h`)
 |:[#602]                    | #open | track that one issue with argparse (should patch) |
 |[#601.5]                   |       | [CLI canon]  (placeheld)
 |[#601.4]                   |       | [expect help screen]  (placeheld)

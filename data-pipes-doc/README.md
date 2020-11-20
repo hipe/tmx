@@ -47,6 +47,7 @@ For now, see `man rs`. `¯\_(ツ)_/¯`
 |                  [#448]   |       | markdown table-targeted synchronization
 |                  [#447.B] | #edit | edit documentation
 |                  [#447]   |       | the collection synchronization algorithm
+|                  [#437]   | #open | single-item format adapter (CSV might work)
 |                  [#436]   |       | [reserved for html format provisions]
 |                  [#435.B] |       | one line per json object (unlike json format)
 |                  [#435]   |       | [producer script format provisions]

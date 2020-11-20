@@ -1,0 +1,87 @@
+digraph g {
+label="\n
+possible pho build pipeline
+(this is all VERY imagined)"
+
+rankdir=LR
+
+subgraph cluster1 {
+  label="content directory"
+
+  file3[label="file 3"]
+
+  subgraph cluster2 {
+    label="arbitrary subdirectory"
+    file1[label="file 1"]
+    file2[label="file 2"]
+  }
+}
+
+subgraph cluster3 {
+  label="output directory"
+
+  file9[label="file 9"]
+
+  subgraph cluster4 {
+    label="designed subdirectory"
+    file7[label="file 7"]
+    file8[label="file 8"]
+  }
+}
+
+subgraph cluster5 {
+  label="watcher"
+  node[shape=rect]
+  watcher_main[label="process config"]
+  watches
+  case_match[label="case match"]
+  rewrite_rules[label="rewrite rules"]
+}
+
+subgraph cluster6 {
+  label="output adapters"
+  node[shape=rect]
+  pelican
+  hugo
+}
+
+subgraph cluster7 {
+  label="watcher adapters"
+  node[shape=rect]
+  watchexec
+  kissrdb_eno[label="kissrdb eno"]
+}
+
+subgraph cluster8 {
+  label="intermediate directory"
+
+  file6[label="file 6"]
+
+  subgraph cluster9 {
+    label="designed subdirectory"
+    file4[label="file 4"]
+    file5[label="file 5"]
+  }
+}
+
+config[label="config" shape=rect]
+
+config->watcher_main
+watcher_main->watches
+watcher_main->case_match
+watcher_main->rewrite_rules
+rewrite_rules->pelican
+pelican->file4
+file4->file7
+
+watches->watchexec
+watchexec->file3[label="watches"]
+watchexec->file1[label="watches"]
+file1->watchexec[label="changed"]
+watchexec->case_match[label="file 2 changed"]
+case_match->rewrite_rules
+
+}
+/*
+  - #born
+*/

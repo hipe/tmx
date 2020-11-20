@@ -1,86 +1,75 @@
 ---
-title: "sakin agac README"
+title: "SSG dim sum"
 date: "2018-04-04T13:55:22-04:00"
 ---
-# sakin agac
-
-(bastardized for the nonsensical turkish "calm tree")
-
-
-
 
 ## objective & scope
 
-our current [broad objectives][\[#403\]] are discussed in their own document.
-
-these were the original stated objectives, here (in part) for posterity:
+(For posterity, the original objectives of this whole host package:)
   - learn react.
   - experiment with unobtrusive static pages
   - do that one static thing with tables
   - do that one static pipeline with webpack
 
+In this document we keep track (at a high level) of which static site
+generators (SSG's) we've surveyed and possibly used..
+
+At this exact moment of writing, there are a jaw-dropping 316 different
+static site generators listed at this one site:
+
+```bash
+    curl https://jamstack.org/generators/ > x.html
+    dp scrape x.html section.cards div.generator-card \
+            'a:nth-of-type(1)>div:nth-of-type(1)'
+```
+
+Finding the perfect static site generator is both out-of-scope at this
+moment, AND ALSO sort of the whole point of a lot of our efforts...
 
 
 
-## sub-node table (experiment)
+## SSG dim sum table
 
-|Id                         | Main Tag | Content |
-|---------------------------|:-----:|---
-|                 (example) | #this | #this-cel-too
-|                   #431    |       | storage roadmap ..
-|                   #430    | #hole |
-|                   #429    |       | content roadmap ..
-|                   #428    |       | design roadmap ..
-|                   #427    |       | frontend roadmap ..
-|                   #426    |       | publishing roadmap ..
-|                   #425    |       | dev workflow notes like git bisect
-|                   #424    |       | [theme notes]
-|                  [#423]   | #hole |
-|                   #422    |       | [hugo theme dim sum]
-|                   #421    |       | hugo vs jekyll vs whatever
-|                   #420    |       | adventures in CSS ..
-|                   #419    |       | heroku CMS add-on dim sum ..
-|                  [#418]   | #hole |
-|                  [#417]   | #hole |
-|                   #416.D  |       | CMS's
-|                   #416.C  |       | parser generators: turn soft notes into tags (for no real reason except posterity)
-|                   #416.B  |       | (nasim!)
-|                   #416    |       | (numberspace for publishing wishlist)
-|                   #415    |       | the "stream" script (see `/script`)
-|                   #413    | #open | undefined: when row edited, does endcap get normalized-in or not?
-|                   #412    | #open | "strict" "typing" (track true wishpoints)
-|                   #411    |       | [the function that flushes stream processors]
-|                   #410.W  | #edit | edit documentation
-|                   #410.V  | #open | (no taggings) sync on a markdown file with no table should complain
-|                   #410.N  | #trak | [html via markdown that isn't sync]
-|                   #410.G  | #trak | nested context managers closing each other
-|                   #410.5  | #trak | workaround to avoid particular dotfiles as reported by vendor script
-|                   #410.4  | #trak | the order that files are listed from the filesystem (even find) is indeterminate
-|                   #410.B  | #open | absorb small graph into big graph
-|                   #410.A.1| #trak | track where we cover specific producer scripts
-|                   #410    |       | (internal tracking)
-|                   #409    | #hole |
-|                  [#408]   | #hole |
-|                  [#407]   | #hole |
-|<a name=406></a>[\[#406\]] | #open | this document might be obviated by "/TODO.dot" (of the mono-repo)
-|<a name=405></a>[\[#405\]] |       | play
-|<a name=404></a>[\[#404\]] |       | wiki app dim sum
-|<a name=403></a>[\[#403\]] |       | broad objectives
-|<a name=402></a>[\[#402\]] |       | scala on heroku
+(order: the most recent ones we are looking at at the top)
+
+| SSG Name | Freeform description |
+|:---|:---|
+| Generic Static Site Generator | (example, max width at writing) |
+| hugo                          | #implementation-language:ruby #we-have-used-it
+| jekyll                        | #implementation-language:ruby #we-have-used-it
 
 
 
+## Skipping over some intermediate steps..
+
+We like a lot of the architecture and vocabulary of pandoc. Looking at "parcel"
+
+We expect that we'll adopt a lot of the vocabulary, idioms and some
+architecture of things like:
+
+- Task execution tools like "make" (and python's nativization "invoke")
+- Application bundlers like "parcel" (not looking at "webpack" rn)
+- "pandoc", the "universal document converter"
+- Static site generators like "pelican" (or hugo or jekyll etc)
 
 
-[\[#406\]]: 406-strategic-dependency-graph.dot
-[\[#405\]]: 405-play.md
-[\[#404\]]: 404-wiki-app-dim-sum.md
-[\[#403\]]: 403-broad-objectives.md
-[\[#402\]]: 402-heroku-and-scala.md
+From build tools like "make" we'll use concepts like EDIT. (see [invoke][3].)
 
+Like "parcel" we may have [trees of "assets"][2].
+
+We will likely share [pandoc's vocaulary][1] of "input formats",
+"output formats", "readers", "writers" and mabe even generic AST's.
+
+
+
+[1]: https://pandoc.org/using-the-pandoc-api.html#pandocs-architecture
+[2]: https://parceljs.org/how_it_works.html
+[3]: https://docs.getpelican.com/en/latest/publish.html#invoke
 
 
 
 ## (document-meta)
 
+  - #pending-rename: [#401] SSG dim-sum OR IS IT architecture?
+  - #history-B.4: re-purpose file from an issues index to an SSG dim-sum
   - #born.

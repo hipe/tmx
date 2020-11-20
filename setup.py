@@ -77,8 +77,6 @@ setup(
             kss=kiss_rdb.cli:cli_for_production
             dp=data_pipes.cli:cli_for_production
             DTF_game_server=game_server:cli_for_production
-            DTF_game_server_adapter=game_server.cli.game_server_adapter:cli_for_production
-            DTF_game_server_server=game_server.cli.game_server_server:cli_for_production
         ''')
 
 # #history-A.7: schlurped all old endpoints into one egg

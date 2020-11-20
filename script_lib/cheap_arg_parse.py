@@ -36,7 +36,7 @@ def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
     ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
     ch_argv = (ch_pn, * cmd_tup[1:])
 
-    es = cmd_funcer()(sin, sout, serr, ch_argv, lambda: xx('oo fun'))
+    es = cmd_funcer()(sin, sout, serr, ch_argv, efx)
     assert isinstance(es, int)
     return es
 

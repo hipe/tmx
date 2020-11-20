@@ -1,0 +1,31 @@
+digraph g {
+
+/* for now we're gonna write the nodes in the order in which they first
+appear in the [#409.5] pseudocode */
+
+label="\nentity relationship diagram for our 'pandoc-like'
+(this is largely IMAGINARY)"
+
+node[shape=rect]
+
+watcher[label="watcher instance\n(from a specific\nwatcher adapter)"]
+watch_controller[label="watch controller"]
+watcher_adapter[label="watcher adapter"]
+case_pattern[label="case pattern"]
+formal_action[label="formal action"]
+build_plan[label="build plan"]
+stage[label="stage"]
+business_lexicon[label="business lexicon"]
+
+watch_controller->watcher[arrowhead=dot]
+watcher_adapter->watcher[label="makes"]
+watch_controller->case_pattern[arrowhead=dot]
+formal_action->case_pattern[arrowhead=dot]
+formal_action->build_plan[arrowhead=dot]
+stage->build_plan[arrowhead=dot]
+business_lexicon->stage[arrowhead=dot]
+
+}
+/*
+  - #born
+*/

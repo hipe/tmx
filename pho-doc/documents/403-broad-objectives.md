@@ -6,8 +6,8 @@ date: 2018-04-06T18:11:58-04:00
 
 ## overview: broad objectives
 
-the broad objective of this subproject (codenamed "sakin agac" and badly
-in need of a real name) is to accomplish "publishing" on these terms:
+the broad objective of this subproject (codenamed "pho" then "TMX notebook"
+for now) is to accomplish "publishing" on these terms:
 
   - the main essential function of the blog is accomplished without a
     "backend" — it's just static assets.

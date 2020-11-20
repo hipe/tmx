@@ -1,111 +1,102 @@
-#!/usr/bin/env python3 -W default::Warning::0
-
-
-def cli_for_production():
-    import sys
-    argv = sys.argv
-    if len(argv) > 1:
-        print('usage: {}'.format(argv[0]))
-    else:
-        __run_adapter_forever(* argv[1:])
-
-
-def __run_adapter_forever():
-
-    class my_state:  # #class-as-namespace
-        _timeout_float = 0.5
-
-    self = my_state
-
-    def __main():
-        while True:
-            _print('(timeout is currently {})'.format(self._timeout_float))
-            inp = __parse_input()
-            if inp.is_redo:
-                continue
-            if inp.is_quit:
-                break
-            __money(inp.send_this_string)
-
-        _print('done.')
-
-    def __money(s):
-
-        import select
-        rlist = (sock.fileno(),)
-
-        send_bytes = bytes(s, 'utf-8')
-        _print('sending: ', repr(send_bytes))
-        sock.sendall(send_bytes)
-        _print('blocking for FIRST read')
-        while True:
-            recvd_bytes = sock.recv(1024)
-            if not len(recvd_bytes):
-                _print('received zero length')
-                break
-            _print('received: ', repr(recvd_bytes))
-            avail, _, _ = select.select(rlist, (), (), self._timeout_float)
-            if not len(avail):
-                _print('nothing was ready')
-                break
-            _print('something should be ready now')
-
-    def __parse_input():
-        s = input('any string (float to change timeout, "done" for done): ')
-        if not len(s):
-            _print('sending the empty string causes problems. try another')
-            return _REDO
-        else:
-            import re
-            md = re.search('^\\d+\\.\\d+$', s)
-            if md is None:
-                if s == 'done':
-                    _print('quitting loop.')
-                    return _QUIT
-                else:
-                    return _NormalInput(s)
-            else:
-                return __when_change_timeout(md[0])
-
-    def __when_change_timeout(float_s):
-        was_float = self._timeout_float
-        self._timeout_float = float(float_s)
-        _fmt = 'changed sleep time from {} to {}'
-        _print(_fmt.format(was_float, self._timeout_float))
-        return _REDO
-
-    sock = None
-    _print = print
-    port = 50007
-
+def open_string_based_tcp_ip_client_via(listener, port):
     import socket
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
-        sck.connect(('0.0.0.0', port))
-        sock = sck  # ick/meh
-        __main()
+
+    # Create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Connect the socket to the port where the server is listening
+    server_address = ('localhost', port)
+    print('connecting to {} port {}'.format(*server_address))
+    sock.connect(server_address)
+
+    def send_string(message):
+
+        # Prepare headers for request
+        payload = _encode(message)
+        header1 = _make_content_length_header_line(len(payload))
+        header2 = _end_of_headers_header_line
+
+        big_data = b''.join((header1, header2, payload))
+
+        # Send request
+        print(f'sending {big_data!r}')
+        sock.sendall(big_data)
+
+        # Parse response headers
+        content_length = None
+        import re
+        while True:  # while more headers
+            content_bytes = sock.recv(80).strip()
+            if b'End of headers' == content_bytes:
+                print('wahoo we found end of headers!')
+                break
+
+            content = _decode(content_bytes)
+            md = re.match('([A-Za-z- ]+):[ ](.+)', content)
+            if md is None:
+                xx(f"why didn't this match: {content!r}")
+
+            n, v = md.groups()
+
+            if 'Content length' == n:
+                assert re.match(r'\d+\Z', v)  # ..
+                content_length = int(v)
+                continue
+            xx(f'not covered: strange header: {n!r}')
+
+        assert content_length is not None
+
+        response_bytes = sock.recv(content_length)
+
+        print(f"Yay we are done. got response: {response_bytes!r}")
+        return 'no see ignore me for now'
+
+    class client:  # #class-as-namespace
+        pass
+
+    client.send_string = send_string
+
+    from contextlib import contextmanager as cm
+
+    @cm
+    def cm():
+        try:
+            yield client
+        finally:
+            print('closing socket')
+            sock.close()
+
+    return cm()
 
 
-class _NormalInput:
-    def __init__(self, s):
-        self.send_this_string = s
-        self.is_quit = False
-        self.is_redo = False
+def _make_content_length_header_line(leng):
+    assert isinstance(leng, int)  # #[#022]
+    content = ' '.join(('Content length:', str(leng)))
+    return _fixed_with_header_line_via(content)
 
 
-class _Redo:
-    def __init__(self):
-        self.is_quit = False
-        self.is_redo = True
+def _fixed_with_header_line_via(string_content):
+    pad_num = 79 - len(string_content)
+    assert -1 < pad_num
+    line = ''.join((string_content, ' '*pad_num, '\n'))
+    return _encode(line)
 
 
-class _Quit:
-    def __init__(self):
-        self.is_quit = True
-        self.is_redo = False
+def _decode(data):
+    return str(data, 'utf-8')
 
 
-_REDO = _Redo()
-_QUIT = _Quit()
+def _encode(msg):
+    return bytes(msg, 'utf-8')
 
+
+_end_of_headers_header_line = _fixed_with_header_line_via('End of headers')
+
+
+def xx(msg):
+    raise RuntimeError(f"ohai: {msg}")
+
+# #history-B.4: repurpose as generic tcp/ip client not "game server" client
+#               and no more select
 # #history-A.1: lost self-executability
 # #born

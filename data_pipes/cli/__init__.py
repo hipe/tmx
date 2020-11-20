@@ -21,6 +21,7 @@ def _subcommands():
     yield 'convert-collection', lambda: _load('.convert_collection')
     yield 'cc', _build_hacked_alias_to_convert_collection
     yield 'sync', lambda: _load('.sync')
+    yield 'scrape', lambda: _load('.scrape')
 
 
 _use_me = \
@@ -49,7 +50,7 @@ class _MutableCommandModule:
     pass
 
 
-def _CLI(sin, sout, serr, argv, rscser):  # #testpoint
+def _CLI(sin, sout, serr, argv, svcser):  # #testpoint
     """Data Pipes is an experimental potpourri of higher-level operations
 
     that operate on top of collections, sort of in the spirit of ReactiveX
@@ -97,13 +98,18 @@ def _CLI(sin, sout, serr, argv, rscser):  # #testpoint
     assert 0 == len(bash_argv)
     bash_argv = list(reversed(vals.pop('command')))  # the rest
 
-    queue, rc = _EXPERIMENTAL_parse_chained_command(serr, bash_argv, foz)
-    if queue is None:
+    # cm = command module
+    queue, cm, rc = _EXPERIMENTAL_parse_chained_command(serr, bash_argv, foz)
+    if rc is not None:
         return rc
 
-    assert 0 < len(queue)
+    if cm:
+        ch_argv = tuple(reversed(bash_argv))
+        return cm.CLI_(sin, sout, serr, ch_argv, svcser)
 
-    return _RUN_THE_QUEUE(sin, sout, serr, queue, rscser)
+    assert queue
+
+    return _RUN_THE_QUEUE(sin, sout, serr, queue, svcser)
 
 
 # == Select
@@ -395,12 +401,14 @@ def _EXPERIMENTAL_parse_chained_command(serr, bash_argv, foz):
             resolve_a_command_from_argv_head()  # reminder: check for empty
             if command_is_not_chainable():
                 if is_first_command():
-                    break
+                    return None, self.cmd_mod, None  # #here3
                 xx("complain about etc")
             parse_the_args_for_that_command_passively()
             if end_of_argv():
                 break
             the_next_token_must_be_a_pipe()
+
+        return tuple(queue), None, None  # #here3
 
     def end_of_argv():
         return 0 == len(bash_argv)
@@ -478,10 +486,9 @@ def _EXPERIMENTAL_parse_chained_command(serr, bash_argv, foz):
     self = main  # #watch-the-world-burn
     stop = _Stop
     try:
-        main()
+        return main()
     except stop as exe:
-        return None, exe.args[0]
-    return tuple(queue), None
+        return None, None, exe.args[0]  # #here3
 
 
 # ==
