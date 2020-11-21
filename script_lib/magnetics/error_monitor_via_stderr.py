@@ -26,7 +26,7 @@ class func:  # error_monitor_via_stderr
             if tf is True:
                 return
             assert(tf is None)
-        self.__see_emission_severity(em)
+        self._see_emission_severity(em)
         self.__express_emission(em)
 
     def __express_emission(self, em):
@@ -68,9 +68,18 @@ class func:  # error_monitor_via_stderr
         for line in lines:
             write_line(line)
 
-    def __see_emission_severity(self, em):
-        if 'error' != em.severity:
-            assert('info' == em.severity)  # ..
+    def _see_emission_severity(self, emi):
+        sev = emi.severity
+        if 'info' == sev:
+            ok = True
+        elif 'error' == sev:
+            ok = False
+        elif 'verbose' == sev:
+            ok = True
+        else:
+            # #[#508.4]: unified semantics would be nice here:
+            raise RuntimeError(f"no probalo: '{sev}'")  # xx
+        if ok:
             return
         self.OK = False
 

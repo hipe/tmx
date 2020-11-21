@@ -76,7 +76,6 @@ setup(
             tmx-timestamp=pho.cli.timestamp:cli_for_production
             kss=kiss_rdb.cli:cli_for_production
             dp=data_pipes.cli:cli_for_production
-            DTF_game_server=game_server:cli_for_production
         ''')
 
 # #history-A.7: schlurped all old endpoints into one egg

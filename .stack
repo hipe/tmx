@@ -19,6 +19,4 @@ the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
 parse headers newline-based not with fixed-width
-change print statements to event emissions
-cover existing string-based tcp/ip server
-abstract the networking component out of tcp/ip server so it's unit testable
+get it to about 88%, client

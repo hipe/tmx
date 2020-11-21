@@ -1,3 +1,6 @@
+import re
+
+
 def run_string_based_tcp_ip_server_via(recv_string, listener, port):
     import socket
 
@@ -11,6 +14,13 @@ def run_string_based_tcp_ip_server_via(recv_string, listener, port):
 
     # Listen for incoming connections
     sock.listen(1)
+
+    _run(sock, listener)
+
+
+def _run(sock, listener):  # #testpoint
+
+    print = _hack_print_via_listener(listener)  # ick/meh experiment
 
     def main_loop():
         while True:
@@ -36,7 +46,6 @@ def run_string_based_tcp_ip_server_via(recv_string, listener, port):
 
         # Parse client headers
         content_length = None
-        import re
         while True:  # while more headers
 
             content_bytes = conn.recv(80)
@@ -104,6 +113,43 @@ def _fixed_with_header_line_via(string_content):  # #scp
     return _encode(line)
 
 
+def _hack_print_via_listener(listener):
+    # Discussion: We want to see what it feels like to have the code-level use
+    # of this look like plain-old print statements but internally we treat that
+    # as a layer on top of structured emissions. It's a bit of opacity that is
+    # hopefully unobtrustive..
+
+    def print(*items):
+        head = items[0]
+        md = re.match(r'^([^ ]+)[ ](.+)', head)
+        first_word, rest = md.groups()  # ..
+        is_verbose = first_word in ('OK', 'wahoo')  # lol
+
+        # fatal error warning info verbose debug trace
+
+        def lineser():
+            yield ' '.join(str(item) for item in items)
+
+        if is_verbose:
+            return listener('verbose', 'expression', lineser)
+
+        # Here's the painful payback..
+        if first_word in allowed_categories:
+            use_cat = first_word
+        elif 'zero length' in head and ' clos' in head:  # meh
+            use_cat = 'closing'
+        elif 'shutting down' in head:
+            use_cat = 'shutting_down'
+        else:
+            raise RuntimeError(f"no probalo: {head!r}")
+
+        return listener('info', 'expression', use_cat, lineser)
+
+    allowed_categories = set('waiting connection sending'.split())
+
+    return print
+
+
 def _decode(data):
     return str(data, 'utf-8')
 
@@ -119,7 +165,6 @@ _yes_keep_alive = True
 
 def xx(msg):
     raise RuntimeError(f"ohai: {msg}")
-
 
 # #history-B.4: repurpose to be general tcp/ip server not "game server"
 # #history-A.1: lost self-executability

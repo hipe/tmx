@@ -1,3 +1,65 @@
+# == Diminishing-Pool-based Emission Testing
+
+def listener_and_done_via_diminishing_pool(allow_set, tc):
+
+    # == Prepare the listener(s):
+
+    rcvrs = []
+    rcvrs.append(_emission_receiver_for_debugging(tc))
+
+    def rcv(emi):
+        # Hardcoding this stuff about severity for now.
+        # eventually we have to model it somehow..
+        sev = emi.severity
+        if 'verbose' == sev:
+            return
+        if 'info' != sev:
+            xx("we have to decide wat do: '{sev}'")
+
+        cat = emi.channel[2]  # ..
+        if cat not in use_allow_set:
+            detail = f"category not in allowed set: '{cat}'"
+            reason = f"unexpected emission: {detail}"
+            raise RuntimeError(reason)
+
+        diminishing_pool.pop(cat, None)  # if it's a repeat we are indifferent
+
+        if (arr := seen.get(cat, None)) is None:
+            seen[cat] = (arr := [])
+        arr.append(emi)
+
+    rcvrs.append(rcv)
+    listener = _listener_via_receivers(rcvrs)
+
+    # == When it's done:
+
+    def done():
+        leng = len(diminishing_pool)
+        if 0 == leng:
+            return seen
+        left, right = ("'", "'") if 1 == leng else ('(', ')')
+        inside = ', '.join(diminishing_pool.keys())
+        _ = ''.join((left, *inside, right))
+        reason = f"expected but did not see emission of this/these: {_}"
+        raise RuntimeError(reason)
+
+    # == Prepare to run:
+
+    def check(x):
+        if isinstance(x, str):
+            return True
+        xx(f"For now, we can't handle complex emission pattern asserts: {x!r}")
+
+    tup = tuple(s for s in allow_set if check(s))
+    use_allow_set = set(tup)
+    diminishing_pool = {k: None for k in tup}  # dict not set to maintain order
+    seen = {}
+
+    # ==
+
+    return listener, done
+
+
 # == Emissions Testing (simple)
 
 def listener_and_done_via(expected_emissions, tc=None):
