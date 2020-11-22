@@ -19,4 +19,4 @@ the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
 parse headers newline-based not with fixed-width
-get it to about 88%, client
+refactor to DRY client and server: listener hack, headers

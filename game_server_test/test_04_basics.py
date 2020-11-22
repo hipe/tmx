@@ -11,8 +11,15 @@ class CommonCase(unittest.TestCase):
         return self.build_end_state()
 
     def build_end_state(self):
-        func = support_lib().end_state_via_test_case
+        func = support_lib().end_state_for_server_via_test_case
         return func(self)
+
+    def expected_emission_categories(_):
+        yield 'waiting'
+        yield 'connection'
+        yield 'sending'
+        yield 'closing'
+        yield 'shutting_down'
 
     do_debug = False
 
@@ -32,13 +39,6 @@ class Case114_string_less_than_80_length_and_no_newline(CommonCase):
         msg, = ctx.exception.args
         self.assertEqual(msg, "in real life this would cause a blocking I/O operation")  # noqa: E501
 
-    def expected_emission_categories(_):
-        yield 'waiting'
-        yield 'connection'
-        yield 'sending'
-        yield 'closing'
-        yield 'shutting_down'
-
     def given_requests_and_expected_responses(_):
         yield 'connection', 'some.ip.address', 'port.no-see'
         yield 'sendall_bytes', b'less than 80 no newline'
@@ -50,13 +50,6 @@ class Case118_header_OK(CommonCase):
 
     def test_050_performs(self):
         assert self.build_end_state()
-
-    def expected_emission_categories(_):
-        yield 'waiting'
-        yield 'connection'
-        yield 'sending'
-        yield 'closing'
-        yield 'shutting_down'
 
     def given_requests_and_expected_responses(_):
         yield 'connection', 'some.ip.address', 'port.no-see'
@@ -70,14 +63,6 @@ class Case124_one_client_with_multiple_requests(CommonCase):
 
     def test_050_performs(self):
         assert self.build_end_state()
-
-    def expected_emission_categories(_):
-        # DRY #todo
-        yield 'waiting'
-        yield 'connection'
-        yield 'sending'
-        yield 'closing'
-        yield 'shutting_down'
 
     def given_requests_and_expected_responses(_):
         yield 'connection', 'some.ip.address', 'port.no-see'
@@ -95,14 +80,6 @@ class Case128_one_client_then_another_client(CommonCase):
     def test_050_performs(self):
         assert self.build_end_state()
 
-    def expected_emission_categories(_):
-        # DRY #todo
-        yield 'waiting'
-        yield 'connection'
-        yield 'sending'
-        yield 'closing'
-        yield 'shutting_down'
-
     def given_requests_and_expected_responses(_):
         yield 'connection', 'ip.address.one', 'port.no-see'
         yield 'send_bytes', content_length(6)
@@ -115,6 +92,55 @@ class Case128_one_client_then_another_client(CommonCase):
         yield 'expect_response'
         yield 'expect_close'
 
+
+class ClientCase(unittest.TestCase):
+
+    def build_end_state(self):
+        func = support_lib().end_state_for_client_via_test_case
+        return func(self)
+
+    do_debug = False
+
+
+class Case150_CLIENT_WAH_GWAN(ClientCase):
+
+    def test_500(self):
+        self.build_end_state()
+
+    def given_session(self, client):
+        act = client.send_string('zib zum cha chum')
+        exp = 'hardcoded meaningless response for now'
+        self.assertEqual(act, exp)
+
+    def given_client_requests_and_expected_responses(_):
+        yield 'expect_emission', 'info', 'sending'
+        yield 'expect_call_to', 'sendall', 'record_arg_as', 'feat. never used'
+        yield 'expect_call_to', 'recv', 'result_via', lambda n: _CLH(n)
+        yield 'expect_call_to', 'recv', 'result_via', lambda n: _EOHL(n)
+        yield 'expect_call_to', 'recv', 'result_via', lambda n: _TING(n)
+        yield 'expect_emission', 'info', 'got_response'
+        yield 'expect_emission', 'info', 'closing'
+        yield 'expect_call_to', 'close'
+
+# == No
+
+
+def _CLH(n):
+    assert 80 == n
+    return content_length_header_line(6)
+
+
+def _EOHL(n):
+    assert 80 == n
+    return end_of_headers_line
+
+
+def _TING(n):
+    assert 6 == n
+    return b'foo fa'
+
+
+# ==
 
 def content_length(num):
     line1 = content_length_header_line(num)

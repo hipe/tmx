@@ -187,6 +187,9 @@ def _emission_receiver_for_debugging(tc):
     return receive_emission
 
 
+emission_receiver_for_debugging = _emission_receiver_for_debugging
+
+
 def debugging_listener():
     def receive_emission(emi):
         _echo_emi_for_debugging(stderr, emi)
@@ -213,6 +216,9 @@ def _listener_via_receivers(emission_receivers):
             receive_emission(emi)
     from modality_agnostic import emission_via_tuple as emi_via
     return listener
+
+
+listener_via_receivers = _listener_via_receivers
 
 
 # == Memoizers

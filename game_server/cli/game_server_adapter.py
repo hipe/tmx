@@ -1,3 +1,6 @@
+import re
+
+
 def open_string_based_tcp_ip_client_via(listener, port):
     import socket
 
@@ -8,6 +11,13 @@ def open_string_based_tcp_ip_client_via(listener, port):
     server_address = ('localhost', port)
     print('connecting to {} port {}'.format(*server_address))
     sock.connect(server_address)
+
+    return _open(sock, listener)
+
+
+def _open(sock, listener):  # #testpoint
+
+    print = _hack_print_via_listener(listener)
 
     def send_string(message):
 
@@ -24,7 +34,6 @@ def open_string_based_tcp_ip_client_via(listener, port):
 
         # Parse response headers
         content_length = None
-        import re
         while True:  # while more headers
             content_bytes = sock.recv(80).strip()
             if b'End of headers' == content_bytes:
@@ -49,7 +58,7 @@ def open_string_based_tcp_ip_client_via(listener, port):
         response_bytes = sock.recv(content_length)
 
         print(f"Yay we are done. got response: {response_bytes!r}")
-        return 'no see ignore me for now'
+        return 'hardcoded meaningless response for now'
 
     class client:  # #class-as-namespace
         pass
@@ -67,6 +76,40 @@ def open_string_based_tcp_ip_client_via(listener, port):
             sock.close()
 
     return cm()
+
+
+def _hack_print_via_listener(listener):
+    # NOTE #todo VERY soon this will merge with the other similar thing (maybe)
+    # on the server side. but we want to cover the client side as-is first
+    # It's worth mentioning here (but delete this later) that this side.
+    # (unlike the server side) only ever gets single-argument (single-string)
+    # calls so it's simpler. Also, we might throw the whole thing away
+
+    def print(content):
+        md = re.match(r'(\w+)[ ]', content)
+        w = md[1]
+        cat = None
+        if w in verbose_set:
+            sev = 'verbose'
+        elif w in info_set:
+            sev = 'info'
+            cat = w  # careful..
+        elif 'Yay' == w:
+            sev = 'info'
+            cat = 'got_response'
+        else:
+            xx(f"ohai: {content!r}")
+
+        these = [sev, 'expression']
+        if cat:
+            these.append(cat)
+
+        listener(*these, lambda: (content,))
+
+    verbose_set = set(('wahoo',))
+    info_set = set('sending closing'.split())
+
+    return print
 
 
 def _make_content_length_header_line(leng):

@@ -1,4 +1,32 @@
-def end_state_via_test_case(tc):
+def end_state_for_client_via_test_case(tc):
+
+    # Discussion: experimentally, departing from how we did on the server side,
+    # we want how it feels if we model the expected emissions and ALSO the
+    # sends AND receives AND closes etc ALL in the same definition structure.
+    # This means the tests will be less level-of-detail regressable and more
+    # strict.. but maybe they will be coarse enough to still be interesting
+    # and regression-friendly..
+
+    itr = tc.given_client_requests_and_expected_responses()
+    scn, listener, done = _not_a_state_machine__thing_for_client(itr, tc)
+
+    # Prepare for performance
+
+    cr = _CallReceiver(scn, tc)
+    conn = _ServerConn(cr)
+
+    # Performance
+    from game_server.cli.game_server_adapter import _open as func
+    with func(conn, listener) as client:
+        res = tc.given_session(client)
+
+    if res is not None:
+        raise RuntimeError(f"result?? {res!r}")
+
+    return done()
+
+
+def end_state_for_server_via_test_case(tc):
 
     # Set up listener and `done()`
     allow_set = tc.expected_emission_categories()
@@ -16,8 +44,7 @@ def end_state_via_test_case(tc):
 
 
 def _listener_and_done_via_categories(allow_set, tc):
-    from modality_agnostic.test_support.common import \
-            listener_and_done_via_diminishing_pool as func
+    func = _em().listener_and_done_via_diminishing_pool
     listener, done = func(allow_set, tc)
     return listener, done
 
@@ -31,6 +58,39 @@ class _MockSocket:
         tup = next(self._steps)
         assert 'connection_socket_step' == tup[0]
         return tup[1:]
+
+
+def _not_a_state_machine__thing_for_client(itr, tc):
+
+    memo = {}
+    itr = (_call_receiver_via_tuple(tup, memo, tc) for tup in itr)
+
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    scn = func(itr)
+
+    def recvr(emi):
+        if scn.empty:
+            reason = f"received {emi.channel!r} when expecting nothing"
+            raise RuntimeError(reason)
+
+        # Manually disregard all verbose (covering it is too .. verbose)
+        if 'verbose' == emi.severity:
+            return
+
+        scn.next().receive_emission(emi)
+
+    lib = _em()
+    recvrs = (lib.emission_receiver_for_debugging(tc), recvr)
+    listener = lib.listener_via_receivers(recvrs)
+
+    def done():
+        if not scn.empty:
+            what = scn.peek.describe_as_expecting()
+            reason = f"At end of performance, still expecting {what}"
+            raise RuntimeError(reason)
+        return memo
+
+    return scn, listener, done
 
 
 def _sockect_steps_via_definition(itr):
@@ -157,7 +217,24 @@ def _sockect_steps_via_definition(itr):
     raise KeyboardInterrupt()  # amazing
 
 
+class _ServerConn:
+    # This mocks the the *client's* connection to the *server*
+
+    def __init__(self, cr):
+        self._receive_call = cr
+
+    def sendall(self, byts):
+        return self._receive_call('sendall', byts)
+
+    def recv(self, num):
+        return self._receive_call('recv', num)
+
+    def close(self):
+        return self._receive_call('close')
+
+
 class _ClientConn:
+    # This mocks the *servers's* connection to the *client*
 
     def __init__(self, connection_steps):
         self._steps = list(reversed(connection_steps))
@@ -205,7 +282,109 @@ class _ClientConn:
             self._steps.pop()
 
 
-def _experimental_sexp_scanner_via_iterator(itr):
+class _CallReceiver:
+
+    def __init__(self, scn, tc):
+        self._scanner = scn
+        self._test_case = tc
+
+    def __call__(self, m, *args):
+
+        if self._test_case.do_debug:
+            print(f"CALL TO: '{m}'")
+
+        scn = self._scanner
+        if scn.empty:  # not MyException for now
+            if 'close' == m:
+                print("IGNORING CALLS TO 'close' WHEN NO EXPECTS FOR NOW")
+                return
+            raise RuntimeError(f"received '{m}' call when expecting nothing")
+
+        res = scn.peek.receive_call(m, args)
+        scn.advance()  # hi.
+        return res
+
+
+def _call_receiver_via_tuple(tup, memo, tc):
+    stack = list(reversed(tup))
+    typ = stack.pop()
+    if 'expect_call_to' == typ:
+        return _call_receiver_via_stack(memo, stack)
+
+    if 'expect_emission' == typ:
+        return _emission_receiver_via_stack(memo, stack, tc)
+
+    raise RuntimeError(f"no: '{typ}'")
+
+
+def _call_receiver_via_stack(memo, stack):
+    m = stack.pop()
+    kw = {}
+    if len(stack):
+        k = stack.pop()
+        if 'record_arg_as' == k:
+            kw['record_arg_as'] = stack.pop()
+        elif 'result_via' == k:
+            kw['result_via'] = stack.pop()
+        else:
+            raise KeyError(f"unrecognized option '{k}'")
+        assert not stack
+    return _call_receiver_via(memo, m, **kw)
+
+
+def _call_receiver_via(memo, method_name, result_via=None, record_arg_as=None):
+
+    class expect_call:  # #class-as-namepsace
+
+        def receive_call(m, args):
+
+            if method_name != m:
+                reason = f"expected {describe_as_expecting()}; '{m}' called"
+                raise RuntimeError(reason)
+
+            if record_arg_as:
+                arg, = args  # ..
+                memo[record_arg_as] = arg
+
+            if result_via:
+                return result_via(*args)
+
+            return 'never see ever ever'
+
+        def receive_emission(emi):
+            reason = f"expected {describe_as_expecting()}, had {emi.channel!r}"
+            raise RuntimeError(reason)
+
+    def describe_as_expecting():
+        return f"call to '{method_name}'"
+
+    expect_call.describe_as_expecting = describe_as_expecting
+    return expect_call
+
+
+def _emission_receiver_via_stack(memo, stack, tc):
+    sev, cat = stack.pop(), stack.pop()
+    assert not stack
+    exp_two = sev, cat
+
+    class expect_emission:  # #class-as-namespace
+
+        def receive_emission(emi):
+            act_two = emi.severity, emi.channel[2]  # ..
+            tc.assertSequenceEqual(act_two, exp_two)
+
+        def receive_call(m, args):
+            reason = f"expected {describe_as_expecting()}, had call to '{m}'"
+            raise RuntimeError(reason)
+
+    def describe_as_expecting():
+        return ' '.join(('emission', repr(exp_two)))
+
+    expect_emission.describe_as_expecting = describe_as_expecting
+    return expect_emission
+
+
+def _experimental_sexp_scanner_via_iterator(itr):  # custom #[#611] scanner
 
     class scn:  # #class-as-namespace
         def next_RHS_value():
@@ -239,6 +418,11 @@ def _experimental_sexp_scanner_via_iterator(itr):
     advance()
     self.advance = advance
     return scn
+
+
+def _em():
+    import modality_agnostic.test_support.common as module
+    return module
 
 
 class MyException(RuntimeError):
