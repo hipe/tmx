@@ -1,4 +1,9 @@
-import re
+from game_server import \
+        hack_print_via_listener_ as _hack_print_via_listener, \
+        make_content_length_header_line_ as _make_content_length_header_line, \
+        end_of_headers_header_line_ as _end_of_headers_header_line, \
+        read_headers_ as _read_headers, \
+        decode_ as _decode, encode_ as _encode
 
 
 def run_string_based_tcp_ip_server_via(recv_string, listener, port):
@@ -20,7 +25,7 @@ def run_string_based_tcp_ip_server_via(recv_string, listener, port):
 
 def _run(sock, listener):  # #testpoint
 
-    print = _hack_print_via_listener(listener)  # ick/meh experiment
+    print = _hack_print_via_listener(listener)
 
     def main_loop():
         while True:
@@ -30,7 +35,7 @@ def _run(sock, listener):  # #testpoint
             try:
                 conn, client_addr = sock.accept()
             except KeyboardInterrupt:
-                print("\nreceived keyboard interrupt. shutting down server immediately. goodbye.")  # noqa: E501
+                print("\nshutting down immediately because received keyboard interrupt. goodbye.")  # noqa: E501
                 return
 
             try:
@@ -45,32 +50,9 @@ def _run(sock, listener):  # #testpoint
         print('connection from', client_addr)
 
         # Parse client headers
-        content_length = None
-        while True:  # while more headers
-
-            content_bytes = conn.recv(80)
-            if 0 == len(content_bytes):
-                print('got zero length msg from client. time to close')
-                return _its_time_to_close_this_connection
-
-            content_bytes = content_bytes.strip()
-            if b'End of headers' == content_bytes:
-                print('wahoo we found end of headers!')
-                break
-
-            content = _decode(content_bytes)
-
-            md = re.match('([A-Za-z- ]+):[ ](.+)', content)
-            if md is None:
-                xx(f"why didn't this match: {content!r}")
-
-            n, v = md.groups()
-            if 'Content length' == n:
-                assert re.match(r'\d+\Z', v)  # ..
-                content_length = int(v)
-                continue
-            xx(f'not covered: strange header: {n!r}')
-
+        stay_open, content_length = _read_headers(conn, print)
+        if not stay_open:
+            return _its_time_to_close_this_connection
         assert content_length is not None
 
         # Read client payload
@@ -100,65 +82,6 @@ def _run(sock, listener):  # #testpoint
     main_loop()
 
 
-def _make_content_length_header_line(leng):  # #scp
-    assert isinstance(leng, int)  # #[#022]
-    content = ' '.join(('Content length:', str(leng)))
-    return _fixed_with_header_line_via(content)
-
-
-def _fixed_with_header_line_via(string_content):  # #scp
-    pad_num = 79 - len(string_content)
-    assert -1 < pad_num
-    line = ''.join((string_content, ' '*pad_num, '\n'))
-    return _encode(line)
-
-
-def _hack_print_via_listener(listener):
-    # Discussion: We want to see what it feels like to have the code-level use
-    # of this look like plain-old print statements but internally we treat that
-    # as a layer on top of structured emissions. It's a bit of opacity that is
-    # hopefully unobtrustive..
-
-    def print(*items):
-        head = items[0]
-        md = re.match(r'^([^ ]+)[ ](.+)', head)
-        first_word, rest = md.groups()  # ..
-        is_verbose = first_word in ('OK', 'wahoo')  # lol
-
-        # fatal error warning info verbose debug trace
-
-        def lineser():
-            yield ' '.join(str(item) for item in items)
-
-        if is_verbose:
-            return listener('verbose', 'expression', lineser)
-
-        # Here's the painful payback..
-        if first_word in allowed_categories:
-            use_cat = first_word
-        elif 'zero length' in head and ' clos' in head:  # meh
-            use_cat = 'closing'
-        elif 'shutting down' in head:
-            use_cat = 'shutting_down'
-        else:
-            raise RuntimeError(f"no probalo: {head!r}")
-
-        return listener('info', 'expression', use_cat, lineser)
-
-    allowed_categories = set('waiting connection sending'.split())
-
-    return print
-
-
-def _decode(data):
-    return str(data, 'utf-8')
-
-
-def _encode(msg):
-    return bytes(msg, 'utf-8')
-
-
-_end_of_headers_header_line = _fixed_with_header_line_via('End of headers')
 _its_time_to_close_this_connection = False
 _yes_keep_alive = True
 

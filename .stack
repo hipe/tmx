@@ -18,5 +18,3 @@ get plain old pelican working with one of the shortlist themes, rewriting 1 file
 the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
-parse headers newline-based not with fixed-width
-refactor to DRY client and server: listener hack, headers

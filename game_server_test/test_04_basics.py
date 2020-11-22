@@ -27,7 +27,7 @@ class CommonCase(unittest.TestCase):
 # Case110 connect and send zero length string  # very similar to next
 
 
-class Case114_string_less_than_80_length_and_no_newline(CommonCase):
+class Case114_string_has_no_double_newline(CommonCase):
 
     def test_010_loads(self):
         assert subject_module()
@@ -41,7 +41,7 @@ class Case114_string_less_than_80_length_and_no_newline(CommonCase):
 
     def given_requests_and_expected_responses(_):
         yield 'connection', 'some.ip.address', 'port.no-see'
-        yield 'sendall_bytes', b'less than 80 no newline'
+        yield 'sendall_bytes', b'one newline but not two\nhi'
         yield 'expect_response'
         yield 'expect_close'
 
@@ -115,24 +115,20 @@ class Case150_CLIENT_WAH_GWAN(ClientCase):
     def given_client_requests_and_expected_responses(_):
         yield 'expect_emission', 'info', 'sending'
         yield 'expect_call_to', 'sendall', 'record_arg_as', 'feat. never used'
-        yield 'expect_call_to', 'recv', 'result_via', lambda n: _CLH(n)
-        yield 'expect_call_to', 'recv', 'result_via', lambda n: _EOHL(n)
+        yield 'expect_call_to', 'HEADERS', 'result_via', lambda: _all_hdrs(6)
         yield 'expect_call_to', 'recv', 'result_via', lambda n: _TING(n)
         yield 'expect_emission', 'info', 'got_response'
         yield 'expect_emission', 'info', 'closing'
         yield 'expect_call_to', 'close'
 
+
 # == No
 
-
-def _CLH(n):
-    assert 80 == n
-    return content_length_header_line(6)
-
-
-def _EOHL(n):
-    assert 80 == n
-    return end_of_headers_line
+def _all_hdrs(content_length):
+    lines = []
+    lines.append(content_length_header_line(content_length))
+    lines.append(end_of_headers_line)
+    return b''.join(lines)
 
 
 def _TING(n):
@@ -152,10 +148,10 @@ def content_length_header_line(num):
 
 
 def header_line(content):
-    return bytes(''.join((content, ' ' * (79-len(content)), '\n')), 'utf-8')
+    return b''.join((bytes(content, 'utf-8'), b'\n'))
 
 
-end_of_headers_line = header_line('End of headers')
+end_of_headers_line = b'\n'
 
 
 def support_lib():

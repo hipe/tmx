@@ -219,15 +219,36 @@ def _sockect_steps_via_definition(itr):
 
 class _ServerConn:
     # This mocks the the *client's* connection to the *server*
+    # It became un-pretty at #history-B.4 when we improved our header encoding
 
     def __init__(self, cr):
         self._receive_call = cr
+        self._is_in_microchunk = False
 
     def sendall(self, byts):
         return self._receive_call('sendall', byts)
 
     def recv(self, num):
+        if 1 == num:
+            if not self._is_in_microchunk:
+                self._enter_microchunk()
+            return self._microchunks.pop()
+        if self._is_in_microchunk:
+            self._exit_microchunk()
+
         return self._receive_call('recv', num)
+
+    def _enter_microchunk(self):
+        assert not self._is_in_microchunk
+        headers = self._receive_call('HEADERS')
+        self._microchunks = _stack_of_bytes_via_header_chunk(headers)
+        self._is_in_microchunk = True
+
+    def _exit_microchunk(self):
+        assert self._is_in_microchunk
+        assert 0 == len(self._microchunks)
+        del self._microchunks
+        self._is_in_microchunk = False
 
     def close(self):
         return self._receive_call('close')
@@ -235,10 +256,13 @@ class _ServerConn:
 
 class _ClientConn:
     # This mocks the *servers's* connection to the *client*
+    # When we changed to IRC-style scanning for newlines in headers (good)
+    # this became bad #history-B.4.
 
     def __init__(self, connection_steps):
         self._steps = list(reversed(connection_steps))
         self._is_in_chunk = False
+        self._is_in_microchunk = False
 
     def recv(self, num_bytes):
         if self._is_in_chunk:
@@ -253,13 +277,19 @@ class _ClientConn:
         return b''
 
     def _do_chunk(self, num_bytes):
+
+        if 1 == num_bytes:
+            if not self._is_in_microchunk:
+                self._enter_microchunk()
+            return self._microchunks.pop()
+        if self._is_in_microchunk:
+            self._exit_microchunk()
+
         leng = len(rem := self._remaining_bytes)
 
         # If the server is requesting LESS bytes than the client has, easy
         if num_bytes < leng:
-            res = rem[0:num_bytes]
-            self._remaining_bytes = rem[num_bytes:]
-            return res
+            return self._shift_chunk(num_bytes)
 
         # If the server is requesting EXACTLY the bytes the client has
         if leng == num_bytes:
@@ -269,6 +299,34 @@ class _ClientConn:
 
         # If the server is requesting MORE bytes than the client has, block
         assert leng < num_bytes
+        return self._pretend_block_for_read()
+
+    def _enter_microchunk(self):
+        assert not self._is_in_microchunk
+
+        offset = self._remaining_bytes.find(b'\n\n')
+        if -1 == offset:
+            return self._pretend_block_for_read()  # not even accurate to real
+        head_chunk = self._shift_chunk(offset+2)
+        self._microchunks = _stack_of_bytes_via_header_chunk(head_chunk)
+        self._is_in_microchunk = True
+
+    def _exit_microchunk(self):
+        assert self._is_in_microchunk
+
+        assert 0 == len(self._microchunks)  # the worst
+        del self._microchunks
+
+        self._is_in_microchunk = False
+
+    def _shift_chunk(self, num_bytes):
+        leng = len(rem := self._remaining_bytes)
+        assert num_bytes < leng
+        res = rem[0:num_bytes]
+        self._remaining_bytes = rem[num_bytes:]
+        return res
+
+    def _pretend_block_for_read(self):
         raise MyException("in real life this would cause a blocking I/O operation")  # noqa: E501
 
     def sendall(self, byts):
@@ -280,6 +338,11 @@ class _ClientConn:
         # (close gets called during cleanup when an exception is thrown so..)
         if 'conn_expect_close_step' == self._steps[-1][0]:
             self._steps.pop()
+
+
+def _stack_of_bytes_via_header_chunk(head_chunk):
+    byts = tuple(d.to_bytes(1, 'little') for d in head_chunk)
+    return list(reversed(byts))
 
 
 class _CallReceiver:
@@ -428,4 +491,5 @@ def _em():
 class MyException(RuntimeError):
     pass
 
+# #history-B.4
 # #born
