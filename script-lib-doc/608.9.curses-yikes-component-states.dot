@@ -1,0 +1,111 @@
+digraph g {
+
+label="\nncurses component state machines"
+
+node[shape=rect]
+rankdir="TB"
+
+
+subgraph clusterWRAPPER_01 {
+label="easy life"
+
+subgraph cluster01 {
+  label="nav bar"
+
+  n01_01[label="initial state"]
+  n01_02[label="has focus [..]"]
+
+  n01_01->n01_02[label="cursor enter"]
+  n01_02->n01_01[label="cursor exit"]
+}
+
+
+subgraph cluster02 {
+  label="checkbox"
+  n02_01[label="initial state"]
+  n02_02[label="has focus"]
+
+  n02_01->n02_02[label="cursor enter"]
+  n02_02->n02_01[label="cursor exit"]
+  n02_02->n02_02[label="[enter] to toggle"]
+}
+
+
+/* radio/select (dropdown) */
+
+
+subgraph cluster04 {
+  label="plain old text field
+(plain old options could be same)"
+
+  n04_01[label="initial state"]
+  n04_02[label="has focus"]
+  n04_03[label="emacs thing"]
+
+  n04_01->n04_02[label="cursor enter"]
+  n04_02->n04_01[label="cursor exit"]
+  n04_02->n04_03[label="[enter] for edit"]
+  n04_03->n04_02[label="??"]
+}
+}
+
+
+subgraph clusterWRAPPER_02 {
+  label="the daunting poly-option"
+
+subgraph cluster05 {
+  label="poly-option label"
+
+  n05_01[label="initial state"]
+  n05_02[label="has focus"]
+  n05_03[label="inserts item at top,
+selects, enters it by one level"]
+
+  n05_01->n05_02[label="cursor enter"]
+  n05_02->n05_01[label="cursor exit"]
+  n05_02->n05_03[label="[a]dd"]
+}
+
+
+subgraph cluster06 {
+  label="poly-option"
+
+  n06_01[label="initial state"]
+  n06_02[label="has focus"]
+  n06_04[label="name has focus"]
+  n06_05[label="value has focus"]
+  n06_06[label="editing name (emacs)"]
+  n06_07[label="editing value (emacs)"]
+
+  n06_41[label="[move it up]" style=filled]
+  n06_42[label="[move it down]" style=filled]
+  n06_51[label="[do the delete]" style=filled]
+
+  n06_01->n06_02[label="cursor enter"]
+  n06_02->n06_01[label="cursor exit"]
+  n06_02->n06_04[label="[enter] to edit"]
+  n06_04->n06_02[label="[d]one editing foo"]
+
+  n06_04->n06_05[label="arrow right"]
+  n06_05->n06_04[label="arrow left"]
+  n06_05->n06_02[label="[d]one editing foo"]
+  n06_04->n06_06[label="[enter] to edit name"]
+  n06_06->n06_04[label=""]
+  n06_05->n06_07[label="[enter] to edit value"]
+  n06_07->n06_05[label=""]
+
+  n06_02->n06_41[label="move [u]p"]
+  n06_41->n06_02
+  n06_02->n06_42[label="move [d]own"]
+  n06_42->n06_02
+
+  n06_02->n06_51[label="[x] delete"]
+}
+
+n05_03->n06_06
+n06_51->n05_02
+}
+}
+/*
+  - #born
+*/

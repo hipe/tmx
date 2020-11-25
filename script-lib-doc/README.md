@@ -28,12 +28,14 @@ the related API that preceded this one.)
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.11]                  | #wish | command aliases
 |[#608.J]                   | #refa | can you employ decorators w/o a starting method
+|[#608.9]                   |       | [see]
 |[#608.8]                   | #trak | track places where we render parse error context
 |[#608.7]                   | #trak | expression shape: convert category into first line prefix
 |[#608.6]                   |       | sunsetted. for now this identifier is retired.
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | "mad parse" (whatever that is)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
+|[#608.2]                   |       | [see]
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
 |[#607.I]                   | #hole |
 |[#607.H]                   | #hole |

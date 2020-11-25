@@ -948,7 +948,7 @@ def _generate_lines_procedurally(classis, var_names, fmt, keyer):
     yield fmt.format(**dct)
 
 
-def _plur(classis=None, keyer=None, noun_stem=None, linenos=None):
+def _plur(classis=None, keyer=None, noun_stem=None, linenos=None):  # #[#612.7]
     class plur:  # #class-as-namespace
         def these_items():
             if max_items < le:

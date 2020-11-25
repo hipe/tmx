@@ -257,7 +257,7 @@ def _pieces_via_jumble(itr):  # 👆
 
 # == Word Wrap
 
-def fixed_shape_word_wrapperer(
+def fixed_shape_word_wrapperer(  # #[#612.6] a word-wrap implementation
         row_max_widths, input_format, ellipsis_string='…'):
 
     if 'big_string' == input_format:
