@@ -1,3 +1,7 @@
+def open_curses_session():
+    return _main_asset_module()._build_this_crazy_context_manager()
+
+
 def function_for_building_abstract_compound_areas():
     from script_lib.curses_yikes import compound_area_via_children as modul
     return modul.abstract_compound_area_via_children_
