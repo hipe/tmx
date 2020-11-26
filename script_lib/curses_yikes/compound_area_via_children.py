@@ -17,46 +17,97 @@ def abstract_compound_area_via_children_(cx):
         def hello_I_am_ACA():
             return True
 
-        def concretize_via_available_height_and_width(h, w, listener):
+        def concretize_via_available_height_and_width(h, w, listener=None):
             return _concretize(h, w, index, cx, listener)
+
+        two_pass_run_behavior = 'break'
 
     return abstract_compound_area
 
 
 def _concretize(h, w, index, cx, listener):
-    tup = _check_constraints(h, w, index, cx, listener)
-    if tup is None:
-        return
+    def main():
+        check_required_dimensions_against_available_dimensions()
+        distribute_extra_height_to_vertical_fillers()
+        return first_and_second_pass()
 
-    extra_available_height, min_height_via_key = tup
-    add_these = _distribute_extra_available_height(
-            extra_available_height, min_height_via_key, cx, index)
+    def first_and_second_pass():
+        is_in_run, memo, run = False, None, []
+        curr_y = 0
 
-    result = {}
-    curr_y = 0
+        for k, aa in cx.items():  # aa = abstract area
 
-    for k, abstract_area in cx.items():
+            # Establish the correct order in this result fellow
+            harnesses[k] = None
 
-        starting_h = min_height_via_key[k]
-        assert isinstance(starting_h, int)
-        final_h = starting_h + add_these.get(k, 0)
+            # Whether or not two-pass, determine comp height and advance curr_y
+            comp_h = calculate_component_height(k)
+            use_curr_y = curr_y
+            curr_y += comp_h
 
-        if 0 == final_h:
-            xx("fine but cover me")
-            result[k] = None  # #here5
-            continue
-        else:
-            concrete_area = abstract_area.\
-                concretize_via_available_height_and_width(final_h, w, listener)
+            if 0 == comp_h:
+                xx("fine but cover me - zero-height components")  # #here5
 
-        if not concrete_area:
+            # Do two-pass run stuff
+            which = aa.two_pass_run_behavior
+            if 'participate' == which:
+                if is_in_run:
+                    aa.write_to_memo(memo)
+                else:
+                    is_in_run = True
+                    memo = {}
+                    aa.write_to_memo(memo)  # or not
+                run.append((k, aa, use_curr_y, comp_h))  # #here6
+            else:
+                assert 'break' == which
+                if is_in_run:
+                    flush_run(memo, run)
+                    memo = None
+                    is_in_run = False
+                ca = aa.concretize_via_available_height_and_width(
+                    comp_h, w, listener)
+                add_to_harnesses(k, use_curr_y, comp_h, ca)
+
+        if is_in_run:
+            flush_run(memo, run)
+        return _ConcreteCompoundArea(harnesses)
+
+    def flush_run(memo, run):
+        for k, aa, curr_y, comp_h in run:  # #here6
+            ca = aa.concretize_via_memo_and(memo, comp_h, w, listener)
+            add_to_harnesses(k, curr_y, comp_h, ca)
+        run.clear()
+
+    def add_to_harnesses(k, curr_y, comp_h, ca):
+        if not ca:
             xx("no problem, but interesting..")
+        harnesses[k] = _AreaHarness(curr_y, 0, comp_h, w, ca)
 
-        area_harness = _AreaHarness(curr_y, 0, final_h, w, concrete_area)
-        result[k] = area_harness
-        curr_y += final_h
+    def calculate_component_height(k):
+        min_h = self.min_height_via_key[k]
+        assert isinstance(min_h, int)
+        return min_h + self.add_these.get(k, 0)
 
-    return _ConcreteCompoundArea(result)
+    def distribute_extra_height_to_vertical_fillers():
+        self.add_these = _distribute_extra_available_height(
+            self.extra_available_height, self.min_height_via_key, cx, index)
+
+    def check_required_dimensions_against_available_dimensions():
+        tup = _check_constraints(h, w, index, cx, listener)
+        if tup is None:
+            raise stop()
+        self.extra_available_height, self.min_height_via_key = tup
+
+    self = main  # #watch-the-world-burn
+    harnesses = {}
+
+    class stop(RuntimeError):
+        pass
+
+    try:
+        return main()
+    except stop:
+        pass
 
 
 class _ConcreteCompoundArea:
@@ -65,7 +116,7 @@ class _ConcreteCompoundArea:
         self._children = cx
 
     def to_rows(self):
-        for harness in self._children.values():
+        for k, harness in self._children.items():
             if harness is None:  # #here5
                 continue
             formal_w = harness.width
@@ -75,11 +126,14 @@ class _ConcreteCompoundArea:
             count = 0
             for string in ch.to_rows():
                 if formal_h == count:
-                    xx('wat do when component breaks the contract (h)')
+                    xx(f'wat do when component breaks the contract (h): {k!r}')
                 count += 1
                 if formal_w != len(string):
-                    xx('wat do when component breaks the contract (w)')
+                    xx(f'wat do when component breaks the contract (w): {k!r}')
                 yield string
+
+    def hello_I_am_CCA(_):
+        return True
 
 
 _AreaHarness = _nt('_AreaHarness', 'y x height width concrete_area'.split())
@@ -234,7 +288,7 @@ def _reify_and_index_children(cx):
         x = stack.pop()
         if isinstance(x, str):
             class_loader = _loader_via_type_string[x]  # ..
-            args = tuple(reversed(stack)) if stack else ()
+            args = k, *reversed(stack)
             klass = class_loader()
             abstract_instance = klass(*args)
         else:
@@ -276,24 +330,33 @@ _Index = _nt('_Index', _)
 
 _loader_via_type_string = {
     # we could make this more dynamic, but why
+    'checkbox': lambda: _simple('abstract_checkbox_via_directive_tail'),
     'horizontal_rule': lambda: _AbstractHorizontalRule,
+    'nav_area': lambda: _simple('abstract_nav_bar_via_directive_tail'),
+    'text_field': lambda: _simple('abstract_text_field_via_directive_tail'),
     'vertical_filler': lambda: _AbstractVerticalFiller,
 }
 
 
+def _simple(func_name):
+    from script_lib.curses_yikes import simple_components as module
+    return getattr(module, func_name)
+
+
 class _AbstractVerticalFiller:
 
-    def __init__(self, *wat):
+    def __init__(self, k, *wat):
         if wat:
             xx("wee, args for vertical filler")
 
-    def concretize_via_available_height_and_width(self, h, w, listener):
+    def concretize_via_available_height_and_width(self, h, w, listener=None):
         assert h  # #here5
         return _ConcreteVerticalFiller(h, w)
 
     def minimum_height_via_width(_, __):
         return 0
 
+    two_pass_run_behavior = 'break'
     can_fill_vertically = True
     minimum_width = 1
 
@@ -303,7 +366,7 @@ class _ConcreteVerticalFiller:
     def __init__(self, h, w):
         assert h
         assert w
-        self._row = ' ' * 2
+        self._row = ' ' * w
         self._range = range(0, h)
 
     def to_rows(self):
@@ -313,17 +376,18 @@ class _ConcreteVerticalFiller:
 
 class _AbstractHorizontalRule:
 
-    def __init__(self, *wat):
+    def __init__(self, k, *wat):
         if wat:
             xx("wee, args for horizontal rule")
 
-    def concretize_via_available_height_and_width(self, h, w, listener):
+    def concretize_via_available_height_and_width(self, h, w, listener=None):
         assert 1 == h
         return _ConcreteHorizontalRule(w)
 
     def minimum_height_via_width(_, __):
         return 1
 
+    two_pass_run_behavior = 'break'
     can_fill_vertically = False
     minimum_width = 1
 
@@ -343,9 +407,34 @@ def _children_initially(cx):
     children = {}
     anon_counts = {}
 
+    ugh = {
+        'checkbox': 'ting1',
+        'nav_area': 'ting2',
+        'text_field': 'ting1',
+    }
+
     for ch in cx:
         if isinstance(ch, tuple):
             k, *rest = ch
+
+            # We don't know exactly how we want the syntax to work.
+            # The simplest thing is have the first term be a key and
+            # require that each one is unique.
+
+            ting = ugh.get(k)
+            if ting:
+                if 'ting1' == ting:
+                    # ..BUT more natural-feeling for form fields is
+                    # the type first and name second (which we flip here).
+                    # How ugly is it to munge the two namespaces?
+                    typ = k
+                    k = rest[0]
+                    rest[0] = typ
+                else:
+                    # ..AND for nav, the term doubles as key and type
+                    assert 'ting2' == ting
+                    rest = k, *rest
+
         else:
             assert isinstance(ch, str)
             assert re.match(r'[a-z]+(?:_[a-z]+)*\Z', ch)

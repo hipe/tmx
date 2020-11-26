@@ -72,7 +72,7 @@ class _AbstractHotkeysArea:
 
         self._wrap_plan_cache = {}
 
-    def concretize_via_available_height_and_width(self, h, w, listener):
+    def concretize_via_available_height_and_width(self, h, w, listener=None):
         # we make several leaps of faith meh
         tot, dyn_max_h, wrap_plans, static_wp = self._wrap_plan_cache[w]
         assert h == tot  # meh
@@ -105,6 +105,7 @@ class _AbstractHotkeysArea:
     def hello_I_am_AHA(self):
         return True
 
+    two_pass_run_behavior = 'break'
     can_fill_vertically = False  # button areas push (not fill) verticality
 
 

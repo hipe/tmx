@@ -20,7 +20,7 @@ class CommonCase(unittest.TestCase):
         act_h = aa.minimum_height_via_width(w)  # write to the cache ugh
         assert h == act_h
 
-        return aa.concretize_via_available_height_and_width(h, w, None)
+        return aa.concretize_via_available_height_and_width(h, w)
 
     @property
     @shared_subject_in_children
