@@ -1,3 +1,8 @@
+def function_for_building_abstract_compound_areas():
+    from script_lib.curses_yikes import compound_area_via_children as modul
+    return modul.abstract_compound_area_via_children_
+
+
 def common_exception_class():
     return _main_asset_module().MyException_
 

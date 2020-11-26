@@ -30,11 +30,7 @@ class CaseForACA(CommonCommonCase):
 
     @property
     def subject_function(self):
-        return self.subject_module().abstract_compound_area_via_children_
-
-    def subject_module(_):
-        from script_lib.curses_yikes import compound_area_via_children as modul
-        return modul
+        return support_lib().function_for_building_abstract_compound_areas()
 
 
 CommonCase = CaseForACA
