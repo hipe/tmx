@@ -70,6 +70,22 @@ def _concretize(h, w, index, cx, listener):
 
         if is_in_run:
             flush_run(memo, run)
+
+        # We need to have one of the components selected from the start for
+        # two reasons: 1) what would the up & down arrows mean if nothing was
+        # selected to begin with? 2) it's tempting to have the controller do
+        # this on init because that's its domain but controller isn't allowed
+        # to change state on its own; we have to apply changes explicitly.
+        # The hardcoded rule is we must select the topmost one; just because
+        topmost_interactable = None
+        for h in harnesses.values():
+            if h.state is None:
+                continue
+            topmost_interactable = h
+            break
+        if topmost_interactable:  # (tests like (Case7650) have no interac.)
+            topmost_interactable.state.move_to_state_via_state_name('has_focus')  # noqa: E501
+
         return _ConcreteCompoundArea(harnesses)
 
     def flush_run(memo, run):
@@ -81,7 +97,7 @@ def _concretize(h, w, index, cx, listener):
     def add_to_harnesses(k, curr_y, comp_h, ca):
         if not ca:
             xx("no problem, but interesting..")
-        harnesses[k] = _AreaHarness(curr_y, 0, comp_h, w, ca)
+        harnesses[k] = _AreaHarness(k, curr_y, 0, comp_h, w, ca)
 
     def calculate_component_height(k):
         min_h = self.min_height_via_key[k]
@@ -113,30 +129,58 @@ def _concretize(h, w, index, cx, listener):
 class _ConcreteCompoundArea:
 
     def __init__(self, cx):
-        self._children = cx
+        self._children = cx  # #testpoint yikes
+
+    def MAKE_A_COPY(self):
+        cx = {k: v.MAKE_A_COPY() for k, v in self._children.items()}
+        return self.__class__(cx)
+
+    def to_EXPERIMENTAL_input_controller(self):
+        from .input_controller_ import InputController_EXPERIMENTAL__ as func
+        return func(tuple(self.to_component_harnesses()))
 
     def to_rows(self):
-        for k, harness in self._children.items():
+        for harness in self.to_component_harnesses():
+
             if harness is None:  # #here5
                 continue
-            formal_w = harness.width
-            formal_h = harness.height
-            ch = harness.concrete_area
 
-            count = 0
-            for string in ch.to_rows():
-                if formal_h == count:
-                    xx(f'wat do when component breaks the contract (h): {k!r}')
-                count += 1
-                if formal_w != len(string):
-                    xx(f'wat do when component breaks the contract (w): {k!r}')
-                yield string
+            for row in harness.to_rows():
+                yield row
+
+    def to_component_harnesses(self):
+        return self._children.values()
 
     def hello_I_am_CCA(_):
         return True
 
 
-_AreaHarness = _nt('_AreaHarness', 'y x height width concrete_area'.split())
+class _AreaHarness:
+    def __init__(self, k, y, x, height, width, concrete_area):
+        self.key = k
+        self._y, self._x = y, x
+        self._height, self._width = height, width
+        self.concrete_area = concrete_area
+
+    def MAKE_A_COPY(self):
+        ca = self.concrete_area.MAKE_A_COPY()
+        return self.__class__(self.key, self._y, self._x, self._height, self._width, ca)  # noqa: E501
+
+    def to_rows(self):
+        formal_w, formal_h = self._width, self._height
+
+        count = 0
+        for row in self.concrete_area.to_rows():
+            if formal_h == count:
+                xx(f'wat do when component breaks the contract (h): {self.key!r}')  # noqa: E501
+            count += 1
+            if formal_w != len(row):
+                xx(f'wat do when component breaks the contract (w): {self.key!r}')  # noqa: E501
+            yield row
+
+    @property
+    def state(self):
+        return self.concrete_area.state
 
 
 def _distribute_extra_available_height(
@@ -332,7 +376,7 @@ _loader_via_type_string = {
     # we could make this more dynamic, but why
     'checkbox': lambda: _simple('abstract_checkbox_via_directive_tail'),
     'horizontal_rule': lambda: _AbstractHorizontalRule,
-    'nav_area': lambda: _simple('abstract_nav_bar_via_directive_tail'),
+    'nav_area': lambda: _simple('abstract_nav_area_via_directive_tail'),
     'text_field': lambda: _simple('abstract_text_field_via_directive_tail'),
     'vertical_filler': lambda: _AbstractVerticalFiller,
 }
@@ -340,7 +384,12 @@ _loader_via_type_string = {
 
 def _simple(func_name):
     from script_lib.curses_yikes import simple_components as module
-    return getattr(module, func_name)
+    klass = getattr(module, func_name)
+    if klass.is_interactable:
+        from script_lib.curses_yikes import \
+            lazy_formal_state_machine_collection_ as func
+        klass = func().WRAP_CLASS_REMARKABLY_HACKY_EXPERIMENT(klass, module)
+    return klass
 
 
 class _AbstractVerticalFiller:
@@ -359,6 +408,7 @@ class _AbstractVerticalFiller:
     two_pass_run_behavior = 'break'
     can_fill_vertically = True
     minimum_width = 1
+    is_interactable = False
 
 
 class _ConcreteVerticalFiller:
@@ -368,6 +418,10 @@ class _ConcreteVerticalFiller:
         assert w
         self._row = ' ' * w
         self._range = range(0, h)
+        self.state = None  # #stateless
+
+    def MAKE_A_COPY(self):
+        return self
 
     def to_rows(self):
         for _ in self._range:
@@ -390,6 +444,7 @@ class _AbstractHorizontalRule:
     two_pass_run_behavior = 'break'
     can_fill_vertically = False
     minimum_width = 1
+    is_interactable = False
 
 
 class _ConcreteHorizontalRule:
@@ -398,6 +453,10 @@ class _ConcreteHorizontalRule:
         glyph = '-'
         assert 1 == len(glyph)
         self._row = glyph * w
+        self.state = None  # #stateless
+
+    def MAKE_A_COPY(self):
+        return self
 
     def to_rows(self):
         yield self._row

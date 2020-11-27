@@ -79,6 +79,18 @@ def _build_this_crazy_stack():
     return list(reversed(result)), self
 
 
+def lazy_formal_state_machine_collection_():
+    o = lazy_formal_state_machine_collection_
+    if o.memo is None:
+        from ._formal_state_machine_collection import \
+            Formal_FSA_Collection_ as func
+        o.memo = func()
+    return o.memo
+
+
+lazy_formal_state_machine_collection_.memo = None
+
+
 class MyException_(RuntimeError):
     pass
 

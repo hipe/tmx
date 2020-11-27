@@ -97,8 +97,12 @@ def _foz_via(defs, pner, x=None):
     return func(defs, pner, x)
 
 
-if '__main__' == __name__:
+def cli_for_production():
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv, None))
+
+
+if '__main__' == __name__:
+    cli_for_production()
 
 # #born
