@@ -2,7 +2,53 @@ from collections import namedtuple as _nt
 import re
 
 
-def abstract_hotkeys_area_via(directives):
+def experimental_deferential_button_AAer_(k, inter_aa_dct):
+    # When first developed, button areas were defined "by hand". In production
+    # we expect to mostly (if not always) autogenerate the pages of buttons
+    # with the complicated algo. So, this function tries to "look like" an
+    # abstract area class ("klass") to the extent that it needs to to sneak in,
+    # but then calls the simpler, actual AA class.
+
+    pi = _pages_index(inter_aa_dct)
+
+    def buttons_definition():
+        for page_name, page_content in pi.to_pages():
+            yield 'page_of_buttons', page_name, defserer(page_content)
+
+        yield 'static_buttons_area', lambda: (('[q]uit',),)
+
+    def defserer(page_content):
+        return lambda: (page_content,)  # it expects several rows
+
+    return _abstract_hotkeys_area_via(buttons_definition(), pi)
+
+
+_ = experimental_deferential_button_AAer_
+_.is_interactable = False  # hard to explain
+_.defer_until_after_interactables_are_indexed = True
+
+
+def _pages_index(inter_aa_dct):
+    FSAs_map, page_via_page_name = _build_pages_index(inter_aa_dct)
+
+    class pages_index:  # #class-as-namespace
+
+        def PAGE_NAME_VIA(k, state_name):
+            aa = inter_aa_dct[k]  # get from key to AA ..
+            ffsa = aa.FFSAer()  # .. to FFSA ..
+            ffsa_key = ffsa.FFSA_key  # .. to FFSA key ..
+            page_name_via_state_name = FSAs_map[ffsa_key]  # .. to this ..
+            return page_name_via_state_name[state_name]  # might be None
+
+        def to_pages():
+            return page_via_page_name.items()
+
+    return pages_index
+
+
+def _abstract_hotkeys_area_via(directives, eli=None):
+    # #testpoint
+
     pages = {}
     static_buttons = None
     hotkeys_cache = _MutableHotkeysCache()
@@ -60,15 +106,18 @@ def abstract_hotkeys_area_via(directives):
     # is one property being a tuple versus a list; so for now we hack it)
     hotkeys_index = hotkeys_cache
     hotkeys_index.hotkeys = tuple(hotkeys_index.hotkeys)
-    return _AbstractHotkeysArea(static_buttons, pages, hotkeys_index)
+    return _AbstractHotkeysArea(
+        static_buttons, pages, hotkeys_index, eli)
 
 
 class _AbstractHotkeysArea:
 
-    def __init__(self, static_buttons, pages, hotkeys_index):
+    def __init__(self, static_buttons, pages, hotkeys_index, eli):
+
         self._static_buttons = static_buttons
         self._pages = pages
         self._hotkeys_index = hotkeys_index
+        self._pages_index = eli
 
         self._wrap_plan_cache = {}
 
@@ -80,7 +129,8 @@ class _AbstractHotkeysArea:
             h=h, w=w, dyn_max_h=dyn_max_h,
             wrap_plans=wrap_plans, static_wrap_plan=static_wp,
             pages=self._pages, static_buttons=self._static_buttons,
-            hotkeys_index=self._hotkeys_index)
+            hotkeys_index=self._hotkeys_index,
+            pages_index=self._pages_index)
 
     def minimum_height_via_width(self, w):
         cache = self._wrap_plan_cache
@@ -113,7 +163,8 @@ class _ConcreteHotkeysArea:
 
     def __init__(
             self, h, w, dyn_max_h, wrap_plans, static_wrap_plan,
-            pages, static_buttons, hotkeys_index):
+            pages, static_buttons, hotkeys_index,
+            pages_index=None):
 
         self._height = h
         self._max_height_of_dynamic_area = dyn_max_h
@@ -123,18 +174,42 @@ class _ConcreteHotkeysArea:
         self._pages = pages
         self._static_buttons = static_buttons
         self._hotkeys_index = hotkeys_index
+        self._pages_index = pages_index
 
         self._center = _centerer(w)
         self._currently_selected_page_key = None
         self._blank_row = ' ' * w
 
-    def set_active_page(self, k):
+        # The buttons area is weirdly *not* "interactable" in the formal sense
+        # that it does not get selected by navigating up or down to it
+        self.state = None  # [#608.2.C] magic name to say not interactable
+
+    # == Receive change
+
+    def apply_change(self, stack):
+        change_type = stack.pop()
+        assert 'selected_changed' == change_type  # ..
+        return self._on_selected_changed(* reversed(stack))
+
+    def _on_selected_changed(self, k, state_name):
+        pn = self._pages_index.PAGE_NAME_VIA(k, state_name)
+        if self._currently_selected_page_key == pn:
+            return ()  # nothing changed visually on our end
+        if pn is None:
+            self._set_active_page_to_none()
+        else:
+            self._set_active_page(pn)
+        return ('buttons',)   # [#608.2.C] magic name of self, changed visually
+
+    def _set_active_page(self, k):  # #testpoint
         self._pages[k]  # validate argument
         self._wrap_plans[k]  # sanity
         self._currently_selected_page_key = k
 
-    def set_active_page_to_none(self):
+    def _set_active_page_to_none(self):  # #testpoint
         self._currently_selected_page_key = None
+
+    # ==
 
     def to_rows(self):
 
@@ -168,6 +243,37 @@ class _ConcreteHotkeysArea:
         if self._static_buttons:
             for row in rows_via_wrap_plan(* self._static_wrap_plan):
                 yield row
+
+    # ==
+
+    def type_and_label_of_button_via_keycode__(self, keycode):
+        # imagine if buttons also had transition names in them, separate
+        # from labels. But maybe the FFSA's read more tightly this way..
+
+        def via_page(page):
+            for btn in (hotkeys[i] for i in page.button_offsets):
+                if fig_key == btn.figurative_key:
+                    return btn.label
+
+        fig_key = self._figurative_key_via_keycode(keycode)
+        hotkeys = self._hotkeys_index.hotkeys
+
+        if (p := self._dynamic_page) and (x := via_page(p)):
+            return 'dynamic', x
+
+        if (p := self._static_page) and (x := via_page(p)):
+            return 'static', x
+
+    def _figurative_key_via_keycode(self, keycode):
+        if re.match(r'[a-z]\Z', keycode):
+            return keycode
+        if '\n' == keycode:
+            return 'enter'
+        xx(f"how to translate this keycode to fig key: {keycode!r}")
+
+    @property
+    def _dynamic_page(self):
+        return (k := self._currently_selected_page_key) and self._pages[k]
 
     def hello_I_am_CHA(_):
         return True
@@ -332,6 +438,64 @@ _hotkey_rx = re.compile(r'''
     [^[\]]*         # again with the zero or more not '[' or ']'
     \Z              # match the end of the string
 ''', re.VERBOSE)
+
+
+def _build_pages_index(inter_aa_dct):
+    # exactly [#608.2.B], the most complicated algorithm here
+
+    def main():
+        FSAs_map = {k: v for k, v in map_for_each_FFSA()}
+        return FSAs_map, page_via_page_name
+
+    def map_for_each_FFSA():
+        for ffsa in unique_list_of_FFSAs():
+            rhs = {k: v for k, v in map_for_FFSA(ffsa)}
+            yield ffsa.FFSA_key, rhs
+
+    def map_for_FFSA(ffsa):
+        def map_for_node(node):
+            page_content = tuple(buttons_via(node))
+            if 0 == len(page_content):
+                return None
+            page_name = page_name_via_page.get(page_content)
+            if page_name is None:
+
+                number = len(page_via_page_name) + 1
+                page_name = f"buttons_page_{number}"
+                page_name_via_page[page_content] = page_name
+                page_via_page_name[page_name] = page_content
+
+            return page_name
+
+        def buttons_via(node):
+            for trans in transitions_via(node):
+                cname = trans.condition_name
+                # big hack
+                if '[' in cname:
+                    yield cname
+
+        def transitions_via(node):
+            for i in node.transitions_from_here:
+                yield transes[i]
+
+        transes = ffsa.transitions
+
+        for k, node in ffsa.nodes.items():
+            yield k, map_for_node(node)
+
+    def unique_list_of_FFSAs():
+        for aa in inter_aa_dct.values():
+            ffsa = aa.FFSAer()
+            k = ffsa.FFSA_key
+            if k in seen:
+                continue
+            seen.add(k)
+            yield ffsa
+
+    page_via_page_name = {}
+    page_name_via_page = {}  # to keep track of which pages we've seen
+    seen = set()
+    return main()
 
 
 def _QUICK_AND_DIRTY_WORD_WRAP_PROBABLY_MOVE(max_w, words_tuple):  # #[#612.6]

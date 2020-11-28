@@ -62,7 +62,7 @@ class Case7671_lets_try_changing_pages(CommonCase):
 
     def test_150_blank_dynamic_area_is_blank(self):
         ca = self.concrete_area
-        ca.set_active_page_to_none()
+        ca._set_active_page_to_none()
         act = tuple(ca.to_rows())
         exp = (
             '                    ',
@@ -72,7 +72,7 @@ class Case7671_lets_try_changing_pages(CommonCase):
 
     def test_175_LETS_GO(self):
         ca = self.concrete_area
-        ca.set_active_page('page_for_strength_training_mode')
+        ca._set_active_page('page_for_strength_training_mode')
         act = tuple(ca.to_rows())
         exp = (
             '  [c]hin/pull-ups   ',
@@ -83,7 +83,7 @@ class Case7671_lets_try_changing_pages(CommonCase):
 
     def test_200_gravity_pulls_downward(self):
         ca = self.concrete_area
-        ca.set_active_page('page_for_endurance_training_mode')
+        ca._set_active_page('page_for_endurance_training_mode')
         act = tuple(ca.to_rows())
         exp = (
             '                    ',
@@ -126,7 +126,7 @@ class Case7675_introduce_static_area(CommonCase):
 
     def test_250_lets_go(self):
         ca = self.concrete_area
-        ca.set_active_page('page_one')
+        ca._set_active_page('page_one')
         act = tuple(ca.to_rows())
         exp = (
             'button [o]ne',
@@ -162,7 +162,7 @@ def support_lib():
 
 
 def build_abstract_hotkeys_area(x):
-    return subject_module().abstract_hotkeys_area_via(x)
+    return subject_module()._abstract_hotkeys_area_via(x)
 
 
 def subject_module():

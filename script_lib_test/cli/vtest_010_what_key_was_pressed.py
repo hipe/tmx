@@ -18,8 +18,8 @@ def _main(stdscr, curses):
     # [X] then: write your own word-wrap again from scratch, just do it coward
     # [X] then: figure out how to read keypresses
     # [X] then: use what you learned in a previous lesson to write a flash msg
-    # [ ] then: complain when a strange key is hit
-    # [ ] then: do the dew and exit when a good key is hit
+    # [X] then: report what key was hit
+    # [X] then: exit when a good key is hit
 
     def normalize_row(msg):
         assert '\n' not in msg

@@ -134,9 +134,9 @@ class Case7704_move_down_oh_boy(CommonCase):
         resp = self.keypress_end_state_response
         assert resp.OK
         change1, change2 = resp.changes
-        exp = 'nav_area transition_over cursor_exit'.split()
+        exp = 'selection_controller change_selected nav_area foo_fah'.split()
         self.assertSequenceEqual(change1, exp)
-        exp = 'foo_fah transition_over cursor_enter'.split()
+        exp = 'buttons_controller selected_changed foo_fah has_focus'.split()
         self.assertSequenceEqual(change2, exp)
 
     def given_keypress(_):
@@ -201,13 +201,13 @@ def state_name_of(comp):
     return comp.state.state_name
 
 
-def concretize(h, w, aa, listener=None):
-    return aa.concretize_via_available_height_and_width(h, w, listener)
-
-
 def em_lib():
     import modality_agnostic.test_support.common as module
     return module
+
+
+def concretize(h, w, aa, listener=None):
+    return support_lib().concretize(h, w, aa, listener)
 
 
 def ACA_via(x):

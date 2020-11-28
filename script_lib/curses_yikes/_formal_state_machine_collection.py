@@ -1,106 +1,39 @@
 from collections import namedtuple as _nt
 
 
-class Formal_FSA_Collection_:
+def produce_formal_FSA_via_definition_function_NOT_USED_(
+        house_module_string, defnf):
 
-    def __init__(self):
-        assert not _mutex_for_singleton
-        _mutex_for_singleton.append(None)
-
-        self._module_cache_via_module_name = {}
-
-    def WRAP_CLASS_REMARKABLY_HACKY_EXPERIMENT(self, klass, module):
-        mc = self._cache_for_module_via_module(module)
-        return mc.wrap_class_hackily(klass)
-
-    def _cache_for_module_via_module(self, module):
-
-        # It seems unlikely that participating class names will be repeated
-        # across various modules that contain them so we could just munge
-        # it maybe but ..
-
-        mname = module.__name__
-        dct = self._module_cache_via_module_name
-        if (mc := dct.get(mname)) is None:
-            dct[mname] = (mc := _CacheForModule(module))
-        return mc
+    return _cache.dereference(house_module_string, defnf)
 
 
-class _CacheForModule:
-
-    def __init__(self, module):
-        self._module = module
-        self._CACHE = {}
-
-    def wrap_class_hackily(self, klass):
-        assert klass.is_interactable
-
-        k = klass.__name__
-        if (wc := self._CACHE.get(k)) is None:
-            self._CACHE[k] = (wc := _wrapped_class_via(klass, self._module))
-
-        return wc
+# {ffsa|FFSA} = formal finite state automaton (as opposed to the instance)
 
 
-def _wrapped_class_via(klass, module):
-    fname = _expected_FFSA_function_name_via_abstract_area_function_name(klass.__name__)  # noqa: E501
-    ffsa_func = getattr(module, fname)
-    ffsa = _formal_state_machine_via_definition(ffsa_func())
+def _build_cache():
 
-    def use_klass(*abstract_area_args):
-        aa = klass(*abstract_area_args)
-        return _WrappedAbstractArea(ffsa, aa)
+    def dereference(house_module_string, defnf):
+        fname = defnf.__name__
+        ffsa_key = house_module_string, fname
 
-    return use_klass
+        if (ffsa := cache.get(ffsa_key)) is None:
+            ffsa = _build_FFSA(ffsa_key, defnf())
+            cache[ffsa_key] = ffsa
 
+        return ffsa
 
-def _delegate(orig_f):
-    def use_f(selv):
-        return getattr(selv._AA, attr)
-    attr = orig_f.__name__
-    return property(use_f)
+    kw = {k: v for k, v in locals().items()}
+    cache = {}
+    return _nt('_Cache', kw.keys())(**kw)
 
 
-class _WrappedAbstractArea:  # we don't love this but..
+_cache = _build_cache()
 
-    def __init__(self, ffsa, aa):
-        self._FFSA, self._AA = ffsa, aa
 
-    def concretize_via_memo_and(self, *many, **kw):
-        ca = self._AA.concretize_via_memo_and(*many, **kw)
-        return self._add_state_machine(ca)
-
-    def concretize_via_available_height_and_width(self, h, w, listener=None):
-        ca = self._AA.concretize_via_available_height_and_width(h, w, listener)
-        return self._add_state_machine(ca)
-
-    def _add_state_machine(self, ca):
-        state = self._FFSA.to_state_machine()
-        ca.state = state  # #EXPERIMENTAL
-        return ca
-
-    def write_to_memo(self, memo):
-        return self._AA.write_to_memo(memo)
-
-    @_delegate
-    def minimum_height_via_width(self):
-        pass
-
-    @_delegate
-    def minimum_width(self):
-        pass
-
-    @_delegate
-    def two_pass_run_behavior(self):
-        pass
-
-    @_delegate
-    def can_fill_vertically(self):
-        pass
-
-    @_delegate
-    def is_interactable(self):
-        pass
+def build_formal_FSA_via_definition_function_(house_module_string, defnf):
+    ffname = defnf.__name__
+    ffsa_key = house_module_string, ffname
+    return _build_FFSA(ffsa_key, defnf())
 
 
 class _StateMachine:
@@ -119,28 +52,27 @@ class _StateMachine:
         return otr
 
     def move_to_state_via_transition_name(self, tn):
-        trans = None
-        for t in self._each_transition():
-            if tn == t.condition_name:
-                trans = t
-                break
-
+        trans = self.transition_via_transition_name(tn)
         if not trans:
             xx(f"whoopsie, can't trans from {self._state_name!r} OVER {tn!r}")
-
-        self._accept_transition(trans)
+        self.accept_transition(trans)
 
     def move_to_state_via_state_name(self, nn):
-        trans = None
-        for t in self._each_transition():
-            if nn == t.right_node_name:
-                trans = t
-                break
-
+        trans = self._first_trans(lambda t: nn == t.right_node_name)
         if not trans:
             xx(f"whoopsie, can't trans from {self._state_name!r} to {nn!r}")
+        self.accept_transition(trans)
 
-        self._accept_transition(trans)
+    def state_name_via_transition_name(self, tn):
+        return self.transition_via_transition_name(tn).right_node_name
+
+    def transition_via_transition_name(self, tn):
+        return self._first_trans(lambda t: tn == t.condition_name)
+
+    def _first_trans(self, condition):
+        for t in self._each_transition():
+            if condition(t):
+                return t
 
     def _each_transition(self):
         node = self._nodes[self._state_name]
@@ -148,11 +80,7 @@ class _StateMachine:
         for i in node.transitions_from_here:  # could have made it dict oh well
             yield transs[i]
 
-    def _accept_transition(self, trans):
-        afn = trans.action_function_name
-        if afn:
-            xx('literally the best thing')
-
+    def accept_transition(self, trans):
         self._state_name = trans.right_node_name  # should be no need to valid
 
     @property
@@ -160,9 +88,9 @@ class _StateMachine:
         return self._state_name
 
 
-def _formal_state_machine_via_definition(defs):
-    transitions = _transitions_via_definition(defs)
-    return _formal_state_machine_via_transitions(tuple(transitions))
+def _build_FFSA(ffsa_key, defs):
+    transitions = tuple(_transitions_via_definition(defs))
+    return _formal_state_machine_via_transitions(transitions, ffsa_key)
 
 
 def _transitions_via_definition(defs):
@@ -172,7 +100,7 @@ def _transitions_via_definition(defs):
         count += 1
 
 
-def _formal_state_machine_via_transitions(transitions):
+def _formal_state_machine_via_transitions(transitions, ffsa_key):
 
     def autovivify_node(name):
         if (node := nodes.get(name)) is None:
@@ -186,16 +114,17 @@ def _formal_state_machine_via_transitions(transitions):
         autovivify_node(t.left_node_name).transitions_from_here.append(i)
         autovivify_node(t.right_node_name).transitions_to_here.append(i)
 
-    return _FormalStateMachine(transitions, nodes)
+    return _FormalStateMachine(transitions, nodes, ffsa_key)
 
 
 class _FormalStateMachine:
-    def __init__(self, transitions, nodes):
-        self._transitions = transitions
-        self._nodes = nodes
+    def __init__(self, transitions, nodes, ffsa_key):
+        self.transitions = transitions
+        self.nodes = nodes
+        self.FFSA_key = ffsa_key
 
     def to_state_machine(self):
-        return _StateMachine(self._transitions, self._nodes)._init_state_machine()  # noqa: E501
+        return _StateMachine(self.transitions, self.nodes)._init_state_machine()  # noqa: E501
 
 
 class _MutableNode:
@@ -223,20 +152,6 @@ _Transition = _nt('_Transition', (
     'transition_offset',
     'left_node_name', 'condition_name', 'right_node_name',
     'action_function_name'))
-
-
-def _expected_FFSA_function_name_via_abstract_area_function_name(fname):
-    import re
-    md = re.match(r'abstract_(.+)_via_.+\Z', fname)
-    if not md:
-        xx(f"whoopsie: {fname!r}")
-    component_name, = md.groups()
-    return '_'.join((component_name, 'state_machine'))
-
-
-# Just for sanity for now, assert there's only one ever in the whole runtime.
-# Doing it this way is bad because we're suppposed to unit test the class
-_mutex_for_singleton = []
 
 
 def xx(msg=None):

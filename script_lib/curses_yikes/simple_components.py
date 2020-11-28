@@ -1,6 +1,3 @@
-# (name magic happens in this module)
-
-
 def text_field_state_machine():
     yield 'initial', 'cursor_enter', 'has_focus'
     yield 'has_focus', 'cursor_exit', 'initial'
@@ -21,6 +18,12 @@ def nav_area_state_machine():
 
 def _one(_, __):
     return 1
+
+
+def _lazy_load_FFSA(fsa_def):
+    def load_FFSA(_=None):
+        return _produce_FFSA(fsa_def)
+    return load_FFSA
 
 
 class abstract_text_field_via_directive_tail:
@@ -44,23 +47,28 @@ class abstract_text_field_via_directive_tail:
         self.minimum_width = minimum_width
 
     def concretize_via_memo_and(self, memo, h, w, li):
-        return _ConcreteTextField(memo, w, self._label)
+        state = self.FFSAer().to_state_machine()
+        return _ConcreteTextField(memo, w, self._label, state)
 
     def write_to_memo(self, memo):
         _write_widest(memo, 'widest_field_label', len(self._label))
+
+    FFSAer = _lazy_load_FFSA(text_field_state_machine)
 
     minimum_height_via_width = _one
     two_pass_run_behavior = 'participate'
     can_fill_vertically = False
     is_interactable = True
+    defer_until_after_interactables_are_indexed = False
 
 
 class _ConcreteTextField:
 
-    def __init__(self, memo, w, label):
+    def __init__(self, memo, w, label, state=None):
         self._memo = memo
         self._width = w
         self._label = label
+        self.state = state
 
     def MAKE_A_COPY(self):
         otr = self.__class__(self._memo, self._width, self._label)
@@ -92,28 +100,39 @@ class abstract_checkbox_via_directive_tail:
         self.minimum_width = minimum_width
 
     def concretize_via_memo_and(self, memo, h, w, li):
-        return _ConcreteCheckbox(memo, w, self._label)
+        state = self.FFSAer().to_state_machine()
+        return _ConcreteCheckbox(memo, w, self._label, state)
 
     def write_to_memo(self, memo):
         _write_widest(memo, 'widest_checkbox_label', len(self._label))
+
+    FFSAer = _lazy_load_FFSA(checkbox_state_machine)
 
     minimum_height_via_width = _one
     two_pass_run_behavior = 'participate'
     can_fill_vertically = False
     is_interactable = True
+    defer_until_after_interactables_are_indexed = False
 
 
 class _ConcreteCheckbox:
 
-    def __init__(self, memo, w, label):
+    def __init__(self, memo, w, label, state=None):
         self._memo = memo
         self._width = w
         self._label = label
 
+        self._is_checked = False
+        self.state = state
+
     def MAKE_A_COPY(self):
         otr = self.__class__(self._memo, self._width, self._label)
+        otr._is_checked = self._is_checked
         otr.state = self.state.MAKE_A_COPY()
         return otr
+
+    def _toggle(self):
+        self._is_checked = not self._is_checked
 
     def to_rows(self):
         yield ('C' * self._width)
@@ -125,20 +144,25 @@ class abstract_nav_area_via_directive_tail:
         self._breadcrumb_keys = breadcrumb_keys
 
     def concretize_via_available_height_and_width(self, h, w, li=None):
-        return _ConcreteNavBar(w, self._breadcrumb_keys)
+        state = self.FFSAer().to_state_machine()
+        return _ConcreteNavBar(w, self._breadcrumb_keys, state)
+
+    FFSAer = _lazy_load_FFSA(nav_area_state_machine)
 
     minimum_height_via_width = _one
     minimum_width = 11  # len("👉 […]foo[…]")
     two_pass_run_behavior = 'break'
     can_fill_vertically = False
     is_interactable = True
+    defer_until_after_interactables_are_indexed = False
 
 
 class _ConcreteNavBar:
 
-    def __init__(self, w, bc_keys):
+    def __init__(self, w, bc_keys, state=None):
         self._breadcrumb_keys = bc_keys
         self._width = w
+        self.state = state
 
     def MAKE_A_COPY(self):
         otr = self.__class__(self._width, self._breadcrumb_keys)
@@ -218,6 +242,8 @@ def _calm_name_via_key(k):  # ..
 # TO MOVE
 
 
+# ==
+
 def _write_widest(memo, k, leng):
     if k in memo:
         if memo[k] < leng:
@@ -230,6 +256,22 @@ def _label_via_key(key):
     s = key.replace('_', ' ')
     return ''.join((s[0].upper(), s[1:]))  # not title()
 
+
+# == FSA support
+
+def _common_init_state(aa):
+    return aa.FFSAer().to_state_machine()
+
+
+def _produce_FFSA(fsa_def):
+    if not hasattr(fsa_def, '_FFSA_'):
+        from ._formal_state_machine_collection import \
+            build_formal_FSA_via_definition_function_ as func
+        fsa_def._FFSA_ = func(__name__, fsa_def)
+    return fsa_def._FFSA_
+
+
+# ==
 
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))

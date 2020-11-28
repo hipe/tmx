@@ -61,6 +61,7 @@ class InputController_EXPERIMENTAL__:
     def __init__(self, harnesses):
         index = _crazy_index_time(harnesses)
         self._selection_controller = _selection_controller(index, harnesses)
+        self._harnesses = harnesses
 
     def receive_keypress(self, k):
         if k in _directions:
@@ -73,6 +74,32 @@ class InputController_EXPERIMENTAL__:
 
         return self._say_does_nothing(k)
 
+    def _attempt_to_dispatch(self, keycode):
+
+        # Does the keypress correspond to one of the currently showing buttons?
+        bc = self._buttons_controller
+        tup = bc.type_and_label_of_button_via_keycode__(keycode)
+        if tup is None:
+            return self._say_does_nothing(keycode)
+        typ, label = tup
+
+        if 'static' == typ:
+            reason = "waiting to implement statics until dynamics API is est."
+            xx(f"{reason} {keycode!r}")
+        assert 'dynamic' == typ
+
+        # Since this was a dynamic button, it must correspond to a transition
+
+        # (since this was a dynamic button, a component must be selected)
+        k = self._key_of_currently_selected_component
+        ca = self._concrete_area(k)
+        assert ca.state.transition_via_transition_name(label)
+
+        changes = (
+            ('input_controller', 'apply_transition', k, label),
+        )
+        return _Response(ok=True, changes=changes)
+
     def _say_does_nothing(self, k):
         # We could map the key strings to prettier labels but why
         def lines():
@@ -82,6 +109,59 @@ class InputController_EXPERIMENTAL__:
     def _handle_vertical_selection_change(self, k):
         is_down = _is_down(k)
         return self._selection_controller.receive_up_or_down(is_down)
+
+    def apply_changes(self, changes):
+        changed_visually = {}
+        for change in changes:
+            stack = list(reversed(change))
+            which_controller = stack.pop()
+            if 'input_controller' == which_controller:
+                me = self
+            else:
+                me = getattr(self, _which_controller[which_controller])
+            for k in me.apply_change(stack):
+                changed_visually[k] = None
+        return tuple(changed_visually.keys())
+
+    def apply_change(self, stack):  # not part of our own public API so to
+        typ = stack.pop()
+        assert 'apply_transition' == typ
+        return self._do_apply_transition(* reversed(stack))
+
+    def _do_apply_transition(self, k, trans_name):
+        ca = self._concrete_area(k)
+        trans = ca.state.transition_via_transition_name(trans_name)
+        afn = trans.action_function_name
+        ca.state.accept_transition(trans)  # before? after?
+
+        # #eventually imagine the component's definition including a custom
+        # controller function that does some kind of validation and writes
+        # to flash on failure, or maybe it leads to other changes in the UI
+        # in other components.. What would be great is to pass it a
+        # mini-client that manages the writing of the response
+
+        if afn:
+            getattr(ca, afn)()  # ..
+
+        return (k,)
+
+    @property
+    def _buttons_controller(self):
+        # #[#608.2.C] buttons as magic name. CA as controller is experimental
+        return self._concrete_area('buttons')
+
+    @property
+    def _key_of_currently_selected_component(self):
+        return self._selection_controller.key_of_currently_selected_component
+
+    def _concrete_area(self, k):
+        return self._harnesses[k].concrete_area
+
+
+_which_controller = {
+    'buttons_controller': '_buttons_controller',
+    'selection_controller': '_selection_controller'
+}
 
 
 # == Keys metadata
@@ -101,7 +181,7 @@ _lowercase_alpha = re.compile(r'[a-z]\Z')
 def _selection_controller(index, harnesses):
 
     # Set up initial indexes used all over the place
-    interactable_harnesses = tuple(harnesses[i] for i in index.offsets_of_interactable_components)  # noqa: E501
+    interactable_harnesses = tuple(harnesses[k] for k in index.keys_of_interactable_components)  # noqa: E501
     leng = len(interactable_harnesses)
     keys_in_order = tuple(h.key for h in interactable_harnesses)
     harness_via_key = {h.key: h for h in interactable_harnesses}
@@ -141,10 +221,28 @@ def _selection_controller(index, harnesses):
                 desired_order_offset = i - 1
 
             k_ = keys_in_order[desired_order_offset]
+
+            sn = harness_via_key[k_].state.state_name_via_transition_name('cursor_enter')  # noqa: E501
+
             changes = (
-                (k, 'transition_over', 'cursor_exit'),
-                (k_, 'transition_over', 'cursor_enter'))
+                ('selection_controller', 'change_selected', k, k_),
+                ('buttons_controller', 'selected_changed', k_, sn),
+            )
             return _Response(ok=True, changes=changes)
+
+        def apply_change(self, stack):
+            m = which_change[stack.pop()]
+            return getattr(self, m)(* reversed(stack))
+
+        def _do_change_selected(self, k, k_):
+            goodbye = harness_via_key[k]
+            hello = harness_via_key[k_]
+            goodbye.state.move_to_state_via_transition_name('cursor_exit')
+            hello.state.move_to_state_via_transition_name('cursor_enter')
+            self.key_of_currently_selected_component = k_
+            return k, k_  # list of components that changed visually
+
+    which_change = {'change_selected': '_do_change_selected'}
 
     return SelectionController()
 
@@ -155,19 +253,15 @@ def _crazy_index_time(harnesses):
     (before := set(locals().keys())).add('before')  # 🙄
     # == BEGIN MAGIC
 
-    offsets_of_interactable_components = []
+    keys_of_interactable_components = []
 
     # == END MAGIC
     index_keys_in_order = tuple(k for k in locals().keys() if k not in before)
 
-    offset = -1
-    for harness in harnesses:
-        offset += 1
-
+    for k, harness in harnesses.items():
         if harness.state is None:
             continue
-
-        offsets_of_interactable_components.append(offset)
+        keys_of_interactable_components.append(k)
 
     locs = locals()
     res = {k: locs[k] for k in index_keys_in_order}

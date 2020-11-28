@@ -2,6 +2,10 @@ def open_curses_session():
     return _main_asset_module()._build_this_crazy_context_manager()
 
 
+def concretize(h, w, aa, listener=None):
+    return aa.concretize_via_available_height_and_width(h, w, listener)
+
+
 def function_for_building_abstract_compound_areas():
     from script_lib.curses_yikes import compound_area_via_children as modul
     return modul.abstract_compound_area_via_children_

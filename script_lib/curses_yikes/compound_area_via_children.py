@@ -1,5 +1,4 @@
 from collections import namedtuple as _nt
-import re
 
 
 def abstract_compound_area_via_children_(cx):
@@ -8,7 +7,7 @@ def abstract_compound_area_via_children_(cx):
         reason = "A compound area must have at least one child"
         raise _my_exception_class()(reason)
 
-    cx, index = _reify_and_index_children(cx.items())
+    cx, index = _abstract_areas_and_index(cx.items())
     if 0 == len(index.can_fill_vertically):
         reason = 'Need at least one component that can fill vertically'
         raise _my_exception_class()(reason)  # #here3
@@ -137,7 +136,7 @@ class _ConcreteCompoundArea:
 
     def to_EXPERIMENTAL_input_controller(self):
         from .input_controller_ import InputController_EXPERIMENTAL__ as func
-        return func(tuple(self.to_component_harnesses()))
+        return func(self._children)
 
     def to_rows(self):
         for harness in self.to_component_harnesses():
@@ -309,71 +308,92 @@ def _whine_about_height(ks, h, tmh):
         yield f"these {len(ks)} components"
 
 
-def _reify_and_index_children(cx):
+def _abstract_areas_and_index(cx):
     # Assume only: each key is a unique string and each value is a tuple whose
-    # length is at least one. Yield result pairs with the same keys in the same
-    # order, and values..
+    # length is at least one. Result is a dictionary and an index structure.
+    # Dictionary has same keys in the same order, with abstract areas as
+    # values. Various characteristics are indexed.
+    # Auto buttons require a special pass, which happens here manually
 
-    before = ('before', *locals().keys())
+    def main():
+        first_pass()
+        second_pass()
+        return finish()
 
-    can_fill_vertically = []
+    def second_pass():
+        dct = {k: abstract_areas[k] for k in interactables}
+        for k, klass, args in deferred:
+            probably_same_k, *rest = args
+            abstract_areas[k] = klass(probably_same_k, dct, *rest)
 
-    maximum_minimum_width = 0
-    maximum_minimum_width_holders = []
+    def first_pass():
+        for k, tup in cx:
 
-    # NOTE the complexity below & #here1 is b.c we want to preserve the order
-    these_local_keys = {k: None for k in locals().keys()}
-    tuple(these_local_keys.pop(k) for k in before)  # ick/meh
+            # First element of tuple is type because #here1
+            mixed_type_ref = (stack := list(reversed(tup))).pop()
+            if isinstance(mixed_type_ref, str):
+                klass = _AA_classer_via_type_string[mixed_type_ref]()
+            else:
+                xx("one day, maybe arbitrary loaders")
 
-    reified_children = {}
-
-    for k, tup in cx:
-        stack = list(reversed(tup))
-        x = stack.pop()
-        if isinstance(x, str):
-            class_loader = _loader_via_type_string[x]  # ..
             args = k, *reversed(stack)
-            klass = class_loader()
-            abstract_instance = klass(*args)
-        else:
-            xx("one day, arbitrary loader")
 
-        o = abstract_instance
+            if klass.defer_until_after_interactables_are_indexed:
+                assert not klass.is_interactable
+                deferred.append((k, klass, args))
+                abstract_areas[k] = None  # maintain order even tho deferred
+                continue
 
-        cfv = o.can_fill_vertically
-        min_w = o.minimum_width
-        del o
+            add_to_index(k, klass(*args))
+
+    def add_to_index(k, aa):  # aa = abstract area
 
         # Keep track of maximum minimum width and all responsible components
-        if min_w is not None and maximum_minimum_width <= min_w:
-            if maximum_minimum_width < min_w:
-                maximum_minimum_width = min_w
+        min_w = aa.minimum_width
+        if min_w is not None and self.maximum_minimum_width <= min_w:
+            if self.maximum_minimum_width < min_w:
+                self.maximum_minimum_width = min_w
                 maximum_minimum_width_holders.clear()
             maximum_minimum_width_holders.append(k)
 
+        # Track abstract areas that probably have FFSA's [#608.2.B]
+        if aa.is_interactable:
+            interactables.append(k)
+
         # Track things that want to or can vertically stretch
-        if cfv:
+        if aa.can_fill_vertically:
             can_fill_vertically.append(k)
 
-        reified_children[k] = abstract_instance
+        abstract_areas[k] = aa
 
-    can_fill_vertically = tuple(can_fill_vertically)
-    maximum_minimum_width_holders = tuple(maximum_minimum_width_holders)
+    def finish():
+        kw = {}
+        kw['interactables'] = tuple(interactables)
+        kw['can_fill_vertically'] = tuple(can_fill_vertically)
+        kw['maximum_minimum_width_holders'] = tuple(maximum_minimum_width_holders)  # noqa: E501
+        kw['maximum_minimum_width'] = self.maximum_minimum_width
+        return abstract_areas, _Index(**kw)
 
-    locs = locals()
-    index = {k: locs[k] for k in these_local_keys.keys()}  # #here1
-    return reified_children, _Index(**index)
+    interactables, can_fill_vertically = [], []
+    maximum_minimum_width_holders = []
+    self = _OpenStruct()
+    self.maximum_minimum_width = 0
+
+    deferred, abstract_areas = [], {}
+    return main()
 
 
-_ = ('can_fill_vertically',
-     'maximum_minimum_width', 'maximum_minimum_width_holders')
+_Index = _nt('_Index', """interactables can_fill_vertically
+    maximum_minimum_width maximum_minimum_width_holders""".split())
 
 
-_Index = _nt('_Index', _)
+class _OpenStruct:
+    pass
 
 
-_loader_via_type_string = {
+_AA_classer_via_type_string = {
     # we could make this more dynamic, but why
+    'buttons': lambda: _this_buttons_module(),
     'checkbox': lambda: _simple('abstract_checkbox_via_directive_tail'),
     'horizontal_rule': lambda: _AbstractHorizontalRule,
     'nav_area': lambda: _simple('abstract_nav_area_via_directive_tail'),
@@ -382,14 +402,15 @@ _loader_via_type_string = {
 }
 
 
+def _this_buttons_module():
+    from .hotkey_via_character_and_label import \
+        experimental_deferential_button_AAer_ as klass
+    return klass
+
+
 def _simple(func_name):
     from script_lib.curses_yikes import simple_components as module
-    klass = getattr(module, func_name)
-    if klass.is_interactable:
-        from script_lib.curses_yikes import \
-            lazy_formal_state_machine_collection_ as func
-        klass = func().WRAP_CLASS_REMARKABLY_HACKY_EXPERIMENT(klass, module)
-    return klass
+    return getattr(module, func_name)
 
 
 class _AbstractVerticalFiller:
@@ -409,6 +430,7 @@ class _AbstractVerticalFiller:
     can_fill_vertically = True
     minimum_width = 1
     is_interactable = False
+    defer_until_after_interactables_are_indexed = False
 
 
 class _ConcreteVerticalFiller:
@@ -445,6 +467,7 @@ class _AbstractHorizontalRule:
     can_fill_vertically = False
     minimum_width = 1
     is_interactable = False
+    defer_until_after_interactables_are_indexed = False
 
 
 class _ConcreteHorizontalRule:
@@ -463,50 +486,58 @@ class _ConcreteHorizontalRule:
 
 
 def _children_initially(cx):
-    children = {}
-    anon_counts = {}
+    # We don't know exactly how we want the syntax to work. The simplest thing
+    # would be: first term is key, second term is type, and the rest is args.
+    # keys must be unique (which we assert). But this leads to defintions that
+    # feel overly verbose, requiring weirdness like giving your horizontal
+    # rules and vertical fills unique names. So:
 
-    ugh = {
-        'checkbox': 'ting1',
-        'nav_area': 'ting2',
-        'text_field': 'ting1',
+    children, anon_counts = {}, {}
+
+    syntactic_experiments = {
+        'buttons': 'first_term_is_both_key_and_type',
+        'checkbox': 'SQL_ish_syntax',
+        'horizontal_rule': 'auto_increment_key',
+        'nav_area': 'first_term_is_both_key_and_type',
+        'text_field': 'SQL_ish_syntax',
+        'vertical_filler': 'auto_increment_key',
     }
 
-    for ch in cx:
-        if isinstance(ch, tuple):
-            k, *rest = ch
+    for x in cx:
+        if isinstance(x, tuple):
+            tup = x
+        else:
+            assert isinstance(x, str)
+            tup = (x,)
+        del x
+        stack = list(reversed(tup))
 
-            # We don't know exactly how we want the syntax to work.
-            # The simplest thing is have the first term be a key and
-            # require that each one is unique.
+        syntax_type = syntactic_experiments.get(stack[-1])
 
-            ting = ugh.get(k)
-            if ting:
-                if 'ting1' == ting:
-                    # ..BUT more natural-feeling for form fields is
-                    # the type first and name second (which we flip here).
-                    # How ugly is it to munge the two namespaces?
-                    typ = k
-                    k = rest[0]
-                    rest[0] = typ
-                else:
-                    # ..AND for nav, the term doubles as key and type
-                    assert 'ting2' == ting
-                    rest = k, *rest
+        if 'SQL_ish_syntax' == syntax_type:
+            typ = stack.pop()
+            k = stack.pop()
+
+        elif 'first_term_is_both_key_and_type' == syntax_type:
+            k = stack.pop()
+            typ = k
+
+        elif 'auto_increment_key' == syntax_type:
+            typ = stack.pop()
+            count = anon_counts.get(typ, 0) + 1
+            anon_counts[typ] = count
+            k = '_'.join((typ, str(count)))
 
         else:
-            assert isinstance(ch, str)
-            assert re.match(r'[a-z]+(?:_[a-z]+)*\Z', ch)
-            count = anon_counts.get(ch, 0)
-            count += 1
-            anon_counts[ch] = count
-            k = '_'.join((ch, str(count)))
-            rest = (ch,)
-        del ch
+            k = stack.pop()
+            assert isinstance(k, str)
+            typ = stack.pop()  # mixed, must be present for now
 
         if k in children:
             reason = f"Encountered duplicate child name: {k!r}"
             raise _my_exception_class()(reason)
+
+        rest = typ, *reversed(stack)  # #here1 type is first element
         children[k] = rest
     return children
 
