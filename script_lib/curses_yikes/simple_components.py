@@ -180,47 +180,111 @@ class _ConcreteNavBar:
 
         max_content_width = self._width - _width_of_selection_stuff
         sep = ' > '
-        sep_w = len(sep)
         ellipsis = '[…] > '
-        ellipsis_w = len(ellipsis)
-        pcs = []
-        current_content_width = 0
+        content = _render_breadcrumb_trail(
+                max_content_width, self._breadcrumb_keys, ellipsis, sep)
+        head = _piece_for_selection(self.state)
+        return (''.join((head, content)),)
 
-        stack = list(reversed(self._breadcrumb_keys))
 
-        if stack and current_content_width < max_content_width:
-            leng = len(label := _calm_name_via_key(stack[-1]))
-            if (current_content_width + leng) <= max_content_width:
-                pcs.append(label)
-                stack.pop()
-                current_content_width += leng
-            else:
-                stack.clear()  # hack to skip next loop yikes
+def _render_breadcrumb_trail(w, slug_keys, ellipsis, sep):
+    assert 0 < w
 
-        while stack and current_content_width < max_content_width:
-            leng = len(label := _calm_name_via_key(stack[-1]))
-            leng += sep_w
-            if max_content_width < current_content_width + leng:
-                break
-            pcs.append(sep)
-            pcs.append(label)
-            stack.pop()
-            current_content_width += leng
+    # Grow from the right: pop the rightmost items first
+    def slug_labels():
+        stack = list(slug_keys)
+        while stack:
+            yield _calm_name_via_key(stack.pop())
+    label_scn = _scanner_via_iterator(slug_labels())
 
-        assert current_content_width <= max_content_width
+    # Group your pieces into non-breaking chunks
+    def nonbreaking_chunks():
+        if label_scn.empty:
+            return
 
-        if stack and (current_content_width + ellipsis_w) < max_content_width:
-            pcs.append(ellipsis)
-            current_content_width += ellipsis_w
+        # Rightmost piece will have no separator to the right of it
+        yield (label_scn.next(),)
 
-        width_left_over = max_content_width - current_content_width
-        assert 0 <= width_left_over
-        pcs.append(_piece_for_selection(self.state))
-        pcs = list(reversed(pcs))
-        pcs.append(' ' * width_left_over)
-        row = ''.join(pcs)
-        assert self._width == len(row)  # harness does this but meh
-        yield row
+        # Each subsequent piece must have separator, which must be part of it
+        while label_scn.more:
+            yield sep, label_scn.next()
+
+    # Get as may chunks as you can into a chunkrow
+    chunks, ww = _ellipsify_experiment(w, nonbreaking_chunks(), ellipsis)
+
+    # We grew it from the right now is the time to flip it and rev it 2 levels
+    chunks = [tuple(reversed(chunk)) for chunk in tuple(reversed(chunks))]
+
+    # Pad the end if necessary
+    if (under_by := (w - ww)) > 0:
+        chunks.append((' '*under_by,))
+    else:
+        assert 0 == under_by
+
+    final = ''.join(s for chunk in chunks for s in chunk)
+    assert w == len(final)
+    return final
+
+
+def _ellipsify_experiment(w, nonbreaking_chunks, ellipsis):
+
+    def classifed_chunks():
+        for chunk in nonbreaking_chunks:
+            chunk_w = sum(len(s) for s in chunk)
+            yield cchunk_via(chunk, chunk_w)
+
+    from collections import namedtuple as nt
+    cchunk_via = nt('CC', ('chunk', 'width'))
+
+    scn = _scanner_via_iterator(classifed_chunks())
+    cchunks, ww = [], 0
+
+    # Keep adding more chunks while you can
+    while scn.more:
+        hypothetical_next_width = ww + scn.peek.width
+
+        # If this additional width would put it over, stop
+        if w < hypothetical_next_width:
+            break
+
+        cchunks.append(scn.next())
+        ww = hypothetical_next_width
+
+        # If this additional width landed right on the money, stop
+        if w == ww:
+            break
+
+    # If you managed to add all the chunks, you are done and happy
+    def result():
+        final_w = sum(cchunk.width for cchunk in cchunks)
+        final_chunks = [cc.chunk for cc in cchunks]
+        return final_chunks, final_w
+
+    if scn.empty:
+        return result()
+
+    # Since there were some chunks you couldn't add, you've got to ellipsify
+    ellicchunk = cchunk_via((ellipsis,), len(ellipsis))
+
+    # Wouldn't it be nice if it was enough just to add the ellipsis and be done
+    while True:
+
+        # If adding the ellipse landed you right on the money or under, done
+        hypothetical_next_width = ww + ellicchunk.width
+        if hypothetical_next_width <= w:
+            cchunks.append(ellicchunk)
+            return result()
+
+        # The current raster roster, even though under, is too long once we
+        # add the ellipsis. So now we backtrack. Crazy if this loops > once
+
+        # If you had to backtrack so far that we are out of content, nothing.
+        # (it's tempting to display an ellipsis, but ours is an infix operator)
+        if 0 == len(cchunks):
+            return result()  # you get NOTHING
+
+        removing = cchunks.pop()
+        ww -= removing.width
 
 
 # FROM MOVE
@@ -272,6 +336,11 @@ def _produce_FFSA(fsa_def):
 
 
 # ==
+
+def _scanner_via_iterator(itr):
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    return func(itr)
+
 
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))

@@ -1,4 +1,5 @@
-def _build_this_crazy_context_manager():  # #testpoint
+def build_this_crazy_context_manager_():
+    # NOTE We want to move this to the "curses adapter" sibling module soon
     # (this is like the `curses.wrapper` but ..)
 
     stack, self = _build_this_crazy_stack()

@@ -29,8 +29,7 @@ class CommonCase(unittest.TestCase):
     def the_component(self):
         cca = self.given_CCA_be_careful()
         k = self.component_key
-        harness = cca._children[k]
-        return harness.concrete_area
+        return cca.CHILD_CONCRETE_AREA(k)
 
     def given_CCA_be_careful(_):
         return CCA_one_BE_CAREFUL()
@@ -61,17 +60,17 @@ class Case7688_nav_area_states(CommonCase):
         move_to_state_via_transition_name(comp, 'cursor_enter')
         assert 'has_focus' == state_name_of(comp)
 
-    def test_040_render_when_not_selected(self):
+    def test_040_render_when_selected(self):
         comp = self.the_component()
         act = tuple(comp.to_rows())
-        exp = ('👉 fipple fapple            ',)
+        exp = ('👉 […] > area 1 > fipp fapp ',)
         self.assertSequenceEqual(act, exp)
 
-    def test_060_render_when_selected(self):
+    def test_060_render_when_not_selected(self):
         comp = self.make_a_copy_of_the_component()
         move_to_state_via_transition_name(comp, 'cursor_exit')
         act = tuple(comp.to_rows())
-        exp = ('  fipple fapple            ',)
+        exp = ('  […] > area 1 > fipp fapp ',)
         self.assertSequenceEqual(act, exp)
 
     component_key = 'nav_area'
@@ -185,7 +184,7 @@ def ACA_one():
 
 def ACA_def_one():
     if True:
-        yield 'nav_area', ('fipple_fapple',)
+        yield 'nav_area', ('my_app_long_name', 'area_1', 'fipp_fapp')
         yield 'text_field', 'foo_fah'
         yield 'horizontal_rule'
         yield 'checkbox', 'be_verbose', 'label', 'Whether to be verbose'

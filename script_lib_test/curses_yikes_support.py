@@ -1,5 +1,10 @@
+def run_compound_area_via_definition(defn):
+    func = _curses_adapter_module().run_compound_area_via_definition
+    return func(defn)
+
+
 def open_curses_session():
-    return _main_asset_module()._build_this_crazy_context_manager()
+    return _top_module().build_this_crazy_context_manager_()
 
 
 def concretize(h, w, aa, listener=None):
@@ -12,10 +17,15 @@ def function_for_building_abstract_compound_areas():
 
 
 def common_exception_class():
-    return _main_asset_module().MyException_
+    return _top_module().MyException_
 
 
-def _main_asset_module():
+def _curses_adapter_module():
+    import script_lib.curses_yikes.curses_adapter as module
+    return module
+
+
+def _top_module():
     from script_lib import curses_yikes as module
     return module
 

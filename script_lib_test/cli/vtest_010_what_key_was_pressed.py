@@ -31,7 +31,7 @@ def _main(stdscr, curses):
             return ''.join((msg, ' ' * extra))
         return msg[0: w]
 
-    w = 70  # ROWS, LINES
+    w = 70  # COLS, LINES
 
     flash_message = None
     stdscr.addstr(1, 1, "Enter any key ('q' to quit):")

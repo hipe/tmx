@@ -110,8 +110,9 @@ class InputController_EXPERIMENTAL__:
         is_down = _is_down(k)
         return self._selection_controller.receive_up_or_down(is_down)
 
-    def apply_changes(self, changes):
-        changed_visually = {}
+    def apply_changes(self, changes, changed_visually=None):
+        if changed_visually is None:
+            changed_visually = {}
         for change in changes:
             stack = list(reversed(change))
             which_controller = stack.pop()
@@ -121,7 +122,7 @@ class InputController_EXPERIMENTAL__:
                 me = getattr(self, _which_controller[which_controller])
             for k in me.apply_change(stack):
                 changed_visually[k] = None
-        return tuple(changed_visually.keys())
+        return changed_visually
 
     def apply_change(self, stack):  # not part of our own public API so to
         typ = stack.pop()

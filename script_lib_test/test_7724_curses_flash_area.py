@@ -13,7 +13,7 @@ class CommonCase(unittest.TestCase):
 
         emis = self.given_emissions()
         if emis:
-            cfa = cca._children['flash_area'].concrete_area
+            cfa = cca.CHILD_CONCRETE_AREA('flash_area')
             from script_lib.curses_yikes.input_controller_ import \
                 _Emission as emi_via
             emis = (emi_via(tup) for tup in emis)

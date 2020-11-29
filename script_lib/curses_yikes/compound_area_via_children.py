@@ -130,7 +130,7 @@ def _concretize(h, w, index, cx, listener):
 class _ConcreteCompoundArea:
 
     def __init__(self, cx):
-        self._children = cx  # #testpoint yikes
+        self._children = cx  # harnesses, for now
 
     def MAKE_A_COPY(self):
         cx = {k: v.MAKE_A_COPY() for k, v in self._children.items()}
@@ -141,7 +141,7 @@ class _ConcreteCompoundArea:
         return func(self._children)
 
     def to_rows(self):
-        for harness in self.to_component_harnesses():
+        for harness in self._to_component_harnesses():
 
             if harness is None:  # #here5
                 continue
@@ -149,14 +149,24 @@ class _ConcreteCompoundArea:
             for row in harness.to_rows():
                 yield row
 
-    def to_component_harnesses(self):
+    def CHILD_CONCRETE_AREA(self, k):
+        return self.CHILD_HARNESS(k).concrete_area
+
+    def CHILD_HARNESS(self, k):
+        return self._children[k]
+
+    def _to_component_harnesses(self):
         return self._children.values()
+
+    def to_children_keys(self):
+        return tuple(self._children.keys())
 
     def hello_I_am_CCA(_):
         return True
 
 
 class _AreaHarness:
+
     def __init__(self, k, y, x, height, width, concrete_area):
         self.key = k
         self._y, self._x = y, x
@@ -168,16 +178,27 @@ class _AreaHarness:
         return self.__class__(self.key, self._y, self._x, self._height, self._width, ca)  # noqa: E501
 
     def to_rows(self):
+        for _, _, row in self.TO_SCREEN_ROWS():
+            yield row
+
+    def TO_SCREEN_ROWS(self):
+
+        curr_y, always_same_x = (self._y - 1), self._x
         formal_w, formal_h = self._width, self._height
 
         count = 0
         for row in self.concrete_area.to_rows():
+
             if formal_h == count:
                 xx(f'wat do when component breaks the contract (h): {self.key!r}')  # noqa: E501
             count += 1
+
             if formal_w != len(row):
                 xx(f'wat do when component breaks the contract (w): {self.key!r}')  # noqa: E501
-            yield row
+
+            curr_y += 1
+
+            yield curr_y, always_same_x, row
 
     @property
     def state(self):

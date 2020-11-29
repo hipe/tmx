@@ -2,7 +2,7 @@ from collections import namedtuple as _nt
 import re
 
 
-def experimental_deferential_button_AAer_(k, inter_aa_dct):
+def experimental_deferential_button_AAer_(k, inter_aa_dct, more=None):
     # When first developed, button areas were defined "by hand". In production
     # we expect to mostly (if not always) autogenerate the pages of buttons
     # with the complicated algo. So, this function tries to "look like" an
@@ -14,6 +14,19 @@ def experimental_deferential_button_AAer_(k, inter_aa_dct):
     def buttons_definition():
         for page_name, page_content in pi.to_pages():
             yield 'page_of_buttons', page_name, defserer(page_content)
+
+        # == BEGIN experiment
+        #    (this will be an ongoing area of exploration, how to straddle
+        #    the boundary between auto and manual, & let both coexist)
+        seen_static = False
+        if more:
+            for tup in more:
+                if 'static_buttons_area' == tup[0]:
+                    seen_static = True
+                yield tup
+        if seen_static:
+            return
+        # == END
 
         yield 'static_buttons_area', lambda: (('[q]uit',),)
 
@@ -51,7 +64,7 @@ def _abstract_hotkeys_area_via(directives, eli=None):
     # #testpoint
 
     pages = {}
-    static_buttons = None
+    static_page = None
     hotkeys_cache = _MutableHotkeysCache()
 
     scn = _scanner_via_iterator(directives)
@@ -98,7 +111,7 @@ def _abstract_hotkeys_area_via(directives, eli=None):
         if is_in_dynamic_section:
             pages[page_key] = page  # NOTE key can be None by this is a hack!
         else:
-            static_buttons = page
+            static_page = page
 
         if scn.empty:
             break
@@ -108,15 +121,15 @@ def _abstract_hotkeys_area_via(directives, eli=None):
     hotkeys_index = hotkeys_cache
     hotkeys_index.hotkeys = tuple(hotkeys_index.hotkeys)
     return _AbstractHotkeysArea(
-        static_buttons, pages, hotkeys_index, eli)
+        static_page, pages, hotkeys_index, eli)
 
 
 class _AbstractHotkeysArea:
 
-    def __init__(self, static_buttons, pages, hotkeys_index, eli):
+    def __init__(self, static_page, pages, hotkeys_index, eli):
 
-        self._static_buttons = static_buttons
-        self._pages = pages
+        self._static_page = static_page
+        self._dynamic_pages = pages
         self._hotkeys_index = hotkeys_index
         self._pages_index = eli
 
@@ -129,7 +142,7 @@ class _AbstractHotkeysArea:
         return _ConcreteHotkeysArea(
             h=h, w=w, dyn_max_h=dyn_max_h,
             wrap_plans=wrap_plans, static_wrap_plan=static_wp,
-            pages=self._pages, static_buttons=self._static_buttons,
+            pages=self._dynamic_pages, static_page=self._static_page,
             hotkeys_index=self._hotkeys_index,
             pages_index=self._pages_index)
 
@@ -140,7 +153,7 @@ class _AbstractHotkeysArea:
             # #live-resize. but some test units have multiple tests such that
             # this cache gets used
             tup = _BEASTMODE(
-                w, self._static_buttons, self._pages, self._hotkeys_index)
+                w, self._static_page, self._dynamic_pages, self._hotkeys_index)
             cache[w] = tup
         total_max_h, max_height_of_etc, wrap_plans, static_wp = tup
         return total_max_h
@@ -164,7 +177,7 @@ class _ConcreteHotkeysArea:
 
     def __init__(
             self, h, w, dyn_max_h, wrap_plans, static_wrap_plan,
-            pages, static_buttons, hotkeys_index,
+            pages, static_page, hotkeys_index,
             pages_index=None):
 
         self._height = h
@@ -172,8 +185,8 @@ class _ConcreteHotkeysArea:
         self._height_of_static_area = h - dyn_max_h
         self._wrap_plans = wrap_plans
         self._static_wrap_plan = static_wrap_plan
-        self._pages = pages
-        self._static_buttons = static_buttons
+        self._dynamic_pages = pages
+        self._static_page = static_page
         self._hotkeys_index = hotkeys_index
         self._pages_index = pages_index
 
@@ -203,7 +216,7 @@ class _ConcreteHotkeysArea:
         return ('buttons',)   # [#608.2.C] magic name of self, changed visually
 
     def _set_active_page(self, k):  # #testpoint
-        self._pages[k]  # validate argument
+        self._dynamic_pages[k]  # validate argument
         self._wrap_plans[k]  # sanity
         self._currently_selected_page_key = k
 
@@ -241,7 +254,7 @@ class _ConcreteHotkeysArea:
                 yield row
 
         # Rendering statics is like rendering dynamics except no blank lines
-        if self._static_buttons:
+        if self._static_page:
             for row in rows_via_wrap_plan(* self._static_wrap_plan):
                 yield row
 
@@ -274,7 +287,8 @@ class _ConcreteHotkeysArea:
 
     @property
     def _dynamic_page(self):
-        return (k := self._currently_selected_page_key) and self._pages[k]
+        if (k := self._currently_selected_page_key):
+            return self._dynamic_pages[k]
 
     def hello_I_am_CHA(_):
         return True
@@ -292,7 +306,7 @@ def _centerer(w):
     return center
 
 
-def _BEASTMODE(w, static_buttons, pages, hotkeys_index):
+def _BEASTMODE(w, static_page, pages, hotkeys_index):
 
     # This is the central crazy of the whole project so far: You have multiple
     # pages of buttons for your pseudo-dynamic buttons area, and you may have
@@ -314,8 +328,8 @@ def _BEASTMODE(w, static_buttons, pages, hotkeys_index):
 
     total_max_height = max_height_of_etc
     static_wp = None
-    if static_buttons:
-        static_wp = wrap_plan_via_page(static_buttons)
+    if static_page:
+        static_wp = wrap_plan_via_page(static_page)
         total_max_height += len(static_wp.wrap_grid)
 
     return total_max_height, max_height_of_etc, wrap_plans, static_wp
@@ -432,7 +446,7 @@ class _Hotkey:
 
     def __init__(self, label):
         if (md := _hotkey_rx.match(label)) is None:
-            raise RuntimeError(f"you must comply. {label!r}")
+            raise RuntimeError(f"you must comply. button label: {label!r}")
         self.label = label
         self.figurative_key = md[1]
 

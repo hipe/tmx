@@ -22,7 +22,8 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
 
         # Press this button
         resp = ic.receive_keypress('KEY_DOWN')
-        act = ic.apply_changes(resp.changes)
+        dct = ic.apply_changes(resp.changes)
+        act = tuple(dct.keys())
 
         # Three components should have changed
         self.assertSequenceEqual(act, ('nav_area', 'be_verbose', 'buttons'))
@@ -35,14 +36,15 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
         resp = ic.receive_keypress('\n')
 
         # Process the arbitrary component state change
-        act = ic.apply_changes(resp.changes)
+        dct = ic.apply_changes(resp.changes)
+        act = tuple(dct.keys())
 
         # One component should have changed
         self.assertSequenceEqual(act, ('be_verbose',))
 
 
 def buttons_top_row(cca):
-    r1, _, = tuple(cca._children['buttons'].to_rows())  # ..
+    r1, _, = tuple(cca.CHILD_HARNESS('buttons').to_rows())  # ..
     return r1
 
 

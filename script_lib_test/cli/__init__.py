@@ -82,6 +82,7 @@ def _whole_name_based_matcher(arg):
 
 def _tests():
     yield '010-what-key-was-pressed', _load_commonly
+    yield '020-buttons-and-flash', _load_commonly
 
 
 def _load_commonly(slug):

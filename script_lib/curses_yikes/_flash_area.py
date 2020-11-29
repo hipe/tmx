@@ -274,9 +274,18 @@ class _QualifiedWord:
     @property
     def has_trailing_punctution_of_any_kind(self):
         c = self._string[-1]
-        if c in '.?!)':  # if any of these, we're sure we don't want it
+
+        # If the string ends in any of these, we are sure we don't want punct
+        if c in '.?!)':
             return True
-        if re.match(r'[a-zA-Z0-9]\Z', c):  # if any of these, yes do want
+
+        # If the string ends in any of these, we are sure we do want punct
+        if re.match(r'[a-zA-Z0-9]\Z', c):
+            return False
+
+        # #cover-me: (developed visually)
+        # If the string ended in a sinqle or double quote, yes punct
+        if c in ('"', "'"):
             return False
 
         # Probably ok just to default to returning False but..
