@@ -35,7 +35,7 @@ def piece_rows_via_jumble(itr):
     Argument is "jumble": a stream each item of which is either a "piece"
     (string, like a "word") or a tuple of pieces. We do a buch of heuristics
     to "make it work" such that the output is a stream of "rows" where each
-    row is a tuple of "pieces" which are like the argumente pieces but with
+    row is a tuple of "pieces" which are like the argument pieces but with
     single spaces (and other punctuation?) interspersed approrpriately.
     """
     # ~(Case3696-(Case3731)

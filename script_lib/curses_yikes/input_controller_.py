@@ -293,12 +293,15 @@ class _Response:
         return self.changes is None and self.emissions is None
 
 
-class _Emission:
+class _Emission:  # #testpoint
     # For now a pared down version of the familiar thing, rewritten
 
     def __init__(self, tup):
         self.severity, shape, self.category, self.to_messages = tup
         assert 'expression' == shape
+
+    def to_channel_tail(self):
+        return (self.category,)
 
 
 _severity_is_OK = {'info': True}

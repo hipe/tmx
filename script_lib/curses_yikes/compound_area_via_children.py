@@ -17,6 +17,8 @@ def abstract_compound_area_via_children_(cx):
             return True
 
         def concretize_via_available_height_and_width(h, w, listener=None):
+            if listener is None:
+                listener = _throwing_listener
             return _concretize(h, w, index, cx, listener)
 
         two_pass_run_behavior = 'break'
@@ -392,14 +394,31 @@ class _OpenStruct:
 
 
 _AA_classer_via_type_string = {
-    # we could make this more dynamic, but why
-    'buttons': lambda: _this_buttons_module(),
+    # we could make this more dynamic, but why. Also change #here7
+    'buttons': lambda: _sibling_module('hotkey_via_character_and_label'),
     'checkbox': lambda: _simple('abstract_checkbox_via_directive_tail'),
+    'flash_area': lambda: _sibling_module('_flash_area'),
     'horizontal_rule': lambda: _AbstractHorizontalRule,
     'nav_area': lambda: _simple('abstract_nav_area_via_directive_tail'),
     'text_field': lambda: _simple('abstract_text_field_via_directive_tail'),
     'vertical_filler': lambda: _AbstractVerticalFiller,
 }
+
+
+def _sibling_module(mod_name):
+    if (x := (dct := _sibling_module.cache).get(mod_name)) is None:
+        dct[mod_name] = (x := _load_sibling_module(mod_name))
+    return x
+
+
+_sibling_module.cache = {}
+
+
+def _load_sibling_module(mod_name):
+    use_mod_name = '.'.join(('script_lib.curses_yikes', mod_name))
+    from importlib import import_module
+    mod = import_module(use_mod_name)
+    return mod.KLASS
 
 
 def _this_buttons_module():
@@ -494,9 +513,10 @@ def _children_initially(cx):
 
     children, anon_counts = {}, {}
 
-    syntactic_experiments = {
+    syntactic_experiments = {  # :#here7
         'buttons': 'first_term_is_both_key_and_type',
         'checkbox': 'SQL_ish_syntax',
+        'flash_area': 'first_term_is_both_key_and_type',
         'horizontal_rule': 'auto_increment_key',
         'nav_area': 'first_term_is_both_key_and_type',
         'text_field': 'SQL_ish_syntax',
@@ -540,6 +560,20 @@ def _children_initially(cx):
         rest = typ, *reversed(stack)  # #here1 type is first element
         children[k] = rest
     return children
+
+
+def _throwing_listener(*emi):
+    sev, shape, *middle, payloader = emi
+    if sev not in ('error', 'fatal'):
+        return
+    colon_us = [term.replace('_', ' ') for term in (sev, *middle)]
+    if ('structure', 'expression').index(shape):
+        msg_line = ' '.join(payloader())
+    else:
+        msg_line = '(structured emission)'
+    colon_us.append(msg_line)
+    reason = ': '.join(colon_us)
+    raise _my_exception_class()(reason)
 
 
 def _my_exception_class():

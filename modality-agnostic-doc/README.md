@@ -40,7 +40,7 @@ only in modeling interfaces for this purpose.
 |[#510.3]                   |       | track custom states
 |[#510.2]                   |       | track blank states
 |[#509]                     |       | [listener via expectations]
-|[#508.4]                   | #trak | the desire for unified severity semantics (the seven: FEWNIDT)
+|[#508.4]                   | #trak | the desire for unified severity semantics (the eight: FEWNIVDT)
 |[#508.3]                   | #trak | track this named temporary file pattern
 |[#508.2]                   | #trak | track chunker
 |[#507.11]                  | #trak | why/how we mock/fake/stub pretend files as line-based

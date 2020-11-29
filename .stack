@@ -28,4 +28,3 @@ integrate a nav bar and a text field and a checkbox and a hot keys area and exit
 a nav element and field and a check box and navigating between them changes hot keys
 only a text field (name and text area) no constraints, hard-coded widths. exits with outputing field value to stdout
 fixed number of rows hot keys area with bottom row fixed slots, flash area. exit with which button pressed written to stdout. flash area whines
-flash area
