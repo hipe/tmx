@@ -36,6 +36,7 @@ the related API that preceded this one.)
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | "mad parse" (whatever that is)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
+|[#608.2.C]                 |       | magic names like 'buttons'
 |[#608.2]                   |       | [see]
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
 |[#607.I]                   | #hole |

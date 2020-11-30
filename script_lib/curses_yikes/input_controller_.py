@@ -53,7 +53,13 @@ components... (EDIT: say something about accept the response)
 """
 
 
+from script_lib.curses_yikes import \
+        Emission_ as _emission, MultiPurposeResponse_ as _multi_response
 import re
+
+
+_input_response = _multi_response
+_change_response = _input_response
 
 
 class InputController_EXPERIMENTAL__:
@@ -84,6 +90,8 @@ class InputController_EXPERIMENTAL__:
         typ, label = tup
 
         if 'static' == typ:
+            if 'q' == keycode:  # hardcoded for now
+                return _response_for_quit()
             reason = "waiting to implement statics until dynamics API is est."
             xx(f"{reason} {keycode!r}")
         assert 'dynamic' == typ
@@ -93,12 +101,15 @@ class InputController_EXPERIMENTAL__:
         # (since this was a dynamic button, a component must be selected)
         k = self._key_of_currently_selected_component
         ca = self._concrete_area(k)
-        assert ca.state.transition_via_transition_name(label)
+        if not ca.state.transition_via_transition_name(label):
+            frm = ca.state.state_name
+            reason = f"no transition {label!r} from {frm!r}"
+            raise RuntimeError(reason)
 
         changes = (
             ('input_controller', 'apply_transition', k, label),
         )
-        return _Response(ok=True, changes=changes)
+        return _input_response(changes=changes)
 
     def _say_does_nothing(self, k):
         # We could map the key strings to prettier labels but why
@@ -110,9 +121,11 @@ class InputController_EXPERIMENTAL__:
         is_down = _is_down(k)
         return self._selection_controller.receive_up_or_down(is_down)
 
-    def apply_changes(self, changes, changed_visually=None):
-        if changed_visually is None:
-            changed_visually = {}
+    def apply_changes(self, changes):
+        tup = tuple(self._responses_from_apply_changes(changes))
+        return tup[0].__class__.MERGE_RESPONSES_EXPERIMENT_(tup)
+
+    def _responses_from_apply_changes(self, changes):
         for change in changes:
             stack = list(reversed(change))
             which_controller = stack.pop()
@@ -120,9 +133,10 @@ class InputController_EXPERIMENTAL__:
                 me = self
             else:
                 me = getattr(self, _which_controller[which_controller])
-            for k in me.apply_change(stack):
-                changed_visually[k] = None
-        return changed_visually
+                if me is None:
+                    # #todo we could unwind this
+                    continue  # allow CCA w/o buttons during testing #here1
+            yield me.apply_change(stack)
 
     def apply_change(self, stack):  # not part of our own public API so to
         typ = stack.pop()
@@ -141,14 +155,20 @@ class InputController_EXPERIMENTAL__:
         # in other components.. What would be great is to pass it a
         # mini-client that manages the writing of the response
 
-        if afn:
-            getattr(ca, afn)()  # ..
+        if afn is None:
+            return _change_response(changed_visually=(k,))
 
-        return (k,)
+        resp = getattr(ca, afn)()  # args?
+        if not resp:
+            xx(f"whoopsie: now, must result in response {k!r} {afn!r}")
+        resp.changes  # assert interface
+        return resp
 
     @property
     def _buttons_controller(self):
         # #[#608.2.C] buttons as magic name. CA as controller is experimental
+        if 'buttons' not in self._harnesses:
+            return  # allow CCA not to have buttons during testing #here1
         return self._concrete_area('buttons')
 
     @property
@@ -229,7 +249,7 @@ def _selection_controller(index, harnesses):
                 ('selection_controller', 'change_selected', k, k_),
                 ('buttons_controller', 'selected_changed', k_, sn),
             )
-            return _Response(ok=True, changes=changes)
+            return _input_response(changes=changes)
 
         def apply_change(self, stack):
             m = which_change[stack.pop()]
@@ -241,7 +261,7 @@ def _selection_controller(index, harnesses):
             goodbye.state.move_to_state_via_transition_name('cursor_exit')
             hello.state.move_to_state_via_transition_name('cursor_enter')
             self.key_of_currently_selected_component = k_
-            return k, k_  # list of components that changed visually
+            return _input_response(changed_visually=(k, k_))
 
     which_change = {'change_selected': '_do_change_selected'}
 
@@ -273,42 +293,22 @@ def _crazy_index_time(harnesses):
 
 # == Response structure and related (Model-esque)
 
+def _response_for_quit():
+    line = 'Goodbye from ncurses yikes®'  # #todo put app name here, or not
+    emi = _emission(('info', 'expression', 'goodbye', lambda: (line,)))
+    changes = (('host_directive', 'quit'),)
+    return _input_response(emissions=(emi,), changes=changes)
+
+
 def listener(*args):
     # A big hack to make code read more familiarly but BE CAREFUL
 
-    emi = _Emission(args)
+    emi = _emission(args)
     emis = (emi,)
-    ok = _severity_is_OK[emi.severity]
-    return _Response(ok=ok, emissions=emis)
+    return _change_response(emissions=emis)
 
 
-class _Response:
-
-    def __init__(self, ok, changes=None, emissions=None):
-        self.OK = ok
-        self.changes = changes
-        self.emissions = emissions
-
-    @property
-    def do_nothing(self):
-        return self.changes is None and self.emissions is None
-
-
-class _Emission:  # #testpoint
-    # For now a pared down version of the familiar thing, rewritten
-
-    def __init__(self, tup):
-        self.severity, shape, self.category, self.to_messages = tup
-        assert 'expression' == shape
-
-    def to_channel_tail(self):
-        return (self.category,)
-
-
-_severity_is_OK = {'info': True}
-
-
-_do_nothing = _Response(ok=True)
+_do_nothing = _change_response()
 
 
 def xx(msg=None):

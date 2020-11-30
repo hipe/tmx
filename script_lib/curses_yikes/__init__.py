@@ -80,6 +80,53 @@ def _build_this_crazy_stack():
     return list(reversed(result)), self
 
 
+class MultiPurposeResponse_:
+
+    def __init__(self, emissions=None, changes=None, changed_visually=None):
+        self.emissions = emissions
+        self.changes = changes
+        self.changed_visually = changed_visually
+
+    def MERGE_RESPONSES_EXPERIMENT_(responses):
+        leng = len(responses)
+        assert leng
+        if 1 == leng:
+            return responses[0]
+        kw = {}
+        for resp in responses:
+            for attr in _response_fields:
+                items = getattr(resp, attr)
+                if not items:
+                    continue
+                if (arr := kw.get(attr)) is None:
+                    kw[attr] = (arr := [])
+                for item in items:
+                    arr.append(item)
+
+        # Each final attributes should be None or non-zero-length tuple
+        for k, v in kw.items():
+            kw[k] = tuple(v)
+        return MultiPurposeResponse_(**kw)
+
+    @property
+    def do_nothing(self):
+        return self.changes is None and self.emissions is None
+
+
+_response_fields = 'emissions', 'changes', 'changed_visually'
+
+
+class Emission_:
+    # For now a pared down version of the familiar thing, rewritten
+
+    def __init__(self, tup):
+        self.severity, shape, self.category, self.to_messages = tup
+        assert 'expression' == shape
+
+    def to_channel_tail(self):
+        return (self.category,)
+
+
 class MyException_(RuntimeError):
     pass
 

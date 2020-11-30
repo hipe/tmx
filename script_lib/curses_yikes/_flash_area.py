@@ -63,7 +63,15 @@ class _ConcreteFlashArea:
 
         # Flatten all our messages into a stream of words (sort of)
         words = _words_via_emissions_with_sentence_hack(emis)
-        words = _words_tuple_via_words_iterator_with_sanity_check(words)
+        return self._receive_words(words)
+
+    def receive_message(self, msg):
+        self.clear_flash_area()
+        words_itr = _words_via_msg_lol(msg)
+        return self._receive_words(words_itr)
+
+    def _receive_words(self, words_itr):
+        words = _words_tuple_via_words_iterator_with_sanity_check(words_itr)
 
         # Get the "grid" that the word wrap came up with
         grid = tuple(self._word_wrap(words))

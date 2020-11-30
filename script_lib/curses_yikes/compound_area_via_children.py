@@ -149,16 +149,16 @@ class _ConcreteCompoundArea:
             for row in harness.to_rows():
                 yield row
 
-    def CHILD_CONCRETE_AREA(self, k):
-        return self.CHILD_HARNESS(k).concrete_area
+    def __getitem__(self, k):
+        return self.HARNESS_AT(k).concrete_area
 
-    def CHILD_HARNESS(self, k):
+    def HARNESS_AT(self, k):
         return self._children[k]
 
     def _to_component_harnesses(self):
         return self._children.values()
 
-    def to_children_keys(self):
+    def to_component_keys(self):
         return tuple(self._children.keys())
 
     def hello_I_am_CCA(_):
@@ -201,8 +201,16 @@ class _AreaHarness:
             yield curr_y, always_same_x, row
 
     @property
-    def state(self):
+    def state(self):  # #todo away this delegator
         return self.concrete_area.state
+
+    @property
+    def harness_y__(self):
+        return self._y
+
+    @property
+    def harness_x__(self):
+        return self._x
 
 
 def _distribute_extra_available_height(

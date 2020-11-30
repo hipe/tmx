@@ -20,10 +20,10 @@ one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
 ncurses send and receives multiple request/responses before clean disconnect/exit
 isomorph niCLI and ncurses (exit with terminal buffer, enter with -i and args, round-trip OK) (consider using [ma])
-something about vertical centering
-make check boxes and other named fields do the clever thing with available area
+the daunting poly-option
+reorderable list (isomorph with glob argument)
 constraints for everything. pass/fail
 only an editable list, no constraints. add, reorder, delete. contrived interface with emacs field.
-integrate a nav bar and a text field and a checkbox and a hot keys area and exit with the form values
-a nav element and field and a check box and navigating between them changes hot keys
-only a text field (name and text area) no constraints, hard-coded widths. exits with outputing field value to stdout
+stylesheet
+fix the display issues with the wide unicode gif by using a double-wide space
+get the form fields back from your current visual test

@@ -6,6 +6,16 @@ import unittest
 
 class CommonCase(unittest.TestCase):
 
+    # == DSL-like assertions
+
+    def expect_does_not_have_focus(self, comp):
+        assert 'initial' == state_name_of(comp)
+
+    def expect_has_focus(self, comp):
+        assert 'has_focus' == state_name_of(comp)  # might change to ! initial
+
+    # ==
+
     @property
     @shared_subject_in_children
     def keypress_end_state_response(self):
@@ -29,7 +39,7 @@ class CommonCase(unittest.TestCase):
     def the_component(self):
         cca = self.given_CCA_be_careful()
         k = self.component_key
-        return cca.CHILD_CONCRETE_AREA(k)
+        return dereference_component(cca, k)
 
     def given_CCA_be_careful(_):
         return CCA_one_BE_CAREFUL()
@@ -49,16 +59,16 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case7688_nav_area_states(CommonCase):
+class Case7688_nav_area_states_and_render(CommonCase):
     # #provision [#608.M]: topmost fella starts out as selected (not the point)
 
     def test_020_my_first_transition_test(self):
         comp = self.make_a_copy_of_the_component()
-        assert 'has_focus' == state_name_of(comp)
+        self.expect_has_focus(comp)
         move_to_state_via_transition_name(comp, 'cursor_exit')
-        assert 'initial' == state_name_of(comp)
+        self.expect_does_not_have_focus(comp)
         move_to_state_via_transition_name(comp, 'cursor_enter')
-        assert 'has_focus' == state_name_of(comp)
+        self.expect_has_focus(comp)
 
     def test_040_render_when_selected(self):
         comp = self.the_component()
@@ -76,26 +86,80 @@ class Case7688_nav_area_states(CommonCase):
     component_key = 'nav_area'
 
 
-class Case7692_checkbox_states(CommonCase):
+class Case7692_checkbox_states_and_render(CommonCase):
 
-    def test_100_hello_state(self):
-        assert 'initial' == state_name_of(self.the_component())
+    def test_020_hello_state(self):
+        comp = self.the_component()
+        self.expect_does_not_have_focus(comp)
+
+    def test_040_hello_render(self):
+        comp = self.the_component()
+        rows = tuple(comp.to_rows())
+        act, = rows
+        exp = '  [ ] Whether to be verbose'
+        self.assertEqual(act, exp)
+
+    def test_060_check(self):
+        comp = self.make_a_copy_of_the_component()
+        move_to_state_via_transition_name(comp, 'cursor_enter')
+        assert comp._is_checked is False
+        state = comp.state
+        tr = state.transition_via_transition_name('[enter] to toggle')  # yuck
+        fname = tr.action_function_name
+        assert fname
+        state.accept_transition(tr)
+        resp = getattr(comp, fname)()
+        k, = resp.changed_visually
+        assert 'be_verbose' == k
+        assert comp._is_checked is True
 
     component_key = 'be_verbose'
 
 
-class Case7696_textfield_states(CommonCase):
+class Case7696_text_field_states_and_render(CommonCase):
 
-    def test_100_hello_state(self):
+    def test_020_hello_state(self):
         assert 'initial' == state_name_of(self.the_component())
+
+    def test_040_hello_render(self):
+        comp = self.the_component()
+        rows = tuple(comp.to_rows())
+        act, = rows
+        exp = '  Foo fah: [              ]'
+        self.assertEqual(act, exp)
+
+    def test_060_big_interaction_for_enter_emacs_mode(self):
+
+        # Navigate down to the text field component
+        comp = self.make_a_copy_of_the_component()
+        move_to_state_via_transition_name(comp, 'cursor_enter')
+
+        # Hit enter on the component to enter edit mode (assert host direc.)
+        state = comp.state
+        tr = state.transition_via_transition_name('[enter] for edit')  # yuck
+        fname = tr.action_function_name
+        assert fname
+        state.accept_transition(tr)
+        resp = getattr(comp, fname)()
+        ch, = resp.changes
+        assert 'host_directive' == ch[0]
+        assert 'enter_text_field_modal' == ch[1]
+
+        # Pretend we enter some text and hit enter
+        resp = comp.receive_new_value_from_modal__('zing')
+
+        # Assert: this results in a response (could write to flash)
+        assert ('foo_fah',) == resp.changed_visually
+
+        # Assert: the new value is displayed by the component now
+        act = tuple(comp.to_rows())
+        exp = ('👉 Foo fah: [zing          ]',)
+        self.assertSequenceEqual(act, exp)
 
     component_key = 'foo_fah'
 
 
 class Case7700_press_a_strange_key(CommonCase):
-
-    def test_033_response_is_OK(self):
-        response_is_OK(self.keypress_end_state_response)
 
     def test_066_response_has_semantic_category(self):
         act = response_category(self.keypress_end_state_response)
@@ -114,9 +178,6 @@ class Case7700_press_a_strange_key(CommonCase):
 
 class Case7702_move_up_but_you_cant_go_up(CommonCase):
 
-    def test_033_response_is_OK(self):
-        response_is_OK(self.keypress_end_state_response)
-
     def test_066_does_nothing(self):
         assert self.keypress_end_state_response.do_nothing
 
@@ -131,7 +192,6 @@ class Case7704_move_down_oh_boy(CommonCase):
 
     def test_033_LETS_GO(self):
         resp = self.keypress_end_state_response
-        assert resp.OK
         change1, change2 = resp.changes
         exp = 'selection_controller change_selected nav_area foo_fah'.split()
         self.assertSequenceEqual(change1, exp)
@@ -160,15 +220,11 @@ def emissions_via_response(resp):
     return resp.emissions
 
 
-def response_is_OK(resp):
-    assert resp.OK is True
-
-
 @lazy
 def controller_one_DO_NOT_MUTATE():
     cca = CCA_one_BE_CAREFUL()
     # cca = cca.MAKE_A_COPY()
-    return cca.to_EXPERIMENTAL_input_controller()
+    return input_controller_via_CCA(cca)
 
 
 @lazy
@@ -192,12 +248,20 @@ def ACA_def_one():
         yield 'vertical_filler'
 
 
+def input_controller_via_CCA(cca):
+    return cca.to_EXPERIMENTAL_input_controller()
+
+
 def move_to_state_via_transition_name(comp, sn):
-    comp.state.move_to_state_via_transition_name(sn)
+    return comp.state.move_to_state_via_transition_name(sn)
 
 
 def state_name_of(comp):
     return comp.state.state_name
+
+
+def dereference_component(cca, k):
+    return cca[k]
 
 
 def em_lib():

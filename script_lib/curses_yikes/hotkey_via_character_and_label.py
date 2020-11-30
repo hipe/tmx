@@ -1,3 +1,4 @@
+from script_lib.curses_yikes import MultiPurposeResponse_ as _change_response
 from collections import namedtuple as _nt
 import re
 
@@ -213,7 +214,8 @@ class _ConcreteHotkeysArea:
             self._set_active_page_to_none()
         else:
             self._set_active_page(pn)
-        return ('buttons',)   # [#608.2.C] magic name of self, changed visually
+        # [#608.2.C] we don't get real name for now, just magic name 'buttons'
+        return _change_response(changed_visually=('buttons',))
 
     def _set_active_page(self, k):  # #testpoint
         self._dynamic_pages[k]  # validate argument
