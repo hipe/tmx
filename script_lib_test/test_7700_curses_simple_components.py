@@ -1,3 +1,4 @@
+from script_lib_test.curses_yikes_support import input_controller_via_CCA
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subject_in_children, \
         lazy
@@ -246,10 +247,6 @@ def ACA_def_one():
         yield 'checkbox', 'be_verbose', 'label', 'Whether to be verbose'
         yield 'text_field', 'fiz_nizzle'
         yield 'vertical_filler'
-
-
-def input_controller_via_CCA(cca):
-    return cca.to_EXPERIMENTAL_input_controller()
 
 
 def move_to_state_via_transition_name(comp, sn):

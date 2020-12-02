@@ -282,6 +282,58 @@ will do is refer to articles in #[#008.10] that-other-project. #edit [#010.B]
 
 
 
+## the five-finger death punch :[#010.8]
+
+This is a placeholder for the idea (documented in another mono-repo).
+Mainly, this section in this document exists so we can establish the tracking
+number and have somewhere that it's explained, at least cursorily.
+
+(This is the first "best practice" we document in this .. document. if we
+want to add another one, we may consider starting a new document for this.)
+
+Briefly:
+
+1. Write out (possibly user stories demonstrating your feature(s) and)
+   your algorithm in pseudocode. This can take several hours or days, and
+   might include lengthy sections for "dicussion" and sections breaking down
+   what are some of the abstract concepts and would-be classes. Typically this
+   phase assists greatly in solidifying what the interworking pieces are,
+   in revealing faulty assumptions, in revealing sub-plots of the whole concern
+   that were overlooked. This absolutely is not the final word on what the
+   algorithm/model will be; but it is nonetheless always a crucial step.
+
+2. Figure out how to break the algorithm (the pipeline, the architecture, etc)
+   into steps that correspond to something like "magnetics" or "model classes"
+   or even just user-story units that can be tested in isolation from one
+   another.
+
+3. Implement each unit. Frequently one-test-file per unit. Frequently
+   one commit per unit (but if the work takes more than a day, consider
+   breaking down the commit-units somehow). As for what order to do this
+   in: hether to do this front-to-back, back-to-front, top-down, bottom-up etc
+   is a concern, but is not one we will cover here. Since units almost
+   certainly have interdependencies, this informs how we do (2) and (1):
+   It's best to be able to test these units (magnetics, say) in isolation,
+   so use models (or plain old structs (or sexp-like tuples)) that you write
+   "by hand". Mock/dummy/stub only when you absolutely have to.
+
+4. (depending on how complex the interactions are between the units) write
+   tests that cover integration among the units. If you have a function API
+   or some kind of "fat model" or controller at the front of this, this is
+   where integration tests go for all that.
+
+5. Cover integration with your interface(s)! This may take days and happen
+   accross many commits/test units. Interfaces could mean CLI, GUI, web and/or
+   other. There is an argument to be made for mocking out your interface first
+   (before even our step (1)), possibly in visual/interface prototyping tools.
+   We support that there are categories of use-case where this approach is
+   Best, and perhaps we should change the wording of (1) to support this.
+
+Real-life user testing isn't covered here, but of course must happen
+and should cycle-back to inform possibly all of these steps (hopefully
+not much step (2) though).
+
+
 [semver]: http://semver.org
 
 ## (document-meta)

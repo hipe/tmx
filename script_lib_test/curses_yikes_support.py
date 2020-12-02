@@ -7,6 +7,12 @@ def open_curses_session():
     return _top_module().build_this_crazy_context_manager_()
 
 
+def input_controller_via_CCA(cca):  # cca = concrete compound area
+    from script_lib.curses_yikes.compound_area_via_children import \
+        input_controller_via_CCA_ as func
+    return func(cca)
+
+
 def concretize(h, w, aa, listener=None):
     return aa.concretize_via_available_height_and_width(h, w, listener)
 

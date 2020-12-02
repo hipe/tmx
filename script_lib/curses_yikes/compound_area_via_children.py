@@ -80,9 +80,10 @@ def _concretize(h, w, index, cx, listener):
         # The hardcoded rule is we must select the topmost one; just because
         topmost_interactable = None
         for h in harnesses.values():
-            if h.state is None:
+            c = h.concrete_area
+            if c.state is None:  # interactability thus
                 continue
-            topmost_interactable = h
+            topmost_interactable = c
             break
         if topmost_interactable:  # (tests like (Case7650) have no interac.)
             topmost_interactable.state.move_to_state_via_state_name('has_focus')  # noqa: E501
@@ -127,6 +128,26 @@ def _concretize(h, w, index, cx, listener):
         pass
 
 
+def input_controller_via_CCA_(cca):  # cca = concrete compound area
+
+    cx = cca._MAKE_THIS_ONE_VIEW()
+
+    from script_lib.curses_yikes.focus_controller_ import \
+        vertical_splay_selection_controller_ as func
+
+    selection_controller = func(cx)
+
+    # [#608.2.C] magic name. allow it not to exist probably just for testing
+    buttons_area = cx.get('buttons')
+
+    from script_lib.curses_yikes.input_controller_ import \
+        BUSINESS_BUTTONPRESS_CONTROLLER_VIA_ as func, \
+        InputController__ as func2
+
+    bbc = func(selection_controller, cx)
+    return func2(selection_controller, bbc, buttons_area)
+
+
 class _ConcreteCompoundArea:
 
     def __init__(self, cx):
@@ -136,9 +157,8 @@ class _ConcreteCompoundArea:
         cx = {k: v.MAKE_A_COPY() for k, v in self._children.items()}
         return self.__class__(cx)
 
-    def to_EXPERIMENTAL_input_controller(self):
-        from .input_controller_ import InputController_EXPERIMENTAL__ as func
-        return func(self._children)
+    def to_EXPERIMENTAL_input_controller__(self):
+        return input_controller_via_CCA_(self)
 
     def to_rows(self):
         for harness in self._to_component_harnesses():
@@ -160,6 +180,28 @@ class _ConcreteCompoundArea:
 
     def to_component_keys(self):
         return tuple(self._children.keys())
+
+    def _MAKE_THIS_ONE_VIEW(self):
+        # pretend like there exists a dictionary of just comps not harnesses
+
+        class view:
+            def items(_):
+                return ((k, getitem(k)) for k in harnesses.keys())
+
+            def get(_, k):
+                return (ca := harnesses.get(k)) and f(ca)
+
+            def __getitem__(_, k):
+                return getitem(k)
+
+        def getitem(k):
+            return f(harnesses[k])
+
+        def f(ca):
+            return ca.concrete_area
+
+        harnesses = self._children
+        return view()
 
     def hello_I_am_CCA(_):
         return True
@@ -199,10 +241,6 @@ class _AreaHarness:
             curr_y += 1
 
             yield curr_y, always_same_x, row
-
-    @property
-    def state(self):  # #todo away this delegator
-        return self.concrete_area.state
 
     @property
     def harness_y__(self):

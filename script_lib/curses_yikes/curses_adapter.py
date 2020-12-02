@@ -33,7 +33,7 @@ def _our_first_ever_input_loop(aca, stdscr, curses):
     cca = aca.concretize_via_available_height_and_width(h, w)
 
     # Get ready to write and read
-    ic = cca.to_EXPERIMENTAL_input_controller()
+    ic = cca.to_EXPERIMENTAL_input_controller__()
     flash = cca['flash_area']  # #[#608.2.C] for now required, magic name
 
     # Use this dict as a mutable struct, throughout the whole lifetime
@@ -60,7 +60,7 @@ def _our_first_ever_input_loop(aca, stdscr, curses):
         redraw_me[k]  # validate name
         redraw_me[k] = True
 
-    # (the remaining logic started as pseudocode in _input_controller)
+    # (the remaining logic started as pseudocode in input_controller_)
 
     stay_running = True
     while stay_running:

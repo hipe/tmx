@@ -2,8 +2,8 @@
 As far as we can forsee for now, the lifecycle of our clients will go
 something like this:
 
-    render the whole screen
     while True:
+        render all the parts of the screen that need rendering
         block waiting for input
 
         if input didn't map to any known thing (was invalid)
@@ -16,7 +16,7 @@ something like this:
         given the valid input, dispatch [something] to the affected components
         (components themselves might soft error, later for that)
         (for now there's a 1-to-1 map b components affected and visual change)
-        based on the components that changed, redraw those components
+        somehow keep track of which components need a redraw
 
 
 Design Objectives Overview
@@ -49,12 +49,13 @@ Objectives in practice
 
 To the end of decomposing this for testing, receiving a keypress results
 in a response but does NOT itself change the state of the controller OR
-components... (EDIT: say something about accept the response)
+components... All of this is now documented in [#608.L]
 """
 
 
 from script_lib.curses_yikes import \
         Emission_ as _emission, MultiPurposeResponse_ as _multi_response
+from collections import namedtuple as _nt
 import re
 
 
@@ -62,33 +63,38 @@ _input_response = _multi_response
 _change_response = _input_response
 
 
-class InputController_EXPERIMENTAL__:
+class InputController__:
 
-    def __init__(self, harnesses):
-        index = _crazy_index_time(harnesses)
-        self._selection_controller = _selection_controller(index, harnesses)
-        self._harnesses = harnesses
+    def __init__(
+            self,
+            directional_controller, business_buttonpress_controller,
+            buttons_area):
 
-    def receive_keypress(self, k):
-        if k in _directions:
-            if k in _horizontal:
-                return _do_nothing  # ..
-            return self._handle_vertical_selection_change(k)
+        frame = _controller_frame(
+            directional_controller, business_buttonpress_controller)
 
-        if _lowercase_alpha.match(k) or _enter == k:
-            return self._attempt_to_dispatch(k)
+        self._controller_stack = [frame]
 
-        return self._say_does_nothing(k)
+        self._buttons_area = buttons_area
 
-    def _attempt_to_dispatch(self, keycode):
+    def receive_keypress(self, keycode):
+        # Is the keypress an arrow key? Use the frame's direction controller
+        if keycode in _arrow_keys:
+            # DC = direction controller
+            return self._top_frame.DC.receive_directional_key_press(keycode)
+
+        # Does the keypress look like a business keypress?
+        if not (_lowercase_alpha.match(keycode) or _enter == keycode):
+            return self._say_does_nothing(keycode)
 
         # Does the keypress correspond to one of the currently showing buttons?
-        bc = self._buttons_controller
+        bc = self._buttons_area  # bc = buttons controller
         tup = bc.type_and_label_of_button_via_keycode__(keycode)
         if tup is None:
             return self._say_does_nothing(keycode)
         typ, label = tup
 
+        # Is the keypress for a static button?
         if 'static' == typ:
             if 'q' == keycode:  # hardcoded for now
                 return _response_for_quit()
@@ -97,19 +103,8 @@ class InputController_EXPERIMENTAL__:
         assert 'dynamic' == typ
 
         # Since this was a dynamic button, it must correspond to a transition
-
-        # (since this was a dynamic button, a component must be selected)
-        k = self._key_of_currently_selected_component
-        ca = self._concrete_area(k)
-        if not ca.state.transition_via_transition_name(label):
-            frm = ca.state.state_name
-            reason = f"no transition {label!r} from {frm!r}"
-            raise RuntimeError(reason)
-
-        changes = (
-            ('input_controller', 'apply_transition', k, label),
-        )
-        return _input_response(changes=changes)
+        # BBC = buttonpress business controller
+        return self._top_frame.BBC.receive_business_buttonpress(label)
 
     def _say_does_nothing(self, k):
         # We could map the key strings to prettier labels but why
@@ -117,178 +112,86 @@ class InputController_EXPERIMENTAL__:
             yield f"Does nothing: {k!r}"
         return listener('info', 'expression', 'key_does_nothing', lines)
 
-    def _handle_vertical_selection_change(self, k):
-        is_down = _is_down(k)
-        return self._selection_controller.receive_up_or_down(is_down)
-
     def apply_changes(self, changes):
         tup = tuple(self._responses_from_apply_changes(changes))
         return tup[0].__class__.MERGE_RESPONSES_EXPERIMENT_(tup)
 
     def _responses_from_apply_changes(self, changes):
+
         for change in changes:
             stack = list(reversed(change))
             which_controller = stack.pop()
-            if 'input_controller' == which_controller:
-                me = self
-            else:
-                me = getattr(self, _which_controller[which_controller])
-                if me is None:
-                    # #todo we could unwind this
-                    continue  # allow CCA w/o buttons during testing #here1
-            yield me.apply_change(stack)
 
-    def apply_change(self, stack):  # not part of our own public API so to
-        typ = stack.pop()
-        assert 'apply_transition' == typ
-        return self._do_apply_transition(* reversed(stack))
+            # == FROM eventually
+            if 'input_controller' == which_controller:
+                typ = stack.pop()
+                assert 'apply_transition' == typ
+                yield self._do_apply_transition(* reversed(stack))
+
+            elif 'selection_controller' == which_controller:
+                yield self._top_frame.DC.apply_change(stack)
+
+            elif 'buttons_controller' == which_controller:
+                ba = self._buttons_area
+                if ba is None:
+                    continue  # allow CCA w/o buttons during testing
+                    # #todo we could unwind this
+                yield ba.apply_change(stack)
+
+            else:
+                raise RuntimeError(f"oops: {which_controller!r}")
+
+            # == TO
 
     def _do_apply_transition(self, k, trans_name):
-        ca = self._concrete_area(k)
+        return self._top_frame.BBC.apply_transition(k, trans_name)
+
+    @property
+    def _top_frame(self):
+        return self._controller_stack[-1]
+
+
+_controller_frame = _nt('CF', ('DC', 'BBC'))
+
+
+def BUSINESS_BUTTONPRESS_CONTROLLER_VIA_(selection_controller, cx):
+
+    def receive_business_buttonpress(label):
+        curr_k = selection_controller.key_of_currently_selected_component
+        ca = cx[curr_k]
+        if not ca.state.transition_via_transition_name(label):
+            frm = ca.state.state_name
+            reason = f"no transition {label!r} from {frm!r}"
+            raise RuntimeError(reason)
+        changes = (('input_controller', 'apply_transition', curr_k, label),)
+        return _input_response(changes=changes)
+
+    def apply_transition(k, trans_name):
+
+        # Dereference the transition by name and traverse it
+        ca = cx[k]
         trans = ca.state.transition_via_transition_name(trans_name)
         afn = trans.action_function_name
         ca.state.accept_transition(trans)  # before? after?
 
-        # #eventually imagine the component's definition including a custom
-        # controller function that does some kind of validation and writes
-        # to flash on failure, or maybe it leads to other changes in the UI
-        # in other components.. What would be great is to pass it a
-        # mini-client that manages the writing of the response
-
+        # If the component's FFSA didn't have an action associated with this
+        # transition, you are done (and assume it changed visually)
         if afn is None:
             return _change_response(changed_visually=(k,))
 
+        # Call the action as implemented by the component
         resp = getattr(ca, afn)()  # args?
         if not resp:
             xx(f"whoopsie: now, must result in response {k!r} {afn!r}")
-        resp.changes  # assert interface
+        resp.changes  # assert interface now, just for sanity for now
         return resp
 
-    @property
-    def _buttons_controller(self):
-        # #[#608.2.C] buttons as magic name. CA as controller is experimental
-        if 'buttons' not in self._harnesses:
-            return  # allow CCA not to have buttons during testing #here1
-        return self._concrete_area('buttons')
-
-    @property
-    def _key_of_currently_selected_component(self):
-        return self._selection_controller.key_of_currently_selected_component
-
-    def _concrete_area(self, k):
-        return self._harnesses[k].concrete_area
-
-
-_which_controller = {
-    'buttons_controller': '_buttons_controller',
-    'selection_controller': '_selection_controller'
-}
-
-
-# == Keys metadata
-
-_up, _down, _left, _right = 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'
-_directions = {_up, _down, _left, _right}
-_horizontal = {_left, _right}
-_is_down = (_up, _down).index  # 👀
-
-
-_enter = '\n'
-_lowercase_alpha = re.compile(r'[a-z]\Z')
-
-
-# == Selection controller
-
-def _selection_controller(index, harnesses):
-
-    # Set up initial indexes used all over the place
-    interactable_harnesses = tuple(harnesses[k] for k in index.keys_of_interactable_components)  # noqa: E501
-    leng = len(interactable_harnesses)
-    keys_in_order = tuple(h.key for h in interactable_harnesses)
-    harness_via_key = {h.key: h for h in interactable_harnesses}
-    order_offset_via_key = {keys_in_order[i]: i for i in range(0, leng)}
-    order_offset_of_bottommost = leng - 1
-
-    # Assert that the topmost interactable component is in the focus state
-    top_k = keys_in_order[0]  # ..
-    top_h = harness_via_key[top_k]
-    rest_h = (harness_via_key[keys_in_order[i]] for i in range(1, leng))
-    sn = top_h.state.state_name
-    if 'has_focus' != sn:
-        xx(f"top compponent ({top_k!r}) must already have focus")
-
-    # Assert that the remaining non-top components are in the initial state
-    def must_be_in_initial_state(harness):
-        sn = harness.state.state_name
-        if 'initial' == sn:
-            return True
-        xx(f"Not in initial state: '{harness.key}' (state: {sn!r})")
-    assert all(must_be_in_initial_state(h) for h in rest_h)
-
-    class SelectionController:
-        def __init__(self):
-            self.key_of_currently_selected_component = top_k
-
-        def receive_up_or_down(self, is_down):
-            k = self.key_of_currently_selected_component
-            i = order_offset_via_key[k]
-            if is_down:
-                if order_offset_of_bottommost == i:
-                    return _do_nothing
-                desired_order_offset = i + 1
-            else:
-                if 0 == i:
-                    return _do_nothing
-                desired_order_offset = i - 1
-
-            k_ = keys_in_order[desired_order_offset]
-
-            sn = harness_via_key[k_].state.state_name_via_transition_name('cursor_enter')  # noqa: E501
-
-            changes = (
-                ('selection_controller', 'change_selected', k, k_),
-                ('buttons_controller', 'selected_changed', k_, sn),
-            )
-            return _input_response(changes=changes)
-
-        def apply_change(self, stack):
-            m = which_change[stack.pop()]
-            return getattr(self, m)(* reversed(stack))
-
-        def _do_change_selected(self, k, k_):
-            goodbye = harness_via_key[k]
-            hello = harness_via_key[k_]
-            goodbye.state.move_to_state_via_transition_name('cursor_exit')
-            hello.state.move_to_state_via_transition_name('cursor_enter')
-            self.key_of_currently_selected_component = k_
-            return _input_response(changed_visually=(k, k_))
-
-    which_change = {'change_selected': '_do_change_selected'}
-
-    return SelectionController()
-
-
-# == Indexing the components
-
-def _crazy_index_time(harnesses):
-    (before := set(locals().keys())).add('before')  # 🙄
-    # == BEGIN MAGIC
-
-    keys_of_interactable_components = []
-
-    # == END MAGIC
-    index_keys_in_order = tuple(k for k in locals().keys() if k not in before)
-
-    for k, harness in harnesses.items():
-        if harness.state is None:
-            continue
-        keys_of_interactable_components.append(k)
-
     locs = locals()
-    res = {k: locs[k] for k in index_keys_in_order}
+    return _busi_buti_conti(** {k: locs[k] for k in _busi_buti_conti._fields})
 
-    from collections import namedtuple as _nt
-    return _nt('_Index', tuple(res.keys()))(**res)
+
+_busi_buti_conti = _nt(
+    '_busi_buti_cont', ('receive_business_buttonpress', 'apply_transition'))
 
 
 # == Response structure and related (Model-esque)
@@ -308,7 +211,11 @@ def listener(*args):
     return _change_response(emissions=emis)
 
 
-_do_nothing = _change_response()
+# == Local constants
+
+_arrow_keys = set('KEY_UP KEY_RIGHT KEY_DOWN KEY_LEFT'.split())
+_enter = '\n'
+_lowercase_alpha = re.compile(r'[a-z]\Z')
 
 
 def xx(msg=None):

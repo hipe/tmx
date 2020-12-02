@@ -27,3 +27,6 @@ only an editable list, no constraints. add, reorder, delete. contrived interface
 stylesheet
 fix the display issues with the wide unicode gif by using a double-wide space
 get the form fields back from your current visual test
+poly-option input (use injection thing)
+conditional buttons thing
+orderable list semi-autonomous area (written with injection in mind)

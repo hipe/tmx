@@ -1,3 +1,4 @@
+from script_lib_test.curses_yikes_support import input_controller_via_CCA
 # from modality_agnostic.test_support.common import lazy
 # dangerous_memoize_in_child_classes as shared_subject_in_children, \
 import unittest
@@ -12,7 +13,7 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
     def test_020_long_story(self):
         aca = ACA_via(ACA_def_one())
         cca = concretize(11, 27, aca)
-        ic = cca.to_EXPERIMENTAL_input_controller()
+        ic = input_controller_via_CCA(cca)
 
         # In intial state
         row = buttons_top_row(cca)
