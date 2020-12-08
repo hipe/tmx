@@ -3,6 +3,9 @@ from collections import namedtuple as _nt
 import re
 
 
+# inter_aa_dct = interactive abstract area dictionary
+
+
 def experimental_deferential_button_AAer_(k, inter_aa_dct, more=None):
     # When first developed, button areas were defined "by hand". In production
     # we expect to mostly (if not always) autogenerate the pages of buttons
@@ -48,11 +51,8 @@ def _pages_index(inter_aa_dct):
 
     class pages_index:  # #class-as-namespace
 
-        def PAGE_NAME_VIA(k, state_name):
-            aa = inter_aa_dct[k]  # get from key to AA ..
-            ffsa = aa.FFSAer()  # .. to FFSA ..
-            ffsa_key = ffsa.FFSA_key  # .. to FFSA key ..
-            page_name_via_state_name = FSAs_map[ffsa_key]  # .. to this ..
+        def PAGE_NAME_VIA(ffsa_key, state_name):
+            page_name_via_state_name = FSAs_map[ffsa_key]
             return page_name_via_state_name[state_name]  # might be None
 
         def to_pages():
@@ -195,21 +195,12 @@ class _ConcreteHotkeysArea:
         self._currently_selected_page_key = None
         self._blank_row = ' ' * w
 
-        # The buttons area is weirdly *not* "interactable" in the formal sense
-        # that it does not get selected by navigating up or down to it
-        self.state = None  # [#608.2.C] magic name to say not interactable
-
     # == Receive change
 
-    def apply_change(self, stack):
-        change_type = stack.pop()
-        assert 'selected_changed' == change_type  # ..
-        return self._on_selected_changed(* reversed(stack))
-
-    def _on_selected_changed(self, k, state_name):
-        pn = self._pages_index.PAGE_NAME_VIA(k, state_name)
+    def apply_change_focus(self, ffsa_key, state_name):
+        pn = self._pages_index.PAGE_NAME_VIA(ffsa_key, state_name)
         if self._currently_selected_page_key == pn:
-            return ()  # nothing changed visually on our end
+            return _change_response()  # _do_nothing
         if pn is None:
             self._set_active_page_to_none()
         else:
@@ -294,6 +285,8 @@ class _ConcreteHotkeysArea:
 
     def hello_I_am_CHA(_):
         return True
+
+    is_focusable = False
 
 
 def _centerer(w):

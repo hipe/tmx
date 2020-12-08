@@ -23,8 +23,9 @@ the related API that preceded this one.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
+|[#608.N]                   |       | curses yikes: a point about focus
 |[#608.13]                  | #wish | argument arity `<like-this>?`
-|[#608.L]                   | #hole |
+|[#608.L]                   |       | curses event model
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.M]                   | #prov | curses yikes: #provision: topmost interactable starts as selected
 |[#608.L]                   |       | curses yikes event model

@@ -1,3 +1,12 @@
+from script_lib.curses_yikes import \
+        StateMachineBasedInteractableComponent_ as _Interactable, \
+        piece_via_has_focus_ as _piece_via_has_focus, \
+        label_via_key_ as _label_via_key, \
+        calm_name_via_key_ as _calm_name_via_key, \
+        MultiPurposeResponse_ as _response, \
+        WriteOnceMutableStruct_ as _MutableStruct
+
+
 def text_field_state_machine():
     yield 'initial', 'cursor_enter', 'has_focus'
     yield 'has_focus', 'cursor_exit', 'initial'
@@ -64,7 +73,7 @@ class abstract_text_field_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteTextField:
+class _ConcreteTextField(_Interactable):
 
     def __init__(self, *five):
         if len(five):
@@ -72,7 +81,7 @@ class _ConcreteTextField:
 
     def _init_normally(self, k, state, memo, w, label):
         self._key = k
-        self.state = state
+        self._state = state
         wlw = memo['widest_text_field_label_width']
         self._render = _bake_text_field_renderer(label, wlw, w)
         self._value_string = None  # will probably become an arg
@@ -80,7 +89,7 @@ class _ConcreteTextField:
     def MAKE_A_COPY(self):
         otr = self.__class__()
         otr._key = self._key
-        otr.state = self.state.MAKE_A_COPY()
+        otr._state = self._state.MAKE_A_COPY()
         otr._render = self._render
         otr._value_string = self._value_string
         return otr
@@ -92,19 +101,15 @@ class _ConcreteTextField:
         return _response(changes=changes)
 
     @property
-    def value_span_x_for_modal__(self):
-        return self._render._SPAN_X
+    def value_span_x_and_width_for_modal_(self):
+        return self._render._SPAN_X, self._render._SPAN_W
 
-    @property
-    def value_span_width_for_modal__(self):
-        return self._render._SPAN_W
-
-    def receive_new_value_from_modal__(self, mixed):
+    def receive_new_value_from_modal_(self, mixed):
         if mixed is None:
             pass  # it means they cancelled out. keep old value
         else:
             self._value_string = mixed  # no validation for now lol
-        self.state.move_to_state_via_transition_name('done_with_emacs_thing')
+        self._state.move_to_state_via_transition_name('done_with_emacs_thing')
 
         # (probably not nec to tell the host we changed b.c it redraws anyway)
         return _response(changed_visually=(self._key,))
@@ -112,7 +117,7 @@ class _ConcreteTextField:
     # == END
 
     def to_rows(self):
-        left_piece = _piece_for_selection(self.state)
+        left_piece = _piece_via_has_focus(self._has_focus)
         return (self._render(left_piece, self._value_string),)
 
 
@@ -128,7 +133,7 @@ def _bake_text_field_renderer(label, widest_label_width, full_width):
         dct = {k: v for k, v in proto_d.items()}
         o = _MutableStruct(dct)
 
-        # The left piece is fixed-width but variable value (selected-ness)
+        # The left piece is fixed-width but variable value (focused-ness)
         o['left'] = left_pc
 
         # The value span is..
@@ -217,7 +222,7 @@ class abstract_checkbox_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteCheckbox:
+class _ConcreteCheckbox(_Interactable):
 
     def __init__(self, *five):
         if len(five):
@@ -225,7 +230,7 @@ class _ConcreteCheckbox:
 
     def _init_normally(self, k, state, memo, w, label):
         self._key = k
-        self.state = state
+        self._state = state
         self._width = w
         wlw = memo['widest_checkbox_label_width']
         self._render = _bake_checkbox_renderer(label, wlw, w)
@@ -234,7 +239,7 @@ class _ConcreteCheckbox:
     def MAKE_A_COPY(self):
         otr = self.__class__()
         otr._key = self._key
-        otr.state = self.state.MAKE_A_COPY()
+        otr._state = self._state.MAKE_A_COPY()
         otr._width = self._width
         otr._render = self._render
         otr._is_checked = self._is_checked
@@ -245,7 +250,7 @@ class _ConcreteCheckbox:
         return _response(changed_visually=(self._key,))
 
     def to_rows(self):
-        left_piece = _piece_for_selection(self.state)
+        left_piece = _piece_via_has_focus(self._has_focus)
         final = self._render(left_piece, self._is_checked)
         assert self._width == len(final)  # idk, magic
         return (final,)
@@ -304,16 +309,16 @@ class abstract_nav_area_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteNavBar:
+class _ConcreteNavBar(_Interactable):
 
-    def __init__(self, w, bc_keys, state=None):
+    def __init__(self, w, bc_keys, state):
         self._breadcrumb_keys = bc_keys
         self._width = w
-        self.state = state
+        self._state = state
 
     def MAKE_A_COPY(self):
-        otr = self.__class__(self._width, self._breadcrumb_keys)
-        otr.state = self.state.MAKE_A_COPY()
+        otr_state = self._state.MAKE_A_COPY()
+        otr = self.__class__(self._width, self._breadcrumb_keys, otr_state)
         return otr
 
     def to_rows(self):
@@ -330,7 +335,7 @@ class _ConcreteNavBar:
         ellipsis = '[…] > '
         content = _render_breadcrumb_trail(
                 max_content_width, self._breadcrumb_keys, ellipsis, sep)
-        head = _piece_for_selection(self.state)
+        head = _piece_via_has_focus(self._has_focus)
         return (''.join((head, content)),)
 
 
@@ -436,27 +441,7 @@ def _ellipsify_experiment(w, nonbreaking_chunks, ellipsis):
         ww -= removing.width
 
 
-# FROM MOVE
-
-def _piece_for_selection(state):
-    sn = state.state_name
-    if 'initial' == sn:
-        return '  '  # _sel_w
-
-    # Currently, all states other than `initial` mean we are "in" the component
-    # (Look at the FFSA for text field..)
-    # assert 'has_focus' == sn  # yikes, needs some thought. might punt this
-
-    return '👉 '
-
-
-_sel_w = 2  # width of the leftmost area that shows whether component selected
-
-
-def _calm_name_via_key(k):  # ..
-    return k.replace('_', ' ')
-
-# TO MOVE
+_sel_w = _piece_via_has_focus.width
 
 
 # ==
@@ -467,11 +452,6 @@ def _write_widest(memo, k, leng):
             memo[k] = leng
     else:
         memo[k] = leng
-
-
-def _label_via_key(key):
-    s = key.replace('_', ' ')
-    return ''.join((s[0].upper(), s[1:]))  # not title()
 
 
 # == FSA support
@@ -489,38 +469,6 @@ def _produce_FFSA(fsa_def):
 
 
 # ==
-
-class _MutableStruct:
-    # Experiment: dictionaries are the most powerful data structure but they
-    # offer a freedom that becomes a liability for your use case. Make them
-    # more strict and less fun by standing this client between you and the
-    # dictionary, to manage writes to it
-    #
-    #   - You can't set a key outside of the defined set (provided at const.)
-    #   - You can't write to any key more than once (experimental^2)
-    #   - Assert that you didn't forget to write to any keys with `done()`
-
-    def __init__(self, dct):
-        self._pool = {k: None for k in dct.keys() if dct[k] is None}
-        self._values = dct
-
-    def __setitem__(self, k, v):
-        self._pool.pop(k)
-        self._values[k] = v
-
-    def done(self):
-        if 0 == len(self._pool):
-            del self._pool
-            return
-        xx(''.join(('oops: ', repr(tuple(self._pool.keys())))))
-
-
-# ==
-
-def _response(**kw):
-    from script_lib.curses_yikes import MultiPurposeResponse_ as cls
-    return cls(**kw)
-
 
 def _scanner_via_iterator(itr):
     from text_lib.magnetics.scanner_via import scanner_via_iterator as func

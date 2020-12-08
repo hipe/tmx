@@ -2,10 +2,10 @@
 The objectives of this visual test (tentative):
 
 - Now that we can have several interactables on the screen, show how key-up
-  and key-down can select among them
+  and key-down changes focus among them
 - Exercise every state of a checkbox. Yesterday we learned there are two
   separate machines: Whether it's checked or not exists independently of
-  whether it's selected or not. If we needed to we could try to rework the
+  whether it's focused or not. If we needed to we could try to rework the
   FFSA but we have to wait and see how this feels in practice
 - See that checkboxes line up but only within runs
 - See that text fields line up but only within runs

@@ -61,7 +61,7 @@ class CommonCase(unittest.TestCase):
 
 
 class Case7688_nav_area_states_and_render(CommonCase):
-    # #provision [#608.M]: topmost fella starts out as selected (not the point)
+    # #provision [#608.M]: topmost fella starts out as focused (not the point)
 
     def test_020_my_first_transition_test(self):
         comp = self.make_a_copy_of_the_component()
@@ -71,17 +71,17 @@ class Case7688_nav_area_states_and_render(CommonCase):
         move_to_state_via_transition_name(comp, 'cursor_enter')
         self.expect_has_focus(comp)
 
-    def test_040_render_when_selected(self):
+    def test_040_render_when_focused(self):
         comp = self.the_component()
         act = tuple(comp.to_rows())
-        exp = ('👉 […] > area 1 > fipp fapp ',)
+        exp = (f'{focused}[…] > area 1 > fipp fapp ',)
         self.assertSequenceEqual(act, exp)
 
-    def test_060_render_when_not_selected(self):
+    def test_060_render_when_not_focused(self):
         comp = self.make_a_copy_of_the_component()
         move_to_state_via_transition_name(comp, 'cursor_exit')
         act = tuple(comp.to_rows())
-        exp = ('  […] > area 1 > fipp fapp ',)
+        exp = (f'{nofocus}[…] > area 1 > fipp fapp ',)
         self.assertSequenceEqual(act, exp)
 
     component_key = 'nav_area'
@@ -97,14 +97,14 @@ class Case7692_checkbox_states_and_render(CommonCase):
         comp = self.the_component()
         rows = tuple(comp.to_rows())
         act, = rows
-        exp = '  [ ] Whether to be verbose'
+        exp = f'{nofocus}[ ] Whether to be verbose'
         self.assertEqual(act, exp)
 
     def test_060_check(self):
         comp = self.make_a_copy_of_the_component()
         move_to_state_via_transition_name(comp, 'cursor_enter')
         assert comp._is_checked is False
-        state = comp.state
+        state = state_of(comp)
         tr = state.transition_via_transition_name('[enter] to toggle')  # yuck
         fname = tr.action_function_name
         assert fname
@@ -126,17 +126,17 @@ class Case7696_text_field_states_and_render(CommonCase):
         comp = self.the_component()
         rows = tuple(comp.to_rows())
         act, = rows
-        exp = '  Foo fah: [              ]'
+        exp = f'{nofocus}Foo fah: [              ]'
         self.assertEqual(act, exp)
 
     def test_060_big_interaction_for_enter_emacs_mode(self):
 
         # Navigate down to the text field component
         comp = self.make_a_copy_of_the_component()
-        move_to_state_via_transition_name(comp, 'cursor_enter')
+        comp.become_focused()
 
         # Hit enter on the component to enter edit mode (assert host direc.)
-        state = comp.state
+        state = state_of(comp)
         tr = state.transition_via_transition_name('[enter] for edit')  # yuck
         fname = tr.action_function_name
         assert fname
@@ -147,14 +147,14 @@ class Case7696_text_field_states_and_render(CommonCase):
         assert 'enter_text_field_modal' == ch[1]
 
         # Pretend we enter some text and hit enter
-        resp = comp.receive_new_value_from_modal__('zing')
+        resp = comp.receive_new_value_from_modal_('zing')
 
         # Assert: this results in a response (could write to flash)
         assert ('foo_fah',) == resp.changed_visually
 
         # Assert: the new value is displayed by the component now
         act = tuple(comp.to_rows())
-        exp = ('👉 Foo fah: [zing          ]',)
+        exp = (f'{focused}Foo fah: [zing          ]',)
         self.assertSequenceEqual(act, exp)
 
     component_key = 'foo_fah'
@@ -191,13 +191,41 @@ class Case7702_move_up_but_you_cant_go_up(CommonCase):
 
 class Case7704_move_down_oh_boy(CommonCase):
 
-    def test_033_LETS_GO(self):
+    def test_033_this_is_what_the_patch_looks_like_for_change_focus(self):
         resp = self.keypress_end_state_response
-        change1, change2 = resp.changes
-        exp = 'selection_controller change_selected nav_area foo_fah'.split()
-        self.assertSequenceEqual(change1, exp)
-        exp = 'buttons_controller selected_changed foo_fah has_focus'.split()
-        self.assertSequenceEqual(change2, exp)
+        change1, = resp.changes
+        stack = list(reversed(change1))
+
+        # The recipient is the IC (the main dispatcher)
+        exp_recip = 'input_controller'
+
+        # The directive is this
+        exp_direc = 'change_focus'
+
+        act = stack.pop(), stack.pop()
+        self.assertSequenceEqual(act, (exp_recip, exp_direc))
+
+        # The previously focused is this
+        exp_prev_comp_k = 'nav_area'
+
+        # The newly focused is this
+        exp_curr_comp_k = 'foo_fah'
+
+        act = stack.pop(), stack.pop()
+        self.assertSequenceEqual(act, (exp_prev_comp_k, exp_curr_comp_k))
+
+        # It tells us what state machine we're talking about
+        exp_ffsa = 'text_field_state_machine'
+
+        # It tells us what state to use in that state machine
+        exp_sn = 'has_focus'
+
+        ffsa = stack.pop()
+        _, act_ffsa_rhs = ffsa.FFSA_key
+        act_state_name, = stack
+
+        act = act_ffsa_rhs, act_state_name
+        self.assertSequenceEqual(act, (exp_ffsa, exp_sn))
 
     def given_keypress(_):
         return 'KEY_DOWN'
@@ -221,17 +249,20 @@ def emissions_via_response(resp):
     return resp.emissions
 
 
-@lazy
 def controller_one_DO_NOT_MUTATE():
-    cca = CCA_one_BE_CAREFUL()
-    # cca = cca.MAKE_A_COPY()
-    return input_controller_via_CCA(cca)
+    return controller_and_CCA_one_DO_NOT_MUTATE()[0]
+
+
+def CCA_one_BE_CAREFUL():
+    return controller_and_CCA_one_DO_NOT_MUTATE()[1]
 
 
 @lazy
-def CCA_one_BE_CAREFUL():
-    aa = ACA_one()
-    return concretize(6, 27, aa)
+def controller_and_CCA_one_DO_NOT_MUTATE():
+    aca = ACA_one()
+    cca = concretize(6, 28, aca)
+    ic = input_controller_via_CCA(cca)
+    return ic, cca
 
 
 @lazy
@@ -250,11 +281,15 @@ def ACA_def_one():
 
 
 def move_to_state_via_transition_name(comp, sn):
-    return comp.state.move_to_state_via_transition_name(sn)
+    return state_of(comp).move_to_state_via_transition_name(sn)
 
 
 def state_name_of(comp):
-    return comp.state.state_name
+    return state_of(comp).state_name
+
+
+def state_of(comp):
+    return comp._state
 
 
 def dereference_component(cca, k):
@@ -278,6 +313,10 @@ def ACA_via(x):
 def support_lib():
     from script_lib_test import curses_yikes_support as module
     return module
+
+
+focused = ' 👉 '  # currently 3 spaces wide because of a visual bug
+nofocus = '   '  # will change to be wider space
 
 
 if __name__ == '__main__':

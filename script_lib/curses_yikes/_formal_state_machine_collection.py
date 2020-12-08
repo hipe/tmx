@@ -38,8 +38,8 @@ def build_formal_FSA_via_definition_function_(house_module_string, defnf):
 
 class _StateMachine:
 
-    def __init__(self, transitions, nodes):
-        self._transitions, self._nodes = transitions, nodes
+    def __init__(self, ffsa):
+        self.FFSA = ffsa
 
     def _init_state_machine(self):
         self._nodes['initial']  # validate the existence of the node
@@ -47,7 +47,7 @@ class _StateMachine:
         return self
 
     def MAKE_A_COPY(self):
-        otr = self.__class__(self._transitions, self._nodes)
+        otr = self.__class__(self.FFSA)
         otr._state_name = self._state_name
         return otr
 
@@ -87,6 +87,14 @@ class _StateMachine:
     def state_name(self):  # no NOT make this plain old writable
         return self._state_name
 
+    @property
+    def _nodes(self):
+        return self.FFSA.nodes
+
+    @property
+    def _transitions(self):
+        return self.FFSA.transitions
+
 
 def _build_FFSA(ffsa_key, defs):
     transitions = tuple(_transitions_via_definition(defs))
@@ -124,7 +132,7 @@ class _FormalStateMachine:
         self.FFSA_key = ffsa_key
 
     def to_state_machine(self):
-        return _StateMachine(self.transitions, self.nodes)._init_state_machine()  # noqa: E501
+        return _StateMachine(self)._init_state_machine()
 
 
 class _MutableNode:

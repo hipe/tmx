@@ -18,6 +18,7 @@ get plain old pelican working with one of the shortlist themes, rewriting 1 file
 the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
+refactor curses yikes: assimilate BBC into input controller if it's not special
 ncurses send and receives multiple request/responses before clean disconnect/exit
 isomorph niCLI and ncurses (exit with terminal buffer, enter with -i and args, round-trip OK) (consider using [ma])
 the daunting poly-option
@@ -29,4 +30,3 @@ fix the display issues with the wide unicode gif by using a double-wide space
 get the form fields back from your current visual test
 poly-option input (use injection thing)
 conditional buttons thing
-orderable list semi-autonomous area (written with injection in mind)

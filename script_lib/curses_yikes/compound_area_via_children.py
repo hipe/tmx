@@ -1,8 +1,8 @@
 from collections import namedtuple as _nt
 
 
-def abstract_compound_area_via_children_(cx):
-    cx = _children_initially(cx)
+def abstract_compound_area_via_children_(cx, vals=None):
+    cx = _children_initially(cx, vals)
     if 0 == len(cx):
         reason = "A compound area must have at least one child"
         raise _my_exception_class()(reason)
@@ -27,6 +27,7 @@ def abstract_compound_area_via_children_(cx):
 
 
 def _concretize(h, w, index, cx, listener):
+
     def main():
         check_required_dimensions_against_available_dimensions()
         distribute_extra_height_to_vertical_fillers()
@@ -71,22 +72,6 @@ def _concretize(h, w, index, cx, listener):
 
         if is_in_run:
             flush_run(memo, run)
-
-        # We need to have one of the components selected from the start for
-        # two reasons: 1) what would the up & down arrows mean if nothing was
-        # selected to begin with? 2) it's tempting to have the controller do
-        # this on init because that's its domain but controller isn't allowed
-        # to change state on its own; we have to apply changes explicitly.
-        # The hardcoded rule is we must select the topmost one; just because
-        topmost_interactable = None
-        for h in harnesses.values():
-            c = h.concrete_area
-            if c.state is None:  # interactability thus
-                continue
-            topmost_interactable = c
-            break
-        if topmost_interactable:  # (tests like (Case7650) have no interac.)
-            topmost_interactable.state.move_to_state_via_state_name('has_focus')  # noqa: E501
 
         return _ConcreteCompoundArea(harnesses)
 
@@ -133,19 +118,21 @@ def input_controller_via_CCA_(cca):  # cca = concrete compound area
     cx = cca._MAKE_THIS_ONE_VIEW()
 
     from script_lib.curses_yikes.focus_controller_ import \
-        vertical_splay_selection_controller_ as func
+        vertical_splay_focus_controller_ as func
 
-    selection_controller = func(cx)
+    focus_controller = func(cx)
 
     # [#608.2.C] magic name. allow it not to exist probably just for testing
     buttons_area = cx.get('buttons')
 
     from script_lib.curses_yikes.input_controller_ import \
-        BUSINESS_BUTTONPRESS_CONTROLLER_VIA_ as func, \
-        InputController__ as func2
+        business_buttonpress_controller_class_EXPERIMENTAL_via_ as bbc_vv, \
+        InputController__ as ic_via
 
-    bbc = func(selection_controller, cx)
-    return func2(selection_controller, bbc, buttons_area)
+    bbc = bbc_vv(cx)()
+    ic = ic_via(focus_controller, bbc, buttons_area)
+    ic.GIVE_FOCUS_TO_TOPMOST_FOCUSABLE_COMPONENT__()  # see
+    return ic
 
 
 class _ConcreteCompoundArea:
@@ -171,6 +158,9 @@ class _ConcreteCompoundArea:
 
     def __getitem__(self, k):
         return self.HARNESS_AT(k).concrete_area
+
+    def COMPONENT_AT(self, k):
+        return self._children[k].concrete_area
 
     def HARNESS_AT(self, k):
         return self._children[k]
@@ -391,17 +381,15 @@ def _abstract_areas_and_index(cx):
 
     def second_pass():
         dct = {k: abstract_areas[k] for k in interactables}
-        for k, klass, args in deferred:
+        for k, klass, args, kw in deferred:
             probably_same_k, *rest = args
-            abstract_areas[k] = klass(probably_same_k, dct, *rest)
+            abstract_areas[k] = klass(probably_same_k, dct, *rest, **(kw or _empty_dict))  # noqa: E501
 
     def first_pass():
-        for k, tup in cx:
+        for k, (typ, stack, kw) in cx:  # #here1: type, stack, kwargs
 
-            # First element of tuple is type because #here1
-            mixed_type_ref = (stack := list(reversed(tup))).pop()
-            if isinstance(mixed_type_ref, str):
-                klass = _AA_classer_via_type_string[mixed_type_ref]()
+            if isinstance(typ, str):
+                klass = _AA_classer_via_type_string[typ]()
             else:
                 xx("one day, maybe arbitrary loaders")
 
@@ -409,11 +397,11 @@ def _abstract_areas_and_index(cx):
 
             if klass.defer_until_after_interactables_are_indexed:
                 assert not klass.is_interactable
-                deferred.append((k, klass, args))
+                deferred.append((k, klass, args, kw))
                 abstract_areas[k] = None  # maintain order even tho deferred
                 continue
 
-            add_to_index(k, klass(*args))
+            add_to_index(k, klass(*args, **(kw or _empty_dict)))
 
     def add_to_index(k, aa):  # aa = abstract area
 
@@ -467,6 +455,7 @@ _AA_classer_via_type_string = {
     'flash_area': lambda: _sibling_module('_flash_area'),
     'horizontal_rule': lambda: _AbstractHorizontalRule,
     'nav_area': lambda: _simple('abstract_nav_area_via_directive_tail'),
+    'orderable_list': lambda: _sibling_module('_orderable_list'),
     'text_field': lambda: _simple('abstract_text_field_via_directive_tail'),
     'vertical_filler': lambda: _AbstractVerticalFiller,
 }
@@ -526,7 +515,6 @@ class _ConcreteVerticalFiller:
         assert w
         self._row = ' ' * w
         self._range = range(0, h)
-        self.state = None  # #stateless
 
     def MAKE_A_COPY(self):
         return self
@@ -534,6 +522,8 @@ class _ConcreteVerticalFiller:
     def to_rows(self):
         for _ in self._range:
             yield self._row
+
+    is_focusable = False
 
 
 class _AbstractHorizontalRule:
@@ -562,7 +552,6 @@ class _ConcreteHorizontalRule:
         glyph = '-'
         assert 1 == len(glyph)
         self._row = glyph * w
-        self.state = None  # #stateless
 
     def MAKE_A_COPY(self):
         return self
@@ -570,8 +559,10 @@ class _ConcreteHorizontalRule:
     def to_rows(self):
         yield self._row
 
+    is_focusable = False
 
-def _children_initially(cx):
+
+def _children_initially(cx, vals=None):
     # We don't know exactly how we want the syntax to work. The simplest thing
     # would be: first term is key, second term is type, and the rest is args.
     # keys must be unique (which we assert). But this leads to defintions that
@@ -586,9 +577,12 @@ def _children_initially(cx):
         'flash_area': 'first_term_is_both_key_and_type',
         'horizontal_rule': 'auto_increment_key',
         'nav_area': 'first_term_is_both_key_and_type',
+        'orderable_list': 'SQL_ish_syntax',
         'text_field': 'SQL_ish_syntax',
         'vertical_filler': 'auto_increment_key',
     }
+
+    vals_pool = {k: v for k, v in vals.items()} if vals else _empty_dict
 
     for x in cx:
         if isinstance(x, tuple):
@@ -624,8 +618,17 @@ def _children_initially(cx):
             reason = f"Encountered duplicate child name: {k!r}"
             raise _my_exception_class()(reason)
 
-        rest = typ, *reversed(stack)  # #here1 type is first element
-        children[k] = rest
+        kw = None
+        val = vals_pool.pop(k, None)
+        if val is not None:
+            kw = {'value': val}
+
+        children[k] = typ, stack, kw  # #here1: type, stack, kwargs
+
+    if vals_pool:
+        _ = ', '.join(vals_pool.keys())
+        xx(f"names(s) in `vals` not in components: ({_})")
+
     return children
 
 
@@ -646,6 +649,9 @@ def _throwing_listener(*emi):
 def _my_exception_class():
     from script_lib.curses_yikes import MyException_ as klass
     return klass
+
+
+_empty_dict = {}
 
 
 def xx(msg=None):

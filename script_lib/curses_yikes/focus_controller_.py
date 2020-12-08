@@ -1,5 +1,5 @@
 """
-in [#608.L] we develop what the selection controller is, its responsibilities
+in [#608.L] we develop what the focus controller is, its responsibilities
 and how it exists independently of the input controller.
 """
 
@@ -10,42 +10,69 @@ from script_lib.curses_yikes import \
 _input_response = _multi_response
 
 
-def vertical_splay_selection_controller_(cx):
-    return _func('vertical', cx)
+def vertical_splay_focus_controller_(cx, **kw):
+    return _func('vertical', cx, **kw)
 
 
-def horizontal_splay_selection_controller_(cx):
-    return _func('horizontal', cx)
+def horizontal_splay_focus_controller_(cx, **kw):
+    return _func('horizontal', cx, **kw)
 
 
-def _func(vertical_or_horizontal, cx):
+def _func(vertical_or_horizontal, cx, current_k=None, TING_WING=None):
     # Whether the movement happens on the vertical (more common) or horizontal,
     # the algorithm is identical. Only the names of thing change (like which
     # keys). We use variable names that correspond to vertical b.c more common
 
-    def main():
-        assert_that_components_initial_state_is_right()
-        return SelectionController()
-
-    class SelectionController:
+    class FocusController:
 
         def __init__(self):
-            self._key_of_currently_selected_component = top_k
+            self._key_of_currently_focused_component = current_k
 
         def receive_directional_key_press(self, key):
-            k = self._key_of_currently_selected_component
+            k = self._key_of_currently_focused_component
             return receive_directional_key_press(key, k)
 
-        def apply_change(self, stack):
-            k, k_ = apply_change(stack)
-            self._key_of_currently_selected_component = k_
-            return _input_response(changed_visually=(k, k_))
+        def change_focus_if_necessary_to(self, k_):
+            k = self._key_of_currently_focused_component
+            if k == k_:
+                return _do_nothing
+            return change_focus(k, k_)
+
+        def change_focus_to(self, k_):
+            k = self._key_of_currently_focused_component
+            assert k != k_
+            return change_focus(k, k_)
+
+        def apply_change_focus(self, k, k_):
+            apply_change_focus(k, k_)
+            self._key_of_currently_focused_component = k_
+
+        def BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(self):
+            k = self._key_of_currently_focused_component
+            return BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(k)
+
+        def accept_new_key_of_focused_component__(self, k_):
+            # (if you know what you're doing)
+            self._key_of_currently_focused_component = k_
 
         @property
-        def key_of_currently_selected_component(self):
-            return self._key_of_currently_selected_component
+        def key_of_currently_focused_component(self):
+            return self._key_of_currently_focused_component
 
-    def receive_directional_key_press(key, currently_selected_component_k):
+        @property
+        def key_of_topmost_focusable_component(self):
+            return keys_in_order[0]
+
+        @property
+        def FOCUSABLE_COMPONENTS__(self):
+            # (oops we don't have this in the input controller)
+            return comp_via_key
+
+        @property
+        def CHA_CHA_CHA__(self):
+            return cx
+
+    def receive_directional_key_press(key, currently_focused_component_k):
 
         meaning = meaning_via_key[key]
 
@@ -53,9 +80,9 @@ def _func(vertical_or_horizontal, cx):
         if 'not_my_dimension' == meaning:
             return _do_nothing
 
-        i = order_offset_via_key[currently_selected_component_k]
+        i = order_offset_via_key[currently_focused_component_k]
 
-        # Make a request for moving the selection up or down, probably
+        # Make a request for moving the focus up or down, probably
         if 'increase_offset' == meaning:
             # Ignore it if KEY_DOWN and already at bottommost, quietly
             if order_offset_of_bottommost == i:
@@ -70,21 +97,30 @@ def _func(vertical_or_horizontal, cx):
 
         desired_order_offset = i + add_me
         k_ = keys_in_order[desired_order_offset]
-        sn = comp_via_key[k_].state.state_name_via_transition_name('cursor_enter')  # noqa: E501
-        changes = (
-            ('selection_controller', 'change_selected', currently_selected_component_k, k_),  # noqa: E501
-            ('buttons_controller', 'selected_changed', k_, sn))
+        return change_focus(currently_focused_component_k, k_)
+
+    def change_focus(k, k_):
+        c = cx[k_]
+        ffsa, sn = c.FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_
+        changes = (('input_controller', 'change_focus', k, k_, ffsa, sn),)
         return _input_response(changes=changes)
 
-    def apply_change(stack):
-        typ = stack.pop()
-        assert 'change_selected' == typ
-        k_, k = stack  # before and after (but order reversed b.c stack)
-        goodbye = comp_via_key[k]
+    def BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(k):
+        c = cx[k]
+        ffsa, sn = c.FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_
+        changes = (('input_controller', 'change_buttons', k, ffsa, sn),)
+        return _input_response(changes=changes)
+
+    def apply_change_focus(k, k_):
+        if TING_WING:
+            TING_WING.apply_change_focus(k, k_)
+            return
+        if k is not None:
+            goodbye = comp_via_key[k]
         hello = comp_via_key[k_]
-        goodbye.state.move_to_state_via_transition_name('cursor_exit')
-        hello.state.move_to_state_via_transition_name('cursor_enter')
-        return k, k_
+        if k is not None:
+            goodbye.become_not_focused()
+        hello.become_focused()
 
     is_vertical_not_horizontal = ('horizontal', 'vertical').index(vertical_or_horizontal)  # noqa: E501
 
@@ -96,34 +132,16 @@ def _func(vertical_or_horizontal, cx):
         meaning_via_key = {
             'KEY_LEFT': 'decrease_offset', 'KEY_RIGHT': 'increase_offset',
             'KEY_UP': 'not_my_dimension', 'KEY_DOWN': 'not_my_dimension'}
-
-    def assert_that_components_initial_state_is_right():
-        # Assert that the topmost interactable component is in the focus state
-        top_c = comp_via_key[top_k]
-        rest_c = (comp_via_key[keys_in_order[i]] for i in range(1, leng))
-        sn = top_c.state.state_name
-        if 'has_focus' != sn:
-            xx(f"top compponent ({top_k!r}) must already have focus")
-
-        # Assert that the remaining non-top components are in the initial state
-        def must_be_in_initial_state(c):
-            sn = c.state.state_name
-            if 'initial' == sn:
-                return True
-            xx(f"Not in initial state: '{c.key}' (state: {sn!r})")
-        assert all(must_be_in_initial_state(c) for c in rest_c)
-
-    # Make a sub-dictionary of only those components that are interactable
-    comp_via_key = {k: c for k, c in cx.items() if c.state is not None}
+    # Make a sub-dictionary of only those components that are focusable
+    comp_via_key = {k: c for k, c in cx.items() if c.is_focusable}
     leng = len(comp_via_key)
 
     # Derive a bunch of index-like values EACH OF WHICH is used as business ind
     keys_in_order = tuple(comp_via_key.keys())
-    top_k = keys_in_order[0]
     order_offset_via_key = {keys_in_order[i]: i for i in range(0, leng)}
     order_offset_of_bottommost = leng - 1
 
-    return main()
+    return FocusController()
 
 
 _do_nothing = _input_response()

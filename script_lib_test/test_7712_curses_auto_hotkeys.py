@@ -1,4 +1,5 @@
-from script_lib_test.curses_yikes_support import input_controller_via_CCA
+from script_lib_test.curses_yikes_support import \
+        buttons_top_row, input_controller_via_CCA
 # from modality_agnostic.test_support.common import lazy
 # dangerous_memoize_in_child_classes as shared_subject_in_children, \
 import unittest
@@ -12,14 +13,14 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
 
     def test_020_long_story(self):
         aca = ACA_via(ACA_def_one())
-        cca = concretize(11, 27, aca)
+        cca = concretize(11, 28, aca)
         ic = input_controller_via_CCA(cca)
 
-        # In intial state
+        # In initial state
         row = buttons_top_row(cca)
 
         # The buttons should look like this now (blank)
-        self.assertEqual(row, '                           ')
+        self.assertEqual(row, f'{not_sel}                         ')
 
         # Press this button
         resp = ic.receive_keypress('KEY_DOWN')
@@ -27,11 +28,11 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
         act = tuple(resp.changed_visually)
 
         # Three components should have changed
-        self.assertSequenceEqual(act, ('nav_area', 'be_verbose', 'buttons'))
+        self.assertSequenceEqual(act, ('buttons', 'nav_area', 'be_verbose'))
         act = buttons_top_row(cca)
 
         # The buttons should look like this now
-        self.assertEqual(act, '     [enter] to toggle     ')
+        self.assertEqual(act, f'{not_sel}  [enter] to toggle      ')
 
         # Press this button (to toggle the checkbox)
         resp = ic.receive_keypress('\n')
@@ -42,11 +43,6 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
 
         # One component should have changed
         self.assertSequenceEqual(act, ('be_verbose',))
-
-
-def buttons_top_row(cca):
-    r1, _, = tuple(cca.HARNESS_AT('buttons').to_rows())  # ..
-    return r1
 
 
 def ACA_def_one():
@@ -72,6 +68,9 @@ def support_lib():
 
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
+
+
+not_sel = ' ' * 3  # ..
 
 
 if __name__ == '__main__':

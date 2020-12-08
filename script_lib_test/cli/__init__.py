@@ -84,6 +84,7 @@ def _tests():
     yield '010-what-key-was-pressed', _load_commonly
     yield '020-buttons-and-flash', _load_commonly
     yield '030-checkboxes-and-fields', _load_commonly
+    yield '040-orderable-list-simple', _load_commonly
 
 
 def _load_commonly(slug):

@@ -144,8 +144,7 @@ def _EMACS_THING_EXPERIMENT(cca, k, stdscr, curses):
     harness = cca.HARNESS_AT(k)
     comp = harness.concrete_area
 
-    span_x = comp.value_span_x_for_modal__
-    span_w = comp.value_span_width_for_modal__
+    span_x, span_w = comp.value_span_x_and_width_for_modal_
     harn_y = harness.harness_y__
     harn_x = harness.harness_x__
 
@@ -173,7 +172,7 @@ def _EMACS_THING_EXPERIMENT(cca, k, stdscr, curses):
     fa.clear_flash_area()  # ..
     _redraw_harness(fa_harness, stdscr)  # 😢
 
-    comp_resp = comp.receive_new_value_from_modal__(message)
+    comp_resp = comp.receive_new_value_from_modal_(message)
 
     # If there's an above component and a below component, needs redraw #here2
     keys = tuple(_any_above_and_self_and_any_below(cca, k))
@@ -195,7 +194,7 @@ def _message_or_none_via_textbox(box):
 
 
 def _any_above_and_self_and_any_below(cca, k):
-    # (we make an index like this in the selection controller too, #watch)
+    # (we make an index like this in the focus controller too, #watch)
     all_ks = tuple(cca.to_component_keys())  # redund #here1
     offset = all_ks.index(k)
     if 0 != offset:

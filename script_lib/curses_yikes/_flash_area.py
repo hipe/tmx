@@ -43,7 +43,6 @@ class _ConcreteFlashArea:
         assert w
 
         self._height, self._width = h, w
-        self.state = None
 
         def word_wrap(words_tuple):
             return func(w, words_tuple)
@@ -161,6 +160,8 @@ class _ConcreteFlashArea:
             return
         for row in self._final_rows:
             yield row
+
+    is_focusable = False
 
 
 def _words_tuple_via_words_iterator_with_sanity_check(words_itr):
