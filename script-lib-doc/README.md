@@ -47,7 +47,7 @@ the related API that preceded this one.)
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
 |[#607.E]                   | #refa | there's no way this is right
 |[#607.4]                   | #hole |
-|[#607.C]                   | #hole |
+|[#607.C]                   |       | curses yikes: track this tiny thing
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
 |[#606]                     | #open | [the unified diff parser]

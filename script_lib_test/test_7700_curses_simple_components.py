@@ -194,38 +194,21 @@ class Case7704_move_down_oh_boy(CommonCase):
     def test_033_this_is_what_the_patch_looks_like_for_change_focus(self):
         resp = self.keypress_end_state_response
         change1, = resp.changes
-        stack = list(reversed(change1))
 
-        # The recipient is the IC (the main dispatcher)
-        exp_recip = 'input_controller'
+        from script_lib.curses_yikes import \
+            MutableChangeFocusDirective_ as func
 
-        # The directive is this
-        exp_direc = 'change_focus'
-
-        act = stack.pop(), stack.pop()
-        self.assertSequenceEqual(act, (exp_recip, exp_direc))
+        o = func(*change1)  # creating this validates the first 2 components
 
         # The previously focused is this
-        exp_prev_comp_k = 'nav_area'
+        assert 'nav_area' == o['goodbye_component_key']
 
         # The newly focused is this
-        exp_curr_comp_k = 'foo_fah'
+        assert 'foo_fah' == o['hello_component_key']
+        assert 'foo_fah' == o['component_key_in_the_context_of_buttons']
 
-        act = stack.pop(), stack.pop()
-        self.assertSequenceEqual(act, (exp_prev_comp_k, exp_curr_comp_k))
-
-        # It tells us what state machine we're talking about
-        exp_ffsa = 'text_field_state_machine'
-
-        # It tells us what state to use in that state machine
-        exp_sn = 'has_focus'
-
-        ffsa = stack.pop()
-        _, act_ffsa_rhs = ffsa.FFSA_key
-        act_state_name, = stack
-
-        act = act_ffsa_rhs, act_state_name
-        self.assertSequenceEqual(act, (exp_ffsa, exp_sn))
+        # Its "component button page key" (state name) is this
+        assert 'has_focus' == o['component_buttons_page_key']
 
     def given_keypress(_):
         return 'KEY_DOWN'

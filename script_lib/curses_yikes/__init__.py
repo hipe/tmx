@@ -131,21 +131,53 @@ class StateMachineBasedInteractableComponent_:
         self._state.move_to_state_via_transition_name('cursor_exit')
         self._has_focus = False
 
-    def RECEIVE_BUTTONPRESS(self, t):
-        self._state.move_to_state_via_transition_name(t.condition_name)
+    @property
+    def component_buttons_page_key_when_has_focus(_):
+        return 'has_focus'  # hi.
+
+    # == Business Button Keypress (two-stroke)
+
+    def receive_business_buttonpress(self, label):
+        self._state.transition_via_transition_name(label)  # assert
+        changes = (('input_controller', 'apply_business_buttonpress', label),)
+        return MultiPurposeResponse_(changes=changes)
+
+    def apply_business_buttonpress(self, label):
+        st = self._state
+        t = st.transition_via_transition_name(label)
+        st.accept_transition(t)  # before or after action? not sure
         afn = t.action_function_name
         if afn is None:
             return _do_nothing  # if you lost/gain focus, covered?
         return getattr(self, afn)()  # args?
 
-    @property
-    def FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_(self):
-        state = self._state
-        return state.FFSA, state.state_name_via_transition_name('cursor_enter')
+    # ==
 
     _has_focus = False
 
     is_focusable = True
+
+
+# ==
+
+def button_pages_via_FFSA_(ffsa):
+
+    def labels_of_transitions_that_look_like_buttons(state_node):
+        for i in state_node.transitions_from_here:
+            trans = transes[i]
+            cname = trans.condition_name
+            if '[' in cname:  # Big hack, but we could formalize it
+                yield cname
+
+    transes = ffsa.transitions
+
+    for state_name_k, state_node in ffsa.nodes.items():
+        itr = labels_of_transitions_that_look_like_buttons(state_node)
+        page_content = tuple(itr)
+        if 0 == len(page_content):
+            yield state_name_k, ()  # better wabi sabi [#607.C]
+            continue
+        yield state_name_k, page_content
 
 
 # ==
@@ -199,6 +231,18 @@ _do_nothing = MultiPurposeResponse_()
 _response_fields = 'emissions', 'changes', 'changed_visually'
 
 
+def MutableChangeFocusDirective_(recip, typ, goodbye_k, butt_k, hello_k, cbpk):
+    assert 'input_controller' == recip
+    assert 'change_focus' == typ
+    dct = {
+        'recipient': recip, 'directive_type': typ,
+        'goodbye_component_key': goodbye_k,
+        'component_key_in_the_context_of_buttons': butt_k,
+        'hello_component_key': hello_k,
+        'component_buttons_page_key': cbpk}
+    return MutableStruct_(dct)
+
+
 class Emission_:
     # For now a pared down version of the familiar thing, rewritten
 
@@ -244,6 +288,9 @@ class MutableStruct_:  # see above
     def __setitem__(self, k, v):
         self._values[k]  # validate name
         self._values[k] = v
+
+    def __getitem__(self, k):
+        return self._values[k]
 
 
 class MyException_(RuntimeError):

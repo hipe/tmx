@@ -46,22 +46,64 @@ _.is_interactable = False  # hard to explain
 _.defer_until_after_interactables_are_indexed = True
 
 
-def _pages_index(inter_aa_dct):
-    FSAs_map, page_via_page_name = _build_pages_index(inter_aa_dct)
+class _pages_index:
 
-    class pages_index:  # #class-as-namespace
+    def __init__(self, inter_aa_dct):
+        for k, dct in _build_button_pages_index(inter_aa_dct):
+            setattr(self, k, dct)
 
-        def PAGE_NAME_VIA(ffsa_key, state_name):
-            page_name_via_state_name = FSAs_map[ffsa_key]
-            return page_name_via_state_name[state_name]  # might be None
-
-        def to_pages():
-            return page_via_page_name.items()
-
-    return pages_index
+    def to_pages(self):
+        return self.page_contents_via_page_key.items()
 
 
-def _abstract_hotkeys_area_via(directives, eli=None):
+def _build_button_pages_index(inter_aa_dct):
+    # Build the button pages index. Exactly [#608.2.B], the most complicated
+    # algortihm here. This was rewritten blind 12 days later to better
+    # isolate the use of FSA's from this module. All this is only used #here1
+
+    page_key_via_component_page_key_via_component_type_key = {}
+    page_contents_via_page_key = {}
+    page_key_via_page_contents = {}
+    component_type_key_via_component_key = {}
+    seen_component_types = set()
+    fields = tuple((locs := locals()).keys())[1:]  # skip the func arg YIKES
+
+    for component_k, aa in inter_aa_dct.items():
+        ctk = aa.component_type_key
+        component_type_key_via_component_key[component_k] = ctk
+
+        # Assume that every AA of the same component type has the same etc
+        if ctk in seen_component_types:
+            continue
+        seen_component_types.add(ctk)
+
+        page_key_via_component_page_key = {}  # this is all for one comp. type
+        for component_page_k, labels in aa.to_button_pages():
+
+            labels = tuple(labels)
+
+            # The comp should explicitly tell us about no-button pages [#607.C]
+            if 0 == len(labels):
+                page_key_via_component_page_key[component_page_k] = None
+                continue
+
+            # Create a new page for thi list of labels IFF we didn't already
+            if (page_k := page_key_via_page_contents.get(labels)) is None:
+                number = len(page_key_via_page_contents) + 1
+                page_k = f"buttons_page_{number}"
+                page_key_via_page_contents[labels] = page_k
+                page_contents_via_page_key[page_k] = labels
+
+            page_key_via_component_page_key[component_page_k] = page_k
+
+        page_key_via_component_page_key_via_component_type_key[ctk] = \
+            page_key_via_component_page_key
+
+    for k in fields:
+        yield k, locs[k]
+
+
+def _abstract_hotkeys_area_via(directives, pi=None):
     # #testpoint
 
     pages = {}
@@ -122,17 +164,17 @@ def _abstract_hotkeys_area_via(directives, eli=None):
     hotkeys_index = hotkeys_cache
     hotkeys_index.hotkeys = tuple(hotkeys_index.hotkeys)
     return _AbstractHotkeysArea(
-        static_page, pages, hotkeys_index, eli)
+        static_page, pages, hotkeys_index, pi)
 
 
 class _AbstractHotkeysArea:
 
-    def __init__(self, static_page, pages, hotkeys_index, eli):
+    def __init__(self, static_page, pages, hotkeys_index, pi):
 
         self._static_page = static_page
         self._dynamic_pages = pages
         self._hotkeys_index = hotkeys_index
-        self._pages_index = eli
+        self._pages_index = pi
 
         self._wrap_plan_cache = {}
 
@@ -197,16 +239,43 @@ class _ConcreteHotkeysArea:
 
     # == Receive change
 
-    def apply_change_focus(self, ffsa_key, state_name):
-        pn = self._pages_index.PAGE_NAME_VIA(ffsa_key, state_name)
-        if self._currently_selected_page_key == pn:
+    # cbpk = component button page key
+    def apply_change_focus(self, k_, cbpk):
+
+        page_k = self._page_key_for_component(k_, cbpk)
+        if self._currently_selected_page_key == page_k:
             return _change_response()  # _do_nothing
-        if pn is None:
+
+        # Now, buttons area is guaranteed to change
+
+        if page_k is None:
             self._set_active_page_to_none()
         else:
-            self._set_active_page(pn)
+            self._set_active_page(page_k)
+
         # [#608.2.C] we don't get real name for now, just magic name 'buttons'
         return _change_response(changed_visually=('buttons',))
+
+    def _page_key_for_component(self, k_, cbpk):  # :#here1
+
+        # If the patch says "focus changed to NO focus (anywhere)", then
+        # change the dynamic buttons area to have no buttons (if necessary)
+        if k_ is None:
+            assert not cbpk
+            return None
+
+        # Get from the currently focused component (key, state) to the page key
+
+        pi = self._pages_index
+
+        ctk = pi.component_type_key_via_component_key[k_]
+
+        page_key_via_component_page_key = \
+            pi.page_key_via_component_page_key_via_component_type_key[ctk]
+
+        return page_key_via_component_page_key[cbpk]  # use provision [#607.C]
+
+    # ==
 
     def _set_active_page(self, k):  # #testpoint
         self._dynamic_pages[k]  # validate argument
@@ -454,62 +523,7 @@ _hotkey_rx = re.compile(r'''
 ''', re.VERBOSE)
 
 
-def _build_pages_index(inter_aa_dct):
-    # exactly [#608.2.B], the most complicated algorithm here
-
-    def main():
-        FSAs_map = {k: v for k, v in map_for_each_FFSA()}
-        return FSAs_map, page_via_page_name
-
-    def map_for_each_FFSA():
-        for ffsa in unique_list_of_FFSAs():
-            rhs = {k: v for k, v in map_for_FFSA(ffsa)}
-            yield ffsa.FFSA_key, rhs
-
-    def map_for_FFSA(ffsa):
-        def map_for_node(node):
-            page_content = tuple(buttons_via(node))
-            if 0 == len(page_content):
-                return None
-            page_name = page_name_via_page.get(page_content)
-            if page_name is None:
-
-                number = len(page_via_page_name) + 1
-                page_name = f"buttons_page_{number}"
-                page_name_via_page[page_content] = page_name
-                page_via_page_name[page_name] = page_content
-
-            return page_name
-
-        def buttons_via(node):
-            for trans in transitions_via(node):
-                cname = trans.condition_name
-                # big hack
-                if '[' in cname:
-                    yield cname
-
-        def transitions_via(node):
-            for i in node.transitions_from_here:
-                yield transes[i]
-
-        transes = ffsa.transitions
-
-        for k, node in ffsa.nodes.items():
-            yield k, map_for_node(node)
-
-    def unique_list_of_FFSAs():
-        for aa in inter_aa_dct.values():
-            ffsa = aa.FFSAer()
-            k = ffsa.FFSA_key
-            if k in seen:
-                continue
-            seen.add(k)
-            yield ffsa
-
-    page_via_page_name = {}
-    page_name_via_page = {}  # to keep track of which pages we've seen
-    seen = set()
-    return main()
+# == SNIP 3
 
 
 def _scanner_via_iterator(itr):
@@ -520,4 +534,5 @@ def _scanner_via_iterator(itr):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #history-B.4
 # #born

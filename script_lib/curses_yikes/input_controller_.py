@@ -54,24 +54,33 @@ components... All of this is now documented in [#608.L]
 
 
 from script_lib.curses_yikes import \
-        Emission_ as _emission, MultiPurposeResponse_ as _multi_response
+        Emission_ as _emission, MultiPurposeResponse_ as _response
 import re
-
-
-_input_response = _multi_response
-_change_response = _input_response
 
 
 class InputController__:
 
     def __init__(
             self,
-            directional_controller, business_buttonpress_controller,
+            directional_controller,
             buttons_area):
 
+        # When a business buttonpress (BBP) comes in, the default (defined
+        # here) is that the currently focused component handles it (both
+        # strokes: receive keypress then apply patch).
+
+        def recv_busi_bp(label):
+            return c().receive_business_buttonpress(label)
+
+        def apply_busi_bp(label):
+            return c().apply_business_buttonpress(label)
+
+        def c():
+            return directional_controller.currently_focused_component
+
         frame = _controller_frame(
-            lambda: directional_controller,
-            business_buttonpress_controller)
+            get_direction_controller=lambda: directional_controller,
+            receive_BBP=recv_busi_bp, apply_BBP=apply_busi_bp)
 
         self._controller_stack = [frame]
 
@@ -103,8 +112,7 @@ class InputController__:
         assert 'dynamic' == typ
 
         # Since this was a dynamic button, it must correspond to a transition
-        # BBC = buttonpress business controller
-        return self._BBC.receive_business_buttonpress(label)
+        return self._top_controller_frame.receive_BBP(label)
 
     def _say_does_nothing(self, k):
         # We could map the key strings to prettier labels but why
@@ -159,8 +167,8 @@ class InputController__:
                         yield resp
                 elif 'change_buttons' == typ:
                     yield self._apply_change_buttons(*args)
-                elif 'give_buttonpress_to_component' == typ:
-                    yield self._BBC.give_buttonpress_to_component(*args)
+                elif 'apply_business_buttonpress' == typ:
+                    yield self._apply_business_buttonpress(*args)
                 elif 'push_receiver' == typ:
                     yield self._apply_push_receiver(*args)
                 elif 'pop_receiver' == typ:
@@ -174,8 +182,8 @@ class InputController__:
     def _apply_push_receiver(self, soa_k):
         """implement the ability for a child component to change the input
 
-        mode so it receives focus and handles directional events and business
-        button preses itself. See section on SACs in [#608.L].
+        mode so it receives focus and handles directional events itself.
+        See section on SACs in [#608.L].
 
         The details of this (like the interface of the directive, the
         interface of the below methods called) are all HIGHLY EXPERIMENTAL.
@@ -191,7 +199,13 @@ class InputController__:
 
         # Build and push the new frame
         kw = {k: v for k, v in c.CONTROLLER_FRAME__()}
+
+        # Remove this one thing from it
+        cbpk = kw.pop('component_button_page_key_once_has_focus')
+
+        # Add this one thing to it
         kw['SOA_component_key'] = soa_k
+
         new_frame = _controller_frame(**kw)
         stack.append(new_frame)
 
@@ -199,7 +213,9 @@ class InputController__:
         # But now that we're pushing in to it we gotta change buttons
 
         # Gotta change the buttons. Assume SAC already had item with focus
-        resp = self._DC.BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH()
+
+        changes = (('input_controller', 'change_buttons', soa_k, cbpk),)
+        resp = _response(changes=changes)
 
         # We're like 99% sure we want to stale the buttons always because
         # that's practically the whole point of pushing in to a new mode is
@@ -250,7 +266,8 @@ class InputController__:
             if resp.changes is None:
                 break
 
-    def _apply_change_focus(self, k, k_, ffsa, state_name):
+    # cbpk = component button page key lol
+    def _apply_change_focus(self, k, butt_k, k_, cbpk):
 
         # Bounce the focus controller's own patch back to it so it notifies
         # one component of the loss and one of the gain ("cast" the direction
@@ -259,79 +276,48 @@ class InputController__:
         assert no is None
 
         # Change the button area (probably) and notify BBC
-        yield self._apply_change_buttons(k_, ffsa, state_name)
+        yield self._apply_change_buttons(butt_k, cbpk)
 
         cv = *(() if k is None else (k,)), k_
 
-        yield _change_response(changed_visually=cv)
+        yield _response(changed_visually=cv)
 
-    def _apply_change_buttons(self, k_, ffsa, state_name):
+    def _apply_change_buttons(self, k_, cbpk):
         # Notify the buttons so they change the dynamic buttons
-
-        ffsa_key = ffsa.FFSA_key
 
         if (ba := self._buttons_area) is None:
             # (for some tests we allow a None button controller :#here1)
             return _no_change
 
-        resp = ba.apply_change_focus(ffsa_key, state_name)
-
-        # Notify the BBC so it can call the correct actions when buttons
-        no = self._BBC.apply_change_focus(k_, ffsa, state_name)
-        assert no is None
+        resp = ba.apply_change_focus(k_, cbpk)
+        assert resp
+        # (used to do thing here)
 
         return resp
 
-    @property
-    def _DC(self):
-        return self._controller_stack[-1].DC
+    def _apply_business_buttonpress(self, label):  # (be just like #here2)
+        return self._top_controller_frame.apply_BBP(label)
 
     @property
-    def _BBC(self):
-        return self._controller_stack[-1].BBC
+    def _DC(self):
+        return self._top_controller_frame.DC
+
+    @property
+    def _top_controller_frame(self):
+        return self._controller_stack[-1]
 
 
 class _controller_frame:
     def __init__(
-            self, get_direction_controller, BBC, SOA_component_key=None):
-
+            self, get_direction_controller, receive_BBP, apply_BBP,
+            SOA_component_key=None):
         self.get_direction_controller = get_direction_controller
-        self.BBC, self.SOA_component_key = BBC, SOA_component_key
+        self.receive_BBP, self.apply_BBP = receive_BBP, apply_BBP
+        self.SOA_component_key = SOA_component_key
 
     @property
     def DC(self):
         return self.get_direction_controller()
-
-
-def business_buttonpress_controller_class_EXPERIMENTAL_via_(cx):
-
-    class BusinessButtonpressController:
-
-        def apply_change_focus(self, k, ffsa, state_name):
-            self._focused_component_key = k
-            self._state_name = state_name
-            self._FFSA = ffsa
-
-        def receive_business_buttonpress(self, label):
-            assert self.transition_via_label(label)
-            k = self._focused_component_key
-            changes = (('input_controller', 'give_buttonpress_to_component', k, label),)  # noqa: E501
-            return _input_response(changes=changes)
-
-        def give_buttonpress_to_component(self, k, label):
-            t = self.transition_via_label(label)
-            c = cx[k]
-            return c.RECEIVE_BUTTONPRESS(t)
-
-        def transition_via_label(self, label):
-            ffsa = self._FFSA
-            transes = ffsa.transitions
-            for offset in ffsa.nodes[self._state_name].transitions_from_here:
-                t = transes[offset]
-                if label == t.condition_name:
-                    return t
-
-    return BusinessButtonpressController
 
 
 # == Response structure and related (Model-esque)
@@ -340,7 +326,7 @@ def _response_for_quit():
     line = 'Goodbye from ncurses yikes®'  # #todo put app name here, or not
     emi = _emission(('info', 'expression', 'goodbye', lambda: (line,)))
     changes = (('host_directive', 'quit'),)
-    return _input_response(emissions=(emi,), changes=changes)
+    return _response(emissions=(emi,), changes=changes)
 
 
 def listener(*args):
@@ -348,10 +334,10 @@ def listener(*args):
 
     emi = _emission(args)
     emis = (emi,)
-    return _change_response(emissions=emis)
+    return _response(emissions=emis)
 
 
-_no_change = _change_response()
+_no_change = _response()
 
 
 # == Local constants

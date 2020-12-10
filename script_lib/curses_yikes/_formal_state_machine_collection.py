@@ -57,12 +57,6 @@ class _StateMachine:
             xx(f"whoopsie, can't trans from {self._state_name!r} OVER {tn!r}")
         self.accept_transition(trans)
 
-    def move_to_state_via_state_name(self, nn):
-        trans = self._first_trans(lambda t: nn == t.right_node_name)
-        if not trans:
-            xx(f"whoopsie, can't trans from {self._state_name!r} to {nn!r}")
-        self.accept_transition(trans)
-
     def state_name_via_transition_name(self, tn):
         return self.transition_via_transition_name(tn).right_node_name
 

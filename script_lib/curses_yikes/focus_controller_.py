@@ -18,7 +18,12 @@ def horizontal_splay_focus_controller_(cx, **kw):
     return _func('horizontal', cx, **kw)
 
 
-def _func(vertical_or_horizontal, cx, current_k=None, TING_WING=None):
+def _func(
+        vertical_or_horizontal, cx,
+        current_key=None,
+        component_key_in_the_context_of_buttons=None,
+        custom_apply_change_focus=None,
+    ):
     # Whether the movement happens on the vertical (more common) or horizontal,
     # the algorithm is identical. Only the names of thing change (like which
     # keys). We use variable names that correspond to vertical b.c more common
@@ -26,7 +31,7 @@ def _func(vertical_or_horizontal, cx, current_k=None, TING_WING=None):
     class FocusController:
 
         def __init__(self):
-            self._key_of_currently_focused_component = current_k
+            self._key_of_currently_focused_component = current_key
 
         def receive_directional_key_press(self, key):
             k = self._key_of_currently_focused_component
@@ -47,13 +52,13 @@ def _func(vertical_or_horizontal, cx, current_k=None, TING_WING=None):
             apply_change_focus(k, k_)
             self._key_of_currently_focused_component = k_
 
-        def BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(self):
-            k = self._key_of_currently_focused_component
-            return BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(k)
-
         def accept_new_key_of_focused_component__(self, k_):
             # (if you know what you're doing)
             self._key_of_currently_focused_component = k_
+
+        @property
+        def currently_focused_component(self):  # assumes one
+            return cx[self._key_of_currently_focused_component]
 
         @property
         def key_of_currently_focused_component(self):
@@ -100,20 +105,29 @@ def _func(vertical_or_horizontal, cx, current_k=None, TING_WING=None):
         return change_focus(currently_focused_component_k, k_)
 
     def change_focus(k, k_):
-        c = cx[k_]
-        ffsa, sn = c.FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_
-        changes = (('input_controller', 'change_focus', k, k_, ffsa, sn),)
-        return _input_response(changes=changes)
+        # Send a change ("patch") back to the input controller, so it can
+        # simply bounce it back to us (method below), but also (the main thing)
+        # notify the buttons controller so it can change dynamic buttons
 
-    def BUTTON_CHANGE_EXPERIMENT_FOR_AFTER_FRAME_PUSH(k):
-        c = cx[k]
-        ffsa, sn = c.FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_
-        changes = (('input_controller', 'change_buttons', k, ffsa, sn),)
+        assert k or k_  # why change from nothing to nothing
+
+        if k:
+            cx[k]  # assert
+
+        cbpk = None
+        if k_:
+            cbpk = cx[k_].component_buttons_page_key_when_has_focus
+
+        comp_key_for_buttons = component_key_in_the_context_of_buttons or k_
+        change = (
+            'input_controller', 'change_focus',
+            k, comp_key_for_buttons, k_, cbpk)
+        changes = (change,)
         return _input_response(changes=changes)
 
     def apply_change_focus(k, k_):
-        if TING_WING:
-            TING_WING.apply_change_focus(k, k_)
+        if custom_apply_change_focus:
+            custom_apply_change_focus(k, k_)
             return
         if k is not None:
             goodbye = comp_via_key[k]

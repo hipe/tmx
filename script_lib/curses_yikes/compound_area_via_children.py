@@ -126,11 +126,9 @@ def input_controller_via_CCA_(cca):  # cca = concrete compound area
     buttons_area = cx.get('buttons')
 
     from script_lib.curses_yikes.input_controller_ import \
-        business_buttonpress_controller_class_EXPERIMENTAL_via_ as bbc_vv, \
         InputController__ as ic_via
 
-    bbc = bbc_vv(cx)()
-    ic = ic_via(focus_controller, bbc, buttons_area)
+    ic = ic_via(focus_controller, buttons_area)
     ic.GIVE_FOCUS_TO_TOPMOST_FOCUSABLE_COMPONENT__()  # see
     return ic
 

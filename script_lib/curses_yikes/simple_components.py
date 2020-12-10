@@ -1,6 +1,7 @@
 from script_lib.curses_yikes import \
-        StateMachineBasedInteractableComponent_ as _Interactable, \
+        StateMachineBasedInteractableComponent_ as _StateBasedInteractable, \
         piece_via_has_focus_ as _piece_via_has_focus, \
+        button_pages_via_FFSA_ as _button_pages_via_FFSA, \
         label_via_key_ as _label_via_key, \
         calm_name_via_key_ as _calm_name_via_key, \
         MultiPurposeResponse_ as _response, \
@@ -29,10 +30,10 @@ def _one(_, __):
     return 1
 
 
-def _lazy_load_FFSA(fsa_def):
-    def load_FFSA(_=None):
-        return _produce_FFSA(fsa_def)
-    return load_FFSA
+def _build_to_button_pages_function(ffsa_defnf):
+    def to_button_pages(_):
+        return _button_pages_via_FFSA(_produce_FFSA(ffsa_defnf))
+    return to_button_pages
 
 
 # == Text Field
@@ -58,14 +59,14 @@ class abstract_text_field_via_directive_tail:
         self.minimum_width = minimum_width
 
     def concretize_via_memo_and(self, memo, h, w, li):
-        state = self.FFSAer().to_state_machine()
+        state = _produce_FFSA(text_field_state_machine).to_state_machine()
         return _ConcreteTextField(self._key, state, memo, w, self._label)
 
     def write_to_memo(self, memo):
         _write_widest(memo, 'widest_text_field_label_width', len(self._label))
 
-    FFSAer = _lazy_load_FFSA(text_field_state_machine)
-
+    to_button_pages = _build_to_button_pages_function(text_field_state_machine)
+    component_type_key = __name__, '__text_field__'  # no see, just be unique
     minimum_height_via_width = _one
     two_pass_run_behavior = 'participate'
     can_fill_vertically = False
@@ -73,7 +74,7 @@ class abstract_text_field_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteTextField(_Interactable):
+class _ConcreteTextField(_StateBasedInteractable):
 
     def __init__(self, *five):
         if len(five):
@@ -207,14 +208,14 @@ class abstract_checkbox_via_directive_tail:
         self.minimum_width = max((calcd_min_width, (minimum_width or 0)))
 
     def concretize_via_memo_and(self, memo, h, w, li):
-        state = self.FFSAer().to_state_machine()
+        state = _produce_FFSA(checkbox_state_machine).to_state_machine()
         return _ConcreteCheckbox(self._key, state, memo, w, self._label)
 
     def write_to_memo(self, memo):
         _write_widest(memo, 'widest_checkbox_label_width', len(self._label))
 
-    FFSAer = _lazy_load_FFSA(checkbox_state_machine)
-
+    to_button_pages = _build_to_button_pages_function(checkbox_state_machine)
+    component_type_key = __name__, '__checkbox__'  # no see, just be unique
     minimum_height_via_width = _one
     two_pass_run_behavior = 'participate'
     can_fill_vertically = False
@@ -222,7 +223,7 @@ class abstract_checkbox_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteCheckbox(_Interactable):
+class _ConcreteCheckbox(_StateBasedInteractable):
 
     def __init__(self, *five):
         if len(five):
@@ -296,11 +297,11 @@ class abstract_nav_area_via_directive_tail:
         self._breadcrumb_keys = breadcrumb_keys
 
     def concretize_via_available_height_and_width(self, h, w, li=None):
-        state = self.FFSAer().to_state_machine()
+        state = _produce_FFSA(nav_area_state_machine).to_state_machine()
         return _ConcreteNavBar(w, self._breadcrumb_keys, state)
 
-    FFSAer = _lazy_load_FFSA(nav_area_state_machine)
-
+    to_button_pages = _build_to_button_pages_function(nav_area_state_machine)
+    component_type_key = __name__, '__nav_area__'  # no see, just be unique
     minimum_height_via_width = _one
     minimum_width = 11  # len("👉 […]foo[…]")
     two_pass_run_behavior = 'break'
@@ -309,7 +310,7 @@ class abstract_nav_area_via_directive_tail:
     defer_until_after_interactables_are_indexed = False
 
 
-class _ConcreteNavBar(_Interactable):
+class _ConcreteNavBar(_StateBasedInteractable):
 
     def __init__(self, w, bc_keys, state):
         self._breadcrumb_keys = bc_keys
@@ -455,10 +456,6 @@ def _write_widest(memo, k, leng):
 
 
 # == FSA support
-
-def _common_init_state(aa):
-    return aa.FFSAer().to_state_machine()
-
 
 def _produce_FFSA(fsa_def):
     if not hasattr(fsa_def, '_FFSA_'):

@@ -18,9 +18,9 @@ get plain old pelican working with one of the shortlist themes, rewriting 1 file
 the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 one layer above string-based server: dictionary-based
-refactor curses yikes: assimilate BBC into input controller if it's not special
 ncurses send and receives multiple request/responses before clean disconnect/exit
 isomorph niCLI and ncurses (exit with terminal buffer, enter with -i and args, round-trip OK) (consider using [ma])
+maybe now would be a good time to prune unused methods with coverage
 the daunting poly-option
 reorderable list (isomorph with glob argument)
 constraints for everything. pass/fail

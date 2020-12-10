@@ -48,7 +48,7 @@ class start_long_story:
         resp = self._release()
         changes = expect_only_changes(resp)
         change, = changes
-        exp = 'input_controller', 'give_buttonpress_to_component'
+        exp = 'input_controller', 'apply_business_buttonpress'
         act = change[0:2]
         self._TC.assertSequenceEqual(act, exp)
         self._hold_via_changes(changes)
@@ -85,9 +85,8 @@ class start_long_story:
     def expect_this_button_was_pressed(self, label):
         resp = self._release()
         changes = expect_only_changes(resp)
-        change, = changes
-        exp = 'input_controller', 'give_buttonpress_to_component', label
-        act = tuple(change[i] for i in (0, 1, 3))  # skip recip & rest for now
+        act, = changes
+        exp = 'input_controller', 'apply_business_buttonpress', label
         self._TC.assertSequenceEqual(act, exp)
         self._hold_via_changes(changes)
 

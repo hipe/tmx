@@ -1,4 +1,5 @@
 from script_lib_test.curses_yikes_support import \
+        expect_only_changed_visually, expect_only_changes, \
         buttons_top_row, input_controller_via_CCA
 # from modality_agnostic.test_support.common import lazy
 # dangerous_memoize_in_child_classes as shared_subject_in_children, \
@@ -24,8 +25,9 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
 
         # Press this button
         resp = ic.receive_keypress('KEY_DOWN')
-        resp = ic.apply_changes(resp.changes)
-        act = tuple(resp.changed_visually)
+        changes = expect_only_changes(resp)
+        resp = ic.apply_changes(changes)
+        act = expect_only_changed_visually(resp)
 
         # Three components should have changed
         self.assertSequenceEqual(act, ('buttons', 'nav_area', 'be_verbose'))
@@ -38,8 +40,9 @@ class Case7706_move_down_and_toggle_checkbox(CommonCase):
         resp = ic.receive_keypress('\n')
 
         # Process the arbitrary component state change
-        resp = ic.apply_changes(resp.changes)
-        act = tuple(resp.changed_visually)
+        changes = expect_only_changes(resp)
+        resp = ic.apply_changes(changes)
+        act = expect_only_changed_visually(resp)
 
         # One component should have changed
         self.assertSequenceEqual(act, ('be_verbose',))

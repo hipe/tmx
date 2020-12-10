@@ -1,7 +1,9 @@
 from script_lib.curses_yikes import \
         StateMachineBasedInteractableComponent_ as _InteractableComponent, \
         piece_via_has_focus_ as _piece_via_has_focus, \
+        button_pages_via_FFSA_ as _button_pages_via_FFSA, \
         label_via_key_ as _label_via_key, \
+        MutableChangeFocusDirective_ as _mutable_change_focus_direc, \
         MultiPurposeResponse_ as _response, \
         Emission_ as _emission, \
         MutableStruct_ as _StrictDict
@@ -10,10 +12,12 @@ from collections import namedtuple as _nt
 
 def orderable_list_state_machine():
     yield 'initial', 'cursor_enter', 'has_focus'
+
     yield 'has_focus', 'cursor_exit', 'initial'
     yield 'has_focus', '[enter] to edit', 'entered', 'call', '_ENTER'
+
     yield 'entered', '[a]dd', 'adding', 'call', '_EMACS'  # #here4 (above too)
-    yield 'entered', '[d]one', 'initial', 'call', '_DONE'
+    yield 'entered', 'do[n]e', 'initial', 'call', '_DONE'
     yield 'entered', 'key_down_probably', 'field_focus'
 
     yield 'adding', 'from_adding_to_field_focus', 'field_focus'
@@ -87,14 +91,19 @@ class __Abstract_Orderable_List__:
     def concretize_via_available_height_and_width(self, h, w, li=None):
         item_AAs = self._item_AAs
         klass = self._klass
-        state = self.FFSAer().to_state_machine()
+        state = _FFSA(orderable_list_state_machine).to_state_machine()
         return _ConcreteOrderableList(
             state, h, w, item_AAs, self._label_row_proto, self._key, klass)
 
     def minimum_height_via_width(self, _):
         return 3  # one for the label row, 2 for 2 items. no point in list if n
 
-    FFSAer = _lazy_load_FFSA(orderable_list_state_machine)
+    def to_button_pages(_):
+        # (we want this to change very soon)
+        ffsa = _FFSA(orderable_list_state_machine)
+        return _button_pages_via_FFSA(ffsa)
+
+    component_type_key = __name__, '__orderable_list__'  # unique but no see
 
     # minimum_width = len("👉 [foo bar baz]: [biffo bazzo waffo]")  # ..
     two_pass_run_behavior = 'break'
@@ -129,11 +138,6 @@ class _ConcreteOrderableList(_InteractableComponent):
         self._blank_row = ' ' * w
 
         self._focus_controller = None
-
-    @property
-    def FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_(self):
-        ffsa = _FFSA(orderable_list_state_machine)
-        return ffsa, 'has_focus'
 
     # == BEGIN we want the buttonpress function of parent class, but, as
     #    a compound area, our visual representation is entirely a function of
@@ -226,24 +230,26 @@ class _ConcreteOrderableList(_InteractableComponent):
 
         yield 'get_direction_controller', lambda: self._focus_controller
 
-        # Normally the business button routing takes into account the currently
-        # focused component to find a state transition that corresponds to
-        # the pressed button. But here we don't want this lookup to take into
-        # account our actually focused child, we want it only ever to use our
-        # "one state to rule them all". AND when that state change request
-        # bounces back in, it has to be addressed to us, the SOA.
+        # == Process Business Buttonpresses (BBP's)
+        #    Unlike the default behavior (where every business buttonpress
+        #    gets routed to the focued component, which propbably changes its
+        #    own state (possibly leading to button changes)), Here we have
+        #    "one state to rule them all", (we are one controller) so we don't
+        #    take into account which of our components has focus on BBP's
 
-        from script_lib.curses_yikes.input_controller_ import \
-            business_buttonpress_controller_class_EXPERIMENTAL_via_ as func
-        bbc_class = func(None)
+        def recv_busi_bp(label):
+            return self.receive_business_buttonpress(label)
 
-        def RECV_BUTTONPRESS(bbc, _k_, label):
-            t = bbc.transition_via_label(label)
-            return self.RECEIVE_BUTTONPRESS(t)
+        def apply_busi_bp(label):
+            return self.apply_business_buttonpress(label)
 
-        bbc_class.give_buttonpress_to_component = RECV_BUTTONPRESS  # BIG FLEX
+        yield 'receive_BBP', recv_busi_bp
 
-        yield 'BBC', bbc_class()
+        yield 'apply_BBP', apply_busi_bp
+
+        # == END
+
+        yield 'component_button_page_key_once_has_focus', 'entered'
 
     # == FROM emacs
 
@@ -380,19 +386,35 @@ class _ConcreteOrderableList(_InteractableComponent):
             new_focus_k = _item_key_via_item_offset(away_item_offset+1)
             new_focus_k_after = away_k
 
-        # This sucks: change the focus
+        # Take focus away from the component being deleted (just because) and
+        # give it to the component we decied above (either item or label row)
         resp = fc.change_focus_to(new_focus_k)
 
+        # The main thing: mutate our dictionary of components (shift & pop)
         _delete_from_dictionary_shifting_keys(self._components, away_k)
+
+        # Re-create the focus index, telling it who already has focus
         self._reinit_focus_controller(new_focus_k_after)
 
+        # Tedious: we need to send back a "change focus" patch so buttons
+        # change and screen areas taint themselves for redraw etc BUT this
+        # patch as it is is now irrelevant because it refers to the state of
+        # things before the delete. Make the patch correctly refer to the
+        # way things are now, after the delete:
+
         change, = resp.changes
-        assert away_k == change[2]
-        assert new_focus_k == change[3]
-        muta_change = list(change)
-        muta_change[2] = None
-        muta_change[3] = new_focus_k_after
-        change = tuple(muta_change)
+        o = _mutable_change_focus_direc(*change)
+
+        assert new_focus_k == o['hello_component_key']
+        assert away_k == o['goodbye_component_key']
+
+        # Actually, say you're changing from NO focus (because you deleted it)
+        o['goodbye_component_key'] = None
+
+        # Actually, make the new focus be THIS key (slots shifted around)
+        o['hello_component_key'] = new_focus_k_after
+
+        change = tuple(o._values.values())
         resp.changes = (change,)  # madman
 
         emi = _emi_via_info_line('deleted_item', 'Deleted 1 item.')
@@ -444,8 +466,6 @@ class _ConcreteOrderableList(_InteractableComponent):
         # emi = _emi_via_info_line('moved_item', f"moved item {adv}")  nah
         return _response(changed_visually=(ref_k, target_k))
 
-    # ==
-
     def _reinit_focus_controller(self, k):
         """
         The focus controller does stuff like index how long the list of items
@@ -459,7 +479,10 @@ class _ConcreteOrderableList(_InteractableComponent):
         from script_lib.curses_yikes.focus_controller_ import \
             vertical_splay_focus_controller_ as func
         self._focus_controller = func(
-                self._components, current_k=already_k, TING_WING=self)
+                self._components,
+                current_key=already_k,
+                component_key_in_the_context_of_buttons=self._key,
+                custom_apply_change_focus=self.apply_change_focus)
 
     def _response_via_info(self, cat, msg):
         emi = _emi_via_info_line(cat, msg)
@@ -564,14 +587,13 @@ def _anonymous_text_field(w):
             self.value_string = x
             self.rest = ''.join((' ', x, filler, ' '))  # #here3
 
-        @property
-        def FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_(self):
-            ffsa = _FFSA(orderable_list_state_machine)
-            return ffsa, 'field_focus'
-
         def to_row(self):
             pc = _piece_via_has_focus(self._has_focus)
             return ''.join((pc, self.rest))
+
+        @property
+        def component_buttons_page_key_when_has_focus(_):
+            return 'field_focus'
 
         is_focusable = True
 
@@ -587,13 +609,14 @@ class _LabelRow(_StateButNoFSA):
     def __init__(self, w, label_proto_d):
         self._render = _bake_label_renderer(w, label_proto_d)
 
-    @property
-    def FFSA_AND_STATE_NAME_ONCE_HAS_FOCUS_(self):
-        ffsa = _FFSA(orderable_list_state_machine)
-        return ffsa, 'entered'  # once you're "in" the SAC. #here4
-
     def to_row(self):
         return self._render(self._has_focus)
+
+    @property
+    def component_buttons_page_key_when_has_focus(_):
+        # when the SOA is not entered yet, the label row will get focus but
+        # this is not that. is this for when the SOA is entered.
+        return 'entered'
 
     is_focusable = True
 
