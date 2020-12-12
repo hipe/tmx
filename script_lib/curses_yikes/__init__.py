@@ -158,6 +158,19 @@ class StateMachineBasedInteractableComponent_:
     is_focusable = True
 
 
+class StateButNoFSA_:
+
+    def become_focused(self):
+        assert self._has_focus is False
+        self._has_focus = True
+
+    def become_not_focused(self):
+        assert self._has_focus is True
+        self._has_focus = False
+
+    _has_focus = False
+
+
 # ==
 
 def button_pages_via_FFSA_(ffsa):

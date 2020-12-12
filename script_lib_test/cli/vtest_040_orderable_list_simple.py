@@ -47,7 +47,7 @@ def CLI_(sin, sout, serr, argv, fxser):
 
 def define_compound_area():
     yield 'nav_area', ('enjoy_your', 'orderable_list')
-    yield 'orderable_list', 'chim_churry',
+    yield 'orderable_list', 'chim_churry', 'item_class', 'anonymous_text_field'
     yield 'flash_area'
     yield 'buttons', buttons_def()
 

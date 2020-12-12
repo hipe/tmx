@@ -1,5 +1,6 @@
 from script_lib.curses_yikes import \
         StateMachineBasedInteractableComponent_ as _InteractableComponent, \
+        StateButNoFSA_ as _StateButNoFSA, \
         piece_via_has_focus_ as _piece_via_has_focus, \
         button_pages_via_FFSA_ as _button_pages_via_FFSA, \
         label_via_key_ as _label_via_key, \
@@ -7,7 +8,6 @@ from script_lib.curses_yikes import \
         MultiPurposeResponse_ as _response, \
         Emission_ as _emission, \
         MutableStruct_ as _StrictDict
-from collections import namedtuple as _nt
 
 
 def orderable_list_state_machine():
@@ -16,7 +16,6 @@ def orderable_list_state_machine():
     yield 'has_focus', 'cursor_exit', 'initial'
     yield 'has_focus', '[enter] to edit', 'entered', 'call', '_ENTER'
 
-    yield 'entered', '[a]dd', 'adding', 'call', '_EMACS'  # #here4 (above too)
     yield 'entered', 'do[n]e', 'initial', 'call', '_DONE'
     yield 'entered', 'key_down_probably', 'field_focus'
 
@@ -24,7 +23,7 @@ def orderable_list_state_machine():
 
     yield 'field_focus', 'move-[u]p', 'field_focus', 'call', '_MOVE_UP'
     yield 'field_focus', 'move-[d]own', 'field_focus', 'call', '_MOVE_DOWN'
-    yield 'field_focus', 'add-[a]fter', 'adding', 'call', '_EMACS'
+
     # yield 'field_focus', '[e]dit', 'editing', 'call', '_EDIT'
     yield 'field_focus', '[x]delete', 'field_focus', 'call', '_DELETE'
     yield 'field_focus', 'deleting_last', 'has_focus'
@@ -32,27 +31,25 @@ def orderable_list_state_machine():
     yield 'field_focus', 'do[n]e-editing-list', 'initial', 'call', '_DONE'
 
 
-def _lazy_load_FFSA(fsa_def):
-    def load_FFSA(_=None):
-        return _FFSA(fsa_def)
-    return load_FFSA
-
-
 class __Abstract_Orderable_List__:
 
     def __init__(self, k, *more, value=None):
         self._key = k
-        kw = {k: None for k in ('label',)}
+        kw = {k: None for k in ('label', 'item_class')}
         stack = list(reversed(more))
         while stack:
             kw[(k := stack.pop())]  # validate name
             kw[k] = stack.pop()
         kw['val'] = value
-        self._klass = _abstract_anonymous_text_field()
         self._do_init(**kw)
 
-    def _do_init(self, label, val):
+    def _do_init(self, item_class, label, val):
         self._init_label_and_increase_minimum_width(label)
+        self._klass = _produce_some_item_class(item_class)
+        self._init_item_abstract_areas(val)  # after resolving item class
+        self._inject_glizzy_into_state_machine_lets_go()
+
+    def _init_item_abstract_areas(self, val):
         if val:
             itr = self._item_AAs_WHILE_increasing_min_width(val)
             self._item_AAs = tuple(itr)
@@ -91,17 +88,21 @@ class __Abstract_Orderable_List__:
     def concretize_via_available_height_and_width(self, h, w, li=None):
         item_AAs = self._item_AAs
         klass = self._klass
-        state = _FFSA(orderable_list_state_machine).to_state_machine()
+        state = self._FFSA.to_state_machine()
         return _ConcreteOrderableList(
             state, h, w, item_AAs, self._label_row_proto, self._key, klass)
 
     def minimum_height_via_width(self, _):
         return 3  # one for the label row, 2 for 2 items. no point in list if n
 
-    def to_button_pages(_):
+    def to_button_pages(self):
         # (we want this to change very soon)
-        ffsa = _FFSA(orderable_list_state_machine)
-        return _button_pages_via_FFSA(ffsa)
+        return _button_pages_via_FFSA(self._FFSA)
+
+    def _inject_glizzy_into_state_machine_lets_go(self):
+        my_ffsa = _FFSA(orderable_list_state_machine)
+        their_ffsa = self._klass.FFSA_for_injection
+        self._FFSA = my_ffsa.__class__.HOLY_SMOKES_MERGE_FFSAs(my_ffsa, their_ffsa)  # noqa: E501
 
     component_type_key = __name__, '__orderable_list__'  # unique but no see
 
@@ -536,72 +537,6 @@ class _ConcreteOrderableList(_InteractableComponent):
     is_focusable = True
 
 
-class _StateButNoFSA:
-
-    def become_focused(self):
-        assert self._has_focus is False
-        self._has_focus = True
-
-    def become_not_focused(self):
-        assert self._has_focus is True
-        self._has_focus = False
-
-    _has_focus = False
-
-
-# == Complicated thing goes here:
-
-
-# == Anoynmous field
-
-def _abstract_anonymous_text_field():
-
-    class constructors:  # #class-as-namespace
-
-        def abstract_area_via_value(val):
-            assert isinstance(val, str)  # #[#022]
-            min_w = left_w + 1 + len(val) + 1  # #here3
-            return aa(min_w, val)
-
-        def constructor_taking_mixed_value_via_width(w):
-            return _anonymous_text_field(w)  # hi.
-
-    aa = _nt('AA', ('minimum_width', 'value'))
-    left_w = _piece_via_has_focus.width
-    return constructors
-
-
-def _anonymous_text_field(w):
-
-    def build(x):
-        leng = len(x)
-        under_by = my_content_width - leng
-        if under_by < 0:
-            xx()
-        filler = ' ' * under_by
-        return AnonymousTextField(x, filler), None
-
-    class AnonymousTextField(_StateButNoFSA):
-
-        def __init__(self, x, filler):
-            self.value_string = x
-            self.rest = ''.join((' ', x, filler, ' '))  # #here3
-
-        def to_row(self):
-            pc = _piece_via_has_focus(self._has_focus)
-            return ''.join((pc, self.rest))
-
-        @property
-        def component_buttons_page_key_when_has_focus(_):
-            return 'field_focus'
-
-        is_focusable = True
-
-    my_width = w - _piece_via_has_focus.width
-    my_content_width = my_width - 2  # #here3 "[value]" mebbe
-    return build
-
-
 # == Label row
 
 class _LabelRow(_StateButNoFSA):
@@ -720,6 +655,26 @@ def _item_offset_via_item_key(item_key):
     if not md:
         xx(f"oops: {item_key!r}")
     return int(md[1]) - 1  # #here2
+
+
+# ==
+
+def _produce_some_item_class(item_class_argument):
+
+    if item_class_argument is None:
+        # Make old tests work, also let definitions stay pretty and terse
+        item_class_argument = 'anonymous_text_field'
+
+    if not isinstance(item_class_argument, str):
+        xx(f"yes it would be interesting if you could inject classes here - {item_class_argument!r}")  # noqa: E501
+
+    from . import _injectable_item_classes as glizzy_module
+
+    # (could make this more dynamic, but why)
+    if 'anonymous_text_field' == item_class_argument:
+        return glizzy_module.abstract_anonymous_text_field_()
+
+    xx(f"not a recognized item class: {item_class_argument!r}")
 
 
 # ==

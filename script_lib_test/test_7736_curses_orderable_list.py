@@ -344,7 +344,7 @@ def ACA_two():  # MEMOIZE ME
 
 def ACA_def_two():
     yield 'nav_area', ('enjoy_your', 'orderable_list')
-    yield 'orderable_list', 'chummo',
+    yield 'orderable_list', 'chummo'
     yield 'flash_area'
     yield 'buttons'
 
@@ -359,7 +359,7 @@ def ACA_one(vals=None):
 
 
 def ACA_def_one():
-    yield 'orderable_list', 'chimmo'
+    yield 'orderable_list', 'chimmo', 'item_class', 'anonymous_text_field'
     yield 'buttons'
 
 
