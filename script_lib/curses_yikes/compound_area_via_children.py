@@ -128,7 +128,7 @@ def input_controller_via_CCA_(cca):  # cca = concrete compound area
     from script_lib.curses_yikes.input_controller_ import \
         InputController__ as ic_via
 
-    ic = ic_via(focus_controller, buttons_area)
+    ic = ic_via(focus_controller, buttons_area, cca._children)
     ic.GIVE_FOCUS_TO_TOPMOST_FOCUSABLE_COMPONENT__()  # see
     return ic
 
@@ -175,6 +175,9 @@ class _ConcreteCompoundArea:
         class view:
             def items(_):
                 return ((k, getitem(k)) for k in harnesses.keys())
+
+            def __contains__(_, k):
+                return k in harnesses
 
             def get(_, k):
                 return (ca := harnesses.get(k)) and f(ca)
@@ -230,13 +233,8 @@ class _AreaHarness:
 
             yield curr_y, always_same_x, row
 
-    @property
-    def harness_y__(self):
-        return self._y
-
-    @property
-    def harness_x__(self):
-        return self._x
+    def translate_point__(self, y, x):
+        return y + self._y, x + self._x
 
 
 def _distribute_extra_available_height(

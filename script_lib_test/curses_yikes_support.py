@@ -43,34 +43,99 @@ class start_long_story:
     # == Enter Text
 
     def enter_text(self, text):
+        self._before_enter_text_apply_the_business_buttonpress()
+        self._for_enter_text_expect_emacs_patch()
+        self.then_enter_text(text)
+        self._after_enter_text_check_changes()
 
-        # Sneak in thing
+    # -- Before enter text, apply the business buttonpress on deck
+
+    def _before_enter_text_apply_the_business_buttonpress(self):
         resp = self._release()
         changes = expect_only_changes(resp)
         change, = changes
         exp = 'input_controller', 'apply_business_buttonpress'
-        act = change[0:2]
-        self._TC.assertSequenceEqual(act, exp)
+        self._TC.assertSequenceEqual(change[0:2], exp)
         self._hold_via_changes(changes)
 
-        # Response is a request to enter into emacs mode
+    # -- After applying business buttonpress, assert the form field is showing
+
+    def expect_this_is_directive_to_draw_emacs_field(self, change):
+
+        act = change[0:2]
+        self._TC.assertSequenceEqual(act, ('parent_area', 'translate_area'))
+
+        assert self._is_ready
+        resp = self.apply_change(change)
+        change, = expect_only_changes(resp)
+
+        from script_lib.curses_yikes import EmacsFieldDirective_ as ting
+        direc, rest = ting.directive_and_rest_via_tuple(change)
+
+        self._YIKES_emacs = direc.component_path, rest
+        return direc, rest
+
+    def _for_enter_text_expect_emacs_patch(self):
         resp = self._release()
         changes = expect_only_changes(resp)
-        change, = changes
-        exp = 'host_directive', 'enter_text_field_modal', self._cont_key
-        act = change[0:3]
-        self._TC.assertSequenceEqual(act, exp)
 
-        sac = self._area.COMPONENT_AT(self._cont_key)
-        resp = sac.receive_new_value_from_modal_(text)
+        # How do we know it's the orderable list? we don't
+        change1, change2 = changes
+
+        # Assert that the injected class sends a directive to add a WIP row
+        exp = 'child_component', self._cont_key, '_insert_WIP_row'
+        self._TC.assertSequenceEqual(change1[0:3], exp)
+
+        # Assert that there's a host directive that needs translating yuck
+        exp = 'parent_area', 'translate_area', 'host_directive'
+        self._TC.assertSequenceEqual(change2[0:3], exp)
+
+        # Apply the patch to add the wip row and translate the thing yuck
+        resp = self._apply_these_changes(changes)
+        change1, change2 = expect_only_changes(resp)
+
+        # Assert that the new WIP row has focus (not quite asserted)
+        exp = 'input_controller', 'change_focus'
+        self._TC.assertSequenceEqual(change1[0:2], exp)
+
+        # Here is our directive for showing the emacs field
+        exp = 'host_directive', 'enter_emacs_modal'
+        self._TC.assertSequenceEqual(change2[0:2], exp)
+
+        # Apply the change to give focus to the WIP row (we don't apply the ot)
+        resp = self.apply_change(change1)
+        self._expect_container_and_maybe_buttons_changed_visually(resp)
+
+        # Yuck
+        from script_lib.curses_yikes import EmacsFieldDirective_ as ting
+        o, rest = ting.directive_and_rest_via_tuple(change2)
+        self._YIKES_emacs = o.component_path, rest
+
+        # return change1  # if you want to verify the field coordinates yoursel
+
+    def then_enter_text(self, text):
+
+        comp_path, args = self._YIKES_emacs
+        del self._YIKES_emacs
+
+        sac_k, comp_k = comp_path  # or not
+
+        sac = self._area.COMPONENT_AT(sac_k)
+        resp = sac.receive_new_value_from_modal_(comp_k, text, *args)
         changes = expect_only_changes(resp)
         change, = changes
-        exp = 'input_controller', 'change_focus'  # OR NOT
+        exp = 'input_controller', 'traverse_transition'  # OR NOT
         act = change[0:len(exp)]
         self._TC.assertSequenceEqual(exp, act, exp)
+        self._hold(resp)
 
+    def _after_enter_text_check_changes(self):
         # Visual changes: SAC area and maybe buttons area
+        changes = expect_only_changes(self._release())
         resp = self._IC.apply_changes(changes)
+        self._expect_container_and_maybe_buttons_changed_visually(resp)
+
+    def _expect_container_and_maybe_buttons_changed_visually(self, resp):
         cv = expect_only_changed_visually(resp)
         pool = {k: None for k in cv}
         pool.pop(self._cont_key)
@@ -159,12 +224,16 @@ class start_long_story:
         rows = tuple(self._area.to_rows())
         return _Screenshot(rows, emis, cv)
 
+    def apply_changes(self):
+        changes = expect_only_changes(self._release())
+        return self._apply_these_changes(changes)
+
     def _apply_recursive(self, resp):
         while True:
             changes = resp.changes
             if not changes:
                 break
-            resp = self._IC.apply_changes(changes)
+            resp = self._apply_these_changes(changes)
 
     def _do_apply_recursive(self, resp):
         while True:
@@ -175,12 +244,18 @@ class start_long_story:
                 for k in cv:
                     yield 'changed_visually', k
             if (changes := resp.changes):
-                resp = self._IC.apply_changes(changes)
+                resp = self._apply_these_changes(changes)
                 continue
             break
 
     def _hold_via_changes(self, changes):
-        self._hold(self._IC.apply_changes(changes))
+        self._hold(self._apply_these_changes(changes))
+
+    def apply_change(self, change):
+        return self._IC.apply_changes((change,))
+
+    def _apply_these_changes(self, changes):
+        return self._IC.apply_changes(changes)
 
     def _hold(self, resp):
         if not self._is_ready:
@@ -194,6 +269,8 @@ class start_long_story:
         res = self._response
         self._response = None
         return res
+
+    release_response = _release  # use sparingly, i guess
 
     def DEBUG_DUMP(self, msg):
         o = print

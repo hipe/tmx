@@ -4,6 +4,7 @@ from script_lib.curses_yikes import \
         piece_via_has_focus_ as _piece_via_has_focus, \
         button_pages_via_FFSA_ as _button_pages_via_FFSA, \
         label_via_key_ as _label_via_key, \
+        EmacsFieldDirective_ as _EmacsFieldDirective, \
         MutableChangeFocusDirective_ as _mutable_change_focus_direc, \
         MultiPurposeResponse_ as _response, \
         Emission_ as _emission, \
@@ -19,8 +20,6 @@ def orderable_list_state_machine():
     yield 'entered', 'do[n]e', 'initial', 'call', '_DONE'
     yield 'entered', 'key_down_probably', 'field_focus'
 
-    yield 'adding', 'from_adding_to_field_focus', 'field_focus'
-
     yield 'field_focus', 'move-[u]p', 'field_focus', 'call', '_MOVE_UP'
     yield 'field_focus', 'move-[d]own', 'field_focus', 'call', '_MOVE_DOWN'
 
@@ -29,6 +28,10 @@ def orderable_list_state_machine():
     yield 'field_focus', 'deleting_last', 'has_focus'
     yield 'field_focus', 'key_up_probably', 'entered'
     yield 'field_focus', 'do[n]e-editing-list', 'initial', 'call', '_DONE'
+
+
+# item_CC = item constructor constructor
+# item_C = item constructor (like a class but other functions too)
 
 
 class __Abstract_Orderable_List__:
@@ -45,7 +48,7 @@ class __Abstract_Orderable_List__:
 
     def _do_init(self, item_class, label, val):
         self._init_label_and_increase_minimum_width(label)
-        self._klass = _produce_some_item_class(item_class)
+        self._item_CC = _produce_some_item_CC(item_class)
         self._init_item_abstract_areas(val)  # after resolving item class
         self._inject_glizzy_into_state_machine_lets_go()
 
@@ -58,7 +61,7 @@ class __Abstract_Orderable_List__:
 
     def _item_AAs_WHILE_increasing_min_width(self, val):
         for mixed in val:
-            item_AA = self._klass.abstract_area_via_value(mixed)
+            item_AA = self._item_CC.abstract_area_via_value(mixed)
             w = item_AA.minimum_width
             if self.minimum_width < w:
                 self.minimum_width = w
@@ -87,10 +90,10 @@ class __Abstract_Orderable_List__:
 
     def concretize_via_available_height_and_width(self, h, w, li=None):
         item_AAs = self._item_AAs
-        klass = self._klass
+        item_CC = self._item_CC
         state = self._FFSA.to_state_machine()
         return _ConcreteOrderableList(
-            state, h, w, item_AAs, self._label_row_proto, self._key, klass)
+            state, h, w, item_AAs, self._label_row_proto, self._key, item_CC)
 
     def minimum_height_via_width(self, _):
         return 3  # one for the label row, 2 for 2 items. no point in list if n
@@ -101,7 +104,7 @@ class __Abstract_Orderable_List__:
 
     def _inject_glizzy_into_state_machine_lets_go(self):
         my_ffsa = _FFSA(orderable_list_state_machine)
-        their_ffsa = self._klass.FFSA_for_injection
+        their_ffsa = self._item_CC.FFSA_for_injection
         self._FFSA = my_ffsa.__class__.HOLY_SMOKES_MERGE_FFSAs(my_ffsa, their_ffsa)  # noqa: E501
 
     component_type_key = __name__, '__orderable_list__'  # unique but no see
@@ -118,12 +121,12 @@ KLASS = __Abstract_Orderable_List__
 
 class _ConcreteOrderableList(_InteractableComponent):
 
-    def __init__(self, state, h, w, item_AAs, label_proto_d, k, klass):
+    def __init__(self, state, h, w, item_AAs, label_proto_d, k, item_CC):
         self._state = state
         self._height, self._width, self._key = h, w, k
 
         # Populate the components from the existing item values list
-        self._init_components(item_AAs, label_proto_d, klass)
+        self._init_components(item_AAs, label_proto_d, item_CC)
 
         # Derive the number of items from the components dictionary (method)
 
@@ -139,6 +142,7 @@ class _ConcreteOrderableList(_InteractableComponent):
         self._blank_row = ' ' * w
 
         self._focus_controller = None
+        self._the_proxy = None
 
     # == BEGIN we want the buttonpress function of parent class, but, as
     #    a compound area, our visual representation is entirely a function of
@@ -151,9 +155,11 @@ class _ConcreteOrderableList(_InteractableComponent):
 
     def become_not_focused(self):  # OVERRIDE (compare)
         if self._focus_controller is not None:  # #here8
-            xx('enjoy')
+            self._focus_controller = None  # EEEK ok hopefully
         self._label_row.become_not_focused()
-        self._state.move_to_state_via_transition_name('cursor_exit')  # 🤷
+        if 'initial' == self._state_name:
+            return
+        self._state.move_to_state_via_transition_name('cursor_exit')
 
     # == END
 
@@ -163,36 +169,11 @@ class _ConcreteOrderableList(_InteractableComponent):
         # Again, we have to do more than the focus controller because we have
         # "one state to rule them all"
 
-        s = self._state
-        sn = s.state_name
-
-        if k is None:  # when deleted
-            if 'label_row' == k_:
-                xx('give me a case please')
-            else:
-                _item_offset_via_item_key(k_)  # assert
-                assert 'field_focus' == sn
-                # (leave state as-is)
-        elif 'label_row' == k:
-            _item_offset_via_item_key(k_)  # assert
-            if 'entered' == sn:
-                s.move_to_state_via_transition_name('key_down_probably')
-            else:
-                assert 'field_focus' == sn  # idk
-
-        elif 'label_row' == k_:
-            _item_offset_via_item_key(k)  # assert
-            if 'initial' == sn:
-                # (when do[n]e was pressed). state was changed automatically
-                pass
-            elif 'field_focus' == sn:
-                pass  # #cover-me
-            else:
-                xx(f"easy: {sn!r}")
-        else:
-            _item_offset_via_item_key(k)  # assert
-            _item_offset_via_item_key(k_)  # assert
-            # Leave state as it is
+        # Figure out what state transition to take based on component names
+        from_type, item_offset = _component_type_via_component_key(k)
+        to_type, item_offset = _component_type_via_component_key(k_)
+        m = self._method_name_via(from_type, to_type)
+        getattr(self, m)()
 
         # The easy part: do what the focus controller does
         if k:
@@ -200,13 +181,60 @@ class _ConcreteOrderableList(_InteractableComponent):
             self._components[k].become_not_focused()
         self._components[k_].become_focused()
 
+    def _method_name_via(self, from_type, to_type):
+        if 'label_row' == from_type:
+            _assert_equal('item_row', to_type)
+            return '_when_label_row_to_item_row'
+        if 'item_row' == from_type:
+            if 'item_row' == to_type:
+                return '_when_item_row_to_item_row'
+            _assert_equal('label_row', to_type)
+            return '_when_item_row_to_label_row'
+        assert 'nothing' == from_type  # when deleted
+        if 'label_row' == to_type:
+            return '_when_item_row_to_label_row'
+        _assert_equal('item_row', to_type)
+        return '_when_nothing_to_item_row'
+
+    def _when_label_row_to_item_row(self):
+        if self._is_entering:
+            return
+        self._assert_state('entered')
+        self._move_to_state_over('key_down_probably')
+
+    def _when_item_row_to_item_row(self):
+        if self._is_entering:
+            return
+        self._assert_state('field_focus')
+
+    def _when_item_row_to_label_row(self):
+        if 'initial' == self._state_name:
+            return
+        self._assert_state('field_focus')
+        self._move_to_state_over('key_up_probably')
+
+    def _when_nothing_to_label_row(self):
+        self._assert_state('field_focus')
+        xx('give me a case please')
+
+    def _when_nothing_to_item_row(self):
+        self._assert_state('field_focus')
+        # leave state as-is
+
+    @property
+    def _is_entering(self):
+        i = self._state_name.find('entering_')
+        return 0 == i
+
+    # == END
+
     def _ENTER(self):
         # Entering into an SOC, push a new controller (us) on to the stack
         change = 'input_controller', 'push_receiver', self._key
         return _response(changes=(change,))
 
     def _DONE(self):
-        # You're going to pop out. leave your label row as focused becase
+        # You're going to pop out. leave your label row as focused because
         # that's what had focus when you popped in.
         if 'label_row' == self._FC_curr_key:
             resp = _response(changes=())  # 😢
@@ -241,8 +269,8 @@ class _ConcreteOrderableList(_InteractableComponent):
         def recv_busi_bp(label):
             return self.receive_business_buttonpress(label)
 
-        def apply_busi_bp(label):
-            return self.apply_business_buttonpress(label)
+        def apply_busi_bp(label, *more):
+            return self.apply_business_buttonpress(label, *more)
 
         yield 'receive_BBP', recv_busi_bp
 
@@ -252,88 +280,46 @@ class _ConcreteOrderableList(_InteractableComponent):
 
         yield 'component_button_page_key_once_has_focus', 'entered'
 
-    # == FROM emacs
+    # == BEGIN add ("emacs")
 
-    def _EMACS(self):
+    """Adding a new item is a complicated series of two-strokes:
+
+    1. "[a]dd" button (or similar) is pressed, whose transition (modeled by
+    the injected item class) probably indicates this "_EMACS" action
+
+    2. When the button press patch is applied, this action is probably executed
+    which results in a patch with two changes: 1. make the WIP space and
+    2. show the emacs field. (This second patch is itself a two-stroke,
+    requiring coordinate translation to screen coordinates.)
+
+    3. MORE
+    """
+
+    def _EMACS(self, *args_for_plugin):
+
         # #eventually :#here6 we will have hide/disable buttons. The button
         # for adding an item should be suspended when the list is full.
-        # But today is not that day, so check it manually :#here7:
-        if self._max_number_of_items == self._current_number_of_items:
+        # But today is not that day, so check it manually :#here3:
+
+        # #open [#607.I]: at history-B.4 it became true that this check can
+        # no longer happen here because if you're a poly-option, you want this
+        # check before you `_EMACS` for the name but not before the value (b.c
+        # the WIP row has already been added when you're doing the value.)
+        # .#open [#607.I] this check needs to happen somewhere.
+        # Also this will be affected by disappearing buttons [#607.K]
+        if False and self._max_number_of_items == self._current_number_of_items:  # noqa: E501
             return self._response_via_info('list_full', 'oops! list is full')
 
-        self._point_of_ref_key = self._FC_curr_key
-        changes = (('host_directive', 'enter_text_field_modal', self._key),)
-        return _response(changes=changes)
+        return self._item_C.emacs(self._proxy, *args_for_plugin)
 
-    @property
-    def value_span_x_and_width_for_modal_(self):
+    def _insert_WIP_row(self, new_k):
 
-        # Where to draw the textbox? Draw it where the soon-to-exist item will
-        # be. (It would be nice to shift the existing rows down first instead
-        # of drawing the textbox over an existing item #wish)
-
-        # First, Y: Assume "insert after". (Because of #here2 label row,
-        # we'll never need an "insert before".) The Y of an item row is the Y
-        # of the SAC plus 1 (label row #here2) plus the offset of the item.
-
-        # Since we want the textbox to be after the "reference row" (formerly
-        # focused row), we'll use the above formula (giving the label row an
-        # imaginary item offset of -1), and add 1 to it to get the row after.
-
-        k = self._point_of_ref_key
-        if 'label_row' == k:  # #here2
-            item_offset = -1
-        else:
-            item_offset = _item_offset_via_item_key(k)
-
-        use_y = item_offset + 2  # one for label #here2. we have no Y
-
-        # NOTE this should come from the injected class
-        # As for the x,
-        w = _piece_via_has_focus.width
-        use_x = w
-
-        # As for the width of the textbox, extend it all the way
-        use_w = self._width - w
-
-        del use_y  # whoops not used yet
-        return use_x, use_w
-
-    def receive_new_value_from_modal_(self, mixed):
-
-        # Assert we have the space to add a new item because #here7
+        # Again (#here3) assert we have the space to add a new item
         assert self._current_number_of_items < self._max_number_of_items
 
-        # Move our state back no matter what
-        self._state.move_to_state_via_transition_name('from_adding_to_field_focus')  # noqa: E501 🤷
-
-        # If they cancelled or it was blank, KISS: nope out of there
-        was_blank = False
-        if mixed is None:
-            was_blank = True
-        else:
-            mixed = mixed.strip()
-            was_blank = not len(mixed)
-
-        if was_blank:
-            return self._response_via_info('blank', 'was blank')
-
-        # What will the key of our new item be?
-        ref_k = self._point_of_ref_key
-        del self._point_of_ref_key
-        if 'label_row' == ref_k:
-            reference_item_offset = -1
-        else:
-            reference_item_offset = _item_offset_via_item_key(ref_k)
-
-        if True:  # if add (not edit existing)
-            new_item_offset = reference_item_offset + 1
-            new_k = _item_key_via_item_offset(new_item_offset)
-
-        # Create the new item (row)
-        new_item, emi = self._item_row_via_mixed_value(mixed)
-        if new_item is None:
-            xx("imagine new item validation failure")
+        # Ask the injected item class to create the blank item component
+        new_item_offset = _item_offset_via_item_key(new_k)
+        new_item = self._item_C.create_WIP_item_component()
 
         # Insert it, praying that the key it assigns is the one we assumed
         _insert_into_dictionary_shifting_keys(
@@ -341,14 +327,18 @@ class _ConcreteOrderableList(_InteractableComponent):
 
         # Re-init the focus controller with the new components
         # (but still point at old focus row because it still has focus)
-        k = self._FC_curr_key
-        assert ref_k == k
-        self._reinit_focus_controller(ref_k)
+        self._reinit_focus_controller(self._FC_curr_key)
 
         # Now change the focus to the newly created item
+        # (note this usually leads to buttons change on first add)
         return self._focus_controller.change_focus_to(new_k)
 
-    # == TO
+    def receive_new_value_from_modal_(self, comp_k, text, *plugin_args):
+        c = self._components[comp_k]
+        p = self._proxy
+        return c.receive_new_value_from_parent_(p, text, *plugin_args)
+
+    # == END add
 
     def _DELETE(self):
         # The row with focus is being deleted. [#608.N] explains (sort of)
@@ -406,8 +396,8 @@ class _ConcreteOrderableList(_InteractableComponent):
         change, = resp.changes
         o = _mutable_change_focus_direc(*change)
 
-        assert new_focus_k == o['hello_component_key']
-        assert away_k == o['goodbye_component_key']
+        _assert_equal(new_focus_k, o['hello_component_key'])
+        _assert_equal(away_k, o['goodbye_component_key'])
 
         # Actually, say you're changing from NO focus (because you deleted it)
         o['goodbye_component_key'] = None
@@ -499,23 +489,67 @@ class _ConcreteOrderableList(_InteractableComponent):
         for _ in range(0, self._height - len(self._components)):
             yield self._blank_row
 
+    @property
+    def _proxy(self):
+        if self._the_proxy is None:
+            self._the_proxy = self._build_proxy()
+        return self._the_proxy
+
+    def _build_proxy(self):
+        class ProxyToParent:
+
+            def experiment_transition(_, tname, *item_k):
+                change = 'input_controller', 'traverse_transition', tname, *item_k  # noqa: E501
+                return _response(changes=(change,))
+
+            def build_change_for_show_EMACS_field(
+                    _, new_k, x, w, *args_for_plugin):
+                return _build_change_for_show_EMACS_field(
+                        self._key, new_k, x, w, args_for_plugin)
+
+            def build_change_for_insert_WIP_row(_, new_k):
+                return 'child_component', self._key, '_insert_WIP_row', new_k
+
+            @property
+            def item_key_of_eventual_item(_):
+                # For now, assume "[a]dd" or "add [a]fter"
+                k = self._FC_curr_key
+                if 'label_row' == k:
+                    return 'item_1'
+                return _item_key_via_item_offset(_item_offset_via_item_key(k) + 1)  # noqa: E501
+
+            @property
+            def STATE_NAME(_):  # useful in development
+                return self._state_name
+
+        return ProxyToParent()
+
+    # Our own personal state machine API
+
+    def _assert_state(self, sn):
+        act = self._state_name
+        _assert_equal(sn, act)
+
+    def _move_to_state_over(self, tn):
+        self._state.move_to_state_via_transition_name(tn)
+
     # One-offs
 
-    def _init_components(self, item_AAs, label_proto_d, klass):
-        kvs = self._do_init_components(item_AAs, label_proto_d, klass)
+    def _init_components(self, item_AAs, label_proto_d, item_CC):
+        kvs = self._do_init_components(item_AAs, label_proto_d, item_CC)
         self._components = {k: v for k, v in kvs}
 
-    def _do_init_components(self, item_AAs, label_proto_d, klass):
+    def _do_init_components(self, item_AAs, label_proto_d, item_CC):
         yield 'label_row', _LabelRow(self._width, label_proto_d)
 
-        c = klass.constructor_taking_mixed_value_via_width(self._width)
-        self._item_row_via_mixed_value = c
+        item_C = item_CC.constructor_taking_mixed_value_via_width(self._width)
+        self._item_C = item_C
 
         item_offset = -1
         for aa in (item_AAs or ()):
             item_offset += 1
             k = _item_key_via_item_offset(item_offset)
-            ca, emi = c(aa.value)
+            ca, emi = item_C.unserialize(aa.value)
             if ca is None:
                 xx('hmm - decoding (unserializing (unmarshalling)) error')
             yield k, ca
@@ -533,6 +567,10 @@ class _ConcreteOrderableList(_InteractableComponent):
     @property
     def _label_row(self):
         return self._components['label_row']
+
+    @property
+    def _state_name(self):
+        return self._state.state_name
 
     is_focusable = True
 
@@ -562,7 +600,7 @@ def _bake_label_renderer(row_w, label_proto_d):
         pc = _piece_via_has_focus(has_focus)
         dct['left'] = pc
         final = ''.join(dct.values())
-        assert row_w == len(final)
+        _assert_equal(row_w, len(final))
         return final
 
     dct = {k: v for k, v in label_proto_d.items()}
@@ -586,32 +624,21 @@ def _bake_label_renderer(row_w, label_proto_d):
 
 # ==
 
-def _hacky_filter(resp, sac_k):
+def _build_change_for_show_EMACS_field(sac_k, new_k, x, w, args_for_plugin):
 
-    # Make a diminishing pool of the keys that changed visually
-    cv = resp.changed_visually
+    # The Y of the emacs field: start with the SAC Y (not pictured,
+    # translated-in elsewhere) and add ONE for the #here2 label row and
+    # add ONE for each of the zero or more items above this WIP one
+    emacs_y = 1 + _item_offset_via_item_key(new_k)
 
-    pool = {k: True for k in cv}
-
-    # Put these magically meaningful things aside
-    mid = {}
-    for k in ('flash_area', 'buttons'):
-        mid[k] = pool.pop(k, False)
-
-    # Do you have any business things in there?
-    yes = len(pool)
-
-    # (assert they were all business things)
-    pool.pop('label_row', None)
-    assert all('item_' == k[0:5] for k in pool.keys())
-
-    # Whether you need to redraw the whole SAC is based on that
-    mid[sac_k] = yes
-
-    out = tuple(k for k, v in mid.items() if v)
-    resp.changed_visually = out or None  # the worst
-    # (seems impossible that we would ever have none)
-    return resp
+    direc = _EmacsFieldDirective.via(
+            component_path=(sac_k, new_k),
+            emacs_field_height=1,
+            emacs_field_width=w,
+            emacs_field_y=emacs_y,
+            emacs_field_x=x)
+    return 'parent_area', 'translate_area', 'host_directive', \
+           'enter_emacs_modal', *tuple(direc), *args_for_plugin
 
 
 # ==
@@ -621,7 +648,7 @@ def _insert_into_dictionary_shifting_keys(cx, offset, value):  # #testpoint
     num_items_after = len(cx)  # #here2
     final_item_keys = tuple(f"item_{i}" for i in range(1, num_items_after+1))
 
-    assert all_keys[1:] == final_item_keys[0:-1]
+    _assert_equal(all_keys[1:], final_item_keys[0:-1])
 
     for i in reversed(range(offset, num_items_after-1)):
         from_key = final_item_keys[i]
@@ -644,6 +671,14 @@ def _delete_from_dictionary_shifting_keys(cx, key):  # #testpoint
     cx.pop(keys[-1])
 
 
+def _component_type_via_component_key(k):
+    if 'label_row' == k:
+        return 'label_row', None
+    if k is None:
+        return 'nothing', None
+    return 'item_row', _item_offset_via_item_key(k)
+
+
 def _item_key_via_item_offset(item_offset):
     assert 0 <= item_offset
     return f"item_{item_offset+1}"
@@ -659,7 +694,7 @@ def _item_offset_via_item_key(item_key):
 
 # ==
 
-def _produce_some_item_class(item_class_argument):
+def _produce_some_item_CC(item_class_argument):
 
     if item_class_argument is None:
         # Make old tests work, also let definitions stay pretty and terse
@@ -671,8 +706,12 @@ def _produce_some_item_class(item_class_argument):
     from . import _injectable_item_classes as glizzy_module
 
     # (could make this more dynamic, but why)
+
+    if 'poly_option' == item_class_argument:
+        return glizzy_module.poly_option_constructor_constructor_()
+
     if 'anonymous_text_field' == item_class_argument:
-        return glizzy_module.abstract_anonymous_text_field_()
+        return glizzy_module.anonymous_text_field_constructor_constructor_()
 
     xx(f"not a recognized item class: {item_class_argument!r}")
 
@@ -691,6 +730,12 @@ def _emi_via_info_line(cat, msg):
     return _emission(('info', 'expression', cat, lambda: (msg,)))
 
 
+def _assert_equal(x1, x2):
+    if x1 == x2:
+        return
+    raise RuntimeError(f"oops: {x1!r} != {x2!r}")
+
+
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
@@ -702,4 +747,20 @@ def xx(msg=None):
 
 """
 
+"""Appendix B: :#here2:
+
+We always only ever consist consist of a label (which takes up eactly ONE row)
+plus ONE ROW PER ITEM for our ZERO OR MORE items
+
+Hence our current number of items is always:
+
+    the number of components minus one
+
+Our item capacity is determined entirely by the available verticality
+with the straightforward formula implied by the above.
+
+This arithmetic relationship is repeated over and over here..
+"""
+
+# #history-B.4
 # #born

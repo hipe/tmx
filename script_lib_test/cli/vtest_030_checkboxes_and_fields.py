@@ -20,6 +20,7 @@ from script_lib_test import curses_yikes_support as support
 
 def CLI_(sin, sout, serr, argv, fxser):
 
+    # == BEGIN copy-paste
     res = support.run_compound_area_via_definition(define_compound_area())
     emis = res.pop('unexpressed_emissions')
 
@@ -35,6 +36,7 @@ def CLI_(sin, sout, serr, argv, fxser):
         serr.write(f"oh? what's this? (vtest 030) {res!r}")
 
     return 0
+    # == END
 
 
 def define_compound_area():

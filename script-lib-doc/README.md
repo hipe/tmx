@@ -40,13 +40,14 @@ the related API that preceded this one.)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#608.2.C]                 |       | magic names like 'buttons'
 |[#608.2]                   |       | [see]
+|[#607.K]                   | #open | curses yikes: disappearing buttons
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
-|[#607.I]                   | #hole |
-|[#607.H]                   | #hole |
+|[#607.I]                   | #open |
+|[#607.H]                   | #open | curses yikes: maybe one day, host directive stipulation in result class
 |[#607.G]                   | #open | sunset the common upstream argument parser module
 |[#607.6]                   | #trak | hidden CLI's that use cheap arg parse that are okay
 |[#607.E]                   | #refa | there's no way this is right
-|[#607.4]                   | #hole |
+|[#607.D]                   | #open | curse yikes documentation
 |[#607.C]                   |       | curses yikes: track this tiny thing
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |

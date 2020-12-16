@@ -63,7 +63,8 @@ class InputController__:
     def __init__(
             self,
             directional_controller,
-            buttons_area):
+            buttons_area,
+            harnesses_experimental):
 
         # When a business buttonpress (BBP) comes in, the default (defined
         # here) is that the currently focused component handles it (both
@@ -80,7 +81,8 @@ class InputController__:
 
         frame = _controller_frame(
             get_direction_controller=lambda: directional_controller,
-            receive_BBP=recv_busi_bp, apply_BBP=apply_busi_bp)
+            receive_BBP=recv_busi_bp, apply_BBP=apply_busi_bp,
+            harnesses_experimental=harnesses_experimental)
 
         self._controller_stack = [frame]
 
@@ -169,15 +171,61 @@ class InputController__:
                     yield self._apply_change_buttons(*args)
                 elif 'apply_business_buttonpress' == typ:
                     yield self._apply_business_buttonpress(*args)
+                elif 'traverse_transition' == typ:
+                    yield self._apply_traverse_transition(*args)
                 elif 'push_receiver' == typ:
                     yield self._apply_push_receiver(*args)
                 elif 'pop_receiver' == typ:
                     yield self._apply_pop_receiver(*args)
                 else:
                     xx(f"easy for you my friend: {typ!r}")
+            elif 'child_component' == which_controller:
+                yield self._apply_change_for_child_component(stack)
+            elif 'parent_area' == which_controller:
+                typ = stack.pop()
+                if 'translate_area' == typ:
+                    yield self._bounceback_translate_area(stack)
+                else:
+                    xx(f"easy for you my friend: {typ!r}")
             else:
                 raise RuntimeError(f"oops: {which_controller!r}")
             # == TO
+
+    def _bounceback_translate_area(self, stack):
+        # Typically rendering happens by: responses flag those components that
+        # need a redraw, then just before the host blocks for input, it asks
+        # the root compound area for those components and asks those components
+        # for their current rows, then we (somehow) determine screen offsets
+        # for the rows and render them to screen.
+
+        # But when it comes to an "emacs field", the component has almost no
+        # interest in managing the rendering (or input) itself. It only wants
+        # to be able to specify an X and a width and let the host do the rest.
+        # Here we translate SAC-space coordinates to screen coords for that..
+
+        these = tuple(stack.pop() for _ in range(0, 7))
+        recip, typ, comp_path, h, w, y, x = these
+
+        if 2 < len(self._controller_stack):
+            xx("wow how ambitious. do you really want to do this?")
+
+        hh = self._controller_stack[-2].harnesses_experimental
+        ah = hh[comp_path[0]]  # 😢
+        use_y, use_x = ah.translate_point__(y, x)
+
+        change = recip, typ, comp_path, h, w, use_y, use_x, *reversed(stack)
+        return _response(changes=(change,))
+
+    def _apply_change_for_child_component(self, stack):
+        which_k = stack.pop()
+        meth = stack.pop()
+
+        # (this is more fragile than it needs to be and makes no sense:
+        # if the controller frame of the target component is at top, why reach
+        # back minus one and ask for the child by name? because the controller
+        # frame currently doesn't just have the plain old SAC on hand 🙃)
+        ca = self._controller_stack[-2].harnesses_experimental[which_k].concrete_area  # noqa: E501
+        return getattr(ca, meth)(* reversed(stack))
 
     def _apply_push_receiver(self, soa_k):
         """implement the ability for a child component to change the input
@@ -298,6 +346,9 @@ class InputController__:
     def _apply_business_buttonpress(self, label):  # (be just like #here2)
         return self._top_controller_frame.apply_BBP(label)
 
+    def _apply_traverse_transition(self, trans_name, *item_k):
+        return self._top_controller_frame.apply_BBP(trans_name, *item_k)
+
     @property
     def _DC(self):
         return self._top_controller_frame.DC
@@ -310,9 +361,10 @@ class InputController__:
 class _controller_frame:
     def __init__(
             self, get_direction_controller, receive_BBP, apply_BBP,
-            SOA_component_key=None):
+            harnesses_experimental=None, SOA_component_key=None):
         self.get_direction_controller = get_direction_controller
         self.receive_BBP, self.apply_BBP = receive_BBP, apply_BBP
+        self.harnesses_experimental = harnesses_experimental
         self.SOA_component_key = SOA_component_key
 
     @property

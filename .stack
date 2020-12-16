@@ -21,12 +21,9 @@ one layer above string-based server: dictionary-based
 ncurses send and receives multiple request/responses before clean disconnect/exit
 isomorph niCLI and ncurses (exit with terminal buffer, enter with -i and args, round-trip OK) (consider using [ma])
 maybe now would be a good time to prune unused methods with coverage
-the daunting poly-option
 reorderable list (isomorph with glob argument)
 constraints for everything. pass/fail
-only an editable list, no constraints. add, reorder, delete. contrived interface with emacs field.
 stylesheet
 fix the display issues with the wide unicode gif by using a double-wide space
 get the form fields back from your current visual test
-poly-option input (use injection thing)
 conditional buttons thing

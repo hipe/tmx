@@ -312,12 +312,16 @@ class _MutableNode:
 def _transition_via_tuple(offset, tup):
     stack = list(reversed(tup))
     left, cond, right = stack.pop(), stack.pop(), stack.pop()
-    kw = {'call': None}
-    while len(stack):
+    afn, afa = None, None
+    if len(stack):
         k = stack.pop()
-        kw[k]  # validate name
-        kw[k] = stack.pop()
-    kw['action_function_name'] = kw.pop('call')  # meh
+        if 'call' != k:  # (for now this is the only option supported)
+            xx(f"unrecognized option for a transition: {k!r}")
+        afn = stack.pop()
+        afa = tuple(reversed(stack))
+    kw = {}
+    kw['action_function_name'] = afn
+    kw['action_arguments'] = afa
     kw['transition_offset'] = offset
     kw.update(left_node_name=left, condition_name=cond, right_node_name=right)
     return _Transition(**kw)
@@ -326,7 +330,7 @@ def _transition_via_tuple(offset, tup):
 _Transition = _nt('_Transition', (
     'transition_offset',
     'left_node_name', 'condition_name', 'right_node_name',
-    'action_function_name'))
+    'action_function_name', 'action_arguments'))
 
 
 def xx(msg=None):

@@ -142,14 +142,21 @@ class StateMachineBasedInteractableComponent_:
         changes = (('input_controller', 'apply_business_buttonpress', label),)
         return MultiPurposeResponse_(changes=changes)
 
-    def apply_business_buttonpress(self, label):
+    def apply_business_buttonpress(self, label, *action_args):
         st = self._state
         t = st.transition_via_transition_name(label)
+        if not t:
+            raise RuntimeError(f"opps, no transition called {label!r} off {st.state_name!r}")  # noqa: E501
         st.accept_transition(t)  # before or after action? not sure
         afn = t.action_function_name
         if afn is None:
-            return _do_nothing  # if you lost/gain focus, covered?
-        return getattr(self, afn)()  # args?
+            # Although there is no action to call, we're going to ASSUME that
+            # a state change in a component probably (or even just maybe) leads
+            # to a visual change. If we really needed to, hook-in instead, but
+            # note (Case7748) assumes this current assumption.
+            return MultiPurposeResponse_(changed_visually=(self._key,))
+        afargs = *t.action_arguments, *action_args
+        return getattr(self, afn)(*afargs)
 
     # ==
 
@@ -240,8 +247,40 @@ class MultiPurposeResponse_:
         return self.changes is None and self.emissions is None
 
 
-_do_nothing = MultiPurposeResponse_()
 _response_fields = 'emissions', 'changes', 'changed_visually'
+
+
+class EmacsFieldDirective_:  # #class-as-namespace
+
+    def directive_and_rest_via_tuple(tup):
+        assert 'host_directive' == tup[0]
+        assert 'enter_emacs_modal' == tup[1]
+        klass = _flefjalesjfl()
+        here = len(klass._fields) + 2
+        return klass(*tup[2:here]), tup[here:]
+
+    def via(**kw):
+        return _flefjalesjfl()(**kw)
+
+
+def _flefjalesjfl():
+    o = _flefjalesjfl
+    if o.klass is None:
+        o.klass = _build_soeifjslefj()
+    return o.klass
+
+
+_flefjalesjfl.klass = None
+
+
+def _build_soeifjslefj():
+    from collections import namedtuple as _nt
+    return _nt('selfkse', """
+                component_path
+                emacs_field_height
+                emacs_field_width
+                emacs_field_y
+                emacs_field_x""".split())
 
 
 def MutableChangeFocusDirective_(recip, typ, goodbye_k, butt_k, hello_k, cbpk):

@@ -98,7 +98,7 @@ class _ConcreteTextField(_StateBasedInteractable):
     # == BEGIN oh boy
 
     def _enter_modal(self):
-        changes = (('host_directive', 'enter_text_field_modal', self._key),)
+        changes = (('host_directive', 'enter_emacs_modal', self._key),)
         return _response(changes=changes)
 
     @property

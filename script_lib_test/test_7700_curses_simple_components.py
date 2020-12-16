@@ -106,10 +106,8 @@ class Case7692_checkbox_states_and_render(CommonCase):
         assert comp._is_checked is False
         state = state_of(comp)
         tr = state.transition_via_transition_name('[enter] to toggle')  # yuck
-        fname = tr.action_function_name
-        assert fname
         state.accept_transition(tr)
-        resp = getattr(comp, fname)()
+        resp = call_action_function(comp, tr)
         k, = resp.changed_visually
         assert 'be_verbose' == k
         assert comp._is_checked is True
@@ -138,13 +136,13 @@ class Case7696_text_field_states_and_render(CommonCase):
         # Hit enter on the component to enter edit mode (assert host direc.)
         state = state_of(comp)
         tr = state.transition_via_transition_name('[enter] for edit')  # yuck
-        fname = tr.action_function_name
-        assert fname
+
         state.accept_transition(tr)
-        resp = getattr(comp, fname)()
+        resp = call_action_function(comp, tr)
+
         ch, = resp.changes
         assert 'host_directive' == ch[0]
-        assert 'enter_text_field_modal' == ch[1]
+        assert 'enter_emacs_modal' == ch[1]
 
         # Pretend we enter some text and hit enter
         resp = comp.receive_new_value_from_modal_('zing')
@@ -261,6 +259,14 @@ def ACA_def_one():
         yield 'checkbox', 'be_verbose', 'label', 'Whether to be verbose'
         yield 'text_field', 'fiz_nizzle'
         yield 'vertical_filler'
+
+
+def call_action_function(comp, tr):  # assume one
+    fname = tr.action_function_name
+    assert fname
+    fargs = tr.action_arguments or ()
+    assert isinstance(fargs, tuple)
+    return getattr(comp, fname)(*fargs)
 
 
 def move_to_state_via_transition_name(comp, sn):

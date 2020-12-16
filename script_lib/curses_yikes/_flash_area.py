@@ -294,7 +294,7 @@ class _QualifiedWord:
 
         # #cover-me: (developed visually)
         # If the string ended in a sinqle or double quote, yes punct
-        if c in ('"', "'"):
+        if c in ('"', "'", '®'):
             return False
 
         # Probably ok just to default to returning False but..
