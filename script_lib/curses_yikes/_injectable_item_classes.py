@@ -130,6 +130,9 @@ def _poly_option(w):
             yield value_slot_format % self._value_string
             yield right_bracket_blanks
 
+        def to_form_value(self):
+            return self._name_string, self._value_string
+
         @property
         def component_buttons_page_key_when_has_focus(_):
             return 'field_focus'
@@ -257,6 +260,9 @@ def _anonymous_text_field(w):
         def to_row(self):
             pc = _piece_via_has_focus(self._has_focus)
             return ''.join((pc, self.rest))
+
+        def to_form_value(self):
+            return self.value_string
 
         @property
         def component_buttons_page_key_when_has_focus(_):

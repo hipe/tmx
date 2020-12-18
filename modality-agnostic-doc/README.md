@@ -28,7 +28,7 @@ only in modeling interfaces for this purpose.
 |[#511.3]                   |       | provision: expression with yield
 |[#510.14]                  |       | track context stack stuff
 |[#510.13]                  |       | track counters
-|[#510.12]                  | #hole |
+|[#510.12]                  | #trak | is this a misuse of context manager?
 |[#510.11]                  |       | find the empty context manager
 |[#510.10]                  |       | track "module via path"
 |[#510.9]                   |       | track mutexers (1 at writing)

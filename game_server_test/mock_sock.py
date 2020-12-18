@@ -28,19 +28,25 @@ def end_state_for_client_via_test_case(tc):
 
 def end_state_for_server_via_test_case(tc):
 
+    # Business tings
+    s_via_s = tc.given_string_via_string_function()
+
     # Set up listener and `done()`
     allow_set = tc.expected_emission_categories()
     listener, done = _listener_and_done_via_categories(allow_set, tc)
 
     # Prepare for performance
     itr = tc.given_requests_and_expected_responses()
-    sock = _MockSocket(itr)
+    memo2 = {}
+    sock = _MockSocket(memo2, itr)
 
     # Performance
     from game_server.cli.game_server_server import _run as func
-    func(sock, listener)  # subroutine not function for now
+    func(sock, s_via_s, listener)  # subroutine not function for now
 
-    return done()
+    memo1 = done()
+    memo1.update(memo2)  # meh
+    return memo1
 
 
 def _listener_and_done_via_categories(allow_set, tc):
@@ -51,8 +57,8 @@ def _listener_and_done_via_categories(allow_set, tc):
 
 class _MockSocket:
 
-    def __init__(self, itr):
-        self._steps = _sockect_steps_via_definition(itr)
+    def __init__(self, memo, itr):
+        self._steps = _sockect_steps_via_definition(memo, itr)
 
     def accept(self):
         tup = next(self._steps)
@@ -93,7 +99,7 @@ def _not_a_state_machine__thing_for_client(itr, tc):
     return scn, listener, done
 
 
-def _sockect_steps_via_definition(itr):
+def _sockect_steps_via_definition(memo, itr):
 
     # == States
 
@@ -147,8 +153,8 @@ def _sockect_steps_via_definition(itr):
         self.bytes.append(scn.next_RHS_value())
 
     def on_expect_response():
-        scn.advance()
-        self.connection_steps.append(('conn_expect_response_step',))
+        parz = _parse_foo_fah_params(scn.next_RHS_rest())
+        self.connection_steps.append(('conn_expect_response_step', memo, parz))
         self.state = from_after_expect_response
 
     def on_expect_close():
@@ -331,8 +337,15 @@ class _ClientConn:
 
     def sendall(self, byts):
         tup = self._steps.pop()
-        assert 'conn_expect_response_step' == tup[0]
-        # (currently, we don't do value assertions on the response)
+        stack = list(reversed(tup))
+        assert 'conn_expect_response_step' == stack[-1]
+        stack.pop()
+        parz, memo = stack
+        if parz is None:
+            return
+        k = parz.pop('store_result_as')
+        assert not parz
+        memo[k] = byts
 
     def close(self):
         # (close gets called during cleanup when an exception is thrown so..)
@@ -451,9 +464,13 @@ def _experimental_sexp_scanner_via_iterator(itr):  # custom #[#611] scanner
 
     class scn:  # #class-as-namespace
         def next_RHS_value():
-            tup = self.next()
-            rhv, = tup[1:]
+            rest = self.next_RHS_rest()
+            rhv, = rest
             return rhv
+
+        def next_RHS_rest():
+            tup = self.next()
+            return tup[1:]
 
         def next():
             x = self.peek_tuple
@@ -481,6 +498,25 @@ def _experimental_sexp_scanner_via_iterator(itr):  # custom #[#611] scanner
     advance()
     self.advance = advance
     return scn
+
+
+def _parse_foo_fah_params(rest):
+    if 0 == len(rest):
+        return None
+    kw = _dict_via_iambic(rest)
+    if 'as' in kw:
+        kw['store_result_as'] = kw.pop('as')  # 'as' is keyword, btw
+    _check_names(**kw)
+    return kw
+
+
+def _check_names(store_result_as=None):
+    pass  # sheez!
+
+
+def _dict_via_iambic(rest):
+    itr = iter(rest)
+    return {k: next(itr) for k in itr}
 
 
 def _em():

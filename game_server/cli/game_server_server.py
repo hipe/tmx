@@ -6,7 +6,7 @@ from game_server import \
         decode_ as _decode, encode_ as _encode
 
 
-def run_string_based_tcp_ip_server_via(recv_string, listener, port):
+def run_string_based_tcp_ip_server_via(string_via_string, listener, port):
     import socket
 
     # Create a TCP/IP socket
@@ -20,10 +20,10 @@ def run_string_based_tcp_ip_server_via(recv_string, listener, port):
     # Listen for incoming connections
     sock.listen(1)
 
-    _run(sock, listener)
+    _run(sock, string_via_string, listener)
 
 
-def _run(sock, listener):  # #testpoint
+def _run(sock, string_via_string, listener):  # #testpoint
 
     print = _hack_print_via_listener(listener)
 
@@ -62,10 +62,9 @@ def _run(sock, listener):  # #testpoint
         leng = len(client_payload)
         print(f"OK received from client {leng} bytes")
 
-        # Prepare response message
-        beg = client_payload[:6]
-        end = client_payload[-7:]
-        message = f"I enjoyed processing this: ({beg}..{end})"
+        message = string_via_string(client_payload, listener)  # ..
+        assert isinstance(message, str)
+        # (server response can be the zero length string, in theory)
 
         # Prepare headers for response
         payload = _encode(message)

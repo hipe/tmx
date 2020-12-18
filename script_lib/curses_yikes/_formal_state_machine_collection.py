@@ -286,6 +286,10 @@ class _FormalStateMachine:
             rhs = gv_key_via_key(t.right_node_name)
             yield ''.join((lhs, '->', rhs, '[label=', label_rhs, ']\n'))
 
+    def __getitem__(self, k):
+        dct = self.THIS_ONE_INDEX_FOR(k)
+        return _NodeProxy(dct, self.transitions)
+
     def THIS_ONE_INDEX_FOR(self, node_name):
         if (dct := self._these_one_indexes) is None:
             self._these_one_indexes = (dct := {})
@@ -300,6 +304,28 @@ class _FormalStateMachine:
             yield transes[i].condition_name, i
 
     HOLY_SMOKES_MERGE_FFSAs = _holy_smokes_merge_FFSAs
+
+
+def _NodeProxy(dct, transitions):
+
+    class NodeProxy:
+
+        def get(_, k, default):
+            if (offset := dct.get(k)) is None:
+                return default
+            return transitions[offset]
+
+        def __getitem__(_, k):
+            return transitions[dct[k]]
+
+        def __hasitem__(_, k):
+            return k in dct
+
+        @property
+        def transition_names(_):
+            return tuple(dct.keys())
+
+    return NodeProxy()
 
 
 class _MutableNode:
@@ -336,5 +362,6 @@ _Transition = _nt('_Transition', (
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #pending-rename: this is used by pho now
 # #history-B.4: got rid of cache facilities in *this* module
 # #born

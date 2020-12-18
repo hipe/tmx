@@ -77,6 +77,7 @@ def _our_first_ever_input_loop(aca, stdscr, curses):
             host_direc = None
             if not stay_running:
                 assert not resp
+                form_value = cca.to_form_value()
                 break
         else:
             # Block waiting for input, then let input controller process it
@@ -151,6 +152,7 @@ def _our_first_ever_input_loop(aca, stdscr, curses):
             # loop around to process this response now
     return {
         'unexpressed_emissions': tuple(unexpressed_emissions),
+        'form_values': form_value,
     }
 
 

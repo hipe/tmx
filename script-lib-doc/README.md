@@ -40,6 +40,10 @@ the related API that preceded this one.)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
 |[#608.2.C]                 |       | magic names like 'buttons'
 |[#608.2]                   |       | [see]
+|[#607.P]                   | #open | curses yikes: prune unused functions in tests and assets
+|[#607.N]                   | #wish | stylesheet
+|[#607.M]                   | #wish | conditional buttons
+|[#607.L]                   | #open | fix the display issues with the wide unicode gif by using a double-wide space
 |[#607.K]                   | #open | curses yikes: disappearing buttons
 |[#607.J]                   | #open | this worst bug with cheap arg parse grammar grammar
 |[#607.I]                   | #open |

@@ -21,7 +21,21 @@ class CommonCase(unittest.TestCase):
         yield 'closing'
         yield 'shutting_down'
 
+    def given_string_via_string_function(_):
+        return default_string_via_string_function
+
     do_debug = False
+
+
+def default_string_via_string_function(request_message, _listener):
+    leng = len(request_message)
+    if leng < 13:
+        desc = repr(request_message)
+    else:
+        beg = request_message[:6]
+        end = request_message[-7:]
+        desc = f"({beg}..{end})"
+    return f"I enjoyed processing this: {desc}"
 
 
 # Case110 connect and send zero length string  # very similar to next
@@ -49,13 +63,18 @@ class Case114_string_has_no_double_newline(CommonCase):
 class Case118_header_OK(CommonCase):
 
     def test_050_performs(self):
-        assert self.build_end_state()
+        assert self.end_state
+
+    def test_100_response(self):
+        memo = self.end_state
+        response = memo['RESPO']
+        self.assertIn(b"I enjoyed processing this: 'ohai'", response)
 
     def given_requests_and_expected_responses(_):
         yield 'connection', 'some.ip.address', 'port.no-see'
         yield 'send_bytes', content_length(4)
         yield 'sendall_bytes', b'ohai'
-        yield 'expect_response'
+        yield 'expect_response', 'as', 'RESPO'
         yield 'expect_close'
 
 
@@ -109,7 +128,7 @@ class Case150_CLIENT_WAH_GWAN(ClientCase):
 
     def given_session(self, client):
         act = client.send_string('zib zum cha chum')
-        exp = 'hardcoded meaningless response for now'
+        exp = 'foo fa'  # string not bytes
         self.assertEqual(act, exp)
 
     def given_client_requests_and_expected_responses(_):

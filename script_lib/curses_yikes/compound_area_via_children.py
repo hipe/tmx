@@ -154,6 +154,20 @@ class _ConcreteCompoundArea:
             for row in harness.to_rows():
                 yield row
 
+    def to_form_value(self):
+        return {k: v for k, v in self._to_form_values()}
+
+    def _to_form_values(self):
+        for k, h in self._children.items():
+            c = h.concrete_area
+            f = c.to_form_value
+            if f is None:
+                continue
+            x = f()
+            if x is None:
+                continue  # (we see this pattern in kiss rdb encoding)
+            yield k, x
+
     def __getitem__(self, k):
         return self.HARNESS_AT(k).concrete_area
 

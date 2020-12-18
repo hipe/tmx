@@ -161,6 +161,7 @@ class _ConcreteFlashArea:
         for row in self._final_rows:
             yield row
 
+    to_form_value = None
     is_focusable = False
 
 

@@ -355,6 +355,7 @@ class _ConcreteHotkeysArea:
     def hello_I_am_CHA(_):
         return True
 
+    to_form_value = None
     is_focusable = False
 
 

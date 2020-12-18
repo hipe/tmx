@@ -556,6 +556,14 @@ class _ConcreteOrderableList(_InteractableComponent):
 
     # Simple readers
 
+    def to_form_value(self):
+        return tuple(self._to_form_values())
+
+    def _to_form_values(self):
+        keys = iter((dct := self._components).keys())
+        assert 'label_row' == next(keys)
+        return (dct[k].to_form_value() for k in keys)
+
     @property
     def _FC_curr_key(self):
         return self._focus_controller.key_of_currently_focused_component

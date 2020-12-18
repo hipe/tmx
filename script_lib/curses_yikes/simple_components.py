@@ -121,6 +121,9 @@ class _ConcreteTextField(_StateBasedInteractable):
         left_piece = _piece_via_has_focus(self._has_focus)
         return (self._render(left_piece, self._value_string),)
 
+    def to_form_value(self):
+        return self._value_string
+
 
 def _bake_text_field_renderer(label, widest_label_width, full_width):
     # To render a text field row, we need to know two numbers: the width of the
@@ -256,6 +259,12 @@ class _ConcreteCheckbox(_StateBasedInteractable):
         assert self._width == len(final)  # idk, magic
         return (final,)
 
+    def to_form_value(self):
+        if self._is_checked:
+            return True
+        else:
+            return None  # resulting in None not False means it will b pruned
+
 
 def _bake_checkbox_renderer(label, widest_label_width, full_width):
 
@@ -338,6 +347,8 @@ class _ConcreteNavBar(_StateBasedInteractable):
                 max_content_width, self._breadcrumb_keys, ellipsis, sep)
         head = _piece_via_has_focus(self._has_focus)
         return (''.join((head, content)),)
+
+    to_form_value = None
 
 
 def _render_breadcrumb_trail(w, slug_keys, ellipsis, sep):
