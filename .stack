@@ -23,5 +23,3 @@ rebuild for one file thru fs watch
 a converter script to write your native file to a pelican page (frontmatter)
 rebuild for one file invoked via CLI
 patch pelican (commit a patchfile ugh) so that one option works; also make it not copy CSS every time
-make a posterity commit of your new base file as-is
-in your new pho-themes top-level directory, make an invoke task that creates a sphinx and etc
