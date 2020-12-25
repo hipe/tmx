@@ -1,16 +1,16 @@
-from invoke import task
 from os.path import join as _join
 from os import rename as _rename
 
 
-@task
 def copy_sphinx_CSS_over(c, do_base_file_too=False):
 
     # Derive the path to the pho themes directory
     from sys import modules
     here = modules[__name__].__file__
-    from os.path import dirname
-    pho_themes_dir = dirname(here)
+    from os.path import dirname as dn
+    pho_tasks_dir = dn(here)
+    mono_repo_dir = dn(pho_tasks_dir)
+    pho_themes_dir = _join(mono_repo_dir, 'pho-themes')
 
     # Create a temporary directory, set up an initial sphinx project
     from tempfile import TemporaryDirectory as tmpdir
@@ -18,7 +18,7 @@ def copy_sphinx_CSS_over(c, do_base_file_too=False):
         with c.cd(tmpdir_path):
 
             # Apply the patch
-            _apply_patch(c, tmpdir_path, pho_themes_dir)
+            _apply_patch(c, tmpdir_path, pho_tasks_dir)
 
             # Ask sphinx to make the website
             res = c.run('make html')
@@ -56,9 +56,9 @@ def _move_the_CSS_files(pho_THEME_dir, genned_html_path):
         _rename(src, dst)
 
 
-def _apply_patch(c, tmpdir_path, pho_themes_dir):
+def _apply_patch(c, tmpdir_path, pho_tasks_dir):
     patch_path = _join(
-            pho_themes_dir, 'task-data', 'empty-sphinx-project.diff')
+            pho_tasks_dir, 'tasks-data', 'empty-sphinx-project.diff')
     res = c.run(f'patch -p2 -i {patch_path}')
     assert res.ok
 

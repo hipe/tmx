@@ -1,0 +1,19 @@
+diff --git a/pelican/settings.py b/pelican/settings.py
+index ea3ee8eb..52e4aae2 100644
+--- a/pelican/settings.py
++++ b/pelican/settings.py
+@@ -524,11 +524,9 @@ def configure_settings(settings):
+             raise Exception("Could not find the theme %s"
+                             % settings['THEME'])
+
+-    # make paths selected for writing absolute if necessary
+-    settings['WRITE_SELECTED'] = [
+-        os.path.abspath(path) for path in
+-        settings.get('WRITE_SELECTED', DEFAULT_CONFIG['WRITE_SELECTED'])
+-    ]
++    # (used to absolute-ize)
++    if 'WRITE_SELECTED' not in settings:
++        settings['WRITE_SELECTED'] = DEFAULT_CONFIG['WRITE_SELECTED']
+
+     # standardize strings to lowercase strings
+     for key in ['DEFAULT_LANG']:
