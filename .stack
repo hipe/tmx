@@ -18,3 +18,10 @@ get plain old pelican working with one of the shortlist themes, rewriting 1 file
 the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 reorderable list (isomorph with glob argument)
+revisit tmx notecards and consider architecture for editing
+rebuild for one file thru fs watch
+a converter script to write your native file to a pelican page (frontmatter)
+rebuild for one file invoked via CLI
+patch pelican (commit a patchfile ugh) so that one option works; also make it not copy CSS every time
+make a posterity commit of your new base file as-is
+in your new pho-themes top-level directory, make an invoke task that creates a sphinx and etc

@@ -128,6 +128,7 @@ when you click create
 |[#413]   | #open | undefined: when row edited, does endcap get normalized-in or not?
 |[#412]   | #open | "strict" "typing" (track true wishpoints)
 |[#411]   |       | [the function that flushes stream processors]
+|[#410.Y] | #open | pho: find nicer way to pull in the Alabaster theme
 |[#410.W] | #edit | edit documentation
 |[#410.V] | #open | (no taggings) sync on a markdown file with no table should complain
 |[#410.N] | #trak | [html via markdown that isn't sync]
@@ -137,6 +138,7 @@ when you click create
 |[#410.B] | #open | absorb small graph into big graph
 |[#410.A.1]| #trak | track where we cover specific producer scripts
 |[#410]   |       | (internal tracking)
+|[#409.7] |       | #see
 |[#409.6] |       | #see
 |[#409.5] |       | #see
 |[#409.4] |       | #see

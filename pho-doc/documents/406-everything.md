@@ -1,12 +1,12 @@
 |ID|main tag|content|
 |---|---|---|
-|[#879.11]|       | hi end gaame #part-of:[#879.1] #after:[#879.10]
-|[#879.10]|       | hi music #part-of:[#879.4] #after:[#879.9]
-|[#879.9] |       | hi procgen #part-of:[#878.8] #after:[#879.8]
-|[#879.8] |       | hi mixed skills #part-of:[#879.3] #after:[#879.7]
-|[#879.7] |       | hi scrapers #part-of:[#878.1] #after:[#879.6]
-|[#879.6] |       | hi near wapps #part-of:[#877.26] #after:[#879.5]
-|[#879.5] |       | hi physical body #part-of:[#879.2]
+|[#879.11]|       | end game #part-of:[#879.1] #after:[#879.10]
+|[#879.10]|       | music #part-of:[#879.4] #after:[#879.9]
+|[#879.9] |       | procgen #part-of:[#878.8] #after:[#879.8]
+|[#879.8] |       | mixed skills #part-of:[#879.3] #after:[#879.7]
+|[#879.7] |       | scrapers #part-of:[#878.1] #after:[#879.6]
+|[#879.6] |       | near wapps #part-of:[#877.26] #after:[#879.5]
+|[#879.5] |       | physical body #part-of:[#879.2]
 |[#879.4] |       | music (again)
 |[#879.3] |       | mixed skills
 |[#879.2] |       | physical body
