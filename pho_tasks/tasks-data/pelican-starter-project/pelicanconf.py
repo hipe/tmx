@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
 
-AUTHOR = 'Leslie Jones'
+AUTHOR = 'tmx media, LLC'
 SITENAME = 'My Awesome TMX notebook cluster'
 SITEURL = ''
 
