@@ -28,7 +28,3 @@ footer: the content is the pelican way, the look is the sphinx way
 get the pages to splay into the sphinx's nav are
 (the above eventually needs to scale out to many pages, but we're putting that off)
 (the above is gonna be rough at first, maybe cycle back)
-get the title right in the two places
-place the content block somewhere in the base template
-bring in lang thing at top and..
-bring in generator meta tag just because and..

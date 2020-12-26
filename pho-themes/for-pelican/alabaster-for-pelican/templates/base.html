@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="{% block html_lang %}{{ DEFAULT_LANG }}{% endblock html_lang %}">
   <head>
     <meta charset="utf-8" />
-    <title>Welcome to PHO Fantabulous Project’s documentation! &#8212; PHO Fantabulous Project  documentation</title>
+    <meta name="generator" content="Pelican" />
+    <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/sphinx-basic.css" type="text/css" />
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/sphinx-alabaster.css" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -12,18 +13,22 @@
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            <div class="section" id="welcome-to-pho-fantabulous-project-s-documentation">
-              <h1>Welcome to PHO Fantabulous Project’s documentation!<a class="headerlink" href="#welcome-to-pho-fantabulous-project-s-documentation" title="Permalink to this headline">¶</a></h1>
-            </div>
-            <div class="section">
-              <p>some para 1</p>
-            </div>
+            {# #history-B.5 removed a section with a title #}
+            {% block content %}
+            {% endblock %}
           </div>
         </div>
       </div>
+<!-- BEGIN EMN -->
+<!-- END EMN -->
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-          <h1 class="logo"><a href="#">PHO Fantabulous Project</a></h1>
+          <h1 class="logo" id="welcome-to-here">
+            <a href="{{ SITEURL }}/">{{ SITENAME }}
+              {% if SITESUBTITLE %} <strong>{{ SITESUBTITLE }}</strong>{% endif %}
+            </a>
+            <a class="headerlink" href="#welcome-to-here" title="Permalink to this headline">¶</a>
+          </h1>
           <h3>Navigation</h3>
           <p>para 2</p>
         </div>
@@ -33,6 +38,7 @@
   </body>
 </html>
 {#
+#history-B.5: removed title from a place
 #history-B.4: remove a bunch of sphinx-related stuff we might want back one day
 #born
 #}
