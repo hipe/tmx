@@ -21,5 +21,14 @@ reorderable list (isomorph with glob argument)
 revisit tmx notecards and consider architecture for editing
 rebuild for one file thru fs watch
 a converter script to write your native file to a pelican page (frontmatter)
+(also as part of next item, our document-meta section is currently getting boofed)
 rebuild for one file invoked via CLI
 patch pelican (commit a patchfile ugh) so that one option works; also make it not copy CSS every time
+footer: the content is the pelican way, the look is the sphinx way
+get the pages to splay into the sphinx's nav are
+(the above eventually needs to scale out to many pages, but we're putting that off)
+(the above is gonna be rough at first, maybe cycle back)
+get the title right in the two places
+place the content block somewhere in the base template
+bring in lang thing at top and..
+bring in generator meta tag just because and..
