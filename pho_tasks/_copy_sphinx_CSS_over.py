@@ -2,7 +2,7 @@ from os.path import join as _join
 from os import rename as _rename
 
 
-def copy_sphinx_CSS_over(c, do_base_file_too=False):
+def copy_sphinx_CSS_over(c, do_base_file_too=False, make_project=None):
 
     # Derive the path to the pho themes directory
     from sys import modules
@@ -13,12 +13,14 @@ def copy_sphinx_CSS_over(c, do_base_file_too=False):
     pho_themes_dir = _join(mono_repo_dir, 'pho-themes')
 
     # Create a temporary directory, set up an initial sphinx project
-    from tempfile import TemporaryDirectory as tmpdir
-    with tmpdir() as tmpdir_path:
+    with _directory(make_project) as tmpdir_path:
         with c.cd(tmpdir_path):
 
             # Apply the patch
             _apply_patch(c, tmpdir_path, pho_tasks_dir)
+
+            if make_project:
+                return
 
             # Ask sphinx to make the website
             res = c.run('make html')
@@ -61,5 +63,21 @@ def _apply_patch(c, tmpdir_path, pho_tasks_dir):
             pho_tasks_dir, 'tasks-data', 'empty-sphinx-project.diff')
     res = c.run(f'patch -p2 -i {patch_path}')
     assert res.ok
+
+
+def _directory(make_project):
+    if make_project:
+        return _make_project_directory(make_project)
+
+    from tempfile import TemporaryDirectory as tmpdir
+    return tmpdir()
+
+
+def _make_project_directory(make_project):
+    from os import mkdir
+    mkdir(make_project)
+
+    from contextlib import nullcontext as func
+    return func(make_project)
 
 # #born

@@ -33,4 +33,18 @@ DEFAULT_PAGINATION = False
 # Uncomment following line if you want document-relative URLs when developing
 # RELATIVE_URLS = True
 
+
+# == BEGIN
+def _theme_path():
+    from os import environ
+    k = 'PHO_PELICAN_THEME'
+    if k not in environ:
+        return
+    return environ[k]
+
+
+if (p := _theme_path()):
+    THEME = p
+# == END
+
 # #born
