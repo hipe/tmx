@@ -19,8 +19,6 @@
           </div>
         </div>
       </div>
-<!-- BEGIN EMN -->
-<!-- END EMN -->
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
           <h1 class="logo" id="welcome-to-here">
@@ -30,7 +28,20 @@
             <a class="headerlink" href="#welcome-to-here" title="Permalink to this headline">¶</a>
           </h1>
           <h3>Navigation</h3>
-          <p>para 2</p>
+          <ul>
+            {% for title, link in MENUITEMS %}
+              <li><a href="{{ link }}">{{ title }}</a></li>
+            {% endfor %}
+            {% if DISPLAY_PAGES_ON_MENU %}
+              {% for pg in pages %}
+                {% if pg == page %}
+                  <li class="active">{{ pg.title }}</li>
+                {% else %}
+                  <li><a href="{{ SITEURL }}/{{ pg.url }}">{{ pg.title }}</a></li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </ul>
         </div>
       </div>
       <div class="clearer"></div>

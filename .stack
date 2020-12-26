@@ -25,6 +25,3 @@ a converter script to write your native file to a pelican page (frontmatter)
 rebuild for one file invoked via CLI
 patch pelican (commit a patchfile ugh) so that one option works; also make it not copy CSS every time
 footer: the content is the pelican way, the look is the sphinx way
-get the pages to splay into the sphinx's nav are
-(the above eventually needs to scale out to many pages, but we're putting that off)
-(the above is gonna be rough at first, maybe cycle back)
