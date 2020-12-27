@@ -1,0 +1,89 @@
+diff --git a/pelican/__init__.py b/pelican/__init__.py
+index 0d723220..2b8ce96a 100644
+--- a/pelican/__init__.py
++++ b/pelican/__init__.py
+@@ -104,6 +104,11 @@ class Pelican:
+                                     os.path.realpath(self.path)])):
+             clean_output_dir(self.output_path, self.output_retention)
+ 
++        orig_generators = None
++        if (dct := context.get('GENERATE_SELECTED')):
++            orig_generators = generators
++            generators = _filter_generators(generators, dct)
++
+         for p in generators:
+             if hasattr(p, 'generate_context'):
+                 p.generate_context()
+@@ -122,6 +127,9 @@ class Pelican:
+ 
+         signals.finalized.send(self)
+ 
++        if orig_generators is not None:
++            generators = orig_generators
++
+         articles_generator = next(g for g in generators
+                                   if isinstance(g, ArticlesGenerator))
+         pages_generator = next(g for g in generators
+@@ -215,6 +223,19 @@ class Pelican:
+         return writer(self.output_path, settings=self.settings)
+ 
+ 
++def _filter_generators(generators, dct):
++    # dct looks like: {'Pages': True, 'Static': False ..}
++
++    # Convert keys like that into classes like PagesGenerator, StaticGenerator
++    from sys import modules
++    mod = modules[__name__]
++    dct = {getattr(mod, f"{k}Generator"): v for k, v in dct.items()}
++    # (raises AttributeError on bad names)
++
++    return tuple(g for g in generators if dct[g.__class__])
++    # (raises KeyError if argument forgot any generator classes)
++
++
+ class PrintSettings(argparse.Action):
+     def __call__(self, parser, namespace, values, option_string):
+         instance, settings = get_instance(namespace)
+@@ -326,6 +347,11 @@ def parse_arguments(argv=None):
+                         dest='selected_paths', default=None,
+                         help='Comma separated list of selected paths to write')
+ 
++    parser.add_argument('--generate-selected', type=str,
++                        dest='selected_generators', default=None,
++                        help=('Hackishly skip certain generators, '
++                              'e.g.: "yes: Pages, Articles no: Static"'))
++
+     parser.add_argument('--fatal', metavar='errors|warnings',
+                         choices=('errors', 'warnings'), default='',
+                         help=('Exit the program with non-zero status if any '
+@@ -384,6 +410,8 @@ def get_config(args):
+         config['CACHE_PATH'] = args.cache_path
+     if args.selected_paths:
+         config['WRITE_SELECTED'] = args.selected_paths.split(',')
++    if args.selected_generators:
++        config['GENERATE_SELECTED'] = _parse_sel_gen(args.selected_generators)
+     if args.relative_paths:
+         config['RELATIVE_URLS'] = args.relative_paths
+     if args.port is not None:
+@@ -396,6 +424,21 @@ def get_config(args):
+     return config
+ 
+ 
++def _parse_sel_gen(s):
++    import re
++    if not re.match(r'(?:(?:yes|no): *(?:(?:(?!(?:yes|no):).)+))+\Z', s):
++        raise RuntimeError(f"must be like 'yes: Foo no: Bar, Baz' (had {s!r})")
++    yeses, nos = [], []
++    tups = (md.groups() for
++            md in re.finditer('(yes|no): *((?:(?!(?:yes|no):).)+)', s))
++    for yes_or_no, comma_sep in tups:
++        which = yeses if ('no', 'yes').index(yes_or_no) else nos
++        which.extend(pc.strip() for pc in comma_sep.split(','))
++    dct = {k: True for k in yeses}
++    dct.update({k: False for k in nos})
++    return dct
++
++
+ def get_instance(args):
+ 
+     config_file = args.settings

@@ -15,8 +15,16 @@ def copy_sphinx_CSS_over(c, do_base_file_too=False, make_project=None):
 
 
 @task
-def patch_pelican(c):
-    from pho_tasks._patch_pelican import patch_pelican as func
+def patch_pelican_for_generate_selected(c):
+    from pho_tasks._patch_pelican import \
+            patch_pelican_for_generate_selected as func
+    return func(c)
+
+
+@task
+def patch_pelican_for_write_selected(c):
+    from pho_tasks._patch_pelican import \
+            patch_pelican_for_write_selected as func
     return func(c)
 
 # #abstracted
