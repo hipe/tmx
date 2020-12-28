@@ -1,8 +1,15 @@
 def cli_for_production():
+
     class efx:  # #class-as-namespace
+
         def produce_monitor():
             from script_lib.magnetics.error_monitor_via_stderr import func
             return func(stderr, default_error_exitstatus=5678)
+
+        def produce_environ():
+            from os import environ as result
+            return result
+
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv, efx))
 
@@ -100,14 +107,21 @@ def _listen_command(sin, sout, serr, argv, efx):
     assert not vals
 
     kw = {}
+    config = None
     if config_path:
         from pho.magnetics_.generation_config_via_definition import \
                 via_path as func
-        config = func(config_path)
+
+        use_environ = efx.produce_environ()
+        config = func(config_path, use_environ)
         kw['config'] = config
 
     mon = efx.produce_monitor()
     if cmd:
+        if config is None:
+            serr.write("-c option needs a <config-path> argument\n")
+            return 1
+
         for line in config.EXECUTE_COMMAND(cmd, mon.listener):
             sout.write(line)
     else:

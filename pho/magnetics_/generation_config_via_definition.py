@@ -1,14 +1,16 @@
-def via_path(path):
+def via_path(path, use_environ):
     from os.path import splitext, sep
     base, ext = splitext(path)
     assert '.py' == ext
     mname = base.replace(sep, '.')
     from importlib import import_module
     config_mod = import_module(mname)
-    return func(config_mod.generation_service_config())
+    config = config_mod.generation_service_config(use_environ)
+    return func(config)
 
 
 def generation_config_via_definition(config_defn, filesystem=None):
+
     _ = _components_via(config_defn, filesystem=filesystem)
     comps = {k: v for k, v in _}
 
@@ -44,9 +46,16 @@ class _Config:
         from pho.config_component_ import execute_command_ as func
         return func(self, cmd, listener, stylesheet)
 
-    @property
-    def component_dictionary_(self):
-        return self._components
+    def get_component_(self, k):
+        return self._components.get(k)
+
+    def to_component_keys_(self):
+        return self._components.keys()
+
+    def to_component_keys_and_values_(self):
+        return self._components.items()
+
+    has_components_ = True
 
     label_for_show_ = 'config for generation'
 

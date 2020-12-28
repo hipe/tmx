@@ -68,14 +68,19 @@ class directory_via_path:
     def _do_execute_show(self, ss, listener):
         yield '(intermediate directory):\n'
         yield f'  path: {self.path!r}\n'
-        yield f'  status: {self.status}\n'
+        yield f'  status: {self._status}\n'
 
     @property
     def _state(self):
-        return self._FFSA[self.status]
+        return self._FFSA[self._status]
 
     @property
     def status(self):
+        with self._open_cache_session():
+            return self._status
+
+    @property
+    def _status(self):
         return self._cached('status_symbol')
 
     # == BEGIN cache yikes
@@ -145,7 +150,7 @@ class directory_via_path:
     def _filesystem(self):
         return self._injected_filesystem or _real_filesystem()
 
-    component_dictionary_ = None
+    has_components_ = False
 
 
 func = directory_via_path

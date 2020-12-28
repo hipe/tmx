@@ -13,8 +13,6 @@ there are todo's
 exit criteria: codepen-style side-by-side editing & viewing
 livereload integrated somehow
 outside of the context of the server, message broker and SSG adapter
-parsing config somehow (decide on config representation)
-get plain old pelican working with one of the shortlist themes, rewriting 1 file
 the server's API exposes a thing "notify of file changed"
 one layer above dictionary-based server: API-based
 reorderable list (isomorph with glob argument)
@@ -22,4 +20,3 @@ revisit tmx notecards and consider architecture for editing
 rebuild for one file thru fs watch
 a converter script to write your native file to a pelican page (frontmatter)
 (also as part of next item, our document-meta section is currently getting boofed)
-rebuild for one file invoked via CLI

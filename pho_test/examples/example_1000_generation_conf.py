@@ -1,4 +1,5 @@
-def generation_service_config():
+def generation_service_config(use_environ):
+    intermed_dir = use_environ['PHO_PELICAN_INTERMEDIATE_DIR']  # ..
 
     yield 'main_pooligan_gen_controller', 'SSG_controller'
 
@@ -11,9 +12,8 @@ def generation_service_config():
 
     def defn():
         yield 'SSG_adapter', 'peloogan'
-        yield 'path', '[favorite temp dir]', 'peloogan_intermed_dir'
+        yield 'path', intermed_dir
     yield defn
 
-    yield 'favorite_temp_dir', 'filesystem_path', 'z'
-
+# #history-B.4: got rid of use of forward reference in path
 # #born

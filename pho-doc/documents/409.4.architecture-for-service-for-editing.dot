@@ -5,6 +5,9 @@ possible pho build pipeline
 
 rankdir=LR
 
+subgraph cluster0 {
+label="imagined server/software components"
+
 subgraph cluster1 {
   label="content directory"
 
@@ -65,6 +68,53 @@ subgraph cluster8 {
 }
 
 config[label="config" shape=rect]
+
+}
+
+subgraph cluster10 {
+  label="imagined swimlanes"
+  node[shape=rect]
+
+  subgraph cluster10_A {
+    label="User Lane"
+    event0500[label="user saves\nfile"]
+    event0600[label="user sees\nupdated page\nreloaded"]
+  }
+
+  subgraph cluster10_B {
+    label="Watcher Lane"
+    event1500[label="says \"file X\nchanged\""]
+  }
+
+  subgraph cluster10_C {
+    label="Watch Controller Lane"
+    event2500[label="Case", shape=diamond]
+    event2505[label="emit\nnotice"]
+    event2550[label="intermediate\ndirectory\nexist?" shape=diamond]
+    event2555[label="generate whole\nintermediate dir\nper case adapter"]
+    event2600[label="generate\nsingle file\nin intermediate dir\nper case adapter"]
+    event2605[label="generate single file\nin output site"]
+    event2650[label="generate\nwhole site"]
+    event2700[label="send an autoreload\nmessage to browser (how?)"]
+
+    event2500->event2505[label="no match"]
+    event2500->event2550[label="yes match"]
+
+    event2550->event2555[label="not exists"]
+    event2550->event2600[label="exists"]
+
+    event2555->event2605
+    event2600->event2650
+
+    event2605->event2700
+    event2650->event2700
+  }
+
+  event0500->event1500
+  event1500->event2500[label="tcp/ip"]
+
+  event2700->event0600
+}
 
 config->watcher_main
 watcher_main->watches

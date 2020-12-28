@@ -31,7 +31,9 @@ class ConfigCase(unittest.TestCase):
         fs_exp = self.given_filesystem_interactions()
         fs, done = support.BUILD_MOCK_FILESYSTEM(fs_exp)
         conf_defnf = self.given_config_definition_function()
-        config = support.config_via_definition(conf_defnf(), filesystem=fs)
+        fake_env = self.given_environment()
+        conf = conf_defnf(fake_env)
+        config = support.config_via_definition(conf, filesystem=fs)
         cmd = self.given_command()
         rs = config.EXECUTE_COMMAND(cmd, listener=None)
 
@@ -47,6 +49,10 @@ class ConfigCase(unittest.TestCase):
         done()
         return (outputted_lines,)  # #here1
 
+    def given_environment(self):
+        path = self.given_intermediate_directory()
+        return {'PHO_PELICAN_INTERMEDIATE_DIR': path}
+
     do_debug = False
 
 
@@ -57,16 +63,18 @@ class Case3805_build_this_config(ConfigCase):
 
     def test_120_path_of_thing_looks_a_way(self):
         c = self.config
-        c = c._components['peloogan_intermed_dir']
-        assert c.path == 'zz/peloogan_intermed_dir'
+        c = c._components[same_key]
+        from os.path import join as _path_join
+        exp = _path_join('zz', same_key)
+        assert c.path == exp
 
     def given_config(_):
 
-        yield 'peloogan_intermed_dir', 'SSG_intermediate_directory'
+        yield same_key, 'SSG_intermediate_directory'
 
         def defn():
             yield 'SSG_adapter', 'peloogan'
-            yield 'path', '[favorite temp dir]', 'peloogan_intermed_dir'
+            yield 'path', '[favorite temp dir]', same_key
         yield defn
 
         yield 'favorite_temp_dir', 'filesystem_path', 'zz'
@@ -86,6 +94,8 @@ class Case3809_ls_directory_from_command(ConfigCase):
 
     def given_filesystem_interactions(self):
 
+        same_path = pretend_path
+
         # Hit the FS once to determine what commands are exposed
         yield 'pretend_os_stat_mode', same_path, 'existing_directory'
 
@@ -98,6 +108,9 @@ class Case3809_ls_directory_from_command(ConfigCase):
     def given_config_definition_function(_):
         return this_one_example()
 
+    def given_intermediate_directory(_):
+        return pretend_path
+
 
 class Case3814_show(ConfigCase):
 
@@ -108,15 +121,16 @@ class Case3814_show(ConfigCase):
         self.expect_expected_output_lines()
 
     def expected_output_lines(_):
+        same_path = pretend_path
         yield '(config for generation):\n'
         yield '  main_pooligan_gen_controller (SSG controller):\n'
         yield '    source directory: pooli_intermed_dir\n'
         yield '  pooli_intermed_dir (intermediate directory):\n'
-        yield "    path: 'z/peloogan_intermed_dir'\n"
+        yield f"    path: '{same_path}'\n"
         yield '    status: exists_and_is_not_directory\n'
-        yield '  favorite_temp_dir: z\n'
 
     def given_filesystem_interactions(self):
+        same_path = pretend_path
         yield 'pretend_os_stat_mode', same_path, 'is_file_not_directory'
 
     def given_command(_):
@@ -124,6 +138,9 @@ class Case3814_show(ConfigCase):
 
     def given_config_definition_function(_):
         return this_one_example()
+
+    def given_intermediate_directory(_):
+        return pretend_path
 
 
 class Case3817_create_directory_from_command(ConfigCase):
@@ -135,9 +152,12 @@ class Case3817_create_directory_from_command(ConfigCase):
         self.expect_expected_output_lines()
 
     def expected_output_lines(_):
+        same_path = pretend_path
         yield f'  mkdir {same_path}\n'
 
     def given_filesystem_interactions(self):
+        same_path = pretend_path
+
         # Hit the FS once to determine what commands are exposed
         yield 'pretend_os_stat_mode', same_path, 'no_ent'
 
@@ -150,6 +170,32 @@ class Case3817_create_directory_from_command(ConfigCase):
     def given_config_definition_function(_):
         return this_one_example()
 
+    def given_intermediate_directory(_):
+        return pretend_path
+
+
+class Case3820_generate_a_single_file(ConfigCase):
+
+    def test_100_generated_ARGV_is_probably_OK(self):
+        conf = self.build_config()
+        argv = self.given_performance(conf)
+        assert all(isinstance(x, str) for x in argv)
+        self.assertIn(len(argv), range(20, 24))  # or whatever
+
+    def build_config(self):
+        intermed_dir = real_FS_intermed_dir_eg_01
+        fake_env = {'PHO_PELICAN_INTERMEDIATE_DIR': intermed_dir}
+        conf_defnf = self.given_config_definition_function()
+        conf_defn = conf_defnf(fake_env)
+        return support.config_via_definition(conf_defn)
+
+    def given_performance(self, conf):  # imagine
+        comp = conf.get_component_('main_pooligan_gen_controller')
+        return comp._procure_ARGV_for_generate_single_file('one-two-three.md')
+
+    def given_config_definition_function(_):
+        return this_one_example()
+
 
 def this_one_example():
     from pho_test.examples.example_1000_generation_conf import \
@@ -157,7 +203,9 @@ def this_one_example():
     return result
 
 
-same_path = 'z/peloogan_intermed_dir'
+real_FS_intermed_dir_eg_01 = 'pho_tasks/tasks-data/pelican-intermed-dir-example-01'  # noqa: E501
+same_key = 'peloogan_intermed_dir'
+pretend_path = '/fake-fs/fake-intermed-dir'
 
 
 if __name__ == '__main__':

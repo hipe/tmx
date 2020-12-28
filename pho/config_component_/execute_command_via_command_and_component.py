@@ -7,7 +7,18 @@ def execute_command_via_command_and_component(
 
     if is_terminal:
         return _execute_terminal_command(comp, k, rest, ss, listener)
+
+    if not comp.has_components_:
+        _when_not_has_components(listener, k, comp)
+        return ()
+
     return _execute_child_command(comp, k, rest, ss, listener)
+
+
+def _when_not_has_components(listener, k, comp):
+    def lines():
+        yield f"can't access {k!r} of {comp.__class__.__name__}, no components"
+    listener('error', 'expression', 'no_components', lines)
 
 
 func = execute_command_via_command_and_component
@@ -61,7 +72,7 @@ class _ProxyForPrimitive:
 
 def _execute_child_command(comp, k, rest, ss, listener):
 
-    ch = comp.component_dictionary_.get(k, None)
+    ch = comp.get_component_(k)
     if ch is None:
         return _bad_command_or_component(comp, listener, 'component', k)
 
@@ -108,10 +119,9 @@ def _execute_show(comp, ss, listener):
 
 def _execute_show_assuming_compound_component(comp, ss, listener):
     label = comp.label_for_show_
-    components = comp.component_dictionary_
 
     yield ''.join(('(', label, ')', ss.colon, '\n'))
-    for k, c in components.items():
+    for k, c in comp.to_component_keys_and_values_():
         for line in _lines_for_component(k, c, ss, listener):
             yield line
 
@@ -164,9 +174,9 @@ def _to_splay_lines(comp, *rest):
     splay = repr(tuple(_to_command_keys(comp)))
     yield f"Commands: {splay}"
 
-    if (dct := comp.component_dictionary_) is None:
+    if not comp.has_components_:
         return
-    splay = repr(tuple(dct.keys()))
+    splay = repr(tuple(comp.to_component_keys_()))
     yield f"Components: {splay}"
 
 
