@@ -55,7 +55,13 @@ def open_string_based_tcp_ip_client_via(listener, port):
 
     # Connect the socket to the port where the server is listening
     server_address = ('localhost', port)
-    print('connecting to {} port {}'.format(*server_address))
+
+    def lines():
+        host, _ = server_address
+        yield f"connecting to {host} port {port}"
+
+    listener('info', 'expression', 'connecting_to_server', lines)
+
     sock.connect(server_address)
 
     return _open(sock, listener)

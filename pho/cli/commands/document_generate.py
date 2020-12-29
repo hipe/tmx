@@ -1,4 +1,6 @@
 def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
+    "(Our oldschool command to assemble a hugo markdown from notecards..)"""
+
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
             _do_CLI, sin, sout, serr, argv, tuple(_params()), efx=efx)

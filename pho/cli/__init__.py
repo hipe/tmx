@@ -71,6 +71,7 @@ def _commands():
 
     yield 'issues', lambda: _load_commonly('issues')
     yield 'listen', lambda: _listen_command
+    yield 'watch', lambda: _watch_command
     yield 'connect', _load_the_connect_COMMAND
     yield 'document-generate', lambda: _load_commonly('document_generate')
     yield 'notecards-graph', lambda: _load_commonly('notecards_graph')
@@ -128,6 +129,57 @@ def _listen_command(sin, sout, serr, argv, efx):
         from pho.magnetics_.run_message_broker_via_config import func
         func(mon.listener, _port, **kw)  # run forever or until interrupt
     return mon.returncode
+
+
+def _formals_for_watch():
+    yield '--preview', 'write generated ARGV to stdout and exit'
+    yield '-h', '--help', 'this screen'
+    yield '<dir>', 'zib zib zub zub'
+
+
+def _watch_command(sin, sout, serr, argv, efx):
+    """Watch a directory for changes (EXPERIMENTAL).
+    Currently hardcoded to use {which}, the only one we have an adapter for.
+    """
+
+    which = 'watchexec'
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = _foz_via(_formals_for_watch(), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+    if vals.get('help'):
+        doc = _watch_command.__doc__.format(which=which)
+        return foz.write_help_into(sout, doc)
+
+    do_preview = vals.pop('preview', False)
+    dir_path = vals.pop('dir')
+    assert not vals
+
+    mon = efx.produce_monitor()
+
+    from importlib import import_module as func
+    ada = func(f"pho.file_watch_adapters_.{which}.run")
+
+    # Check version
+    if not ada.CHECK_VERSION(mon.listener):
+        return mon.returncode
+
+    # Money
+    argv = ada.ARGV_VIA_DIRECTORY(dir_path)
+
+    if do_preview:
+        serr.write("Here is a preview of the command:\n")
+        from shlex import join as func
+        line = func(argv)
+        sout.write(line)
+        sout.write('\n')
+        return 0
+
+    from os import execvp as func
+    func(argv[0], argv)
+    raise RuntimeError('never see')
 
 
 def _load_the_connect_COMMAND():

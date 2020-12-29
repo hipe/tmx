@@ -44,7 +44,7 @@ class func:  # error_monitor_via_stderr
             self.see_exitstatus(errno)
 
         write_line = self._write_line
-        from script_lib.magnetics.expression_via_structured_emission import \
+        from .expression_via_structured_emission import \
             lines_via_channel_tail_and_details as func
         for line in func(em.to_channel_tail(), dct):
             write_line(line)

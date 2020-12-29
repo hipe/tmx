@@ -535,7 +535,7 @@ def _is_plural_is_required_moniker(pair):
     # Currently the innermost moniker of the expression must be an ellipsis
     _monikers_recursive(monks := [], pair)
     if monks[-1] not in ('..', '…', '...'):
-        _no("Currently, the innermost moniker of a nested optional positional"
+        _no("Currently, the innermost moniker of a nested optional positional "
             f"expression must be an ellipsis. Had: {repr(monks[-1])}")
 
     # If left side is empty string, the whole thing is contained in []

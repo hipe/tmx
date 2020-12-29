@@ -2,6 +2,8 @@ import re
 
 
 def CLI(sin, sout, serr, argv, efx=None):
+    """(Ancient thing to assist in migrating from toml to emo for kiss-rdb)"""
+
     # efx = external function.
     # We don't use it but we must accept it because our parent does
     from script_lib.cheap_arg_parse import cheap_arg_parse
