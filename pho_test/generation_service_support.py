@@ -1,5 +1,5 @@
 def config_via_definition(config_defn, **kw):
-    from pho.magnetics_.generation_config_via_definition import func
+    from pho.generation_service_.generation_config_via_definition import func
     return func(config_defn, **kw)
 
 

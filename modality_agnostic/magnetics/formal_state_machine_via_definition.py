@@ -4,8 +4,7 @@ from collections import namedtuple as _nt
 # {ffsa|FFSA} = formal finite state automaton (as opposed to the instance)
 
 
-def build_formal_FSA_via_definition_function_(
-        house_module_string, defnf, **kw):
+def build_formal_FSA_via_definition_function(house_module_string, defnf, **kw):
     ffname = defnf.__name__
     ffsa_key = house_module_string, ffname
     return _build_FFSA(ffsa_key, defnf(), **kw)
@@ -362,6 +361,6 @@ _Transition = _nt('_Transition', (
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
-# #pending-rename: this is used by pho now
+# #history-B.5: re-housed
 # #history-B.4: got rid of cache facilities in *this* module
 # #born

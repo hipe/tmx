@@ -16,7 +16,7 @@ import unittest
 CommonCase = unittest.TestCase
 
 
-class Case1010_basic_write(CommonCase):
+class Case0123_basic_write(CommonCase):
 
     def test_100_returns_num_bytes_wrote_no_matter_what_you_result_in(self):
         def f(s):
@@ -28,7 +28,7 @@ class Case1010_basic_write(CommonCase):
         self.assertEqual(res, 4)
 
 
-class Case1020_flush(CommonCase):
+class Case0125_flush(CommonCase):
 
     def test_100_there_is_no_flush_normally(self):
         o = _write_only_IO_proxy(None)
@@ -53,7 +53,7 @@ class Case1020_flush(CommonCase):
         self.assertEqual(counter.value, 1)
 
 
-class Case1030_context_manager(CommonCase):
+class Case0127_context_manager(CommonCase):
 
     def test_100_wrote(self):
         writes = self.o['writes']

@@ -23,8 +23,8 @@ class Case8313_the_only_case(CommonCase):
 
     @shared_subject
     def _items(self):
-        _gen = _subject_magnetic()(_this_one_module())
-        return [x for x in _gen]
+        itr = _subject_magnetic()(_this_one_module())
+        return tuple(itr)
 
 
 def _this_one_module():

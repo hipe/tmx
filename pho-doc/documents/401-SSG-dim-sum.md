@@ -70,6 +70,5 @@ We will likely share [pandoc's vocaulary][1] of "input formats",
 
 ## (document-meta)
 
-  - #pending-rename: [#401] SSG dim-sum OR IS IT architecture?
   - #history-B.4: re-purpose file from an issues index to an SSG dim-sum
   - #born.

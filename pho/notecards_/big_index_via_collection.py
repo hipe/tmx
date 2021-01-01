@@ -316,6 +316,9 @@ def big_index_via_collection(collection, listener):
             parent_of, children_of, previous_of, next_of, frag_of)
 
 
+func = big_index_via_collection
+
+
 def _complain_about_bad_double_linkedness_parents_vs_children(
         listener, parent_of, children_of):
 
@@ -521,7 +524,7 @@ def _unordered_notecards_via_collection(collection, listener):
 
 
 def _notecards_via(idens, collection, listener):
-    from pho.magnetics_.notecard_via_definition import notecard_via_definition
+    from pho.notecards_.notecard_via_definition import notecard_via_definition
     for iden in idens:
         iid_s = iden.to_string()
         ent = collection.retrieve_entity(iid_s, listener)

@@ -159,8 +159,8 @@ func = directory_via_path
 def _formal_state_machine():
     o = _formal_state_machine
     if o.value is None:
-        from script_lib.curses_yikes._formal_state_machine_collection import \
-                build_formal_FSA_via_definition_function_ as func
+        from modality_agnostic.magnetics.formal_state_machine_via_definition \
+            import build_formal_FSA_via_definition_function as func
         o.value = func(__name__, _state_machine)
     return o.value
 

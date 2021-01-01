@@ -1,4 +1,4 @@
-from game_server import \
+from microservice_lib import \
         hack_print_via_listener_ as _hack_print_via_listener, \
         make_content_length_header_line_ as _make_content_length_header_line, \
         end_of_headers_header_line_ as _end_of_headers_header_line, \

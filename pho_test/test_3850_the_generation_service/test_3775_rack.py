@@ -8,7 +8,7 @@ class CommonCase(unittest.TestCase):
     def go(self, rc):
         dct = {k: v for k, v in self.given_request_dictionary()}
         listener, emis = listener_and_emissions_for(self)
-        from pho.magnetics_.run_message_broker_via_config import \
+        from pho.generation_service_.run_message_broker_via_config import \
             _response_dict_via_request_dict as func
         dct = func(dct, listener)
         if self.do_debug:

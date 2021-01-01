@@ -65,7 +65,7 @@ def prepare_edit_(eid_tup, mixed, busi_coll, listener):
         return
     LLs, non_LLs = two
 
-    from .units_of_work import UnitsOfWorkForEntity
+    from pho.magnetics_.units_of_work import UnitsOfWorkForEntity
     uows = UnitsOfWorkForEntity(ent_cud_type, bent, busi_coll, listener)
 
     try:
@@ -783,7 +783,7 @@ class delete_primitive(_UoW_Writer):
 
 
 def _CUD_parser():
-    from .units_of_work import CUD_parser_via_formal_entity
+    from pho.magnetics_.units_of_work import CUD_parser_via_formal_entity
     return CUD_parser_via_formal_entity(_FORMALS)
 
 

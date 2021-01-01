@@ -470,8 +470,8 @@ def _write_widest(memo, k, leng):
 
 def _produce_FFSA(fsa_def):
     if not hasattr(fsa_def, '_FFSA_'):
-        from ._formal_state_machine_collection import \
-            build_formal_FSA_via_definition_function_ as func
+        from modality_agnostic.magnetics.formal_state_machine_via_definition \
+            import build_formal_FSA_via_definition_function as func
         fsa_def._FFSA_ = func(__name__, fsa_def)
     return fsa_def._FFSA_
 

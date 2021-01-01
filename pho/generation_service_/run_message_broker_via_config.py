@@ -3,8 +3,10 @@ from inspect import getfullargspec as _getfullargspec
 
 def func(listener, port):
     recv_string = _build_string_receiver(_response_dict_via_request_dict)
-    import game_server.cli.game_server_server as lib
-    return lib.run_string_based_tcp_ip_server_via(recv_string, listener, port)
+
+    from microservice_lib.tcp_ip_server import \
+        run_string_based_tcp_ip_server_via as func
+    return func(recv_string, listener, port)
 
 
 def _build_string_receiver(response_dict_via_request_dict):

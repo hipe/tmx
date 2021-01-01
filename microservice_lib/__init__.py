@@ -139,7 +139,6 @@ def encode_(msg):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
-# #pending-rename: we might rename this whole package to "microservice"
 # #history-B.4.2: spike from empty: shared assets btwn tcp/ip server and client
 # #history-B.4.1: become empty because begin repurposing whole package
 # #history-A.1: delete the entrypoint CLI file that did nothing but call us

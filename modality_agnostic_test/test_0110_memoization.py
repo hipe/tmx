@@ -28,7 +28,7 @@ class _CommonYikes(unittest.TestCase):
         return namedtuple
 
 
-class Case0105_memoize(_CommonYikes):
+class Case0110_memoize(_CommonYikes):
 
     def test_010_gives_the_same_result_at_each_subsquent_call(self):
         num_a = self.end_state.number_array

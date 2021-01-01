@@ -277,8 +277,8 @@ def _anonymous_text_field(w):
 
 def _FFSA(fsa_def):  # copy-paste-modify. memoize the FFSA into its own func
     if not hasattr(fsa_def, '_FFSA_'):
-        from ._formal_state_machine_collection import \
-            build_formal_FSA_via_definition_function_ as func
+        from modality_agnostic.magnetics.formal_state_machine_via_definition \
+            import build_formal_FSA_via_definition_function as func
         wti = fsa_def.where_to_insert()
         fsa_def._FFSA_ = func(__name__, fsa_def, where_to_insert=wti)
     return fsa_def._FFSA_

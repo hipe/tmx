@@ -28,7 +28,7 @@ class Case1620_MONO_CASE(unittest.TestCase):
 
     @shared_subject
     def custom_end_state(self):
-        from pho.magnetics_.graph_via_collection import \
+        from pho.notecards_.graph_via_collection import \
             output_lines_via_big_index_
 
         from pho import big_index_via_collection_

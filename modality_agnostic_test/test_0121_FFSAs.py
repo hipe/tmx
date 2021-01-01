@@ -6,7 +6,7 @@ class CommonCase(unittest.TestCase):
     pass
 
 
-class test_7685_intro(CommonCase):
+class test_0120_intro(CommonCase):
 
     def test_010_loads(self):
         self.assertTrue(subject_module())
@@ -16,7 +16,7 @@ class test_7685_intro(CommonCase):
         assert ffsa.FFSA_key  # touch any arbitrary exposure of it
 
 
-class test_7695_holy_smokes_merge(CommonCase):
+class test_0121_holy_smokes_merge(CommonCase):
 
     def test_010_FFSA_two_builds(self):
         assert ffsa_two()
@@ -91,12 +91,13 @@ def build_FFSA(defnf, **kw):
 
 
 def build_FFSA_via(house_module_string, defnf, **kw):
-    return subject_module().build_formal_FSA_via_definition_function_(
+    return subject_module().build_formal_FSA_via_definition_function(
         house_module_string, defnf, **kw)
 
 
 def subject_module():
-    from script_lib.curses_yikes import _formal_state_machine_collection as mod
+    from modality_agnostic.magnetics import \
+        formal_state_machine_via_definition as mod
     return mod
 
 

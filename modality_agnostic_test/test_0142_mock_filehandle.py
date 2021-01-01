@@ -23,7 +23,7 @@ def properties_via_offsets(attr, num):  # #
     return (build_function(i) for i in range(0, num))
 
 
-class Case0303_reproduces_the_lines(CommonCase):
+class Case0137_reproduces_the_lines(CommonCase):
 
     def test_050_loads(self):
         assert subject_module()
@@ -52,7 +52,7 @@ class Case0303_reproduces_the_lines(CommonCase):
         yield lines
 
 
-class Case0306_close_then_try_to_read(CommonCase):
+class Case0142_close_then_try_to_read(CommonCase):
 
     def test_050_big_story(self):
         fh = subject_function()(iter(('aa', 'bb', 'cc')), 'me')

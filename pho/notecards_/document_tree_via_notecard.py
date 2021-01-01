@@ -26,6 +26,9 @@ def document_tree_via_notecard(
                 big_index, listener)
 
 
+func = document_tree_via_notecard
+
+
 def _when_recursive(fw, out_dir, big_index, listener):
 
     if not os.path.isdir(out_dir):

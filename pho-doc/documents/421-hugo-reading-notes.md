@@ -300,6 +300,5 @@ this document uses the documentation of hugo to form a doo-hah.
 
 
 ## (document-meta)
-  - #pending-rename: a name to reflect that this is hugo-only. *maybe* in a dedicated directory undoer pho-doc
   - #history-A.1: rewrite hand-written outline with generated markdown table
   - #born.

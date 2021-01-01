@@ -1,4 +1,4 @@
-# game server
+# microservice lib
 
 ## objective & scope
 
@@ -52,12 +52,12 @@ see [installing and deploying python](../README.md#018).
 using [these aliases](#aliases),
 run one test file
 
-    py game_server_test/test_05_meta_tests/test_090_fundamentals.py
+    py microservice_lib_test/test_05_meta_tests/test_090_fundamentals.py
 
 
 run the whole test suite
 
-    pud game_server_test
+    pud microservice_lib_test
 
 
 
@@ -102,4 +102,5 @@ this is why the author feels strongly about "regression order".
 
 ## (document-meta)
 
+  - #history-B.4: package re-purposed from "game server" to "microservice lib"
   - this document is identified by `:[#006]` (without the colon)

@@ -81,7 +81,7 @@ class _Notecards:  # #testpoint
             order=order, listener=listener)
 
     def _prepare_edit(self, eid_tup, mixed, listener):  # #testpoint
-        from .magnetics_.edited_notecard_via_request_and_notecards \
+        from .notecards_.edited_notecard_via_request_and_notecards \
                 import prepare_edit_
         return prepare_edit_(eid_tup, mixed, self, listener)
 
@@ -101,7 +101,7 @@ class _Notecards:  # #testpoint
         return self.entity_via_definition_(nid_s, core_attributes, listener)
 
     def entity_via_definition_(self, nid_s, core_attributes, listener):
-        from .magnetics_.notecard_via_definition import notecard_via_definition
+        from .notecards_.notecard_via_definition import notecard_via_definition
         return notecard_via_definition(nid_s, core_attributes, listener)
 
     def to_identifier_stream(self, listener):
@@ -136,9 +136,8 @@ _SOMEWHAT_LESS_THAN_A_LINES_WIDTH = 60
 # == stowaway support for magnetics
 
 def big_index_via_collection_(coll, listener):
-    from pho.magnetics_.big_index_via_collection import \
-            big_index_via_collection
-    return big_index_via_collection(coll, listener)
+    from pho.notecards_.big_index_via_collection import func
+    return func(coll, listener)
 
 
 def collection_via_path_(collection_path, listener, rng=None):

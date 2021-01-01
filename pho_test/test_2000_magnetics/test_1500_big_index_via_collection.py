@@ -106,10 +106,8 @@ class Case1580_generate_one_document(CommonCase):
         _big_index = _big_index_one()
 
         def run(listener):
-            from pho.magnetics_.document_tree_via_notecard import (
-                    document_tree_via_notecard)
-
-            return document_tree_via_notecard(
+            from pho.notecards_.document_tree_via_notecard import func
+            return func(
                     out_tuple=('open_output_filehandle', spy),
                     notecard_IID_string='48R',
                     big_index=_big_index,
@@ -195,7 +193,7 @@ class _CustomIndex:
 @lazy
 def _big_index_one():
     listener = throwing_listenerer()
-    from pho.magnetics_ import big_index_via_collection as lib
+    from pho.notecards_ import big_index_via_collection as lib
     _coll = collection_one()
     return lib.big_index_via_collection(_coll, listener)
 

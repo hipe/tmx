@@ -174,12 +174,12 @@ end_of_headers_line = b'\n'
 
 
 def support_lib():
-    import game_server_test.mock_sock as module
+    import microservice_lib_test.mock_sock as module
     return module
 
 
 def subject_module():
-    import game_server as module
+    import microservice_lib as module
     return module
 
 
@@ -190,6 +190,5 @@ def xx(msg):
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: to something like 'string-based tcp/ip servers and clients'
 # #history-B.4: repurpose, spike string-based tcp/ip server and client
 # #born: lost DNA

@@ -110,7 +110,7 @@ def _listen_command(sin, sout, serr, argv, efx):
     kw = {}
     config = None
     if config_path:
-        from pho.magnetics_.generation_config_via_definition import \
+        from pho.generation_service_.generation_config_via_definition import \
                 via_path as func
 
         use_environ = efx.produce_environ()
@@ -126,7 +126,7 @@ def _listen_command(sin, sout, serr, argv, efx):
         for line in config.EXECUTE_COMMAND(cmd, mon.listener):
             sout.write(line)
     else:
-        from pho.magnetics_.run_message_broker_via_config import func
+        from pho.generation_service_.run_message_broker_via_config import func
         func(mon.listener, _port, **kw)  # run forever or until interrupt
     return mon.returncode
 

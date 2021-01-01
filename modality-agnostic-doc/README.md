@@ -50,7 +50,7 @@ only in modeling interfaces for this purpose.
 |[#507.G]                   | #open | idiomize something for the test platform
 |[#507.6]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #hole |
-|[#507.D]                   | #open | gross violation of python internals
+|[#507.D]                   | #hole |
 |[#507.C]                   | #hole |
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)

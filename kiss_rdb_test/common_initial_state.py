@@ -29,15 +29,27 @@ def TSLO_via(identifier_string, meta_or_attributes):
 @lazy
 def didactic_collectioner():
     import kiss_rdb_test.fixture_code._1416_SAs._33_SAs as mod
+    # == BEGIN #open [#008.4]
     path = mod.__path__
-    paths = path._path
-    if 1 < len(paths):
-        fs_path, = tuple(set(paths))  # assert they are all the same
-    else:
-        fs_path, = paths
+    fs_path = _resolve_one_path(mod.__path__)
     from kiss_rdb.magnetics_.collection_via_path import \
         collectioner_via_storage_adapters_module as func
     return func(path._name, fs_path)
+
+
+def _resolve_one_path(paths):  # #open [#008.4]
+    if 1 == len(paths):
+        return paths[0]
+    paths = tuple({k: None for k in paths}.keys())  # set, preserve order
+    leng = len(paths)
+    if 1 == leng:
+        return paths[0]
+    if 2 < leng:
+        assert()
+    from logging import warning as func
+    left, right = paths
+    func(f"symlink? #open [#008.4] this hacky business:\n  {left}\n  {right}")
+    return left
 
 
 # == Assertion support

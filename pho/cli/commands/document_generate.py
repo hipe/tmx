@@ -70,9 +70,8 @@ def _do_CLI(
 
         # get money
 
-        from pho.magnetics_.document_tree_via_notecard import \
-            document_tree_via_notecard
-        _ok = document_tree_via_notecard(
+        from pho.magnetics_.document_tree_via_notecard import func
+        _ok = func(
                 out_tuple=(out_type, out_value),
                 notecard_IID_string=notecard_id,
                 big_index=big_index,

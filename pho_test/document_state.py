@@ -1,5 +1,5 @@
 def document_state_via_notecards(frag_itr):
-    from pho.magnetics_.document_via_notecards import Document_
+    from pho.notecards_.document_via_notecards import Document_
     _notecards = tuple(_frags_via_frag_itr(frag_itr))
     _doc = Document_(_notecards)
     return _DocumentState(_doc)
@@ -77,7 +77,7 @@ class _Section:
 
 def _frags_via_frag_itr(frag_itr):
 
-    from pho.magnetics_.notecard_via_definition import \
+    from pho.notecards_.notecard_via_definition import \
             notecard_via_definition
 
     def listener(*e):

@@ -728,8 +728,8 @@ def _produce_some_item_CC(item_class_argument):
 
 def _FFSA(fsa_def):  # copy-paste. memoize the FFSA into its own func
     if not hasattr(fsa_def, '_FFSA_'):
-        from ._formal_state_machine_collection import \
-            build_formal_FSA_via_definition_function_ as func
+        from modality_agnostic.magnetics.formal_state_machine_via_definition \
+            import build_formal_FSA_via_definition_function as func
         fsa_def._FFSA_ = func(__name__, fsa_def)
     return fsa_def._FFSA_
 

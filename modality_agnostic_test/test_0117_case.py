@@ -10,7 +10,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-class Case0107_works(CommonCase):
+class Case0111_works(CommonCase):
 
     def test_050_works(self):
         es = self.build_end_state()
@@ -27,7 +27,7 @@ class Case0107_works(CommonCase):
         return tuple(rec)
 
 
-class Case0108_when_not_found_with_string_values(CommonCase):
+class Case0113_when_not_found_with_string_values(CommonCase):
 
     def test_050_result_was_nothing(self):
         act = self.end_state.result_value
@@ -63,7 +63,7 @@ class Case0108_when_not_found_with_string_values(CommonCase):
         return EndState(tuple(emis), tuple(rec), x)
 
 
-class Case0109_one_arg_form(CommonCase):
+class Case0115_one_arg_form(CommonCase):
 
     def test_050_like_this(self):
 
@@ -95,7 +95,7 @@ class Case0109_one_arg_form(CommonCase):
         assert val == 'value for two'
 
 
-class Case0110_one_arg_form_error_message(CommonCase):
+class Case0117_one_arg_form_error_message(CommonCase):
 
     def test_100_the_message_is_the_moneyshot(self):
         msgs = self.build_end_state()

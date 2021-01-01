@@ -52,9 +52,10 @@ def _do_CLI(sin, sout, serr, collection_path, do_veri, resourcer):
         return _express_verification(sout, serr, big_index)
 
     # express graph
-    from pho.magnetics_.graph_via_collection import output_lines_via_big_index_
     w = _line_writer(sout)
-    for line in output_lines_via_big_index_(big_index, listener):
+    from pho.notecards_.graph_via_collection import \
+        output_lines_via_big_index_ as func
+    for line in func(big_index, listener):
         w(line)
 
 

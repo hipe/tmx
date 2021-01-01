@@ -6,8 +6,9 @@ months from #born, consider just adding this one method to parent
 def func(listener, port):
     from contextlib import contextmanager as cm
 
-    import game_server.cli.game_server_adapter as lib  # will change
-    opened = lib.open_dictionary_based_tcp_ip_client_via(listener, port)
+    from microservice_lib.tcp_ip_client import \
+        open_dictionary_based_tcp_ip_client_via as func
+    opened = func(listener, port)
 
     @cm  # idk
     def cm():

@@ -16,7 +16,7 @@ def end_state_for_client_via_test_case(tc):
     conn = _ServerConn(cr)
 
     # Performance
-    from game_server.cli.game_server_adapter import _open as func
+    from microservice_lib.tcp_ip_client import _open as func
     with func(conn, listener) as client:
         res = tc.given_session(client)
 
@@ -41,7 +41,7 @@ def end_state_for_server_via_test_case(tc):
     sock = _MockSocket(memo2, itr)
 
     # Performance
-    from game_server.cli.game_server_server import _run as func
+    from microservice_lib.tcp_ip_server import _run as func
     func(sock, s_via_s, listener)  # subroutine not function for now
 
     memo1 = done()

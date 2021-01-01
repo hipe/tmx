@@ -261,7 +261,7 @@ alias pi='py pho/cli/commands/issues.py'
 |[#008.G]                   |       | track callable modules
 |[#008.F]                   | #vape | machine-generated tests
 |[#008.E]                   | #wish | gettext uber alles
-|[#008.D]                   | #hole |
+|[#008.4]                   | #open | symlinks, `__path__`
 |[#008.C]                   | #wish | function-based commands
 |[#008.2]                   | #trak | track state machine implementations
 |[#008]                     |       | (placeheld for small internal tracking)

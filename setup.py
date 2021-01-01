@@ -9,11 +9,11 @@ install this with:
 
 | this                   | needs these
 |------------------------|-------------
-|game_server_test        | (none)
 |grep_dump_test          | (none)
 |upload_bot_test         | (none)
 |modality_agnostic_test  | (none)
 |script_lib_test         | (none)
+|microservice_lib_test   | (none)
 |tag_lyfe_test           | tatsu
 |kiss_rdb_test           | toml, enolib, click
 |^ google sheets         | google-api-python-client, google-auth-httplib2,
