@@ -1,6 +1,9 @@
+from os.path import splitext as _splitext
+
+
 def via_path(path, use_environ, listener):
-    from os.path import splitext, sep
-    base, ext = splitext(path)
+    from os.path import  sep
+    base, ext = _splitext(path)
     assert '.py' == ext
     mname = base.replace(sep, '.')
     from importlib import import_module
@@ -144,21 +147,48 @@ def _filesystem_change_event_via(change_type, path, listener):
     # (there are certainly other change types we could act on, like delete,
     # but those comprise a tiny fraction of our real-life use case FS events)
 
-    return None, _FileCreatedOrSaved(path)
+    _, ext = _splitext(path)
+    if '.md' == ext:
+        return None, _DocumentCreatedOrSaved(path)
+
+    if '.eno' == ext:
+        return None, _NotecardCreatedOrSaved(path)
+
+    def lines():
+        yield f"expected '.md' or '.eno' had {ext!r}"
+    listener('error', 'expression', 'unexpected_file_extension', lines)
+    return 123, None
 
 
-class _FileCreatedOrSaved:
+_same_change_type = 'file_created_or_saved'
+
+
+class _NotecardCreatedOrSaved:
 
     def __init__(self, path):
         self.path = path
 
-    def TO_ABSTRACT_DOCUMENT(self):
+    def TO_ABSTRACT_DOCUMENT(self, listener):
+        xx("rough sketch. never been run")  # #todo
+        from pho.notecards_.abstract_document_via_file_with_changes \
+            import func
+        return func(self.path, listener)
+
+    change_type = _same_change_type
+
+
+class _DocumentCreatedOrSaved:
+
+    def __init__(self, path):
+        self.path = path
+
+    def TO_ABSTRACT_DOCUMENT(self, listener):
         from pho.magnetics_.abstract_document_via_native_markdown_lines \
             import func
         with open(self.path) as lines:
             return func(lines, path=self.path)
 
-    change_type = 'file_created_or_saved'
+    change_type = _same_change_type
 
 
 def _components_via(config_defn, filesystem=None):  # might push up later

@@ -29,8 +29,16 @@ def business_collection_one():
 
 
 @lazy
+def collection_two():
+    return _collection_via_directory(fixture_directory_two())
+
+
+@lazy
 def collection_one():
-    directory = fixture_directory_one()
+    return _collection_via_directory(fixture_directory_one())
+
+
+def _collection_via_directory(directory):
     from pho import collection_via_path_
     return collection_via_path_(directory, lambda *_: xx())
 
@@ -41,6 +49,11 @@ def throwing_listenerer():
 
 
 # == Directories and related
+
+@lazy
+def fixture_directory_two():
+    return fixture_directory('collection-00600-new-way')
+
 
 @lazy
 def fixture_directory_one():

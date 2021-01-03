@@ -105,7 +105,9 @@ class _Notecards:  # #testpoint
         return notecard_via_definition(nid_s, core_attributes, listener)
 
     def to_identifier_stream(self, listener):
-        return self._coll.to_identifier_stream(listener)
+        with self._coll.open_identifier_traversal(listener) as idens:
+            for iden in idens:
+                yield iden
 
     @property
     def IMPLEMENTATION_(self):

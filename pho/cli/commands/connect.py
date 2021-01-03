@@ -63,9 +63,6 @@ def _do_CLI(sin, sout, serr, vals, foz, efx):
         _interactive(sin, serr, open_connection, listener)
         return mon.returncode
 
-    # Both ping and regular mode, let's have them both process response same
-    express_response = _response_expresser(sout, serr)
-
     if 'ordinary_connect' == one_mode:
         formals = None, 'ADAPTER_EVENT_TYPE', 'WATCHED_DIR'
         from pho.cli import parse_positionals_ as func
@@ -75,32 +72,41 @@ def _do_CLI(sin, sout, serr, vals, foz, efx):
                 serr.write(line)
             serr.write(foz.invite_line)
             return rc
-        return _do_ordinary_connect(express_response, args, open_connection, efx)  # noqa: E501
+        return _do_ordinary_connect(
+            sout, serr, args, open_connection, efx, mon)
 
     assert 'ping' == one_mode
-    return _do_ping(express_response, args, open_connection)
+    return _do_ping(sout, serr, args, open_connection)
 
 
 # ==
 
-def _do_ordinary_connect(express_response, args, open_connection, efx):
+def _do_ordinary_connect(sout, serr, args, open_connection, efx, mon):
     which_adapter, adapter_event_type, watched_dir = args
+    li = mon.listener
 
-    # Do ordinary connect
-    from importlib import import_module as func
-    ada = func(f"pho.file_watch_adapters_.{which_adapter}.notify")
-    # (2 of 2 places)
+    ada = _load_module(li, 'pho.file_watch_adapters_', which_adapter, 'notify')
+    if ada is None:
+        return mon.returncode
 
     env = efx.produce_environ()
-    dct = ada.ARGS_FOR_FILE_CHANGED(adapter_event_type, watched_dir, env)
+    dct = ada.ARGS_FOR_FILE_CHANGED(adapter_event_type, watched_dir, env, li)
+    if dct is None:
+        return mon.returncode
 
     with open_connection() as client:
         resp = client.file_changed(**dct)
 
+    # Both ping and regular mode, let's have them both process response same
+    express_response = _response_expresser(sout, serr)
     return express_response(resp)
 
 
-def _do_ping(express_response, positionals, open_connection):
+def _do_ping(sout, serr, positionals, open_connection):
+
+    # Both ping and regular mode, let's have them both process response same
+    express_response = _response_expresser(sout, serr)
+
     with open_connection() as client:
         resp = client.ping(positionals)
     return express_response(resp)
@@ -168,8 +174,8 @@ def _interactive(sin, serr, open_connection, listener):
         # interface but today is not that day.
         # It's really difficult to develop w/o interactive debugging.)
 
-        import re
-        rx = re.compile(r'q(?:u(?:it?)?)?\Z', re.IGNORECASE)
+        import re as _re
+        rx = _re.compile(r'q(?:u(?:it?)?)?\Z', _re.IGNORECASE)
 
         while True:
             fv = _form_values_via_curses_yikes(serr, listener)
@@ -284,7 +290,28 @@ def _verbose_aware_listener_via_listener(be_verbose, listener):
     return use_listener
 
 
-#  == Support
+# == Load Module (abstraction candidate (see kiss) (should be in [ma]))
+
+def _load_module(listener, before, middle, after=None):  # :[#407.C]
+
+    import re as _re
+    if not _re.match(r'', middle):
+        def lines():
+            yield f"Doesn't look like module name: {middle!r}"
+        listener('error', 'expression', 'module_not_found_error', lines)
+        return
+
+    mname = '.'.join(s for s in (before, middle, after) if s)
+    from importlib import import_module as func
+    try:
+        return func(mname)
+    except ModuleNotFoundError as exce:
+        e = exce
+
+    listener('error', 'expression', 'module_not_found_error', lambda: (str(e),))  # noqa: E501
+
+
+# == Support
 
 def _vw():
     from text_lib.magnetics import via_words as result

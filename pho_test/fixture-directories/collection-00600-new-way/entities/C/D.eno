@@ -1,0 +1,24 @@
+# entity: CDE: attributes
+previous: FGH
+heading: Section 2 (CDE)
+-- body
+body for section 2
+-- body
+next: JKL
+children:
+- JKH
+- JKG
+
+
+# entity: CDF: attributes
+heading: Imagine a chapter maybe. no see (CDF)
+--- body
+body for chapter 1
+--- body
+children:
+- FGH
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

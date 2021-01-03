@@ -91,7 +91,10 @@ class _SSG_Controller:
             return rc
 
         # Derive title and native lines from abstract (normalized) lines
-        ad = fcev.TO_ABSTRACT_DOCUMENT()
+        ad = fcev.TO_ABSTRACT_DOCUMENT(listener)
+        if ad is None:
+            return 123
+
         from .native_lines_via_abstract_document import func
         title, wlines = func(ad)
 

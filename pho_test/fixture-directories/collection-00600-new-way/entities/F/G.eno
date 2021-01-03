@@ -1,0 +1,13 @@
+# entity: FGH: attributes
+parent: CDF
+hierarchical_container_type: document
+heading: Section 1 (FGH)
+-- body
+body for section 1
+-- body
+next: CDE
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

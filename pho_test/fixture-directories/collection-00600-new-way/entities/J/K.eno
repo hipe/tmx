@@ -1,0 +1,27 @@
+# entity: JKG: attributes
+parent: CDE
+heading: Section 2-2 (JKG)
+-- body
+body for seciton 2-2
+-- body
+
+
+# entity: JKH: attributes
+parent: CDE
+heading: Section 2-1 (JKH)
+-- body
+body for section 2-1
+-- body
+
+
+# entity: JKL: attributes
+previous: CDE
+heading: Section 3 (JKL)
+-- body
+body for section 3
+-- body
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

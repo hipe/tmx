@@ -1,7 +1,7 @@
 def cli_for_production():
     def resourceser():
         if self.value is None:
-            self.value = _build_my_resources(serr)
+            self.value = external_functions_via_stderr_(serr)
         return self.value
     self = resourceser  # #watch-the-world-burn
     self.value = None
@@ -546,7 +546,7 @@ def normalize_collection_reference_(
     return fmt, use_coll_ID
 
 
-def _build_my_resources(serr, rscser=None):  # #testpoint
+def external_functions_via_stderr_(serr, rscser=None):  # #testpoint
     # there's a design issue here. this is how we would get env vars in from
     # the "real world". in tests it's easiest to just pass in None here.
     # maybe in production too.. so this "service" of producing a monitor ends

@@ -56,6 +56,11 @@ def validate_and_normalize_core_attributes_(
     if not has_body:
         return fail("body cannot be none (for now)")
 
+    # ad-hoc enum
+    if (s := dct['hierarchical_container_type']) is not None:
+        if s != 'document':
+            return fail("for now the only hierarchical_container_type is 'document' (had {s!r})")  # noqa: E501
+
     # == end hard-coded validations
     return dct
 
@@ -64,6 +69,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
         parent=None,
         previous=None,
         natural_key=None,
+        hierarchical_container_type=None,
         heading=None,
         document_datetime=None,
         body=None,
@@ -90,6 +96,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
             'parent': parent,
             'previous': previous,
             'natural_key': natural_key,
+            'hierarchical_container_type': hierarchical_container_type,
             'heading': heading,
             'document_datetime': document_datetime,
             'body': body,
@@ -102,12 +109,14 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
 class _Notecard:
 
     def __init__(
-            self, parent, previous, identifier_string,
+            self, parent, previous,
+            hierarchical_container_type, identifier_string,
             heading_is_natural_key, heading, document_datetime,
             body, children, next, annotated_entity_revisions):
 
         self.parent_identifier_string = parent
         self.previous_identifier_string = previous
+        self.hierarchical_container_type = hierarchical_container_type
         self.identifier_string = identifier_string
         self.heading_is_natural_key = heading_is_natural_key  # not used yet..
         self.heading = heading
@@ -132,6 +141,7 @@ class _Notecard:
         dct = {}
         o('parent', 'parent_identifier_string')
         o('previous', 'previous_identifier_string')
+        o('hierarchical_container_type')
 
         if self.heading_is_natural_key:
             dct['natural_key'] = self.heading

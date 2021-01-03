@@ -155,6 +155,7 @@ def _execute_command_now__no_daemonize(sout, serr, cmd, config, mon):
 
 def _formals_for_watch():
     yield '--preview', 'write generated ARGV to stdout and exit'
+    yield '-x', '--file-extension=EXT', '"md" or "eno" (default: "md")'
     yield '-p', '--port=PORT', 'how to reach the message broker (has default)'
     yield '-v', '--verbose', 'turn on verbose output (probably to vendor)'
     yield '-h', '--help', 'this screen'
@@ -177,6 +178,12 @@ def _watch_command(sin, sout, serr, argv, efx):
         doc = _watch_command.__doc__.format(which=which)
         return foz.write_help_into(sout, doc)
 
+    ext = vals.pop('file_extension', 'md')
+    if ext not in (these := ('md', 'eno')):
+        or_list = ' or '.join(repr(s) for s in these)
+        serr.write(f"--file-extension must be {or_list} (had {ext!r})\n")
+        return 123
+
     if (rc := parse_port_(serr, vals, _port, foz)):
         return rc
 
@@ -189,14 +196,14 @@ def _watch_command(sin, sout, serr, argv, efx):
     mon = efx.produce_monitor()
 
     from importlib import import_module as func
-    ada = func(f"pho.file_watch_adapters_.{which}.run")  # 1 of 2 places
+    ada = func(f"pho.file_watch_adapters_.{which}.run")  # see [#407.C]
 
     # Check version
     if not ada.CHECK_VERSION(mon.listener):
         return mon.returncode
 
     # Money
-    argv = ada.ARGV_VIA_DIRECTORY(dir_path, port, be_verbose)
+    argv = ada.ARGV_VIA_DIRECTORY(dir_path, ext, port, be_verbose)
 
     if do_preview:
         serr.write("Here is a preview of the command:\n")

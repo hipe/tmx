@@ -49,7 +49,8 @@ class CLI_Case:  # :[#459.6]
             rscser.HELLO_FROM_SCRIPT_LIB_THIS_DOES_NOTHING
             return my_CLI(sin, sout, serr, argv, use_rscser)
         from data_pipes.cli import \
-            _CLI as my_CLI, _build_my_resources as resources_via
+            _CLI as my_CLI, \
+            external_functions_via_stderr_ as resources_via
         return use_CLI
 
     def given_stdin(self):

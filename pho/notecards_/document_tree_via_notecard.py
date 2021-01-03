@@ -1,5 +1,8 @@
-import os
-import re
+
+
+
+from os import path as _os_path
+import re as _re
 
 
 def document_tree_via_notecard(
@@ -31,7 +34,7 @@ func = document_tree_via_notecard
 
 def _when_recursive(fw, out_dir, big_index, listener):
 
-    if not os.path.isdir(out_dir):
+    if not _os_path.isdir(out_dir):
         def _():
             return {'path': out_dir}
         return listener('error', 'structure', 'directory_must_exist', _)
@@ -60,7 +63,7 @@ def _when_recursive(fw, out_dir, big_index, listener):
                 ))
         seen.add(filename)
 
-        _ = os.path.join(out_dir, filename)
+        _ = _os_path.join(out_dir, filename)
         _ok = fw.write_file('output_file_path', _, facets, doc, listener)
         if _ok:
             count_files_written += 1
@@ -121,7 +124,7 @@ class _FileWriter:
 
         if 'output_file_path' == out_type:
             out_path = out_value
-            if os.path.exists(out_path) and not self.force_is_present:
+            if _os_path.exists(out_path) and not self.force_is_present:
                 _whine_about_no_clobber(listener, out_path)
                 return
             is_stdout_probably = False
@@ -223,12 +226,12 @@ class _FacetsForPublishing:
         # may result in runs of multiple spaces where before there were none.)
         # Also note: we are allowing thru [- _] (those three)
 
-        _ = re.sub('[^-a-zA-Z0-9_ ]+', '', _)
+        _ = _re.sub('[^-a-zA-Z0-9_ ]+', '', _)
 
         # Then convert long runs of space-like characters down to just one,
         # while also normalizing this into just one type of space-like char.
 
-        _ = re.sub('[-_ ]+', '-', _)
+        _ = _re.sub('[-_ ]+', '-', _)
 
         # Then, let's lowercase everything for normality
 
@@ -258,7 +261,7 @@ class _FacetsForPublishing:
         # title
 
         s = self.frontmatter_title
-        if re.match('["\n]', s):
+        if _re.match('["\n]', s):
             xx('titles with quotes or newlines')
             escaped_title = s.replace('"', '\\"')  # newline tho
         else:

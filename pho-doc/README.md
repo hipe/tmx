@@ -144,6 +144,8 @@ when you click create
 |[#409.4] |       | #see
 |[#409.3] |       | #see
 |[#409.2] |       | #see
+|[#407.D] | #trak | this smell of prev-next should be ordered children mebbe
+|[#407.C] | #trak | loading modules
 |[#407.B] |       | hardcoded values that should be env vars
 |[#407]   |       | [reserved for internal tracking for now]
 |[#406.23]| #open | this document might be obviated by "/TODO.dot" (of the mono-repo)

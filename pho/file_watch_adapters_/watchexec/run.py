@@ -40,13 +40,13 @@ def CHECK_VERSION(listener):
         pass
 
 
-def ARGV_VIA_DIRECTORY(dir_path, port, be_verbose=False):
-    rows = _argv_tokens(dir_path, port, be_verbose)
+def ARGV_VIA_DIRECTORY(dir_path, ext, port, be_verbose=False):
+    rows = _argv_tokens(dir_path, ext, port, be_verbose)
     return tuple(s for row in rows for s in ((row,)
                  if isinstance(row, str) else row))
 
 
-def _argv_tokens(dir_path, port, be_verbose):
+def _argv_tokens(dir_path, ext, port, be_verbose):
     yield _EXECUTABLE_NAME
 
     # 👉 The remainder of this method is *every* "FLAG" and "OPTION"
@@ -76,7 +76,15 @@ def _argv_tokens(dir_path, port, be_verbose):
     # yield '--ext/-s <extensions>'
 
     # Ignore all modifications except those matching the pattern
-    yield '--filter', '*.md'  # ..
+
+    if 'md' == ext:
+        glob = '*.md'
+    elif 'eno' == ext:
+        glob = '*.eno'
+    else:
+        assert()
+
+    yield '--filter', glob
 
     # Force polling mode (interval in milliseconds)
     # yield '--force-poll <interval>'

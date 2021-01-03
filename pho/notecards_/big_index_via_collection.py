@@ -1,4 +1,9 @@
-"""this is all an experiment. the idea is that with the "big index"
+"""
+(21 months later we decided to demarcate documents with a boolean flag
+attribute. but we may still use this for integrity checks..)
+
+
+this is all an experiment. the idea is that with the "big index"
 
 (built below), we can "flatten" our whole collection into an ordered
 series of notecards demarcated (dynamically) into documents. for larger

@@ -1,7 +1,87 @@
 """
-a document is ~somehow~ composed of 1 or more notecards. (how those notecards
+We derive a document from one or more notecards in the following
+(EXPERIMENTAL (still at start of 2021)) formulation:
 
-came to be "flattened" into this one document is out of our scope here.)
+(After we painstakingly wrote it, we thought of two edits we want to make to
+this, (one cosmetic and one substantial) but we're gonna save it for another
+edit #todo.)
+
+A notecard can have an attribute `is_document_root`. If present, this
+attribute must have a value of `true`. (Eventually we may experiment with
+procedural hierarchical demarcation, but not today.) (This part of having a
+boolean attribute to demarcate it was added #history-B.4, 19 months after
+birth.)
+
+Now, every notecard has:
+
+- zero or one parent notecard
+- zero or more children notecards
+- zero or one previous notecard
+- zero or one next notecard
+
+Experimentally (*very* experimentally) no notecard can have *both* a
+previous *and* a parent. (*But* a notecard can have *both* a next *and*
+children.)
+
+Probably eventually we'll make it so the previous-next relationships
+correspond to the ordered-children list of the parent. But if this is not
+the case now, we'll just live with it. For now, we'll imagine this *is* the
+case, and know that when we say previous/next we are talking about sibling
+nodes with the same parent. (This broad issue is now [#407.D].)
+
+Now, to obtain a document tree from any arbitrary node:
+
+    Is it a document root node? Go to the appropriate section below.
+    Otherwise (and it's not document root node),
+    also go to the appropriate section below.
+
+If it's not a document root node:
+
+    Keep hopping up over the parent relationship until either there's
+    no parent or the current parent is a document root node.
+    If the former, the start node wasn't within a document.
+    Otherwise (and you found the document root node) go to the next section.
+
+From a document node:
+
+    Traverse its children depth-first recursively BUT keep track of how
+    deep you are from the first node:
+
+    If the current node *is* a document root node,
+        if it *is*  an immediate child of the first node,
+            skip it. (it's okay that it's a document)
+        otherwise,
+            fail because you can't do this, it must be the other way
+    otherwise (and it's not a document root node),
+    [something about don't go deeper than depth N]
+    otherwise yield and procede
+
+(NOTE #todo the above is not implemented and we want to abandon it: A
+"chapter" node (or "chapter section") node should not merely be a document
+with children documents, because we want it to have a different depth in the
+hierarchy. When there is such a change in what we conceive of as the
+container type, it must correspond to structural relationships expressed
+over the parent-child axis, not the previous-next axis. So the bottom line
+is, documents can have no child documents (recursive).
+This is NOT covered yet.)
+
+In summary, a document is derived from any node by traversing upward from
+it until the document root node is found, and then by traversing downwards
+depth-first rescursively to find all the nodes. While doing so, these
+constraints are effected:
+    - It might end up that the start node wasn't "in" a document.
+      (If we find this to be the case, we express it.)
+    - Distance from the document root node to any child cannot exceed X
+      (probably 5).
+    - A document node can hypothetically NOT have children document nodes
+
+
+
+# Recociling any headers in body text and any heading, across notecards
+
+The remainder of this text describes what we do with *headings* (as in
+`heading` the attribute) and *headers* (a markdown feature in the `body` text)
+and how we reconcile them together and normalize them.
 
 Each notecard has zero or one heading, and then in its body string (lines)
 any arbitrary subset of those lines can be a "header" (alla markdown) line
@@ -40,6 +120,124 @@ In detail:
 """
 
 import re
+
+
+def _document_sections_in_order_via_any_arbitrary_start_node(  # #testpoint
+        start_notecard_EID, notecards, listener=None):
+
+    doc_root_node = _find_document_root_node(
+            start_notecard_EID, notecards, listener)
+    if doc_root_node is None:
+        return
+    return _produce_all_document_sections_depth_first_recursive(
+        doc_root_node, notecards, listener)
+
+
+def _produce_all_document_sections_depth_first_recursive(
+        doc_root_node, notecards, listener=None):
+
+    def recurse(node, current_depth, do_horizontal=True):
+        eid = node.identifier_string
+        if eid in seen:
+            xx(f"integrity error: circular reference. {eid!r} seen twice")
+        seen.add(eid)
+        yield node, current_depth
+
+        # Discussion: despite how hard we are trying, we can't read our old
+        # code enough to determine whether a node can have both children and
+        # next [#407.D]. For now we'll write it assuming yes, and (depth first)
+        # recurse into children before going "horizontal" to next..
+
+        # Descend into each of any children
+        s_a = node.children
+        if s_a is not None:
+            assert len(s_a)  # or not
+
+            use_depth = current_depth + 1
+            if _max_depth < use_depth:
+                xx("max depth exceeded. not covered yet.")
+
+            for eid in s_a:
+                ch = notecards.retrieve_notecard(eid, listener)
+                if not ch:
+                    xx("integrity error (not covered)")  # #here3
+
+                for ch_node, ch_depth in recurse(ch, use_depth):
+                    yield ch_node, ch_depth
+
+        if not do_horizontal:
+            return
+
+        # Traverse across each in the horizontal row
+        eid = node.next_identifier_string
+        if eid is None:
+            return
+
+        while True:
+            next_node = notecards.retrieve_notecard(eid, listener)
+            if not next_node:
+                xx("integrity error (not covered)")  # #here3
+
+            # NOTE we do NOT use an incremented depth: going horizontally
+            for nn, n_depth in recurse(next_node, current_depth, False):
+                yield nn, n_depth
+            eid = next_node.next_identifier_string
+            if eid is None:
+                break
+
+    seen = set()
+
+    return recurse(doc_root_node, 0)
+
+
+_max_depth = 5  # html headers <H1> thru <H6>
+
+
+def _find_document_root_node(eid, notecards, listener=None):
+
+    curr = notecards.retrieve_notecard(eid, listener)
+    if curr is None:
+        xx("cover me, easy: when start node not found. probably just return")
+
+    seen = set()
+    while True:
+        # If this is the document root node, you're done!
+        if 'document' == curr.hierarchical_container_type:
+            return curr
+
+        # Little integrity check lol
+        prev_eid = curr.previous_identifier_string
+        parent_eid = curr.parent_identifier_string
+        predecessor_eid = None
+        if parent_eid:
+            if prev_eid:
+                xx("wat [#407.D]")
+            predecessor_eid = parent_eid
+        elif prev_eid:
+            predecessor_eid = prev_eid
+
+        # If this node doesn't have a parent, this one error
+        if predecessor_eid is None:
+            return _when_not_in_document(listener, len(seen), eid)
+
+        curr = notecards.retrieve_notecard(predecessor_eid, listener)
+        if curr is None:  # error was expressed above
+            return
+
+        if predecessor_eid in seen:
+            xx("integrity error, circular child-parent relationships")
+
+        seen.add(predecessor_eid)
+
+
+def _when_not_in_document(listener, num_hops, eid):
+    def lines():
+        if num_hops:
+            and_what = f"and none of its {num_hops} predecessor(s) are either"
+        else:
+            and_what = "and it has no parents"
+        yield f"'{eid}' is not in a document: it is not not a document root node {and_what}"  # noqa: E501
+    listener('error', 'expression', 'node_not_in_document', lines)
 
 
 class Document_:
@@ -381,6 +579,7 @@ def xx(msg=None):
 _not_ok = False
 _okay = True
 
+# #history-B.4
 # #history-A.3: refactored from S-expressions's to AST's
 # #history-A.2: document fragment moves to own file
 # #history-A.1: introduce footnote merging

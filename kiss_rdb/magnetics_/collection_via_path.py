@@ -255,8 +255,8 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
             def retrieve_entity(iden, listener):
                 return read_funcs.retrieve_entity_via_identifier(iden, listener)  # noqa: E501
 
-            def TO_IDENTIFIER_STREAM(listener):
-                raise RuntimeError("CHANGE IT PlEASE")
+            def retrieve_entity_via_identifier(iden, listener):
+                return read_funcs.retrieve_entity_via_identifier(iden, listener)  # noqa: E501
 
             def open_identifier_traversal(listener):
                 return read_funcs.open_identifier_traversal(listener)

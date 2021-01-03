@@ -11,13 +11,16 @@ Yes this file is really anemic but:
 """
 
 
-def ARGS_FOR_FILE_CHANGED(adapter_event_type, watched_dir, env):
+def ARGS_FOR_FILE_CHANGED(adapter_event_type, watched_dir, env, listener):
 
     # There is only one adapter event type for now
     if 'file_changed_in_directory' != adapter_event_type:
-        raise RuntimeError(
-          "currenly there is only one adapter event type, and it is "
-          f"'file_changed_in_directory' (had {adapter_event_type!r})")
+        def lines():
+            yield "currenly there is only one adapter event type"
+            had = f"(had {adapter_event_type!r})"
+            yield f"and it is 'file_changed_in_directory' {had}"
+        listener('error', 'expression', 'unrecognized_event_type', lines)
+        return
 
     # relevant verbiage taken directly from the watchexec manpage at #birth:
 

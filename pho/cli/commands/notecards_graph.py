@@ -3,35 +3,36 @@ def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
 
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv, tuple(_params()), efx=efx)
+            _do_CLI, sin, sout, serr, argv, tuple(_formals()), efx=efx)
 
 
-def _params():
+def _formals():
     from pho.cli import CP_
     yield '-c', '--collection-path=PATH', * CP_().descs
     yield '-v', '--verify', 'Check the integrity of the notecard collection'
     yield '-h', '--help', 'this screen'
 
 
-def return_exitstatus(orig_f):
-    def use_f(monitor, *rest):
-        x = orig_f(monitor, *rest)
-        if x is not None:
-            assert(isinstance(x, int))
-            return x
-        return monitor.exitstatus
+def _return_exitstatus(orig_f):
+    def use_f(*args):
+        efx = args[-1]
+        mon = efx.produce_monitor()
+        efx.produce_monitor = lambda: mon  # so bad
+        x = orig_f(*args)
+        assert x is None
+        return mon.returncode
     use_f.__doc__ = orig_f.__doc__
     return use_f
 
 
-@return_exitstatus
-def _do_CLI(sin, sout, serr, collection_path, do_veri, resourcer):
+@_return_exitstatus
+def _do_CLI(sin, sout, serr, collection_path, do_veri, efx):
     """Show every relationship between every notecard in the collection.
 
     Output a graph-viz digraph of the whole collection.
     """
 
-    mon = resourcer().monitor
+    mon = efx.produce_monitor()
     listener = _build_CLI_enhanced_listener(mon)
 
     if collection_path is None:
