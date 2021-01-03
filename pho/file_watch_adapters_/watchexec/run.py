@@ -40,13 +40,13 @@ def CHECK_VERSION(listener):
         pass
 
 
-def ARGV_VIA_DIRECTORY(dir_path):
-    rows = _argv_tokens(dir_path)
+def ARGV_VIA_DIRECTORY(dir_path, port, be_verbose=False):
+    rows = _argv_tokens(dir_path, port, be_verbose)
     return tuple(s for row in rows for s in ((row,)
                  if isinstance(row, str) else row))
 
 
-def _argv_tokens(dir_path):
+def _argv_tokens(dir_path, port, be_verbose):
     yield _EXECUTABLE_NAME
 
     # 👉 The remainder of this method is *every* "FLAG" and "OPTION"
@@ -119,7 +119,8 @@ def _argv_tokens(dir_path):
     # yield '--signal <signal>'
 
     # Print debugging messages to stderr
-    yield '--verbose'
+    if be_verbose:
+        yield '--verbose'
     # (this is indeed verbose)
 
     # Prints version information
@@ -131,7 +132,18 @@ def _argv_tokens(dir_path):
     # Ignore events while the process is still running
     # yield '--watch-when-idle'
 
-    yield '--', 'pho', 'wow-holy-smokes', dir_path
+    # The thing you send to the client, that one should be absolute because
+    # it will be used to compare against paths that the OS sends and those
+    # are (not always, but when it matters) absolute. Not doing it earlier
+    # to be cute
+
+    from os.path import abspath as func
+    use_dir_path = func(dir_path)
+
+    yield ('--', 'pho', 'connect',
+           _EXECUTABLE_NAME,
+           '--port', str(port),
+           'file_changed_in_directory', use_dir_path)
 
 
 # == Decorators

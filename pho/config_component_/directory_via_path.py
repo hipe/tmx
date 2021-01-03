@@ -1,3 +1,6 @@
+from . import result_is_output_lines_ as _result_is_output_lines
+
+
 def _state_machine():
     # NOTE in this module, state is only ever derived from actual FS state;
     # we don't ever actually traverse these transitions *in* our FSA.
@@ -24,14 +27,15 @@ class directory_via_path:
         self._injected_filesystem = filesystem
         self._d = None
 
+    def create_directory(self, listener):
+        return self.EXECUTE_COMMAND('create_directory', listener)
+
     # == Hook-in to component API
 
     def EXECUTE_COMMAND(self, cmd, listener, stylesheet=None):
         from pho.config_component_ import execute_command_ as func
         with self._open_cache_session():
-            # (traverse the iteration while within the cache)
-            for line in func(self, cmd, listener, stylesheet):
-                yield line
+            return func(self, cmd, listener, stylesheet)
 
     def to_additional_commands_(self):
         for k in self._state.transition_names:
@@ -47,28 +51,32 @@ class directory_via_path:
 
     def _create_directory(self, listener):
         self._clear_cache_early()
-        pretend = ''.join(('mkdir ', self.path, '\n'))
-        yield pretend
+        pretend = ''.join(('mkdir ', self.path))
+        listener('info', 'expression', 'executing_system_command', lambda: (pretend,))  # noqa: E501
         self._filesystem.mkdir(self.path)  # result is none
+        return 0
 
     # == Read-only and derivations
 
     def _list_directory(self, listener):
         tup = self._cached('listdir_tuple')
-        if not len(tup):
+        if len(tup):
+            listener('output', 'expression', lambda: tup)
+        else:
             msg = f'(empty directory: {self.path})'
             listener('info', 'expression', 'dir_is_empty', lambda: (msg,))
-        return (f"{s}\n" for s in tup)
+        return 0
 
+    @_result_is_output_lines
     def execute_show_(self, ss, listener):
         with self._open_cache_session():
             for line in self._do_execute_show(ss, listener):
                 yield line
 
     def _do_execute_show(self, ss, listener):
-        yield '(intermediate directory):\n'
-        yield f'  path: {self.path!r}\n'
-        yield f'  status: {self._status}\n'
+        yield '(intermediate directory):'
+        yield f'  path: {self.path!r}'
+        yield f'  status: {self._status}'
 
     @property
     def _state(self):

@@ -1,10 +1,8 @@
-def SOMETHING_DUMPLING(path, listener, target=None):
-    # (based directly on the cli command code that ships with liverelaod)
+def func(path, listener, port, target=None):
+    # (based directly on the cli command code that ships with livereload)
 
     from tornado import log
     log.enable_pretty_logging()
-
-    port = 35729
 
     from livereload.server import Server
     server = Server()

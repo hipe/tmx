@@ -1,3 +1,6 @@
+from . import result_is_output_lines_ as _result_is_output_lines
+
+
 def execute_command_via_command_and_component(
         comp, cmd, listener, stylesheet=None):
 
@@ -9,8 +12,7 @@ def execute_command_via_command_and_component(
         return _execute_terminal_command(comp, k, rest, ss, listener)
 
     if not comp.has_components_:
-        _when_not_has_components(listener, k, comp)
-        return ()
+        return _when_not_has_components(listener, k, comp)
 
     return _execute_child_command(comp, k, rest, ss, listener)
 
@@ -19,6 +21,7 @@ def _when_not_has_components(listener, k, comp):
     def lines():
         yield f"can't access {k!r} of {comp.__class__.__name__}, no components"
     listener('error', 'expression', 'no_components', lines)
+    return 123
 
 
 func = execute_command_via_command_and_component
@@ -53,12 +56,16 @@ class _ProxyForPrimitive:
             reason = f"No command {k!r}. {say()}"
             return _whine(listener, reason)
 
+        xx("DEMARK")
+
         if 'list' == k:
-            return (''.join((say(), '\n')),)
+            listener('output', 'expression', lambda: (say(),))
+            return 0
 
         assert 'show' == k
         return self.execute_show_(stylesheet, listener)
 
+    @_result_is_output_lines
     def execute_show_(self, ss, listener):
         x = self._mixed
         if isinstance(x, str) and ' ' not in x:
@@ -84,8 +91,7 @@ def _execute_child_command(comp, k, rest, ss, listener):
 
 def _do_execute_child_command(comp, ch, rest, ss, listener):
     ch = _proxy_if_necessary(ch)
-    for line in ch.EXECUTE_COMMAND(rest, listener, stylesheet=ss):
-        yield ''.join((ss.tab, line))
+    return ch.EXECUTE_COMMAND(rest, listener, stylesheet=ss)
 
 
 # == Execute Terminal Command
@@ -98,7 +104,8 @@ def _execute_terminal_command(comp, k, rest, ss, listener):
 
     if 'list' == k:
         assert not rest
-        return (f'{s}\n' for s in _to_splay_lines(comp))
+        listener('output', 'expression', lambda: _to_splay_lines(comp))
+        return 0
 
     for kk, func in _to_additional_commands(comp):
         if k != kk:
@@ -120,41 +127,41 @@ def _execute_show(comp, ss, listener):
 def _execute_show_assuming_compound_component(comp, ss, listener):
     label = comp.label_for_show_
 
-    yield ''.join(('(', label, ')', ss.colon, '\n'))
+    line = ''.join(('(', label, ')', ss.colon))
+    listener('output', 'expression', lambda: (line,))
+
     for k, c in comp.to_component_keys_and_values_():
-        for line in _lines_for_component(k, c, ss, listener):
-            yield line
+        rc = _execute_show_for_component(k, c, ss, listener)
+        assert isinstance(rc, int)  # #todo
+        if rc:
+            return rc
+    return 0
 
 
-def _lines_for_component(k, c, ss, listener):
+def _execute_show_for_component(k, c, ss, listener):
     c = _proxy_if_necessary(c)
 
-    lines = iter(_execute_show(c, ss, listener))
+    lines = []
+    from . import capture_output_lines_ as func
+    rc = _execute_show(c, ss, func(lines.append, listener))
+    assert isinstance(rc, int)  # #todo
+    if rc:
+        return rc
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
 
-    # Determine if the component only produces one line (by peeking)
-    first_line, only_one_line = next(lines), True
-    for line in lines:
-        only_one_line = False
-        second_line = line
-        break
+    def output_lineser():
+        scn = func(iter(lines))
+        first_line = scn.next()  # ..
+        # If the component only produced one line, make it look like this
+        if scn.empty:
+            yield ''.join((ss.tab, k, ': ', first_line))
+        else:
+            yield ''.join((ss.tab, k, ' ', first_line))
+        while scn.more:
+            yield ''.join((ss.tab, scn.next()))
 
-    # If it's only one line, be done with it
-    if only_one_line:
-        yield ''.join((ss.tab, k, ': ', first_line))
-        return
-
-    # Because it's multiple lines, stream the results
-
-    # (combine name and "type" into one line hackily):
-    yield ''.join((ss.tab, k, ' ', first_line))
-
-    def rewind():
-        yield second_line
-        for line in lines:
-            yield line
-
-    for line in rewind():
-        yield ''.join((ss.tab, line))
+    listener('output', 'expression', output_lineser)
+    return 0
 
 
 # == Support (small)
@@ -163,7 +170,7 @@ def _bad_command_or_component(comp, listener, *rest):
     def lines():
         return _to_splay_lines(comp, *rest)
     listener('error', 'expression', 'noent', lines)
-    return ()
+    return 123
 
 
 def _to_splay_lines(comp, *rest):
@@ -214,6 +221,7 @@ class _default_stylesheet:
 
 def _whine(listener, reason):
     listener('error', 'expression', 'error', lambda: (reason,))
+    return 123
 
 
 def xx(msg=None):

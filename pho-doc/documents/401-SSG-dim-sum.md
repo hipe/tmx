@@ -53,7 +53,8 @@ architecture of things like:
 - Static site generators like "pelican" (or hugo or jekyll etc)
 
 
-From build tools like "make" we'll use concepts like EDIT. (see [invoke][3].)
+From build tools like "make" we'll use concepts like EDIT.
+(See [invoke][4] (found thru [pelican docs][3]).)
 
 Like "parcel" we may have [trees of "assets"][2].
 
@@ -65,6 +66,8 @@ We will likely share [pandoc's vocaulary][1] of "input formats",
 [1]: https://pandoc.org/using-the-pandoc-api.html#pandocs-architecture
 [2]: https://parceljs.org/how_it_works.html
 [3]: https://docs.getpelican.com/en/latest/publish.html#invoke
+[4]: https://www.pyinvoke.org/
+
 
 
 

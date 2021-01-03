@@ -44,9 +44,10 @@ def _generator_via_dir_path(dir_path):
 
 def _dir_path_via_module(collection_module):  # #open [#008.4]
     s_a = collection_module.__path__._path
+    if 1 != len(s_a):
+        s_a = tuple({k: None for k in s_a}.keys())  # uniq set but keep order
     if 1 == len(s_a):
         return s_a[0]
-    s_a = tuple({k: None for k in s_a}.keys())  # uniq set but keep order
     if 2 == len(s_a):
         left, right = s_a
         if left == right:

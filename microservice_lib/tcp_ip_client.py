@@ -29,6 +29,9 @@ def _send_dictionary_via_send_string(impl):
     def send_dictionary(dct):
         big_s = json_via_dict(dct)
         resp_s = impl.send_string(big_s)
+        if resp_s is None:
+            return  # [#102.B]
+
         assert isinstance(resp_s, str)  # [#022]
 
         # (if the request was not well-formed etc, it returns the empty string)
@@ -86,6 +89,11 @@ def _open(sock, listener):  # #testpoint
 
         # Parse response headers
         stay_open, content_length = _read_headers(sock, print)
+        if not stay_open:
+            reason = f"server failed while processing response. got stay_open: {stay_open!r}"  # noqa: E501
+            listener('error', 'expression', 'server_failed', lambda: (reason,))
+            return  # [#102.B]
+
         assert stay_open
         assert content_length is not None
 

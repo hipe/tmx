@@ -93,6 +93,7 @@ this is why the author feels strongly about "regression order".
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
+|[#102.B]                   | #trak | when server fails
 |[#015.B]                   | #edit | edit documentation
 |[#001.B]                   | #edit | edit documentation
 [[#000]                     |       | REMINDER - numberspace placeheld with ../README.md

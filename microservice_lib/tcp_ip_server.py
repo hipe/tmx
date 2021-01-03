@@ -20,7 +20,10 @@ def run_string_based_tcp_ip_server_via(string_via_string, listener, port):
     # Listen for incoming connections
     sock.listen(1)
 
-    _run(sock, string_via_string, listener)
+    try:
+        _run(sock, string_via_string, listener)
+    finally:
+        sock.close()
 
 
 def _run(sock, string_via_string, listener):  # #testpoint

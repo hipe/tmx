@@ -11,8 +11,9 @@ class ConfigCase(unittest.TestCase):
     def expect_expected_output_lines(self):
         exp = tuple(self.expected_output_lines())
         es = self.end_state
-        act, = es  # #here1
+        act, rc = es  # #here1
         self.assertSequenceEqual(act, exp)
+        assert 0 == rc
 
     # == Set-up
 
@@ -32,22 +33,24 @@ class ConfigCase(unittest.TestCase):
         fs, done = support.BUILD_MOCK_FILESYSTEM(fs_exp)
         conf_defnf = self.given_config_definition_function()
         fake_env = self.given_environment()
-        conf = conf_defnf(fake_env)
+        conf = conf_defnf(fake_env, listener=None)
         config = support.config_via_definition(conf, filesystem=fs)
         cmd = self.given_command()
-        rs = config.EXECUTE_COMMAND(cmd, listener=None)
 
-        if self.do_debug:  # ..
-            outputted_lines = []
-            for line in rs:
-                print(f"DBG: {line!r}")
-                outputted_lines.append(line)
-            outputted_lines = tuple(outputted_lines)
-        else:
-            outputted_lines = tuple(rs)
+        from modality_agnostic.test_support.common import \
+            listener_and_emissions_for as func
+        listener, emis = func(self)
 
+        rc = config.EXECUTE_COMMAND(cmd, listener)
+
+        def nl(s):
+            if '\n' in s:
+                raise RuntimeError(f'where: {s!r}')
+            return f"{s}\n"
+
+        olines = tuple(nl(s) for emi in emis for s in emi.payloader())
         done()
-        return (outputted_lines,)  # #here1
+        return olines, rc  # #here1
 
     def given_environment(self):
         path = self.given_intermediate_directory()
@@ -89,8 +92,8 @@ class Case3809_ls_directory_from_command(ConfigCase):
         self.expect_expected_output_lines()
 
     def expected_output_lines(_):
-        yield '  file1.txt\n'
-        yield '  file2.txt\n'
+        yield f'{ind}file1.txt\n'
+        yield f'{ind}file2.txt\n'
 
     def given_filesystem_interactions(self):
 
@@ -153,7 +156,7 @@ class Case3817_create_directory_from_command(ConfigCase):
 
     def expected_output_lines(_):
         same_path = pretend_path
-        yield f'  mkdir {same_path}\n'
+        yield f'{ind}mkdir {same_path}\n'
 
     def given_filesystem_interactions(self):
         same_path = pretend_path
@@ -186,7 +189,7 @@ class Case3820_generate_a_single_file(ConfigCase):
         intermed_dir = real_FS_intermed_dir_eg_01
         fake_env = {'PHO_PELICAN_INTERMEDIATE_DIR': intermed_dir}
         conf_defnf = self.given_config_definition_function()
-        conf_defn = conf_defnf(fake_env)
+        conf_defn = conf_defnf(fake_env, listener=None)
         return support.config_via_definition(conf_defn)
 
     def given_performance(self, conf):  # imagine
@@ -206,6 +209,8 @@ def this_one_example():
 real_FS_intermed_dir_eg_01 = 'pho_tasks/tasks-data/pelican-intermed-dir-example-01'  # noqa: E501
 same_key = 'peloogan_intermed_dir'
 pretend_path = '/fake-fs/fake-intermed-dir'
+
+ind = ''
 
 
 if __name__ == '__main__':

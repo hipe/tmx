@@ -22,7 +22,19 @@ class _Client:
     def __init__(self, impl):
         self._impl = impl
 
-    def send_API_call(self, command_name, **cmd_args):
+    def file_changed(
+            self, agnostic_change_type, watched_dir, path_that_changed=None):
+        cmd_args = {
+            'agnostic_change_type': agnostic_change_type,
+            'watched_dir': watched_dir,
+            'path_that_changed': path_that_changed,
+        }
+        return self.send_API_call('filesystem_changed', cmd_args)
+
+    def ping(self, args):
+        return self.send_API_call('ping', {'args': args})
+
+    def send_API_call(self, command_name, cmd_args):
         dct = {'command_name': command_name, 'command_args': cmd_args}
         return self.send_dictionary(dct)
 

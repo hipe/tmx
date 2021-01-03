@@ -1,15 +1,19 @@
 from inspect import getfullargspec as _getfullargspec
+import os.path as _path
 
 
-def func(listener, port):
-    recv_string = _build_string_receiver(_response_dict_via_request_dict)
-
+def run_message_broker_via_config(listener, port, config=None):
+    recv_string = _build_string_receiver(
+            _response_dict_via_request_dict, config)
     from microservice_lib.tcp_ip_server import \
         run_string_based_tcp_ip_server_via as func
     return func(recv_string, listener, port)
 
 
-def _build_string_receiver(response_dict_via_request_dict):
+func = run_message_broker_via_config
+
+
+def _build_string_receiver(response_dict_via_request_dict, config=None):
 
     def recv_string(request_string, listener):
 
@@ -30,7 +34,7 @@ def _build_string_receiver(response_dict_via_request_dict):
             listener('error', 'expression', 'JSON_decode_error', lambda: (r,))
             return ''
 
-        resp_dct = response_dict_via_request_dict(dct, listener)
+        resp_dct = response_dict_via_request_dict(dct, listener, config)
 
         # Encode and return the response
         return json_dumps(resp_dct, indent='  ')
@@ -57,6 +61,7 @@ def _API_endpoint_function(orig_f):
     assert not any(rest)
 
     # Assert every API endpoint func has this (which we disallow as an etc)
+    assert 'config' == args.pop()
     assert 'listener' == args.pop()
 
     _via_command_name[orig_f.__name__] = set(args), orig_f
@@ -67,7 +72,63 @@ _via_command_name = {}
 
 
 @_API_endpoint_function
-def ping(args, listener):
+def filesystem_changed(
+        watched_dir, agnostic_change_type, path_that_changed,
+        listener, config):
+
+    if config is None:
+        reason = f"server must be started with config to process {agnostic_change_type!r}"  # noqa: E501
+        return {'status': 13, 'reason': reason}
+
+    if not _path.isabs(watched_dir):
+        reason = f"Watcher should absolutize path. How do we know what CWD is? {watched_dir!r}"  # noqa: E501
+        return {'status': 14, 'reason': reason}
+
+    if path_that_changed:
+        if not _path.isabs(path_that_changed):
+            reason = f"Expecting absolute path that changed. Had: {path_that_changed!r}"  # noqa: E501
+            return {'status': 14, 'reason': reason}
+
+        exp = _path.join(watched_dir, '')
+        here = len(exp)
+        act = path_that_changed[:here]
+
+        if exp != act:
+            reason = ("Expected path that changed to be inside watched dir.\n"
+                      f"watched directory: {watched_dir}\n"
+                      f"path that changed: {path_that_changed}")
+            return {'status': 14, 'reason': reason}
+
+        use_path = path_that_changed
+    else:
+        use_path = watched_dir
+
+    def my_listener(sev, shape, *rest):
+        assert 'expression' == shape
+        *middle, lineser = rest
+        these_lines = tuple(lineser())
+        if 'output' == sev:
+            output_and_errput_lines.extend(these_lines)
+        elif 'info' == sev:
+            info_lines.extend(these_lines)
+            listener(sev, shape, *middle, lambda: these_lines)
+        else:
+            assert 'error' == sev
+            output_and_errput_lines.extend(these_lines)
+            listener(sev, shape, *middle, lambda: these_lines)
+
+    output_and_errput_lines = []
+    info_lines = []
+
+    rc = config.FILESYSTEM_CHANGED(agnostic_change_type, use_path, my_listener)
+    if not isinstance(rc, int):
+        xx(f"where: {type(rc)}")  # #todo
+
+    return {'status': rc, 'messages': (output_and_errput_lines or info_lines)}
+
+
+@_API_endpoint_function
+def ping(args, listener, config):
     bads = tuple(
         (i, type(args[i])) for i in range(0, len(args))
         if not (isinstance(args[i], str)))
@@ -90,18 +151,20 @@ def ping(args, listener):
         'messages': tuple(messages())}
 
 
-def _response_dict_via_request_dict(dct, listener):  # #testpoint
+def _response_dict_via_request_dict(dct, listener, config=None):  # #testpoint
 
     def main():
         cmd_name, cmd_args = parse_level_one()
-        these, func = _via_command_name.get(cmd_name)
-        if these is None:
+        two = _via_command_name.get(cmd_name)
+        if two is None:
             return when_strange_command_name(cmd_name)
+        these, func = two
 
         if (extra := (set(cmd_args.keys()) - these)):
             return when_extra_args(extra, cmd_name)
 
-        cmd_args['listener'] = _cray_listener  # watch world burn
+        cmd_args['listener'] = listener
+        cmd_args['config'] = config
         return func(**cmd_args)
 
     def parse_level_one():
@@ -139,7 +202,7 @@ def _response_dict_via_request_dict(dct, listener):  # #testpoint
         raise _Stop(reason, 6)
 
     def when_strange_command_name(x):
-        raise _Stop(f"SCN: {x!r}", 5)
+        raise _Stop(f"unrecognized command name: {x!r}", 5)
 
     def when_type_mismatch(varname, v, label):
         use = v.__class__.__name__  # meh
@@ -160,10 +223,6 @@ def _response_dict_via_request_dict(dct, listener):  # #testpoint
         return main()
     except _Stop as e:
         return e.to_dictionary()
-
-
-def _cray_listener(*a):
-    xx()
 
 
 class _Stop(RuntimeError):

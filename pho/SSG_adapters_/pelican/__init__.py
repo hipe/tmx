@@ -1,13 +1,21 @@
+from pho.config_component_ import \
+        result_is_output_lines_ as _result_is_output_lines
 from os.path import join as _path_join
 
 
 class SSG_controller_via_defn:
 
     def __init__(self, itr):
+        self._freeform_name_value_pairs = {
+            'author': 'Viola Davis',  # #open [#407.B] get these from env
+            'timezone': 'EST',
+        }
         self._forward_refs = []
         for direc in itr:
             if 'source_directory' == direc[0]:
                 self._accept_source_directory(* direc[1:])
+            else:
+                xx()
 
     def _accept_source_directory(self, pc):
         from pho.config_component_ import varname_via_placeholder_ as func
@@ -22,6 +30,7 @@ class SSG_controller_via_defn:
     def finish_via_resolved_forward_references(self, comps):
         kw = {v: comps[k] for k, v in self._forward_refs}
         kw['source_directory_varname'] = self._source_directory_varname
+        kw['freeform_KV'] = self._freeform_name_value_pairs
         return _SSG_Controller(**kw)
 
     @property
@@ -33,6 +42,7 @@ class _SSG_Controller:
 
     def __init__(
             self, source_directory, source_directory_varname,
+            freeform_KV,
             ):
 
         self._output_directory = 'OUTPUT_DIREOCTO'
@@ -40,6 +50,8 @@ class _SSG_Controller:
 
         self._source_directory = source_directory
         self._source_directory_varname = source_directory_varname
+
+        self._freeform_name_value_pairs = freeform_KV
 
         # self._author = "HALLO I'M AUTHOR"  # #here1
         self._site_name = "HALLO I'M SITE NAME"
@@ -65,12 +77,50 @@ class _SSG_Controller:
             args = (rest,)  # while it works
         return getattr(self, cname)(listener, *args)
 
+    # fcev = file change event
+
+    def RECEIVE_FILESYSTEM_CHANGED(self, fcev, listener):
+        assert 'file_created_or_saved' == fcev.change_type
+
+        # Make intermediate directory (which is a whole peloocan project)
+        diro = self._source_directory
+        fkv = self._freeform_name_value_pairs
+
+        rc = _touch_intermediate_project(diro, fkv, listener)
+        if rc:
+            return rc
+
+        # Derive title and native lines from abstract (normalized) lines
+        ad = fcev.TO_ABSTRACT_DOCUMENT()
+        from .native_lines_via_abstract_document import func
+        title, wlines = func(ad)
+
+        # Derive entry from title ("Sinbad Shazaam" -> "Sinbad-Shazam.md")
+        # (this logic should happen elsewhere and get memoized for reasons..)
+        import re
+        md = re.match(r'([A-Za-z]+(?:[ ][A-Za-z]+)*)\.?\Z', title)
+        if not md:
+            xx(f"loosen this constraint, but not all the way: {title!r}")
+
+        pcs = md[1].split(' ')
+        entry = ''.join(('-'.join(pcs), '.md'))
+
+        # Write the intermediate file (maybe it's create, maybe clobber)
+        wpath = _path_join(diro.path, 'pages', entry)  # [#882.B]
+        with open(wpath, 'w') as fh:
+            for line in wlines:
+                fh.write(line)
+
+        # Generate the final output file from the intermediate file!! WHEW
+        return self.generate_file(listener, entry)
+
     def generate_file(self, listener, source_directory_entry):
         argv = self._procure_ARGV_for_generate_single_file(
                 source_directory_entry, listener)
         if argv is None:
-            return ()
-        return self._invoke_pelican_via_ARGV(argv, listener)
+            return 123
+        return self._invoke_pelican_via_ARGV(
+                argv, source_directory_entry, listener)
 
     def _procure_ARGV_for_generate_single_file(
             self, source_dir_ent, listener=None):  # #testpoint
@@ -88,7 +138,7 @@ class _SSG_Controller:
             output_directory=self._output_directory,
             theme_path=None, listener=listener)
 
-    def _invoke_pelican_via_ARGV(self, argv, listener):
+    def _invoke_pelican_via_ARGV(self, argv, entry, listener):
         from pelican import main as func
         # (when server, would be nice to load the above eagerly, or not, #todo)
 
@@ -96,7 +146,9 @@ class _SSG_Controller:
         assert res is None  # just sanity check on their API
         # sadly, we probably can't figure out if it fails easily ..
 
-        return ()
+        msg = f"probably generated: {entry}"
+        listener('output', 'expression', lambda: (msg,))
+        return 0
 
     def list_source_files(self, listener):
         return self._source_directory.EXECUTE_COMMAND('ls', listener)
@@ -109,11 +161,12 @@ class _SSG_Controller:
             return True
         _when_directory_not_ready(listener, status, need, sd.path)
 
+    @_result_is_output_lines
     def execute_show_(self, ss, listener):
-        yield ''.join((self.label_for_show_, ss.colon, '\n'))
+        yield ''.join((self.label_for_show_, ss.colon))
 
         if (sdvn := self._source_directory_varname):
-            yield ''.join((ss.tab, 'source directory: ', sdvn, '\n'))
+            yield ''.join((ss.tab, 'source directory: ', sdvn))
             return
 
         lines = iter(self._source_directory.execute_show_(ss, listener))
@@ -141,6 +194,35 @@ def _when_directory_not_ready(listener, status, need, path):
         yield f"source directory not ready. Is {status!r} need {need!r}"
         yield f"directory: {path}"
     listener('error', 'expression', 'source_directory_not_ready', lines)
+
+
+def _touch_intermediate_project(diro, fkv, listener):
+    status = diro.status
+
+    # If directory already exists and has something in it, assume it's ok
+    if 'non_empty_directory' == status:
+        return 0
+
+    # At this point, path must be noent
+    if 'noent' != status:
+        def lines():
+            reason = status.replace('_', ' ')  # haha
+            yield f"can't generate because {reason} - {diro.path}"
+        listener('error', 'expression', 'cant_generate', lines)
+        return 123
+
+    # Call our task with the rando, messy, particular things we have to give it
+    fkv = fkv.copy()
+    author = fkv.pop('author')
+    timezone = fkv.pop('timezone')
+    if fkv:
+        xx(f"why: {tuple(fkv.keys())!r}")
+
+    from invoke.context import Context
+    c = Context()
+    from pho_tasks.tasks import make_pelican_intermediate_directory as task
+    task(c, diro.path, author, timezone)  # you chose to result in None
+    return 0  # for now we just assume success
 
 
 class intermediate_directory_via_defn:
@@ -199,7 +281,8 @@ def _ARGV_for_generate_single_file(
     def extra_setting_asst_exprs():
         for k, v in extra_settings_raw():
             if '' == v:
-                use_v = 'none'
+                # use_v = 'none'
+                use_v = ''
             elif ' ' in v:
                 if '"' in v:
                     xx(f"have fun: {v!r}")
