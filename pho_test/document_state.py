@@ -1,98 +1,130 @@
-def document_state_via_notecards(frag_itr):
-    from pho.notecards_.document_via_notecards import Document_
-    _notecards = tuple(_frags_via_frag_itr(frag_itr))
-    _doc = Document_(_notecards)
-    return _DocumentState(_doc)
+from unittest import TestCase
 
 
-class _DocumentState:
-
-    def __init__(self, doc):
-
-        self._sections = None
-
-        def sectionser():
-            if self._sections is None:
-                self._sections = _sections_via_doc(doc)
-            return self._sections
-        self._sectionser = sectionser
-
-        def titler():
-            return doc.document_title
-        self._titler = titler
-
-    @property
-    def document_title(self):
-        return self._titler()
-
-    @property
-    def first_section(self):
-        return self.section_at(0)
-
-    def section_at(self, i):
-        return self.sections[i]
-
-    @property
-    def sections(self):
-        return self._sectionser()
+# == Case Parent Classes
 
 
-def _sections_via_doc(doc):
-    return tuple(_sections_via_doc_2(doc))
+class CaseMetaClass(type):
+    # Make it so when the below parent class is subclassed, the subclasses
+    # get a "test" method, but the parent itself doesn't have a "test" method
+    # because if it had one and you import it into your module, it auto runs
+
+    def __new__(cls, class_name, bases=None, dct=None):
+        res = type.__new__(cls, class_name, bases, dct)
+        if TestCase != bases[-1]:
+            setattr(res, 'test', res.definition_for_the_method_called_test())
+        return res
 
 
-def _sections_via_doc_2(doc):
+class SexpCase(TestCase, metaclass=CaseMetaClass):
+    # For asserting how the `body` attribute (content lines) are broken into
+    # a stream of S-expressions; the first pass of parsing notecards for md
 
-    ast_itr = doc._to_line_ASTs(None)
+    def definition_for_the_method_called_test():
+        return the_method_called_test_for_the_sexp_case
 
-    # only for the first section, it's possible that there's no header line
 
-    ast = next(ast_itr)
+def the_method_called_test_for_the_sexp_case(self):
 
-    if 'header' == ast.symbol_name:
-        header_SL_for_section = ast
-        cache = []
-    else:
-        header_SL_for_section = None
-        cache = [ast]
+    act = tuple(subject_module()._sexps_via_lines(self.given_lines()))
 
-    for ast in ast_itr:
-        if 'header' == ast.symbol_name:
-            yield _Section(header_SL_for_section, tuple(cache))
-            header_SL_for_section = ast
-            cache.clear()
+    exp = tuple(((row, None) if isinstance(row, str) else row)
+                for row in self.expected_sexps())
+
+    act_types = tuple(sx[0] for sx in act)
+    exp_types = tuple(two[0] for two in exp)
+    self.assertSequenceEqual(act_types, exp_types)
+
+    for i in range(0, len(exp)):
+        exp_x = exp[i][1]
+        if exp_x is None:
             continue
-        cache.append(ast)
-
-    if len(cache) or header_SL_for_section is not None:
-        yield _Section(header_SL_for_section, tuple(cache))
-
-
-class _Section:
-
-    def __init__(self, header_AST, asts):
-        self.header = header_AST  # None ok
-        self.body_line_ASTs = asts
+        act_x = act[i][1]
+        if isinstance(act_x, tuple):
+            use_num = len(act_x)
+        else:
+            assert isinstance(act_x, int)
+            use_num = act_x
+        if exp_x == use_num:
+            continue
+        raise RuntimeError(f"had {use_num} expected {exp_x} at offset {i}")
 
 
-def _frags_via_frag_itr(frag_itr):
+# ==
 
-    from pho.notecards_.notecard_via_definition import \
-            notecard_via_definition
+def document_state_via_notecards(frag_itr):
+    use_itr = ((h, _body_via_lines(lines)) for h, lines in frag_itr)
+    ad = subject_module().abstract_document_via_notecards_(use_itr)
 
-    def listener(*e):
-        raise RuntimeError('where')
+    # NOTE for now we're just trying to bridge back to 17 month old code
+    # to get old tests to pass (asserting still current specs). But when
+    # we introduce abstract document procurement, do that here probably
 
-    for title_s, line_itr in frag_itr:
+    class document_state:  # #clas-as-n
 
-        _body = ''.join(_add_newline(s) for s in line_itr)
+        @property
+        def document_title(_):
+            return ad.frontmatter['title']
 
-        dct = {'heading': title_s, 'body': _body}
-        if title_s is None:
-            dct['previous'] = 'HAK'
+        @property
+        def first_section(self):
+            return self.section_at(0)
 
-        yield notecard_via_definition(
-                identifier_string=None, core_attributes=dct, listener=listener)
+        def section_at(_, offset):
+            return ad.sections[offset]
+
+        @property
+        def AD(_):
+            return ad
+
+    return document_state()
+
+
+def final_sexps_via_notecards(notecards):
+
+    def these():
+        for heading, lines in notecards:
+            yield heading, _body_via_lines(lines)
+
+    sxs = tuple(subject_module()._final_sexps(these()))
+    return _SexpAccessor(sxs)
+
+
+class _SexpAccessor:
+
+    def __init__(self, sexps):
+        self.sexps = sexps
+
+    def first(self, key):
+        return first_in_sexps(self.sexps, key)
+
+    def last(self, key):
+        return last_in_sexps(self.sexps, key)
+
+    def all(self, key):
+        return all_in_sexps(self.sexps, key)
+
+
+def last_in_sexps(sexps, key):
+    for sx in reversed(sexps):
+        if key == sx[0]:
+            return sx
+    raise KeyError(key)
+
+
+def first_in_sexps(sexps, key):
+    for sx in sexps:
+        if key == sx[0]:
+            return sx
+    raise KeyError(key)
+
+
+def all_in_sexps(sexps, key):
+    return (sx for sx in sexps if key == sx[0])
+
+
+def _body_via_lines(lines):
+    return ''.join(_add_newline(s) for s in lines)
 
 
 def _add_newline(s):
@@ -100,5 +132,16 @@ def _add_newline(s):
     # but let's add a sanity check because this breaks a deep convention
     assert(0 == len(s) or '\n' != s[-1])
     return f'{s}\n'
+
+
+# ==
+
+def subject_module():
+    import pho.notecards_.document_via_notecards as mod
+    return mod
+
+
+def xx(msg):
+    raise RuntimeError(msg)
 
 # #born.

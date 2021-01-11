@@ -29,32 +29,28 @@ class Case1540_whole_document_tree_from_first_collection(CommonCase):
 
     def test_220_every_notecard_heading_was_expressed_somehow(self):
         _actual = len(self.lines_that_expressed_headings)
-        self.assertEqual(_actual, 6)
+        self.assertEqual(_actual, 7)
 
     def test_240_these_7_notecards_produced_only_4_documents(self):
-        _lines = self.lines_that_expressed_headings
-
-        count = 0
-        for line in _lines:
-            if 'DOC TITLE' in line:
-                count += 1
-
+        them = self.custom_index.document_titles
+        count = len(them)
         self.assertEqual(count, 4)
 
     def test_300_all_the_bookmarks_came_out(self):
         _actual = self.custom_index.lines_that_define_bookmarks
         self.assertEqual(len(_actual), 7)
 
-    @shared_subject
+    @property
     def lines_that_expressed_headings(self):
         return self.custom_index.lines_that_express_the_notecard_heading
 
     @shared_subject
     def custom_index(self):
-        return custom_index_via_big_index(_big_index_one())
+        return custom_index_via_big_index(_big_index_one(), self)
 
 
-_this_range = range(59, 60)
+_this_range = range(52, 60)
+# #history-B.4 lowered min by 7 because less blank lines
 # #history-A.1 bumped max by 1 because of unknown change
 
 
@@ -128,66 +124,71 @@ class Case1580_generate_one_document(CommonCase):
                 'payloader_BE_CAREFUL_HOT': emi.payloader}
 
 
-def custom_index_via_big_index(big_index):
+def custom_index_via_big_index(big_index, tc):
+    signal = define_signals('document_title', 'line')
 
-    if True:  # meh
+    if tc.do_debug:
+        subscribe_to_signals_for_debugging(signal)
 
-        listener = throwing_listenerer()
-        doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
-        is_first = True
+    kw = {'doc_titles': [], 'total_line_count': 0,
+          'lines_that_express_the_notecard_heading': [],
+          'lines_that_define_bookmarks': []}
 
-        from modality_agnostic.test_support.common import Counter
-        total_line_counter = Counter()
-        lines_that_express_the_notecard_heading = []
-        lines_that_define_bookmarks = []
+    subscribe_to_signals_for_work(kw, signal)
 
-        def echo(line):
+    send_doc_title_signal = signal('document_title').send
+    send_line_signal = signal('line').send
 
-            # FOR DEBUGGING:
-            # print(line)
+    def visit_doc(doc):
+        send_doc_title_signal(doc.document_title)
+        for line in doc.TO_LINES():
+            send_line_signal(line)
 
-            total_line_counter.increment()
+    for doc in big_index.TO_DOCUMENT_STREAM():
+        visit_doc(doc)
 
-            if not len(line):
-                return
+    return _CustomIndex(
+        kw['total_line_count'],
+        kw['lines_that_express_the_notecard_heading'],
+        kw['lines_that_define_bookmarks'], kw['doc_titles'])
 
-            if 'FRAG' in line:
-                lines_that_express_the_notecard_heading.append(line)
-            elif '[' == line[0]:
-                lines_that_define_bookmarks.append(line)
 
-        """SO:
-        we originally developed the below code as a quick-and-dirty visual
-        confirmation but then repurposed it so that it's used to hackishly
-        gather statistics (totals) on types of lines, for testing.
+def subscribe_to_signals_for_work(memo, signal):
 
-        we aren't gonna refactor it yet because we anticipate a pretty big
-        overhaul at .#open :[#882.D] which will make testing this less hacky.
-        """
+    def on_doc_title(dt):
+        memo['doc_titles'].append(dt)
+    signal('document_title').connect(on_doc_title)
 
-        for doc in doc_itr:
-            if is_first:
-                is_first = False
-            else:
-                echo('')
-                echo('')
+    def on_line(line):
+        char = line[0]
+        if '#' == char:
+            memo['lines_that_express_the_notecard_heading'].append(line)
+        elif '[' == char:  # meh
+            memo['lines_that_define_bookmarks'].append(line)
+        memo['total_line_count'] += 1
+    signal('line').connect(on_line)
 
-            echo(f'DOC TITLE: {doc.document_title}')
 
-            for line in doc.TO_LINES(listener):
-                echo(line)
+def subscribe_to_signals_for_debugging(signal):
 
-        return _CustomIndex(
-                total_line_counter.value,
-                lines_that_express_the_notecard_heading,
-                lines_that_define_bookmarks)
+    def on_doc_title(dt):
+        w(f"\n\ndoc title: {dt}\n")
+    signal('document_title').connect(on_doc_title)
+
+    def on_line(line):
+        w(f"     line: {line}")
+    signal('line').connect(on_line)
+
+    from sys import stderr
+    w = stderr.write
 
 
 class _CustomIndex:
-    def __init__(self, _1, _2, _3):
+    def __init__(self, _1, _2, _3, _4):
         self.total_line_count = _1
         self.lines_that_express_the_notecard_heading = _2
         self.lines_that_define_bookmarks = _3
+        self.document_titles = _4
 
 
 @lazy
@@ -198,8 +199,39 @@ def _big_index_one():
     return lib.big_index_via_collection(_coll, listener)
 
 
+# == BEGIN hackishly duplicate a small portion of `blinker`, as a treat
+
+def define_signals(*ks):
+
+    dct = {}
+    for k in ks:
+        assert k not in dct
+        dct[k] = _Signal(k)
+
+    return dct.__getitem__
+
+
+class _Signal:
+    def __init__(self, k):
+        self._receivers = []
+
+    def connect(self, receiver):
+        self._receivers.append(receiver)
+
+    def send(self, mixed):
+        for recv in self._receivers:
+            recv(mixed)
+
+# == END
+
+
+def xx(*aa):
+    raise RuntimeError(f"sure, whatever: {aa!r}")
+
+
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #history-A.1
 # #born.

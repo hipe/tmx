@@ -1,60 +1,91 @@
-import re
+def TING_via_TING(section_scn, notecard_scn):
+    o = _header_functions()
+    md_header_sexp_via_heading = o.md_header_sexp_via_heading
+    demote_by_one = o.demote_by_one
+    demote_by_two = o.demote_by_two
+
+    heading = None  # although the first notecard had one, pretend it didn't
+    while True:  # for each section
+
+        if section_scn.empty:
+            xx("notecard with no sections (no body) behavior undefined")
+
+        demote = demote_by_one
+        use_hdr_sx = None
+
+        # The first section in the body needs to reconcile heading & header
+        hdr_sx, crs = section_scn.next()
+        if heading:
+            hdr_from_heading = md_header_sexp_via_heading(heading)
+
+            # If heading AND header..
+            if hdr_sx:
+                # ..then heading in own section with no content runs
+                yield 'section', hdr_from_heading, None
+
+                # ..and every header in this body gets demoted by 2
+                demote = demote_by_two
+                use_hdr_sx = demote(hdr_sx)
+
+            # Otherwise (and heading but no header)..
+            else:
+                use_hdr_sx = hdr_from_heading  # ..use the heading as header
+
+        # Otherwise, if (no heading but) header
+        elif hdr_sx:
+            use_hdr_sx = demote(hdr_sx)
+
+        yield 'section', use_hdr_sx, crs
+
+        # For the remaining sections in this body, demote appropriately
+        while section_scn.more:
+            hdr_sx, crs = section_scn.next()
+            use_hdr_sx = hdr_sx and demote(hdr_sx)
+            yield 'section', use_hdr_sx, crs
+
+        if notecard_scn.empty:
+            break
+        heading, section_scn = notecard_scn.next()
 
 
-def decide_how_to_express_heading(
-        is_head_notecard, frag_heading):
-
-    if is_head_notecard:
-        # all head notecards have headings [#883.2], expressed elsewhere
-        assert(frag_heading is not None)
-        add_header_depth = _normal_header_depth_to_add
-        header = None
-
-    elif frag_heading is None:
-        # non-head notecard with no heading (Case121)
-        add_header_depth = _normal_header_depth_to_add
-        header = None
-
-    else:
-        # non-head notecard with YES heading (Case115)
-        add_header_depth = _normal_header_depth_to_add + 1
-        _use_header_text = f'{frag_heading}\n'
-        header = _Header(add_header_depth, _use_header_text)
-
-    return add_header_depth, header
+def _header_functions():
+    if _header_functions._do:  # [#510.4] custom memoizer
+        _header_functions._do = False
+        for k, f in _build_header_functions():
+            setattr(_header_functions, k, f)
+    return _header_functions
 
 
-# == models & associated trivial builder functions
-
-def via_line(line):
-    md = _header_rx.match(line)
-    begin, end = md.span(1)
-    number_of_octothorpes = end - begin
-    rest = md[2]
-    # --
-    return _Header(number_of_octothorpes, rest)
+_header_functions._do = True
 
 
-class _Header:
+def _build_header_functions():  # #here5
 
-    def __init__(self, depth, text):
-        self.depth = depth  # number of octothorpes, typically
-        self.text = text  # may or may not have leading space based on etc
+    def build_demoter(how_much):
+        def demote(sx):
+            assert 'header_line' == sx[0]
+            mdh = via_line(sx[1])
+            mdh = mdh.replace_depth(mdh.depth + how_much)  # #here5
+            return 'md_header', mdh
+        return demote
 
-    def to_lines(self):
-        _1 = '#' * self.depth
-        text = self.text
-        # (headers from headings don't, the others do probably)
-        _2 = '' if ' ' == text[0] else ' '
-        yield f'{_1}{_2}{text}'
+    yield 'demote_by_one', build_demoter(1)
+    yield 'demote_by_two', build_demoter(2)
 
-    symbol_name = 'header'
+    def func(heading):
+        # Ever header we make from a heading gets demoted by 1
+        return 'md_header', construct(2, '', heading, '')
+
+    yield 'md_header_sexp_via_heading', func
+
+    from pho.magnetics_.abstract_document_via_native_markdown_lines import \
+        markdown_header_via_header_line_ as via_line, \
+        MarkdownHeader_ as construct
 
 
-_Header.new_via = _Header  # wee
+def xx(msg=None):
+    raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
-
-_header_rx = re.compile('^(#+)(.+\n)$')
-_normal_header_depth_to_add = 1  # #[#883.3]
-
+# #pending-rename
+# #history-B.4: blind rewrite
 # #abstracted

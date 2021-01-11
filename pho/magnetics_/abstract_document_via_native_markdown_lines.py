@@ -23,7 +23,7 @@ def abstract_document_via(lines, path=None):
     itr = _frontmatter_then_sections(scn)
     frontmatter = next(itr)
     sections = tuple(itr)
-    return _AbstractDocument(frontmatter, sections, path=path)
+    return AbstractDocument_(frontmatter, sections, path=path)
 
 
 func = abstract_document_via
@@ -61,6 +61,12 @@ def _frontmatter_then_sections(scn):
 
     if current_markdown_header or current_section_body_lines:
         yield flush()
+
+
+def markdown_header_via_header_line_(line):
+    md = _markdown_header_line_probably.match(line)
+    assert md
+    return _markdown_header_via_matchdata(md)
 
 
 def _parse_hugo_yaml_frontmatter(scn):
@@ -107,11 +113,12 @@ def _hugo_yaml_frontmatter_body_lines_via(scn):
     scn.advance()
 
 
-class _AbstractDocument:
+class AbstractDocument_:
 
-    def __init__(self, frontmatter, sections, path=None):
+    def __init__(self, frontmatter, sections, path=None, ncid=None):
         self.frontmatter, self.sections = frontmatter, sections
         self.path = path
+        self.head_notecard_identifier_string = ncid
 
     def to_summary_lines(self):
         if (dct := self.frontmatter):
@@ -126,11 +133,34 @@ class _AbstractDocument:
         yield f"{section_count} section(s)\n"
         yield f"{body_line_count} body lines(s)\n"
 
+    def TO_LINES(self, listener=None):
+        # #todo: adapters should be the one doing this. this is just
+        # here to bridge to old tests for now
+
+        if self.frontmatter:
+            yield '---\n'
+            for k, v in self.frontmatter.items():
+                yield f'{k}: {v}\n'  # meh
+            yield '---\n'
+            yield '\n'  # idk
+
+        for s in self.sections:
+            for line in s.to_normalized_lines():
+                yield line
+
     @property
     def classified_path(self):  # assumes path
         if not hasattr(self, '_classified_path'):
             self._classified_path = _ClassifiedPath(self.path)
         return self._classified_path
+
+    @property
+    def document_title(self):  # grandfathered in
+        return self.frontmatter['title']
+
+    @property
+    def document_datetime(self):  # #todo
+        return self.frontmatter.get('document_datetime')
 
 
 def _markdown_section_via(md_header, lines):
@@ -151,10 +181,10 @@ def _markdown_section_via(md_header, lines):
     while len(lines) and _is_blank(lines[-1]):
         lines.pop()  # ! 👀
 
-    return _MarkdownSection(md_header, these())
+    return MarkdownSection_(md_header, these())
 
 
-class _MarkdownSection:
+class MarkdownSection_:
 
     def __init__(self, md_header, normal_body_lines):
         self.header = md_header
@@ -173,10 +203,10 @@ class _MarkdownSection:
 
 def _markdown_header_via_matchdata(md):
     octothorpes, opening, label_text, rest = md.groups()
-    return _MarkdownHeader(len(octothorpes), opening, label_text, rest)
+    return MarkdownHeader_(len(octothorpes), opening, label_text, rest)
 
 
-class _MarkdownHeader:
+class MarkdownHeader_:
     # NOTE there is another header model class in this package (dedicated file)
     # unifying this one with that one is left as an exercise for later or never
 

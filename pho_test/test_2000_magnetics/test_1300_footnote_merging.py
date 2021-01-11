@@ -1,91 +1,100 @@
-from pho_test import document_state as doc_state_lib
+from pho_test.document_state import \
+        SexpCase, final_sexps_via_notecards, \
+        all_in_sexps, CaseMetaClass, subject_module
 from modality_agnostic.test_support.common import \
-        dangerous_memoize as shared_subject
+        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
 class CommonCase(unittest.TestCase):
 
-    def to_document_line_ASTs(self):
+    def identifiers_of_RSL_definitions(self):
+        sa = self.end_state_sexps
+        sx = sa.last('RSL_definitions')
+        return tuple(sx[1].keys())
 
-        _frags = self.given_notecards()
-        _state = doc_state_lib.document_state_via_notecards(_frags)
+    @property
+    @shared_subject_in_child_classes
+    def end_state_sexps(self):
+        return final_sexps_via_notecards(self.given_notecards())
 
-        for sect in _state.sections:
-            for ast in sect.body_line_ASTs:
-                yield ast
+
+class ReferenceStyleLinkCase(unittest.TestCase, metaclass=CaseMetaClass):
+
+    def definition_for_the_method_called_test():
+        return ReferenceStyleLinkCase.will_be_test
+
+    def will_be_test(self):
+        given_line = self.given_line()
+        mod = subject_module()
+        rx = mod._RSL_definition_rx
+        md = rx.match(given_line)
+        if md is None:
+            raise RuntimeError(f"failed to match: {given_line!r}")
+
+        from pho.models_.footnote import _RSL_def_rx_keys as these_keys
+        act = {k: md[k] for k in these_keys}
+        for k, exp_s in self.expected_parts():
+            act_s = act[k]
+            self.assertEqual(act_s, exp_s)
 
 
 # (1200-1390)
 
-class Case1220_footnotes_in_just_one_notecard_will_get_normalized(CommonCase):
 
-    def test_100_footnote_defs_have_IDs_in_order_w_respect_to_each_other(self):
-        def f(ast):
-            self.assertEqual(ast.symbol_name, 'footnote definition')
-            return int(ast.identifier_string)
-        a = self.the_last_N_line_ASTs
-        int_itr = (f(ast) for ast in a)
-        prev_int = next(int_itr)
-        for integer in int_itr:
-            expected = prev_int + 1
-            self.assertEqual(integer, expected)
-            prev_int = integer
+class Case1230_introduce_RSL_definition(ReferenceStyleLinkCase):
 
-    def test_200_footnote_defs_preserved_the_order_of_their_entities(self):
-        import re
-        rx = re.compile(r'^url_for_([^\n]+)\n$')
+    def expected_parts(_):
+        yield 'margin', '   '
+        yield 'link_identifier', 'PDP_15'
+        yield 'second_whitespace', '\t\t'
+        yield 'link_url', 'hddp://foo.biz/bar'
 
-        def f(ast):
-            md = rx.match(ast.url_probably)
-            return md[1]
-        _actual = tuple(f(ast) for ast in self.the_last_N_line_ASTs)
+    def given_line(_):
+        return "   [PDP_15]:\t\thddp://foo.biz/bar\n"
 
-        self.assertSequenceEqual(_actual, ('bking', 'here', 'mcdo'))
 
-    def test_300_footnote_defs_now_start_at_number_one(self):
-        _ast = self.the_last_N_line_ASTs[0]
-        self.assertEqual(_ast.identifier_string, '1')
+class Case1235_RSL_definition_line_with_title(ReferenceStyleLinkCase):
 
-    def test_400_the_body_copy_now_uses_the_new_IDs_and_they_are_correct(self):
+    def expected_parts(_):
+        yield 'margin', ''
+        yield 'link_identifier', '1'
+        yield 'second_whitespace', ' '
+        yield 'link_url', '/some/local/link'
+        yield 'third_whitespace', ' '
+        yield 'single_quoted_insides', "Mom\\'s Spaghetti"
 
-        def f(ast, s, s_):
-            self.assertEqual(ast.symbol_name, 'footnote reference')
-            self.assertEqual(ast.label_text, s)
-            self.assertEqual(ast.identifier_string, s_)
+    def given_line(_):
+        return "[1]: /some/local/link 'Mom\\'s Spaghetti'\n"
 
-        first, second, third = self.line_ASTs[0:3]
 
-        self.assertEqual(second.symbol_name, 'content line')
-        self.assertEqual(second.line, 'and also the\n')
+class Case1240_x2(SexpCase):
 
-        self.assertEqual(first.symbol_name, 'structured content line')
+    def expected_sexps(_):
+        yield 'content_run', 1
+        yield 'link_definition_run', 2
+        yield 'content_run', 1
 
-        _1, _2, _3 = first.mixed_children
+    def given_lines(_):
+        yield '[chim_churry][chip_chewey] is a good reference.\n'
+        yield '   [chip_curry]: hddp://xxyyzz.com/haha\n'
+        yield '  [2]: hddp://xx.com/foo "ohai yes"\n'
+        yield '    [not_chip_curry]: hddp://xxyyzz.com/haha\n'  # 4 indented
 
-        self.assertEqual(_1, 'as youths, we enjoyed ')
 
-        f(_2, "McDonald's", '3')
+class Case1245_footnotes_in_just_one_notecard_will_get_normalized(CommonCase):
 
-        self.assertEqual(_3, '\n')
+    def test_100_RSL_definitions_retain_the_order_they_are_first_encount(self):
+        act = self.identifiers_of_RSL_definitions()
+        self.assertSequenceEqual(act, ('66', '33', '99'))
 
-        a = third.mixed_children
-        f(a[1], 'Burger King', '1')
-        f(a[3], 'here', '2')
+    # (deleted a test about RSL definition RHS's retaining order #history-B.4)
 
-    def test_500_footnote_defs_now_have_some_blank_lines_in_between(self):
-        my_set = set()
-        for ast in self.line_ASTs[-5:-3]:
-            my_set.add(ast.symbol_name)
-        self.assertSequenceEqual(tuple(my_set), ('empty line',))
+    # (deleted a test about footnote numbers starting from one #history-B.4)
 
-    @shared_subject
-    def the_last_N_line_ASTs(self):
-        return self.line_ASTs[-3:]
+    # (deleted a test asserting new RSL idens used in content #history-B.4)
 
-    @shared_subject
-    def line_ASTs(self):
-        return tuple(self.to_document_line_ASTs())
+    # (deleted test asserting blank line(s) separating sects #history-B.4)
 
     def given_notecards(self):
         yield 'el título', (
@@ -100,62 +109,21 @@ class Case1220_footnotes_in_just_one_notecard_will_get_normalized(CommonCase):
 class Case1250_footnotes_are_normalized_across_notecards(CommonCase):
 
     def test_100_only_3_footnotes_down_from_4(self):
-        def f(act, exp):
-            sn, id_s, url = exp
-            self.assertEqual(act.symbol_name, sn)
-            self.assertEqual(act.identifier_string, id_s)
-            self.assertEqual(act.url_probably, url)
-
-        a1, a2, a3 = self.custom_three[2]
-
-        e1 = ('footnote definition', '1', 'url_for_paris\n')
-        e2 = ('footnote definition', '2', 'url_for_cph\n')
-        e3 = ('footnote definition', '3', 'url_for_berlin\n')
-
-        f(a1, e1)
-        f(a2, e2)
-        f(a3, e3)
+        act = self.identifiers_of_RSL_definitions()
+        self.assertSequenceEqual(act, ('uno', 'dos', 'ein'))
 
     def test_200_ids_are_correct(self):
+        sa = self.end_state_sexps
+        sects = sa.all('section')
+        act = tuple(line for sect in sects for line in lines_via_section(sect))
+        exp = tuple(self.expected_lines())
+        self.assertSequenceEqual(act, exp)
 
-        def f(act, exp):
-            a_s, o, _ = act.mixed_children
-            e_s, (sn, tx, id_s) = exp
-            self.assertEqual(_, '\n')
-            self.assertEqual(a_s, e_s)
-            self.assertEqual(o.symbol_name, sn)
-            self.assertEqual(o.label_text, tx)
-            self.assertEqual(o.identifier_string, id_s)
-
-        ((a1, a2), (a3, a4)) = self.custom_three[0:-1]
-
-        e1 = ('meet me at the ', ('footnote reference', 'paris', '1'))
-        e2 = ('meet me at the ', ('footnote reference', 'copenhagen', '2'))
-
-        e3 = ("let's meet in ", ('footnote reference', 'berlin', '3'))
-        e4 = ("let's meet in ", ('footnote reference', 'paris', '1'))
-
-        f(a1, e1)
-        f(a2, e2)
-        f(a3, e3)
-        f(a4, e4)
-
-    @shared_subject
-    def custom_three(self):
-        itr = self.to_document_line_ASTs()
-        sections = []
-        cache = []
-        for ast in itr:
-            if 'empty line' == ast.symbol_name:
-                nxt = next(itr)
-                self.assertEqual(nxt.symbol_name, 'empty line')
-                sections.append(tuple(cache))
-                cache.clear()
-                continue
-            cache.append(ast)
-        sections.append(tuple(cache))
-        self.assertEqual(len(sections), 3)
-        return sections
+    def expected_lines(_):
+        yield 'meet me at the [paris][uno]\n'
+        yield 'meet me at the [copenhagen][dos]\n'
+        yield "let's meet in [berlin][ein]\n"
+        yield "let's meet in [paris][uno]\n"
 
     def given_notecards(self):
         yield 'el título de frag 1', (
@@ -172,37 +140,37 @@ class Case1250_footnotes_are_normalized_across_notecards(CommonCase):
 
 class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
 
-    def test_100_look_at_this_crazy_thing(self):
-        act = tuple(ast.symbol_name for ast in self.end_array)
-        exp = (
-                'content line',
-                'fenced code block',
-                'structured content line',
-                'empty line',
-                'empty line',
-                'footnote definition')
-        self.assertSequenceEqual(act, exp)
+    # (deleted test asserting the AST types of many lines #history-B.4)
 
     def test_200_the_fenced_code_block_is_just_lines(self):
-        act = self.end_array[1]._lines
-        exp = (
-            '```bash\n',
-            '[mami][tchami]\n',
-            '```\n')
+        sect = self.the_last_section
+        cf_run, = all_in_sexps(sect[2], 'code_fence_run')
+        act = tuple(lines_via_run_sexp(cf_run))
+        exp = tuple(self.expected_code_fence_lines())
         self.assertSequenceEqual(act, exp)
 
     def test_300_but_this_other_fellow_is_actually_a_footnote_reference(self):
-        ast = self.end_array[2]
-        _1, _2, _3 = ast.mixed_children
-        _exp = ('see ', ('footnote reference', 'mami', '1'))
-        _act = (_1, (_2.symbol_name, _2.label_text, _2.identifier_string))
-        self.assertSequenceEqual(_act, _exp)
+        sect = self.the_last_section
+        lines = tuple(lines_via_section(sect))
+        act_line = lines[-1]
+        exp_line = 'see [mami][orig_iden_for_tchami]\n'
+        assert exp_line == act_line
 
-    @shared_subject
-    def end_array(self):
-        return tuple(self.to_document_line_ASTs())
+    @property
+    def the_last_section(self):
+        _, last = self.end_state_sexps.all('section')
+        return last
+
+    def expected_code_fence_lines(_):
+        yield "```bash\n"
+        yield "[mami][tchami]\n"
+        yield "```\n"
 
     def given_notecards(self):
+        yield 'sneak in 17 months later', (
+                'zib zub',
+                '[orig_iden_for_tchami]: url_for_tchami',
+                )
         yield 'el título', (
                 "here's how: ",
                 '```bash',
@@ -215,7 +183,21 @@ class Case1330_what_looks_like_footnotes_in_code_blocks_is_not_pic(CommonCase):
 # could cover: footnote reference with bad name raises key error
 
 
+def lines_via_section(sx):  # NOTE header/headings are ignored
+    for cr in sx[2]:
+        for line in lines_via_run_sexp(cr):
+            yield line
+
+
+def lines_via_run_sexp(sexp):
+    if sexp[0] not in ('content_run', 'code_fence_run'):
+        assert()
+    for line in sexp[1]:
+        yield line
+
+
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4
 # #born.

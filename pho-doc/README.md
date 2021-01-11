@@ -97,7 +97,7 @@ when you click create
 |[#882.J]                   | #trak | timetrack syncing: local vs remote, time field
 |[#882.I]                   | #edit | edits to do in fragments
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
-|[#882.G]                   | #trak | empty but self-documentary files
+|[#882.G]                   | #hole |
 |[#882.F]                   | #open | we need proper markdown parsing
 |[#882.E]                   | #hole |
 |[#882.D]                   | #hole |

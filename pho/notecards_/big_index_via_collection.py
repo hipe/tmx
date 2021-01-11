@@ -555,7 +555,7 @@ class _BigIndex:
         self.next_of = next_of
         self.notecard_of = frag_of
 
-    def TO_DOCUMENT_STREAM(self, listener):
+    def TO_DOCUMENT_STREAM(self, listener=None):
 
         these = self.ids_of_frags_with_no_parent_or_previous
 
@@ -596,13 +596,20 @@ class _BigIndex:
         if a is None:
             xx('it is as the prophecy foretold')
 
-        frag_of = self.notecard_of
+        notecard_of = self.notecard_of
+        notecards = (notecard_of[eid] for eid in a)
+        first_notecard = next(notecards)
 
-        _frags = tuple(frag_of[iid] for iid in a)
+        def these():
+            yield first_notecard.heading, first_notecard.body
+            for nc in notecards:
+                yield nc.heading, nc.body
 
-        from .document_via_notecards import Document_
-
-        return Document_(_frags)
+        kw = {'ncid': first_notecard.identifier_string}
+        kw['datetime'] = first_notecard.document_datetime
+        from .document_via_notecards import \
+            abstract_document_via_notecards_ as func
+        return func(these(), **kw)
 
 
 def _touch_list(dct, key):  # there's got to be a better idiom
@@ -619,4 +626,5 @@ def xx(msg=None):
 
 _okay = True
 
+# #history-B.4
 # #born.
