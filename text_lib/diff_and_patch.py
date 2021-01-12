@@ -195,6 +195,11 @@ class _Hunk:
     def runs(self):
         return self._runs
 
+    def to_the_four_integers(self):
+        import re
+        md = re.match(r'@@[ ]\-(\d+),(\d+)[ ]\+(\d+),(\d+)[ ]@@[ ]', self._at_at_line)  # noqa: E501
+        return tuple(int(s) for s in md.groups())
+
     def _parse(self):
         lines = self._body_lines
         del self._body_lines
@@ -522,5 +527,7 @@ def xx(msg=None):
 if '__main__' == __name__:
     cli_for_production()
 
+
+# #pending-rename: branch down, become etc
 # #history-B.2
 # #began-as-abstraction
