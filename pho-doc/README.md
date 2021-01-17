@@ -101,7 +101,7 @@ when you click create
 |[#882.F]                   | #open | we need proper markdown parsing
 |[#882.E]                   | #hole |
 |[#882.D]                   | #hole |
-|[#882.C]                   | #hole |
+|[#882.C]                   | #trak | metaclass
 |[#882.B]                   | #trak | pelookan: track where you use '/pages/'
 |[#882.1]                   | #open | ideally there should be no producer scripts not covered
 |[#882]                     |       | (internal tracking)

@@ -1,6 +1,8 @@
 from modality_agnostic.test_support.common import \
-    dangerous_memoize_in_child_classes as shared_subject_in_child_classes
+    dangerous_memoize_in_child_classes as shared_subject_in_child_classes, \
+    lazy
 import unittest
+from os.path import join
 
 
 class CommonCase(unittest.TestCase):
@@ -28,13 +30,25 @@ class CommonCase(unittest.TestCase):
         return {k: v for k, v in self._do_given_lines()}
 
     def _do_given_lines(self):
+
         def do(k):
-            with open(dct.pop(k)) as fh:
+            path = dct.pop(k, None)
+            if path is None:
+                return
+            with open(path) as fh:
                 return tuple(fh)
+
         dct = {k: v for k, v in self.given_paths()}
-        yield 'before_lines', do('before_path')
-        yield 'after_lines', do('after_path')
-        yield 'patch_lines', do('patch_path')
+
+        if (x := do('before_path')) is not None:
+            yield 'before_lines', x
+
+        if (x := do('after_path')) is not None:
+            yield 'after_lines', x
+
+        if (x := do('patch_path')) is not None:
+            yield 'patch_lines', x
+
         assert not dct
 
     do_debug = True
@@ -69,11 +83,16 @@ class Case4145_intro(CommonCase):
         self.assertSequenceEqual(act, exp)
 
     def given_paths(_):
-        from os.path import dirname, join
-        head = join(dirname(__file__), 'fixture-directories', 'directory-050')
+        head = join(fixture_dirs(), 'directory-050')
         yield 'before_path', join(head, 'before.txt')
         yield 'after_path', join(head, 'after.txt')
         yield 'patch_path', join(head, 'patch.diff')
+
+
+@lazy
+def fixture_dirs():
+    from os.path import dirname
+    return join(dirname(__file__), 'fixture-directories')
 
 
 def subject_function():

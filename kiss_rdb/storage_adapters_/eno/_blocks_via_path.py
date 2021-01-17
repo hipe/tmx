@@ -37,6 +37,8 @@
 # - semaphores!? concurrency yikes
 
 
+# cf = collection facade
+
 def new_file_lines__(file_edit, cf, order, emi, **body_of_text):
     for block in _new_file_blocks(file_edit, cf, order, emi, **body_of_text):
         for line in block.to_lines():

@@ -96,17 +96,12 @@ class _SSG_Controller:
             return 123
 
         from .native_lines_via_abstract_document import func
-        title, wlines = func(ad)
+        o = func(ad, listener=None)
+        if o is None:
+            return 123
 
-        # Derive entry from title ("Sinbad Shazaam" -> "Sinbad-Shazam.md")
-        # (this logic should happen elsewhere and get memoized for reasons..)
-        import re
-        md = re.match(r'([A-Za-z]+(?:[ ][A-Za-z]+)*)\.?\Z', title)
-        if not md:
-            xx(f"loosen this constraint, but not all the way: {title!r}")
-
-        pcs = md[1].split(' ')
-        entry = ''.join(('-'.join(pcs), '.md'))
+        entry = o.entry
+        wlines = o.write_lines
 
         # Write the intermediate file (maybe it's create, maybe clobber)
         wpath = _path_join(diro.path, 'pages', entry)  # [#882.B]

@@ -159,7 +159,7 @@ def _formals_for_watch():
     yield '-p', '--port=PORT', 'how to reach the message broker (has default)'
     yield '-v', '--verbose', 'turn on verbose output (probably to vendor)'
     yield '-h', '--help', 'this screen'
-    yield '<dir>', 'zib zib zub zub'
+    yield '<dir>', 'the directory to watch'
 
 
 def _watch_command(sin, sout, serr, argv, efx):

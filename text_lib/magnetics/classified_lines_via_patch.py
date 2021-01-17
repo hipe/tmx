@@ -62,34 +62,56 @@ class _Expanded:
         self._runs = runs
 
     def to_applied_lines(self):
-        assert_offset = 0
-        for start, stop, exi, repl in self._runs:
-            assert assert_offset == start
-            assert start <= stop
-            assert_offset = stop
-            num = stop - start
-            if exi is None:
-                assert 0 == num
-                use = repl
+        for typ, run in self.to_classified_runs():
+            if 'no_change' == typ:
+                use = run[2]  # #here1
+            elif 'remove_lines' == typ:
+                continue
             else:
-                assert num == len(exi)
-                use = exi if repl is None else repl
+                assert 'insert_lines' == typ
+                use = run[3]  # #here1
             for line in use:
                 yield line
 
     def to_reference_lines(self):
-        assert_offset = 0
-        for start, stop, exi, repl in self._runs:
-            assert assert_offset == start
-            assert start <= stop
-            assert_offset = stop
-            num = stop - start
-            if exi is None:
-                assert 0 == num
+        for typ, run in self.to_classified_runs():
+            if 'no_change' == typ:
+                use = run[2]  # #here1
+            elif 'remove_lines' == typ:
+                use = run[2]  # #here1
+            else:
+                assert 'insert_lines' == typ
                 continue
-            assert num == len(exi)
-            for line in exi:
+            for line in use:  # #here1
                 yield line
+
+    def to_classified_runs(self):
+        assert_offset = 0
+        for run in self._runs:
+            start, stop, exi, repl = run
+
+            # Make sure each next start is at the last stop
+            assert assert_offset == start
+
+            # Make sure each start is before or at each stop
+            assert start <= stop
+
+            assert_offset = stop
+
+            num = stop - start
+
+            if exi is None:
+                assert 0 == num  # there is no 'replace_lines'
+                assert len(repl)
+                yield 'insert_lines', run
+            else:
+                assert num
+                assert num == len(exi)
+                if repl is None:
+                    yield 'no_change', run
+                else:
+                    assert 0 == len(repl)
+                    yield 'remove_lines', run
 
 
 def _work(diff_lines, after_lines):

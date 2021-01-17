@@ -148,18 +148,18 @@ In detail:
 import re as _re
 
 
-def _document_sections_in_order_via_any_arbitrary_start_node(  # #testpoint
+def document_notecards_in_order_via_any_arbitrary_start_node_(  # #testpoint
         start_notecard_EID, notecards, listener=None):
 
     doc_root_node = _find_document_root_node(
             start_notecard_EID, notecards, listener)
     if doc_root_node is None:
         return
-    return _produce_all_document_sections_depth_first_recursive(
+    return _produce_all_document_notecards_depth_first_recursive(
         doc_root_node, notecards, listener)
 
 
-def _produce_all_document_sections_depth_first_recursive(
+def _produce_all_document_notecards_depth_first_recursive(
         doc_root_node, notecards, listener=None):
 
     def recurse(node, current_depth, do_horizontal=True):
@@ -258,13 +258,27 @@ def _find_document_root_node(eid, notecards, listener=None):
 
 # ==
 
-def abstract_document_via_notecards_(notecards, ncid=None, datetime=None):
+def abstract_document_via_notecards_iterator_(itr):
+    first_notecard = next(itr)
+
+    def these():
+        yield first_notecard.heading, first_notecard.body
+        for nc in itr:
+            yield nc.heading, nc.body
+
+    kw = {'ncid': first_notecard.identifier_string}
+    kw['datetime'] = first_notecard.document_datetime
+    return _do_abstract_document_via_notecards(these(), **kw)
+
+
+def _do_abstract_document_via_notecards(notecards, ncid=None, datetime=None):
     # Flat map each notecard body into its N sections while:
     # - emitting a special s-expression just for the heading-derived title
     # - re-provisioning RSL names to be correct in the scope of the document
     # - gathering RSL definitions for output in a final section at doc end
     # - reconciling heading-as-header with existing body headers
     # - normalizing header depth based on the above
+    # #testpoint
 
     itr = _final_sexps(notecards)
     typ, title = next(itr)
@@ -322,6 +336,15 @@ def _lines_via_content_runs(crs):
     for sx in crs:
         typ, val = sx
         if typ in ('content_run', 'code_fence_run'):
+
+            # == hotfix, for now, "fix" these bodies
+            leng = len(val)
+            assert leng
+            if '\n' != val[-1][-1]:  # ..
+                val = list(val)
+                val[-1] = ''.join((val[-1], '\n'))
+            # ==
+
             for line in val:
                 yield line
             continue
@@ -717,6 +740,7 @@ _code_fence_rx = _re.compile(r'```(?:[a-z\(]|$)')  # ick/meh
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #pending-rename: maybe to "abstract document"
 # #history-B.5: blind rewrite of 17 months older code
 # #history-B.4
 # #history-A.3: refactored from S-expressions's to AST's

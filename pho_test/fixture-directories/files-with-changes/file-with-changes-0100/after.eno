@@ -1,0 +1,34 @@
+# entity: PBC: attributes
+heading: Comparison of GUI toolkits
+-- body
+# The very high-level summary:
+- wxWidgets: sounded cool when we heard about it in the Dolpin emulator
+- swift we abandoned for electron (just after #birth) because python-shell works
+Here's some new stuff
+-- body
+children:
+- 38U
+- 48R
+- ELE
+annotated_entity_revisions:
+- #birth
+# entity: PBR: attributes
+previous: 8W2
+heading: gcc and linking: gotta learn this first
+-- body
+gotta learn [gcc][1] first.
+
+we had to learn you link C code (with `gcc`):
+
+```(bash)
+gcc -o pho/pho-bridge.o -Ipho -c pho/pho-bridge.c
+gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
+```
+
+[1]: https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
+-- body
+next: AZC
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

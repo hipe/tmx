@@ -10,5 +10,8 @@ learn enough SDK to make WASD
 have full on eno
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
-revisit tmx notecards and consider architecture for editing
 get those placeholder values out of there with default AUTHOR and TIMEZONE
+for each production "notecards" directory (there's 2), modernize to new way
+  (exit criteria for above: whole site for collection looks good)
+how pelican does "pages" order is gonna need some love
+a "build all" type command that builds every document in a [collection?] the new way

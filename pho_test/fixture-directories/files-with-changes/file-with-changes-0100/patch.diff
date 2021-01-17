@@ -1,0 +1,16 @@
+diff --git a/pho-doc/notecards/entities/P/B.eno b/pho-doc/notecards/entities/P/B.eno
+index 9b6b47da..171f568b 100644
+--- a/pho-doc/notecards/entities/P/B.eno
++++ b/pho-doc/notecards/entities/P/B.eno
+@@ -2,10 +2,9 @@
+ heading: Comparison of GUI toolkits
+ -- body
+ # The very high-level summary:
+-- flutter: we are looking forward to maybe trying it one day
+-- electron: it's working for us for now
+ - wxWidgets: sounded cool when we heard about it in the Dolpin emulator
+ - swift we abandoned for electron (just after #birth) because python-shell works
++Here's some new stuff
+ -- body
+ children:
+ - 38U

@@ -94,7 +94,7 @@ class Case0993_when_yes_document(CommonCase):
 
 def nodes_in_order_via(start_eid, coll, listener):
     from pho.notecards_.document_via_notecards import \
-            _document_sections_in_order_via_any_arbitrary_start_node as func
+            document_notecards_in_order_via_any_arbitrary_start_node_ as func
     return func(start_eid, coll, listener)
 
 
@@ -107,4 +107,5 @@ def notecards_two():
 if __name__ == '__main__':
     unittest.main()
 
+# #pending-rename: this & many others: consider following asset file structure
 # #born

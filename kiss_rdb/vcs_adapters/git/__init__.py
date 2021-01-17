@@ -1,3 +1,27 @@
+def git_diff(path, listener, opn=None):
+    # NOTE: the only way we've gotten this to express its error case below
+    # is when the path doesn't resolve as being under a git repo.
+    # Whether the path is noent or not result is the same (in both cases),
+    # the same as if it's versioned but no case, success w/ zero output lines.
+
+    sout_lines, serr_lines = [], []
+    for typ, val in _tagged_response_parts_for_diff(path, listener, opn=opn):
+        if 'sout' == typ:
+            sout_lines.append(val)
+            continue
+        if 'serr' == typ:
+            serr_lines.append(val)
+            continue
+        assert 'returncode' == typ
+        returncode = val
+    if 0 == returncode:
+        assert not serr_lines
+        return 0, sout_lines
+    assert serr_lines
+    listener('error', 'expression', 'cannot_diff_with_git', lambda: serr_lines)
+    return returncode, None
+
+
 def blame_index_via_path(path, listener=None, opn=None):
     # Read all lines of a `git blame` in to memory. Lazily, on-demand,
     # give random-access to the commit metadata of any line in the file
@@ -109,21 +133,15 @@ def _metrics_and_line_cache(path, opn):
         assert 'returncode' == typ
         raise _Stop('issue_from_subprocess', data, returncode)
 
-    itr = (opn or _tagged_items)(path)
+    itr = (opn or _tagged_response_parts_for_blame)(path)
     return main()
 
 
-def _tagged_items(path):
+def _tagged_response_parts_for_blame(path):
     cwd, entry = _split_path(path)
     args = _GIT_EXE, 'blame', entry
 
-    import subprocess as sp
-    opened = sp.Popen(
-        args=args, stdin=sp.DEVNULL, stdout=sp.PIPE, stderr=sp.PIPE,
-        text=True,  # don't give me binary, give me utf-8 strings
-        cwd=cwd)  # None means pwd
-
-    with opened as proc:
+    with _open_subprocess(args, cwd=cwd) as proc:
 
         for line in proc.stdout:
             yield 'sout', line
@@ -133,6 +151,31 @@ def _tagged_items(path):
 
         proc.wait()  # not terminate. timeout maybe one day
         yield 'returncode', proc.returncode
+
+
+def _tagged_response_parts_for_diff(path, listener, opn=None):
+    cmd = _GIT_EXE, 'diff', '--', path
+    if opn:
+        for k, v in opn(cmd):
+            yield k, v
+        return
+    with _open_subprocess(cmd) as proc:
+        for line in proc.stdout:
+            yield 'sout', line
+
+        for line in proc.stderr:
+            yield 'serr', line
+
+        proc.wait()  # not terminate. timeout maybe one day
+        yield 'returncode', proc.returncode
+
+
+def _open_subprocess(cmd, cwd=None):
+    import subprocess as sp
+    return sp.Popen(
+        args=cmd, stdin=sp.DEVNULL, stdout=sp.PIPE, stderr=sp.PIPE,
+        text=True,  # don't give me binary, give me utf-8 strings
+        cwd=cwd)  # None means pwd
 
 
 def _metrics_via_first_line(line):
@@ -183,4 +226,5 @@ def xx(msg=None):
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'  # pho
 _GIT_EXE = 'git'
 
+# #history-B.4: add a whole new function not covered
 # #born

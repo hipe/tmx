@@ -4,13 +4,43 @@ def cli_for_production():
 
 
 def _CLI(sin, sout, serr, argv):
-    from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch as br
+    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as br
     return br(sin, sout, serr, argv, _children())
 
 
 def _children():
+    yield 'git-diff', lambda: _CLI_for_git_diff
     yield 'build-versioned-file-one', lambda: _CLI_for_child_1
     yield 'build-when-not-versioned', lambda: _CLI_for_child_2
+
+
+def _CLI_for_git_diff(sin, sout, serr, argv, fx):
+    """experiment with our thing"""
+
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    from script_lib.cheap_arg_parse import formals_via_definitions as func
+    foz = func((
+            ('-h', '--help', 'this screen'),
+            ('path', 'some path'),
+        ), lambda: prog_name)
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+    if vals.get('help'):
+        _ = _CLI_for_git_diff.__doc__
+        return foz.write_help_into(sout, _)
+    path = vals.pop('path')
+    from script_lib.magnetics.error_monitor_via_stderr import func
+    mon = func(serr)
+    from kiss_rdb.vcs_adapters.git import git_diff as func
+    rc, patch_lines = func(path, mon.listener)
+    if rc:
+        return rc
+    for line in patch_lines:
+        sout.write(line)
+    if not patch_lines:
+        serr.write("(no diff lines)\n")
+    return mon.returncode
 
 
 def _CLI_for_child_2(sin, sout, serr, argv, en=None):

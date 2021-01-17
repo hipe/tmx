@@ -4,7 +4,7 @@ from unittest import TestCase
 # == Case Parent Classes
 
 
-class CaseMetaClass(type):
+class CaseMetaClass(type):  # [#882.C] meta class
     # Make it so when the below parent class is subclassed, the subclasses
     # get a "test" method, but the parent itself doesn't have a "test" method
     # because if it had one and you import it into your module, it auto runs
@@ -54,7 +54,7 @@ def the_method_called_test_for_the_sexp_case(self):
 
 def document_state_via_notecards(frag_itr):
     use_itr = ((h, _body_via_lines(lines)) for h, lines in frag_itr)
-    ad = subject_module().abstract_document_via_notecards_(use_itr)
+    ad = subject_module()._do_abstract_document_via_notecards(use_itr)
 
     # NOTE for now we're just trying to bridge back to 17 month old code
     # to get old tests to pass (asserting still current specs). But when

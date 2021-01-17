@@ -598,18 +598,10 @@ class _BigIndex:
 
         notecard_of = self.notecard_of
         notecards = (notecard_of[eid] for eid in a)
-        first_notecard = next(notecards)
 
-        def these():
-            yield first_notecard.heading, first_notecard.body
-            for nc in notecards:
-                yield nc.heading, nc.body
-
-        kw = {'ncid': first_notecard.identifier_string}
-        kw['datetime'] = first_notecard.document_datetime
         from .document_via_notecards import \
-            abstract_document_via_notecards_ as func
-        return func(these(), **kw)
+                abstract_document_via_notecards_iterator_ as func
+        return func(notecards)
 
 
 def _touch_list(dct, key):  # there's got to be a better idiom

@@ -78,6 +78,10 @@ class StringScanner:  # see also [#611] the scanner library
         return self._line[self._position:]
 
     @property
+    def more(self):
+        return not self.empty
+
+    @property
     def empty(self):
         return self._length == self._position
 

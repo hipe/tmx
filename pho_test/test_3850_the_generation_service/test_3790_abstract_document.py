@@ -1,22 +1,56 @@
 from modality_agnostic.test_support.common import lazy
-#        dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
 
-class CommonCase(unittest.TestCase):
+class ThisOneMetaclass(type):  # [#882.C] meta class
 
-    # == BEGIN BREAK THIS UP
+    def __new__(cls, class_name, bases=None, dct=None):
+        res = type.__new__(cls, class_name, bases, dct)
+        # If the parent class of this class just subclassed is the vendor
+        # unittest base class, don't do this hack (because it's support class)
+        if unittest.TestCase != bases[-1]:
+            setattr(res, 'test', res.do_test)
+        return res
+
+
+class CommonCase(unittest.TestCase):
 
     @property
     def derived_title(self):
         lines = self.given_native_lines()
         path = self.given_path()
         ad = abstract_document_via(lines, path)
-        title, _ = title_and_lines_via(ad)
-        return title
+        o = ADAPTER_module().func(ad, listener=None)
+        return o.title
 
 
-class Case37XX1_empty_native_document(CommonCase):
+class NormTitleCase(unittest.TestCase, metaclass=ThisOneMetaclass):
+
+    def do_test(self):
+        def listener(*wow):
+            print(f"wow: {wow!r}")
+            raise RuntimeError()
+
+        given_title = self.given_abstract_frontmatter_title()
+        func = ADAPTER_module()._normalize_title
+        two = func(given_title, listener)
+        act_entry, act_title = two
+
+        exp_entry = self.expected_entry()
+        self.assertEqual(act_entry, exp_entry)
+        assert given_title == act_title
+
+
+class Case3782_ting1(NormTitleCase):
+
+    def expected_entry(self):
+        return 'swing-ting-2020-rundown-w-joey-b-samrai-r.md'
+
+    def given_abstract_frontmatter_title(self):
+        return "Swing Ting 2020 Rundown (w/ Joey B & Samrai) (R)"
+
+
+class Case3786_empty_native_document(CommonCase):
 
     def test_xx01_parses_as_abstract_document(self):
         ad = self.abstract_document
@@ -27,7 +61,7 @@ class Case37XX1_empty_native_document(CommonCase):
         return this_empty_abstract_document()
 
 
-class Case37XX2_look_at_this_document(CommonCase):
+class Case3790_look_at_this_document(CommonCase):
 
     def test_xx02_has_frontmatter(self):
         fm = self.abstract_document.frontmatter
@@ -63,7 +97,7 @@ class Case37XX2_look_at_this_document(CommonCase):
         return this_one_abstract_document()
 
 
-class Case37XX3_when_frontmatter_has_title_use_that(CommonCase):
+class Case3794_when_frontmatter_has_title_use_that(CommonCase):
 
     def test_010_go(self):
         act = self.derived_title
@@ -86,7 +120,7 @@ class Case37XX3_when_frontmatter_has_title_use_that(CommonCase):
         return '/fake-fs/no-see'
 
 
-class Case37XX4_when_this_crazy_depth_scenario_use_that(CommonCase):
+class Case3798_when_this_crazy_depth_scenario_use_that(CommonCase):
 
     def test_010_go(self):
         act = self.derived_title
@@ -102,7 +136,7 @@ class Case37XX4_when_this_crazy_depth_scenario_use_that(CommonCase):
         return '/fake-fs/no-see'
 
 
-class Case37XX5_otherwise_use_path(CommonCase):
+class Case3802_otherwise_use_path(CommonCase):
 
     def test_010_go(self):
         act = self.derived_title
@@ -192,14 +226,12 @@ def the_pho_doc_documents_path():
 
 # == END
 
-def title_and_lines_via(ad):
-    return subject_adapter_function()(ad)
 
 
-def subject_adapter_function():
-    from pho.SSG_adapters_.pelican.native_lines_via_abstract_document \
-        import func
-    return func
+def ADAPTER_module():  # tests that cover adapters should be in their own files
+    from pho.SSG_adapters_.pelican import \
+        native_lines_via_abstract_document as module
+    return module
 
 
 def abstract_document_via(lines, path=None):

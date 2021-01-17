@@ -76,6 +76,8 @@ class func:  # error_monitor_via_stderr
             ok = False
         elif 'verbose' == sev:
             ok = True
+        elif 'notice' == sev:
+            ok = True
         else:
             # #[#508.4]: unified semantics would be nice here:
             raise RuntimeError(f"no probalo: '{sev}'")  # xx

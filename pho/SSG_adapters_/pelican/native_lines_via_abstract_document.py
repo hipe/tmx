@@ -5,7 +5,7 @@ concept, to fill in this essential hole in the build pipeline, and to get
 us writing and using the system.
 
 We find it HIGHLY LIKELY that we will want to attempt at least most of
-these refactorings down the road, but we didn't want to early abtrac them:
+these refactorings down the road, but we didn't want to early abtract them:
 
 - One day if there's ever another SSG adapter, abstract out parts of this.
   This is sort of a proving ground for finding out what kind of facilities
@@ -17,7 +17,10 @@ these refactorings down the road, but we didn't want to early abtrac them:
 """
 
 
-def native_lines_via_abstract_document(ad):
+from collections import namedtuple as _nt
+
+
+def native_lines_via_abstract_document(ad, listener):
 
     # If the last section is this one thing, take it off
     doc_meta_section = None
@@ -29,10 +32,11 @@ def native_lines_via_abstract_document(ad):
     # Normalize the depth of the section headers to make room for title (H1)
     orig_depths, sections = _normalize_header_depth(sections, 2)
 
-    # Derive title
+    # Derive abstract title
     def cpather():
         return ad.classified_path
-    yn, title = _derive_title(ad.frontmatter, orig_depths, sections, cpather)
+    yn, title = _derive_abstract_title(
+            ad.frontmatter, orig_depths, sections, cpather)
     if yn:
         # the SSG's template (the ones we've seen) produce an H1 for the title,
         # so if you derived the title from the first section header, you don't
@@ -40,6 +44,12 @@ def native_lines_via_abstract_document(ad):
         sections[0] = sections[0].replace_header(None)
 
     assert '"' not in title
+
+    # Normalize the derived title
+    two = _normalize_title(title, listener)
+    if two is None:
+        return
+    entry, title = two
 
     def to_normalized_lines():
         yield f"title: {title}\n"  # NO QUOTES! quotes will end up in final tit
@@ -49,16 +59,128 @@ def native_lines_via_abstract_document(ad):
             for line in section.to_normalized_lines():
                 yield line
 
-    return title, to_normalized_lines()
+    wlines = to_normalized_lines()
+    return _these(entry=entry, title=title, write_lines=wlines)
 
 
 func = native_lines_via_abstract_document
 
 
+_these = _nt('these', ('entry', 'title', 'write_lines'))
+
+
 # == ..
 
+def _normalize_title(title, listener):  # #testpoint
+    """
+    A head notecard's heading is ANY non-empty string (assume). From the
+    heading we get (directly??) the title as it appears in the *abstract*
+    frontmatter. Now, *somehow* we get from the abstract frontmatter title to
+    the actual frontmatter title in the outputted vendor markdown document.
 
-def _derive_title(frontmatter, orig_depths, sections, cpather):
+    A basic fact of life for SSGs (and web in general) is that there are
+    characters you might want in an on-screen title that you won't want in
+    filesystem paths (and relatedly, url paths). The latter are composed of
+    components called "slugs".
+
+    Presumably every SSG has some function (exposed or emergent) that gets you
+    from frontmatter title to filesystem entry (filename (just basename)).
+    (In peloogan it's `util.slugify` plus settings.)
+
+    The thing is, we need to be sure we know what filesystem entry (slug plus)
+    extension) the SSG will derive from its frontmatter, because we use
+    filesystem paths (not frontmatter titles) to specify which outputted html
+    document we want to reload on. If the strings don't line up, we will
+    silently fail to generate the final document.
+
+    At first we prototyped a lengthy but robust "slugify" of our own, and then
+    after the fact we pried into vendor internals to see how they did it.
+
+    At writing, not sure what the end pipeline will be with respect to our own
+    code vs theirs, but the point is we have to be able to know (beforehand)
+    what slug the vendor will derive from our title, so we can request to
+    output the correct document. See (Case3782) and maybe others nearby.
+    """
+
+    entry = _entry_via_title(title, listener)
+    if False:  # tests run faster without this (~1000ms), vendor is bloated
+        vendor_entry = _vendor_entry_via_title(title)
+        if entry != vendor_entry:
+            xx(f"Interesting: {entry!r} vs {vendor_entry!r}")
+    return entry, title
+
+
+def _vendor_entry_via_title(title):
+    from pelican.settings import DEFAULT_CONFIG as conf
+    from pelican.utils import slugify
+    slug = slugify(title, regex_subs=conf['SLUG_REGEX_SUBSTITUTIONS'])
+    return f"{slug}.md"
+
+
+def _entry_via_title(title, listener):
+    o = _entry_via_title
+    if o.x is None:
+        o.x = _build_this_function()
+    return o.x(title, listener)
+
+
+_entry_via_title.x = None
+
+
+def _build_this_function():
+
+    def work(title, listener):
+
+        def main():
+            words = words_via_title(title, listener)
+            pcs = (pc for pc in (piece_via_word(w) for w in words) if len(pc))
+            return ''.join(('-'.join(pcs), '.md'))
+
+        listener = throwing_listener_via(listener)
+        try:
+            return main()
+        except stop:
+            pass
+
+    def piece_via_word(w):
+        return replace_these_rx.sub('', w).lower()
+
+    def words_via_title(title, listener):
+
+        # Require at least one word
+        scn = StringScanner(title, listener)
+        yield scn.scan_required(word)
+        while scn.more:
+
+            # If there's something after one word, it has to be space
+            scn.skip_required(space)
+
+            # Assert another word
+            yield scn.scan_required(word)
+
+    from text_lib.magnetics.string_scanner_via_string import \
+        StringScanner, pattern_via_description_and_regex_string as o
+    import re as _re
+
+    word = o('word', r'\S+')
+    space = o('space', r'\s+')
+
+    replace_these_rx = _re.compile(r'[^\w-]+')  # adapted from vendor & django
+
+    def throwing_listener_via(listener):
+        def use_listener(sev, *rest):
+            listener(sev, *rest)
+            if 'error' == sev:
+                raise stop()
+        return use_listener
+
+    class stop(RuntimeError):
+        pass
+
+    return work
+
+
+def _derive_abstract_title(frontmatter, orig_depths, sections, cpather):
 
     # One thing we didn't love about hugo that we similarly don't love
     # about peloogan is the requirement that you specify a title in the

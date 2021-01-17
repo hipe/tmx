@@ -169,7 +169,6 @@ class _NotecardCreatedOrSaved:
         self.path = path
 
     def TO_ABSTRACT_DOCUMENT(self, listener):
-        xx("rough sketch. never been run")  # #todo
         from pho.notecards_.abstract_document_via_file_with_changes \
             import func
         return func(self.path, listener)
