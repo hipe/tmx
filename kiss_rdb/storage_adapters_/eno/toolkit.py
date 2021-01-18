@@ -57,8 +57,8 @@ def _do_crazy_CLI(sout, serr, argv):
     tests = {}
 
     @command
-    def BIG_THING():
-        return _the_main_experiment(sout, serr, coll)
+    def TRAVERSE_AND_EXPLAIN():
+        return _traverse_and_explain_whole_collection(sout, serr, coll)
 
     @command
     def RETRIEVE_ENTITY():
@@ -94,9 +94,9 @@ def _do_crazy_CLI(sout, serr, argv):
     return tests[test_name]()
 
 
-def _the_main_experiment(sout, serr, coll):  # #testpoint
+def _traverse_and_explain_whole_collection(sout, serr, coll):  # #testpoint
     from kiss_rdb.storage_adapters_.eno._blocks_via_path import \
-        _document_sections_via_BoT as sects_via
+        document_sections_via_BoT_ as sects_via
 
     serr = sout  # (oops) Write to stdout not stderr (changed now)
     del sout
@@ -105,10 +105,12 @@ def _the_main_experiment(sout, serr, coll):  # #testpoint
 
     mon = cf.monitor_via_listener_(_listener_via_IO(serr))
 
+    from . import body_of_text_ as body_of_text_via
+
     for path in cf.to_file_paths_():
         serr.write(f'PATH: {path}\n')
 
-        body_of_text = cf.body_of_text_via_(path=path)
+        body_of_text = body_of_text_via(path=path)
 
         for entb in sects_via(body_of_text, cf, mon):
 

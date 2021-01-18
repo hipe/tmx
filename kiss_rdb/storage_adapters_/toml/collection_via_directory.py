@@ -256,11 +256,11 @@ class collection_implementation_via_directory_and_schema:
         from . import business_schema_via_definition as lib
         return lib.DEFAULT_BUSINESS_SCHEMA
 
-    def PRODUCE_IDENTIFIER_FUNCTIONER_(_):
-        return _produce_identifier_function
+    def build_identifier_function_(self, listener):
+        return _produce_identifier_function(listener)
 
 
-def _produce_identifier_function(listener, cstacker=None):
+def _produce_identifier_function(listener):
     def my_iden_via_s(s):
         iden = iden_via_s(s, listener)
         if iden is None:

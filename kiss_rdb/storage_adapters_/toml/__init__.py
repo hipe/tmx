@@ -34,7 +34,7 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
             return ci
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
-            return ci.PRODUCE_IDENTIFIER_FUNCTIONER_()
+            return ci.build_identifier_function_
 
         CUSTOM_FUNCTIONS_OLD_WAY = ci  # #open [#877.B] (Case4322)
     return fxr

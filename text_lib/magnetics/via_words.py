@@ -710,7 +710,7 @@ class _WAS_EMPTY:
 
 # == Rotating Buffer
 
-def rotating_bufferer(*funcs):
+def rotating_bufferer(*funcs):  # #[#510.15] one of several rotating buffers
     """
     We produce a flat-map that classifies each item of the argument stream
     based on how far it is from the end of the stream by some fixed N amount,

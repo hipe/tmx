@@ -41,14 +41,23 @@ def multiline_field_lines(var_name, lines, yes_trailing_newline=True):
 def field_line(var_name, string_value):
     return f'{var_name}: {string_value}\n'
 
+
 # == END
 
+def EXPERIMENTAL_caching_collection(directory, max_num_lines_to_cache=None):
+    def fsr(ci):
+        return FS_reader_class(ci, max_num_lines_to_cache)
+    from ._caching_layer import Caching_FS_Reader_ as FS_reader_class, \
+        ReadOnlyCollectionLayer_ as collection_class
+    real_coll = eno_collection_via_(directory, fsr=fsr)
+    return collection_class(real_coll)
 
-def eno_collection_via_(directory, rng=None):  # #testpoint
+
+def eno_collection_via_(directory, rng=None, fsr=None):  # #testpoint
     import sys
     sa_mod = sys.modules[__name__]
     from kiss_rdb import collection_via_storage_adapter_and_path as func
-    return func(sa_mod, directory, None, rng=rng)
+    return func(sa_mod, directory, None, rng=rng, fsr=fsr)
 
 
 def CREATE_COLLECTION(collection_path, listener, is_dry):
@@ -71,10 +80,10 @@ def ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
 
 
 def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
-        directory, listener, storage_schema=None, rng=None):
+        directory, listener, storage_schema=None, rng=None, fsr=None):
 
     del storage_schema
-    ci = _collection_implementation(directory, rng)
+    ci = _collection_implementation(directory, rng=rng, fsr=fsr)
 
     class fxr:  # #class-as-namespace
         def PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY():
@@ -84,13 +93,14 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
             return ci
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
-            return ci.PRODUCE_IDENTIFIER_FUNCTIONER_()
+            return ci.build_identifier_function_
 
         CUSTOM_FUNCTIONS_OLD_WAY = ci  # #open [#877.B] (Case1476)
     return fxr
 
 
-def _collection_implementation(directory, rng=None, opn=None):
+def _collection_implementation(directory, fsr=None, rng=None, opn=None):
+
     class collection_implementation:  # #class-as-namespace
 
         # -- the big collection API operations (or experimental similar)
@@ -169,14 +179,7 @@ def _collection_implementation(directory, rng=None, opn=None):
 
         def retrieve_entity_via_identifier(iden, listener):
             mon = _monitor_via_listener(listener)
-            path = self.path_via_identifier_(iden, listener)
-            if path is None:
-                return
-            sect_el = _retrieve_entity_section_element(
-                    iden, path, injection, self, mon)
-            if sect_el is None:
-                return
-            return self.read_only_entity_via_section_(sect_el, iden, mon)
+            return fs_reader().entity(iden, mon)
 
         def open_identifier_traversal(listener):
             from contextlib import nullcontext
@@ -192,79 +195,25 @@ def _collection_implementation(directory, rng=None, opn=None):
                 yield None, each_entity()  # ..
 
             def each_entity():
-                for (eid, sect) in self._items_ish(mon):
-                    iden = iden_via(eid, listener)  # #here4
-                    if iden is None:
-                        return
-                    ent = ent_via(sect, iden, mon)
-                    if ent is None:
-                        return
-                    yield ent
-
-            ent_via = self.read_only_entity_via_section_
-            iden_via = self.identifier_via_string_
-            mon = self.monitor_via_listener_(listener)
-            listener = mon.listener  # #overwrite
+                return (ent for fr in to_FRs(listener)
+                        for ent in fr.to_entities())
             return cm()
 
         def to_idens(listener):
-            iden_via = self.identifier_via_string_
-            mon = self.monitor_via_listener_(listener)
-            for (eid, sect) in self._items_ish(mon):
-                iden = iden_via(eid, listener)  # #here4
-                if iden is None:
-                    return
-                yield iden
-
-        def _items_ish(mon):
-            listener = mon.listener
-            for path in self.to_file_paths_():
-                docu = self.eno_document_via_(path=path, listener=listener)
-                if docu is None:
-                    return
-                k_scts = self._entity_section_els_via_document(docu, path, mon)
-                for eid, sect in k_scts:
-                    yield eid, sect
-
-        def PRODUCE_IDENTIFIER_FUNCTIONER_():
-            def iden_er_er(listener, cstacker=None):
-                def iden_er(eid):
-                    return func(eid, listener)
-                from kiss_rdb.magnetics_.identifier_via_string import \
-                    identifier_via_string_ as func
-                return iden_er
-            return iden_er_er
-
-        # -- protected magnetics
-
-        read_only_entity_via_section_ = _read_only_entity
-
-        def _entity_section_els_via_document(document, path, mon):
-            itr = self.document_sections_(document, path, mon)
-            for typ, eid, sect_el in itr:
-                if 'entity_section' == typ:
-                    yield eid, sect_el
-                    continue
-                break
-            assert('document_meta' == typ)
-            for _ in itr:
-                assert()
-
-        document_sections_ = _document_sections
-
-        def eno_document_via_(listener=None, **body_of_text):
-            body_of_text = _body_of_text(**body_of_text)
-            return injection.eno_document_via_(
-                    listener=listener, body_of_text=body_of_text)
+            return (iden for fr in to_FRs(listener)
+                    for iden in fr.to_identifiers())
 
         def path_via_identifier_(iden, listener):
             return _path_via_identifier(iden, directory, listener)
 
-        identifier_via_string_ = _identifier_via_string
+        def build_identifier_function_(listener):
+            def iden_via(eid):
+                return use(eid, listener)
+            from kiss_rdb.magnetics_.identifier_via_string import \
+                identifier_via_string_ as use
+            return iden_via
 
-        body_of_text_via_ = _body_of_text
-
-        monitor_via_listener_ = _monitor_via_listener
+        monitor_via_listener_ = _monitor_via_listener  # the ONLY conv. func
 
         # -- protected properties & similar
 
@@ -272,21 +221,161 @@ def _collection_implementation(directory, rng=None, opn=None):
             _ = _file_posix_paths_in_collection_directory(directory, _THREE)
             return (str(pp) for pp in _)
 
-        number_of_digits_ = 3  # _THREE
+        number_of_digits_ = _THREE
 
-    class injection:
-        def eno_document_via_(_, listener=None, **body_of_text):
-            return eno_document_via_(listener=listener, **body_of_text)
+    def to_FRs(listener):
+        mon = _monitor_via_listener(listener)
+        return fs_reader().file_readers_via_monitor(mon)
+
+    if fsr:
+        def fs_reader():
+            o = fs_reader
+            if o.x is None:
+                o.x = fsr(self)  # stateful (long-running) but hidden for now
+            return o.x
+
+        fs_reader.x = None  # [#510.4]
+    else:
+        def fs_reader():
+            return _FS_Reader(self)
+
+    self = collection_implementation
+    self.eno_document_via_ = eno_document_via_
+    return self
+
+
+class _FS_Reader:
+
+    def __init__(self, ci):
+        self._back = ci
+
+    def entity(self, iden, mon):
+        return RetrieveEntity_(iden, mon, self._back).execute()
+
+    def file_readers_via_monitor(self, mon):
+        paths = self._back.to_file_paths_()
+        return file_readers_via_paths_(mon, paths, self._back)
+
+
+class RetrieveEntity_:
+
+    def __init__(self, iden, mon, ci):
+        self.identifier, self._monitor, self._back = iden, mon, ci
+
+    def execute(o):
+        def main():
+            o.resolve_path_given_identifier()
+            o.resolve_file_reader_given_path()
+            return o.procure_entity_given_file_reader()
+        return o.do(main)
+
+    def do(self, main):
+        try:
+            return main()
+        except _Stop:
+            pass
+
+    def procure_entity_given_file_reader(self):
+        # Maybe the file doesn't have the entity
+        target_eid = self.identifier.to_string()
+        count, found = 0, None
+        for (eid, sect) in self.file_reader.to_entity_sections():
+            if target_eid == eid:
+                found = sect
+                break
+            count += 1
+        if not self._monitor.OK:
+            raise _Stop()
+        if not found:
+            _when_section_not_found(
+                self._listener, count, target_eid, self.path)
+            raise _Stop()
+        return read_only_entity_via_section_(
+                found, self.identifier, self._monitor)
+
+    def resolve_file_reader_given_path(self):
+        # Maybe there is no such file
+        itr = file_readers_via_paths_(
+                self._monitor, (self.path,), self._back)
+        tup = None
+        try:
+            tup = tuple(itr)
+        except FileNotFoundError as e:
+            exc = e
+        if tup is None:
+            _when_entity_not_found_because_no_file(
+                self._listener, exc, exc.filename, self.identifier)
+            raise _Stop()
+        self.file_reader, = tup
+
+    def resolve_path_given_identifier(self):
+        # Maybe the identifier is too shallow/deep
+        path = self._back.path_via_identifier_(
+                self.identifier, self._listener)
+        if path is None:
+            raise _Stop()
+        self.path = path
+
+    @property
+    def _listener(self):
+        return self._monitor.listener
+
+
+def file_readers_via_paths_(mon, paths, back):
+
+    class file_reader:
+
+        def __init__(self, docu, path):
+            self._docu, self._path = docu, path
+            self._idener = None
+
+        def to_entities(self):
+            idener = self.identifier_builder_
+            for (eid, sect) in self.to_entity_sections():
+                iden = idener(eid)
+                if iden is None:
+                    return
+                ent = read_only_entity_via_section_(sect, iden, mon)
+                if ent is None:
+                    return
+                yield ent
+
+        def to_identifiers(self):
+            idener = self.identifier_builder_
+            for (eid, sect) in self.to_entity_sections():
+                iden = idener(eid)  # #here4
+                if iden is None:
+                    return
+                yield iden
+
+        def to_entity_sections(self):
+            itr = self.to_section_elements()
+            for typ, eid, sect_el in itr:
+                if 'entity_section' == typ:
+                    yield eid, sect_el
+                    continue
+                break
+            assert 'document_meta' == typ
+            for _ in itr:
+                assert()
+
+        def to_section_elements(self):
+            return document_sections_of_(self._docu, self._path, mon)
 
         @property
-        def directory(_):
-            return directory
+        def identifier_builder_(self):
+            if self._idener is None:
+                self._idener = back.build_identifier_function_(listener)
+            return self._idener
 
-    injection = injection()
-    return (self := collection_implementation)
+    listener = mon.listener
+    docu_via = back.eno_document_via_
+    for path in paths:
+        docu = docu_via(path=path)  # throw for now, since #history-B.5
+        yield file_reader(docu, path)
 
 
-def _read_only_entity(sect_el, ID, mon):
+def read_only_entity_via_section_(sect_el, ID, mon):
     section = sect_el.to_section()  # #here3
     dct = {k: v for k, v in _attribute_keys_and_values(section, mon)}
     if not mon.OK:
@@ -365,28 +454,6 @@ def _path_via_identifier(iden, directory, listener):
     return path
 
 
-def _retrieve_entity_section_element(ID, path, injection, coll, mon):
-    try:
-        docu = injection.eno_document_via_(path=path)
-    except FileNotFoundError as e:
-        _when_entity_not_found_because_no_file(mon.listener, e, path, ID)
-        return
-
-    target_ID_s = ID.to_string()
-    count = 0
-
-    _ = coll._entity_section_els_via_document(docu, path, mon)
-    for eid, sect_el in _:
-        if target_ID_s == eid:
-            return sect_el
-        count += 1
-
-    if not mon.OK:
-        return
-
-    _when_section_not_found(mon.listener, count, target_ID_s, path)
-
-
 def _file_posix_paths_in_collection_directory(directory, depth):
 
     def sorted_entries_of(posix_path):  # #cp never rely on filesystem order
@@ -414,9 +481,9 @@ def _file_posix_paths_in_collection_directory(directory, depth):
             yield file_pp
 
 
-def _document_sections(document, path, mon):
+def document_sections_of_(document, path, mon):
 
-    state_machine = {
+    state_machine = {  # [#008.2] custom state machine
             'start': {
                 'entity_section': lambda: change_from_start_to_main(),
                 'document_meta': lambda: on_doc_meta(),
@@ -558,21 +625,15 @@ def _section_elements(document, path, listener):
         return
 
 
-def eno_document_via_(listener=None, **body_of_text):
-    body_of_text = _body_of_text(**body_of_text)
-    if listener:
-        try:
-            big_string = body_of_text.big_string
-        except FileNotFoundError as e:
-            xx(str(e))
-    else:
-        big_string = body_of_text.big_string
-
+def eno_document_via_(**body_of_text):
+    # (At #history-B.5 we took NOENT exception handling out)
+    body_of_text = body_of_text_(**body_of_text)
+    big_string = body_of_text.big_string  # throws e.g FileNotFoundError
     from enolib import parse as enolib_parse
     return enolib_parse(big_string)
 
 
-def _body_of_text(body_of_text=None, big_string=None, lines=None, path=None):
+def body_of_text_(body_of_text=None, big_string=None, lines=None, path=None):
     if body_of_text:
         return body_of_text
     return _BodyOfText(big_string, lines, path)
@@ -696,12 +757,6 @@ def _details(orig_function):
     return use_function
 
 
-def _identifier_via_string(s, listener):
-    from kiss_rdb.magnetics_.identifier_via_string\
-            import identifier_via_string_
-    return identifier_via_string_(s, listener)
-
-
 def _monitor_via_listener(listener):
     from modality_agnostic import ModalityAgnosticErrorMonitor
     return ModalityAgnosticErrorMonitor(listener)
@@ -730,6 +785,7 @@ each eno document into one big tree (memory-hog-not-streaming, DOM-like)
 we do when we stream over the lines of each file ourselves.
 """
 
+# #history-B.5
 # #history-B.4
 # #history-A.1 spike first sketch of read-only
 # #born as nonworking stub

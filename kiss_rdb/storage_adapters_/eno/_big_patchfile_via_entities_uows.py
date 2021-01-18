@@ -59,9 +59,9 @@ def _patch_file_for_index_file(
 
 def _make_patch(fuow, coll, order, emi, **bot):
     from ._blocks_via_path import new_file_lines__
+    from . import body_of_text_ as body_of_text_via
 
-    body_of_text_via_ = coll.body_of_text_via_
-    bot = body_of_text_via_(**bot)
+    bot = body_of_text_via(**bot)
     tail = bot.path or 'some-imaginary-file.dot'
 
     # somewhere (here?) ..
@@ -73,7 +73,7 @@ def _make_patch(fuow, coll, order, emi, **bot):
         fake_lines = (
             '# document-meta\n', '-- string_as_comment\n',
             '# #born\n', '-- string_as_comment\n')
-        bot = body_of_text_via_(lines=fake_lines, path=bot.path)
+        bot = body_of_text_via(lines=fake_lines, path=bot.path)
         before_lines = ()
     else:
         before_lines = bot.lines

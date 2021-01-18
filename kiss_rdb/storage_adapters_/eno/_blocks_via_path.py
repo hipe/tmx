@@ -70,11 +70,10 @@ def _new_file_blocks(edit_via_attr_via_eid, cf, order, emi, **body_of_text):  # 
     stop = emi.stop
     listener = emi.listener
 
-    body_of_text = cf.body_of_text_via_(**body_of_text)
+    from . import body_of_text_ as func
+    body_of_text = func(**body_of_text)
 
-    def p(eid):
-        return cf.identifier_via_string_(eid, listener)
-
+    p = cf.build_identifier_function_(listener)
     idens = tuple(p(eid) for eid in edit_via_attr_via_eid.keys())
     assert(emi.OK)
     stack = list(reversed(sorted(idens)))
@@ -89,7 +88,7 @@ def _new_file_blocks(edit_via_attr_via_eid, cf, order, emi, **body_of_text):  # 
 
     prev_doc_iden = None
 
-    itr = _document_sections_via_BoT(body_of_text, cf, emi.monitor)
+    itr = document_sections_via_BoT_(body_of_text, cf, emi.monitor)
     for entb in itr:
 
         if entb.is_pass_thru_block:
@@ -339,9 +338,11 @@ def file_units_of_work_via__(entities_units_of_work, cf, emi):
 
         return file_units_of_work[i][1].dictionary
 
+    iden_via = cf.build_identifier_function_(listener)
+
     for entity_cud_type, eid, *rest in entities_units_of_work:
 
-        _assert(iden := cf.identifier_via_string_(eid, listener))
+        _assert(iden := iden_via(eid))
         _assert(path := cf.path_via_identifier_(iden, listener))
         dct = dictionary_via_path()
         dct = dictionary_via_eid(dct)  # #here7
@@ -596,10 +597,11 @@ def _line_index_via_lines(line_cache):
 
 # == Read Existing Blocks
 
-def _document_sections_via_BoT(bot, cf, mon):
+def document_sections_via_BoT_(bot, cf, mon):
 
-    docu = cf.eno_document_via_(body_of_text=bot, listener=mon.listener)
-    itr = cf.document_sections_(docu, bot.path, mon)
+    docu = cf.eno_document_via_(body_of_text=bot)  # throw FileNotFound, others
+    from . import document_sections_of_ as func
+    itr = func(docu, bot.path, mon)
     itr = _add_line_starts(itr)
     line_index = _line_index_via_lines(bot.lines)
     itr = _add_line_ends(len(line_index.line_cache), itr)
@@ -607,11 +609,14 @@ def _document_sections_via_BoT(bot, cf, mon):
 
     lines_pointer = []
 
+    from . import read_only_entity_via_section_ as read_only_entity_via_section
+    iden_via = cf.build_identifier_function_(mon.listener)
+
     for typ, eid, vendor_sect, beg, end in itr:
         if 'entity_section' != typ:
             break
-        iden = cf.identifier_via_string_(eid, mon.listener)
-        ent = cf.read_only_entity_via_section_(vendor_sect, iden, mon)
+        iden = iden_via(eid)
+        ent = read_only_entity_via_section(vendor_sect, iden, mon)
         entb = _existing_entity_block(beg, end, ent, line_index)
 
         # if the previous entity had some slot B or slot C comments, take them

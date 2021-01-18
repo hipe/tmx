@@ -99,7 +99,7 @@ class Case4794_traverse_whole_document_tree_for_debugging(CommonCase):
     def end_state(self):
         sout, sout_lines = spy_on_write_and_lines_for(self, 'DBG SOUT: ')
         coll = stateless_collection()
-        func = self.subject_module._the_main_experiment
+        func = self.subject_module._traverse_and_explain_whole_collection
         rc = func(sout, None, coll)
         return rc, tuple(sout_lines)
 

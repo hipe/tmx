@@ -26,6 +26,7 @@ only in modeling interfaces for this purpose.
 |---------------------------|:-----:|-
 |[#511.4]                   |       | the previous but plus styler
 |[#511.3]                   |       | provision: expression with yield
+|[#510.15]                  | #trak | [rotating buffer]
 |[#510.14]                  |       | track context stack stuff
 |[#510.13]                  |       | track counters
 |[#510.12]                  | #trak | is this a misuse of context manager?

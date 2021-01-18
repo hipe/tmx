@@ -66,7 +66,9 @@ class emission_via_tuple:  # moved here at #history-B.4
         sct = self.payloader()
         if 'reason' in sct:
             return (sct['reason'],)
-        return (sct['message'],)
+        if 'message' in sct:
+            return (sct['message'],)
+        return (sct['reason_tail'],)
 
     def to_channel_tail(self):
         return self.channel[2:]

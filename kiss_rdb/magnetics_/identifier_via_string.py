@@ -214,6 +214,9 @@ def identifier_via_string_(id_s, listener):
     return Identifier_(tuple(digits))
 
 
+func = identifier_via_string_
+
+
 def identifier_via_integer__(i):  # arbitrary depth, on the fly
     assert(0 <= i)
     big_endian = []
@@ -239,6 +242,7 @@ class Identifier_:
 
     def __init__(self, native_digits):
         self.native_digits = native_digits  # assume tuple #wish #[#022]
+        self._as_EID = None  # EID = entity identifier (string)
 
     def __lt__(self, other):  # :#here5
         return self.native_digits < other.native_digits  # (Case4302) and ..
@@ -247,7 +251,9 @@ class Identifier_:
         return self.native_digits == other.native_digits  # (Case4294)
 
     def to_string(self):
-        return ''.join(nd.character for nd in self.native_digits)
+        if self._as_EID is None:
+            self._as_EID = ''.join(nd.character for nd in self.native_digits)
+        return self._as_EID
 
     to_primitive = to_string
 
