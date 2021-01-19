@@ -599,8 +599,8 @@ class _BigIndex:
         notecard_of = self.notecard_of
         notecards = (notecard_of[eid] for eid in a)
 
-        from .document_via_notecards import \
-                abstract_document_via_notecards_iterator_ as func
+        from .abstract_document_via_notecards import \
+            abstract_document_via_notecards_iterator_ as func
         return func(notecards)
 
 

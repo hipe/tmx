@@ -528,6 +528,5 @@ if '__main__' == __name__:
     cli_for_production()
 
 
-# #pending-rename: branch down, become etc
 # #history-B.2
 # #began-as-abstraction

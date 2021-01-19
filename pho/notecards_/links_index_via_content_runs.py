@@ -284,6 +284,5 @@ _RSL_def_rx_keys = tuple((  # #testpoint
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
-# #pending-rename: something with "RSL"
 # #history-B.4: blind rewrite
 # #abstracted.

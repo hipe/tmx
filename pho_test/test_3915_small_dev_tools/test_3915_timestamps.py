@@ -6,7 +6,7 @@ import unittest
 CommonCase = unittest.TestCase
 
 
-class Case250_parse_lines(CommonCase):
+class Case3914_parse_lines(CommonCase):
 
     def test_100_loads(self):
         self.assertIsNotNone(asset_lib())
@@ -46,7 +46,7 @@ class Case250_parse_lines(CommonCase):
         return raw_structs_one()
 
 
-class Case255_normal_structs(CommonCase):
+class Case3915_normal_structs(CommonCase):
 
     def test_100_parses(self):
         self.assertIsNotNone(self.normal_structs)
@@ -77,7 +77,7 @@ class Case255_normal_structs(CommonCase):
         return normal_structs_one()
 
 
-class Case260_normal_entities_for_sync(CommonCase):
+class Case3916_normal_entities_for_sync(CommonCase):
 
     def test_100_works(self):
         self.assertIsNotNone(self.result)

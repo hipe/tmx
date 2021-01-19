@@ -32,7 +32,9 @@ class ReferenceStyleLinkCase(unittest.TestCase, metaclass=CaseMetaClass):
         if md is None:
             raise RuntimeError(f"failed to match: {given_line!r}")
 
-        from pho.models_.footnote import _RSL_def_rx_keys as these_keys
+        from pho.notecards_.links_index_via_content_runs import \
+            _RSL_def_rx_keys as these_keys
+
         act = {k: md[k] for k in these_keys}
         for k, exp_s in self.expected_parts():
             act_s = act[k]

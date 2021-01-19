@@ -28,8 +28,8 @@ class Caching_FS_Reader_:  # #testpoint
 
         self._max_number_of_lines_to_cache = max_num_lines_to_cache
 
-        from kiss_rdb.magnetics_.doubly_linked_list_functions import \
-            build_new_doubly_linked_list as func
+        from modality_agnostic.magnetics.doubly_linked_list_via_nothing \
+            import func
         self._doubly_linked_list = func()  # #[#510.15] one of several rotbuff
 
     def entity(self, iden, mon):

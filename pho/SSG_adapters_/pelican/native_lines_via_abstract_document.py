@@ -213,7 +213,7 @@ def _derive_abstract_title(frontmatter, orig_depths, sections, cpather):
     return False, cpath.derived_title
 
 
-# == BEGIN probably move to place in models_
+# == BEGIN probably move to the module dedicated to this? #todo
 
 def _normalize_header_depth(sections, target_depth):
 

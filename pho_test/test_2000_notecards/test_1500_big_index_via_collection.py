@@ -102,7 +102,7 @@ class Case1580_generate_one_document(CommonCase):
         _big_index = _big_index_one()
 
         def run(listener):
-            from pho.notecards_.document_tree_via_notecard import func
+            from pho.SSG_adapters_.hugo import func
             return func(
                     out_tuple=('open_output_filehandle', spy),
                     notecard_IID_string='48R',

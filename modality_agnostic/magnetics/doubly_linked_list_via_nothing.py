@@ -1,4 +1,4 @@
-def build_new_doubly_linked_list():
+def func():
     return _DoublyLinkedList()
 
 

@@ -100,7 +100,7 @@ def subject_function():
 
 
 def subject_module():
-    import text_lib.magnetics.classified_lines_via_patch as mod
+    import text_lib.diff_and_patch.classified_lines_via_patch as mod
     return mod
 
 

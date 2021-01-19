@@ -99,7 +99,7 @@ def abstract_document_via_file_with_changes(path, listener=None):
         from pho import notecards_via_path
         return notecards_via_path(coll_path, listener)
 
-    from .document_via_notecards import \
+    from .abstract_document_via_notecards import \
         abstract_document_via_notecards_iterator_ as AD_via_NCs, \
         document_notecards_in_order_via_any_arbitrary_start_node_ as do_NCs_via
 
@@ -182,7 +182,7 @@ def _EIDS_via_file_with_changes(path, listener, opn=None):  # #testpoint
             yield dtri[1][2]  # #here3 then #here2
 
     def resolve_extended_patches(patch_lines):
-        from text_lib.magnetics.classified_lines_via_patch import func
+        from text_lib.diff_and_patch.classified_lines_via_patch import func
         with open(path) as lines:
             fwd, rev = func(patch_lines, lines)
             return fwd, rev

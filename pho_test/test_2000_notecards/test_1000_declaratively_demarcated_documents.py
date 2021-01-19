@@ -93,7 +93,7 @@ class Case0993_when_yes_document(CommonCase):
 
 
 def nodes_in_order_via(start_eid, coll, listener):
-    from pho.notecards_.document_via_notecards import \
+    from pho.notecards_.abstract_document_via_notecards import \
             document_notecards_in_order_via_any_arbitrary_start_node_ as func
     return func(start_eid, coll, listener)
 

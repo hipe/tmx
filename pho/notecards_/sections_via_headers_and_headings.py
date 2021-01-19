@@ -1,4 +1,4 @@
-def TING_via_TING(section_scn, notecard_scn):
+def func(section_scn, notecard_scn):
     o = _header_functions()
     md_header_sexp_via_heading = o.md_header_sexp_via_heading
     demote_by_one = o.demote_by_one
@@ -86,6 +86,5 @@ def _build_header_functions():  # #here5
 def xx(msg=None):
     raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
-# #pending-rename
 # #history-B.4: blind rewrite
 # #abstracted

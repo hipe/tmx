@@ -30,9 +30,9 @@ class _MutableDocumentEntity:
         return self.__class__()._init_via(new_LL, new_TSLO, new_dict)
 
     def _init_via_TSLO(self, table_start_line_object):
-        from kiss_rdb.magnetics_ import doubly_linked_list_functions as _
-        _linked_list = _.build_new_doubly_linked_list()
-        return self._init_via(_linked_list, table_start_line_object, {})
+        from modality_agnostic.magnetics.doubly_linked_list_via_nothing \
+            import func
+        return self._init_via(func(), table_start_line_object, {})
 
     def _init_via(self, linked_list, table_start_line_object, dct):
         del self._init_mutex

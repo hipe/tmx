@@ -2,33 +2,102 @@
 
 from sys import argv, stdin, stderr
 from functools import reduce
+import re as _re
 
 
 def _help():
-    from os.path import basename as bn
-    me = bn(argv[0])
+    me = _program_name()
     yield f'usage: cat some.table | {me} BEGIN END'
+    yield f'                        {me} BEGIN END NUM_PIECES'
     yield 'synopsis: distribute available space proportionally'
     yield f'example: echo "thing-A 3\\nthing-B 4" | {me} 4063 4375'
 
 
-if 3 != len(argv) or stdin.isatty():
-    for s in _help():
-        stderr.write(f'{s}\n')
-    exit(1)
+def _int(token):
+    if _re.match(r'[0-9]+\Z', token):
+        return int(token)
+    stderr.write(f"Expected integer, had {token!r}.\n")
+    exit(_invite())
 
 
-begin, end = tuple(int(s) for s in argv[1:])
+def _invite():
+    stderr.write(f"See '{_program_name()} -h'\n")
+    return 123
 
 
-def _label_and_casecount():
-    import re
-    for line in stdin:
-        label, count = re.split(' +', line)
-        yield (label, int(count))
+def _program_name():
+    from os.path import basename as bn
+    return bn(_long_program_name)
 
 
-label_and_casecounts = tuple(_label_and_casecount())
+bash_argv = list(reversed(argv))
+_long_program_name = bash_argv.pop()
+
+
+opts = tuple(s for s in bash_argv if '-' == s[0])
+if opts:
+    rx = _re.compile(r'--?h(?:e(?:lp?))?\Z')
+    if any(rx.match(s) for s in opts):
+        for s in _help():
+            stderr.write(f'{s}\n')
+        exit(0)
+    stderr.write(f"Unrecognized option {opts[0]!r}\n")
+    exit(_invite())
+
+
+def _require_positionals(*who):
+    return tuple(_do_require_positionals(who))
+
+
+def _do_require_positionals(who):
+
+    formals = list(reversed(who))
+    while len(bash_argv):
+        if len(formals):
+            formals.pop()
+            yield _int(bash_argv.pop())
+            continue
+        stderr.write(f"Unexpected argument: {bash_argv[-1]!r}\n")
+        yield 123
+        return
+
+    if 0 == len(formals):
+        yield 0
+        return
+
+    for _ in range(len(formals)):
+        yield None
+
+    stderr.write(f"Expecting {formals[-1]!r}\n")
+    yield 456
+
+
+if stdin.isatty():
+    begin, end, num, rc = _require_positionals('BEGIN', 'END', 'NUM_ITEMS')
+
+    def _each_label_and_casecount():
+        for i in range(0, num):
+            yield f"Thing {i+1}",  1
+
+else:
+    begin, end, rc = _require_positionals('BEGIN', 'END')
+
+    def _each_label_and_casecount():
+        for line in stdin:
+            if '\n' == line:
+                stderr.write("(Skipping a blank line in input)\n")
+                continue
+            tup = _re.split(' +', line)
+            label, count = tup
+            count = _int(count.strip())
+            yield label, count
+
+if rc:
+    _invite()
+    exit(rc)
+
+
+label_and_casecounts = tuple(_each_label_and_casecount())
 
 
 tw = end - begin  # total width
@@ -76,4 +145,5 @@ for label, num_cases in label_and_casecounts:
 print('')
 print(f'endpoint: {end}')
 
+# #history-B.4 add a simpler interface signature
 # #born.

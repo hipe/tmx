@@ -137,7 +137,7 @@ def _add_newline(s):
 # ==
 
 def subject_module():
-    import pho.notecards_.document_via_notecards as mod
+    import pho.notecards_.abstract_document_via_notecards as mod
     return mod
 
 

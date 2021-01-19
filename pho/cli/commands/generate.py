@@ -70,7 +70,7 @@ def _do_CLI(
 
         # get money
 
-        from pho.magnetics_.document_tree_via_notecard import func
+        from pho.SSG_adapters_.hugo import func
         _ok = func(
                 out_tuple=(out_type, out_value),
                 notecard_IID_string=notecard_id,

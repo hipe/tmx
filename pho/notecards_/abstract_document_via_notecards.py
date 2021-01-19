@@ -363,7 +363,7 @@ def _final_sexps(notecards):
             itr = sections_w_reprovisioned_RSLs(rsl_def_index, itr)
             yield heading, scanner(itr)
 
-    from pho.models_.footnote import these_two as func
+    from pho.notecards_.links_index_via_content_runs import these_two as func
     sections_w_reprovisioned_RSLs, rsl_def_index = func()
 
     from text_lib.magnetics.scanner_via import scanner_via_iterator as scanner
@@ -376,7 +376,7 @@ def _final_sexps(notecards):
     assert heading  # every document-root notecard needs a heading [#883.2]
     yield 'document_title', heading
 
-    from pho.models_.header import TING_via_TING as func  # will move
+    from pho.notecards_.sections_via_headers_and_headings import func
     for sx in func(section_scn, notecard_scn):
         yield sx
 
@@ -740,7 +740,6 @@ _code_fence_rx = _re.compile(r'```(?:[a-z\(]|$)')  # ick/meh
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
-# #pending-rename: maybe to "abstract document"
 # #history-B.5: blind rewrite of 17 months older code
 # #history-B.4
 # #history-A.3: refactored from S-expressions's to AST's
