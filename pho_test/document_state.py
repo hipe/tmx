@@ -4,7 +4,7 @@ from unittest import TestCase
 # == Case Parent Classes
 
 
-class CaseMetaClass(type):  # [#882.C] meta class
+class CaseMetaClass(type):  # #[#510.16] meta-class
     # Make it so when the below parent class is subclassed, the subclasses
     # get a "test" method, but the parent itself doesn't have a "test" method
     # because if it had one and you import it into your module, it auto runs

@@ -145,6 +145,31 @@ def _nonterminal_parse(foz, bash_argv):
     return vals, None
 
 
+def _passive_parse(foz, serr, bash_argv):
+    """EXPERIMENTAL. consume contiguous recognized options archored to ARGV
+    head, stopping at first positional-looking arg, unrecognized option-looking
+    arg, or the end. The only way for this to fail is if an invoked, recognized
+    option has syntax errors.
+    """
+
+    if len(foz.formal_positionals):
+        raise DefinitionError_("no positionals in formals of passive parse")
+
+    vals, stop = {}, None
+    parse_option = _build_option_parser(vals, bash_argv, foz, be_passive=True)
+    try:
+        while len(bash_argv) and (md := re.match('^-(.)', bash_argv[-1])):
+            x = parse_option(md[1])
+            if x is not None:
+                assert '_passive_stop_' == x
+                break
+    except _Stop as e:
+        stop = e
+    if stop:
+        return _write_stop_into(serr, foz, *stop.args)
+    return vals, None
+
+
 def _terminal_parse(foz, bash_argv):
     # This is the more familiar algorithm where options can be interspersed
     # with arguments but we have to parse all the way to the end of the input
@@ -176,14 +201,17 @@ def _stop_and_invite(orig_f):
         try:
             return orig_f(foz, bash_argv)
         except _Stop as stop:
-            msg, exitstatus = stop.args
-            if len(msg) < 40:  # to the bane of tests
-                serr.write(f'{msg}. {foz.invite_line}')
-            else:
-                serr.write(f'{msg}\n')
-                serr.write(foz.invite_line)
-            return None, exitstatus
+            return _write_stop_into(serr, foz, *stop.args)
     return use_f
+
+
+def _write_stop_into(serr, foz, msg, exitstatus):
+    if len(msg) < 40:  # to the bane of tests
+        serr.write(f'{msg}. {foz.invite_line}')
+    else:
+        serr.write(f'{msg}\n')
+        serr.write(foz.invite_line)
+    return None, exitstatus
 
 
 def _parse_contiguous_positionals(values, bash_argv, faz):
@@ -218,18 +246,20 @@ def _parse_contiguous_positionals(values, bash_argv, faz):
     values[special.key] = bash_argv.pop()
 
 
-def _build_option_parser(values, bash_argv, foz):
+def _build_option_parser(values, bash_argv, foz, be_passive=False):
 
     def parse_option(char):
         tok = bash_argv[-1]
         if '-' == char:
-            parse_long(tok)
+            return parse_long(tok)
         else:
-            parse_short(tok)
+            return parse_short(tok)
 
     def parse_long(tok):
         stem = (md := re.match('--([^=]*)(?:=(.*))?$', tok))[1]
         if (i := offset_via_long_stem.get(stem)) is None:
+            if be_passive:
+                return passive_stop
             return no(f"Unrecognized option '--{stem}'", 11)
         if (fo := formal_options[i]).takes_argument:
             return parse_long_that_takes_argument(md, fo)
@@ -277,7 +307,9 @@ def _build_option_parser(values, bash_argv, foz):
             bash_argv.pop()
             fo.set_or_append_value(values, mixed_trueish)
             return
-        fo_via_char(tok[1])  # trigger failure
+        if be_passive:
+            return passive_stop
+        return fo_via_char(tok[1])  # trigger failure
 
     def fo_via_char(char):
         if (fo := any_fo_via_char(char)) is None:
@@ -290,8 +322,8 @@ def _build_option_parser(values, bash_argv, foz):
 
     def parse_short_that_takes_argument(fo, tok):
         if 2 < len(tok):
-            fo.set_or_append_value(values, tok[2:])
-            return bash_argv.pop()
+            fo.set_or_append_value(values, bash_argv.pop()[2:])  # is tok
+            return
         fo.set_or_append_value(values, parse_value(fo, 'short'))
 
     def parse_value(fo, short_or_long):
@@ -310,6 +342,7 @@ def _build_option_parser(values, bash_argv, foz):
     offset_via_short_char = foz.offset_via_short_char
     offset_via_long_stem = foz.offset_via_long_stem
     formal_options = foz.formal_options
+    passive_stop = '_passive_stop_'
 
     return parse_option
 
@@ -448,6 +481,7 @@ def formals_via_definitions(definitions, prog_namer=None, cxer=None):
         cls.parse_alternation_fuzzily = _parse_alternation_fuzzily
         cls.nonterminal_parse = _stop_and_invite(_nonterminal_parse)
         cls.terminal_parse = _stop_and_invite(_terminal_parse)
+        cls.passive_parse = _passive_parse
         cls.write_help_into = _write_help_into
         cls.help_lines = _help_lines
         cls.invite_line = property(lambda _: _invite_line(prog_namer()))
@@ -666,7 +700,7 @@ def _build_formal_option_parser():
                              arg_moniker, descs, is_required, is_plural)
 
     long_rx = re.compile(r'''^
-      --(?P<stem>  [a-z][a-z0-9]* (?: -[a-z][a-z0-9]* )* )
+      --(?P<stem>  [a-zA-Z][a-zA-Z0-9]* (?: -[a-zA-Z][a-zA-Z0-9]* )* )
       (?: =
         (?P<arg_moniker>
            <[a-z][a-z0-9]+(?:-[a-z][a-z0-9]+)*>   # dashes IFF all lowercase

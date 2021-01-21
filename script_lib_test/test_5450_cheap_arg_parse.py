@@ -425,6 +425,150 @@ class Case5484_you_cannot_combine_flags_and_argument_takers_in_a_ball(same):
 # assumption that perhaps all CLI's are built on.
 
 
+""""Passive parsing" (introduced 3 years after birth) is a mode of parsing
+that stops at the first unrecognized token. This can be useful for constructing
+dynamic syntaxes that change how they are parsed midway through the parse,
+based arguments they encounter during the parse (for example if an option
+enables a plugin or adapter, that then makes more options available).
+"""
+
+
+class ThisOneMetaclass(type):  # #[#510.16] meta-class
+
+    def __new__(cls, class_name, bases=None, dct=None):
+        res = type.__new__(cls, class_name, bases, dct)
+        if unittest.TestCase != bases[-1]:
+            if not hasattr(res, 'test'):  # hi
+                setattr(res, 'test_010_values', res.do_test_values)
+                setattr(res, 'test_020_remaining', res.do_test_remaining)
+        return res
+
+
+class PassiveParseCase(unittest.TestCase, metaclass=ThisOneMetaclass):
+
+    def do_test_values(self):
+        act = tuple(self.end_state['values'].items())
+        exp = tuple(self.expected_vals())
+        self.assertSequenceEqual(act, exp)
+
+    def do_test_remaining(self):
+        act = self.end_state['remaining_argv']
+        exp = self.expected_remaining_bash_ARGV()
+        self.assertSequenceEqual(act, exp)
+
+    @property
+    @shared_subj_in_children
+    def end_state(self):
+        return self.build_end_state()
+
+    def perform(self):
+        return self.build_end_state()
+
+    def build_end_state(self):
+        return {k: v for k, v in self.names_and_values_of_performance()}
+
+    def names_and_values_of_performance(self):
+        foz = self.given_formals()
+        argv = self.given_args()
+        bash_argv = list(reversed(argv))
+        vals, rc = foz.passive_parse(None, bash_argv)
+        yield 'returncode', rc
+        yield 'values', vals
+        yield 'remaining_argv', tuple(reversed(bash_argv))
+
+    def expected_remaining_bash_ARGV(_):
+        return ()
+
+    def given_formals(_):
+        return formals_two()
+
+
+class Case5484_004_you_cannot_passive_parse_with_positionals(PassiveParseCase):
+    # We made this part of our spec only because we don't need it yet and,
+    # disallowing it frees us from needing asset code and test code for it
+
+    def test(self):
+        def run():
+            self.perform()
+        errcls = subject_module().DefinitionError_
+        self.assertRaisesRegex(errcls, "no positionals in formals", run)
+
+    def given_formals(_):
+        return formals_one()
+
+    def given_args(_):
+        return ()
+
+
+class Case5484_008_none_OK(PassiveParseCase):
+
+    def expected_vals(_):
+        return ()
+
+    def given_args(_):
+        return ()
+
+
+class Case5484_012_all_recognized_OK(PassiveParseCase):
+
+    def expected_vals(_):
+        yield 'dingus', 'WAA'
+        yield 'alfalfa', True
+
+    def given_args(_):
+        return '-dWAA', '-a'
+
+
+class Case5484_018_stop_on_unrec_opt(PassiveParseCase):
+
+    def expected_vals(_):
+        yield 'dingus', 'WAH'
+        yield 'bubu', True
+
+    def expected_remaining_bash_ARGV(_):
+        return '-zapos', 'flapos'
+
+    def given_args(_):
+        return '--dingus', 'WAH', '--bubu', '-zapos', 'flapos'
+
+
+class Case5484_022_stop_on_unrec_posi(PassiveParseCase):
+
+    def expected_vals(_):
+        yield 'dingus', 'WAH1'
+
+    def expected_remaining_bash_ARGV(_):
+        return 'WAH2', '--flazoo'
+
+    def given_args(_):
+        return '-d', 'WAH1', 'WAH2', '--flazoo'
+
+
+class Case5484_026_all_unrec_ok(PassiveParseCase):
+
+    def expected_vals(_):
+        return ()
+
+    def expected_remaining_bash_ARGV(_):
+        return 'WAH2', '--flazoo'
+
+    def given_args(_):
+        return 'WAH2', '--flazoo'
+
+
+class Case5484_032_hitting_unrec_shadows_rc(PassiveParseCase):
+
+    def expected_vals(_):
+        yield 'alfalfa', True
+        yield 'bubu', True
+
+    def expected_remaining_bash_ARGV(_):
+        return '-z', '-d', 'foo'
+
+    def given_args(_):
+        return '-a', '-b', '-z', '-d', 'foo'
+
+
 # help meh
 
 
@@ -470,5 +614,6 @@ def xx(msg=None):
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.3
 # #history-B.2
 # #born.

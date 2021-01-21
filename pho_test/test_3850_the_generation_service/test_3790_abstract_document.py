@@ -2,7 +2,7 @@ from modality_agnostic.test_support.common import lazy
 import unittest
 
 
-class ThisOneMetaclass(type):  # [#882.C] meta class
+class ThisOneMetaclass(type):  # #[#510.16] meta-class
 
     def __new__(cls, class_name, bases=None, dct=None):
         res = type.__new__(cls, class_name, bases, dct)
