@@ -15,7 +15,7 @@ class CommonCase(unittest.TestCase):
 class Case7755_default_argument_arity(CommonCase):
 
     def test_010_magnetic_loads(self):
-        self.assertIsNotNone(_subject_module())
+        self.assertIsNotNone(subject_module())
 
     def test_020_parameter_builds(self):
         self.assertIsNotNone(self.parameter_)
@@ -121,6 +121,54 @@ class Case7805_desc_yes_style(CommonCase):
         return _build_parameter_with_this_description(f)
 
 
+class Case78015_crazy_hack(CommonCase):  # move it to elsewhere if you want to
+
+    def test_010_lines_look_good(self):
+        act = self.end_state[0]
+        exp = tuple(self.expected_desc_lines())
+        self.assertSequenceEqual(act, exp)
+
+    def test_020_param_descs_look_good(self):
+        act = self.end_state[1]
+        exp_ks = ('notecard_ID', 'verbose')
+        self.assertSequenceEqual(tuple(act.keys()), exp_ks)
+        import re
+        this_rx = re.compile(r'^[^ ].*\n\Z')
+        for lines in act.values():
+            assert 0 < len(lines)
+            assert all(this_rx.match(s) for s in lines)  # ..
+
+    def expected_desc_lines(_):
+        yield "Hello I am a command with parameters specific to..\n"
+        yield "\n"
+        yield "This generates hugo-flavored markdown files from notecards.\n"
+        yield "\n"
+
+    @shared_subject
+    def end_state(self):
+        func = subject_module()._crazy_hack
+        lines, pool = func(frobulate_fiz_buzz.__doc__)
+        return lines, pool
+
+
+def frobulate_fiz_buzz(  # a fixture fuction
+        collection_path, listener,
+        notecard_ID=None,
+        verbose: bool = False):
+
+    """Hello I am a command with parameters specific to..
+
+    This generates hugo-flavored markdown files from notecards.
+
+    Args:
+        notecard_ID: yy
+                     xx
+        verbose: The second parameter Verbose output go away as option.
+    """
+
+    raise RuntimeError('no run')
+
+
 def _lines_of_description(param):
     """NOTE - this is a proof of concept for how you should implement this"""
 
@@ -138,6 +186,7 @@ def _lines_of_description(param):
 
 
 class _STYLER:  # #class-as-namespace
+    if True:
         def em(s):
             return '*%s*' % s
 
@@ -156,7 +205,7 @@ def _build_parameter_with_this_description(f):
 
 
 def _build_parameter_via_argument_arity_string(s):
-    mod = _subject_module()
+    mod = subject_module()
     arity = getattr(mod.arities, s)
     return mod.define(argument_arity=arity)
 
@@ -164,10 +213,10 @@ def _build_parameter_via_argument_arity_string(s):
 # --
 
 def define(**kwargs):
-    return _subject_module().define(**kwargs)
+    return subject_module().define(**kwargs)
 
 
-def _subject_module():
+def subject_module():
     from modality_agnostic.magnetics import formal_parameter_via_definition
     return formal_parameter_via_definition
 

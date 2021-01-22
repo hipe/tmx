@@ -387,10 +387,13 @@ def _help_lines(foz, doc=None, description_valueser=None):
             maxi = leng
         cx_rows.append(('', key, desc))
 
-    if doc and len(doc):
+    doc_is_iter = (doc and hasattr(doc, '__next__'))
+    if doc and (doc_is_iter or len(doc)):
         if description_valueser:
             doc = doc.format(** description_valueser())
-        if '\n' in doc:
+        if doc_is_iter:
+            itr = doc
+        elif '\n' in doc:
             itr = (md[1] for md in re.finditer('(.+\n)[ ]*', doc))
         else:
             itr = iter((f'{doc}\n',))  # (Case5519)

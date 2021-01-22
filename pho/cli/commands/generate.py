@@ -1,5 +1,19 @@
+def _output_types():
+    yield 'markdown', lambda: _CLI_for_markdown
+
+
+def _formals_for_top():
+    yield '-t', '--output-type=TYPE', "(Specify one to see specific help.)"
+    yield '-h', '--help', "This screen"
+
+
 def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
     "(Our oldschool command to assemble a hugo markdown from notecards..)"""
+
+    # == BEGIN temporary bridge to new code with this secret way [#882.D]
+    if 1 < len(argv) and '-t' == argv[1][:2]:
+        return _CLI_NEW_WAY(sin, sout, serr, argv, efx)
+    # == END
 
     from script_lib.cheap_arg_parse import cheap_arg_parse
     return cheap_arg_parse(
@@ -27,6 +41,56 @@ def _params():
            'The directory into which to write the files',
            '(whose filenames are derived from the head notecard headings).',
            'Use "-" to write to STDOUT (IN PROGRESS).')
+
+
+def _CLI_NEW_WAY(sin, sout, serr, argv, efx):
+
+    # Passive parse because we might need an adapter to parse the rest
+    prog_name = (bash_argv := list(reversed(argv))).pop()
+    foz = _foz_via(_formals_for_top(), lambda: prog_name)
+    vals, es = foz.passive_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    # Before we process help, parse any --output-type because of the one trick
+    did_request_help = vals.pop('help', False)
+
+    # If output type was specified, validate it
+    output_type, rest = None, None
+    keep_arg = arg = vals.pop('output_type', None)
+    if arg is not None:
+        tup, rc = _parse_output_type(serr, bash_argv, arg, foz)
+        if tup is None:
+            return rc
+        output_type, child_CLI, rest = tup
+
+    # For now, require output type
+    if not output_type:
+        if did_request_help:
+            _ = ', '.join(k for (k, _) in _output_types())  # #here1
+            big_string = f"{CLI.__doc__} Available output types: ({_})\n"
+            return foz.write_help_into(sout, big_string)
+        serr.write("For now, must specify --output-type\n")
+        serr.write("(One day we'll probably assume default of 'website'.)\n")
+        return 123
+
+    if did_request_help:
+        bash_argv.append('--help')  # (cleverness as a treat #here4)
+
+    bash_argv.append(f"{prog_name} -t{keep_arg}")
+
+    if rest is not None:
+        bash_argv.append(rest)  # terrifying, #here2
+
+    return child_CLI(sin, sout, serr, bash_argv, efx)
+
+
+def _adapter_powered_command(method_name):
+    def decorator(orig_f):
+        orig_f.rest_formal = 'SSG_ADAPTER'
+        orig_f.adapter_function_name = method_name
+        return orig_f
+    return decorator
 
 
 def _do_CLI(
@@ -132,6 +196,287 @@ def _do_CLI(
     return monitor.exitstatus
 
 
+@_adapter_powered_command('generate_markdown')
+def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
+    """Generate markdown tailored to the specific SSG.
+
+    Specify the SSG adapter, e.g.: "-t md:pelican".
+    You can specify "-t md:help" or "-t md:list".
+    """
+
+    tup, rc = _this_is_a_lot(sout, serr, bash_argv, efx, _CLI_for_markdown)
+    if tup is None:
+        return rc
+    adapter_func, vals, mon = tup  # #here5
+
+    omg = adapter_func(**vals)
+    for tup in omg:
+        typ = tup[0]
+        if 'adapter_error' == typ:
+            continue  # or w/e
+        if 'markdown_file' != typ:
+            xx("ok neato have fun: {typ!r}")
+        entry, lines = tup[1:]
+
+        sout.write(f"DAMN SHAWTY OKAYY: {entry!r}\n")
+        for line in lines:
+            sout.write(line)
+
+    return mon.returncode
+
+
+def _build_extended_FOZ_for_MD(adapter_func, prog_name):
+
+    # Crazy parse the signature AND DOCSTRING of the function
+    pool, desc_lines = _crazy_parse(adapter_func)
+
+    # Assume the function takes exactly one of {listener|monitor} eew
+    two = ((pool.pop(k, None) is not None) for k in ('monitor', 'listener'))
+    two = tuple(two)
+    assert any(two)
+    assert not all(two)
+    monitor_not_listener = two[0]
+
+    # For now, assume function takes exactly one collection_path
+    pool.pop('collection_path')
+
+    # Construct a formal ARGV from this omg
+    def formals():
+        # Options before positionals
+        for tup in opts:
+            yield tup
+        yield _collection_path()  # because assumption above
+        yield _help_this_screen  # they can request help again here, diff sig
+
+        # Positionals after options
+        for tup in posis:
+            yield tup
+    opts, posis = _ARGV_formals_via_formals(pool.items())
+    foz = _foz_via(formals(), lambda: prog_name)
+    return foz, desc_lines, monitor_not_listener
+
+
+def _this_is_a_lot(sout, serr, bash_argv, efx, caller_func):
+    """Effect this rule table balancing loading adapter & serving help
+
+    ({no adapter|bad adapter|good adapter} x {no help|yes help}):
+
+    - not specified adapter not specified help: punish, [ invite to help ]
+    - specified invalid adapter not specified help: punish
+    - specified good adapter not specified help: normal
+    - not specified adapter specified help: no punish, just generic help
+    - specified invalid adapter specified help: whine, still show help
+    - specified good adapter specified help: show help specific to adapter
+    """
+
+    # An ARGV with nothing but --help is valid. Check for that first
+    adapter_arg = bash_argv.pop()  # #here2
+    prog_name = bash_argv.pop()
+    did_request_help = False
+    if len(bash_argv) and bash_argv[-1] == '--help':  # #here4
+        # (we feel dumb parsing the same argv FOUR times)
+        bash_argv.pop()
+        did_request_help = True
+
+    # Attempt to load the adapter if A or B
+    if adapter_arg or not did_request_help:
+        mod, rc = _parse_SSG_adapter_name(sout, serr, adapter_arg, prog_name)
+        adapter_loaded_OK = mod is not None
+
+    # Build the extended, final foz from the adapter (if we know one)
+    if adapter_arg and adapter_loaded_OK:
+        adapter_func = getattr(mod, caller_func.adapter_function_name)  # ..
+        three = _build_extended_FOZ_for_MD(adapter_func, prog_name)
+        foz, adapter_desc_lines, monitor_not_listener = three
+
+    def mega_lines():
+        for line in these_lines():
+            yield line
+        for line in adapter_desc_lines:
+            yield line
+
+    def these_lines():
+        return _normal_lines_via_docstring(caller_func.__doc__)
+
+    # Do the rule table above
+    if did_request_help:
+
+        if adapter_arg and adapter_loaded_OK:
+            return None, foz.write_help_into(sout, mega_lines())
+
+        # (adapter either wasn't specified or was invalid)
+        sout.write(f"Usage: {prog_name}:SSG_ADAPTER_NAME [adapter-specific opts]\n")  # noqa: E501
+        sout.write('\n')
+        itr = these_lines()
+        sout.write(f"Description: {next(itr)}")
+        for line in itr:
+            sout.write(line)
+        return None, 0
+
+    if not adapter_arg or not adapter_loaded_OK:  # 🧠
+        return None, rc
+
+    # Now parse the remaining args, this time terminal & with adapter
+    vals, rc = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return None, rc
+
+    # Maybe the help flag was passed not at the end
+    if vals.get('help'):
+        return None, foz.write_help_into(sout, mega_lines())
+
+    # For now assume collection path is necessary just like every other command
+    mon = efx.produce_monitor()
+
+    coll_path, es = _require_collection_path(mon.listener, vals, efx)
+    if coll_path is None:
+        return None, 123
+    vals['collection_path'] = coll_path  # put it back in probably lol
+
+    if monitor_not_listener:
+        vals['monitor'] = mon
+    else:
+        vals['listener'] = mon.listener
+
+    tup = adapter_func, vals, mon  # #here5
+    return tup, None
+
+
+# == BEGIN this pattern
+
+def _parse_SSG_adapter_name(sout, serr, arg, pname):
+    import re
+    mod, extra = None, None
+
+    if re.match(r'^[A-Za-z_-]+\Z', arg):
+
+        if 'help' == arg:
+            _ = _oxford_join(_SSG_adapter_names(), ' and ')
+            serr.write(f"Available SSG adapters: {_}\n")
+            return None, 0
+
+        if 'list' == arg:
+            for slug in _SSG_adapter_names():
+                sout.write(slug)
+                sout.write('\n')
+            return None, 0
+
+        use = arg.replace('-', '_')
+        from importlib import import_module as func
+        try:
+            mod = func(f"pho.SSG_adapters_.{use}")
+        except ModuleNotFoundError as e:
+            extra = e.msg
+
+    if mod is None:
+        _ = _oxford_join(_SSG_adapter_names(), ' or ')
+        serr.write(f"No SSG adapter {arg!r}. Available: {_}\n")
+        if extra:
+            serr.write(''.join(('(', extra, ')\n')))
+        serr.write(f"See '{pname} -h' for help\n")
+        return None, 123
+    return mod, None
+
+
+def _SSG_adapter_names():
+    from os.path import splitext, basename, dirname as dn, join
+    package_path = dn(dn(dn(__file__)))
+    here = join(package_path, 'SSG_adapters_')
+    glob_path = join(here, '[a-z]*')
+    from glob import glob as func
+    these = func(glob_path)
+
+    def clean(s):
+        bn = basename(s)
+        head, _ = splitext(bn)
+        return head.replace('_', '-')
+    return tuple(sorted(clean(s) for s in these))  # sort, not up to FS
+
+# == END
+
+
+def _parse_output_type(serr, bash_argv, arg, foz):
+
+    # Split arg around colon (max 1x)
+    i = arg.find(':')
+    needle, rest = (arg, None) if -1 == i else (arg[:i], arg[i+1:])
+
+    # Resolve sub-command name from arg
+    use_needle = _aliases.get(needle, needle)
+
+    found = False
+    for slug, func in _output_types():
+        if slug == use_needle:
+            output_type, child_CLI_funcer = slug, func
+            found = True
+            break
+
+    # Explain if not found
+    if not found:
+        _ = _oxford_join((k for (k, _) in _output_types()), ' or ')
+        serr.write(f"Unrecognized output type {needle!r}. Expecting {_}\n")
+        serr.write(foz.invite_line)
+        return None, 123
+
+    # Parse rest
+    child_CLI = child_CLI_funcer()
+    rf = child_CLI.rest_formal
+    if rf is None:
+        if rest is not None:
+            tail = ''.join((':', rest))
+            serr.write(f"Unexpected args to {needle!r}: {tail!r}\n")
+            serr.write(foz.invite_line)
+            return None, 123
+    elif rest is None:
+        # serr.write(f"expecting {rf} after {needle!r} (eg '{needle}:foo')\n")
+        rest = ''  # #here3
+
+    tup = output_type, child_CLI, rest
+    return tup, None
+
+
+_aliases = {
+    'md': 'markdown',
+}
+
+
+def _collection_path():
+    return '-c', '--collection-path=PATH', *_CPT().descs
+
+
+_help_this_screen = '-h', '--help', "This screen"
+
+
+def _ARGV_formals_via_formals(formal_items):  # candidate to move to text-lib
+    opts, posis = [], []
+    for k, param in formal_items:
+        desc = param.description
+        if not desc:
+            xx(f"need google-style pydoc docstring for {k!r}")
+        assert isinstance(desc, tuple)
+        desc = tuple(s[:-1] for s in desc)  # chomp newlines yikes
+
+        slug = k.replace('_', '-')
+        if param.is_required:
+            posis.append((slug, *desc))
+        elif param.is_flag:
+            opts.append((f"--{slug}", *desc))
+        else:
+            opts.append((f"--{slug}=X", *desc))
+    return tuple(opts), tuple(posis)
+
+
+def _crazy_parse(arg_func):
+    from modality_agnostic.magnetics.formal_parameter_via_definition \
+        import parameter_index_via_mixed as func
+    # (pi = parameter index)
+    pi = func(arg_func, do_crazy_hack=True)
+    assert not pi.parameters_that_start_with_underscores  # or _listener, _coll
+    pool = {k: param for k, param in
+            pi.parameters_that_do_not_start_with_underscores}
+    return pool, pi.desc_lines
+
+
 def _whine_about_dry_run(listener):
     def _():
         return {'reason': '«dry-run» is meaningless when output is stdout'}
@@ -172,5 +517,43 @@ def __whine_big_flex_pieces(is_recursive, has_frag_id, has_out_path):
     yield ', '
     yield sp
 
+
+# == Delegations & smalls
+
+def _require_collection_path(listener, vals, efx):
+    val = vals.pop('collection_path', None)
+    if val is not None:
+        return val, None
+    return _CPT().require_collection_path(listener, efx)
+
+
+def _CPT():
+    from pho.cli import collection_path_tools_ as func
+    return func()
+
+
+def _foz_via(defs, pner, x=None):
+    from script_lib.cheap_arg_parse import formals_via_definitions as func
+    return func(defs, pner, x)
+
+
+def _oxford_join(slugs, sep):  # rewrite something in text_lib
+    leng = len(slugs := tuple(slugs))
+    seps = '', *(', ' for _ in range(0, leng-2)), sep
+    rows = tuple((seps[i], repr(slugs[i])) for i in range(0, leng))
+    return ''.join(s for row in rows for s in row)
+
+
+def _normal_lines_via_docstring(big_string):
+    from modality_agnostic.magnetics.formal_parameter_via_definition \
+        import normal_lines_via_docstring as func
+    return func(big_string)
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
+
+
+# #history-B.4 begin re-arch for different SSG adapters and one god "generate"
 # #history-A.1 rewrite during cheap arg parse not click
 # #born.

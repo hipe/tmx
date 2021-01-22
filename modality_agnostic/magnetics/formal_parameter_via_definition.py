@@ -112,14 +112,17 @@ parameter); but don't do that.
 #    At #history-A.3 this became stowaway here & sunsetted anemic other file.
 #    There are lots of holes here that would be straightforward to fill,
 #    but we haven't done so because we don't use this system in production.
+#    At #history-B.4 we begin using it again.
 
 
 class parameter_index_via_mixed:
 
-    def __init__(self, function_or_method):
+    def __init__(self, function_or_method, do_crazy_hack=False):
 
-        starts_with_underscore = []
-        does_not_start_with_underscore = []
+        if do_crazy_hack:
+            self.desc_lines, pool = _crazy_hack(function_or_method.__doc__)
+
+        starts_with_underscore, does_not_start_with_underscore = [], []
 
         fparam_args_via = _formal_parameter_argumentser()
 
@@ -131,39 +134,129 @@ class parameter_index_via_mixed:
                 starts_with_underscore.append(name)
                 continue
 
-            _dct = {k: v for k, v in fparam_args_via(param)}
-            _fparam = _FormalParameter(**_dct)
-            does_not_start_with_underscore.append((name, _fparam))
+            kw = {k: v for k, v in fparam_args_via(param)}
+
+            if do_crazy_hack:
+                desc_lines = pool.pop(name, None)
+                if desc_lines:
+                    kw['description'] = desc_lines
+
+            fparam = _FormalParameter(**kw)
+            does_not_start_with_underscore.append((name, fparam))
+
+        if do_crazy_hack and pool:
+            xx(f"oops, in docstring but not in params: {tuple(pool.keys())!r}")
 
         self.parameters_that_start_with_underscores = tuple(starts_with_underscore)  # noqa: E501
         self.parameters_that_do_not_start_with_underscores = tuple(does_not_start_with_underscore)  # noqa: E501
 
 
-def _formal_parameter_argumentser():
+def _crazy_hack(doc):  # #testpoint
+    itr = _do_crazy_hack(doc)
+    these_lines = next(itr)
+    pool = {k: v for k, v in itr}
+    return these_lines, pool
 
-    from inspect import Parameter, _empty
+
+def _do_crazy_hack(doc):
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    scn = func(normal_lines_via_docstring(doc))
+
+    # Cache up lines that don't look like this one line
+    these_lines = []
+    while 'Args:\n' != scn.peek:  # (doing it dirty for now
+        these_lines.append(scn.next())
+    scn.advance()
+
+    yield tuple(these_lines)
+
+    # Parse every item of the Args section
+    import re
+    da = re.DOTALL
+    rx_one = re.compile('^[ ]{4}([a-zA-Z][a-zA-Z_0-9]*):[ ]+([^ ].*)', da)
+    rx_two = re.compile('^[ ]{5}[ ]*(?P<rest>[^ ].*)', da)
+
+    md = rx_one.match(scn.peek)
+    if not md:
+        xx(f"Item line? {scn.peek!r}")
+    scn.advance()
+
+    # Parse each arg while dealing with its any multiple descrciption lines
+    while True:
+        param_identifier, desc_line_1 = md.groups()
+        desc_lines = [desc_line_1]
+        while scn.more and (md := rx_two.match(scn.peek)):
+            desc_lines.append(md['rest'])
+            scn.advance()
+        yield param_identifier, tuple(desc_lines)
+        if scn.empty:
+            break
+        if (md := rx_one.match(scn.peek)):
+            scn.advance()
+            continue
+        break
+
+    while scn.more and '\n' == scn.peek:
+        scn.advance()
+
+    if scn.more:
+        xx(f"never thought about this. is it result? {scn.peek!r}")
+
+
+def normal_lines_via_docstring(doc):
+    import re
+    raw_lines = (md[0] for md in re.finditer(r'[^\n]*\n', doc))  # #[#610]
+
+    exactly_four_lines_of_indent_rx = re.compile('^[ ]{4}(.+)', re.DOTALL)
+
+    yield next(raw_lines)  # Following google convention, assume `"""Foo ..`
+    for line in raw_lines:
+        if '\n' == line:
+            yield line
+            continue
+        # For now we're gonna assume etc
+        md = exactly_four_lines_of_indent_rx.match(line)
+        assert md
+        yield md[1]
+
+
+def _formal_parameter_argumentser():
+    from inspect import Parameter as o
+    POSITIONAL_OR_KEYWORD = o.POSITIONAL_OR_KEYWORD
+    KEYWORD_ONLY, POSITIONAL_ONLY = o.KEYWORD_ONLY, o.POSITIONAL_ONLY
+    VAR_KEYWORD, VAR_POSITIONAL = o.VAR_KEYWORD, o.VAR_POSITIONAL
+    from inspect import _empty as empty  # there has to be a better way
 
     def via(param):
-        x = param.kind
-        if (x == Parameter.POSITIONAL_OR_KEYWORD):
-            x = param._default
-            if _empty == x:
+        kind, default, annot = param.kind, param.default, param.annotation
+
+        if POSITIONAL_OR_KEYWORD == kind:
+            if empty == default:
                 yield 'argument_arity', arities.REQUIRED_FIELD
                 return
-            yield 'argument_arity', arities.OPTIONAL_FIELD
-            yield 'default_value', x
-            return
 
-        if x == Parameter.KEYWORD_ONLY:
+            if empty == annot:
+                yield 'argument_arity', arities.OPTIONAL_FIELD
+                yield 'default_value', default
+                return
+
+            if bool == annot:
+                assert default is False  # ..
+                yield 'argument_arity', arities.FLAG
+                yield 'default_value', default
+                return
             xx()
 
-        if x == Parameter.POSITIONAL_ONLY:
+        if KEYWORD_ONLY == kind:
             xx()
 
-        if x == Parameter.VAR_KEYWORD:
+        if POSITIONAL_ONLY == kind:
             xx()
 
-        assert (x == Parameter.VAR_POSITIONAL)
+        if VAR_KEYWORD == kind:
+            xx()
+
+        assert VAR_POSITIONAL == kind
         xx()
 
     return via
@@ -190,6 +283,11 @@ class _FormalParameter:
 
         self.description = description
         self.default_value = default_value
+
+    @property
+    def is_flag(self):  # this is a CLI term, just shorthand here
+        rang = self.argument_arity_range
+        return 0 == rang.start and 0 == rang.stop
 
     @property
     def is_required(self):
@@ -248,9 +346,10 @@ class _MyArity:
         self.stop = stop
 
 
-def xx():
-    raise Exception('write me')
+def xx(msg=None):
+    raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
+# #history-B.4
 # #history-A.3
 # #history-A.2: (can be temporary) for not covered
 # #history-A.1: large doc spike of parameter modeling theory

@@ -16,6 +16,13 @@ only in modeling interfaces for this purpose.
 
 
 
+## Hard to Find
+
+- "lines via big string" (keywords: line scanner) is [#610].
+
+
+
+
 ## <a name="node-table"></a>the node table
 
 (this table is explained at [\[#002\]] using the node table.)

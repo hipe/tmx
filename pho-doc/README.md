@@ -100,7 +100,7 @@ when you click create
 |[#882.G]                   | #hole |
 |[#882.F]                   | #open | we need proper markdown parsing
 |[#882.E]                   | #hole |
-|[#882.D]                   | #hole |
+|[#882.D]                   | #trak | MARK OLD CODE
 |[#882.C]                   | #open | [see] some niche thing for invoking python from GUI
 |[#882.B]                   | #trak | pelookan: track where you use '/pages/'
 |[#882.1]                   | #open | ideally there should be no producer scripts not covered

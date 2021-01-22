@@ -27,7 +27,7 @@ def _lines_for_write_selected():
     return _lines_via_big_string(_write_selected_big_string)
 
 
-def _lines_via_big_string(big_string):
+def _lines_via_big_string(big_string):  # #[#610]
     from re import finditer
     itr = (md[0] for md in finditer(r'[^\n]*\n', big_string))
     assert "\n" == next(itr)  # every big string in this file

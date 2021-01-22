@@ -1,8 +1,24 @@
-
-
-
 from os import path as _os_path
 import re as _re
+
+
+def generate_markdown(
+        collection_path, listener,
+        opt1=None, opt_two: bool = False):
+    """
+    Ohai I am the hugo-specific generator function
+
+    Args:
+        opt1:      This is the description for option 1
+                   second line of opt1
+        opt_two:   This is the desc for option 2
+                   second line of opt2
+    """
+    # Things you say above go in to UI
+
+    yield ('adapter_error',)
+    yield 'markdown_file', 'dir-1/file-1.md', ('line one\n', 'line two\n')
+    yield 'markdown_file', 'dir-1/file-2.md', ('line one\n', 'line two\n')
 
 
 def document_tree_via_notecard(

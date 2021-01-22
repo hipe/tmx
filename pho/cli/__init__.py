@@ -34,11 +34,11 @@ def _lazy(build):  # [#510.8] yet another take on "lazy"
     return Lazy()
 
 
-def _build_memoized_thing():
+def _build_collection_path_tools():
 
     coll_path_env_var_name = 'PHO_COLLECTION_PATH'
 
-    class Fellow:
+    class collection_path_tools:
 
         @property
         def descs(_):
@@ -46,20 +46,22 @@ def _build_memoized_thing():
             yield '(the directory that contains the `entities` directory)'
             yield f'(or set the env var {coll_path_env_var_name})'
 
-        def require_collection_path(_, efx, listener):
-            collection_path = efx.enver().get(coll_path_env_var_name)
+        def require_collection_path(_, listener, efx):
+            env = efx.produce_environ()
+            collection_path = env.get(coll_path_env_var_name)
             if collection_path is not None:
-                return collection_path
+                return collection_path, None
             whine_about(listener)
+            return None, 134
 
     def whine_about(listener):
         listener('error', 'structure', 'parameter_is_currently_required',
                  lambda: {'reason_tail': '--collection-path'})
 
-    return Fellow()
+    return collection_path_tools()
 
 
-CP_ = _lazy(_build_memoized_thing)
+collection_path_tools_ = _lazy(_build_collection_path_tools)
 
 
 def _commands():
