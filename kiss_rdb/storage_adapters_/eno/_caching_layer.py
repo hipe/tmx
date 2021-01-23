@@ -161,7 +161,7 @@ class Caching_FS_Reader_:  # #testpoint
     def _pop_the_oldest_file_reader(self):
 
         dll = self._doubly_linked_list
-        iid = dll.head_IID()  # We append to the DLL, so head is always oldest
+        iid = dll.head_IID  # We append to the DLL, so head is always oldest
 
         # Remove this path from the rotbuf
         path = dll.delete_item(iid)

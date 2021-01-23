@@ -10,9 +10,12 @@ class _DoublyLinkedList:
         self._tail_IID = None
 
     def to_item_stream(self):
+        return (item for _, item in self.items())
+
+    def items(self):
         item_via_IID = self.item_via_IID
         for iid in self.to_internal_identifier_stream():
-            yield item_via_IID(iid)
+            yield iid, item_via_IID(iid)
 
     def to_internal_identifier_stream(self):  # #testpoint
         next_IID_via_IID = self.next_IID_via_IID
@@ -21,9 +24,11 @@ class _DoublyLinkedList:
             yield iid
             iid = next_IID_via_IID(iid)
 
+    @property
     def head_IID(self):
         return self._head_IID
 
+    @property
     def tail_IID(self):
         return self._tail_IID
 

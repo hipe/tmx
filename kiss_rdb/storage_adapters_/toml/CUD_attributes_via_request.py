@@ -178,7 +178,7 @@ def __head_OK_excerpt_index(qits, mde):
 
     # qit = qualified item
 
-    head_iid = mde._LL.head_IID()
+    head_iid = mde._LL.head_IID
     if head_iid is None:
         return  # empty document entity
 
@@ -318,7 +318,7 @@ def __longest_tail_anchored_run_of_attribute_body_blocks_in_order(mde):
     # -- iterator to traverse each IID from back to front
 
     def IIDs_in_reverse():
-        iid = ll.tail_IID()
+        iid = ll.tail_IID
         while iid is not None:
             yield iid
             iid = ll.prev_IID_via_IID(iid)

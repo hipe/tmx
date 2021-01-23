@@ -61,6 +61,13 @@ class StringScanner:  # see also [#611] the scanner library
             return
         return self._advance_for_scan(m)
 
+    def match_of_scan(self, pattern):
+        m = self._match(pattern)
+        if m is None:
+            return
+        self._position = m.end()
+        return m
+
     def _advance_for_scan(self, m):
         self._position = m.end()
         return m.group(0)  # ..
