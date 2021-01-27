@@ -9,6 +9,9 @@ def notecard_via_definition(identifier_string, core_attributes, listener):
     return _Notecard(identifier_string=identifier_string, **dct)
 
 
+func = notecard_via_definition
+
+
 def validate_and_normalize_core_attributes_(
         identifier_string, core_attributes, listener):
 

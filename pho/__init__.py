@@ -104,6 +104,38 @@ class _Notecards:  # #testpoint
         from .notecards_.notecard_via_definition import notecard_via_definition
         return notecard_via_definition(nid_s, core_attributes, listener)
 
+    # == BEGIN [#882.D]
+
+    def notecards_via_NCIDs(self, ncids, listener):
+        with self._coll.open_entities_via_EIDs(ncids, listener) as ents:
+            for nc in self._notecards_via_entities(ents, listener):
+                if nc is None:
+                    yield None  # [#xxx]
+                    continue
+                yield nc
+
+    def _notecards_via_entities(self, ents, listener):
+        def these():
+            for ent in ents:
+                if ent is None:
+                    yield None   # [#xxx]
+                    continue
+                ent_dct = ent.to_dictionary_two_deep()
+                ncid, core_attributes = _validate_these_names(** ent_dct)
+                yield ncid, core_attributes
+        return self.notecards_via_ent_defs_(these(), listener)
+
+    def notecards_via_ent_defs_(_, edefs, listener):
+        from .notecards_.notecard_via_definition import notecard_via_definition
+        for two in edefs:
+            if two is None:
+                yield None  # [#xxx]
+                continue
+            ncid, core_attrs = two
+            yield notecard_via_definition(ncid, core_attrs, listener)
+
+    # == END
+
     def to_identifier_stream(self, listener):
         with self._coll.open_identifier_traversal(listener) as idens:
             for iden in idens:
@@ -116,6 +148,9 @@ class _Notecards:  # #testpoint
 
 def _validate_entity_dictionary_names(identifier_string, core_attributes):
     return identifier_string, core_attributes
+
+
+_validate_these_names = _validate_entity_dictionary_names  # [#882.D]
 
 
 def repr_(value):

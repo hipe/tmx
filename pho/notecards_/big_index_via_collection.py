@@ -67,6 +67,312 @@ There are known holes in our integrity check. See [#882.K].
 """
 
 
+# bcoll = buisiness collection (as distinct from coll, kiss-rdb storage collec)
+
+def big_index_for_many(argument_ncids, bcoll, listener):
+    """Any series of one or more unique identifiers of the collection (in
+
+    any order but no repeats) can produce one or more "node trees" where:
+
+    - every identifier in the argument stream is somewhere in one of the
+      result trees
+    - every identifer of every root of every tree in the result set
+      corresponds to one of the identifiers in the argument stream (but not
+      necessarily the reverse)
+    - none of the nodes in the result trees appear more than once anywhere
+      in the result (which is to say the trees are disjoint — you will not
+      have a tree that ends up being a parent or child tree of a later tree
+      in the result set).
+
+    Since the result trees are disjoint, they have no spatial (or otherwise)
+    relationship to each other and you should not infer meaning to the order
+    they appear in the ressult structure.
+    """
+
+    num, x = _peek_length_of_iterator(argument_ncids)
+    if 0 == num:
+        xx("cover empty stream of identifiers")
+    if 1 == num:
+        xx("fine but just be advised this looks like many not one")
+    assert 2 == num
+    return _big_index_when_many(x, bcoll, listener)
+
+
+def _peek_length_of_iterator(itr):  # [#510.17] a common thing
+    for first in itr:  # once
+        for second in itr:  # once
+            def rebuilt():
+                yield first
+                yield second
+                for item in itr:
+                    yield item
+            return 2, rebuilt()
+        return 1, first
+    return 0, None
+
+
+def _big_index_when_many(argument_ncids, bcoll, listener):
+    """since it's MORE THAN ONE notecard we are big-indexing:
+
+    - for each identifier,
+      - if it's "seen" (recursed), skip
+      - retrieve node from a caching layer but don't mark it as seen
+      - if it has a parent, add it to the "postponed" queue (because
+        if one of its parents appears later in the argument EIDs,
+        it will get indexed there.)
+      - otherwise, call our "descend" function, adding it to "seen"..
+      - the result of this (not just node but tree index) should go
+        in to a "built" hash..
+
+    - for each identifier in the postponed queue,
+      - if it's "seen", skip
+      - again call our "descend" function,  adding it to "seen".
+      - the result of this (not just node but tree index) goes into a
+        "built" hash...
+
+    - each value of the "built" hash is now your result
+    """
+
+    def main():
+        postponed = []
+        for eid in argument_ncids:
+            if eid in seen:
+                continue
+            node = retrieve(eid)
+            if node.parent_identifier_string is not None:
+                postponed.append(eid)
+                continue
+            descend(node)
+
+        for eid in postponed:
+            if eid in seen:
+                continue
+            descend(retrieve(eid))
+        return built, cache
+
+    def descend(node):
+        yn = _is_document(node)
+        res = wrapped_descend(node, yn)
+        if yn:
+            res = (('document_depth_minmax', (0, 0)), *res)  # #here3
+        else:
+            res = tuple(res)
+        eid = node.identifier_string
+        assert eid not in built
+        built[eid] = res
+
+    def WRAP(vendor_descend):
+        def use_descend(node, yn):
+            eid = node.identifier_string
+            if eid in built:
+                return built.pop(eid)
+            if eid in seen:
+                xx('hmmmm think very hard')
+            seen.add(eid)
+            return vendor_descend(node, yn)
+        return use_descend
+
+    def retrieve(eid):
+        node = cache.get(eid)
+        if node:
+            return node
+        node = do_retrieve(eid)
+        if 100 < len(cache):
+            xx("cache is getting big, consider etc")
+        cache[eid] = node
+        return node
+
+    do_retrieve = _build_retriever(bcoll, listener)
+    wrapped_descend = _build_descender(retrieve, WRAP)
+    built, seen, cache = {}, set(), {}
+    return main()
+
+
+def big_index_for_one(argument_EID, bcoll, listener):
+    """(If we're only indexing one notecard, we can bypass lots of moving
+
+    parts: we don't do "reassignment"; we just depth-first traverse the
+    tree ensuring we never see any node more than once, while determining
+    depth etc.)
+
+    - start a "seen" set
+    - add the argument eid to the "seen" set
+    - note whether or not the argument node is a document
+    - you should never retrieve the same eid more than once
+    """
+
+    def main():
+        argument_node = retrieve(argument_EID)
+        is_doc = _is_document(argument_node)
+
+        if is_doc:
+            yield 'document_depth_minmax', (0, 0)  # #here3
+
+        descend = _build_descender(retrieve)
+        for k, v in descend(argument_node, is_doc):
+            yield k, v
+        yield 'business_entity_cache', seen
+
+    def retrieve(eid):
+        if eid in seen:
+            xx(f"Is graph cycling vertically? already seen: {eid!r}")
+        bent = do_retrieve(eid)
+        seen[eid] = bent
+        return bent
+
+    do_retrieve = _build_retriever(bcoll, listener)
+    seen = {}
+    return main()
+
+
+def _build_retriever(bcoll, listener):
+    def retrieve(eid):
+        node = bcoll.retrieve_notecard(eid, listener)
+        if node is None:
+            xx(f"invalid enitty identifier in reference? {eid!r}")
+        assert eid == node.identifier_string  # else something is very wrong
+        return node
+    return retrieve
+
+
+def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
+    """
+    == this is the start of the "recurse" function ==
+      - which requires a "node" argument
+      - and an argument of whether or not we are "in" a document
+
+    - (We will not traverse your any siblings (horizontally))
+    - If you have zero children:
+      - yield that you have an overall depth of 1
+      - (whether we ourselves are a document is handled by caller)
+      - return
+
+    - Otherwise, for each of your one or more children:
+      - assert the current node has no previous (else integrity error)
+
+      - start your overall depth at 1 (this is a "max" number we will add to)
+
+      - while true:
+        - if current node is in seen hash, data integrity error
+        - add it to the seen hash
+
+        - make a copy of the boolean of whether or not you're under a document
+        - if the current node is a document
+            - if you are somewhere under a document in this recurse,
+              data integrity error
+            - update the above boolean to true (it must have been false)
+            - do you have an existing dminmax to be returned? if yes:
+              - whatever the min was before, set it to 1 now (it could not
+                have been zero)
+              - leave the max as is
+            - otherwise:
+              - set dminmax to 1, 1. that is, set both min and max to 1
+        - recurse. with the results:
+          - did the call result in a document depth minmax?
+            - add 1 to each (they are both depths)
+            - if we have no dminmax,
+              - set it to this
+            - otherwise,
+              - update our dminmax min and max if necessary in the usual way
+          - get the overall depth as reported by the node
+          - add one to it.
+          - if this is more than your "max" depth above, update your max
+        - if current node has next, loop again else break
+        - if you have a dminmax, yield that
+        - yield your overall depth as that max
+    """
+
+    def descend(node, is_somewhere_under_document):
+        cx = node.children
+        if cx is None:
+            yield 'overall_depth', 1
+            return
+        assert len(cx)  # don't store empty lists as empty lists
+
+        my_dminmax = None
+        my_overall_depth_so_far_which_is_a_max = 1
+        expanded_children_EIDs = []
+        for ch in expanded_children(cx):
+            cheid = ch.identifier_string
+            expanded_children_EIDs.append(cheid)
+
+            is_somewhere_under_document_for_ch = is_somewhere_under_document
+            if _is_document(ch):
+                if is_somewhere_under_document:
+                    xx("can't have document inside of document")
+                is_somewhere_under_document_for_ch = True
+                if my_dminmax:
+                    my_dminmax[0] = 1
+                else:
+                    my_dminmax = [1, 1]
+            kw = {}
+            for k, v in descend(ch, is_somewhere_under_document_for_ch):
+                if 'expanded_children' == k:
+                    yield k, v
+                    continue
+                assert k not in kw
+                kw[k] = v
+            ch_dminmax = kw.pop('document_depth_minmax', None)
+            if ch_dminmax:
+                cands = [d+1 for d in ch_dminmax]
+                if my_dminmax:
+                    if cands[0] < my_dminmax[0]:
+                        my_dminmax[0] = cands[0]
+                    if my_dminmax[1] < cands[1]:
+                        my_dminmax[1] = cands[1]
+                else:
+                    my_dminmax = cands
+            cand = kw.pop('overall_depth') + 1
+            if my_overall_depth_so_far_which_is_a_max < cand:
+                my_overall_depth_so_far_which_is_a_max = cand
+
+        if my_dminmax:
+            yield 'document_depth_minmax', tuple(my_dminmax)
+
+        yield 'overall_depth', my_overall_depth_so_far_which_is_a_max
+        ec_val = node.identifier_string, tuple(expanded_children_EIDs)
+        yield 'expanded_children', ec_val
+
+    def expanded_children(cx):
+        local_seen = set()  # we've got to check this somewhere else hang
+        for ch in do_expanded_children(cx):
+            eid = ch.identifier_string
+            if eid in local_seen:
+                xx(f"risk of linked list infinite loop cycle: {eid!r}")
+            local_seen.add(eid)
+            yield ch
+
+    def do_expanded_children(cx):  # note [#882.E] will explain
+        for eid in cx:
+            node = retrieve(eid)
+            if node.previous_identifier_string:
+                xx("data-integrity error: child cannot have previous")
+
+            yield node
+            neid = node.next_identifier_string
+            if neid is None:
+                continue
+
+            while True:
+                node = retrieve(neid)
+                if eid != node.previous_identifier_string:
+                    xx("data-integrity error: next doesn't point back to prev")
+                yield node
+                eid = neid
+                neid = node.next_identifier_string
+                if neid is None:
+                    break
+
+    if WRAP_DESCEND_EXPERIMENTAL:
+        descend = WRAP_DESCEND_EXPERIMENTAL(descend)
+
+    return descend
+
+
+def _is_document(node):
+    return 'document' == node.hierarchical_container_type
+
+
 class _CollectionTraversal:
     """mainly, maintain a dictionary so we can sanity check for the integrity
 

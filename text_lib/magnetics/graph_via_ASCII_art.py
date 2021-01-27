@@ -649,7 +649,13 @@ def _build_line_tokenizer():
         'down_arrow_head', 'pipe', 'stonks_slash', 'backslash')
     rang = range(0, len(these))
 
-    node_label = o('node label', '[A-Z0-9]+')  # KISS for now
+    node_label = o('node label', '[a-zA-Z0-9_]+')
+    # (Our rule for node identifiers started as [A-Z0-9]+, then we tried
+    # "same rule as for C-identifiers". Now we are experimentally expanding
+    # it to allow starting with digits (so we can model [kiss-rdb] nodes),
+    # but keep in mind such identifiers are not GraphViz identifiers.
+    # One day we may expand it even more to allow quoted strings.)
+
     spaces = o('spaces', '[ ]+')
 
     return tokens_via_line

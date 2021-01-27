@@ -33,6 +33,7 @@ only in modeling interfaces for this purpose.
 |---------------------------|:-----:|-
 |[#511.4]                   |       | the previous but plus styler
 |[#511.3]                   |       | provision: expression with yield
+|[#510.17]                  | #trak | peek the beginning length of an iterator
 |[#510.16]                  | #trak | meta-programming (kw: metaclass)
 |[#510.15]                  | #trak | [rotating buffer]
 |[#510.14]                  |       | track context stack stuff

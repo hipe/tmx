@@ -11,6 +11,78 @@ reading notes, somewhat like the popular Apple application "Evernote".
 
 (#edit [#880.B] get description from groupchat from around the time of #birth lol.)
 
+The most ambitious conceit of "TMX Notebook" (and also something of an
+offshoot, side-distraction) is perhaps "writing without borders":
+
+
+
+## What is "Writing _With_ Borders"?
+
+When doing this kind of writing, our immediate motivation is normally of
+*content*: "What is the thing that I'm writing right now?" "What are the
+essential pieces of information to jot down so I don't forget this?"
+
+Another equally important category of questions plagues us around
+*context*: "How do these new ideas fit in to the bigger picture of
+[my collection of notes]?" "How will I find this content later when I'm
+looking for it?"
+
+These questions manifest as specific, structural decisions occurring
+continually throughout the process: "Is this file too long yet?",
+"Shouldn't this idea be 'closer' to this related idea in another file?",
+"Are these related ideas voluminous enough to justify their own file (yet)?"
+
+You could just as soon replace "file" above a with other, lower-level
+"hierarchical containers" like "section": "Should these two ideas be in the
+same section or should they each have their own section?" Or substitute
+"paragraph" for "section"; and so on.
+
+And yes, "hierarchical containers" of content go upward too: surely a
+bane to any would-be book author is questions like "Should this
+[huge group of ideas] be _one_ chapter or _two_?" and "What order should these
+chapters be in, relative to each other?"
+
+Just as these "taxonomic" concerns cascade upwards, they also spill outwards
+into various media: the origin story of Kill Bill I & II, or of George Lucas's
+one sprawling script that got somehow partitioned out into nine (?) movies.
+(Does "Einstein on the Beach" really need to be five hours long? Is there
+a radio edit?)
+
+These questions have affinity with the relatively recent idea of
+_Information Architecture_, but they have probably been asked as long
+as humankind has had narrative. (Did the village elder, telling stories
+around the fire, wonder if their rambling narrative was too long or
+incoherent? I bet they did, and I bet I share a good portion of their DNA..)
+
+
+
+## Other editorial concerns, existential concerns
+
+[There's a whole other, related concern of questions, those of _relevance_
+and/or _level-of-detail_: "Is this information too low-level or otherwise
+too parenthetical to my main point?". But we'll just leave here for now as
+this dog-ear EDIT.]
+
+
+
+## So what is Writing _Without_ Borders? (WWB)
+
+Having established the ideas of writing for *content* and *context*, we
+can now begin to suggest our main origin story/creation myth for
+"TMX Notecards", which is mainly an experiment:
+
+The dream is that we write little paragraph-sized ideas in "notecards" without
+initially giving thought to how it fits in to the big picture. Then we place
+the notecard into a giant hierarchy simply by assiging it a "parent" or a
+"previous" notecard, again though not knowing necessarily what the "page"
+will be.
+
+Potential applications for this foundation include "dynamic taxonomification"
+(I don't know how to pronounce it either); but such an imagined feature has
+drawbacks for our immediate target use-case. (EDIT)
+
+VCS integration (EDIT)
+
 
 
 ## About the names & origin
@@ -99,7 +171,7 @@ when you click create
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
 |[#882.G]                   | #hole |
 |[#882.F]                   | #open | we need proper markdown parsing
-|[#882.E]                   | #hole |
+|[#882.E]                   | #trak | [at writing this is a note in an unversioned document lol]
 |[#882.D]                   | #trak | MARK OLD CODE
 |[#882.C]                   | #open | [see] some niche thing for invoking python from GUI
 |[#882.B]                   | #trak | pelookan: track where you use '/pages/'
