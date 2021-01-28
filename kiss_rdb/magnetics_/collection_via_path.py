@@ -261,6 +261,9 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
             def open_identifier_traversal(listener):
                 return read_funcs.open_identifier_traversal(listener)
 
+            def open_EID_traversal_EXPERIMENTAL(listener):
+                return read_funcs.open_EID_traversal_EXPERIMENTAL(listener)
+
             def open_entity_traversal(listener):  # #todo: use conversion
                 @_contextmanager()
                 def cm():
@@ -276,6 +279,11 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
                         cm.__exit__(None, None, None)
                 return cm()
 
+            def open_entities_via_EIDs(eids, listener):
+                iden_via = iden_er_er(listener)
+                itr = (iden_via(eid) for eid in eids)
+                return read_funcs.open_entities_via_identifiers(itr, listener)
+
             def open_schema_and_entity_traversal(listener):
                 return read_funcs.open_schema_and_entity_traversal(listener)
 
@@ -288,7 +296,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         if (o := getattr(fxr, 'CUSTOM_FUNCTIONS_OLD_WAY', None)):
             custom_functions = o
 
-        mixed_collection_identifier_EXPERIMENTAL = x
+        MIXED_COLLECTION_IDENTIFIER = x  # used by [pho] #cover-me
         storage_adapter = sa
 
     if has_custom_functions:

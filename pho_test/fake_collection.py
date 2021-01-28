@@ -43,6 +43,10 @@ class _omg_bcoll_via_ASCII_art_graph:
             return nc
         return dereference
 
+    @property
+    def MIXED_COLLECTION_IDENTIFIER(self):
+        return '/this/collection-made-by-an-ASCII-graph'
+
 
 def _fake_notecard(eid, gi):
     from pho.notecards_.notecard_via_definition import func

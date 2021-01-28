@@ -32,7 +32,7 @@ woah boy.
 |---------------------------|:------|:----|
 |[#899.Z]                   | #eg   | eg
 |[#877.4]                   | #trak | do we want to make string identifiers the default?
-|[#877.C]                   | #hole |
+|[#877.C]                   | #trak | new pattern of holes in traversal streams that client can chose to skip
 |[#877.B]                   | #open | CUSTOM_FUNCTIONS_OLD_WAY .. not sure what do
 |[#877]                     |       | now, a third node for internal & external tracking
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine

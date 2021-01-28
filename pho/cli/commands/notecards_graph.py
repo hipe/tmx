@@ -40,14 +40,7 @@ def _do_CLI(sin, sout, serr, collection_path, do_veri, efx):
         if collection_path is None:
             return
 
-    import pho as lib
-    coll = lib.collection_via_path_(collection_path, listener)
-    if coll is None:
-        return
-
-    big_index = lib.big_index_via_collection_(coll, listener)
-    if big_index is None:
-        return
+    xx("get RO bcoll from cp then big index via RO bcoll")
 
     if do_veri:
         return _express_verification(sout, serr, big_index)

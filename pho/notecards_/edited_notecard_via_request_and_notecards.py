@@ -5,6 +5,7 @@ _FORMALS = {  # [#822.M]
     'parent': {'editable': True, 'LL': True},
     'previous': {'editable': True, 'LL': True},
     'identifier': {'reason': 'identifiers are appointed to you'},
+    'hierarchical_container_type': {'reason': 'locking it down for now'},
     'natural_key': {'editable': 'on_create', 'reason': 'permanant for life'},
     'heading': {'editable': True},
     'document_datetime': {'reason': 'for now, datetime is always generated'},
@@ -95,7 +96,7 @@ def prepare_edit_(eid_tup, mixed, busi_coll, listener):
 def _prepare_for_create(mixed, busi_coll, listener):
 
     # Reserve a new entity identifier for the entity to create
-    eidr = busi_coll.IMPLEMENTATION_.custom_functions\
+    eidr = busi_coll.KISS_COLLECTION_.custom_functions\
         .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
     if eidr is None:
         return  # full
@@ -124,7 +125,8 @@ def _prepare_for_create(mixed, busi_coll, listener):
         min_core_attrs[k] = v
 
     # Build a business object for the entity we are creating
-    bent = busi_coll.entity_via_definition_(eid, min_core_attrs, listener)
+
+    bent = busi_coll.notecard_via_ent_def_(eid, min_core_attrs, listener)
 
     # THE WORST make it not set again because of the check #here5
     for k in min_core_attrs.keys():
@@ -139,7 +141,7 @@ def _prepare_for_create(mixed, busi_coll, listener):
 def _prepare_for_delete(bent, busi_coll, listener):
 
     # Make the patch to remove the identifier from the index
-    ifc = busi_coll.IMPLEMENTATION_.custom_functions\
+    ifc = busi_coll.KISS_COLLECTION_.custom_functions\
         .REMOVE_IDENTIFIER_FROM_INDEX(bent.identifier_string, listener)
     if ifc is None:
         return  # full

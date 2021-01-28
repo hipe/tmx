@@ -209,7 +209,10 @@ def retrieve_random_notecard(sin, sout, serr, argp, efx):
     if ncs is None:
         return mon.exitstatus
     listener = mon.listener
-    yikes = tuple(ncs.to_identifier_stream(listener))
+
+    with ncs.open_identifier_traversal(listener) as idens:
+        yikes = tuple(idens)
+
     leng = len(yikes)
 
     if 0 == leng:

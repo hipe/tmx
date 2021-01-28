@@ -1,4 +1,5 @@
 # entity: 48R: attributes
+hierarchical_container_type: document
 heading: heading for (FRAG: 48R)
 document_datetime: 2019-05-24 18:41:19-04:00
 -- body
@@ -26,5 +27,6 @@ next: 8W2
 
 # document-meta
 -- string_as_comment
+# #history-B.4 add the experimental hierarchical container type (field and value)
 # #born.
 -- string_as_comment

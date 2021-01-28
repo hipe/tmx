@@ -49,11 +49,11 @@ def EXPERIMENTAL_caching_collection(directory, max_num_lines_to_cache=None):
         return FS_reader_class(ci, max_num_lines_to_cache)
     from ._caching_layer import Caching_FS_Reader_ as FS_reader_class, \
         ReadOnlyCollectionLayer_ as collection_class
-    real_coll = eno_collection_via_(directory, fsr=fsr)
+    real_coll = mutable_eno_collection_via(directory, fsr=fsr)
     return collection_class(real_coll)
 
 
-def eno_collection_via_(directory, rng=None, fsr=None):  # #testpoint
+def mutable_eno_collection_via(directory, rng=None, fsr=None):
     import sys
     sa_mod = sys.modules[__name__]
     from kiss_rdb import collection_via_storage_adapter_and_path as func
@@ -178,12 +178,25 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
                     eid, directory, _THREE, listener)
 
         def retrieve_entity_via_identifier(iden, listener):
+            with self.open_entities_via_identifiers((iden,), listener) as ents:
+                res, = ents
+            return res
+
+        def open_entities_via_identifiers(idens, listener):
             mon = _monitor_via_listener(listener)
-            return fs_reader().entity(iden, mon)
+            itr = fs_reader().entities_via_identifiers(idens, mon)
+            from contextlib import nullcontext as func
+            return func(itr)
 
         def open_identifier_traversal(listener):
             from contextlib import nullcontext
-            return nullcontext(self.to_idens(listener))
+            idens = (o for fr in to_FRs(listener) for o in fr.to_identifiers())
+            return nullcontext(idens)
+
+        def open_EID_traversal_EXPERIMENTAL(listener):
+            from contextlib import nullcontext
+            eids = (o for fr in to_FRs(listener) for o in fr.to_EIDs_in_file())
+            return nullcontext(eids)
 
         def open_schema_and_entity_traversal(listener):
             # (There are never files to close. there are no resources to manage
@@ -195,13 +208,9 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
                 yield None, each_entity()  # ..
 
             def each_entity():
-                return (ent for fr in to_FRs(listener)
-                        for ent in fr.to_entities())
-            return cm()
+                return (e for fr in to_FRs(listener) for e in fr.to_entities())
 
-        def to_idens(listener):
-            return (iden for fr in to_FRs(listener)
-                    for iden in fr.to_identifiers())
+            return cm()
 
         def path_via_identifier_(iden, listener):
             return _path_via_identifier(iden, directory, listener)
@@ -249,8 +258,15 @@ class _FS_Reader:
     def __init__(self, ci):
         self._back = ci
 
-    def entity(self, iden, mon):
-        return RetrieveEntity_(iden, mon, self._back).execute()
+    def entities_via_identifiers(self, idens, mon):
+        work = RetrieveEntity_(None, mon, self._back)
+        for iden in idens:
+            if iden is None:
+                yield None  # [#877.C]
+                continue
+            work.identifier = iden
+            ent = work.execute()
+            yield ent
 
     def file_readers_via_monitor(self, mon):
         paths = self._back.to_file_paths_()

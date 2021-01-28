@@ -1,5 +1,6 @@
 def _output_types():
     yield 'markdown', lambda: _CLI_for_markdown
+    yield 'check', lambda: _CLI_for_check
 
 
 def _formals_for_top():
@@ -21,7 +22,7 @@ def CLI(sin, sout, serr, argv, efx=None):  # efx = external functions
 
 
 def _params():
-    from pho.cli import CP_
+    CP_ = _legacy_bridge_1()
 
     yield ('-c', '--collection-path=PATH', * CP_().descs)
 
@@ -123,12 +124,8 @@ def _do_CLI(
         if dry_run and not can_be_dry:
             return _whine_about_dry_run(listener)
 
-        import pho as lib
-        coll = lib.collection_via_path_(collection_path, listener)
-        if coll is None:
-            return
-
-        big_index = lib.big_index_via_collection_(coll, listener)
+        bcoll = _read_only_business_collection(collection_path)
+        big_index = bcoll.build_big_index_OLD_(listener)
         if big_index is None:
             return
 
@@ -189,7 +186,7 @@ def _do_CLI(
     def resolve_collection_path():
         if collection_path is not None:
             return collection_path
-        from pho.cli import CP_
+        CP_ = _legacy_bridge_1()
         return CP_().require_collection_path(efx, listener)
 
     main()
@@ -223,6 +220,146 @@ def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
             sout.write(line)
 
     return mon.returncode
+
+
+def _formals_for_check():
+    yield _collection_path()
+    yield _help_this_screen
+
+
+def _CLI_for_check(sin, sout, serr, bash_argv, efx=None):
+    """Run an integrity check on the whole collection and output
+    a few summary lines
+    """
+
+    tup, rc = _common_start(
+            sout, serr, bash_argv, efx, _CLI_for_check, _formals_for_check)
+    if tup is None:
+        return rc
+    coll_path, foz, mon = tup
+    bcoll = _read_only_business_collection(coll_path)
+    two = bcoll.build_big_index_NEW_(mon.listener)
+    if two is None:
+        return mon.returncode
+
+    hello = tuple(two.to_node_tree_index_items())
+    ordered = sorted(hello, key=lambda tup: (-tup[1].to_node_count(), tup[0]))
+
+    # == BEGIN, our own word-wrap again [#612.6], why always so long 😩
+
+    def lines(line_width):
+        tot, cache = 0, []
+        for piece in pieces():
+            leng = len(piece)
+            is_first_piece_on_line = 0 == len(cache)
+            next_tot = leng if is_first_piece_on_line else (tot + 1 + leng)
+
+            # If we would still be under the limit by adding this content..
+            if next_tot < line_width:
+                if not is_first_piece_on_line:
+                    cache.append(' ')
+                cache.append(piece)
+                tot = next_tot
+                continue
+
+            # If adding this content puts us exactly at the limit..
+            if next_tot == line_width:
+                cache.extend((' ', piece))
+                yield ''.join(cache)  # #here6
+                cache.clear()
+                tot = 0
+                continue
+
+            # Adding this content would put us over
+            assert line_width < next_tot
+
+            # If this is the first piece, output it anyway -
+            # breaking long words is well outside our scope
+            if is_first_piece_on_line:
+                yield piece  # #here6
+                continue
+
+            # Flush the definitely existing content then start a new line
+            yield ''.join(cache)  # #here6
+            cache.clear()
+            cache.append(piece)
+            tot = leng
+
+        if len(cache):
+            yield ''.join(cache)  # #here6
+
+    # == END
+
+    def pieces():  # (avoiding using "scanner" as an exercise)
+        itr = pieces_without_commas()
+        prev = next(itr)  # ..
+        for pc in itr:
+            yield f"{prev},"
+            prev = pc
+        yield f"{prev}."  # or no period
+
+    def pieces_without_commas():
+        for k, ti in ordered:
+            totals.total_number_of_nodes += ti.to_node_count()
+            totals.total_number_of_trees += 1
+            yield piece(k, ti)
+
+    totals = pieces_without_commas  # #watch-the-world-burn
+    totals.total_number_of_trees = 0
+    totals.total_number_of_nodes = 0
+
+    def piece(k, ti):
+        n = ti.to_node_count()
+        return f"{k!r} ({n} node(s))"
+
+    if False:  # (turn this on for visual testing of word wrap and totals lol)
+        def ordered():
+            yield mock('HJK', 12)
+            yield mock('DEF', 7)
+            yield mock('123', 7)
+            yield mock('456', 6)
+            yield mock('123', 6)
+            yield mock('ABC', 3)
+
+        def mock(s, d):
+            return s, mock_ting(d)
+
+        class mock_ting:
+            def __init__(self, d):
+                self.d = d
+
+            def to_node_count(self):
+                return self.d
+        ordered = tuple(ordered())
+
+    coll_path = bcoll.collection_path
+    sout.write(f"Collection {coll_path}:\n")
+
+    for line in lines(79):
+        sout.write(line)
+        sout.write('\n')
+
+    n1, n2 = totals.total_number_of_nodes, totals.total_number_of_trees
+    sout.write(f"{n1} node(s) in {n2} tree(s) all OK.\n")
+    return 0
+
+
+# == Support related to CLI
+
+def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
+    prog_name = bash_argv.pop()
+    foz = _foz_via(foz_func(), lambda: prog_name)
+    vals, rc = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return None, rc
+    if vals.get('help'):
+        rc = foz.write_help_into(sout, CLI_func.__doc__)
+        return None, rc
+    mon = efx.produce_monitor()
+    coll_path, rc = _require_collection_path(mon.listener, vals, efx)
+    if coll_path is None:
+        return None, rc
+    return (coll_path, foz, mon), None
 
 
 def _build_extended_FOZ_for_MD(adapter_func, prog_name):
@@ -420,7 +557,7 @@ def _parse_output_type(serr, bash_argv, arg, foz):
 
     # Parse rest
     child_CLI = child_CLI_funcer()
-    rf = child_CLI.rest_formal
+    rf = getattr(child_CLI, 'rest_formal', None)
     if rf is None:
         if rest is not None:
             tail = ''.join((':', rest))
@@ -477,6 +614,8 @@ def _crazy_parse(arg_func):
     return pool, pi.desc_lines
 
 
+# == Whiners
+
 def _whine_about_dry_run(listener):
     def _():
         return {'reason': '«dry-run» is meaningless when output is stdout'}
@@ -520,11 +659,21 @@ def __whine_big_flex_pieces(is_recursive, has_frag_id, has_out_path):
 
 # == Delegations & smalls
 
+def _read_only_business_collection(collection_path):
+    from pho import read_only_business_collection_via_path_ as func
+    return func(collection_path)
+
+
 def _require_collection_path(listener, vals, efx):
     val = vals.pop('collection_path', None)
     if val is not None:
         return val, None
     return _CPT().require_collection_path(listener, efx)
+
+
+def _legacy_bridge_1():
+    cpt = _CPT()
+    return lambda: cpt
 
 
 def _CPT():

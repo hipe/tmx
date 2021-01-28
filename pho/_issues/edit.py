@@ -11,7 +11,7 @@ def open_issue(readme, dct, listener, be_verbose=False, opn=None):
             # (when someting doesn't work right, turning verbose on can help)
             yield f'means: {typ}'
             yield f'identifier: {iden.to_string()}'
-            x = ic.collection.mixed_collection_identifier_EXPERIMENTAL
+            x = ic.collection.MIXED_COLLECTION_IDENTIFIER  # [#882.G]
             if hasattr(x, 'name'):
                 x = x.name
             yield f'collection identifier: {x}'

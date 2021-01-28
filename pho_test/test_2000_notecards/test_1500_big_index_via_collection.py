@@ -1,4 +1,6 @@
-from pho_test.common_initial_state import collection_one, throwing_listenerer
+from pho_test.common_initial_state import \
+        read_only_business_collection_one as collection_one, \
+        throwing_listenerer
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import unittest
@@ -45,8 +47,8 @@ order from timestamps (but then how?))
 def higher_level_end_state(attr):  # #decorator
     def decorator(orig_f):
         def use_f(self):
-            built, cache = getattr(self, attr)
-            return higher_level_end_state_for_multiple(built, cache)
+            two_tup_plus = getattr(self, attr)
+            return {k: v for k, v in two_tup_plus.to_node_tree_index_items()}
         return use_f
     return decorator
 
@@ -159,8 +161,7 @@ class Case1505_the_only_New_Way_case(CommonCase):
         """
 
         bcoll = self.fake_collection
-        eids = bcoll._coll.TO_EIDS_FOR_TEST()  # (same as:)
-        # eids = (iden.to_string() for iden in bcoll.to_identifier_stream(None
+        eids = bcoll._coll.TO_EIDS_FOR_TEST()
 
         peek = tuple(reversed(eids))
         eids = iter(peek)
@@ -170,7 +171,8 @@ class Case1505_the_only_New_Way_case(CommonCase):
     def end_state_for_one(self):
         ncs = self.fake_collection
         itr = subject_function_for_one()('A', ncs, None)
-        return tree_index_via_items(itr)
+        func = subject_module().higher_level_functions().tree_index_via_items
+        return func(itr)
 
     @shared_subject
     def fake_collection(self):
@@ -376,37 +378,7 @@ class _CustomIndex:
 
 @lazy
 def _big_index_one():
-    listener = throwing_listenerer()
-    from pho.notecards_ import big_index_via_collection as lib
-    _coll = collection_one()
-    return lib.big_index_via_collection(_coll, listener)
-
-
-def higher_level_end_state_for_multiple(built, cache):
-    def these():
-        for k, tup in built.items():
-            yield k, tree_index_via_items(tup)
-    return {k: v for k, v in these()}
-
-
-def tree_index_via_items(items):  # probably move up to library
-    slots = {k: None for k in _these}
-    cx_of = {}
-    for k, val in items:
-        if 'expanded_children' == k:
-            parent_eid, cx_eids = val
-            assert parent_eid not in cx_of
-            cx_of[parent_eid] = cx_eids
-            continue
-        assert slots[k] is None
-        slots[k] = val
-    return TreeIndex(children_of=cx_of, **slots)
-
-
-_these = 'document_depth_minmax overall_depth business_entity_cache'.split()
-
-
-TreeIndex = _nt('TreeIndex', (*_these, 'children_of'))  # noqa: E501
+    return collection_one().build_big_index_OLD_(throwing_listenerer())
 
 
 # == BEGIN hackishly duplicate a small portion of `blinker`, as a treat

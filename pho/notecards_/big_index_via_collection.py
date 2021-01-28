@@ -89,9 +89,14 @@ def big_index_for_many(argument_ncids, bcoll, listener):
     they appear in the ressult structure.
     """
 
+    coll_path = bcoll.collection_path  # out here until [#882.G]
     num, x = _peek_length_of_iterator(argument_ncids)
     if 0 == num:
-        xx("cover empty stream of identifiers")
+        # #cover-me (developed visually)
+        def lines():
+            yield f"empty or non-existent collection: {coll_path!r}"
+        listener('error', 'expression', 'empty_or_notent_collection', lines)
+        return
     if 1 == num:
         xx("fine but just be advised this looks like many not one")
     assert 2 == num
@@ -148,7 +153,7 @@ def _big_index_when_many(argument_ncids, bcoll, listener):
             if eid in seen:
                 continue
             descend(retrieve(eid))
-        return built, cache
+        return higher_level_functions()._named_tuple_for_big_index(built, cache)  # noqa: E501
 
     def descend(node):
         yn = _is_document(node)
@@ -223,6 +228,76 @@ def big_index_for_one(argument_EID, bcoll, listener):
     do_retrieve = _build_retriever(bcoll, listener)
     seen = {}
     return main()
+
+
+# ==
+
+def higher_level_functions():
+    o = higher_level_functions
+    if o.x is None:
+        o.x = _define_higher_level_functions()
+    return o.x
+
+
+higher_level_functions.x = None  # #[#510.4] custom memoizer
+
+
+def _define_higher_level_functions():
+    """We are adamant (for now) that the result of indexing a single node tree
+    be a *stream* (iterator) of name-value pairs that might go in to making an
+    index; it's up to the client to consume this stream and cherry-pick (or
+    otherwise process) the elements in a manner appropriate to the use case.
+    Having said that, here's an example all-purpose ting
+    """
+
+    def export():
+        yield 'public', 'tree_index_via_items', tree_index_via_items
+        yield 'protected', '_named_tuple_for_big_index', _BigIndex_NEW_WAY
+
+    def to_node_tree_index_items(self):
+        return ((k, tree_index_via_items(tup))
+                for k, tup in self.built.items())
+
+    def tree_index_via_items(items):
+        slots, cx_of = {k: None for k in simple_fields}, {}
+        for k, val in items:
+            if 'expanded_children' == k:
+                parent_eid, cx_eids = val
+                assert parent_eid not in cx_of
+                cx_of[parent_eid] = cx_eids
+                continue
+            assert slots[k] is None
+            slots[k] = val
+        return _TreeIndex(children_of=cx_of, **slots)
+
+    from collections import namedtuple as _nt
+
+    _BigIndex_NEW_WAY = _nt('_BigIndex_NEW_WAY', ('built', 'cache'))
+    _BigIndex_NEW_WAY.to_node_tree_index_items = to_node_tree_index_items
+
+    simple_fields = """
+        document_depth_minmax overall_depth business_entity_cache
+    """.split()
+
+    _TreeIndex = _nt('_TreeIndex', (*simple_fields, 'children_of'))
+
+    def count(self):
+        return sum(len(v) for v in self.children_of.values()) + 1
+
+    _TreeIndex.to_node_count = count
+
+    pub_dct, prot_dct = {}, []
+    for visi, k, v in export():
+        if 'public' == visi:
+            pub_dct[k] = v
+            continue
+        assert 'protected' == visi
+        prot_dct.append((k, v))
+
+    cls = _nt('_FX', pub_dct.keys())
+    for k, v in prot_dct:
+        setattr(cls, k, v)  # BE CAREFUL
+    return cls(** pub_dct)
 
 
 def _build_retriever(bcoll, listener):
@@ -578,7 +653,7 @@ class _OrderedRun:
         return self._collection_traversal.big_index
 
 
-def big_index_via_collection(collection, listener):
+def func(collection, listener):
 
     ids_of_frags_with_no_parent_or_previous = []
     unresolved_forward_references_of = {}
@@ -625,9 +700,6 @@ def big_index_via_collection(collection, listener):
     return _BigIndex(
             ids_of_frags_with_no_parent_or_previous,
             parent_of, children_of, previous_of, next_of, frag_of)
-
-
-func = big_index_via_collection
 
 
 def _complain_about_bad_double_linkedness_parents_vs_children(

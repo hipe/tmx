@@ -1,4 +1,4 @@
-from pho_test.common_initial_state import collection_one
+from pho_test.common_initial_state import big_index_one
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject
 import unittest
@@ -31,13 +31,8 @@ class Case1620_MONO_CASE(unittest.TestCase):
         from pho.notecards_.graph_via_collection import \
             output_lines_via_big_index_
 
-        from pho import big_index_via_collection_
-
-        busi_coll = collection_one()
-
         def run(listener):
-            bi = big_index_via_collection_(busi_coll, listener)
-            assert(bi)
+            bi = big_index_one()
             _itr = output_lines_via_big_index_(bi, listener)
             return tuple(_itr)  # you have to do it in here to reach the emits
 

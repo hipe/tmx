@@ -1,7 +1,7 @@
 def coll_via_path(dir_path, **kw):
     if len(kw):
         assert ('rng',) == tuple(kw.keys())  # just saying hello
-    func = _subject_module().eno_collection_via_
+    func = _subject_module().mutable_eno_collection_via
     return func(dir_path, **kw)
 
 

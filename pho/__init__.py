@@ -1,12 +1,21 @@
-def notecards_via_path(ncs_path, listener):
+def mutable_business_collection_via_path_NOT_RE_INTEGRATED_YET(collection_path):  # noqa: E501
     def rng(pool_size):
         from random import randrange
         return randrange(1, pool_size)  # avoid 222 #open [#867.V]
+    return _mutable_business_collection_via(collection_path, rng)
 
-    coll = collection_via_path_(ncs_path, listener, rng)
-    if coll is None:
-        return
-    return _Notecards(coll)
+
+def _mutable_business_collection_via(collection_path, rng):  # #testpoint
+    from kiss_rdb.storage_adapters_.eno import \
+        mutable_eno_collection_via as func
+    coll = func(collection_path, rng=rng)
+    return coll and _Notecards(coll)
+
+
+def read_only_business_collection_via_path_(collection_path):
+    from kiss_rdb.storage_adapters_.eno import \
+        EXPERIMENTAL_caching_collection as func
+    return _Notecards(func(collection_path))
 
 
 class _Notecards:  # #testpoint
@@ -62,12 +71,13 @@ class _Notecards:  # #testpoint
             return
         cf = self._coll.custom_functions
 
-        # The below list is the keys in order from neighbor [#822.M], minus
+        # The below list is the keys in order from [#822.M], minus
         # one of them. Whenever it gets annoying, load that module & change to:
         # d = {k: None for k in formals.keys()}; d.pop('identifier'); d.keys()
 
         order = (
-          'parent', 'previous', 'natural_key', 'heading', 'document_datetime',
+          'parent', 'previous', 'hierarchical_container_type',
+          'natural_key', 'heading', 'document_datetime',
           'body', 'children', 'next', 'annotated_entity_revisions')
 
         ifc_dct = (ifc := edit.index_file_change) and ifc.to_dictionary()
@@ -84,6 +94,19 @@ class _Notecards:  # #testpoint
         from .notecards_.edited_notecard_via_request_and_notecards \
                 import prepare_edit_
         return prepare_edit_(eid_tup, mixed, self, listener)
+
+    # == Read-Only Methods
+
+    def build_big_index_NEW_(self, listener=None):
+        from .notecards_.big_index_via_collection import \
+            big_index_for_many as func
+
+        with self.open_EID_traversal_EXPERIMENTAL(listener) as eids:
+            return func(eids, self, listener)
+
+    def build_big_index_OLD_(self, listener):  # [#882.D]
+        from .notecards_.big_index_via_collection import func
+        return func(self._coll, listener)
 
     def retrieve_notecard(self, ncid, listener):
         ent = self._coll.retrieve_entity(ncid, listener)
@@ -125,6 +148,11 @@ class _Notecards:  # #testpoint
                 yield ncid, core_attributes
         return self.notecards_via_ent_defs_(these(), listener)
 
+    def notecard_via_ent_def_(self, eid, core_attrs, listener):
+        defs = ((eid, core_attrs),)
+        bent, = self.notecards_via_ent_defs_(defs, listener)
+        return bent
+
     def notecards_via_ent_defs_(_, edefs, listener):
         from .notecards_.notecard_via_definition import notecard_via_definition
         for two in edefs:
@@ -136,13 +164,18 @@ class _Notecards:  # #testpoint
 
     # == END
 
-    def to_identifier_stream(self, listener):
-        with self._coll.open_identifier_traversal(listener) as idens:
-            for iden in idens:
-                yield iden
+    def open_identifier_traversal(self, listener):
+        return self._coll.open_identifier_traversal(listener)
+
+    def open_EID_traversal_EXPERIMENTAL(self, listener):
+        return self._coll.open_EID_traversal_EXPERIMENTAL(listener)
 
     @property
-    def IMPLEMENTATION_(self):
+    def collection_path(self):
+        return self._coll.MIXED_COLLECTION_IDENTIFIER
+
+    @property
+    def KISS_COLLECTION_(self):
         return self._coll
 
 
@@ -169,21 +202,6 @@ def repr_(value):
 
 _SOMEWHAT_LESS_THAN_A_LINES_WIDTH = 60
 
-
-# == stowaway support for magnetics
-
-def big_index_via_collection_(coll, listener):
-    from pho.notecards_.big_index_via_collection import func
-    return func(coll, listener)
-
-
-def collection_via_path_(collection_path, listener, rng=None):
-    from kiss_rdb import collectionerer
-    return collectionerer().collection_via_path(
-            collection_path, listener, rng=rng)
-
-
-# ==
 
 def xx(msg=None):
     use_msg = ''.join(('oops/write me', * ((': ', msg) if msg else ())))

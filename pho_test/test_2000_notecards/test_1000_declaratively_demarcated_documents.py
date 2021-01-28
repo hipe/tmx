@@ -1,6 +1,7 @@
-from pho_test.common_initial_state import collection_two
+from pho_test.common_initial_state import \
+        read_only_business_collection_two as notecards_two
 from modality_agnostic.test_support.common import \
-        listener_and_emissions_for, lazy, \
+        listener_and_emissions_for, \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 import unittest
 
@@ -96,12 +97,6 @@ def nodes_in_order_via(start_eid, coll, listener):
     from pho.notecards_.abstract_document_via_notecards import \
             document_notecards_in_order_via_any_arbitrary_start_node_ as func
     return func(start_eid, coll, listener)
-
-
-@lazy
-def notecards_two():
-    from pho import _Notecards as cls
-    return cls(collection_two())
 
 
 if __name__ == '__main__':

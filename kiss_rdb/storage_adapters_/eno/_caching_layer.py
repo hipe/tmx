@@ -9,8 +9,15 @@ class ReadOnlyCollectionLayer_:
     def open_identifier_traversal(self, listener):
         return self._back.open_identifier_traversal(listener)
 
+    def open_EID_traversal_EXPERIMENTAL(self, listener):
+        return self._back.open_EID_traversal_EXPERIMENTAL(listener)
+
     def open_entity_traversal(self, listener):
         return self._back.open_entity_traversal(listener)
+
+    @property
+    def MIXED_COLLECTION_IDENTIFIER(self):  # #cover-me [pho]
+        return self._back.MIXED_COLLECTION_IDENTIFIER
 
 
 class Caching_FS_Reader_:  # #testpoint
@@ -32,11 +39,16 @@ class Caching_FS_Reader_:  # #testpoint
             import func
         self._doubly_linked_list = func()  # #[#510.15] one of several rotbuff
 
-    def entity(self, iden, mon):
-        mfr = self._file_reader_for(iden, mon)
-        if mfr is None:
-            return
-        return mfr.dereference(iden, mon)
+    def entities_via_identifiers(self, idens, mon):
+        for iden in idens:
+            if iden is None:
+                yield None  # [#877.C]
+                continue
+            mfr = self._file_reader_for(iden, mon)
+            if mfr is None:
+                yield None  # [#877.C]
+                continue
+            yield mfr.dereference(iden, mon)
 
     def _file_reader_for(self, iden, mon):
 
@@ -185,7 +197,7 @@ class Caching_FS_Reader_:  # #testpoint
 def _build_my_file_reader(fr, path, mon):
 
     # Index sections by entity identifier
-    section_offset_via_EID, sections, offset = {}, [], 0
+    section_offset_via_EID, sections, offset = {}, [], -1
     for typ, eid, sect in fr.to_section_elements():
         offset += 1
         if 'entity_section' == typ:
@@ -223,14 +235,16 @@ class _MyFileReader:
         self._build_entity = func
 
     def to_entities(self):
-        iden_via = self._idenerer()
         mon = self._monitor
-        for eid in self.to_EIDs_in_file():
-            iden = iden_via(eid)
+        for iden in self.to_identifiers():
             ent = self.dereference(iden, mon)
             if ent is None:
                 break
             yield ent
+
+    def to_identifiers(self):  # #not-covered
+        iden_via = self._idenerer()
+        return (iden_via(eid) for eid in self.to_EIDs_in_file())
 
     def dereference(self, iden, mon):
 

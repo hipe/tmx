@@ -46,7 +46,8 @@ class CommonCase(unittest.TestCase):
 
         # Build the collection
         coll_path = this_one_dir()
-        from kiss_rdb.storage_adapters_.eno import eno_collection_via_ as func
+        from kiss_rdb.storage_adapters_.eno import \
+            mutable_eno_collection_via as func
         coll = func(coll_path, fsr=fsr)
 
         rest = () if (eid := self.given_EID()) is None else (eid,)

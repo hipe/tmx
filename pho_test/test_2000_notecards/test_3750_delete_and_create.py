@@ -1,4 +1,5 @@
-from pho_test.common_initial_state import business_collection_one
+from pho_test.common_initial_state import \
+        mutable_business_collection_one as business_collection_one
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes
 from unittest import TestCase, main as unittest_main

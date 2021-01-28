@@ -19,28 +19,36 @@ def lazy(f):  # #[#510.8]
 # == Collections
 
 @lazy
-def business_collection_one():
+def big_index_one():
+    bcoll = read_only_business_collection_one()
+    return bcoll.build_big_index_OLD_(None)
+
+
+@lazy  # 👀
+def mutable_business_collection_one():
+    return _mutable_business_collection_via(fixture_directory_one())
+
+
+@lazy
+def read_only_business_collection_two():
+    return _read_only_business_collection_via(fixture_directory_two())
+
+
+@lazy
+def read_only_business_collection_one():
+    return _read_only_business_collection_via(fixture_directory_one())
+
+
+def _mutable_business_collection_via(collection_path):
     def rng(pool_size):
         return 11584  # DC6 with two behind it?
-    from pho import _Notecards, collection_via_path_
-    directory = fixture_directory_one()
-    coll = collection_via_path_(directory, lambda *_: xx(), rng)
-    return _Notecards(coll)
+    from pho import _mutable_business_collection_via as func
+    return func(collection_path, rng)
 
 
-@lazy
-def collection_two():
-    return _collection_via_directory(fixture_directory_two())
-
-
-@lazy
-def collection_one():
-    return _collection_via_directory(fixture_directory_one())
-
-
-def _collection_via_directory(directory):
-    from pho import collection_via_path_
-    return collection_via_path_(directory, lambda *_: xx())
+def _read_only_business_collection_via(directory):
+    from pho import read_only_business_collection_via_path_ as func
+    return func(directory)
 
 
 def throwing_listenerer():
@@ -77,11 +85,7 @@ def _top_test_dir():
 # == These
 
 def xx(msg=None):
-    raise xxx(msg)
-
-
-def xxx(msg=None):
     use_msg = ''.join(('oops / write me', * ((': ', msg) if msg else ())))
-    return RuntimeError(use_msg)
+    raise RuntimeError(use_msg)
 
 # #born.
