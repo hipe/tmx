@@ -26,8 +26,13 @@ class _omg_bcoll_via_ASCII_art_graph:
     def open_identifier_traversal(self, _):
         return _nullcontext(_Identifier(k) for k in self._graph.nodes.keys())
 
-    def TO_EIDS_FOR_TEST(self):
+    def open_EID_traversal_EXPERIMENTAL(self, _):
+        return _nullcontext(self._to_EIDs())
+
+    def _to_EIDs(self):
         return self._graph.nodes.keys()
+
+    TO_EIDS_FOR_TEST = _to_EIDs
 
     def open_entities_via_EIDs(self, eids, listener):
         deref = self._build_dereferencer(listener)
@@ -60,7 +65,7 @@ def _do_fake_notecard(eid, gi):
     if 'd' == eid[-1]:  # lol
         use_HCT = 'document'
 
-    use_heading = r"Hello I am the heading for {eid!r}"
+    use_heading = f"Hello I am the heading for {eid!r}"
 
     use_body = f"Hello i am the body for {eid!r} KISS For now"
     # (no newline at end of line so it looks like the accidentally bad way)

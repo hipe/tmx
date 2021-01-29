@@ -1,5 +1,6 @@
 def _output_types():
     yield 'markdown', lambda: _CLI_for_markdown
+    yield 'tree', lambda: _CLI_for_tree
     yield 'check', lambda: _CLI_for_check
 
 
@@ -222,6 +223,32 @@ def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
     return mon.returncode
 
 
+def _formals_for_tree():
+    yield '-t', '--test', "(whether to load --collection-path as ..)"
+    yield _collection_path()
+    yield _help_this_screen
+
+
+def _CLI_for_tree(sin, sout, serr, bash_argv, efx=None):
+    "Generate a tree..."
+
+    tup, rc = _common_start(
+            sout, serr, bash_argv, efx, _CLI_for_tree, _formals_for_tree)
+    if tup is None:
+        return rc
+    coll_path, vals, foz, mon = tup
+    big_index = _big_index_via(coll_path, mon.listener, vals.get('test'))
+    if big_index is None:
+        return mon.returncode
+
+    from pho.notecards_.graph_via_collection import \
+        tree_ASCII_art_lines_via as func
+
+    for line in func(big_index):
+        sout.write(line)
+    return 0
+
+
 def _formals_for_check():
     yield _collection_path()
     yield _help_this_screen
@@ -236,7 +263,7 @@ def _CLI_for_check(sin, sout, serr, bash_argv, efx=None):
             sout, serr, bash_argv, efx, _CLI_for_check, _formals_for_check)
     if tup is None:
         return rc
-    coll_path, foz, mon = tup
+    coll_path, _vals, foz, mon = tup
     bcoll = _read_only_business_collection(coll_path)
     two = bcoll.build_big_index_NEW_(mon.listener)
     if two is None:
@@ -313,24 +340,7 @@ def _CLI_for_check(sin, sout, serr, bash_argv, efx=None):
         return f"{k!r} ({n} node(s))"
 
     if False:  # (turn this on for visual testing of word wrap and totals lol)
-        def ordered():
-            yield mock('HJK', 12)
-            yield mock('DEF', 7)
-            yield mock('123', 7)
-            yield mock('456', 6)
-            yield mock('123', 6)
-            yield mock('ABC', 3)
-
-        def mock(s, d):
-            return s, mock_ting(d)
-
-        class mock_ting:
-            def __init__(self, d):
-                self.d = d
-
-            def to_node_count(self):
-                return self.d
-        ordered = tuple(ordered())
+        ordered = _build_mock_ordered()
 
     coll_path = bcoll.collection_path
     sout.write(f"Collection {coll_path}:\n")
@@ -344,7 +354,36 @@ def _CLI_for_check(sin, sout, serr, bash_argv, efx=None):
     return 0
 
 
+def _build_mock_ordered():
+    def ordered():
+        yield mock('HJK', 12)
+        yield mock('DEF', 7)
+        yield mock('123', 7)
+        yield mock('456', 6)
+        yield mock('123', 6)
+        yield mock('ABC', 3)
+
+    def mock(s, d):
+        return s, mock_ting(d)
+
+    class mock_ting:
+        def __init__(self, d):
+            self.d = d
+
+        def to_node_count(self):
+            return self.d
+    return tuple(ordered())
+
+
 # == Support related to CLI
+
+def _big_index_via(coll_path, listener, is_test=False):
+    if is_test:
+        bcoll = _read_only_business_collection_via_fixture_path(coll_path)
+    else:
+        bcoll = _read_only_business_collection(coll_path)
+    return bcoll.build_big_index_NEW_(listener)
+
 
 def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
     prog_name = bash_argv.pop()
@@ -359,7 +398,7 @@ def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
     coll_path, rc = _require_collection_path(mon.listener, vals, efx)
     if coll_path is None:
         return None, rc
-    return (coll_path, foz, mon), None
+    return (coll_path, vals, foz, mon), None
 
 
 def _build_extended_FOZ_for_MD(adapter_func, prog_name):
@@ -658,6 +697,17 @@ def __whine_big_flex_pieces(is_recursive, has_frag_id, has_out_path):
 
 
 # == Delegations & smalls
+
+def _read_only_business_collection_via_fixture_path(fpath):
+    i = fpath.rindex('.')
+    head = fpath[:i]
+    tail = fpath[i+1:]
+    from importlib import import_module as func
+    mod = func(head)
+    cls = getattr(mod, tail)
+    tc = cls(methodName='CAN_BE_USED_BY_VISUAL_TEST')
+    return tc.COLLECTION_FOR_VISUAL_TEST
+
 
 def _read_only_business_collection(collection_path):
     from pho import read_only_business_collection_via_path_ as func

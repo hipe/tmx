@@ -334,6 +334,21 @@ and should cycle-back to inform possibly all of these steps (hopefully
 not much step (2) though).
 
 
+
+## Table of commonly-used abbreviations for variable names
+
+(EDIT there's lots to say about where we do and don't use abbreviations)
+
+
+| Name | Expanded |
+|:-----|:------|
+| cls  | class
+| cx   | children
+| tc   | test case (unit testing library test case class instance)
+
+
+
+
 [semver]: http://semver.org
 
 ## (document-meta)
