@@ -18,12 +18,6 @@ def lazy(f):  # #[#510.8]
 
 # == Collections
 
-@lazy
-def big_index_one():
-    bcoll = read_only_business_collection_one()
-    return bcoll.build_big_index_OLD_(None)
-
-
 @lazy  # 👀
 def mutable_business_collection_one():
     return _mutable_business_collection_via(fixture_directory_one())

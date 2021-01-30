@@ -1,5 +1,6 @@
 def _output_types():
     yield 'markdown', lambda: _CLI_for_markdown
+    yield 'dotfile', lambda: _CLI_for_dotfile
     yield 'tree', lambda: _CLI_for_tree
     yield 'check', lambda: _CLI_for_check
 
@@ -223,8 +224,38 @@ def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
     return mon.returncode
 
 
+def _formals_for_dotfile():
+    yield _the_test_option
+    yield _collection_path()
+    yield _help_this_screen
+
+
+def _CLI_for_dotfile(sin, sout, serr, bash_argv, efx=None):
+    """Generate a graph-viz document from a notecards collection
+
+    Show every relationship between every notecard in the collection.
+    Output a graph-viz digraph of the whole collection.
+    """
+
+    tup, rc = _common_start(
+            sout, serr, bash_argv, efx, _CLI_for_dotfile, _formals_for_dotfile)
+    if tup is None:
+        return rc
+    coll_path, vals, foz, mon = tup
+    big_index = _big_index_via(coll_path, mon.listener, vals.get('test'))
+    if big_index is None:
+        return mon.returncode
+
+    from pho.notecards_.graph_via_collection import \
+        graphviz_dotfile_lines_via_ as func
+
+    for line in func(big_index, mon.listener):
+        sout.write(line)
+    return mon.returncode
+
+
 def _formals_for_tree():
-    yield '-t', '--test', "(whether to load --collection-path as ..)"
+    yield _the_test_option
     yield _collection_path()
     yield _help_this_screen
 
@@ -620,6 +651,7 @@ def _collection_path():
     return '-c', '--collection-path=PATH', *_CPT().descs
 
 
+_the_test_option = '-t', '--test', "(whether to load --collection-path as ..)"
 _help_this_screen = '-h', '--help', "This screen"
 
 
@@ -753,6 +785,7 @@ def xx(msg=None):
     raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
 
+# #history-B.5 absorb graph-viz command (file)
 # #history-B.4 begin re-arch for different SSG adapters and one god "generate"
 # #history-A.1 rewrite during cheap arg parse not click
 # #born.

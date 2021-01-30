@@ -1,4 +1,3 @@
-from pho_test.common_initial_state import big_index_one
 from modality_agnostic.test_support.common import \
         listener_and_emissions_for, \
         dangerous_memoize as shared_subject
@@ -79,41 +78,51 @@ class Case1610_ASCII_tree_intro(CommonCase):
         yield r"                     Y    1d      "
 
 
-class Case1620_MONO_CASE(CommonCase):
+class Case1620_dotfile_intro(CommonCase):
 
     def test_100_lines_are_okay_probably(self):
         lines, _, _ = self.custom_end_state
         self.assertEqual(lines[0].index('digraph g {'), 0)
         self.assertIn(len(lines), range(16, 30))
 
-    def test_150_lines_are_NOT_newline_terminated(self):
+    def test_150_lines_are_YES_newline_terminated(self):
+        # (this changed in #history-B.4 from *not* to yes)
         lines, _, _ = self.custom_end_state
-        self.assertEqual(lines[0], 'digraph g {')
-        self.assertEqual(lines[-1], '}')
+        self.assertEqual(lines[0], 'digraph g {\n')
+        self.assertEqual(lines[-1], '}\n')
 
     def test_200_emits_a_summary(self):
         _, payloader_BE_CAREFUL_HOT, chan = self.custom_end_state
         self.assertSequenceEqual(chan, ('info', 'structure', 'summary'))
         sct = payloader_BE_CAREFUL_HOT()
         import re
-        md = re.match(
-                r'^graph reflects relationships among (\d+) notecards\.$',
-                sct['message'])
-        self.assertIn(int(md[1]), range(6, 10))
+        rx = re.compile(r"""
+            ^graph[ ]reflects[ ](?P<num_nodes>\d+)[ ]node\(s\)[ ]
+            in[ ](?P<num_trees>\d+)[ ]tree\(s\)\.?
+        """, re.VERBOSE)
+        act = sct['message']
+        self.assertRegex(act, rx)
+        md = rx.match(act)
+        nn, nt = (int(md[k]) for k in 'num_nodes num_trees'.split())
+
+        exp = 5, 6  # expect this to change soon-ish
+        self.assertSequenceEqual((nt, nn), exp)
 
     @shared_subject
     def custom_end_state(self):
+        # Prepare listener
+        from modality_agnostic.test_support.common import \
+            listener_and_emissions_for as func
+        listener, emissions = func(self, limit=1)
+
+        # Resolve business collection then big index
+        bcoll = self.given_collection
+        big_index = bcoll.build_big_index_NEW_(listener)
+
+        # Perform
         output_lines_via_big_index = subject_function_for_GraphViz()
-
-        def run(listener):
-            bi = big_index_one()
-            _itr = output_lines_via_big_index(bi, listener)
-            return tuple(_itr)  # you have to do it in here to reach the emits
-
-        import modality_agnostic.test_support.common as em
-        listener, emissions = em.listener_and_emissions_for(self, limit=1)
-
-        lines = run(listener)
+        lines = output_lines_via_big_index(big_index, listener)
+        lines = tuple(lines)  # You have to do it to produce the emissions
         emi, = emissions
 
         if self.do_debug:
@@ -123,11 +132,20 @@ class Case1620_MONO_CASE(CommonCase):
 
         return lines, emi.payloader, emi.channel
 
+    @property
+    def given_collection(self):
+        from pho_test.common_initial_state import \
+            read_only_business_collection_one as func
+        return func()
+
+    CAN_BE_USED_BY_VISUAL_TEST = True
+    COLLECTION_FOR_VISUAL_TEST = given_collection
+
     do_debug = False
 
 
 def subject_function_for_GraphViz():
-    return subject_module().output_lines_via_big_index_
+    return subject_module().graphviz_dotfile_lines_via_
 
 
 def subject_function_for_ASCII():
@@ -142,4 +160,5 @@ def subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4 change dotfile tests to cover big index new way
 # #born.

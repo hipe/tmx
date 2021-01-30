@@ -2,49 +2,57 @@ _max_rows_per_label = 3
 _max_cols_per_label = 9
 
 
-def output_lines_via_big_index_(o, listener):
+def graphviz_dotfile_lines_via_(big_index, listener):
 
-    # begin
+    yield 'digraph g {\n'
+    yield '  rankdir=BT\n'
 
-    yield 'digraph g {'
-    yield 'rankdir=BT'
+    unordered = tuple(big_index.to_node_tree_index_items())
+    ordered = _same_order(unordered)
 
-    # previouses
+    def lines_for_subgraph(eid, tree_index):
+        yield f"  subgraph cluster_{eid} {{\n"
+        yield f"    label=\"\\nThe '{eid}' node tree\"\n"
 
-    for me, prev in o.previous_of.items():
-        yield f'_{me}->_{prev}[label="prev"]'
+        all_eids = [eid]
 
-    # parents
+        for parent_eid, eids in tree_index.children_of.items():  # ..
+            for ch_eid in eids:
+                yield f"    _{ch_eid}->_{parent_eid}\n"
+                all_eids.append(ch_eid)
 
-    for parent, cx in o.children_of.items():
-        for child in cx:
-            yield f'_{child}->_{parent}[label="parent"]'
+        totals.node += len(all_eids)
+        totals.tree += 1
 
-    # no parents
+        for ch_eid in all_eids:
+            node = cache[ch_eid]
+            plus = ''
+            if 'document' == node.hierarchical_container_type:
+                plus = " style=filled"
+            label = label_via(node.heading, ch_eid)
+            yield f"    _{ch_eid}[label={label}{plus}]\n"
 
-    for iid in o.ids_of_frags_with_no_parent_or_previous:
-        yield f'_{iid}->"(no parent)"'
+        yield '  }\n'
 
-    # labels for nodes
     notch = len(' (ABC)') - 4  # ??
     these = _these_via_these(_max_cols_per_label, _max_rows_per_label, notch)
     label_via = _build_label_maker(these, '(', ')')
 
-    frag_of = o.notecard_of
-    for k, frag in frag_of.items():
-        label = label_via(frag.heading, frag.identifier_string)
-        yield f'_{k}[label={label}]'
+    totals = lines_for_subgraph  # #watch-the-world-burn
+    totals.tree = 0
+    totals.node = 0
 
-    # done
+    cache = big_index.cache
 
-    yield ('label="\\n(generated) notecard relationships\\n'
-           'in your whole collection"')
-    yield '}'
+    for eid, tree_index in ordered:
+        for line in lines_for_subgraph(eid, tree_index):
+            yield line
+
+    yield "}\n"
 
     def f():
-        _num = len(frag_of)
-        _message = f'graph reflects relationships among {_num} notecards.'
-        return {'message': _message}
+        msg = f"graph reflects {totals.node} node(s) in {totals.tree} tree(s)."
+        return {'message': msg}
     listener('info', 'structure', 'summary', f)
 
 
@@ -169,8 +177,8 @@ def _normal_tree_via_big_index(big_index):
         cx_of = tree_index.children_of
         return make_childrener(top_key)
 
-    these = tuple(big_index.to_node_tree_index_items())
-    ordered = sorted(these, key=lambda tup: (-tup[1].to_node_count(), tup[0]))
+    unordered = tuple(big_index.to_node_tree_index_items())
+    ordered = _same_order(unordered)
     cache = big_index.cache
 
     return 'collection', tree_indexes_as_children
@@ -187,6 +195,9 @@ def _label_pieces_for(node):
     if (s := node.heading):
         yield f" {s!r}"
 
+
+def _same_order(unordered):
+    return sorted(unordered, key=lambda tup: (-tup[1].to_node_count(), tup[0]))
 
 # == END
 
