@@ -126,8 +126,9 @@ def CUD_parser_via_formal_entity(formal_entity):
     def many_lineser():
 
         def filter(strange_set):
+            our_repr = _our_repr()
             for strange in strange_set:
-                s = repr_(strange)
+                s = our_repr(strange)
                 if s is None:
                     continue
                 yield f'  - had{s}'
@@ -241,9 +242,9 @@ class _CUD:
         return self.dattr  # meh
 
 
-def repr_(value):
-    from pho import repr_ as _
-    return _(value)
+def _our_repr():
+    from pho.magnetics_.text_via import our_repr as func
+    return func
 
 
 class _ModuleLocalException(RuntimeError):

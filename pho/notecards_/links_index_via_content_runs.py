@@ -64,7 +64,7 @@ def _build_line_replacer(new_name_via_old_name):
             old_key = line[name_begin:name_end]
             new_name = new_name_via_old_name.get(old_key)
             if new_name is None:
-                xx(f"RSL identifier used but not defined: {old_key!r}")
+                xx(f"RSL identifier used but not defined: {old_key!r} {line!r}")  # noqa: E501
             yield new_name
             yield line[name_end:match_end]  # always just ']'
             cursor = match_end

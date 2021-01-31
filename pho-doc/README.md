@@ -161,6 +161,7 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.Q]                   | #open | our internal reference to [#605.6], help screen option desc lines
 |[#882.P]                   | #trak | [graph via collection]
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
 |[#882.M]                   | #trak | formal attributes (the model) is balkanized

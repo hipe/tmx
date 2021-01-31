@@ -133,17 +133,7 @@ class AbstractDocument_:
         yield f"{section_count} section(s)\n"
         yield f"{body_line_count} body lines(s)\n"
 
-    def TO_LINES(self, listener=None):
-        # #todo: adapters should be the one doing this. this is just
-        # here to bridge to old tests for now
-
-        if self.frontmatter:
-            yield '---\n'
-            for k, v in self.frontmatter.items():
-                yield f'{k}: {v}\n'  # meh
-            yield '---\n'
-            yield '\n'  # idk
-
+    def TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES(self):
         for s in self.sections:
             for line in s.to_normalized_lines():
                 yield line

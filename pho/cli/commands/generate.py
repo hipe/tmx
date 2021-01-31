@@ -195,32 +195,110 @@ def _do_CLI(
     return monitor.exitstatus
 
 
+def _base_formals_for_markdown():
+    yield _collection_path()
+    yield '-n', '--dry-run', "Doesn't actually write files"
+    yield '-v', '--verbose', "Output one line per file"
+    yield _help_this_screen  # they can request help again here, diff sig
+    yield 'output-directory', 'Output directory to put markdown in'
+
+
 @_adapter_powered_command('generate_markdown')
 def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
     """Generate markdown tailored to the specific SSG.
 
-    Specify the SSG adapter, e.g.: "-t md:pelican".
-    You can specify "-t md:help" or "-t md:list".
+    If you specify '-' for the output directory, lines are written to
+    STDOUT (with each filename written in a line to STDERR)
+
+    Specifying an SSG adapter will show more options.
+    Try "-t md:help" or "-t md:list".
     """
 
-    tup, rc = _this_is_a_lot(sout, serr, bash_argv, efx, _CLI_for_markdown)
+    tup, rc = _this_is_a_lot(
+            sout, serr, bash_argv, efx,
+            _base_formals_for_markdown(), _CLI_for_markdown)
     if tup is None:
         return rc
     adapter_func, vals, mon = tup  # #here5
 
-    omg = adapter_func(**vals)
-    for tup in omg:
+    # ==
+
+    path_head = vals.pop('output_directory')
+    is_dry = vals.pop('dry_run', False)
+    be_verbose = vals.pop('verbose', False)
+
+    do_output_to_stdout = False
+    if '-' == path_head:
+        do_output_to_stdout = True
+        path_head = '.'
+
+    # ==
+
+    if is_dry and do_output_to_stdout:
+        serr.write("-n and collection path of '-' are mutually exclusive\n")
+        return 123
+
+    # ==
+
+    if do_output_to_stdout:
+        def open_file(wpath):
+            serr.write(f"MARKDOWN FILE: {wpath}\n")
+            from contextlib import nullcontext as func
+            return func(write)
+
+        def write(s):
+            return sout.write(s)
+        write.write = write  # #watch-the-world-burn
+    elif is_dry:
+        def open_file(wpath):
+            from contextlib import nullcontext as func
+            return func(write)
+
+        def write(s):
+            return len(s)
+        write.write = write  # #watch-the-world-burn
+    else:
+        def open_file(wpath):
+            return open(wpath, 'w')
+
+    from os.path import join as _path_join
+
+    tot_files, tot_lines, tot_something = 0, 0, 0
+    did_error = False
+
+    for tup in adapter_func(**vals):
         typ = tup[0]
         if 'adapter_error' == typ:
+            did_error = True
             continue  # or w/e
         if 'markdown_file' != typ:
-            xx("ok neato have fun: {typ!r}")
-        entry, lines = tup[1:]
+            xx(f"ok neato have fun: {typ!r}")
 
-        sout.write(f"DAMN SHAWTY OKAYY: {entry!r}\n")
+        path_tail, lines = tup[1:]
+
+        wpath = _path_join(path_head, path_tail)
+        with open_file(wpath) as io:
+            local_tot_something = 0
+            for line in lines:
+                local_tot_something += io.write(line)
+                tot_lines += 1
+
+            if be_verbose:
+                serr.write(f"wrote {wpath} ( ~ {local_tot_something} bytes)\n")
+
+            tot_something += local_tot_something
+
+        tot_files += 1
+
         for line in lines:
             sout.write(line)
 
+    do_summary = not (did_error and 0 == tot_something)
+    # (do summary unless we errored AND no bytes were written)
+
+    if do_summary:
+        serr.write(f"wrote {tot_files} file(s), "
+                   f"{tot_lines} lines, ~ {tot_something} bytes\n")
     return mon.returncode
 
 
@@ -303,58 +381,10 @@ def _CLI_for_check(sin, sout, serr, bash_argv, efx=None):
     hello = tuple(two.to_node_tree_index_items())
     ordered = sorted(hello, key=lambda tup: (-tup[1].to_node_count(), tup[0]))
 
-    # == BEGIN, our own word-wrap again [#612.6], why always so long 😩
-
     def lines(line_width):
-        tot, cache = 0, []
-        for piece in pieces():
-            leng = len(piece)
-            is_first_piece_on_line = 0 == len(cache)
-            next_tot = leng if is_first_piece_on_line else (tot + 1 + leng)
-
-            # If we would still be under the limit by adding this content..
-            if next_tot < line_width:
-                if not is_first_piece_on_line:
-                    cache.append(' ')
-                cache.append(piece)
-                tot = next_tot
-                continue
-
-            # If adding this content puts us exactly at the limit..
-            if next_tot == line_width:
-                cache.extend((' ', piece))
-                yield ''.join(cache)  # #here6
-                cache.clear()
-                tot = 0
-                continue
-
-            # Adding this content would put us over
-            assert line_width < next_tot
-
-            # If this is the first piece, output it anyway -
-            # breaking long words is well outside our scope
-            if is_first_piece_on_line:
-                yield piece  # #here6
-                continue
-
-            # Flush the definitely existing content then start a new line
-            yield ''.join(cache)  # #here6
-            cache.clear()
-            cache.append(piece)
-            tot = leng
-
-        if len(cache):
-            yield ''.join(cache)  # #here6
-
-    # == END
-
-    def pieces():  # (avoiding using "scanner" as an exercise)
-        itr = pieces_without_commas()
-        prev = next(itr)  # ..
-        for pc in itr:
-            yield f"{prev},"
-            prev = pc
-        yield f"{prev}."  # or no period
+        from pho.magnetics_.text_via import \
+            word_wrap_pieces_using_commas as func
+        return func(pieces_without_commas(), line_width)
 
     def pieces_without_commas():
         for k, ti in ordered:
@@ -432,7 +462,7 @@ def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
     return (coll_path, vals, foz, mon), None
 
 
-def _build_extended_FOZ_for_MD(adapter_func, prog_name):
+def _build_extended_FOZ(adapter_func, prog_name, base_formals):
 
     # Crazy parse the signature AND DOCSTRING of the function
     pool, desc_lines = _crazy_parse(adapter_func)
@@ -450,20 +480,35 @@ def _build_extended_FOZ_for_MD(adapter_func, prog_name):
     # Construct a formal ARGV from this omg
     def formals():
         # Options before positionals
-        for tup in opts:
-            yield tup
-        yield _collection_path()  # because assumption above
-        yield _help_this_screen  # they can request help again here, diff sig
 
-        # Positionals after options
-        for tup in posis:
+        # Options from adapter BEFORE base options
+        for tup in ada_opts:
             yield tup
-    opts, posis = _ARGV_formals_via_formals(pool.items())
+
+        for tup in base_opts:
+            yield tup
+
+        # Positionals adapter AFTER base positionsls
+        for tup in base_posis:
+            yield tup
+
+        for tup in ada_posis:
+            yield tup
+
+    ada_opts, ada_posis = _ARGV_formals_via_formals(pool.items())
+
+    base_opts, base_posis = [], []
+    for tup in base_formals:
+        if '-' == tup[0][0]:
+            base_opts.append(tup)
+        else:
+            base_posis.append(tup)
+
     foz = _foz_via(formals(), lambda: prog_name)
     return foz, desc_lines, monitor_not_listener
 
 
-def _this_is_a_lot(sout, serr, bash_argv, efx, caller_func):
+def _this_is_a_lot(sout, serr, bash_argv, efx, base_formals, caller_func):
     """Effect this rule table balancing loading adapter & serving help
 
     ({no adapter|bad adapter|good adapter} x {no help|yes help}):
@@ -493,7 +538,7 @@ def _this_is_a_lot(sout, serr, bash_argv, efx, caller_func):
     # Build the extended, final foz from the adapter (if we know one)
     if adapter_arg and adapter_loaded_OK:
         adapter_func = getattr(mod, caller_func.adapter_function_name)  # ..
-        three = _build_extended_FOZ_for_MD(adapter_func, prog_name)
+        three = _build_extended_FOZ(adapter_func, prog_name, base_formals)
         foz, adapter_desc_lines, monitor_not_listener = three
 
     def mega_lines():
@@ -768,11 +813,9 @@ def _foz_via(defs, pner, x=None):
     return func(defs, pner, x)
 
 
-def _oxford_join(slugs, sep):  # rewrite something in text_lib
-    leng = len(slugs := tuple(slugs))
-    seps = '', *(', ' for _ in range(0, leng-2)), sep
-    rows = tuple((seps[i], repr(slugs[i])) for i in range(0, leng))
-    return ''.join(s for row in rows for s in row)
+def _oxford_join(slugs, sep):
+    from pho.magnetics_.text_via import oxford_join as func
+    return func(slugs, sep)
 
 
 def _normal_lines_via_docstring(big_string):

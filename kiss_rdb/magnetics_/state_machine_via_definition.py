@@ -526,7 +526,7 @@ def re_emit_case_error_CRAZILY(listener, stack, emi_tup):  # EXPERIMENTAL
         sct = emi.payloader()
         msgs = [sct['reason']]  # #here2
     else:
-        msg = emi.to_messages()
+        msgs = list(emi.to_messages())
 
     # Downcase the first letter of the first messages
     msg = msgs[0]

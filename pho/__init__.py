@@ -12,10 +12,16 @@ def _mutable_business_collection_via(collection_path, rng):  # #testpoint
     return coll and _Notecards(coll)
 
 
-def read_only_business_collection_via_path_(collection_path):
+def read_only_business_collection_via_path_(collection_path, listener=None):
+
+    if not isinstance(collection_path, str):
+        collection_path.build_big_index_NEW_
+        return collection_path
+
     from kiss_rdb.storage_adapters_.eno import \
         EXPERIMENTAL_caching_collection as func
-    return _Notecards(func(collection_path))
+    coll = func(collection_path, listener=listener)
+    return _Notecards(coll)
 
 
 class _Notecards:  # #testpoint
@@ -184,28 +190,6 @@ def _validate_entity_dictionary_names(identifier_string, core_attributes):
 
 
 _validate_these_names = _validate_entity_dictionary_names  # [#882.D]
-
-
-def repr_(value):
-    def do_repr():
-        return ''.join((': ', repr(value)))
-
-    if not isinstance(value, str):
-        assert(isinstance(value, tuple))  # ..
-        return do_repr()
-
-    if len(value) <= _SOMEWHAT_LESS_THAN_A_LINES_WIDTH:  # meh
-        return do_repr()
-
-    return ''
-
-
-_SOMEWHAT_LESS_THAN_A_LINES_WIDTH = 60
-
-
-def xx(msg=None):
-    use_msg = ''.join(('oops/write me', * ((': ', msg) if msg else ())))
-    raise RuntimeError(use_msg)
 
 
 HELLO_FROM_PHO = "hello from pho"

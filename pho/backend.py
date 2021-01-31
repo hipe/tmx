@@ -292,8 +292,8 @@ def _parse_children_value(string, serr):
     md = re.match(f'^{rxs}(?:,[ ]{rxs})*$', string)
     if md:
         return tuple(string.split(', ')), None
-    from pho import repr_
-    serr.write(f"expecting format: 'aa, bb, cc'{repr_(string)}\n")
+    from pho.magnetics_.text_via import our_repr as func
+    serr.write(f"expecting format: 'aa, bb, cc'{func(string)}\n")
     return None, 5
 
 

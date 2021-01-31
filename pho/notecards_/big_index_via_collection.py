@@ -69,6 +69,158 @@ There are known holes in our integrity check. See [#882.K].
 
 # bcoll = buisiness collection (as distinct from coll, kiss-rdb storage collec)
 
+
+# == BEGIN
+
+def _narrative_property(attr):  # #[#510.6] custom memoizer decorator
+    def decorator(orig_f):
+        def use_f(self):
+            val = getattr(self, attr, None)
+            if val is not None:
+                return val
+            val = orig_f(self)
+            if val is None:
+                raise self._stop()
+            setattr(self, attr, val)
+            return val
+        return property(use_f)
+    return decorator
+
+
+class NarrativeFacilitator:
+    """Experimental high-level facilitator for "narrative"-style code
+
+    The purpose is to allow us to write dense "main" code that reads like
+    algorithm pseudocode, while encapsulating commmon boilerplate.
+
+    Unlike most of our modern-day objects, this one is highly stateful.
+    Every participating business value is evaluated lazily and memoized.
+    When it fails to resolve, the argument "stop" exception is raised.
+    Clients always catch this following the the same idiomatic pattern.
+    Such exceptions will be raised repeatedly on repeated dereferencings.
+    """
+
+    def __init__(self, ncid, collection_path, listener, stop):
+        self._NCID = ncid
+        self._collection_path = collection_path
+        self._listener, self._stop = listener, stop
+        self._notecardness_is_known = False
+
+    # Actions: whiners
+
+    def complain_about_no_container(self):
+        def lines():
+            yield f"Notecard '{self._NCID}' is not part of a document or document hierarchy"  # noqa: E501
+        self._listener('error', 'expression', 'notecard_not_under_container', lines)  # noqa: E501
+
+    # High-level conditions
+
+    @property
+    def node_is_specified_and_document_tree(self):
+        if self._NCID is None:
+            return False
+        return 'this_is_a_document_tree_index' == self._my_personal_index[0]
+
+    @property
+    def node_is_specified_and_part_of_document(self):
+        if self._NCID is None:
+            return False
+        return 'these_are_notecards' == self._my_personal_index[0]
+
+    # (possibly mutating) Getters (as appropriate for condition)
+
+    def PROCURE_EXACTLY_ONE_DOCUMENT_TREE(self):
+        bcoll = self._read_only_collection
+        bi = bcoll.build_big_index_NEW_(self._listener)
+        ks = tuple(bi.built.keys())
+        # ks = ('ABC', 'DEF', 'GHI', * 'sf sef sef efs fsef sef efsfe'.split())
+        if 1 != len(ks):
+            _when_not_one_node_tree(self._listener, ks, bcoll)
+            raise self._stop()
+        (k, ti), = bi.to_node_tree_index_items()
+
+        assert ti.business_entity_cache is None  # the worst, meh
+        ti = ti._replace(business_entity_cache=bi.cache)
+
+        return ti
+
+    def RELEASE_DOCUMENT_TREE(self):
+        typ, x = self._release_thing()
+        assert 'this_is_a_document_tree_index' == typ
+        return x
+
+    def RELEASE_ABSTRACT_DOCUMENT(self):
+        typ, x = self._release_thing()
+        assert 'these_are_notecards' == typ
+        ncs = (nc for (nc, depth) in x)  # ignoring depth for now
+        from .abstract_document_via_notecards import \
+            abstract_document_via_notecards_iterator_ as func
+        return func(ncs)
+
+    def _release_thing(self):
+        typ, x = self._my_personal_index_value
+        del self._my_personal_index_value
+        return typ, x
+
+    @_narrative_property('_my_personal_index_value')
+    def _my_personal_index(self):
+        eid = self._NCID
+        assert eid is not None
+
+        # Build the big index under the node
+        bcoll = self._read_only_collection
+        itr = big_index_for_one(eid, bcoll, self._listener)
+        # ..
+        func = higher_level_functions().tree_index_via
+        tree_index = func(eid, itr)
+
+        ddmm = tree_index.document_depth_minmax
+        if ddmm is None:
+            # This node is not a document, no documents within the tree.
+            # We try this older "look up" way second because if it fails
+            # it emits and doing it second allows us not to hack a listener
+            return self._ting_ting()
+
+        return 'this_is_a_document_tree_index', tree_index
+
+    def _ting_ting(self):
+        from .abstract_document_via_notecards import \
+            document_notecards_in_order_via_any_arbitrary_start_node_ as func
+
+        itr = func(self._NCID, self._read_only_collection, self._listener)
+        if itr is None:
+            raise self._stop()
+        return 'these_are_notecards', itr
+
+    @property
+    def notecard_NOT_USED(self):
+
+        # Return cached value if we already resolve it (None ok)
+        # (can't use normal memoizer because none is valid :/)
+        if self._notecardness_is_known:
+            return self._notecard
+        if self._NCID is None:
+            self._notecardness_is_known, self._notecard = True, None
+            return
+
+        # Resolve the notecard via the EID
+        bcoll = self._read_only_collection
+        nc = bcoll.retrieve_notecard(self._NCID, self._listener)
+        if nc is None:
+            raise self._stop()
+
+        # Memoize it
+        self._notecardness_is_known, self._notecard = True, nc
+        return self._notecard
+
+    @_narrative_property('_bcoll')
+    def _read_only_collection(self):
+        from pho import read_only_business_collection_via_path_ as func
+        return func(self._collection_path, listener=self._listener)
+
+# == END
+
+
 def big_index_for_many(argument_ncids, bcoll, listener):
     """Any series of one or more unique identifiers of the collection (in
 
@@ -251,14 +403,14 @@ def _define_higher_level_functions():
     """
 
     def export():
-        yield 'public', 'tree_index_via_items', tree_index_via_items
+        yield 'public', 'tree_index_via', tree_index_via
         yield 'protected', '_named_tuple_for_big_index', _BigIndex_NEW_WAY
 
     def to_node_tree_index_items(self):
-        return ((k, tree_index_via_items(tup))
+        return ((k, tree_index_via(k, tup))
                 for k, tup in self.built.items())
 
-    def tree_index_via_items(items):
+    def tree_index_via(root_EID, items):
         slots, cx_of = {k: None for k in simple_fields}, {}
         for k, val in items:
             if 'expanded_children' == k:
@@ -268,7 +420,7 @@ def _define_higher_level_functions():
                 continue
             assert slots[k] is None
             slots[k] = val
-        return _TreeIndex(children_of=cx_of, **slots)
+        return _TreeIndex(root_EID, children_of=cx_of, **slots)
 
     from collections import namedtuple as _nt
 
@@ -279,11 +431,15 @@ def _define_higher_level_functions():
         document_depth_minmax overall_depth business_entity_cache
     """.split()
 
-    _TreeIndex = _nt('_TreeIndex', (*simple_fields, 'children_of'))
+    _TreeIndex = _nt('_TreeIndex', ('root_EID', *simple_fields, 'children_of'))
+
+    def TO_ABSTRACT_DOCUMENTS(self):
+        return _abstract_documents_via_tree_index(self)
 
     def count(self):
         return sum(len(v) for v in self.children_of.values()) + 1
 
+    _TreeIndex.TO_ABSTRACT_DOCUMENTS = TO_ABSTRACT_DOCUMENTS
     _TreeIndex.to_node_count = count
 
     pub_dct, prot_dct = {}, []
@@ -298,6 +454,50 @@ def _define_higher_level_functions():
     for k, v in prot_dct:
         setattr(cls, k, v)  # BE CAREFUL
     return cls(** pub_dct)
+
+
+def _abstract_documents_via_tree_index(ti):
+
+    def recurse(k, path_head):
+        node = cache[k]
+        if _is_document(node):
+            flat = recurse_nodes_via_node(k)
+            ad = AD_via(flat)
+            yield path_head, ad
+            return
+
+        slug = _slug_via_heading_EXPERIMENTAL(node.heading)
+        if not len(slug):
+            xx(f"can't make slug from heading: {node.heading!r}")
+
+        ch_path_head = (*path_head, slug)
+        for ch_k in cx_of[k]:
+            for tup in recurse(ch_k, ch_path_head):
+                yield tup
+
+    def recurse_nodes_via_node(k):
+        yield cache[k]
+        ks = cx_of.get(k)
+        if ks is None:
+            return
+        for ch_k in ks:
+            for node in recurse_nodes_via_node(ch_k):
+                yield node
+
+    from pho.notecards_.abstract_document_via_notecards import \
+        abstract_document_via_notecards_iterator_ as AD_via
+
+    cx_of = ti.children_of
+    cache = ti.business_entity_cache
+    return recurse(ti.root_EID, ())
+
+
+def _slug_via_heading_EXPERIMENTAL(heading):  # repeating something from elsew
+    import re
+    all_caps = re.compile(r'^[A-Z]+\Z')
+    pcs = (s for s in re.split('[^a-zA-Z0-9]+', heading) if len(s))
+    pcs = ((s if all_caps.match(s) else s.lower()) for s in pcs)
+    return '-'.join(pcs)
 
 
 def _build_retriever(bcoll, listener):
@@ -700,6 +900,17 @@ def func(collection, listener):
     return _BigIndex(
             ids_of_frags_with_no_parent_or_previous,
             parent_of, children_of, previous_of, next_of, frag_of)
+
+
+def _when_not_one_node_tree(listener, tree_idens, bcoll):
+    0 == len(tree_idens) and xx('wahoo')
+    from pho.magnetics_.text_via import word_wrap_pieces_using_commas as func
+
+    def lines():
+        yield "Multiple node trees, choose one:"
+        for line in func(tree_idens, 24):
+            yield line
+    listener('error', 'expression', 'multiple_node_trees', lines)
 
 
 def _complain_about_bad_double_linkedness_parents_vs_children(

@@ -1,4 +1,6 @@
 # entity: PBC: attributes
+
+hierarchical_container_type: document
 heading: Comparison of GUI toolkits
 -- body
 # The very high-level summary:

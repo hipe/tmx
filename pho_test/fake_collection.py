@@ -67,7 +67,7 @@ def _do_fake_notecard(eid, gi):
 
     use_heading = f"Hello I am the heading for {eid!r}"
 
-    use_body = f"Hello i am the body for {eid!r} KISS For now"
+    use_body = f"Hello i am the body for {eid!r} KISS For now\nline 2"
     # (no newline at end of line so it looks like the accidentally bad way)
 
     use_parent = gi.parent_of.get(eid)

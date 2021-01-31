@@ -345,6 +345,9 @@ class _functions:
     pass
 
 
+HELLO_I_AM_AN_ADAPTER_MODULE = True
+
+
 def xx(msg=None):
     raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 

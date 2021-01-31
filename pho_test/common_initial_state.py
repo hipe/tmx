@@ -41,6 +41,11 @@ def _mutable_business_collection_via(collection_path):
 
 
 def _read_only_business_collection_via(directory):
+
+    if not isinstance(directory, str):
+        directory.build_big_index_NEW_  # [#022]
+        return directory
+
     from pho import read_only_business_collection_via_path_ as func
     return func(directory)
 

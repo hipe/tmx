@@ -171,8 +171,8 @@ class Case1505_the_only_New_Way_case(CommonCase):
     def end_state_for_one(self):
         ncs = self.fake_collection
         itr = subject_function_for_one()('A', ncs, None)
-        func = subject_module().higher_level_functions().tree_index_via_items
-        return func(itr)
+        func = subject_module().higher_level_functions().tree_index_via
+        return func('A', itr)
 
     @shared_subject
     def fake_collection(self):
@@ -209,7 +209,10 @@ class Case1540_whole_document_tree_from_first_collection(CommonCase):
 
     def test_100_some_lines_were_made(self):
         num = self.custom_index.total_line_count
-        self.assertLess(100, num)
+
+        self.assertLess(86, num)
+        # (at #history-B.6 no more frontmatter in custom index. away soon)
+
         self.assertLess(num, 120)
 
     def test_220_every_notecard_heading_was_expressed_somehow(self):
@@ -234,7 +237,8 @@ class Case1540_whole_document_tree_from_first_collection(CommonCase):
         return custom_index_via_big_index(_big_index_one(), self)
 
 
-_this_range = range(52, 60)
+_this_range = range(48, 60)
+# #history-B.6 lowered min by 4 becase no more frontmatter
 # #history-B.4 lowered min by 7 because less blank lines
 # #history-A.1 bumped max by 1 because of unknown change
 
@@ -326,7 +330,7 @@ def custom_index_via_big_index(big_index, tc):
 
     def visit_doc(doc):
         send_doc_title_signal(doc.document_title)
-        for line in doc.TO_LINES():
+        for line in doc.TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES():
             send_line_signal(line)
 
     for doc in big_index.TO_DOCUMENT_STREAM():
@@ -437,6 +441,7 @@ def xx(*aa):
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.6
 # #history-B.5 insert/spike for new big index via hierarchical container type
 # #history-B.4
 # #history-A.1

@@ -223,7 +223,7 @@ def _find_document_root_node(eid, notecards, listener=None):
 
     curr = notecards.retrieve_notecard(eid, listener)
     if curr is None:
-        xx("cover me, easy: when start node not found. probably just return")
+        return None  # e.g malformed EID
 
     seen = set()
     while True:
@@ -328,7 +328,9 @@ def _sections(itr):
     if 0 == len(rsl_defs):
         return
 
-    lines = tuple(o.to_line() for o in rsl_defs.values())
+    lines = ("\n", *(o.to_line() for o in rsl_defs.values()))
+    # (Hugo and maybe others require one blank line to separate it from etc)
+
     yield 'section', _markdown_section(None, lines)
 
 
@@ -387,7 +389,8 @@ def _final_sexps(notecards):
 
 def _sections_future_and_each_RSL_definition_run(body):
 
-    body_sexps = _sexps_via_lines(_lines_via_big_string(body))
+    body_sexps = _sexps_via_lines(_lines_via_body_string(body))
+    body_sexps = tuple(body_sexps)
 
     def future():
         return result_all_sections
@@ -693,14 +696,36 @@ def _when_not_in_document(listener, num_hops, eid):
             and_what = f"and none of its {num_hops} predecessor(s) are either"
         else:
             and_what = "and it has no parents"
-        yield f"'{eid}' is not in a document: it is not not a document root node {and_what}"  # noqa: E501
+        yield f"'{eid}' is not in a document: it is not a document root node {and_what}"  # noqa: E501
     listener('error', 'expression', 'node_not_in_document', lines)
 
 
 # == Smalls
 
-def _lines_via_big_string(big_s):  # #[#610]
-    return (md[0] for md in _re.finditer('[^\n]*\n|[^\n]+', big_s))
+def _lines_via_body_string(big_string):  # #[#610]
+    """(Discussion: this was a oneliner before, but now we normalize the last
+
+    line to ensure it's always newline-terminated even if the big string
+    didn't enter storage that way. (So this is a lossy codex: we don't retrieve
+    what is stored; we munge two cases of input into one output.)
+    This is for poka-yoke: to accomodate the way we typically terminate bodies
+    "by hand", in the manner that looks right (but isn't); so (in turn)
+    regexes like #here4 can assume every line is newline-terminated. hotfix.
+
+    We don't split because it wastes memory. Also it's orthogonal to above.)
+    """
+
+    itr = _re.finditer('[^\n]*\n', big_string)
+    leng = len(big_string)
+    md = None
+    for md in itr:
+        yield md[0]
+    if md is None:
+        xx("empty body? not covered yet")
+    _start, stop = md.span()
+    if stop < leng:
+        raw_string = big_string[stop:]
+        yield ''.join((raw_string, '\n'))
 
 
 # == Regexen

@@ -213,7 +213,7 @@ _argument_error = 'edit_argument_error'
 
 def _resolve_children(o, destination_attr, received_value):
     if isinstance(received_value, str):  # #[#022]
-        raise TypeError(f"can't be string any more {repr_(received_value)}")
+        raise TypeError(f"can't be string any more {_repr(received_value)}")
 
     cx = tuple(o.retrieve(eid) for eid in received_value)
     eid = o.entity_identifier_string
@@ -232,7 +232,7 @@ def _resolve_children(o, destination_attr, received_value):
 
     if len(set(received_value)) < len(received_value):
         anp, cat = attribute_noun_phrase_and_category()
-        o.stop(f"{anp} cannot include duplicates{repr_(received_value)}")
+        o.stop(f"{anp} cannot include duplicates{_repr(received_value)}")
 
     setattr(o, destination_attr, cx)
 
@@ -384,7 +384,7 @@ class _UoW_Writer:
             return
         self.stop(
             f"existing value of '{self.document_attribute_name}' is"
-            f" already set to the requested value{repr_(ev)}")
+            f" already set to the requested value{_repr(ev)}")
 
     def ensure_not_set(self):
         value = self.existing_value
@@ -789,9 +789,9 @@ def _CUD_parser():
     return CUD_parser_via_formal_entity(_FORMALS)
 
 
-def repr_(value):
-    from pho import repr_ as _
-    return _(value)
+def _repr(x):
+    from pho.magnetics_.text_via import our_repr as func
+    return func(x)
 
 
 class _Stop(RuntimeError):

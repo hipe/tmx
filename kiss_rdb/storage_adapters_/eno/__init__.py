@@ -44,20 +44,22 @@ def field_line(var_name, string_value):
 
 # == END
 
-def EXPERIMENTAL_caching_collection(directory, max_num_lines_to_cache=None):
+def EXPERIMENTAL_caching_collection(
+        directory, max_num_lines_to_cache=None, listener=None):
     def fsr(ci):
         return FS_reader_class(ci, max_num_lines_to_cache)
     from ._caching_layer import Caching_FS_Reader_ as FS_reader_class, \
         ReadOnlyCollectionLayer_ as collection_class
-    real_coll = mutable_eno_collection_via(directory, fsr=fsr)
-    return collection_class(real_coll)
+    real_coll = mutable_eno_collection_via(
+        directory, fsr=fsr, listener=listener)
+    return real_coll and collection_class(real_coll)
 
 
-def mutable_eno_collection_via(directory, rng=None, fsr=None):
+def mutable_eno_collection_via(directory, rng=None, fsr=None, listener=None):
     import sys
     sa_mod = sys.modules[__name__]
     from kiss_rdb import collection_via_storage_adapter_and_path as func
-    return func(sa_mod, directory, None, rng=rng, fsr=fsr)
+    return func(sa_mod, directory, listener, rng=rng, fsr=fsr)
 
 
 def CREATE_COLLECTION(collection_path, listener, is_dry):
