@@ -5,6 +5,7 @@ from os.path import join as _join, dirname as _dirname
 
 def make_pelican_starter_project(c, path):
     _make_sure_path_not_exists_but_parent_directory_does(path)
+    _mkdir(path)
     _make_empty_content_tree(_join(path, 'content'))
     _mkdir(_join(path, 'output'))
 

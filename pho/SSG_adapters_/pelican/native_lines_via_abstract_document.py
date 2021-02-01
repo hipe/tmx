@@ -10,10 +10,12 @@ these refactorings down the road, but we didn't want to early abtract them:
 - One day if there's ever another SSG adapter, abstract out parts of this.
   This is sort of a proving ground for finding out what kind of facilities
   an SSG adapter would need.
+  (29 days later, it looks like no: we won't abstract anything lol)
 
 - There are existing redundancies between this and the year old plus work
   of turning notecards into hugo (yikes) documents. It would be best to
   back-factor this new work into the old work, once this settles.
+  (29 days later: again no)
 """
 
 
@@ -219,6 +221,11 @@ def _normalize_header_depth(sections, target_depth):
 
     dct = _depths_index_via_sections(sections)
     yield dct  # we're gonna use this in title derivations
+
+    # If none of the sections have headers, nothing to do
+    if 0 == len(dct):
+        yield sections
+        return
 
     # How far down do we have to push the depths to meet the target?
     shallowest = min(dct.keys())

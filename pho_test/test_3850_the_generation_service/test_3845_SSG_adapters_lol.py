@@ -139,6 +139,10 @@ class Case3845_135_smalls(SmallsCase):
     def test_030_you_must_chose_one(self):
         self.you_must_choose_one()
 
+    @o('peloocan')
+    def test_040_you_must_chose_one(self):
+        self.you_must_choose_one()
+
     def given_business_collection(_):
         return business_collection_ONE()
 
@@ -181,6 +185,44 @@ class Case3845_200_document_tree_given_EID_huggo(Document_Tree_Given_EID):
         return these['huggo']()
 
 
+class Case3845_230_document_tree_given_EID_peloogan(Document_Tree_Given_EID):
+
+    def test_010_directive_types_OK(self):
+        self.directive_types_and_number_of_directives_looks_right()
+
+    def test_050_paths_OK(self):
+        # (order matters, we are asserting it. the way the parsers parses it..)
+
+        paths = tuple(tup[1] for tup in self.markdown_file_directives)
+
+        same = 'hello-I-am-the-heading-for-A/'
+        path1 = f"{same}hello-i-am-the-heading-for-fd.md"
+        path2 = f"{same}hello-i-am-the-heading-for-gd.md"
+
+        self.assertSequenceEqual(paths, (path1, path2))
+
+    def test_100_file_content_OK(self):
+        lines_itrs = tuple(tup[2] for tup in self.markdown_file_directives)
+        liness = tuple(tuple(itr) for itr in lines_itrs)
+
+        looks_like_the_Fd_content_for_peloocan(self, liness[0])
+
+        exp = tuple(self.expected_lines_for_second_file())
+        self.assertSequenceEqual(liness[1], exp)
+
+    def expected_lines_for_second_file(_):
+        yield 'title: Hello I am the heading for \'Gd\'\n'
+        # (expecting needing a dividing blank line here)
+        yield "Hello i am the body for 'Gd' KISS For now\n"
+        yield "line 2\n"
+
+    def test_200_no_emissions(self):
+        self.no_emissions()
+
+    def given_adapter_module(_):
+        return these['peloocan']()
+
+
 class Case3845_265_document_given_EID_huggo(Document_Given_EID):
 
     def test_010_directive_types_OK(self):
@@ -200,6 +242,40 @@ class Case3845_265_document_given_EID_huggo(Document_Given_EID):
 
     def given_adapter_module(_):
         return these['huggo']()
+
+
+class Case3845_285_document_given_EID_peloogan(Document_Given_EID):
+
+    def test_010_directive_types_OK(self):
+        self.directive_types_and_number_of_directives_looks_right()
+
+    def test_050_path_is_only_component_deep(self):
+        (_, path, lines), = self.markdown_file_directives
+        assert 'hello-i-am-the-heading-for-fd.md' == path
+
+    def test_100_content_OK(self):
+        (_, path, lines), = self.markdown_file_directives
+        looks_like_the_Fd_content_for_peloocan(self, tuple(lines))
+
+    def test_200_no_emissions(self):
+        self.no_emissions()
+
+    def given_adapter_module(_):
+        return these['peloocan']()
+
+
+def looks_like_the_Fd_content_for_peloocan(tc, lines):
+    tc.assertSequenceEqual(lines, tuple(_these_peloocan_lines()))
+
+
+def _these_peloocan_lines():
+    yield "title: Hello I am the heading for 'Fd'\n"
+    # (expecting needing a dividing blank line here)
+    yield "Hello i am the body for 'Fd' KISS For now\n"
+    yield "line 2\n"
+    yield "## Hello I am the heading for 'H'\n"
+    yield "Hello i am the body for 'H' KISS For now\n"
+    yield "line 2\n"
 
 
 def looks_like_the_Fd_content_for_huggo(tc, big_s):
@@ -248,4 +324,5 @@ def xx(msg=None):
 if __name__ == '__main__':
     unittest_main()
 
+# #history-B.4 spike peloogan intro (and most of its integration to date)
 # #born

@@ -95,13 +95,11 @@ class _SSG_Controller:
         if ad is None:
             return 123
 
-        from .native_lines_via_abstract_document import func
-        o = func(ad, listener=None)
-        if o is None:
-            return 123
+        two = _entry_and_lines_via_abstract_document(ad)
+        if two is None:
+            return 122
 
-        entry = o.entry
-        wlines = o.write_lines
+        entry, wlines = two
 
         # Write the intermediate file (maybe it's create, maybe clobber)
         wpath = _path_join(diro.path, 'pages', entry)  # [#882.B]
@@ -192,6 +190,86 @@ def _when_directory_not_ready(listener, status, need, path):
         yield f"source directory not ready. Is {status!r} need {need!r}"
         yield f"directory: {path}"
     listener('error', 'expression', 'source_directory_not_ready', lines)
+
+
+def generate_markdown(collection_path, listener, NCID=None):
+    """(adapter-specific hello goes here)
+
+    example output directory: zz-zz/content/pages
+
+    Args:
+        NCID: If notecard ID is a document head, output only that document.
+              If it's a part of a document, same.
+              If it's a document container type (book, book part, chapter,
+              chapter section etc), outputs the documents in order.
+              If none, attempt to produce every document in the collection.
+    """
+    # (NOTE the above is parsed and merged in to UI (CLI) (all experimental))
+
+    def main():
+        if o.node_is_specified_and_part_of_document:
+            return do_single_document()
+        if o.node_is_specified_and_document_tree:
+            return do_multiple_documents()
+        if NCID:
+            o.complain_about_no_container()
+            raise stop_running()
+        return attempt_every_document()
+
+    def attempt_every_document():
+        return do_document_tree(o.PROCURE_EXACTLY_ONE_DOCUMENT_TREE())
+
+    def do_multiple_documents():
+        ti = o.RELEASE_DOCUMENT_TREE()
+        return do_document_tree(ti)
+
+    def do_document_tree(ti):
+        start, stop = ti.document_depth_minmax
+        reason = None
+        if start != stop:
+            reason = f"can't do different document depths ({start}, {stop})"
+        elif 1 < start:
+            reason = f"for now, afraid of deep document trees (?) ({start})"
+        if reason:
+            listener('error', 'expression', 'document_depths', lambda: (reason,))  # noqa: E501
+            yield ('adapter_error',)
+            return
+        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS():
+            for direc in _directives_via_abstract_document(ptup, ad, listener):
+                yield direc
+
+    def do_single_document():
+        ad = o.RELEASE_ABSTRACT_DOCUMENT()
+        return _directives_via_abstract_document((), ad, listener)
+
+    class stop_running(RuntimeError):
+        pass
+
+    from pho.notecards_.big_index_via_collection import NarrativeFacilitator
+    o = NarrativeFacilitator(NCID, collection_path, listener, stop_running)
+
+    try:
+        return main()
+    except stop_running:
+        return (('adapter_error',),)  # not sure
+
+
+def _directives_via_abstract_document(ptup, ad, listener):
+    two = _entry_and_lines_via_abstract_document(ad, listener)
+    if two is None:
+        yield ('adapter_error',)
+        return
+    entry, lines = two
+    path_tail = _path_join(*ptup, entry)
+    yield 'markdown_file', path_tail, lines
+
+
+def _entry_and_lines_via_abstract_document(ad, listener=None):
+    from .native_lines_via_abstract_document import func
+    o = func(ad, listener=None)
+    if o is None:
+        return
+    return o.entry, o.write_lines  # skipping o.title in the middle
 
 
 def _touch_intermediate_project(diro, fkv, listener):

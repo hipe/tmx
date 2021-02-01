@@ -76,7 +76,6 @@ def _commands():
     yield 'watch', lambda: _watch_command
     yield 'connect', _load_the_connect_COMMAND
     yield 'generate', lambda: _load_commonly('generate')
-    yield 'notecards-graph', lambda: _load_commonly('notecards_graph')
     yield 'static-webserver', lambda: _static_webserver_command
     yield 'toml2eno', lambda: _load_commonly('toml2eno')
 
