@@ -1,0 +1,61 @@
+{% extends "!simple/article.html" %}
+
+{% block nav_for_article_PLACEMENT_IS_EXPERIMENTAL %}
+
+{# 0-N top-level nodes before #}
+{% for title, url in article.nav_tree.top_level_nodes_before %}
+    <li><a href="{{ url }}">{{ title }}</a></li>
+{% endfor %}
+
+{# 0-N the depth trail #}
+{% for title, url in article.nav_tree.depth_trail %}
+    <li><a href="{{ url }}">{{ title }}</a>
+      <ul>
+{% endfor %}
+
+{# 0-N sibling nodes before you #}
+{% for title, url in article.nav_tree.sibling_nodes_before %}
+    <li><a href="{{ url }}">{{ title }}</a></li>
+{% endfor %}
+
+{# the node you are on #}
+{% if article.nav_tree.current_node_title %}
+    <li>{{ article.nav_tree.current_node_title }}
+    {# leave <li> open #}
+{% endif %}
+
+{# if current node was a branch (so has chidren) #}
+{% if article.nav_tree.children_nodes %}
+    <ul>
+      {% for title, url in article.nav_tree.children_nodes %}
+        <li><a href="{{ url }}">{{ title }}</a></li>
+      {% endfor %}
+    </ul>
+{% endif %}
+
+{# close the node you are on #}
+{% if article.nav_tree.current_node_title %}
+    </li>
+{% endif %}
+
+{# 0-N sibling nodes after you #}
+{% for title, url in article.nav_tree.sibling_nodes_after %}
+    <li><a href="{{ url }}">{{ title }}</a></li>
+{% endfor %}
+
+{# close the any depth trail #}
+{% for _ in article.nav_tree.depth_trail %}
+      </ul>
+    </li>
+{% endfor %}
+
+{# 0-N top-level nodes after #}
+{% for title, url in article.nav_tree.top_level_nodes_after %}
+    <li><a href="{{ url }}">{{ title }}</a></li>
+{% endfor %}
+
+{% endblock %}
+
+{#
+#born
+#}

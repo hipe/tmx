@@ -1,4 +1,4 @@
-# modality agnositc modeling
+# Modality Agnostic Modeling
 
 this is a relatively simple idea that has been developed elsewhere.
 
@@ -61,7 +61,7 @@ only in modeling interfaces for this purpose.
 |[#507.6]                   | #open | integrate this with teardown so the memory is reclaimed
 |[#507.E]                   | #hole |
 |[#507.D]                   | #hole |
-|[#507.C]                   | #hole |
+|[#507.C]                   | #open | one day look in to "data class" instead of named tuple [here][1]
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
 |[#505]                     | #hole |
@@ -71,6 +71,9 @@ only in modeling interfaces for this purpose.
 |[#502]                     | #open | parameter modeling thoery & API
 |[#501]                     |       | (placeholder for this readme)
 
+
+
+[1]: https://stackoverflow.com/questions/11351032/named-tuple-and-default-values-for-optional-keyword-arguments
 
 
 

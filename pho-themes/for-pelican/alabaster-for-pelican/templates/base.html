@@ -29,9 +29,13 @@
           </h1>
           <h3>Navigation</h3>
           <ul>
+
+            {% block nav_for_article_PLACEMENT_IS_EXPERIMENTAL %}{% endblock %}
+
             {% for title, link in MENUITEMS %}
               <li><a href="{{ link }}">{{ title }}</a></li>
             {% endfor %}
+
             {% if DISPLAY_PAGES_ON_MENU %}
               {% for pg in pages %}
                 {% if pg == page %}
@@ -41,6 +45,7 @@
                 {% endif %}
               {% endfor %}
             {% endif %}
+
           </ul>
         </div>
       </div>

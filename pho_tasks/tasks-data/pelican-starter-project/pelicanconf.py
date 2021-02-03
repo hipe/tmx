@@ -38,9 +38,15 @@ DEFAULT_PAGINATION = False
 def _theme_path():
     from os import environ
     k = 'PHO_PELICAN_THEME'
-    if k not in environ:
-        return
-    return environ[k]
+    if (s := environ.get(k, None)) is not None:
+        return s
+
+    import pho
+    here = pho.__path__[0]
+
+    from os.path import dirname, join as join
+    return join(dirname(here),
+                'pho-themes', 'for-pelican', 'alabaster-for-pelican')
 
 
 if (p := _theme_path()):

@@ -144,9 +144,11 @@ class _VerticalRuns:
             for iid, growable in dll.items():
                 if (start := growable[-1].start) < needle:   # #here4
                     continue
+                if start == needle:
+                    xx("oops cover this")
                 assert needle < start
                 return iid
-        needle, dll = node.start, self._DLL
+        needle, dll = token.start, self._DLL
         growable_item = [node, token]  # #here4
         if (iid := find()) is None:
             dll.append_item(growable_item)

@@ -14,4 +14,7 @@ get those placeholder values out of there with default AUTHOR and TIMEZONE
 [#882.D] marks old code that needs removal after re-arch
 for each production "notecards" directory (there's 2), modernize to new way
   (exit criteria for above: whole site for collection looks good)
-how pelican does "pages" order is gonna need some love
+pho pelican adapter output "strict nav tree"-compatible "Chilren" frontmatter component
+  (also it's gotta output articles not pages now, this will affect the service)
+maybe alter pho so documents with children documents are allowed (or encouraged (or required))
+  (alternately our branch nodes will have no content (yuck), or alternately..)
