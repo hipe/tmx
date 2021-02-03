@@ -14,7 +14,7 @@ class Case1610_ASCII_tree_intro(CommonCase):
     def end_state(self):
         listener, emissions = listener_and_emissions_for(self)
         bcoll = self.fake_collection
-        big_index = bcoll.build_big_index_NEW_(listener)
+        big_index = bcoll.build_big_index_(listener)
         output_lines_via_big_index = subject_function_for_ASCII()
         olines = output_lines_via_big_index(big_index)
         return tuple(olines), tuple(emissions)
@@ -117,7 +117,7 @@ class Case1620_dotfile_intro(CommonCase):
 
         # Resolve business collection then big index
         bcoll = self.given_collection
-        big_index = bcoll.build_big_index_NEW_(listener)
+        big_index = bcoll.build_big_index_(listener)
 
         # Perform
         output_lines_via_big_index = subject_function_for_GraphViz()

@@ -15,7 +15,7 @@ def _mutable_business_collection_via(collection_path, rng):  # #testpoint
 def read_only_business_collection_via_path_(collection_path, listener=None):
 
     if not isinstance(collection_path, str):
-        collection_path.build_big_index_NEW_
+        collection_path.build_big_index_
         return collection_path
 
     from kiss_rdb.storage_adapters_.eno import \
@@ -103,16 +103,12 @@ class _Notecards:  # #testpoint
 
     # == Read-Only Methods
 
-    def build_big_index_NEW_(self, listener=None):
+    def build_big_index_(self, listener=None):
         from .notecards_.big_index_via_collection import \
             big_index_for_many as func
 
         with self.open_EID_traversal_EXPERIMENTAL(listener) as eids:
             return func(eids, self, listener)
-
-    def build_big_index_OLD_(self, listener):  # [#882.D]
-        from .notecards_.big_index_via_collection import func
-        return func(self._coll, listener)
 
     def retrieve_notecard(self, ncid, listener):
         ent = self._coll.retrieve_entity(ncid, listener)
@@ -123,17 +119,8 @@ class _Notecards:  # #testpoint
         return self._notecard_via_any_entity(ent, listener)
 
     def _notecard_via_any_entity(self, ent, listener):
-        if ent is None:
-            return
-        ent_dct = ent.to_dictionary_two_deep()
-        nid_s, core_attributes = _validate_entity_dictionary_names(** ent_dct)
-        return self.entity_via_definition_(nid_s, core_attributes, listener)
-
-    def entity_via_definition_(self, nid_s, core_attributes, listener):
-        from .notecards_.notecard_via_definition import notecard_via_definition
-        return notecard_via_definition(nid_s, core_attributes, listener)
-
-    # == BEGIN [#882.D]
+        res, = self._notecards_via_entities((ent,), listener)
+        return res
 
     def notecards_via_NCIDs(self, ncids, listener):
         with self._coll.open_entities_via_EIDs(ncids, listener) as ents:
@@ -150,16 +137,16 @@ class _Notecards:  # #testpoint
                     yield None   # [#xxx]
                     continue
                 ent_dct = ent.to_dictionary_two_deep()
-                ncid, core_attributes = _validate_these_names(** ent_dct)
+                ncid, core_attributes = _validate_entity_dict_keys(** ent_dct)
                 yield ncid, core_attributes
-        return self.notecards_via_ent_defs_(these(), listener)
+        return self._notecards_via_ent_defs(these(), listener)
 
     def notecard_via_ent_def_(self, eid, core_attrs, listener):
         defs = ((eid, core_attrs),)
-        bent, = self.notecards_via_ent_defs_(defs, listener)
+        bent, = self._notecards_via_ent_defs(defs, listener)
         return bent
 
-    def notecards_via_ent_defs_(_, edefs, listener):
+    def _notecards_via_ent_defs(_, edefs, listener):
         from .notecards_.notecard_via_definition import notecard_via_definition
         for two in edefs:
             if two is None:
@@ -167,8 +154,6 @@ class _Notecards:  # #testpoint
                 continue
             ncid, core_attrs = two
             yield notecard_via_definition(ncid, core_attrs, listener)
-
-    # == END
 
     def open_identifier_traversal(self, listener):
         return self._coll.open_identifier_traversal(listener)
@@ -185,11 +170,8 @@ class _Notecards:  # #testpoint
         return self._coll
 
 
-def _validate_entity_dictionary_names(identifier_string, core_attributes):
+def _validate_entity_dict_keys(identifier_string, core_attributes):
     return identifier_string, core_attributes
-
-
-_validate_these_names = _validate_entity_dictionary_names  # [#882.D]
 
 
 HELLO_FROM_PHO = "hello from pho"

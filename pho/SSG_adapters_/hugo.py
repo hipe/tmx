@@ -82,161 +82,6 @@ def _directives_via_AD(ptup, ad, listener):
     yield 'markdown_file', path_tail, lines_of_this_one_file()
 
 
-# == BEGIN [#882.D]
-
-def document_tree_via_notecard(
-        out_tuple,
-        notecard_IID_string,
-        big_index,
-        be_recursive,
-        force_is_present,
-        is_dry_run,
-        listener,
-        ):
-
-    fw = _FileWriter(force_is_present, is_dry_run)
-
-    if be_recursive:
-        out_type, out_dir = out_tuple
-        assert('output_directory_path' == out_type)
-        return _when_recursive(
-                fw, out_dir,
-                big_index, listener)
-    else:
-        return _when_single_file(
-                fw, *out_tuple, notecard_IID_string,
-                big_index, listener)
-
-
-func = document_tree_via_notecard
-
-
-def _when_recursive(fw, out_dir, big_index, listener):
-
-    if not _os_path.isdir(out_dir):
-        def _():
-            return {'path': out_dir}
-        return listener('error', 'structure', 'directory_must_exist', _)
-
-    _doc_itr = big_index.TO_DOCUMENT_STREAM(listener)
-
-    count_files_attempted = 0
-    count_files_written = 0
-
-    seen = set()
-
-    for doc in _doc_itr:
-        count_files_attempted += 1
-
-        facets = _facets_for_publishing_via_doc(doc, listener)
-        if facets is None:
-            continue  # meh
-
-        # filename
-
-        filename = facets.filename
-        if filename in seen:
-            xx((
-                f'multiple documents share the same generated fileanme: '
-                f'{filename}'
-                ))
-        seen.add(filename)
-
-        _ = _os_path.join(out_dir, filename)
-        _ok = fw.write_file('output_file_path', _, facets, doc, listener)
-        if _ok:
-            count_files_written += 1
-
-    fw.express_summary_into(
-            listener, count_files_written, count_files_attempted)
-
-    return True
-
-
-def _when_single_file(
-        fw, out_type, out_value, notecard_IID_string,
-        big_index, listener):
-
-    doc = big_index.RETRIEVE_DOCUMENT(notecard_IID_string, listener)
-    if doc is None:
-        return
-
-    facets = _facets_for_publishing_via_doc(doc, listener)
-    if facets is None:
-        return
-
-    ok = fw.write_file(out_type, out_value, facets, doc, listener)
-    if ok:
-        fw.express_summary_into(listener, 1, 1)
-    return ok
-
-# == END
-
-
-class _FileWriter:
-    """meant to abstract those parts of writing files common to both
-
-    single file and recursive mode..
-    """
-
-    def __init__(self, force_is_present, is_dry):
-        self.count_bytes_written = 0
-        self.count_lines_written = 0
-        self.force_is_present = force_is_present
-        self.is_dry = is_dry
-        if is_dry:
-            from modality_agnostic import write_only_IO_proxy as func
-            self._dry_open_file = func(
-                    write=lambda x: None,
-                    on_OK_exit=lambda: None)
-
-    def express_summary_into(
-            self, listener, count_files_attempted, count_files_written):
-        def f():
-            msg = (
-                    f'wrote {count_files_written}'
-                    f' of {count_files_attempted} files'
-                    f' ({self.count_lines_written} lines,'
-                    f' ~{self.count_bytes_written} bytes)')
-            return {'message': msg}
-        listener('info', 'structure', 'wrote_files', f)
-
-    def write_file(self, out_type, out_value, facets, doc, listener):
-
-        if 'output_file_path' == out_type:
-            out_path = out_value
-            if _os_path.exists(out_path) and not self.force_is_present:
-                _whine_about_no_clobber(listener, out_path)
-                return
-            is_stdout_probably = False
-        else:
-            assert('open_output_filehandle' == out_type)
-            assert(not self.is_dry)  # check at higher level
-            open_file = out_value
-            is_stdout_probably = True
-        del out_value
-
-        def lines():
-            for line in facets.to_frontmatter_lines():
-                yield line
-
-            for line in doc.TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES():
-                yield line
-
-        if is_stdout_probably:
-            pass
-        elif self.is_dry:
-            open_file = self._dry_open_file
-        else:
-            open_file = open(out_path, 'w')
-
-        with open_file as io:
-            for line in lines():
-                self.count_lines_written += 1
-                self.count_bytes_written += io.write(line)
-        return True
-
-
 def _facets_for_publishing_via_doc(doc, listener):
     """In order to publish a document (that is, write it to a file), we need
 
@@ -372,17 +217,12 @@ def _whine_about_datetime(listener, doc):
     listener('error', 'structure', 'missing_required_attribute', payloader)
 
 
-def _whine_about_no_clobber(listener, out_path):
-    def payloader():
-        return {'reason_tail': f"(without «force») {out_path}"}
-    listener('error', 'structure', 'cannot_overwrite_file', payloader)
-
-
 HELLO_I_AM_AN_ADAPTER_MODULE = True
 
 
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #history-B.5 removed old code
 # #history-B.4 as adapter, hierarchical containter type & narrative faciliator
 # #born.
