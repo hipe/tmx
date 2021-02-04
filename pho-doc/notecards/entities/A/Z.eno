@@ -1,5 +1,6 @@
 # entity: AZC: attributes
-previous: PBR
+hierarchical_container_type: document
+parent: 48H
 heading: Bridging python & swift: a minimal case
 document_datetime: 2019-05-20 04:15:35-0400
 -- body
@@ -39,7 +40,10 @@ swift run -v -Xlinker -L../z --package-path pho
 Below we maintain how we obtained the above information, and details of our
 project structure and workflow at this moment.
 -- body
-next: DC7
+children:
+- 8W2
+- PBR
+- 38U
 
 # document-meta
 -- string_as_comment

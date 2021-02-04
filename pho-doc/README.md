@@ -161,6 +161,7 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.R]                   | #wish | tree visualization needs to be able to specify document tree
 |[#882.Q]                   | #open | our internal reference to [#605.6], help screen option desc lines
 |[#882.P]                   | #trak | [graph via collection]
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
@@ -173,7 +174,7 @@ when you click create
 |[#882.G]                   | #open | waiting for MIXED_COLLECTION_IDENTIFIER to go public [kiss]
 |[#882.F]                   | #open | we need proper markdown parsing
 |[#882.E]                   | #trak | [at writing this is a note in an unversioned document lol]
-|[#882.D]                   | #hole |
+|[#882.D]                   | #feat | track implementation for feature: documents inside documents
 |[#882.C]                   | #open | [see] some niche thing for invoking python from GUI
 |[#882.B]                   | #trak | pelookan: track where you use '/pages/'
 |[#882.1]                   | #open | ideally there should be no producer scripts not covered

@@ -1,4 +1,7 @@
 """
+(22 months later, waiting for everything to finally settle after
+"documents can have child documents", then EDIT #todo)
+
 (21 months later we decided to demarcate documents with a boolean flag
 attribute. but we may still use this for integrity checks..)
 
@@ -64,10 +67,45 @@ let's see what it's like:
 
 This doubles as a verification for the data integrity of the collection.
 There are known holes in our integrity check. See [#882.K].
+
+
+# Under the New New Way:
+
+"New way" was the introduction of the "hierarchical containter type" field,
+which was optional and whose only valid value was "document". The only rule
+for this used to be "documents can't be nested".
+
+Now we're changing that (experimentally, of course) to target our shiny
+new "strict nav tree" plugin for pelican, for which we want to avoid
+"no-content branch nodes", or just boring "index" style branch-node
+pages.
+
+Experimentally, every node in a *document tree* will be EITHER:
+
+- a "dewey" node
+- a document node
+- a section-esque node ("section node" for short)
+
+A node is a "dewey" node if it and ALL of the zero or more nodes above it up
+to the root are *not* document nodes. (The name is from the decimal system,
+relating as it does to higher-level taxonomics.)
+
+A section-esque node is any node anywhere under a document node that
+is not itself a document node.
+
+A document node may seat under another document node IFF that parent-child
+relationship is immediate. So documents may be arbitrarily deeply nested
+within documents, but each non-top-level document's parent must be a
+document. A document cannot be a child of a section-esque node.
+
+For now we do not proscribe any suggested ordering convention for
+documents-versus-sections in a row of siblings: they can be freely intermixed.
+It's tempting to say "documents should be at the end, after sections"; but
+note such an ordering wouldn't affect generated document trees; and we can
+see an advantage of a node "popping in and out" of document-ness (based on
+volume of content, for example) all the while keeping some sort of narratively
+significant ordering with its siblings.
 """
-
-
-# bcoll = buisiness collection (as distinct from coll, kiss-rdb storage collec)
 
 
 # == BEGIN narrative facilitator
@@ -130,6 +168,7 @@ class NarrativeFacilitator:
     # (possibly mutating) Getters (as appropriate for condition)
 
     def PROCURE_EXACTLY_ONE_DOCUMENT_TREE(self):
+        # bcoll = buisiness collection (distinct from coll (kiss-rdb storage))
         bcoll = self._read_only_collection
         bi = bcoll.build_big_index_(self._listener)
         ks = tuple(bi.built.keys())
@@ -309,11 +348,9 @@ def _big_index_when_many(argument_ncids, bcoll, listener):
 
     def descend(node):
         yn = _is_document(node)
-        res = wrapped_descend(node, yn)
-        if yn:
-            res = (('document_depth_minmax', (0, 0)), *res)  # #here3
-        else:
-            res = tuple(res)
+        my_type = 'doc' if yn else 'dewey'  # #here2
+        itr = wrapped_descend(node, my_type)
+        res = tuple(_complicated_descend(itr, yn))
         eid = node.identifier_string
         assert eid not in built
         built[eid] = res
@@ -324,7 +361,7 @@ def _big_index_when_many(argument_ncids, bcoll, listener):
             if eid in built:
                 return built.pop(eid)
             if eid in seen:
-                xx('hmmmm think very hard')
+                xx(f'hmmmm think very hard: {eid!r}')
             seen.add(eid)
             return vendor_descend(node, yn)
         return use_descend
@@ -361,12 +398,10 @@ def big_index_for_one(argument_EID, bcoll, listener):
     def main():
         argument_node = retrieve(argument_EID)
         is_doc = _is_document(argument_node)
-
-        if is_doc:
-            yield 'document_depth_minmax', (0, 0)  # #here3
-
+        my_type = 'doc' if is_doc else 'dewey'  # #here2
         descend = _build_descender(retrieve)
-        for k, v in descend(argument_node, is_doc):
+        itr = descend(argument_node, my_type)
+        for k, v in _complicated_descend(itr, is_doc):
             yield k, v
         yield 'business_entity_cache', seen
 
@@ -380,6 +415,41 @@ def big_index_for_one(argument_EID, bcoll, listener):
     do_retrieve = _build_retriever(bcoll, listener)
     seen = {}
     return main()
+
+
+def _complicated_descend(itr, is_doc):
+    # trying to implement "document depth minmax" while maintaining streaming 🙃
+
+    itr = _do_complicated_descend(itr)
+    future = next(itr)
+    for k, v in itr:
+        yield k, v
+    ddm = _combine_DDM(is_doc, future())
+    if ddm:
+        yield 'document_depth_minmax', ddm
+
+
+def _combine_DDM(is_doc, dmm):
+    if dmm:
+        start, stop = dmm
+        if is_doc:
+            return 0, stop
+        return dmm
+    if is_doc:
+        return 0, 0
+
+
+def _do_complicated_descend(itr):
+    def future():
+        return dmm
+    yield future
+    dmm = None
+    for k, x in itr:
+        if 'document_depth_minmax' == k:
+            assert dmm is None
+            dmm = x
+            continue
+        yield k, x
 
 
 # ==
@@ -418,7 +488,8 @@ def _define_higher_level_functions():
                 assert parent_eid not in cx_of
                 cx_of[parent_eid] = cx_eids
                 continue
-            assert slots[k] is None
+            if slots[k] is not None:
+                xx(f"wasn't expecting there to already be a {k!r}")
             slots[k] = val
         return _TreeIndex(root_EID, children_of=cx_of, **slots)
 
@@ -457,39 +528,89 @@ def _define_higher_level_functions():
 
 
 def _abstract_documents_via_tree_index(ti):
+    """
+    This is the essential [#882.D] document-within-document implementation/
+    late integrity check. 19½ months after project birth (at #history-B.6)
+    it's much more complicated, as complicated as this:
+    """
 
-    def recurse(k, path_head):
-        node = cache[k]
+    def recurse(node, parent_ptup):  # ptup = path tuple
         if _is_document(node):
-            flat = recurse_nodes_via_node(k)
-            ad = AD_via(flat)
-            yield path_head, ad
-            return
+            return recurse_into_document(node, parent_ptup)
+        return recurse_into_dewey(node, parent_ptup)
 
+    def recurse_into_dewey(node, parent_ptup):
+        eid = node.identifier_string
+        cx = cx_of.get(eid)
+        if cx is None:
+            xx(f"strange: {eid!r} is a dewey node with no children? maybe OK")
+
+        this_ptup = ptup_plus(node, parent_ptup)
+        for ch_k in cx:
+            for directive in recurse(cache[ch_k], this_ptup):
+                yield directive
+
+    def recurse_into_document(node, parent_ptup):
+
+        # Because we're insane we stream the section nodes into the abstract
+        # document maker while accumulating the child documents; rather than
+        # patition-flushing the stream ourselves into two lists.
+
+        def flatten():
+            yield node
+            for k, ch_node in do_recurse_into_document(node.identifier_string):
+                if 'section_esque_node' == k:
+                    yield ch_node
+                    continue
+                assert 'child_document' == k
+                child_document_head_nodes.append(ch_node)
+
+        child_document_head_nodes = []
+        ad = AD_via(flatten())
+        child_document_head_nodes = tuple(child_document_head_nodes)
+        ad.CHILDREN_DOCUMENT_HEAD_NODES = child_document_head_nodes
+        this_ptup = ptup_plus(node, parent_ptup)
+        yield parent_ptup, ad
+
+        for ch_node in child_document_head_nodes:
+            for two in recurse_into_document(ch_node, this_ptup):
+                yield two
+
+    def do_recurse_into_document(k):
+        if (cx := cx_of.get(k)) is None:
+            return
+        for ch_k in cx:
+            ch_node = cache[ch_k]
+            if _is_document(ch_node):
+                yield 'child_document', ch_node
+                continue
+            yield 'section_esque_node', ch_node
+            for k, v in recurse_assert_no_children(ch_k):
+                yield k, v
+
+    def recurse_assert_no_children(k):
+        if (cx := cx_of.get(k)) is None:
+            return
+        for ch_k in cx:
+            ch_node = cache[ch_k]
+            if _is_document(ch_node):
+                xx(f"{k!r} (section-esque) can't have child {ch_k!r} (document)")  # noqa: E501
+            yield 'section_esque_node', ch_node
+            for k, v in recurse_assert_no_children(ch_k):
+                yield k, v
+
+    def ptup_plus(node, ptup):
         slug = _slug_via_heading_EXPERIMENTAL(node.heading)
         if not len(slug):
             xx(f"can't make slug from heading: {node.heading!r}")
-
-        ch_path_head = (*path_head, slug)
-        for ch_k in cx_of[k]:
-            for tup in recurse(ch_k, ch_path_head):
-                yield tup
-
-    def recurse_nodes_via_node(k):
-        yield cache[k]
-        ks = cx_of.get(k)
-        if ks is None:
-            return
-        for ch_k in ks:
-            for node in recurse_nodes_via_node(ch_k):
-                yield node
+        return (*ptup, slug)
 
     from pho.notecards_.abstract_document_via_notecards import \
         abstract_document_via_notecards_iterator_ as AD_via
 
     cx_of = ti.children_of
     cache = ti.business_entity_cache
-    return recurse(ti.root_EID, ())
+    return recurse(cache[ti.root_EID], ())
 
 
 def _slug_via_heading_EXPERIMENTAL(heading):  # repeating something from elsew
@@ -504,7 +625,7 @@ def _build_retriever(bcoll, listener):
     def retrieve(eid):
         node = bcoll.retrieve_notecard(eid, listener)
         if node is None:
-            xx(f"invalid enitty identifier in reference? {eid!r}")
+            xx(f"oops didn't resolve as a node (should have emitted) {eid!r}")
         assert eid == node.identifier_string  # else something is very wrong
         return node
     return retrieve
@@ -557,7 +678,7 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
         - yield your overall depth as that max
     """
 
-    def descend(node, is_somewhere_under_document):
+    def descend(node, my_type):
         cx = node.children
         if cx is None:
             yield 'overall_depth', 1
@@ -567,21 +688,17 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
         my_dminmax = None
         my_overall_depth_so_far_which_is_a_max = 1
         expanded_children_EIDs = []
-        for ch in expanded_children(cx):
+        for ch in expand_children(cx, node.identifier_string):
             cheid = ch.identifier_string
             expanded_children_EIDs.append(cheid)
-
-            is_somewhere_under_document_for_ch = is_somewhere_under_document
-            if _is_document(ch):
-                if is_somewhere_under_document:
-                    xx("can't have document inside of document")
-                is_somewhere_under_document_for_ch = True
+            ch_type = _derive_context_aware_type(ch, my_type)
+            if 'doc' == ch_type:
                 if my_dminmax:
                     my_dminmax[0] = 1
                 else:
                     my_dminmax = [1, 1]
             kw = {}
-            for k, v in descend(ch, is_somewhere_under_document_for_ch):
+            for k, v in descend(ch, ch_type):
                 if 'expanded_children' == k:
                     yield k, v
                     continue
@@ -608,21 +725,20 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
         ec_val = node.identifier_string, tuple(expanded_children_EIDs)
         yield 'expanded_children', ec_val
 
-    def expanded_children(cx):
+    def expand_children(cx, cstacker):
         local_seen = set()  # we've got to check this somewhere else hang
-        for ch in do_expanded_children(cx):
+        for ch in do_expand_children(cx, cstacker):
             eid = ch.identifier_string
             if eid in local_seen:
                 xx(f"risk of linked list infinite loop cycle: {eid!r}")
             local_seen.add(eid)
             yield ch
 
-    def do_expanded_children(cx):  # note [#882.E] will explain
+    def do_expand_children(cx, peid):  # note [#882.E] will explain
         for eid in cx:
             node = retrieve(eid)
             if node.previous_identifier_string:
-                xx("data-integrity error: child cannot have previous")
-
+                xx(_when_big_problems(node, peid))
             yield node
             neid = node.next_identifier_string
             if neid is None:
@@ -631,7 +747,7 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
             while True:
                 node = retrieve(neid)
                 if eid != node.previous_identifier_string:
-                    xx("data-integrity error: next doesn't point back to prev")
+                    xx(f"prev of {neid!r} should be {eid!r} but is {node.previous_identifier_string!r}")  # noqa: E501
                 yield node
                 eid = neid
                 neid = node.next_identifier_string
@@ -642,6 +758,32 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
         descend = WRAP_DESCEND_EXPERIMENTAL(descend)
 
     return descend
+
+
+def _derive_context_aware_type(ch, my_type):
+
+    if 'section_esque' == my_type:
+        if _is_document(ch):
+            xx("can't have document node under section-esque node")
+
+        # Yes, OK: a section can be under another section
+        return 'section_esque'
+
+    if 'doc' == my_type:
+        if _is_document(ch):
+            # Yes, OK: a document can be under another document
+            return 'doc'
+
+        # Yes, OK: a section can be under a document
+        return 'section_esque'
+
+    assert 'dewey' == my_type
+    if _is_document(ch):
+        # Yes, OK: a document can be under a dewey
+        return 'doc'
+
+    # Yes, OK: a dewey can be under another dewey
+    return 'dewey'
 
 
 def _is_document(node):
@@ -661,9 +803,37 @@ def _when_not_one_node_tree(listener, tree_idens, bcoll):
     listener('error', 'expression', 'multiple_node_trees', lines)
 
 
+def _when_big_problems(node, peid):
+    return ' '.join(_pieces_for_big_problems(node, peid))
+
+
+def _pieces_for_big_problems(node, peid):
+    meid = node.identifier_string
+    prev = node.previous_identifier_string
+    yield f"{meid!r} appears in the list of children for {peid!r}"
+    yield f"but it has a previous of {prev!r}."
+    near_peid = node.parent_identifier_string
+    if peid == near_peid:
+        return
+    yield f"Futhermore, it thinks its parent ID is {near_peid!r}"
+
+
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+
+""":#here2: doing the New New way right involves knowing the full context
+of a node up to the root: if a node is a not-document, you can't know whether
+it's a dewey or a section-esque without searching upwards until you find
+either a document or the root.
+
+Places marked with this tag indicate places that are vulnerable to such
+a mis-characterization of the start node from a recursion; that is, we
+will let some invalid document trees through for now.
+"""
+
+
+# #history-B.6 just kidding documents can have documents
 # #history-B.5 remove lots of old way code before hierarchical container type
 # #history-B.4
 # #born.

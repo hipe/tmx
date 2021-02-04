@@ -1,4 +1,5 @@
 # entity: EL8: attributes
+hierarchical_container_type: document
 previous: E2B
 heading: How We Got Started With Our Electron GUI
 document_datetime: 2020-08-04 16:16:25-0400
@@ -30,8 +31,24 @@ rs
 annotated_entity_revisions:
 - #born
 
-# entity: ELE: attributes
+# entity: ELC: attributes
+hierarchical_container_type: document
 parent: PBC
+heading: Electron Overview
+-- body
+
+Electron ended up winning out over Cocoa/swift for getting us to a
+bleeding alpha version of our GUI.
+
+This section documents the journey from nothing to our working GUI.
+-- body
+children:
+- ELE
+- E2B
+
+# entity: ELE: attributes
+hierarchical_container_type: document
+parent: ELC
 heading: First Notes on the Electron Framework
 document_datetime: 2019-11-20 18:43:00-0400
 -- body
@@ -145,7 +162,6 @@ Maybe later: [Building a deployable Python-Electron App][6]
 [2]: https://electronjs.org/
 [1]: https://en.wikipedia.org/wiki/Electron_(software_framework)
 -- body
-next: E2B
 
 # document-meta
 -- string_as_comment

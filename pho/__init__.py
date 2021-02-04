@@ -1,4 +1,4 @@
-def mutable_business_collection_via_path_NOT_RE_INTEGRATED_YET(collection_path):  # noqa: E501
+def mutable_business_collection_via_path_NOT_COVERED(collection_path):
     def rng(pool_size):
         from random import randrange
         return randrange(1, pool_size)  # avoid 222 #open [#867.V]

@@ -1,5 +1,6 @@
 # entity: DC7: attributes
-previous: AZC
+parent: 48H
+hierarchical_container_type: document
 heading: import in swift
 document_datetime: 2019-05-21 23:50:03-0400
 -- body

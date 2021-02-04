@@ -195,9 +195,9 @@ class Case3845_230_document_tree_given_EID_peloogan(Document_Tree_Given_EID):
 
         paths = tuple(tup[1] for tup in self.markdown_file_directives)
 
-        same = 'hello-I-am-the-heading-for-A/'
-        path1 = f"{same}hello-i-am-the-heading-for-fd.md"
-        path2 = f"{same}hello-i-am-the-heading-for-gd.md"
+        # (no more deep paths at #history-B.5)
+        path1 = "hello-i-am-the-heading-for-fd.md"
+        path2 = "hello-i-am-the-heading-for-gd.md"
 
         self.assertSequenceEqual(paths, (path1, path2))
 
@@ -212,6 +212,7 @@ class Case3845_230_document_tree_given_EID_peloogan(Document_Tree_Given_EID):
 
     def expected_lines_for_second_file(_):
         yield 'title: Hello I am the heading for \'Gd\'\n'
+        yield 'date: 1925-05-19 12:13:14+05:00\n'
         # (expecting needing a dividing blank line here)
         yield "Hello i am the body for 'Gd' KISS For now\n"
         yield "line 2\n"
@@ -270,6 +271,7 @@ def looks_like_the_Fd_content_for_peloocan(tc, lines):
 
 def _these_peloocan_lines():
     yield "title: Hello I am the heading for 'Fd'\n"
+    yield 'date: 1925-05-19 12:13:14+05:00\n'
     # (expecting needing a dividing blank line here)
     yield "Hello i am the body for 'Fd' KISS For now\n"
     yield "line 2\n"
@@ -324,5 +326,6 @@ def xx(msg=None):
 if __name__ == '__main__':
     unittest_main()
 
+# #history-B.5
 # #history-B.4 spike peloogan intro (and most of its integration to date)
 # #born

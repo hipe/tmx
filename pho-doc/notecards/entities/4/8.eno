@@ -1,5 +1,33 @@
-# entity: 48R: attributes
+# entity: 48H: attributes
+hierarchical_container_type: document
 parent: PBC
+heading: Cocoa/Swift Overview
+-- body
+# Status: waylaid
+
+Originally (circa 2019-05) we were excited to learn more swift/Cocoa and
+try to make a native desktop app. The big tricky thing was gonna be needing
+python interpoperabily.
+
+(Now (2021-02) looking back and knowing what we know now, we might try
+to see in to bridging to our python as a TCP/IP service or something
+similar, inter-process-communication etc…)
+
+But anyway somewhere along the line we decided it would be most prudent
+to abandon this avenue in favor of Electron, because briding to the
+command line seemed easier from the node stack (it was); keeping in mind
+that this was all a means to an end.
+
+But anyway here are our notes from the adventure for posterity.
+-- body
+children:
+- 48R
+- AZC
+- DC7
+
+# entity: 48R: attributes
+hierarchical_container_type: document
+parent: 48H
 heading: swift Cocoa UI intro
 document_datetime: 2019-05-14 09:10:11-0400
 -- body
@@ -30,8 +58,6 @@ for about one minute.)
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
 -- body
-next: 8W2
-
 # document-meta
 -- string_as_comment
 # #born.

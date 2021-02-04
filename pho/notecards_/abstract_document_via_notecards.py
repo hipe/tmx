@@ -360,8 +360,12 @@ def _lines_via_content_runs(crs):
 def _final_sexps(notecards):
 
     def each_notecard():
+
+        def cstacker():
+            return ({'heading': heading},)
+
         for heading, body in notecards:
-            itr = _sections_future_and_each_RSL_definition_run(body)
+            itr = _sections_future_and_each_RSL_definition_run(body, cstacker)
             itr = sections_w_reprovisioned_RSLs(rsl_def_index, itr)
             yield heading, scanner(itr)
 
@@ -387,9 +391,9 @@ def _final_sexps(notecards):
 
 # ==
 
-def _sections_future_and_each_RSL_definition_run(body):
+def _sections_future_and_each_RSL_definition_run(body, cstacker):
 
-    body_sexps = _sexps_via_lines(_lines_via_body_string(body))
+    body_sexps = _sexps_via_lines(_lines_via_body_string(body, cstacker))
     body_sexps = tuple(body_sexps)
 
     def future():
@@ -702,7 +706,7 @@ def _when_not_in_document(listener, num_hops, eid):
 
 # == Smalls
 
-def _lines_via_body_string(big_string):  # #[#610]
+def _lines_via_body_string(big_string, cstacker):  # #[#610]
     """(Discussion: this was a oneliner before, but now we normalize the last
 
     line to ensure it's always newline-terminated even if the big string
@@ -715,15 +719,31 @@ def _lines_via_body_string(big_string):  # #[#610]
     We don't split because it wastes memory. Also it's orthogonal to above.)
     """
 
-    itr = _re.finditer('[^\n]*\n', big_string)
     leng = len(big_string)
+    if 0 == leng:
+        context = {k: v for frame in cstacker() for k, v in frame.items()}
+        xx(f"empty body? not covered yet ({context!r})")
+
+    # Produce the 0-N head-anchored normal strings in the 1-N length big string
+    itr = _re.finditer('[^\n]*\n', big_string)
     md = None
     for md in itr:
         yield md[0]
-    if md is None:
-        xx("empty body? not covered yet")
-    _start, stop = md.span()
-    if stop < leng:
+
+    # Determine if we didn't traverse the full string and if not, transform
+    def stop():
+        if md:
+            stop = md.span()[1]
+            if stop < leng:
+                return stop
+            return
+
+        # If we didn't even match one
+        assert leng
+        assert '\n' not in big_string
+        return 0
+    stop = stop()
+    if stop is not None:
         raw_string = big_string[stop:]
         yield ''.join((raw_string, '\n'))
 

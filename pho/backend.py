@@ -72,7 +72,7 @@ def update_notecard(sin, sout, serr, argp, efx):
     ncid_s, es = argp.parse_one_argument('notecard identifier')
     if es:
         return es
-    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    ncs, mon = _mutable_notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
 
@@ -136,7 +136,7 @@ def create_notecard(sin, sout, serr, argp, efx):
         serr.write(f"not an option for 'create_notecard': '{arg}'\n")
         return 5
 
-    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    ncs, mon = _mutable_notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
 
@@ -183,7 +183,7 @@ def delete_notecard(sin, sout, serr, argp, efx):
         if es:
             return es
 
-    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    ncs, mon = _mutable_notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
 
@@ -205,7 +205,7 @@ def retrieve_random_notecard(sin, sout, serr, argp, efx):
     if es:
         return es
     ncs_path, = args
-    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    ncs, mon = _read_only_notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
     listener = mon.listener
@@ -238,7 +238,7 @@ def retrieve_notecard(sin, sout, serr, argp, efx):
     if es:
         return es
     ncid_s, ncs_path = args
-    ncs, mon = _notecards_and_monitor(ncs_path, serr)
+    ncs, mon = _read_only_notecards_and_monitor(ncs_path, serr)
     if ncs is None:
         return mon.exitstatus
     nc = ncs.retrieve_notecard(ncid_s, mon.listener)
@@ -300,16 +300,30 @@ def _parse_children_value(string, serr):
 _hand_written_attribute_parsers = {'children': _parse_children_value}
 
 
-def _notecards_and_monitor(ncs_path, serr):
+def _build(ting):
     # many of our API actions need to resolve the collection as the first
     # step and also crete a monitor, so there's this weird pairing
 
-    mon = _monitor_via_stderr(serr)
-    from pho import notecards_via_path
-    ncs = notecards_via_path(ncs_path, mon.listener)
-    if ncs is None:
-        return None, mon
-    return ncs, mon
+    def use(path, serr):
+        mon = _monitor_via_stderr(serr)
+        bcoll = ting(path, mon.listener)
+        return (bcoll, mon) if bcoll else (None, mon)
+    return use
+
+
+def _mutable_notecards(path, _listener):
+    from pho import mutable_business_collection_via_path_NOT_COVERED as func
+    return func(path)
+
+
+def _read_only_notecards(path, listener):
+    from pho import read_only_business_collection_via_path_ as func
+    return func(path, listener)
+
+
+_mutable_notecards_and_monitor = _build(_mutable_notecards)
+_read_only_notecards_and_monitor = _build(_read_only_notecards)
+del _build
 
 
 def _arg_parser(bash_argv, serr):

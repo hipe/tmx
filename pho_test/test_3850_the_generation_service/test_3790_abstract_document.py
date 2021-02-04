@@ -32,13 +32,11 @@ class NormTitleCase(unittest.TestCase, metaclass=ThisOneMetaclass):
             raise RuntimeError()
 
         given_title = self.given_abstract_frontmatter_title()
-        func = ADAPTER_module()._normalize_title
-        two = func(given_title, listener)
-        act_entry, act_title = two
-
+        func = ADAPTER_module()._sluggerer()
+        slug = func(given_title, listener)
+        act_entry = ''.join((slug, '.md'))
         exp_entry = self.expected_entry()
         self.assertEqual(act_entry, exp_entry)
-        assert given_title == act_title
 
 
 class Case3782_ting1(NormTitleCase):

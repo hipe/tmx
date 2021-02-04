@@ -47,14 +47,34 @@ def native_lines_via_abstract_document(ad, listener):
 
     assert '"' not in title
 
-    # Normalize the derived title
-    two = _normalize_title(title, listener)
-    if two is None:
+    # Vendor will etc but we want to etc
+    entry = _entry_via_title(title, listener)
+    if entry is None:
         return
-    entry, title = two
+
+    # Something terrifying about children
+    # (for use with our "strict_nav_tree" plugin)
+    cx_line = None
+    OHAI = getattr(ad, 'CHILDREN_DOCUMENT_HEAD_NODES', None)
+    if OHAI:
+        slugger = _sluggerer()
+        ugh = []
+        for ch_node in OHAI:
+            slug = slugger(ch_node.heading, listener)
+            if slug is None:
+                return
+            ugh.append(slug)
+        cx_line = f"children: {' '.join(ugh)}\n"
 
     def to_normalized_lines():
         yield f"title: {title}\n"  # NO QUOTES! quotes will end up in final tit
+        if cx_line:
+            yield cx_line
+        yield "date: 1925-05-19 12:13:14+05:00\n"
+        # At #history-B.4 changing from pages to articles so now we need dates,
+        # but we do NOT want to let default peloocan determine our order
+        # nor etc. Later we will probably derive dates from etc..
+
         # (we don't need the rest of the frontmatter)
 
         for section in sections:
@@ -73,7 +93,7 @@ _these = _nt('these', ('entry', 'title', 'write_lines'))
 
 # == ..
 
-def _normalize_title(title, listener):  # #testpoint
+def _entry_via_title(title, listener):  # #testpoint
     """
     A head notecard's heading is ANY non-empty string (assume). From the
     heading we get (directly??) the title as it appears in the *abstract*
@@ -104,12 +124,14 @@ def _normalize_title(title, listener):  # #testpoint
     output the correct document. See (Case3782) and maybe others nearby.
     """
 
-    entry = _entry_via_title(title, listener)
+    return (slug := _sluggerer()(title, listener)) and ''.join((slug, '.md'))
+    # (There's your hard-coded ".md" ☝️ :P)
+
     if False:  # tests run faster without this (~1000ms), vendor is bloated
+        entry = None  # no
         vendor_entry = _vendor_entry_via_title(title)
         if entry != vendor_entry:
             xx(f"Interesting: {entry!r} vs {vendor_entry!r}")
-    return entry, title
 
 
 def _vendor_entry_via_title(title):
@@ -119,24 +141,24 @@ def _vendor_entry_via_title(title):
     return f"{slug}.md"
 
 
-def _entry_via_title(title, listener):
-    o = _entry_via_title
+def _sluggerer():  # #testpoint
+    o = _sluggerer
     if o.x is None:
-        o.x = _build_this_function()
-    return o.x(title, listener)
+        o.x = _build_slugger()
+    return o.x
 
 
-_entry_via_title.x = None
+_sluggerer.x = None  # [#510.4]
 
 
-def _build_this_function():
+def _build_slugger():
 
     def work(title, listener):
 
         def main():
             words = words_via_title(title, listener)
             pcs = (pc for pc in (piece_via_word(w) for w in words) if len(pc))
-            return ''.join(('-'.join(pcs), '.md'))
+            return '-'.join(pcs)
 
         listener = throwing_listener_via(listener)
         try:
@@ -189,6 +211,7 @@ def _derive_abstract_title(frontmatter, orig_depths, sections, cpather):
     # frontmatter, when a title can generally be derived from the filename
     # or the first header (when it looks title-y). In fact we wrote a script
     # long ago to derive the requisite frontmatter from other things.
+    # (one month later we are starting to see the light)
 
     # Anyway, now that some native documents have frontmatter and others
     # don't, we now use the frontmatter (when present) as the authoritative
@@ -306,4 +329,5 @@ def _last_section_is_document_meta_section(sections):
 def xx(msg=None):
     raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
+# #history-B.4
 # #born

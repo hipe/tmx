@@ -1,5 +1,6 @@
 # entity: 38U: attributes
-parent: PBC
+hierarchical_container_type: document
+parent: AZC
 natural_key: The bootstrapping problem
 document_datetime: 2019-05-20 04:15:35-0400
 -- body

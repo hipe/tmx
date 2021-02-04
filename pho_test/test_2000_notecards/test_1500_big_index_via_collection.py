@@ -10,7 +10,7 @@ class CommonCase(unittest.TestCase):
     do_debug = False
 
 
-# Case1530-Case1610
+# [Case1505-Case1610)
 
 
 def higher_level_end_state(attr):  # #decorator
@@ -20,6 +20,13 @@ def higher_level_end_state(attr):  # #decorator
             return {k: v for k, v in two_tup_plus.to_node_tree_index_items()}
         return use_f
     return decorator
+
+
+def fake_collection(orig_f):
+    def use_f(tc):
+        from pho_test.fake_collection import omg_fake_bcoll_via_lines as func
+        return func(orig_f(tc))
+    return shared_subject(use_f)
 
 
 class Case1505_the_only_New_Way_case(CommonCase):
@@ -122,12 +129,8 @@ class Case1505_the_only_New_Way_case(CommonCase):
         func = subject_module().higher_level_functions().tree_index_via
         return func('A', itr)
 
-    @shared_subject
-    def fake_collection(self):
-        from pho_test.fake_collection import omg_fake_bcoll_via_lines as func
-        return func(self.given_collection())
-
-    def given_collection(_):
+    @fake_collection
+    def fake_collection(_):
         yield r"                  A               "
         yield r"     B           / \              "
         yield r"    / \         /   \      Zd     "
@@ -142,6 +145,30 @@ class Case1505_the_only_New_Way_case(CommonCase):
         yield r"       U   V   W   X              "
         yield r"                    \             "
         yield r"                     Y    1d      "
+
+
+class Case1515_NEW_WAY(CommonCase):
+
+    def test_010_yes_fam(self):
+        bcoll = self.fake_collection
+        wow = bcoll.build_big_index_()
+        hey = {k: v for k, v in wow.to_node_tree_index_items()}
+        key, = hey.keys()
+        assert 'INDEXd' == key
+        ti = hey['INDEXd']
+        assert (0, 2) == ti.document_depth_minmax
+
+    @fake_collection
+    def fake_collection(_):
+        yield r"      INDEXd     "
+        yield r"     /  |   \     "
+        yield r"    /   |    \     "
+        yield r" ABOUTd |     \     "
+        yield r"        |      \      "
+        yield r"       BOOKSd  TOOLSd "
+        yield r"              /|\  \  "
+        yield r"             / | \  \  "
+        yield r"           Ed  F Gd  H  "
 
 
 def subject_function_for_many():

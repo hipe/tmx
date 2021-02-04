@@ -225,22 +225,25 @@ def generate_markdown(collection_path, listener, NCID=None):
 
     def do_document_tree(ti):
         start, stop = ti.document_depth_minmax
-        reason = None
+
         if start != stop:
-            reason = f"can't do different document depths ({start}, {stop})"
+            def lines():
+                yield f"(jagged document tree ({start}, {stop}))"
+            listener('info', 'expression', 'jagged_tree', lines)
         elif 1 < start:
-            reason = f"for now, afraid of deep document trees (?) ({start})"
-        if reason:
-            listener('error', 'expression', 'document_depths', lambda: (reason,))  # noqa: E501
-            yield ('adapter_error',)
-            return
+            def lines():
+                yield f"(deep document tree ({start}))"
+            listener('info', 'expression', 'deep_document_tree', lines)
+
+        directiver = _directiverer(listener)
         for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS():
-            for direc in _directives_via_abstract_document(ptup, ad, listener):
+            for direc in directiver(ptup, ad):
                 yield direc
 
     def do_single_document():
         ad = o.RELEASE_ABSTRACT_DOCUMENT()
-        return _directives_via_abstract_document((), ad, listener)
+        func = _directiverer(listener)
+        return func((), ad)
 
     class stop_running(RuntimeError):
         pass
@@ -254,14 +257,31 @@ def generate_markdown(collection_path, listener, NCID=None):
         return (('adapter_error',),)  # not sure
 
 
-def _directives_via_abstract_document(ptup, ad, listener):
-    two = _entry_and_lines_via_abstract_document(ad, listener)
-    if two is None:
-        yield ('adapter_error',)
-        return
-    entry, lines = two
-    path_tail = _path_join(*ptup, entry)
-    yield 'markdown_file', path_tail, lines
+def _directiverer(listener):
+    # Have a little session for every time you make a set of documents from
+    # a document tree; one that ..
+
+    def directiver(ptup, ad):
+        two = _entry_and_lines_via_abstract_document(ad, listener)
+        if two is None:
+            yield ('adapter_error',)
+            return
+
+        # Pelican seems to prefer you to keep your articles flat.
+        # so far we like it.. It will affect how we write headings at scale
+
+        path_tail, lines = two
+        # path_tail = _path_join(*ptup, path_tail)  # if you wanted it deep
+
+        if path_tail in path_tail_seen:
+            prev_ptup = path_tail_seen[path_tail]
+            xx(f"different docus with same entry: {prev_ptup!r} then {ptup!r}")
+
+        path_tail_seen[path_tail] = ptup
+        yield 'markdown_file', path_tail, lines
+
+    path_tail_seen = {}
+    return directiver
 
 
 def _entry_and_lines_via_abstract_document(ad, listener=None):

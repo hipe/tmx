@@ -3,6 +3,9 @@ class ReadOnlyCollectionLayer_:
     def __init__(self, back):
         self._back = back
 
+    def retrieve_entity_via_identifier(self, iden, listener):
+        return self._back.retrieve_entity(iden.to_primitive(), listener)
+
     def retrieve_entity(self, eid, listener):
         return self._back.retrieve_entity(eid, listener)
 

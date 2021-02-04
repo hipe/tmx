@@ -11,9 +11,4 @@ have full on eno
 [#874.9] files marked as "LEGACY" should be seated or deleted
 there are todo's
 get those placeholder values out of there with default AUTHOR and TIMEZONE
-for each production "notecards" directory (there's 2), modernize to new way
-  (exit criteria for above: whole site for collection looks good)
-pho pelican adapter output "strict nav tree"-compatible "Chilren" frontmatter component
-  (also it's gotta output articles not pages now, this will affect the service)
-maybe alter pho so documents with children documents are allowed (or encouraged (or required))
-  (alternately our branch nodes will have no content (yuck), or alternately..)
+service

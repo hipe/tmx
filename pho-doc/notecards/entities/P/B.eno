@@ -1,22 +1,41 @@
 # entity: PBC: attributes
-
 hierarchical_container_type: document
-heading: Comparison of GUI toolkits
+heading: index
 -- body
-# The very high-level summary:
+# Welcome to TMX reading notes
+
+For now, because all the articles are about adventures in GUI,
+that's everything that will be here.
+
+One day (hopefully soon) we will branch down..
+
+# Comparison of GUI toolkits
+
+## The very high-level summary:
 - flutter: we are looking forward to maybe trying it one day
 - electron: it's working for us for now
 - wxWidgets: sounded cool when we heard about it in the Dolpin emulator
 - swift we abandoned for electron (just after #birth) because python-shell works
 -- body
 children:
-- 38U
-- 48R
-- ELE
+- 48H
+- PBD
+- ELC
 annotated_entity_revisions:
+- bring in some depth
 - #birth
+
+# entity: PBD: attributes
+hierarchical_container_type: document
+parent: PBR
+heading: ncurses Overview
+-- body
+We did a lot with ncurses that we should document and link to here...
+-- body
+
 # entity: PBR: attributes
-previous: 8W2
+hierarchical_container_type: document
+parent: AZC
 heading: gcc and linking: gotta learn this first
 -- body
 gotta learn [gcc][1] first.
@@ -30,7 +49,6 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 [1]: https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
 -- body
-next: AZC
 # document-meta
 -- string_as_comment
 # #born.

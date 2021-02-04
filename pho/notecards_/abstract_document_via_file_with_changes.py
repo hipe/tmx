@@ -96,8 +96,8 @@ def abstract_document_via_file_with_changes(path, listener=None):
 
     def coll_via(coll_path):
         # failure seems somewhat unlikely
-        from pho import notecards_via_path
-        return notecards_via_path(coll_path, listener)
+        from pho import read_only_business_collection_via_path_ as func
+        return func(coll_path, listener)
 
     from .abstract_document_via_notecards import \
         abstract_document_via_notecards_iterator_ as AD_via_NCs, \

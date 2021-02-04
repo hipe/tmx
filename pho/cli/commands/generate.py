@@ -206,7 +206,10 @@ def _formals_for_tree():
 
 
 def _CLI_for_tree(sin, sout, serr, bash_argv, efx=None):
-    "Generate a tree..."
+    """Generate an ASCII visualization of the collection
+
+    inspired by the `tree` unix utility
+    """
 
     tup, rc = _common_start(
             sout, serr, bash_argv, efx, _CLI_for_tree, _formals_for_tree)
