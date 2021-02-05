@@ -225,7 +225,6 @@ def the_pho_doc_documents_path():
 # == END
 
 
-
 def ADAPTER_module():  # tests that cover adapters should be in their own files
     from pho.SSG_adapters_.pelican import \
         native_lines_via_abstract_document as module
@@ -237,7 +236,7 @@ def abstract_document_via(lines, path=None):
 
 
 def subject_function():
-    return subject_module().abstract_document_via
+    return subject_module().abstract_document_via_lines
 
 
 def subject_module():

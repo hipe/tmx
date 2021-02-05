@@ -80,9 +80,9 @@ def abstract_document_via_file_with_changes(path, listener=None):
         coll_path = _collection_path_via_file_path(path)
         eids = eids_via()
         ncid, = eids  # only because #here4
-        coll = coll_via(coll_path)
-        ncs = NCs_via(ncid, coll)
-        return AD_via_NCs(ncs)
+        bcoll = bcoll_via(coll_path)
+        ncs = NCs_via(ncid, bcoll)
+        return bcoll.abstract_document_via_notecards(ncs, listener)
 
     def NCs_via(ncid, coll):
         for nc, depth in do_NCs_via(ncid, coll, listener):
@@ -94,13 +94,12 @@ def abstract_document_via_file_with_changes(path, listener=None):
             raise _Stop()
         return eids
 
-    def coll_via(coll_path):
+    def bcoll_via(coll_path):
         # failure seems somewhat unlikely
         from pho import read_only_business_collection_via_path_ as func
         return func(coll_path, listener)
 
     from .abstract_document_via_notecards import \
-        abstract_document_via_notecards_iterator_ as AD_via_NCs, \
         document_notecards_in_order_via_any_arbitrary_start_node_ as do_NCs_via
 
     try:

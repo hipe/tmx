@@ -1,5 +1,11 @@
 storage_adapter: eno
 storage_schema: 32x32x32
 
+value_function: get_body_from_special_place pho_test.value_functions.my_value_function_one
+value_function_variable: special_place_one here is the cha cha
+
+value_function: get_body_from_document pho.magnetics.notecard_body_via_document.func
+value_function_variable: directario_one ../documents-00500
+
 # #history-A.1: migrated from toml to eno
 # #born.

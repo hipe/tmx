@@ -235,8 +235,9 @@ def generate_markdown(collection_path, listener, NCID=None):
                 yield f"(deep document tree ({start}))"
             listener('info', 'expression', 'deep_document_tree', lines)
 
+        bcoll = o.read_only_business_collection
         directiver = _directiverer(listener)
-        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS():
+        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS(bcoll):
             for direc in directiver(ptup, ad):
                 yield direc
 

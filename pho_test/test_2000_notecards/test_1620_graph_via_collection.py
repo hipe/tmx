@@ -83,7 +83,7 @@ class Case1620_dotfile_intro(CommonCase):
     def test_100_lines_are_okay_probably(self):
         lines, _, _ = self.custom_end_state
         self.assertEqual(lines[0].index('digraph g {'), 0)
-        self.assertIn(len(lines), range(16, 30))
+        self.assertIn(len(lines), range(24, 36))
 
     def test_150_lines_are_YES_newline_terminated(self):
         # (this changed in #history-B.4 from *not* to yes)
@@ -105,7 +105,7 @@ class Case1620_dotfile_intro(CommonCase):
         md = rx.match(act)
         nn, nt = (int(md[k]) for k in 'num_nodes num_trees'.split())
 
-        exp = 5, 6  # expect this to change soon-ish
+        exp = 7, 8  # expect this to change soon-ish
         self.assertSequenceEqual((nt, nn), exp)
 
     @shared_subject

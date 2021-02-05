@@ -161,6 +161,8 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.T]                   | #trak | two somewhat redunant implementations of parsing a function call
+|[#882.S]                   | #trak | namespace for tracking provisions of "body function"
 |[#882.R]                   | #wish | tree visualization needs to be able to specify document tree
 |[#882.Q]                   | #open | our internal reference to [#605.6], help screen option desc lines
 |[#882.P]                   | #trak | [graph via collection]

@@ -1,6 +1,7 @@
 def build_collection(dir_path, schema, inj):
     kw = {_short_name_via_long_name[k]: v for k, v in inj.items()}
     kw['toml_schema'] = schema  # let's go
+    kw['do_load_schema_from_filesystem'] = False
 
     sa_mod = _subject_module()
 
@@ -16,7 +17,7 @@ _short_name_via_long_name = {
 
 
 def _throwing_listener(*x):
-    raise RuntimeError('no')
+    raise RuntimeError(f"Unexpected emission: {x[:-1]!r}")
 
 
 def _lib_module():

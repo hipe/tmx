@@ -189,12 +189,11 @@ class NarrativeFacilitator:
         return x
 
     def RELEASE_ABSTRACT_DOCUMENT(self):
+        bcoll = self._read_only_collection
         typ, x = self._release_thing()
         assert 'these_are_notecards' == typ
         ncs = (nc for (nc, depth) in x)  # ignoring depth for now
-        from .abstract_document_via_notecards import \
-            abstract_document_via_notecards_iterator_ as func
-        return func(ncs)
+        return bcoll.abstract_document_via_notecards(ncs, self._listener)
 
     def _release_thing(self):
         typ, x = self._my_personal_index_value
@@ -256,6 +255,10 @@ class NarrativeFacilitator:
     def _read_only_collection(self):
         from pho import read_only_business_collection_via_path_ as func
         return func(self._collection_path, listener=self._listener)
+
+    @property
+    def read_only_business_collection(self):
+        return self._bcoll
 
 # == END
 
@@ -504,8 +507,8 @@ def _define_higher_level_functions():
 
     _TreeIndex = _nt('_TreeIndex', ('root_EID', *simple_fields, 'children_of'))
 
-    def TO_ABSTRACT_DOCUMENTS(self):
-        return _abstract_documents_via_tree_index(self)
+    def TO_ABSTRACT_DOCUMENTS(self, bcoll):
+        return _abstract_documents_via_tree_index(self, bcoll)
 
     def count(self):
         return sum(len(v) for v in self.children_of.values()) + 1
@@ -527,7 +530,7 @@ def _define_higher_level_functions():
     return cls(** pub_dct)
 
 
-def _abstract_documents_via_tree_index(ti):
+def _abstract_documents_via_tree_index(ti, bcoll):
     """
     This is the essential [#882.D] document-within-document implementation/
     late integrity check. 19½ months after project birth (at #history-B.6)
@@ -566,7 +569,7 @@ def _abstract_documents_via_tree_index(ti):
                 child_document_head_nodes.append(ch_node)
 
         child_document_head_nodes = []
-        ad = AD_via(flatten())
+        ad = bcoll.abstract_document_via_notecards(flatten())
         child_document_head_nodes = tuple(child_document_head_nodes)
         ad.CHILDREN_DOCUMENT_HEAD_NODES = child_document_head_nodes
         this_ptup = ptup_plus(node, parent_ptup)
@@ -604,9 +607,6 @@ def _abstract_documents_via_tree_index(ti):
         if not len(slug):
             xx(f"can't make slug from heading: {node.heading!r}")
         return (*ptup, slug)
-
-    from pho.notecards_.abstract_document_via_notecards import \
-        abstract_document_via_notecards_iterator_ as AD_via
 
     cx_of = ti.children_of
     cache = ti.business_entity_cache

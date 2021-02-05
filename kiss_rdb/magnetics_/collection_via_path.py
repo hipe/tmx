@@ -40,7 +40,31 @@ def collection_via_storage_adapter_module_and_path_(sa_mod, x, listener, kw):
     cci = _classify_collection_identifier(x)
     key = _key_via_storage_adapter_module(sa_mod)
     sa = _StorageAdapter(sa_mod, key)
+
+    yes = hasattr(sa_mod, 'ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER')
+    if yes:
+        yes = kw.pop('do_load_schema_from_filesystem', True)
+        assert yes is not None  # unless you're really sure
+
+    if yes:
+        ok = _parse_and_munge_or_dont(kw, cci, sa, listener)
+        if not ok:
+            return
+
     return _collection_via(sa, cci, listener, kw)
+
+
+def _parse_and_munge_or_dont(kw, cci, sa, listener):
+    dct = _parse_schema_file_when_you_know_SA_already(cci, sa, listener)
+    if dct is None:
+        return
+    # Munge our namespace and adpater namespace, or don't (2nd time)
+    for k, v in dct.items():
+        if k in kw:
+            xx(f"decide on munging policy: {k!r}")
+            continue
+        kw[k] = v
+    return True
 
 
 def _collection_via(sa, cci, listener, kw):
@@ -118,6 +142,9 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
 
     # Determine what the capabilities are and prepare binding strategies
     # (ALL of this binding logic is VERY experimental)
+
+    not_sure = kw.pop('value_functions', None)
+    if_here = kw.pop('value_function_variables', None)
 
     opn = kw.get('opn')
 
@@ -295,6 +322,9 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
 
         if (o := getattr(fxr, 'CUSTOM_FUNCTIONS_OLD_WAY', None)):
             custom_functions = o
+
+        VALUE_FUNCTION_RIGHT_HAND_SIDES = not_sure
+        VALUE_FUNCTION_VARIABLE_RIGHT_HAND_SIDES = if_here
 
         MIXED_COLLECTION_IDENTIFIER = x  # used by [pho] #cover-me
         storage_adapter = sa
@@ -636,14 +666,12 @@ def _parse_schema_and_resolve_SA(cci, fmt, saidx, listener, opn=None):
     # == Workhorse
 
     def load_and_parse_schema_file():
+        if self.SA:
+            xx('lol think about this a little')
         x = cci.mixed_collection_identifier
         two = _SA_opts_via_parse_schema(x, saidx, opn, throwing_listener)
         assert two  # otherwise a stop should have been raised above
-        sa, self.adapter_opts = two
-        if self.SA:
-            xx('lol think about this a little')
-        else:
-            self.SA = sa
+        self.SA, self.adapter_opts = two
 
     # == Mechanics
 
@@ -671,33 +699,91 @@ def _parse_schema_and_resolve_SA(cci, fmt, saidx, listener, opn=None):
         pass
 
 
+# sfs = schema file scanner
+
+
 def _SA_opts_via_parse_schema(x, saidx, opn, listener):
     # again we try to hew as close as possible to flowchart [#857.D]
 
-    from kiss_rdb import SCHEMA_FILE_ENTRY_ as tail
-    from os.path import join as os_path_join
-    schema_path = os_path_join(x, tail)
-    try:
-        opened = (opn or open)(schema_path)
-    except FileNotFoundError as e:  # #here4
-        return _emit_about_no_schema_file(listener, e)
-    except NotADirectoryError:
-        return _emit_about_no_extname(listener, x)
+    # What you do while the schema file is open:
+    def main(out, fx):
+        sfs = out.schema_file_scanner
 
-    def storage_adapter_by(o):
-        o.resolve_first_field_line()
-        o.check_that_first_field_line_has_a_particular_name()
-        return o.resolve_storage_adapter_given_name()
+        fx.resolve_first_field_line()
+        field = out.field
+
+        fx.check_that_first_field_line_has_a_particular_name()
+
+        def validate(sa):
+            if sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
+                return True
+            return _emit_about_not_directory_based(listener, sa, cstacker)
+
+        def cstacker():
+            return (sfs.contextualize_about_field_value({}, field),)
+
+        sa = saidx.storage_adapter_via_key(
+            field.field_value_string, listener, cstacker, validate)
+        return sa and (sfs, sa)
+
+    opened = _open_schema_file(x, listener, opn)
+    if opened is None:
+        return
 
     with opened as opened:
-        reso = _crazy_schema_thing(opened, storage_adapter_by, saidx, listener)
-        if reso is None:
+        sfs_sa = _schema_parse_narrator(opened, main, listener)
+        if sfs_sa is None:
             return
-        sfs, sa = reso.schema_file_scanner, reso.storage_adapter
+        sfs, sa = sfs_sa
         dct = sa.module.ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(sfs, listener)
         if dct is None:
             return
         return sa, dct
+
+
+def _parse_schema_file_when_you_know_SA_already(cci, sa, listener):
+    sa_mod = sa.module
+    assert cci.arg_looks_like_string
+    coll_path = cci.mixed_collection_identifier
+    opened = _open_schema_file(coll_path, listener)
+    if opened is None:
+        xx("WHAT IS YOUR ERRROR MODEL")
+
+    def main(out, fx):
+        sfs = out.schema_file_scanner
+
+        fx.resolve_first_field_line()
+        field = out.field
+
+        fx.check_that_first_field_line_has_a_particular_name()
+
+        have = field.field_value_string
+        expect = sa.key
+
+        if expect != have:
+            xx("did you try to use the wrong adapter on a collection? "
+               f"expected {expect!r} had {have!r}")
+
+        return sa_mod.ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(sfs, listener)
+
+    with opened as opened:
+        return _schema_parse_narrator(opened, main, listener)
+
+
+def _open_schema_file(coll_path, listener, opn=None):
+
+    from kiss_rdb import SCHEMA_FILE_ENTRY_ as tail
+    from os.path import join as os_path_join
+    schema_path = os_path_join(coll_path, tail)
+    try:
+        return (opn or open)(schema_path)
+    except FileNotFoundError as e:  # #here4
+        args = (e,)
+        func = _emit_about_no_schema_file
+    except NotADirectoryError:
+        args = (coll_path,)
+        func = _emit_about_no_extname
+    func(listener, *args)
 
 
 # == Storage Adapter Index
@@ -830,24 +916,11 @@ class _storage_adapter_index:
         return sa
 
 
-def _crazy_schema_thing(opened, main, saidx, listener):
+def _schema_parse_narrator(opened, main, listener):
 
-    def resolve_storage_adapter_given_name():
-        def cstacker():
-            return (scanner.contextualize_about_field_value({}, reso.field),)
+    export, controllerer = _export_and_controllerer()
 
-        def validate(sa):
-            if sa.module.STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES:
-                return True
-            return _emit_about_not_directory_based(listener, sa, cstacker)
-
-        sa = saidx.storage_adapter_via_key(
-            reso.field.field_value_string, listener, cstacker, validate)
-        if sa is None:
-            raise stop()
-        reso.storage_adapter = sa
-        return reso
-
+    @export
     def check_that_first_field_line_has_a_particular_name():
         if 'storage_adapter' == reso.field.field_name:
             return
@@ -857,6 +930,7 @@ def _crazy_schema_thing(opened, main, saidx, listener):
         _emit_about_first_field_name(listener, cstacker)
         raise stop()
 
+    @export
     def resolve_first_field_line():
         if there_is_another_block():
             if its_a_separator_block():
@@ -904,26 +978,24 @@ def _crazy_schema_thing(opened, main, saidx, listener):
 
     from kiss_rdb.storage_adapters_.rec import ErsatzScanner
     scn = ErsatzScanner(opened)
-    from kiss_rdb.magnetics_.schema_file_scanner_via_recfile_scanner import (
-            schema_file_scanner_via_recfile_scanner)
-    scanner = schema_file_scanner_via_recfile_scanner(scn)
+    from kiss_rdb.magnetics_.schema_file_scanner_via_recfile_scanner \
+        import func
+    scanner = func(scn)
     reso.schema_file_scanner = scanner
-
-    class controls:
-        pass
-    controls.resolve_first_field_line = resolve_first_field_line
-    controls.check_that_first_field_line_has_a_particular_name = check_that_first_field_line_has_a_particular_name  # noqa: E501
-    controls.resolve_storage_adapter_given_name = resolve_storage_adapter_given_name  # noqa: E501
 
     class stop(RuntimeError):
         pass
+
+    controller = controllerer()
+    controller.stop = stop
+
     try:
-        return main(controls)
+        return main(reso, controller)
     except stop:
         pass
 
 
-def _classify_collection_identifier(x):
+def _classify_collection_identifier(x):  # #testpoint
     # exists only to DRY up any logic to be shared between the two new ways
 
     def these():
@@ -1203,6 +1275,13 @@ def _flatten_context_stack(context_stack):  # #[#510.14]
     return {k: v for row in context_stack for k, v in row.items()}
 
 
+def _export_and_controllerer():  # #[#this-is-a-thing]
+    def export(orig_f):
+        setattr(export, orig_f.__name__, orig_f)  # #watch-the-world-burn
+        return orig_f
+    return export, lambda: export
+
+
 def _no_op():
     pass
 
@@ -1246,6 +1325,7 @@ _this_shape = ('error', 'structure')
 _EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
 _EC_for_not_found = (*_this_shape, 'cannot_load_collection')
 
+# #history-B.6: oops parse sch*ma file when loading coll directly too
 # #history-B.5
 # #history-B.4
 # #history-A.2: massive refactor for clarity

@@ -15,21 +15,197 @@ in implementation:
 import re as _re
 
 
-def abstract_document_via(lines, path=None):
-    from text_lib.magnetics.scanner_via \
-            import scanner_via_iterator as func
-
-    scn = func(iter(lines))
-    itr = _frontmatter_then_sections(scn)
+def abstract_document_via_lines(lines, path=None):
+    itr = _frontmatter_then_sections_OLD_WAY(lines)
     frontmatter = next(itr)
     sections = tuple(itr)
     return AbstractDocument_(frontmatter, sections, path=path)
 
 
-func = abstract_document_via
+func = abstract_document_via_lines
 
 
-def _frontmatter_then_sections(scn):
+def PARSE_DOCUMENT_NEW_WAY_(lines, path=None):
+    """Discussion:
+
+    - Erase most or all of this comment block at some future date #todo
+    - At #history-B.4 we were implementing "notecard body via document"
+    - The local objective was, "get the file lines without any frontmatter
+      lines or trailing special document meta section"
+    - We began imagining parsing the document file lines with our familiar
+      FSA pattern. *As* we were doing this, we knew that somewhere we had
+      done something similar elsewhere
+    - After only a few minutes, we searched for where elsewhere we did
+      something like this; and found this module (file)
+    - At this point it was too late. We liked the state machine approach so
+      much better than the older (but not very old lol) way we were parsing
+      documents (to make abstract documents from them)
+    - But (A), refactoring the old way was out of scope
+    - And (B), the side-by-side comparison is interesting
+
+    The old way is about passing a line scanner around to ad-hoc funcs
+    """
+    # (#history-B.4 spike new way)
+
+    # == States (this state machine pattern #[#008.2])
+
+    def from_beginning():
+        yield if_dash_dash_dash, leave_beginning_and_enter_frontmatter_state
+        yield otherwise, leave_beginning_state_and_enter_body_state_and_retry
+
+    def from_frontmatter_state():
+        yield if_dash_dash_dash, exit_frontmatter_state_and_enter_body_state
+        yield otherwise, handle_frontmatter_line
+
+    def from_body_state():
+        yield if_header_line, roll_section_over_because_matched_header_line
+        yield if_start_code_block, enter_code_block_state
+        yield otherwise, add_line
+
+    def from_code_block_state():
+        yield if_end_code_block, exit_code_block_state
+        yield otherwise, add_line
+
+    # == Can End On
+
+    from_beginning.when_EOS = lambda: complain_about_empty_file()
+    from_frontmatter_state.when_EOS = lambda: complain_ended_mid('frontmatter')
+    from_body_state.when_EOS = lambda: yield_any_final_section()
+    from_code_block_state.when_EOS = lambda: complain_ended_mid('a code block')
+
+    # == Actions
+
+    def leave_beginning_and_enter_frontmatter_state():
+        # NOTE we do not actually keep the "---\n" line
+        state.unparsed_frontmatter_lines = []
+        stack.pop()
+        stack.append(from_frontmatter_state)
+
+    def handle_frontmatter_line():
+        # Parsing it now would be trivial, but we let clients delay it to never
+        state.unparsed_frontmatter_lines.append(line)
+
+    def exit_frontmatter_state_and_enter_body_state():
+        # NOTE we do not actually keep the "---\n" line
+        res = tuple(state.unparsed_frontmatter_lines)
+        del state.unparsed_frontmatter_lines
+        stack.pop()
+        enter_body_state()
+        return 'yield_this', ('unparsed_frontmatter_lines', res)
+
+    def leave_beginning_state_and_enter_body_state_and_retry():
+        stack.pop()
+        enter_body_state()
+        tup = 'unparsed_frontmatter_lines', None
+        return 'yield_this_and_retry_current_line', tup
+
+    def enter_code_block_state():
+        add_line()
+        stack.append(from_code_block_state)
+
+    def exit_code_block_state():
+        add_line()
+        stack.pop()
+
+    def enter_body_state():
+        state.current_header_AST = None
+        state.current_section_lines = []
+        stack.append(from_body_state)
+
+    def roll_section_over_because_matched_header_line():
+        md = state.previous_markdown_header_match
+        md_hdr_AST = _markdown_header_via_matchdata(md)
+        maybe = flush_any_previous_section()
+        state.current_header_AST = md_hdr_AST
+        return maybe and yield_this_section(maybe)
+
+    def yield_any_final_section():
+        maybe = flush_any_previous_section()
+        return maybe and yield_this_section(maybe)
+
+    def yield_this_section(tup):
+        hdr, lines = tup  # #here1
+        return 'yield_this', ('markdown_header', MarkdownSection_(hdr, lines))
+
+    def add_line():
+        state.current_section_lines.append(line)
+
+    def flush_any_previous_section():
+        hdr = state.current_header_AST
+        lines = state.current_section_lines
+        if not (hdr or lines):
+            return
+        state.current_header_AST = None
+        lines = tuple(lines)
+        state.current_section_lines.clear()
+        return hdr, lines  # #here1
+
+    # == Conditions
+
+    def if_dash_dash_dash():
+        return _hugo_yaml_open_and_close_frontmatter_line_rx.match(line)
+
+    def if_header_line():
+        md = _markdown_header_line_probably.match(line)
+        state.previous_markdown_header_match = md
+        return True if md else False
+
+    def if_start_code_block():
+        return _code_block_start_and_stop_lol_rx.match(line)
+
+    def if_end_code_block():
+        return _code_block_start_and_stop_lol_rx.match(line)
+
+    def otherwise():
+        return True
+
+    # == Whiney actions
+
+    def complain_about_empty_file():
+        xx("empty file!")
+
+    def complain_ended_mid(what):
+        xx(f"file ended while in the middle of {what}")
+
+    # ==
+
+    state = otherwise  # #watch-the-world-burn
+    stack = [from_beginning]
+
+    def find_action():
+        for cond, action in stack[-1]():
+            yn = cond()
+            if yn:
+                return action
+
+    for line in lines:
+        while True:
+            found = find_action()
+            if not found:
+                xx(f"no state transition found {stack[-1].__name} - {line!r}")
+            tup = found()
+            if tup is None:
+                break  # fall through to process next line
+            typ, x = tup
+            if 'yield_this' == typ:
+                yield x
+                break  # fall through to process next line
+            assert 'yield_this_and_retry_current_line'
+            yield x
+            # stay in loop to do line again
+
+    do = stack[-1].when_EOS
+    if not do:
+        return
+    tup = do()  # probably throws
+    typ, x = tup
+    assert 'yield_this' == typ
+    yield x
+
+
+def _frontmatter_then_sections_OLD_WAY(lines):
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    scn = func(iter(lines))
 
     # Parse any hugo-style frontmatter
     frontmatter = None
@@ -227,6 +403,7 @@ def _is_blank(line):
 _hugo_yaml_open_and_close_frontmatter_line_rx = _re.compile('^---$')
 _hugo_frontmatter_line_rx = _re.compile(r'^([^ :]+)[ ]*:[ ]*(.*)$')
 _markdown_header_line_probably = _re.compile(r'^(#+)[ ]*(\(?)([^)\n]*)([^\n]*)$')  # noqa: E501
+_code_block_start_and_stop_lol_rx = _re.compile('^```')
 
 
 class _ClassifiedPath:
@@ -267,4 +444,5 @@ def _interesting_parts_via_path(path):
 def xx(msg=None):
     raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
+# #history-B.4
 # #born

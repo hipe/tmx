@@ -36,7 +36,7 @@ class CommonCase(unittest.TestCase):
         emitter_via = mod.emitter_via_monitor__
 
         from kiss_rdb_test.eno_support import coll_via_path as func
-        coll = func('/dev/null')
+        coll = func('/dev/null', do_load_schema_from_filesystem=False)
         cf = coll.custom_functions
         mon = cf.monitor_via_listener_(listener)
         emi = emitter_via(mon)

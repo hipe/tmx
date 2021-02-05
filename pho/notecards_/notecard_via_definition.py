@@ -27,11 +27,14 @@ def validate_and_normalize_core_attributes_(
         listener('error', 'expression', 'entity_has_invalid_composition', lineser)  # noqa: E501
 
     # setup
+
+    has_body = dct['body'] is not None or dct['body_function'] is not None
+    # (mutually-exclusive rule table for above is/isn't done at [#882.S.2])
+
     has_parent = dct['parent'] is not None
     has_previous = dct['previous'] is not None
     has_natty_key = dct['natural_key'] is not None
     has_heading = dct['heading'] is not None
-    has_body = dct['body'] is not None
 
     has_parent_or_previous = has_previous or has_parent
 
@@ -76,6 +79,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
         heading=None,
         document_datetime=None,
         body=None,
+        body_function=None,
         children=None,
         next=None,
         annotated_entity_revisions=None,
@@ -103,6 +107,7 @@ def _normalize_core_attribute_names(  # sort of #[#022] wish for strong types?
             'heading': heading,
             'document_datetime': document_datetime,
             'body': body,
+            'body_function': body_function,
             'children': children,
             'next': next,
             'annotated_entity_revisions': annotated_entity_revisions,
@@ -115,7 +120,8 @@ class _Notecard:
             self, parent, previous,
             hierarchical_container_type, identifier_string,
             heading_is_natural_key, heading, document_datetime,
-            body, children, next, annotated_entity_revisions):
+            body, body_function,
+            children, next, annotated_entity_revisions):
 
         self.parent_identifier_string = parent
         self.previous_identifier_string = previous
@@ -124,7 +130,7 @@ class _Notecard:
         self.heading_is_natural_key = heading_is_natural_key  # not used yet..
         self.heading = heading
         self.document_datetime = document_datetime
-        self.body = body
+        self.body, self.body_function = body, body_function
         self.children = children
         self.next_identifier_string = next
         self.annotated_entity_revisions = annotated_entity_revisions

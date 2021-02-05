@@ -201,6 +201,8 @@ def _to_additional_commands(comp):
 
 
 def _parse_config_command(cmd):
+    # (if you *really* insist on adding feature to this, see [#882.T])
+
     import re
     md = re.match(r'([a-zA-Z_]+)(?:\.(.+)|\((.*)\))?\Z', cmd)
     if not md:

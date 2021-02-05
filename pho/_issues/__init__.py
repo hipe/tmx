@@ -417,17 +417,24 @@ class _Identifier:
             self._as_string_lazy = ''.join(self._to_string_pieces())
         return self._as_string_lazy
 
+    def to_inner_string_(self):
+        return ''.join(self._to_inner_string_pieces())
+
     def _to_string_pieces(self):
-        major_int, minor_int = self.key
         if self.include_bracket:
             yield '['
         yield '#'
+        for pc in self._to_inner_string_pieces():
+            yield pc
+        if self.include_bracket:
+            yield ']'
+
+    def _to_inner_string_pieces(self):
+        major_int, minor_int = self.key
         yield '%03d' % major_int
         if minor_int is not None:
             yield '.'
             yield self._minor_surface  # (Case3853)
-        if self.include_bracket:
-            yield ']'
 
     def __le__(self, otr):
         return self._compare(otr) in (-1, 0)

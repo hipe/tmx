@@ -44,6 +44,8 @@ def field_line(var_name, string_value):
 
 # == END
 
+# fsr = filesystem reader
+
 def EXPERIMENTAL_caching_collection(
         directory, max_num_lines_to_cache=None, listener=None):
     def fsr(ci):
@@ -55,11 +57,19 @@ def EXPERIMENTAL_caching_collection(
     return real_coll and collection_class(real_coll)
 
 
-def mutable_eno_collection_via(directory, rng=None, fsr=None, listener=None):
+def mutable_eno_collection_via(
+        directory, listener=None,
+        rng=None, fsr=None,
+        do_load_schema_from_filesystem=True  # 👀
+        ):
+
     import sys
     sa_mod = sys.modules[__name__]
     from kiss_rdb import collection_via_storage_adapter_and_path as func
-    return func(sa_mod, directory, listener, rng=rng, fsr=fsr)
+    return func(
+            sa_mod, directory, listener,
+            rng=rng, fsr=fsr,
+            do_load_schema_from_filesystem=do_load_schema_from_filesystem)
 
 
 def CREATE_COLLECTION(collection_path, listener, is_dry):
@@ -72,20 +82,36 @@ def ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     # to support only one storage schema. but when the day comes, abstract
     # the things out of the sibling spot in the toml adapter
 
-    dct = schema_file_scanner.flush_to_config(
-            listener, storage_schema='allowed')
+    kw = {k: 'multiple' for k in _plural_via_singular.keys()}
+    kw['storage_schema'] = 'allowed'
+
+    dct = schema_file_scanner.flush_to_config(listener, **kw)
 
     if 'storage_schema' in dct:
         assert '32x32x32' == dct['storage_schema']
 
+    # Pluralize the names:
+    for sing, plur in _plural_via_singular.items():
+        if (x := dct.pop(sing, None)):
+            dct[plur] = x
+
     return dct
 
 
+_plural_via_singular = {
+    'value_function': 'value_functions',
+    'value_function_variable': 'value_function_variables'
+}
+
+
 def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
-        directory, listener, storage_schema=None, rng=None, fsr=None):
+        directory, listener, storage_schema=None,
+        custom_functions=None,
+        custom_variables=None,
+        rng=None, fsr=None, opn=None):
 
     del storage_schema
-    ci = _collection_implementation(directory, rng=rng, fsr=fsr)
+    ci = _collection_implementation(directory, rng=rng, fsr=fsr, opn=opn)
 
     class fxr:  # #class-as-namespace
         def PRODUCE_EDIT_FUNCTIONS_FOR_DIRECTORY():

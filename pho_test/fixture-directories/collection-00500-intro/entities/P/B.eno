@@ -15,8 +15,19 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 
 [1]: url_for_gcc
-
 -- body
+
+
+# entity: PBX: attributes
+
+heading: heading is normal
+body_function: get_body_from_special_place(special_place_one)
+
+
+# entity: PBY: attributes
+
+heading: heading is me
+body_function: get_body_from_document(directario_one, [#123.B])
 
 
 # document-meta

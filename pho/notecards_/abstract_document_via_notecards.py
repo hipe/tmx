@@ -258,13 +258,31 @@ def _find_document_root_node(eid, notecards, listener=None):
 
 # ==
 
-def abstract_document_via_notecards_iterator_(itr):
+def abstract_document_via_notecards_iterator_(itr, bcoll, listener):
     first_notecard = next(itr)
 
     def these():
-        yield first_notecard.heading, first_notecard.body
+        yield first_notecard.heading, body_of(first_notecard)
         for nc in itr:
-            yield nc.heading, nc.body
+            yield nc.heading, body_of(nc)
+
+    def body_of(nc):
+        # (we said we woud do this rule table somewhere [#882.S.2])
+
+        s = nc.body
+        bf = nc.body_function
+
+        if bf is None:
+            assert s  # checked within the builder near the class
+            return s
+
+        if s is not None:
+            xx(f"{nc.identifier_string!r} has both 'body' and 'body_function'")
+
+        s = bcoll.call_value_function_(bf, nc, listener)
+        if not s:
+            xx("cover this - wat do when fail this late")
+        return s
 
     kw = {'ncid': first_notecard.identifier_string}
     kw['datetime'] = first_notecard.document_datetime

@@ -7,6 +7,12 @@ files must parse as recfiles, but not all recfiles will parse with our
 If we encounter a future with an actual storage adaptation for recfiles, it
 seems almost certain that we can future-fit the below implementation while
 preserving this "block scanner"-style interface for our one client.
+
+This is the external thing: [GNU Recutils][1] (and this [example][2]).
+
+
+[1]: https://www.gnu.org/software/recutils/
+[2]: https://www.gnu.org/software/recutils/manual/A-Little-Example.html
 """
 
 from text_lib.magnetics.string_scanner_via_string import \

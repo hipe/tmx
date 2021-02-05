@@ -46,7 +46,9 @@ def generate_markdown(collection_path, listener, NCID=None):
             listener('error', 'expression', 'document_depths', lambda: (reason,))  # noqa: E501
             yield ('adapter_error',)
             return
-        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS():
+
+        bcoll = o.read_only_business_collection
+        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS(bcoll):
             for direc in _directives_via_AD(ptup, ad, listener):
                 yield direc
 

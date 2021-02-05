@@ -103,6 +103,18 @@ class _Notecards:  # #testpoint
 
     # == Read-Only Methods
 
+    def abstract_document_via_notecards(self, ncs, listener=None):
+        from .notecards_.abstract_document_via_notecards import \
+                abstract_document_via_notecards_iterator_ as func
+        return func(iter(ncs), self, listener)
+
+    def call_value_function_(self, expression_string, bent, listener):
+        if not hasattr(self, '_custom_func_memo'):
+            self._custom_func_memo = {}
+        from .notecards_.call_value_function import func
+        return func(bent, expression_string,
+                    self._custom_func_memo, self, listener)
+
     def build_big_index_(self, listener=None):
         from .notecards_.big_index_via_collection import \
             big_index_for_many as func

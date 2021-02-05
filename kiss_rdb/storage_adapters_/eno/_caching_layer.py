@@ -1,3 +1,9 @@
+def _property_from_back(orig_f):
+    def use_f(self):
+        return getattr(self._back, orig_f.__name__)
+    return property(use_f)
+
+
 class ReadOnlyCollectionLayer_:
 
     def __init__(self, back):
@@ -18,9 +24,21 @@ class ReadOnlyCollectionLayer_:
     def open_entity_traversal(self, listener):
         return self._back.open_entity_traversal(listener)
 
-    @property
-    def MIXED_COLLECTION_IDENTIFIER(self):  # #cover-me [pho]
-        return self._back.MIXED_COLLECTION_IDENTIFIER
+    # == BEGIN #cover-me [pho]
+
+    @_property_from_back
+    def MIXED_COLLECTION_IDENTIFIER(self):
+        pass
+
+    @_property_from_back
+    def VALUE_FUNCTION_RIGHT_HAND_SIDES(self):
+        pass
+
+    @_property_from_back
+    def VALUE_FUNCTION_VARIABLE_RIGHT_HAND_SIDES(self):
+        pass
+
+    # == END
 
 
 class Caching_FS_Reader_:  # #testpoint

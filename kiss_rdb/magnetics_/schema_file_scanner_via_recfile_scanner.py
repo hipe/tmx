@@ -7,24 +7,53 @@ class schema_file_scanner_via_recfile_scanner:
 
         result = {}
 
-        says_required = ('allowed', 'required').index
-        dim_pool = set(k for k, v in formal_fields.items() if says_required(v))
-        # dim pool = diminshing pool: find missing requireds as you traverse
+        # dim pool = diminishing pool: find missing requireds as you traverse
+        dim_pool = set()
+
+        is_multiple = {}
+
+        for k, typ in formal_fields.items():
+            is_multiple[k] = False
+            if 'required' == typ:
+                dim_pool.add(k)
+                continue
+            if 'allowed' == typ:
+                continue
+            assert 'multiple' == typ
+            is_multiple[k] = True
 
         while True:
+
+            # Did our scanner fail to read the next field name-value?
             field = self.next_field(listener)
             if field is None:
                 return
+
+            # Did we reach the end of the file?
             if field.is_end_of_file:
                 break
-            n = field.field_name
-            if n not in formal_fields:
+
+            # Is the field name a strange name?
+            k = field.field_name
+            yes_multiple = is_multiple.get(k)
+            if yes_multiple is None:
                 return self._emit_about_extra(listener, field, formal_fields)
-            if n in dim_pool:
-                dim_pool.remove(n)
-            if n in result:
+
+            # Is it a required field that was just set?
+            if k in dim_pool:
+                dim_pool.remove(k)
+
+            # If it's "multiple" type, do that
+            value = field.field_value_string
+            if yes_multiple:
+                if (arr := result.get(k)) is None:
+                    result[k] = (arr := [])
+                arr.append(value)
+                continue
+
+            if k in result:
                 return self._emit_about_collision(listener, field)
-            result[n] = field.field_value_string
+            result[k] = value
 
         if len(dim_pool):
             return self._emit_about_missing(listener, dim_pool, formal_fields)
@@ -95,6 +124,7 @@ class schema_file_scanner_via_recfile_scanner:
             return dct
         listener('error', 'structure',
                  'unrecognized_config_attribute', structur)
+        # (for searching: "unrecognized config attribute" ☝️)
 
     def contextualize_about_field_name(self, dct, field):
         dct['position'] = field.position_of_start_of_field_name
@@ -110,5 +140,8 @@ class schema_file_scanner_via_recfile_scanner:
         dct['lineno'] = parse_state.lineno
         dct['path'] = parse_state.path
         return dct
+
+
+func = schema_file_scanner_via_recfile_scanner
 
 # #born.
