@@ -32,10 +32,16 @@ Restart shell:
 
 
 
+## to see if newer python versions exist in the world:
+
+    pyenv install --list
+
+
+
 ## build target python version (once per version per system)
 
-    pyenv install 3.8.0  # might take 5 minutes
-    pyenv local 3.8.0  # writes .python-version
+    pyenv install 3.9.0rc1  # might take 5 minutes
+    pyenv local 3.9.0rc1  # writes .python-version
     py -V  # confirm this says the right version (uses aliases in README.md)
 
 
@@ -44,23 +50,32 @@ Restart shell:
 
 ## create your virtualenv (once per project directory)
 
-virtualenv --python=python3 my-venv
+    virtualenv --python=python3 my-venv
 
 
 
 ## enter your virtualenv (once per work session (terminal))
 
-source my-venv/bin/activate
+    source my-venv/bin/activate
 
 
 
 ## one per virtual environment per (set of dependencies)
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
+
+
+(or, if you have just experimentally upgraded your python version, pray:)
+
+    pip install --upgrade -r requirements.txt
+
+(☝️ this takes some time, like at least 5 minutes)
 
 
 
 # general
+
+(#todo what is this)
 
 export PYTHONPATH='.'
 
