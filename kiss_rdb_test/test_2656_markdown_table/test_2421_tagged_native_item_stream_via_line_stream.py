@@ -1,4 +1,4 @@
-from kiss_rdb_test.common_initial_state import functions_for
+from kiss_rdb_test.common_initial_state import functions_for, unindent
 import modality_agnostic.test_support.common as em
 from modality_agnostic.test_support.common import \
         dangerous_memoize_in_child_classes as shared_subj_in_children
@@ -47,26 +47,31 @@ class CommonCase(unittest.TestCase):
     def end_state(self):
         return self.build_end_state()
 
-    def build_end_state_expecting_failure(self):
-        fixture_file = self.fixture_file()
+    def build_end_state_expecting_one_emission(self):
+        lines_or_file = self.fixture_lines_or_file()
         listener, emissions = em.listener_and_emissions_for(self)
-        tuples = _common_execute(fixture_file, listener)
+        tuples = _common_execute(lines_or_file, listener)
         emi, = emissions
         msgs = emi.to_messages()
         return _EndState(tuples, msgs)
 
-    def build_end_state_expecting_success(self):
-        fixture_file = self.fixture_file()
-        tuples = _common_execute(fixture_file, 'listener03')
+    def build_end_state_expecting_no_emissions(self):
+        lines_or_file = self.fixture_lines_or_file()
+        listener, _ = em.listener_and_emissions_for(self, limit=0)
+        tuples = _common_execute(lines_or_file, listener)
         return _EndState(tuples)
 
-    def fixture_file(self):
-        x = self.given_markdown()
-        # FOR NOW
-        assert isinstance(x, str)
-        assert '\n' not in x
-        return x
+    def fixture_lines_or_file(self):
+        func = self.given_markdown_lines
+        if func:
+            return 'lines_not_file', func()
+        path = self.given_markdown()
+        # == BEGIN some legacy-ism from before #history-B.4 idk
+        assert isinstance(path, str)
+        assert '\n' not in path
+        return 'file_not_lines', path
 
+    given_markdown_lines = None
     do_debug = False
 
 
@@ -84,7 +89,7 @@ class Case2420_fail_too_many_rows(CommonCase):
         self._failed_talking_bout(_exp)
 
     def build_end_state(self):
-        return self.build_end_state_expecting_failure()
+        return self.build_end_state_expecting_one_emission()
 
     def given_markdown(_):
         return '0090-cel-overflow.md'
@@ -108,16 +113,118 @@ class Case2422_minimal_working(CommonCase):
         self._expect_this_many_rows(2)
 
     def build_end_state(self):
-        return self.build_end_state_expecting_success()
+        return self.build_end_state_expecting_no_emissions()
 
     def given_markdown(_):
         return '0100-hello.md'
 
 
-def _common_execute(fixture_file, listener):
+class Case2424_table_header(CommonCase):
+
+    def test_010_hi(self):
+        es = self.end_state
+        assert es.did_succeed
+        tup = es.tuples[4]
+        assert 'table_schema_line_TWO_of_two' == tup[0]
+        ast = tup[2]
+        act = ast.table_cstack_[-1]['table_header_line']  # eek
+        assert "# Zib Zub super table\n" == act
+
+    def build_end_state(self):
+        return self.build_end_state_expecting_no_emissions()
+
+    def given_markdown_lines(_):
+        return unindent("""
+        # Zib Zub super table
+
+        |aa|bb|cc|
+        |---|---|---
+        |x1|x2|x3
+        |x4|x5|x6|
+
+        """)
+
+
+# Case2428_010 imagine file with no lines
+
+
+class Case2428_020_file_with_no_table(CommonCase):
+
+    def test_010_ohai(self):
+        es = self.end_state
+        assert not es.did_succeed
+        act, = es.error_messages
+        assert "no markdown table found in 2 lines" == act
+
+    def build_end_state(self):
+        return self.build_end_state_expecting_one_emission()
+
+    def given_markdown_lines(_):
+        yield "line 1\n"
+        yield "line 2\n"
+
+
+class Case2428_030_end_early(CommonCase):
+
+    def test_010_is_OK(self):
+        es = self.end_state
+        assert es.did_succeed
+
+    def build_end_state(self):
+        return self.build_end_state_expecting_no_emissions()
+
+    def given_markdown_lines(_):
+        return unindent("""
+        hello
+
+        |aa|bb|cc|
+        |---|---|---
+        """)
+
+
+class Case2428_040_multi_table(CommonCase):
+
+    def test_010_not_yes(self):
+        es = self.end_state
+        assert not es.did_succeed
+        act, = es.error_messages
+        assert "for now can only have one table" == act
+
+    def build_end_state(self):
+        return self.build_end_state_expecting_one_emission()
+
+    def given_markdown_lines(_):
+        return unindent("""
+        # 1
+
+        |aa|bb|cc|
+        |---|---|---
+        |eg|[#867.5.1]
+        |x1|x2|x3
+        |x4|x5|x6|
+
+        ## 2
+        |dd|ee|ff|
+        |---|---|---
+        |x|x|x
+        """)
+
+
+def _common_execute(lines_or_file, listener):
+
+    typ = lines_or_file[0]
+    if 'file_not_lines' == typ:
+        entry, = lines_or_file[1:]
+        path = fixture_path(entry)
+        opened = open(path)
+    else:
+        assert 'lines_not_file' == typ
+        itr, = lines_or_file[1:]
+        from contextlib import nullcontext as func
+        opened = func(itr)
+
     tagged_row_ASTs_or_lines_via = subject_function()
-    path = fixture_path(fixture_file)
-    with open(path) as lines:
+    with opened as lines:
         return tuple(tagged_row_ASTs_or_lines_via(lines, listener))
 
 
@@ -197,6 +304,11 @@ _all_possible_transitions = (
         'end_of_file')
 
 
+def lines_via_indendted_big_string(big_string):
+    from re import finditer as func  # [#610]
+    return (md[1] for md in func(r'^[ ]*((?:[^ ][^\n])*?\n)', big_string))
+
+
 def subject_function():
     from kiss_rdb_test.markdown_storage_adapter import \
             tagged_row_ASTs_or_lines_via_lines as function
@@ -206,5 +318,6 @@ def subject_function():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.4: changed parsing to use state machine and added many cases
 # #history-A.1: remove "too few cels"
 # #born.

@@ -158,7 +158,7 @@ def pretend_resource_and_controller_via_KV_pairs(itr):
     k, f = next(itr)
     assert 'pretend_file' == k
     dct = {k: v for layer in (f(), itr) for k, v in layer}
-    dct['lines'] = _lines_via_big_string(dct.pop('big_string'))
+    dct['lines'] = unindent(dct.pop('big_string'))
     return _pretend_resource(**dct)
 
 
@@ -181,7 +181,7 @@ def _pretend_resource_via_two(pretend_path, x):
 
     typ = type(x).__name__
     if 'str' == typ:
-        itr = _lines_via_big_string(x)
+        itr = unindent(x)
     elif 'generator' == typ:
         itr = x
     else:
@@ -195,11 +195,6 @@ def _pretend_resource_via_string(x):
 
     # façader will open and close it as a real filesystem file
     return x, None  # #here1
-
-
-def _lines_via_big_string(big_string):
-    from .common_initial_state import unindent as func
-    return func(big_string)
 
 
 def _pretend_resource(lines, pretend_path, expect_num_rewinds=None, **kw):

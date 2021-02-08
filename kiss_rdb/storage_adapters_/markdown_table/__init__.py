@@ -14,6 +14,9 @@ older one. At #history-B.1 we unified the strains.
 :[#873.N]:
 """
 
+from dataclasses import dataclass as _dataclass, field as _field
+
+
 STORAGE_ADAPTER_CAN_LOAD_DIRECTORIES = False
 STORAGE_ADAPTER_CAN_LOAD_SCHEMALESS_SINGLE_FILES = True
 STORAGE_ADAPTER_ASSOCIATED_FILENAME_EXTENSIONS = ('.md',)
@@ -183,7 +186,7 @@ def _build_sexps_via_listener(fh, iden_er_er):  # #testpoint
 
 
 def _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er):  # th
-    context_stack = ({'path': fh.name},)
+    context_stack = ({'path': _path_via_lines(fh)},)
 
     # Resolve tagged lines via lines
     tagged_lines = _tagged_lines_via_lines(fh)
@@ -612,81 +615,85 @@ in practice we are not so lenient given:
 
 
 def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
+    # rewrote as FSA not scanner-based, procedural mish-mash at #history-B.5
 
-    def stop_because(reason):
-        sct = _flatten_context_stack((*build_cstack(), {'reason': reason}))
-        listener('error', 'structure', 'stop', lambda: sct)
-        raise _Stop()
+    # States [#008.2]
 
-    def throwing_listener(severity, *rest):
-        listener(severity, *rest)
-        if 'error' == severity:
-            raise _Stop()
+    def from_beginning_state():
+        yield if_other_line, yield_head_line_or_other_line
+        yield if_table_header_line, handle_header_and_transition_to_after
+        yield if_table_line, start_TIP_and_handle_schema_line_one
 
-    def build_cstack():
-        return (*(context_stack or ()), {'line': line, 'lineno': peek_lineno()})  # noqa: E501
+    def from_ready_state():  # (like beginning state but after one table #todo)
+        yield if_other_line, yield_head_line_or_other_line
+        yield if_table_header_line, handle_header_and_transition_to_after
+        yield if_table_line, start_TIP_and_handle_schema_line_one
 
-    iden_er = None
-    if iden_er_er:
-        iden_er = iden_er_er(throwing_listener, build_cstack)  # VERY EXPERIM
+    def from_after_table_header_line():
+        yield if_interstitial, wow_do_something_with_interstitial
+        yield if_table_line, handle_schema_line_one
 
-    def peek_lineno():
-        return counter_count() + 1
-    scn = _scnlib().scanner_via_iterator(tagged_lines)
-    counter_count = _scnlib().MUTATE_add_counter(scn)  # duplication #here1 meh
+    def from_after_first_schema_line():
+        yield if_table_line, on_schema_line_two
 
-    # Skip over leading other lines
-    while scn.more and 'other' == scn.peek[0]:
-        yield 'head_line', scn.next()[1]
+    def from_after_second_schema_line():
+        yield if_table_line, enter_table_body_state_and_handle_item_row
+        xx("you're gonna wanna handle empty tables")
 
-    is_first = True
+    def from_table_body_state():
+        yield if_table_line, handle_item_row
+        yield if_other_line, handle_end_of_table_because_other_line
 
-    # (It may be that no table was found in zero or more lines)
+    from_beginning_state.on_EOS = lambda: when_file_with_no_tables()
+    from_ready_state.on_EOS = lambda: None  # the most common end
+    from_after_first_schema_line.on_EOS = lambda: xx('premature end of file')
+    from_after_second_schema_line.on_EOS = lambda: when_end_after_open_table()
+    from_table_body_state.on_EOS = lambda: when_table_is_at_EOF()
 
-    while scn.more:
-        # Something other than 'other' is guaranteed; so, a table
+    # Actions
 
-        # For now we don't keep 'table_header_interstitial'*
-        table_context_frame = {}  # used in error messages, maybe in #here2
-        if 'table_header' == scn.peek[0]:
-            table_context_frame['table_header_line'] = scn.peek[1]
-            if is_first:
-                is_first = False
-                head_line_or_other_line = 'head_line'
-            else:
-                head_line_or_other_line = 'other_line'  # (Case2516)
+    def wow_do_something_with_interstitial():
+        state.table_in_progress.interstitial_lines.append(line)
+        return yield_head_line_or_other_line()
 
-            while True:
-                yield head_line_or_other_line, scn.next()[1]
-                if 'table_header_interstitial' != scn.peek[0]:
-                    break
+    def handle_header_and_transition_to_after():
+        # (externally, pass thru as ordinary lines but internally (Case2516))
 
-        schema_row_AST_via_line = _build_row_AST_via_line(
-                throwing_listener, context_stack, schema=None)
+        start_table_in_progress(table_header_line=line)
+        move_to_state(from_after_table_header_line)
+        return yield_head_line_or_other_line()
 
-        # First table schema line
-        table_lineno = peek_lineno()
-        typ, line = scn.next()
-        assert 'table_line' == typ  # per the upstream grammar
-        tsl1of2_ast = schema_row_AST_via_line(line, table_lineno)
+    def start_TIP_and_handle_schema_line_one():
+        start_table_in_progress()
+        return handle_schema_line_one()
+
+    def handle_schema_line_one():
+        tip = state.table_in_progress
+        tsl1of2_ast = schema_row_AST_via_line(line, lineno)
+        tip.table_schema_line_ONE_of_two_AST = tsl1of2_ast
+
         if not tsl1of2_ast.has_endcap:
             stop_because('header row 1 must have "endcap" (trailing pipe)')
-        yield 'table_schema_line_ONE_of_two', line  # for now, AST 4 me not u
 
-        table_context_frame.update({'line': line, 'lineno': table_lineno})
-        if scn.empty:
-            xx("file ended on first table schema line - what do we output?")
+        state.head_line_or_other_line = 'other_line'
+        # (now, every line that is not a table line will be 'other' if not alr)
 
-        # Second table schema line
-        typ, line = scn.next()
-        if 'table_line' != typ:
-            xx(f"expected table schema line 2 (alignments), had '{typ}'")
+        move_to_state(from_after_first_schema_line)
+        return 'yield_this', ('table_schema_line_ONE_of_two', line)
+
+    def start_table_in_progress(table_header_line=None):
+        assert state.table_in_progress is None
+        state.table_in_progress = _TableInProgress(
+                line=line, lineno=lineno, table_header_line=table_header_line)
+
+    def on_schema_line_two():
+        tip = state.table_in_progress
+        tsl1of2_ast = tip.table_schema_line_ONE_of_two_AST
         tsl2of2_ast = schema_row_AST_via_line(line, 0)
 
         # Make sure the two schema lines accord
-        two = (tsl1of2_ast, tsl2of2_ast)
-        count1, count2 = (o.cell_count for o in two)
-        has1, has2 = (o.has_endcap for o in two)
+        ((count1, has1), (count2, has2)) = \
+            ((o.cell_count, o.has_endcap) for o in (tsl1of2_ast, tsl2of2_ast))
 
         if count1 != count2:
             xx("column counts didn't line up between schema row line 1 & 2")
@@ -694,27 +701,147 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
         if has1 != has2:
             pass  # endcap on one but not the other is okay (Case2557)
 
-        cstck = (*context_stack, table_context_frame)
+        cstck = (*context_stack, tip.to_context_frame())
         complete_schema = complete_schema_via_(
             tsl1of2_ast, tsl2of2_ast, cstck, iden_er)
 
-        yield 'table_schema_line_TWO_of_two', line, complete_schema  # #here3
-
-        row_AST_via_line = _build_row_AST_via_line(
+        tip.item_row_AST_via_line = _build_row_AST_via_line(
                 throwing_listener, context_stack, complete_schema)
 
-        # Zero or more business object rows
-        while scn.more and 'table_line' == scn.peek[0]:
-            ast = row_AST_via_line((line := scn.peek[1]), peek_lineno())
-            count3 = ast.cell_count
-            if count1 < count3:  # #here4
-                stop_because(_line_about_cell_count_delta(count3, count1))
-            yield 'business_row_AST', ast, peek_lineno()
-            scn.advance()
+        tip.formal_cell_count = count1
 
-        # Zero or more "other" lines (either til end of file or til next table)
-        while scn.more and 'other' == scn.peek[0]:
-            yield 'other_line', scn.next()[1]
+        move_to_state(from_after_second_schema_line)
+
+        out = 'table_schema_line_TWO_of_two', line, complete_schema  # #here3
+        return 'yield_this', out
+
+    def enter_table_body_state_and_handle_item_row():
+        move_to_state(from_table_body_state)
+        return handle_item_row()
+
+    def handle_item_row():
+        tip = state.table_in_progress
+        ast = tip.item_row_AST_via_line(line, lineno)
+        actual = ast.cell_count
+        if tip.formal_cell_count < actual:  # #here4
+            reason = _line_about_cell_count_delta(
+                    actual, tip.formal_cell_count)
+            stop_because(reason)
+        return 'yield_this', ('business_row_AST', ast, lineno)
+
+    def handle_end_of_table_because_other_line():
+        state.table_in_progress = None
+        move_to_state(from_ready_state)
+        return yield_head_line_or_other_line()
+
+    def yield_head_line_or_other_line():
+        return 'yield_this', (state.head_line_or_other_line, line)
+
+    # Conditions
+
+    def if_other_line():
+        return 'other' == token_type
+
+    def if_table_header_line():
+        return 'table_header' == token_type
+
+    def if_interstitial():
+        return 'table_header_interstitial' == token_type
+
+    def if_table_line():
+        return 'table_line' == token_type
+
+    # ==
+
+    def move_to_state(func):
+        stack[-1] = func
+
+    # ==
+
+    # == Whiners & Adjacent
+
+    def when_file_with_no_tables():
+        pass  # client emits an error, we don't need to notice (Case2428_020)
+
+    def when_end_after_open_table():
+        pass  # (Case2428_030)
+
+    def when_table_is_at_EOF():
+        pass  # (Case2557)
+
+    # == Support
+
+    def find_transition():
+        for condition, action in stack[-1]():
+            yn = condition()
+            if yn:
+                return action
+        from_where = stack[-1].__name__.replace('_', ' ')
+        what = repr(token_type)
+        xx(f"{from_where} got line of type {what}. add a transition for this")
+
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise _Stop()
+
+    def stop_because(reason):
+        sct = _flatten_context_stack((*build_cstack(), {'reason': reason}))
+        listener('error', 'structure', 'stop', lambda: sct)
+        raise _Stop()
+
+    def build_cstack():
+        return (*(context_stack or ()), {'line': line, 'lineno': lineno})
+
+    # == Functions derived from above
+
+    schema_row_AST_via_line = _build_row_AST_via_line(
+            throwing_listener, context_stack)
+
+    iden_er = None
+    if iden_er_er:
+        iden_er = iden_er_er(throwing_listener, build_cstack)  # VERY EXPERIM
+
+    state = from_ready_state  # #watch-the-world-burn
+    state.table_in_progress = None
+
+    state.head_line_or_other_line = 'head_line'
+    # (lines that aren't table lines are 'head_line' or 'other_line')
+
+    stack = [from_beginning_state]  # (incidentally, we don't ever push/pop)
+
+    lineno = 0
+    for token_type, line in tagged_lines:
+        lineno += 1
+        while True:  # (placeheld for a possible future "retry" directive)
+            action = find_transition()
+            direc = action()
+            typ = direc[0]
+            assert 'yield_this' == typ
+            x, = direc[1:]
+            yield x
+            break  # go on to process the next line
+
+    direc = stack[-1].on_EOS()
+    if direc is None:
+        return
+    xx('ok easy')
+
+
+@_dataclass
+class _TableInProgress:
+    """mutable parse state for building AST progressively over several lines"""
+
+    table_header_line: str
+    lineno: int
+    line: str
+    interstitial_lines: list[str] = _field(default_factory=list)
+
+    def to_context_frame(self):  # maybe used in #here2
+        kw = {'line': self.line, 'lineno': self.lineno}
+        if (s := self.table_header_line):
+            kw['table_header_line'] = s
+        return kw
 
 
 def _line_about_cell_count_delta(count3, count1):
@@ -868,6 +995,15 @@ def _merge_stack_in_to_stack(main_stack, second_stack):  # goofy experiment
         main_stack[main_offset] = (typ1, f3)
 
 
+# == Smalls
+
+def _path_via_lines(fh):
+    if hasattr(fh, 'name'):
+        return fh.name
+    assert hasattr(fh, '__next__')
+    return "«line generator, not path»"
+
+
 def _combine_two_monadics(f1, f2):
     def f3(arg):
         f1(arg)
@@ -887,6 +1023,7 @@ def _scnlib():
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.5
 # #history-B.4
 # #history-B.1: blind rewrite. absorb four modules
 # #history-A.4: no more format adapter

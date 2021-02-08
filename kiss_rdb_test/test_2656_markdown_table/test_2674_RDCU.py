@@ -223,7 +223,9 @@ class Case2676_create_but_something_is_invalid(CommonCase):
         self.assertIn('n pretend-file/2536-for-ID-traversal.md', self.reason())
 
     def test_640_also_says_line_number(self):
-        self.assertEqual(self.reason()[-12:], 'versal.md:2)')
+        self.assertEqual(self.reason()[-12:], 'versal.md:1)')
+        # (at #history-B.6 this changed from line 2 to line 1 because now
+        # we count the any header line as the start of the table)
 
     def dictionary_for_create_with_something_invalid_about_it(self):
         return {'i_de_n_ti_fier_zz': 'B9I',
@@ -613,6 +615,7 @@ This is near [#867.Z] we can't use seek(0) etc on files. just line-by-line
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.6
 # #history-B.5
 # #history-B.4
 # #history-B.1
