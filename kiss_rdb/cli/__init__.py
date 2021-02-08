@@ -54,8 +54,16 @@ class _CommonFunctions:
 
     @property
     def stdout(self):  # (get it from click because we hack override it)
-        from click.utils import _default_text_stdout
-        return _default_text_stdout()
+        return self._get_it_from_click('_default_text_stdout')
+
+    @property
+    def stderr(self):
+        return self._get_it_from_click('_default_text_stderr')
+
+    def _get_it_from_click(self, fname):
+        import click.utils as mod
+        vendor_func = getattr(mod, fname)
+        return vendor_func()
 
 
 _empty_mapping = {}  # OCD
@@ -369,7 +377,8 @@ def create_collection(ctx, adapter_name, collection_path, dry_run):
     """Create a new collection given the storage adapter type. EXPERIMENTAL
     """
 
-    listener = ctx.obj.build_monitor().listener
+    efx = ctx.obj
+    listener = efx.build_monitor().listener
     from kiss_rdb import collectionerer
     collrr = collectionerer()
     sa = collrr.storage_adapter_via_format_name(adapter_name, listener)
@@ -378,9 +387,47 @@ def create_collection(ctx, adapter_name, collection_path, dry_run):
     coll = sa.CREATE_COLLECTION(collection_path, listener, dry_run)
     if coll is None:
         return
-    import sys
-    serr, = (getattr(sys, x) for x in ('stderr',))
+    serr = efx.stderr
     serr.write(f"created collection: {collection_path}\n")
+
+
+@cli.command()
+@click.option('--preview', '-p', is_flag=True, help="Write lines to STDOUT")
+@click.option('-i', is_flag=True, help="Do overwrite the file (like 'sed')")
+@click.argument('collection-path')
+@click.pass_context
+def reindex(ctx, preview, i, collection_path):
+    """
+    To make it possible to CREATE without needing to traverse the whole
+
+    collection, we maintain an index of all the currently occupied entity
+    identifiers in the collection. If you stick to the API functions to
+    to CREATE and DELETE, this shouldn't be necessary to call. But if you
+    ever add or remove entities "by hand" (by editing files), you will need
+    to update the index file yourself with this command.
+    """
+
+    efx = ctx.obj
+    from kiss_rdb.magnetics_.index_via_identifiers import CLI_ as cli_via
+
+    # Rebuild the argv with modifications 🙃
+    from sys import argv as real_argv
+    from os.path import basename
+    use_program_name = ' '.join((basename(real_argv[0]), real_argv[1]))
+    use_argv = [use_program_name, collection_path]
+    if i:
+        use_argv.append('-i')
+
+    if preview:
+        use_argv.append('--preview')
+
+    use_argv = tuple(use_argv)
+
+    sout, serr = efx.stdout, efx.stderr
+    cli = cli_via(None, sout, serr, use_argv)
+
+    rc = cli.execute__generate__()
+    del rc
 
 
 # == END commands
@@ -479,6 +526,8 @@ class _Monitor:
         if self.max_errno is None:
             return success_exit_code_
         return self.max_errno
+
+    returncode = exitstatus  # not sure, we might change it
 
 
 def _echo_error(line):

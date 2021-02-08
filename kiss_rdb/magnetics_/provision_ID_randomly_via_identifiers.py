@@ -145,9 +145,9 @@ def _index_file_patch(
 
 
 def _index_path_for_directory(directory):
-    from .identifiers_via_index import ENTITY_INDEX_FILENAME_
-    from os.path import join as _os_path_join
-    return _os_path_join(directory, ENTITY_INDEX_FILENAME_)
+    from .identifiers_via_index import \
+            index_file_path_via_collection_path_ as func
+    return func(directory)
 
 
 def provision_new_identifier_(

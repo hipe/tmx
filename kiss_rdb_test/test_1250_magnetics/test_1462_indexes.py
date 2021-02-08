@@ -243,7 +243,9 @@ class Case1474_shallowest(CommonCase):
 class Case1476_CLI_tool(CommonCase):
 
     def test_050_exit_code_says_success(self):
-        act = self.end_state[1]
+        """(Note hard-coded relative path)"""
+
+        act = self.end_state[2]
         self.assertEqual(act, 0)
 
     def test_100_lines_look_good(self):
@@ -253,16 +255,22 @@ class Case1476_CLI_tool(CommonCase):
         exp = '9 (                            G H J)\n'
         self.assertEqual(act, exp)
 
+    def test_120_info_lines(self):
+        serr_lines = self.end_state[1]
+        act, = serr_lines
+        self.assertIn('wrote 152 bytes to «stdout»', act)
+
     @shared_subject
     def end_state(self):
-        sout, sout_lines = spy_on_write_and_lines_for(self, 'DBG: ')
+        sout, sout_lines = spy_on_write_and_lines_for(self, 'SOUT DBG: ')
+        serr, serr_lines = spy_on_write_and_lines_for(self, 'SERR DBG: ')
 
         yikes = 'kiss_rdb_test/fixture-directories/4844-eno/050-canon-main'
-        argv = '[me]', 'generate', yikes
+        argv = '[me]', 'generate', yikes, '--preview'
 
-        cli = subject_module()._CLI
-        ec = cli(None, sout, None, argv).execute()
-        return tuple(sout_lines), ec
+        cli = subject_module().CLI_
+        rc = cli(None, sout, serr, argv).execute()
+        return tuple(sout_lines), tuple(serr_lines), rc
 
 
 def _other_subject_mod():

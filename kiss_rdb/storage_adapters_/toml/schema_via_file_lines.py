@@ -94,9 +94,8 @@ class _SchemaPather:
     def _index_file(self):
         if self._index_file_value is None:
             from kiss_rdb.magnetics_.identifiers_via_index import \
-                    ENTITY_INDEX_FILENAME_
-            self._index_file_value = _os_path_join(
-                    self._dir_path, ENTITY_INDEX_FILENAME_)
+                index_file_path_via_collection_path_ as func
+            self._index_file_value = func(self._dir_path)
         return self._index_file_value
 
     def open_identifier_traversal(self, listener):

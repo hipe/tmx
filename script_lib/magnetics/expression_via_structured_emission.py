@@ -58,6 +58,9 @@ def lines_via_channel_tail_and_details(channel_tail, details):
     return _lines_via_prepared(slots)
 
 
+func = lines_via_channel_tail_and_details
+
+
 # forward-declare functions we define below
 
 def _the_series_of_counting_numbers():

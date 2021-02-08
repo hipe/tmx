@@ -131,6 +131,9 @@ class write_only_IO_proxy:
         self._on_OK_exit = None
         f()
 
+    def truncate(_):
+        pass  # we are supposed to return tell() (current pointer position)
+
     def isatty(self):
         self._isatty
 

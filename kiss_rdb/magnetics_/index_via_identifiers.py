@@ -111,7 +111,7 @@ for reference, the original specification imagined lines something like this:
     AXB XCB AXB XCB AXB XCB AXB XCB AXB XCB AXB XCB AXB XCB AXB XCB AXB XCB ..
 
 now that we think about it, this has problems we didn't even consider at the
-time; but at the time the man thing that bothered us was all the visual and
+time; but at the time the main thing that bothered us was all the visual and
 spatial redundancy of the more significant digits.
 
 we considered using toml but didn't like the "impurity" of how shardings
@@ -144,7 +144,7 @@ our current specification is optimized for these design objectives:
 """
 
 
-class _CLI:
+class CLI_:
     """quick and dirty aid in re-generating index files FOR NOW..
 
     at #history-A-1 this works for our 32x32x32 collection but it borks
@@ -166,23 +166,57 @@ class _CLI:
             return errno
         return getattr(self, f"execute__{command_name}__")()
 
-    def execute__generate__(self):
-        stack = self._arg_stack
-        do_usage, do_help, do_invite, exitstatus = (True, False, True, 444)
+    def execute__generate__(self):  # also called by client at #history-B.4
 
-        if len(stack):
+        stack = self._arg_stack
+        do_usage, do_help, do_invite, returncode = False, False, False, None
+
+        flag_formals_and_actuals = {
+            '-i': False,
+            '--preview': False,
+        }
+
+        formal_positionals_stack = ['COLLECTION_PATH']
+        actual_positionals = []
+
+        while len(stack):
             arg = stack.pop()
-            if _looks_like_help_flag(arg):
-                do_help, do_invite, exitstatus = (True, False, 0)
-            elif '-' == arg[0]:
+            if '-' == arg[0]:
+                if _looks_like_help_flag(arg):
+                    do_help, returncode = True, 0
+                    break
+                if arg in flag_formals_and_actuals:
+                    flag_formals_and_actuals[arg] = True
+                    continue
                 self.stderr.write(f"unrecognized option {repr(arg)}\n")
-            elif len(stack):
-                self.stderr.write(f"unexpected argument: {repr(stack[-1])}\n")
-            else:
-                coll_path = arg
-                do_usage, do_invite, do_help, exitstatus = (0, 0, 0, None)
-        else:
-            self.stderr.write("expecting COLLECTION_PATH\n")
+                do_usage, do_invite, returncode = True, True, 124
+                break
+            if len(formal_positionals_stack):
+                formal_positionals_stack.pop()
+                actual_positionals.append(arg)
+                continue
+            self.stderr.write(f"unexpected argument: {arg!r}\n")
+            do_usage, do_invite, returncode = True, True, 125
+            break
+
+        if returncode is None and len(formal_positionals_stack):
+            which = formal_positionals_stack[-1]
+            self.stderr.write(f"expecting {which}\n")
+            do_invite, returncode = True, 126
+
+        if returncode is None:
+            do_preview = flag_formals_and_actuals.pop('--preview')
+            do_edit_in_place = flag_formals_and_actuals.pop('-i')
+            assert not flag_formals_and_actuals
+            coll_path, = actual_positionals
+
+        if do_edit_in_place:
+            if do_preview:
+                self.stderr.write("'-i' and '--preview' are mutually exclusive\n")  # noqa: E501
+                do_invite, returncode = True, 127
+        elif not do_preview:
+            self.stderr.write("Must have one of '-i' or '--preview'\n")
+            do_invite, returncode = True, 128
 
         def say_pn():
             return f"{self.program_name} generate"
@@ -196,8 +230,8 @@ class _CLI:
         if do_invite:
             self.stderr.write(f"use '{say_pn()} -h' for help\n")
 
-        if exitstatus is not None:
-            return exitstatus
+        if returncode is not None:
+            return returncode
 
         # having done all the above, cheap_arg_parse might be in order
 
@@ -209,20 +243,40 @@ class _CLI:
         from kiss_rdb import collectionerer
         coll = collectionerer().collection_via_path(coll_path, listener)
         if coll is None:
-            return
+            return 123
 
-        self.listener = listener
-        self.collection = coll
+        def produce_opened():
+            if do_edit_in_place:
+                # Open the file as 'r+' (not 'w') to ensure it exists first
+                return wpath, open(wpath, 'r+')  # #here1
+
+            assert do_preview
+            from contextlib import nullcontext as func
+            return f"«stdout» (not {wpath})", func(self.stdout)
+
+        from .identifiers_via_index import \
+            index_file_path_via_collection_path_ as func
+        wpath = func(coll_path)
+
+        depth = coll.custom_functions.number_of_digits_
+
         with coll.open_identifier_traversal(listener) as idens:
-            return self.with_idens(idens)
+            lines = _lines_of_index_via_identifiers(idens, depth, listener)
+            desc_and_fh = produce_opened()
+            if desc_and_fh is None:
+                return 124
+            desc, wopened = desc_and_fh
 
-    def with_idens(self, idens):
-        coll, listener = self.collection, self.listener
-        num_digits = coll.custom_functions.number_of_digits_
-        lines = _lines_of_index_via_identifiers(idens, num_digits, listener)
-        write = self.stdout.write
-        for line in lines:
-            write(line)
+            bytes_tot = 0
+            with wopened as out_filehandle:
+                write = out_filehandle.write
+                for line in lines:
+                    bytes_tot += write(line)
+
+                out_filehandle.truncate()  # #here1
+                # (if the new file size is smaller than previous. ok on stdout)
+
+        self.stderr.write(f"(wrote {bytes_tot} bytes to {desc})\n")
         return 0
 
     def parse_command_name(self):
@@ -240,7 +294,7 @@ class _CLI:
         arg = stack.pop()
         if '-' == arg[0]:
             if _looks_like_help_flag(arg):
-                self.stderr.write(f'description: {(_CLI.__doc__)}\n\n')
+                self.stderr.write(f'description: {(CLI_.__doc__)}\n\n')
                 return None, self.express_usage()
 
             self.stderr.write(f'unrecognized option: {arg}\n')
@@ -259,23 +313,22 @@ class _CLI:
         # one-off, but #trak #[#008.11] is to abstract it to be more accessible
 
         def listener(*args):
+            write = self.stderr.write
             mood, shape, typ, *rest, payloader = args
-            error_case = (None, rest[0])[len(rest)]
             if 'expression' == shape:
                 for line in payloader():
-                    self.stderr.write(f'{line}\n')
-            elif 'structure' == shape:
-                _line = self.__line_via_these_REDUNDANT(
-                        typ, error_case, payloader().get('reason', None))
-                self.stderr.write(f'{_line}\n')
+                    write(f'{line}\n')
+            assert 'structure' == shape
+            dct = payloader()
+            chan_tail = (typ, *rest)
+            from script_lib.magnetics.expression_via_structured_emission \
+                import func
+            itr = func(chan_tail, dct)
+            for line in itr:
+                write(line)
+                if '\n' != line[-1]:
+                    write('\n')
         return listener
-
-    def __line_via_these_REDUNDANT(self, error_category, error_case, reason):
-        _ = (error_category, error_case)
-        _ = [None if s is None else s.replace('_', ' ') for s in _]  # [#608.7]
-        _.append(reason)
-        _ = tuple(s for s in _ if s is not None)
-        return ': '.join(_)
 
     def express_usage_and_invite(self):
         self.express_usage()
@@ -558,9 +611,10 @@ _num_digits = 32  # copy paste! from sibling
 
 if __name__ == '__main__':
     from sys import argv, stdout, stderr
-    exit(_CLI(None, stdout, stderr, argv).execute())
+    exit(CLI_(None, stdout, stderr, argv).execute())
 
 
+# #history-B.4 mounted by legacy CLI
 # #history-A-1: add CLI
 # #history: received transplant
 # #born.

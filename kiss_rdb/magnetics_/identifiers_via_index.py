@@ -9,9 +9,6 @@ or even to cover such edges cases for now!
 import re
 
 
-ENTITY_INDEX_FILENAME_ = '.identifiers.txt'
-
-
 # == BEGIN CLI
 
 class _CLI:
@@ -108,6 +105,14 @@ class _CLI:
 
 def identifiers_via_lines_of_index(file_lines):
     return _StateMachineIsh(file_lines).execute()
+
+
+def index_file_path_via_collection_path_(coll_path):
+    from os.path import join as _os_path_join
+    return _os_path_join(coll_path, _ENTITY_INDEX_FILENAME)
+
+
+_ENTITY_INDEX_FILENAME = '.identifiers.txt'
 
 
 class _StateMachineIsh():  # #[#008.2] a state machine
