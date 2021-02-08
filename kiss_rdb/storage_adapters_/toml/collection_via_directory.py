@@ -55,7 +55,9 @@ class collection_implementation_via_directory_and_schema:
                 return _delete_entity(
                         lmef, indexy_file, iden, self._filesystem, listener)
 
-    def create_entity_via_identifier(self, idnr, dct, listener):
+    def create_entity_via_identifier(
+            self, eid, idnr, dct, listener, is_dry=False):
+
         """
         create is the most complicated per [#864.C] this table.
 
@@ -73,6 +75,12 @@ class collection_implementation_via_directory_and_schema:
 
         and the above is only for if the entities file already exists
         """
+
+        if eid is not None:
+            xx("CREATE with EID specified not implemented for toml")
+
+        if is_dry:
+            xx("--dry-run not implemented")
 
         # DISCUSSION: because in Python 3.7 dictionaries are insertion-ordered,
         # the KISS-iest interface here is that CREATE should take an isomorphic

@@ -21,7 +21,10 @@ def FUNCTIONSER_VIA_DIRECTORY_AND_ADAPTER_OPTIONS(
         path, listener, opn,
         idens_must_start_with_letter, number_of_digits_in_idens):
 
-    def create(iden_er_er, x, listener):
+    def create(eid, iden_er_er, x, listener, is_dry=False):
+
+        assert eid is None
+        assert not is_dry
 
         # "Provision" a new identifier by building up our complicated string
         num = len(dict_as_datastore) + 1

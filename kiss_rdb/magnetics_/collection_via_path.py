@@ -264,9 +264,9 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
                 return edit_funcs.update_entity_via_identifier(
                     iden, x, listener)
 
-            def create_entity(x, listener):
+            def create_entity(x, listener, eid=None, is_dry=False):
                 return edit_funcs.create_entity_via_identifier(
-                    iden_er_er, x, listener)
+                    eid, iden_er_er, x, listener, is_dry=is_dry)
 
             @parse_identifier
             def delete_entity(iden, listener):
@@ -352,8 +352,10 @@ def _bind_editors_for_single_file(idi, ssm, x, funcs, opn):
         return funcs.UPDATE_VIA_FILEHANDLE(fh, iden, edit_x, listen)
 
     @open_writable
-    def use_create(fh, iden_er_er, dct, listen):
-        return funcs.CREATE_VIA_FILEHANDLE(fh, iden_er_er, dct, listen)
+    def use_create(fh, eid, iden_er_er, dct, listen, is_dry=False):
+        if is_dry:
+            xx("have fun: drun run for single file")
+        return funcs.CREATE_VIA_FILEHANDLE(fh, eid, iden_er_er, dct, listen)
 
     @open_writable
     def use_delete(fh, iden, listen):
@@ -464,12 +466,12 @@ def _bind_readers_for_single_file(idi, ssm, x, funcs, opn):
 
 def _build_binder(opener):
     def decorator(orig_f):
-        def use_f(*args):
+        def use_f(*args, **kw):
             opened = opener(args[-1])
             if opened is None:
                 return
             with opened as fh:
-                return orig_f(fh, *args)
+                return orig_f(fh, *args, **kw)
         return use_f
     return decorator
 

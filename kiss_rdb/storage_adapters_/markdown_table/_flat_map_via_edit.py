@@ -1,7 +1,32 @@
-def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener, grow_downwards):
-    flat_map, state = _these_two_for[typ](*cud_args, grow_downwards, listener)
+from dataclasses import dataclass as _dataclass
+
+
+def CUD_markdown_(  # 1x
+        create_update_or_delete: str,  # enum-like {'create'|'update'|'delete'}
+        identity_arguments,  # iden if UPDATE or DELETE, tuple if CREATE
+        attribute_arguments,  # dict if CREATE, kv tuple if UPDATE, none if DEL
+        all_sexpser,  # callable that produces the stream of existing AST-likes
+        collection_path: str,  # the filename or similar that produce the above
+        grow_downwards: bool,  # whether or not new items get added to the end
+        opn, listener  # the common idioms
+        ):
+
+    typ = create_update_or_delete
+    if 'update' == typ:
+        req = _UpdateRequest(identity_arguments, attribute_arguments)
+    elif 'create' == typ:
+        eid, _iden_r_r = identity_arguments
+        if eid is not None:
+            xx("for markdown CREATE, EID is required and must be in attrs dct")
+        req = _CreateRequest(attribute_arguments)
+    else:
+        assert 'delete' == typ
+        assert attribute_arguments is None
+        req = _DeleteRequest(identity_arguments)
+
+    flat_map, state = _flat_map_and_state[typ](req, grow_downwards, listener)
     from ._file_diff_via_flat_map import sync_agent_ as func
-    sa = func(all_sexpser, coll_path)
+    sa = func(all_sexpser, collection_path)
     diff_lines = sa.DIFF_LINES_VIA(flat_map, listener)
     if diff_lines is None:
         return
@@ -32,32 +57,54 @@ def cud_(all_sexpser, coll_path, opn, typ, cud_args, listener, grow_downwards):
 def _build_decorator():
     def flat_map_for_who(cud):
         def decorator(orig_f):
-            def use_f(*cud_args):
-                class state:  # #class-as-namespace
-                    result_value = None
-                rows = tuple(orig_f(*cud_args, state))
-                flat = tuple(x for row in rows for x in row)  # yeah idk
-                prs = _chunk(2, flat)
-                grow_down = cud_args[-2]  # YUCK
-                assert isinstance(grow_down, bool)
-                flat_map = _build_flat_map(state, grow_down, **{k: v for k, v in prs})  # noqa: E501
-                return flat_map, state
+            def use_f(req, grow_down, listener):
+                return _call_CUD_function(orig_f, req, grow_down, listener)
             assert cud not in dct
             dct[cud] = use_f
             return use_f
         return decorator
-
-    def norm_and_val(recv_item, recv_end, emit_edited):
-        return recv_item, recv_end, emit_edited
-
     return flat_map_for_who, (dct := {})
 
 
-_implement, _these_two_for = _build_decorator()
+_implement, _flat_map_and_state = _build_decorator()
+
+
+def _call_CUD_function(impl_func, req, grow_down, listener):
+    assert isinstance(grow_down, bool)
+    state = _OperationState()
+    opc_kw = impl_func(state, *req.to_CUD_appriate_args(), grow_down, listener)
+    opc_kw = {k: v for row in opc_kw for (k, v) in _chunk(2, row)}  # #here5
+    opc = _OperationComponents(**opc_kw)
+    opc_kw = opc.to_dictionary()
+    flat_map = _build_flat_map(state, grow_down, **opc_kw)
+    return flat_map, state
+
+
+@_dataclass
+class _OperationComponents:
+    recv_end: callable                 # U[✓]  C[✓]  D[✓]
+    recv_iden: callable = None         # U[✓]  C[-]  D[✓]
+    emit_edited: callable = None       # U[-]  C[✓]  D[✓]
+    recv_sch: callable = None          # U[-]  C[✓]  D[-]
+
+    def to_dictionary(self):
+        return {k: v for k, v in self._to_dictionary()}
+
+    def _to_dictionary(self):
+        for attr in ('recv_end', 'recv_iden', 'emit_edited', 'recv_sch'):
+            x = getattr(self, attr)
+            if x is None:
+                continue
+            yield attr, x
+
+
+@_dataclass
+class _OperationState:
+    result_value = None
 
 
 @_implement('update')
-def _(needle_iden, edit, grow_downwards, listener, state):
+def _update_no_see(state, needle_iden, edit, grow_downwards, listener):
 
     def receive_identifier(iden):
         if above(iden, needle_iden):
@@ -86,11 +133,11 @@ def _(needle_iden, edit, grow_downwards, listener, state):
 
     above = _less_than if grow_downwards else _greater_than
 
-    yield 'recv_iden', receive_identifier, 'recv_end', at_end
+    yield 'recv_iden', receive_identifier, 'recv_end', at_end  # #here5
 
 
 @_implement('create')
-def _(dct, _iden_er_er, grow_downwards, listener, state):
+def _create_no_see(state, dct, grow_downwards, listener):
 
     def recv_sch(sch):
         ks = sch.field_name_keys
@@ -132,8 +179,8 @@ def _(dct, _iden_er_er, grow_downwards, listener, state):
 
 
 @_implement('delete')
-def _(needle_iden, _grow_downwards, listener, state):
-    if not _grow_downwards:
+def _delete_no_see(state, needle_iden, grow_downwards, listener):
+    if not grow_downwards:
         xx('cover this for grow upwards')
 
     def receive_identifier(iden):
@@ -354,6 +401,35 @@ Create and insert the entity in an appropriate place in the table.
 
 
 # == Model-esque
+
+# == BEGIN #todo maybe better as namedtuples
+
+@_dataclass
+class _UpdateRequest:
+    identifier: object
+    attributes_edit_tuple: tuple
+
+    def to_CUD_appriate_args(self):
+        return self.identifier, self.attributes_edit_tuple
+
+
+@_dataclass
+class _CreateRequest:
+    attributes_dictionary: dict
+
+    def to_CUD_appriate_args(self):
+        return (self.attributes_dictionary,)
+
+
+@_dataclass
+class _DeleteRequest:
+    identifier: object
+
+    def to_CUD_appriate_args(self):
+        return (self.identifier,)
+
+# == END
+
 
 def _custom_structs():  # #[#510.8] custom impl of lazy
     if (o := _custom_structs).value is None:

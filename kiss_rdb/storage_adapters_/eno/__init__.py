@@ -86,6 +86,8 @@ def ADAPTER_OPTIONS_VIA_SCHEMA_FILE_SCANNER(schema_file_scanner, listener):
     kw['storage_schema'] = 'allowed'
 
     dct = schema_file_scanner.flush_to_config(listener, **kw)
+    if dct is None:
+        return
 
     if 'storage_schema' in dct:
         assert '32x32x32' == dct['storage_schema']
@@ -134,25 +136,26 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
         # -- the big collection API operations (or experimental similar)
 
         def create_entity_via_identifier(
-                _, attr_vals, listener, is_dry=False):
+                eid, _, attr_vals, listener, is_dry=False):
             # (not used by our main application client but here for developmen)
 
-            bpf = self._big_patchfile_for_create_entity(attr_vals, listener)
+            bpf = self._big_patchfile_for_create_entity(
+                eid, attr_vals, listener)
             if bpf is None:
                 return
             return bpf.APPLY_PATCHES(listener, is_dry=is_dry)
 
-        def _big_patchfile_for_create_entity(attr_vals, listener):
+        def _big_patchfile_for_create_entity(eid, attr_vals, listener):
 
             # Reserve the new entity identifier
-            eidr = self.RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+            eidr = self.RESERVE_NEW_ENTITY_IDENTIFIER(listener, eid=eid)
             if eidr is None:
                 return  # maybe full
+            eid = eidr.identifier_string
 
             # Flatten the creation dictionary into CUD units of work
             def p(k, v):
                 return ('create_entity', eid, 'create_attribute', k, v)
-            eid = eidr.identifier_string
             euow = tuple(p(k, v) for k, v in attr_vals.items())
 
             # Define the result document entity (just what is needed)
@@ -193,11 +196,10 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
                 index_file_change, entities_units_of_work,
                 result_document_entityer, self, order, listener)
 
-        def RESERVE_NEW_ENTITY_IDENTIFIER(listener):
+        def RESERVE_NEW_ENTITY_IDENTIFIER(listener, eid=None):
             from kiss_rdb.magnetics_.provision_ID_randomly_via_identifiers \
-                import RESERVE_NEW_ENTITY_IDENTIFIER_
-            return RESERVE_NEW_ENTITY_IDENTIFIER_(
-                    directory, rng, _THREE, listener)
+                import reserve_new_entity_identifier_ as func
+            return func(eid, directory, rng, _THREE, listener)
 
         def REMOVE_IDENTIFIER_FROM_INDEX(eid, listener):
             from kiss_rdb.magnetics_.provision_ID_randomly_via_identifiers \
@@ -797,8 +799,25 @@ def _when_identifier_is_wrong_depth(listener, ID, depth, verb_string):
 
 def _details(orig_function):
     def use_function():
-        return {k: v for k, v in orig_function()}
+        kw = {k: v for k, v in orig_function()}
+        if 'lineno' in kw and 'path' in kw and 'line' not in kw:
+            _what_a_hack(kw)
+        return kw
     return use_function
+
+
+def _what_a_hack(kw):
+    stop = kw['lineno']
+    count = 0
+    line = None
+    with open(kw['path']) as lines:
+        for line in lines:
+            count += 1
+            if stop == count:
+                break
+    if count != stop:
+        line = "(line content unknown)\n"
+    kw['line'] = line
 
 
 def _monitor_via_listener(listener):

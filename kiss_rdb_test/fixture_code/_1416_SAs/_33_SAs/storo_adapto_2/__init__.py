@@ -9,11 +9,11 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #watch [#857.6] we don't love opn
 
     class edit_ns:  # #class-as-namespace
-        def CREATE_VIA_FILEHANDLE(fp, iden_er_er, dct, listener):
+        def CREATE_VIA_FILEHANDLE(fp, EID, iden_er_er, dct, listener):
             msg, _path = fp
             assert "we assume you aren't actually writing.." == msg
             iden_er = iden_er_er(listener)
-            return _do_create(iden_er, dct, listener)
+            return _do_create(EID, iden_er, dct, listener)
 
     class read_ns:  # #class-as-namespace
         def schema_and_entities_via_lines(fp, listener):
@@ -31,14 +31,15 @@ def FUNCTIONSER_FOR_SINGLE_FILES(opn):  # #watch [#857.6] we don't love opn
                 for line in fp:
                     name_from_line = line[:-1]
                     dct = {'my_name_from_line': name_from_line}
-                    _do_create(iden_via_s, dct, listener)
+                    _do_create(None, iden_via_s, dct, listener)
 
             def ents():
                 for k, v in dict_as_datastore.items():
                     yield _MinimalEntity(k, v)
             return None, ents()
 
-    def _do_create(iden_via_EID, x, listener):
+    def _do_create(EID, iden_via_EID, x, listener):
+        assert EID is None  # ..
         d = len(dict_as_datastore) + 1
         k = ''.join(('felloo', str(d)))
         assert iden_via_EID(k)

@@ -52,8 +52,8 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
         def UPDATE_VIA_FILEHANDLE(fh, iden, edit_x, listener):
             return cud('update', fh, listener, iden, edit_x)
 
-        def CREATE_VIA_FILEHANDLE(fh, iden_er_er, dct, listener):
-            return cud('create', fh, listener, dct, iden_er_er)
+        def CREATE_VIA_FILEHANDLE(fh, eid, iden_er_er, dct, listener):
+            return cud('create', fh, listener, (eid, iden_er_er), dct)
 
         def DELETE_VIA_FILEHANDLE(fh, iden, listener):
             return cud('delete', fh, listener, iden)
@@ -63,12 +63,15 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
                 lines_via_schema_and_entities_ as func
             return func(schema, ents, listener)
 
-    def cud(typ, fh, listener, *cud_args):
+    def cud(typ, fh, listener, identity_args, attr_args=None):
         all_sxser = _build_sexps_via_listener(fh, iden_er_er)
         use_filename = fh.name
-        yn = file_grows_downwards
-        from ._flat_map_via_edit import cud_ as func
-        return func(all_sxser, use_filename, opn, typ, cud_args, listener, yn)
+        from ._flat_map_via_edit import CUD_markdown_ as func
+        return func(
+            create_update_or_delete=typ,
+            identity_arguments=identity_args, attribute_arguments=attr_args,
+            all_sexpser=all_sxser, collection_path=use_filename,
+            grow_downwards=file_grows_downwards, opn=opn, listener=listener)
 
     class read_funcs:  # #class-as-namespace
 

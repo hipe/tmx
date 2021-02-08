@@ -231,10 +231,13 @@ def _build_my_file_reader(fr, path, mon):
 
     # Get line number count with big hack, gonna fail one day
     who = sections[-1]._instruction['elements'][-1]
-    assert 'Multiline Field Begin' == who['type']
-    who = who['end']
-    assert 'Multiline Field End' == who['type']
-    num_lines = who['line'] + 1  # 0-indexed
+    typ = who['type']
+    if 'Multiline Field Begin' == typ:
+        who = who['end']
+        assert 'Multiline Field End' == who['type']
+        num_lines = who['line'] + 1  # 0-indexed
+    else:
+        xx('enjoy')
 
     def idenerer(): return fr.identifier_builder_
 

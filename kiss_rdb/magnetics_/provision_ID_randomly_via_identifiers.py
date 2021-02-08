@@ -70,30 +70,91 @@ provision a new identifier.)
 """
 
 
-def RESERVE_NEW_ENTITY_IDENTIFIER_(directory, rng, depth, listener):
-    # experimental higher-level
+# eidr = entity identifer reservation
+
+
+def reserve_new_entity_identifier_(eid, directory, rng, depth, listener):
+
+    def main():
+        lines_tup = read_all_lines_into_memory_because_used_in_patch_later()
+        identifiers = iterator_of_identifiers_via_lines_of_file(lines_tup)
+        iden_idens = provision_or_otherwise_produce_identifier(identifiers)
+        if iden_idens is None:
+            return
+        iden, idens = iden_idens
+        return build_index_file_patch(iden, idens, lines_tup)
+
+    def build_index_file_patch(iden, idens, lines_tup):
+
+        def index_file_new_lines():
+            return do_index_file_new_lines(iden, idens)
+
+        return _index_file_patch(
+            index_file_new_lines, lines_tup, index_path, iden)
+
+    def do_index_file_new_lines(iden, all_existing_idens):
+        from .index_via_identifiers import \
+            new_lines_via_add_identifier_into_index_ as func
+        return func(iden, all_existing_idens)
+
+    def provision_or_otherwise_produce_identifier(idens):
+        if eid:
+            return _when_EID_is_passed_explicitly(eid, idens, depth, listener)
+        return provision(idens)
+
+    def provision(identifiers):
+        return provision_new_identifier_(
+            rng, lambda: identifiers, depth, listener)
+
+    def iterator_of_identifiers_via_lines_of_file(lines_tup):
+        from .identifiers_via_index import \
+            identifiers_via_lines_of_index as func
+        return func(lines_tup)
+
+    def read_all_lines_into_memory_because_used_in_patch_later():
+        with open(index_path) as lines:
+            return tuple(lines)
 
     index_path = _index_path_for_directory(directory)
-    from .identifiers_via_index import identifiers_via_lines_of_index
-    with open(index_path) as lines:
-        lines_tup = tuple(lines)
-        identifers = identifiers_via_lines_of_index(lines_tup)
-        pair = provision_new_identifier_(
-                rng, lambda: identifers, depth, listener)
+    return main()
 
-    if pair is None:
-        return  # full
 
-    iden, all_existing_idens = pair
+def _when_EID_is_passed_explicitly(eid, idens, depth, listener):
 
-    def eidr_to_index_file_new_lines():
-        from .index_via_identifiers import \
-            new_lines_via_add_identifier_into_index_
-        return new_lines_via_add_identifier_into_index_(
-            iden, all_existing_idens)
+    # Does the EID parse correctly?
+    from .identifier_via_string import func
+    iden = func(eid, listener)
+    if iden is None:
+        return
 
-    return _index_file_patch(
-            eidr_to_index_file_new_lines, lines_tup, index_path, iden)
+    # Is it the correct depth?
+    if depth != (d := iden.number_of_digits):
+        def lines():
+            yield f"identifier needs depth {depth} had {d}: {eid!r}"
+        listener('error', 'expression', 'depth_mismath', lines)
+        return
+
+    # Is it already occupied? #b-tree
+    traversed, collided = [], False
+    assert hasattr(idens, '__next__')
+    for this_iden in idens:
+        traversed.append(this_iden)
+        if this_iden < iden:
+            continue
+        if this_iden == iden:
+            collided = True
+            break
+        assert iden < this_iden
+        break
+
+    if not collided:
+        for this_iden in idens:
+            traversed.append(this_iden)
+        return iden, tuple(traversed)
+
+    def lines():
+        yield f"identifier {eid!r} is already occupied"
+    listener('error', 'expression', 'already_occupied', lines)
 
 
 def REMOVE_IDENTIFIER_FROM_INDEX_(eid, directory, depth, listener):
@@ -169,8 +230,8 @@ def provision_new_identifier_(
 
     # get the decoder function from the depth
 
-    from . import identifier_via_string as _
-    iid_via_int, int_via_iid, cap = _.three_via_depth_(identifier_depth)
+    from .identifier_via_string import three_via_depth_ as func
+    iid_via_int, int_via_iid, cap = func(identifier_depth)
 
     # run the function against the list of things
 

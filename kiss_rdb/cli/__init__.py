@@ -167,11 +167,20 @@ def cli(ctx, collections_hub):
 
 
 @cli.command()
-@click.option('-val', '--value', nargs=2, multiple=True)
+@click.option('-val', '--value', nargs=2, multiple=True, help=(
+              "One instance for each name-value pair, e.g: "
+              "\"-val first_name Malcom -val last_name X\". "
+              "(Be advised syntax will change slightly in the future.)"))
+@click.option('--EID', metavar='EID', help=(
+              "Attempt to specify which entity identifier to use. (Normally "
+              "the storage adapter provisions one with its own particular "
+              "strategy. Not available under all storage adapters.)"))
+@click.option('--dry-run', '-n', is_flag=True, help=(
+              "(As available under storage adapter)"))
 @click.argument('collection')
 @click.pass_context
 # #history-A.3 (did require hub)
-def create(ctx, collection, value):
+def create(ctx, value, eid, dry_run, collection):
     """create a new entity in the collection
     given name-value pairs expressed by the --value option.
     """
@@ -183,7 +192,11 @@ def create(ctx, collection, value):
     listener = mon.listener
 
     attr_values = {name_s: val_s for name_s, val_s in value}  # ..
-    cs = coll.create_entity(attr_values, listener)  # cs = custom struct
+
+    # cs = custom struct
+
+    cs = coll.create_entity(
+        attr_values, eid=eid, listener=listener, is_dry=dry_run)
 
     # exact same thing as 2 others #here3
 
