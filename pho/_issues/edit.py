@@ -1,3 +1,6 @@
+import re as _re
+
+
 def open_issue(readme, dct, listener, be_verbose=False, opn=None):
     opened = _open_file(readme, 'r+', opn, listener)  # #here2
     if opened is None:
@@ -106,6 +109,9 @@ def _validate_content(dct, allowed_keys, listener):
     listener('error', 'expression', 'cell_content_error', lineser)
 
 
+# tl = throwing listener
+
+
 def _provision_identifier(away_soon, fh, listener):  # #testpoint
 
     def main():
@@ -119,8 +125,8 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
             return 'major_hole', new_iden
 
         if 'last_iden_with_real_minor_hole_above_it' == typ:
-            new_iden = _increment_identifier(iden, 'minor')  # (Case3882)
-            return 'minor_hole', new_iden
+            new_iden = _increment_identifier(iden, 'minor', numerals_not_let)
+            return 'minor_hole', new_iden  # (Case3882)
 
         if 'empty_collection' == typ:
             msg = ("Can't provision identifier for an empty collection. "
@@ -139,8 +145,25 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
         last_iden_with_real_minor_hole_above_it = None
         above_iden, branch, ent = eg_iden, False, None
 
-        for ent in ents:
+        from text_lib.magnetics.scanner_via import \
+            scanner_via_iterator as func
+        scn = func(ents)
+
+        # If using a limiter range, advance past the ceiling limit
+        # (ceiling is physically above floor in the file, and comes first,
+        # because lower line numbers have higher identifier numbers)
+
+        while scn.more and is_over_limiter_ceiling(scn.peek.identifier):
+            scn.advance()
+
+        while scn.more:
+            ent = scn.peek
             iden = ent.identifier
+
+            # If using a limiter range, stop when you hit the floor limit
+            if is_under_limiter_floor(iden):
+                break
+
             if tagged_as_hole(ent):
                 last_iden_tagged_as_hole = iden
             was_under_branch = branch
@@ -157,14 +180,35 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
                 # compound to compound (so was): minor hole
                 # simple to compound (so was not): major hole
                 # compound to simple (so was): major hole
+
+                ok = True
+                yes1 = not numerals_not_let
+                yes2 = iden.has_sub_component and 14 == iden.minor_integer
+                if yes1 and yes2:
+                    # YIKES if you're about to say that 14 (aka "N") has a
+                    # minor hole above it AND you're doing letters not numerals
+                    # then don't say it, because that would be 15 (aka "O")
+                    # and we don't use that letter because it looks like "0".
+                    # Take this check out and see that this "false hole"
+                    # exists everywhere in our collections.
+
+                    def lines():
+                        yield "(won't use 'O' because it looks like '0')"
+                    listener('info', 'expression', 'skipping_O', lines)
+
+                    ok = False
+
                 if was_under_branch and branch:
-                    last_iden_with_real_minor_hole_above_it = iden
+                    if ok:
+                        last_iden_with_real_minor_hole_above_it = iden
                 elif branch:  # new at writing. experiment.
                     # begining of the world to compound: minor hole
-                    last_iden_with_real_minor_hole_above_it = iden
+                    if ok:
+                        last_iden_with_real_minor_hole_above_it = iden
                 else:
                     last_iden_with_real_major_hole_above_it = iden
             above_iden = iden
+            scn.advance()
 
         if (iden := last_iden_tagged_as_hole):
             return 'last_iden_tagged_as_hole', iden
@@ -182,8 +226,7 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
             return
         return rx.match(s)
 
-    import re
-    rx = re.compile(r'(?:^| )#hole\b')
+    rx = _re.compile(r'(?:^| )#hole\b')
 
     def compare(above_iden, iden, is_under_branch):
         if is_under_branch:
@@ -226,6 +269,13 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
         ic = _issues_collection_via(fh, tl, away_soon)
         coll = ic.collection
         with coll.open_schema_and_RAW_entity_traversal(tl) as (sch, ents):
+
+            limiter = _parse_interstitials(
+                sch.interstitial_lines, sch.identifier_class_, tl)
+            is_over_limiter_ceiling, is_under_limiter_floor, \
+                numerals_not_let = _limiter_funcs_and_ting(limiter)
+            del limiter
+
             assert 'main_tag' == sch.field_name_keys[1]  # or w/e
             main_tag_key = 'main_tag'
 
@@ -251,11 +301,61 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
         pass
 
 
-def _increment_identifier(iden, maj_or_min):
+def _limiter_funcs_and_ting(iden_range):
+    if iden_range is None:
+        return _is_over_ceiling, _is_under_floor, False
+
+    o = iden_range
+    start, stop = o.start, o.stop
+    incl_start, incl_stop = o.start_is_included, o.stop_is_included
+
+    if incl_stop:
+        def is_over_ceiling(iden):
+            return stop < iden
+    else:
+        def is_over_ceiling(iden):
+            return stop <= iden
+
+    if incl_start:
+        def is_under_floor(iden):
+            return iden < start
+    else:
+        def is_under_floor(iden):
+            return iden <= start
+
+    # The default #here4 is to use letters not numerals for new compound
+    # identifiers. But you can get it to use numerals instead if you have a
+    # limiter range, at least one of the identifiers in that range has a minor
+    # component, and all minor components in the range are numerals. whew!
+
+    numerals_not_let = False
+    only_these = tuple(idn for idn in (start, stop) if idn.has_sub_component)
+    if len(only_these):  # you need at least one
+        def yes(idn):
+            return _re.match(r'[0-9]+\Z', idn._minor_surface)
+        numerals_not_let = all(yes(idn) for idn in only_these)
+
+    return is_over_ceiling, is_under_floor, numerals_not_let
+
+
+def _is_over_ceiling(iden):
+    return False
+
+
+def _is_under_floor(iden):
+    return False
+
+
+def _increment_identifier(iden, maj_or_min, numerals_not_let=False):
     use_maj, use_minor = iden.major_integer, None
 
     if 'minor' == maj_or_min:
-        use_minor = (False, str(iden.minor_integer + 1))  # ick, meh
+        as_int = iden.minor_integer + 1
+        if numerals_not_let:
+            is_letter, string = False, str(as_int)
+        else:
+            is_letter, string = True, chr(ord('A') - 1 + as_int)
+        use_minor = is_letter, string
     else:
         assert 'major' == maj_or_min
         use_maj += 1
@@ -319,6 +419,17 @@ def _build_throwing_listener(stop, listener):
 
 # == Delegations & Hops
 
+def _parse_interstitials(interstitial_lines, iden_via, throwing_listener):
+    if not any('\n' != s for s in interstitial_lines):
+        return
+    from ._directives import func
+    kv = func(interstitial_lines, iden_via, throwing_listener)
+    one = kv.pop('our_range', None)
+    two = kv.pop('put_new_issues_in_this_range', None)
+    assert not kv
+    return two or one
+
+
 def _issues_collection_via(x, listener, opn=None):
     from pho._issues import issues_collection_via_ as func
     return func(x, listener, opn)
@@ -329,6 +440,7 @@ def _issues_collection_via(x, listener, opn=None):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.5 directives
 # #history-B.4
 # #history-B.3
 # #born

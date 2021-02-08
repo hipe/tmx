@@ -89,7 +89,7 @@ class Case3882_if_no_major_holes_uses_lowest_minor_hole(ProviCase):
         self.assertEqual(self.end_provision_type(), 'minor_hole')
 
     def test_150_correct_integer(self):
-        self.assertEqual(self.end_identifier_string(), '[#122.8]')
+        self.assertEqual(self.end_identifier_string(), '[#122.H]')
 
     def given_lines(_):
         yield '| iden |Main tag|Content|\n'
@@ -173,6 +173,35 @@ class Case3886_money_insert(MoneyCase):
     def expected_emissions(_):
         yield 'verbose', 'expression'  # 😕
         yield 'info', 'structure', 'created_entity', 'as', 'the_emi'
+
+    def expected_num_rewinds(_):
+        return 1
+
+
+class Case3887_directives(MoneyCase):
+
+    def test_010_go(self):
+        act = self.end_state.end_result.created_entity.identifier.to_string()
+        assert '[#124.C]' == act
+
+    def given_lines(_):
+        yield "## (hello i'm table title)\n"
+        yield "\n"
+        yield "(Our range: [#000-#999])\n"
+        yield "([#123-122) is yadda yadda this isn't a thing)\n"
+        yield "(Put new issues in this range: [#124.A-#125))\n"
+        yield "\n"
+        yield '| col 1 | main tag | col 3|\n'
+        yield '|---|---|---|\n'
+        yield '|[#999] | see one ? | see two? |\n'
+        yield '|[#128]  | see one ? | see two? |\n'
+        yield '|[#124.B]| #obun | fix the thing\n'
+        yield '|[#124.A]| #obun | fix the thing\n'
+        yield '|[#122]  | #obun | fix the thing\n'
+
+    def expected_emissions(_):
+        yield 'verbose', 'expression'
+        yield 'info', 'structure', 'created_entity'
 
     def expected_num_rewinds(_):
         return 1

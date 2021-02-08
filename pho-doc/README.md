@@ -147,8 +147,9 @@ when you click create
 
 ## (the identifier registry)
 
+(Our range: [#876-#900))
 ([#401-431] is (formally) the range for "TMX notebook" (app) SSG research)
-(Our range is [#876]-[#899].)
+(Put new issues in this range: [#882.A-#883))
 
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
@@ -212,7 +213,6 @@ when you click create
 |[#410.5] | #trak | workaround to avoid particular dotfiles as reported by vendor script
 |[#410.4] | #trak | the order that files are listed from the filesystem (even find) is indeterminate
 |[#410.B] | #open | absorb small graph into big graph
-|[#410.A.1]| #trak | track where we cover specific producer scripts
 |[#410]   |       | (internal tracking)
 |[#409.7] |       | #see
 |[#409.6] |       | #see

@@ -465,7 +465,10 @@ def _cell_AST(span, line):
     return document_cell()
 
 
-def complete_schema_via_(ast1, ast2, table_cstack=None, iden_er=None):
+def complete_schema_via_(
+        ast1, ast2,
+        interstitial_lines=(), iden_er=None, table_cstack=None):
+
     def key_via_cell(cell):
         s = normal_field_name_via_string(cell.value_string)
         assert(len(s))  # ..
@@ -486,6 +489,7 @@ def complete_schema_via_(ast1, ast2, table_cstack=None, iden_er=None):
         table_cstack_ = table_cstack
 
     complete_schema.row_AST_via_three_ = _build_row_AST_via_three(complete_schema)  # noqa: E501
+    complete_schema.interstitial_lines = tuple(interstitial_lines)
     return complete_schema
 
 
@@ -703,7 +707,9 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
 
         cstck = (*context_stack, tip.to_context_frame())
         complete_schema = complete_schema_via_(
-            tsl1of2_ast, tsl2of2_ast, cstck, iden_er)
+            tsl1of2_ast, tsl2of2_ast,
+            interstitial_lines=tip.interstitial_lines,
+            iden_er=iden_er, table_cstack=cstck)
 
         tip.item_row_AST_via_line = _build_row_AST_via_line(
                 throwing_listener, context_stack, complete_schema)

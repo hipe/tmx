@@ -237,38 +237,83 @@ def _real_apply_diff(itr, listener):
 
 
 def build_identifier_parser_(listener, cstacker=None):  # #testpoint
+
     def identifier_via_string(piece):
+        """At #history-B.4 we had to leave behind something more readable
+
+        to introduce the new kind of fancy ranges (inclusive/exclusive).
+        This *almost* has us wanting to look into EBNF etc but sigh
+        """
+
         def main():
-            if parse_any_open_bracket():
-                if parse_any_wild_oldschool_markdown_footnote_thing():
-                    parse_octothorpe()
-                    parse_the_rest_of_the_identifier()
-                    parse_wild_oldschool_markdown_footnote_thing_close()
-                else:
-                    parse_octothorpe()
-                    parse_the_rest_of_the_identifier_and_close_bracket()
-                    if parse_any_dash():
-                        parse_open_bracket()
-                        parse_the_rest_of_the_identifier_and_close_bracket()
-                parse_end_of_string()
-            elif parse_any_octothorpe():
-                begin_identifier()
-                parse_the_rest_of_the_identifier()
-                parse_end_of_string()
-            else:
-                expecting_open_bracket_or_octothorphe()
+            ch = scn.more and scn.peek(1)
+            if '[' == ch:
+                return when_open_square_bracket()
+            if '#' == ch:
+                return when_octothorpe_at_beginning()
+            if '(' == ch:
+                return when_open_paren_at_beginning()
+            scn.whine_about_expecting(
+                open_bracket, octothorpe, open_parenthesis)
 
-        def parse_the_rest_of_the_identifier_and_close_bracket():
-            parse_the_first_component()
-            if not scn.empty and ']' == scn.peek(1):
-                scn.advance_by_one()
-                return
-            parse_the_second_component()
-            scn.skip_required(close_bracket)
+        # == Three kinds of beginnings
 
-        def parse_the_rest_of_the_identifier():
+        def when_open_square_bracket():
+            scn.advance_by_one()
+            if parse_any_wild_oldschool_markdown_footnote_thing():
+                return when_oldschool()
+            parse_identifier_starting_with_octothorpe()
+            if parse_any_dash():
+                open_and_close_bracket_type[0] = 'square'
+                return finish_range_tight_version()
+            parse_close_bracket()
+            if parse_any_dash():
+                open_and_close_bracket_type[0] = 'square'
+                return finish_range_wide_version()
+            parse_end_of_string()
+
+        def when_octothorpe_at_beginning():
+            parse_identifier_starting_with_octothorpe()
+            parse_end_of_string()
+
+        def when_open_paren_at_beginning():
+            open_and_close_bracket_type[0] = 'parenthesis'
+            parse_identifier_starting_with_octothorpe()
+            parse_dash()
+            parse_identifier_starting_with_octothorpe()
+            parse_close_square_bracket_or_parenthesis_and_end_of_string()
+
+        # ==
+
+        def when_oldschool():
+            # this form is ancient and hasn't been covered in ages and prob gon
+
+            parse_identifier_starting_with_octothorpe()
+            parse_wild_oldschool_markdown_footnote_thing_close()
+            parse_end_of_string()
+
+        def finish_range_tight_version():
+            # If you use the dash inside the range, fancy range caps
+            # example tight ranges:  "[#123-#123.5)"  "(#123-#124]"
+            parse_identifier_starting_with_octothorpe()
+            parse_close_square_bracket_or_parenthesis_and_end_of_string()
+
+        def finish_range_wide_version():
+            # If you use the dash outside the brackets, no fancy range caps
+            # example wide range: "[#123]-[#124.B]"
+
+            parse_open_square_bracket()
+            parse_identifier_starting_with_octothorpe()
+            parse_close_bracket()
+            parse_end_of_string()
+
+        # == Parse Identifiers
+
+        def parse_identifier_starting_with_octothorpe():
+            scn.skip_required(octothorpe)
+            begin_identifier()
             parse_the_first_component()
-            if scn.empty:
+            if scn.empty or '.' != scn.peek(1):
                 return
             parse_the_second_component()
 
@@ -288,12 +333,6 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
                 scn.whine_about_expecting(
                     second_component_as_letter, second_component_as_number)
 
-        def parse_any_octothorpe():
-            return scn.skip(octothorpe)
-
-        def parse_octothorpe():
-            scn.skip_required(octothorpe)
-
         def parse_wild_oldschool_markdown_footnote_thing_close():
             xx()
 
@@ -301,40 +340,44 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
             if '\\' == scn.peek(1):
                 xx()
 
-        def parse_close_bracket():
-            xx()
+        def parse_close_square_bracket_or_parenthesis_and_end_of_string():
+            ch = scn.more and scn.peek(1)
+            if ']' == ch:
+                typ = 'square'
+            elif ')' == ch:
+                typ = 'parenthesis'
+            else:
+                scn.whine_about_expecting(close_bracket, close_parenthesis)
+            open_and_close_bracket_type[1] = typ
+            scn.advance_by_one()
+            parse_end_of_string()
 
-        def parse_any_open_bracket():
-            if '[' == scn.peek(1):
-                scn.advance_by_one()
-                begin_identifier()
-                return True
+        # == Single characters
 
-        def parse_open_bracket():
+        def parse_open_square_bracket():
             scn.skip_required(open_bracket)
-            xx()
-            begin_identifier()
 
         def parse_any_dash():
-            if scn.empty:
-                return
-            if '-' == scn.peek(1):
-                xx()
-                scn.advance_by_one()
-                return True
+            return scn.skip(dash)
+
+        def parse_dash():
+            scn.skip_required(dash)
+
+        def parse_close_bracket():
+            scn.skip_required(close_bracket)
 
         def parse_end_of_string():
             if scn.empty:
                 return
             scn.whine_about_expecting('end of string')
 
-        def expecting_open_bracket_or_octothorphe():
-            scn.whine_about_expecting(open_bracket, octothorpe)
+        # == Support
 
         def begin_identifier():
             one_or_two_identifiers.append([None, None, True])  # #here1
 
         one_or_two_identifiers = []
+        open_and_close_bracket_type = [None, None]
         scn = build_string_scanner(piece)
 
         try:
@@ -345,16 +388,19 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
         if 1 == len(rang):
             iden, = rang
             return iden
-        return _IdentifierRange(*rang)
+        return _IdentifierRange(*rang, *open_and_close_bracket_type)
 
     o, build_string_scanner, stop = _throwing_string_scan(listener, cstacker)
     fnetd = o('for now exactly three digits', '[0-9]{3}')
     dot = o('"."', r'\.')
     octothorpe = o('octothorpe', '#')
     open_bracket = o('open bracket', r'\[')
+    open_parenthesis = o('open parenthesis', r'\(')
     second_component_as_letter = o('second component as letter ([A-Z])', '[A-Z]')  # noqa: E501
     second_component_as_number = o('second component as number (d or dd)', '[0-9]{1,2}')  # noqa: E501
+    dash = o('dash', '-')
     close_bracket = o('close bracket', r']')
+    close_parenthesis = o('close parenthesis', r'\)')
     return identifier_via_string
 
 
@@ -380,14 +426,28 @@ def _throwing_string_scan(listener, cstacker=None):
 
 class _IdentifierRange:
 
-    def __init__(self, one, two):
-        self._left = one
-        self._right = two
+    def __init__(self, one, two, open_square_or_paren, close_square_or_paren):
+        self.start_is_included = _include_yes_no.index(open_square_or_paren)
+        self.stop_is_included = _include_yes_no.index(close_square_or_paren)
+        self.start, self.stop = one, two
 
     def to_string(self):
-        xx()
+        return ''.join(self._to_string_pieces())
+
+    def _to_string_pieces(self):
+        yield '[' if self.start_is_included else '('
+        yield '#'
+        for pc in self.start._to_inner_string_pieces():
+            yield pc
+        yield '-#'
+        for pc in self.stop._to_inner_string_pieces():
+            yield pc
+        yield ']' if self.stop_is_included else ')'
 
     is_range = True
+
+
+_include_yes_no = ('parenthesis', 'square')
 
 
 class _Identifier:
@@ -498,4 +558,5 @@ def _named_tuple(s, t):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.4
 # #born.
