@@ -16,7 +16,7 @@ def func(bent, expression_string, memo, bcoll, listener):
         func, memo_yikes = funco.func, funco.memo_yikes
         wval = func(*args, bent, memo_yikes, bcoll, listener)
         if wval is None:
-            xx(f"fun, we've never covered failure (from {funco.locator!r})")
+            return
         x, = wval  # ..
         return x
 
@@ -195,23 +195,36 @@ def _build_function_call_parser():
             if scn.skip(close_paren):  # #here2
                 return
             while True:
-                if (s := scn.scan(variable_name_symbol)):
-                    yield 'variable_name', s
-                elif (s := scn.scan(hacky_mixed_value_sym)):
-                    yield 'literal_value', s
-                else:
-                    scn.whine_about_expecting(
-                        variable_name_symbol, hacky_mixed_value_sym)
+                yield do_one_arg(scn)
                 if scn.skip(close_paren):  # #here2
                     return
                 scn.skip_required(comma)
-        return func_name, tuple(do_args())
+
+        arg_sexps = tuple(do_args())
+        if scn.more:
+            xx('cover extra characters after close')
+        return func_name, arg_sexps
+
+    def do_one_arg(scn):
+        s = scn.scan(variable_name_symbol)
+        if s:
+            return 'variable_name', s
+
+        s = scn.scan(hacky_mixed_value_sym)
+        if s:
+            return 'literal_value', s
+
+        scn.whine_about_expecting(
+            variable_name_symbol, hacky_mixed_value_sym)
+
+        assert()
 
     def build_throwing_listener(listener):
         def use_listener(sev, *rest):
             listener(sev, *rest)
             if 'error' == sev:
                 raise stop()
+        return use_listener
 
     from text_lib.magnetics.string_scanner_via_string import \
         StringScanner, \
@@ -219,7 +232,10 @@ def _build_function_call_parser():
 
     func_name_symbol = o('function_name', iden)
     open_paren = o('open_paren', r'\(')
-    variable_name_symbol = o('variable_name', iden)
+
+    variable_name_symbol = o('variable_name', f"{iden}(?=[,)])")
+    # (you need the forward lookahead assertion so you don't match foo.md 🙃)
+
     comma = o('comma', r',[ ]*')
     close_paren = o('close_paren', r'\)')
     hacky_mixed_value_sym = o('hacky_mixed_value', '[^,)]+')  # assume not var

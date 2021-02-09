@@ -296,6 +296,11 @@ class AbstractDocument_:
         self.path = path
         self.head_notecard_identifier_string = ncid
 
+    def replace_sections_(self, sections):
+        return self.__class__(
+            self.frontmatter, sections,
+            path=self.path, ncid=self.head_notecard_identifier_string)
+
     def to_summary_lines(self):
         if (dct := self.frontmatter):
             yield f"{len(dct)} elements of frontmatter\n"
@@ -310,8 +315,22 @@ class AbstractDocument_:
         yield f"{body_line_count} body lines(s)\n"
 
     def TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES(self):
-        for s in self.sections:
-            for line in s.to_normalized_lines():
+        # insert interceding newlines between sections IFF necessary (OCD)
+        # (peloogan doesn't like a table immediately followed by a header)
+        # .#[#882.U]
+
+        if (0 == (leng := len(sects := self.sections))):
+            return
+
+        line = None
+        for line in sects[0].to_normalized_lines():
+            yield line
+
+        for i in range(1, leng):
+            if line and '\n' != line:
+                yield '\n'
+
+            for line in sects[i].to_normalized_lines():
                 yield line
 
     @property

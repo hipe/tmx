@@ -77,10 +77,11 @@ def native_lines_via_abstract_document(ad, listener):
 
         # (we don't need the rest of the frontmatter)
 
-        for section in sections:
-            for line in section.to_normalized_lines():
-                yield line
+        for line in ad.TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES():
+            # rely on [#882.U] the separating newlines, vendor needs it
+            yield line
 
+    ad = ad.replace_sections_(sections)
     wlines = to_normalized_lines()
     return _these(entry=entry, title=title, write_lines=wlines)
 

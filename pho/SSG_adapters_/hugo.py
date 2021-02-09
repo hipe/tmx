@@ -32,7 +32,7 @@ def generate_markdown(collection_path, listener, NCID=None):
         return do_document_tree(o.PROCURE_EXACTLY_ONE_DOCUMENT_TREE())
 
     def do_multiple_documents():
-        ti = o.RELEASE_DOCUMENT_TREE()
+        ti = o.RELEASE_DOCUMENT_TREE_INDEX()
         return do_document_tree(ti)
 
     def do_document_tree(ti):
@@ -48,13 +48,16 @@ def generate_markdown(collection_path, listener, NCID=None):
             return
 
         bcoll = o.read_only_business_collection
-        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS(bcoll):
+        for ptup, ad in ti.ABSTRACT_DOCUMENTS(bcoll, listener):
             for direc in _directives_via_AD(ptup, ad, listener):
                 yield direc
 
     def do_single_document():
-        ad = o.RELEASE_ABSTRACT_DOCUMENT()
-        return _directives_via_AD((), ad, listener)
+        two = o.RELEASE_CONTEXTUALIZED_ABSTRACT_DOCUMENT()
+        if two is None:
+            return
+        ptup, ad = two
+        return _directives_via_AD(ptup, ad, listener)
 
     class stop_running(RuntimeError):
         pass
@@ -225,6 +228,7 @@ HELLO_I_AM_AN_ADAPTER_MODULE = True
 def xx(msg=None):
     raise Exception('cover me' if msg is None else f'cover me: {msg}')
 
+# #tombstone sunsetted a symlink used in building old hugo site
 # #history-B.5 removed old code
 # #history-B.4 as adapter, hierarchical containter type & narrative faciliator
 # #born.

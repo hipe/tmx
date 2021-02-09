@@ -1,37 +1,149 @@
 # entity: PBC: attributes
 hierarchical_container_type: document
-heading: index
+parent: PBJ
+heading: Comparison of GUI toolkits
 -- body
-# Welcome to TMX reading notes
-
-For now, because all the articles are about adventures in GUI,
-that's everything that will be here.
-
-One day (hopefully soon) we will branch down..
-
-# Comparison of GUI toolkits
-
 ## The very high-level summary:
 - flutter: we are looking forward to maybe trying it one day
 - electron: it's working for us for now
 - wxWidgets: sounded cool when we heard about it in the Dolpin emulator
 - swift we abandoned for electron (just after #birth) because python-shell works
+
+## Epilogue / TL;DR:
+
+Epilogue: We messed with Cocoa/Swift for a while but landed on Electron to
+get us to our prototype frontend. Also we had a detour into ncurses which
+is of course more GUI-_adjacent_. The following documents document this.
+
 -- body
-children:
-- 48H
-- PBD
-- ELC
+
 annotated_entity_revisions:
+- lose all children, no longer top kid
 - bring in some depth
 - #birth
+
 
 # entity: PBD: attributes
 hierarchical_container_type: document
 parent: PBR
-heading: ncurses Overview
+heading: para-GUI toolkit: ncurses
 -- body
-We did a lot with ncurses that we should document and link to here...
+We did a lot with ncurses that we should document and link to here…
+
+Although we ended up not needing the small utility we built to the
+extent that we first envisioned (and also the utility in its current
+state has one sort of systemic family of bugs); it was a good detour.
 -- body
+
+
+# entity: PBJ: attributes
+hierarchical_container_type: document
+heading: index
+-- body
+# Welcome to TMX reading notes
+
+EDIT One day we'll introduce TMX (python) by linking the topmost README.
+
+For now please enjoy perusing the documentation to TMX Notebook 👈 🤗
+
+
+-- body
+children:
+- PH6
+- PHB
+- PBM
+- PHA
+- PHK
+- PHZ
+- PHC
+- PBL
+- PBC
+- PBD
+- 48H
+- ELE
+- PBK
+- PH2
+- PH4
+- PHF
+- PHG
+- PHT
+- PHX
+- PHY
+- PHE
+- PH5
+
+
+# entity: PBK: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying a SSG
+-- body
+
+A review of our above discussions of "Justifying a web backend" and
+"Justifying a CMS" will reveal that we found those solutions to be
+too heavy, to have too many moving parts for our near-term requirements.
+
+Perhaps a motivating "rubric" for this project is to see what it feels
+like to push an SSH too far…
+
+The following sections, then, document our surveying of various SSG
+solutions, then which one we focused on (note "TMX Notecards" currently
+has adapters for two of these SSG's).
+
+-- body
+
+
+# entity: PBL: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying a GUI
+-- body
+
+We hold the merits of GUIs to be self-evident.
+
+The README for this project (the first document in this big cluster)
+outlines a very rough wireframe for a GUI in ASCII (lol).
+
+We wanted to get to a point where it felt more natural to create
+content with our GUI than to create our content "by hand" (using plain
+old files and our usual text editor). We are not yet at that point.
+
+But nonetheless, we wanted to see what it felt like to get a rough
+prototype of a GUI mostly working on a variety of platforms: Cocoa/swift,
+then Electron. We achieved this and saw that it was good.
+
+(See a comparison of various GUI toolkits we considered next.)
+-- body
+
+
+# entity: PBM: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying a web backend
+-- body
+
+There is no justification for a web backend.
+
+Early in this effort, we wanted an excuse to learn Scala or Clojure,
+and to get more comfortable with containerized, hosted platforms
+(heroku then aws then docker then kubernetes).
+
+But at this early stage we didn't have any sense for our requirements
+so we didn't know whether or not we would need any backend programming.
+
+So in the following documents you'll see a smattering of reading notes
+from us going thru tutorials of Scala & Play (on heroku); but ultimately
+this area of inquiry has been put on the backburner for now.
+
+-- body
+
+
+# entity: PBN: attributes
+parent: PHK
+hierarchical_container_type: document
+heading: There are many heroku add-ons
+body_function: get_body_from_document(pho_docs_dir, [#415])
+
 
 # entity: PBR: attributes
 hierarchical_container_type: document
@@ -49,6 +161,8 @@ gcc -o pho/main.o -Ipho pho/pho-bridge.o pho/main.c
 
 [1]: https://www.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
 -- body
+
+
 # document-meta
 -- string_as_comment
 # #born.

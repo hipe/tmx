@@ -197,6 +197,8 @@ def _label_pieces_for(node):
 
 
 def _same_order(unordered):
+    if 1 == len(unordered):
+        return unordered
     return sorted(unordered, key=lambda tup: (-tup[1].to_node_count(), tup[0]))
 
 # == END

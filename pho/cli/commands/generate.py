@@ -187,7 +187,8 @@ def _CLI_for_dotfile(sin, sout, serr, bash_argv, efx=None):
     if tup is None:
         return rc
     coll_path, vals, foz, mon = tup
-    big_index = _big_index_via(coll_path, mon.listener, vals.get('test'))
+    big_index = _big_index_via(
+        coll_path, mon.listener, vals.get('NCID'), vals.get('test'))
     if big_index is None:
         return mon.returncode
 
@@ -200,6 +201,7 @@ def _CLI_for_dotfile(sin, sout, serr, bash_argv, efx=None):
 
 
 def _formals_for_tree():
+    yield '--NCID=<ncid>', "use this node as root (see just a subtree)"
     yield _the_test_option
     yield _collection_path()
     yield _help_this_screen
@@ -216,7 +218,8 @@ def _CLI_for_tree(sin, sout, serr, bash_argv, efx=None):
     if tup is None:
         return rc
     coll_path, vals, foz, mon = tup
-    big_index = _big_index_via(coll_path, mon.listener, vals.get('test'))
+    big_index = _big_index_via(
+        coll_path, mon.listener, vals.get('NCID'), vals.get('test'))
     if big_index is None:
         return mon.returncode
 
@@ -308,12 +311,12 @@ def _build_mock_ordered():
 
 # == Support related to CLI
 
-def _big_index_via(coll_path, listener, is_test=False):
+def _big_index_via(coll_path, listener, NCID, is_test):
     if is_test:
         bcoll = _read_only_business_collection_via_fixture_path(coll_path)
     else:
         bcoll = _read_only_business_collection(coll_path)
-    return bcoll.build_big_index_(listener)
+    return bcoll.build_big_index_(listener, NCID=NCID)
 
 
 def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):

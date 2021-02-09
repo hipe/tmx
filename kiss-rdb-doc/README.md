@@ -36,6 +36,7 @@ woah boy.
 |[#877.B]                   | #open | CUSTOM_FUNCTIONS_OLD_WAY .. not sure what do
 |[#877]                     |       | now, a third node for internal & external tracking
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
+|[#874.9]                   | #open | sign off on what to do with this file marked LEGACY
 |[#874.5]                   | #open | clean up the interface to this emitter
 |[#874.4]                   |       | multi-tablism  (see also #multi-tablism)
 |[#874.3]                   |       | the API (interface) for entity

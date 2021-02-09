@@ -3,11 +3,11 @@ title: "README"
 date: 2019-05-14T08:06:54-04:00
 excerpt: "introduction, objective & scope."
 ---
-## introduction, objective & scope
+## Introduction, Objective & Scope
 
 The main intended purpose for this project (currently codenamed "pho" and
 (interchangeablely but somewhat more formally) "TMX notebook") is for taking
-reading notes, somewhat like the popular Apple application "Evernote".
+reading notes, inspired loosely by the popular [Evernote][ev].
 
 (#edit [#880.B] get description from groupchat from around the time of #birth lol.)
 
@@ -27,6 +27,9 @@ Another equally important category of questions plagues us around
 [my collection of notes]?" "How will I find this content later when I'm
 looking for it?"
 
+
+### The document tree follows the structure of the ideas
+
 These questions manifest as specific, structural decisions occurring
 continually throughout the process: "Is this file too long yet?",
 "Shouldn't this idea be 'closer' to this related idea in another file?",
@@ -36,6 +39,9 @@ You could just as soon replace "file" above a with other, lower-level
 "hierarchical containers" like "section": "Should these two ideas be in the
 same section or should they each have their own section?" Or substitute
 "paragraph" for "section"; and so on.
+
+
+### Questions of taxonomy & boundaries go downward, upward & outward
 
 And yes, "hierarchical containers" of content go upward too: surely a
 bane to any would-be book author is questions like "Should this
@@ -50,9 +56,9 @@ a radio edit?)
 
 These questions have affinity with the relatively recent idea of
 _Information Architecture_, but they have probably been asked as long
-as humankind has had narrative. (Did the village elder, telling stories
+as humankind has had narrative: Did the village elder, telling stories
 around the fire, wonder if their rambling narrative was too long or
-incoherent? I bet they did, and I bet I share a good portion of their DNA..)
+incoherent? I bet they did, and I bet I share a good portion of their DNA…
 
 
 
@@ -153,7 +159,7 @@ when you click create
 
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
-|[#899]                     | #exmp | This is an example issue.
+|[#899.Q]                   | #exmp | This is an example issue.
 |[#887]                     | #hole |
 |[#886]                     | #open | jagged alignment of multiline descs (see "close") #is:[#603.2]
 |[#885.2]                   |       | this one UI sketch
@@ -162,10 +168,13 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.W]                   | #open | get placeholder AUTHOR and TIMEZONE out
+|[#882.V]                   | #trak | track where we attempt to skip errors
+|[#882.U]                   | #trak | where we insert or normalize newlines in generated markdown
 |[#882.T]                   | #trak | two somewhat redunant implementations of parsing a function call
 |[#882.S]                   | #trak | namespace for tracking provisions of "body function"
 |[#882.R]                   | #wish | tree visualization needs to be able to specify document tree
-|[#882.Q]                   | #open | This tracks an issue that is now closed there maybe we can close it here
+|[#882.Q]                   | #open | service
 |[#882.P]                   | #trak | [graph via collection]
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
 |[#882.M]                   | #trak | formal attributes (the model) is balkanized
@@ -233,6 +242,9 @@ when you click create
 |[#401]   |       | #see
 |[#400]   |       | [refers to the whole package]
 
+
+
+[ev]: https://evernote.com/
 
 
 

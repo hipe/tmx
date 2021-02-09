@@ -16,15 +16,14 @@ _FORMALS = {  # [#822.M]
 }
 
 
-def prepare_edit_(eid_tup, mixed, busi_coll, listener):
+def prepare_edit_(CUD_directive, mixed, busi_coll, listener):
     ifc, do_revalidate = (None, False)  # ifc = index file change
     additionally = None
 
-    ent_cud_type, *rest = eid_tup
+    ent_cud_type, eid = CUD_directive  # create takes EID sometimes yes
 
     # If update or delete, retrieve the entity being updated or deleted
     if ent_cud_type in ('update_entity', 'delete_entity'):
-        eid, = rest
         bent = busi_coll.retrieve_notecard(eid, listener)
         if bent is None:
             return
@@ -37,8 +36,7 @@ def prepare_edit_(eid_tup, mixed, busi_coll, listener):
 
     # If create, do a bunch of special work
     elif 'create_entity' == ent_cud_type:
-        assert(not len(rest))
-        these = _prepare_for_create(mixed, busi_coll, listener)
+        these = _prepare_for_create(mixed, eid, busi_coll, listener)
         if these is None:
             return
         ifc, bent, attr_cud_tups = these
@@ -93,11 +91,11 @@ def prepare_edit_(eid_tup, mixed, busi_coll, listener):
     return prepared_edit
 
 
-def _prepare_for_create(mixed, busi_coll, listener):
+def _prepare_for_create(mixed, eid, busi_coll, listener):
 
     # Reserve a new entity identifier for the entity to create
     eidr = busi_coll.KISS_COLLECTION_.custom_functions\
-        .RESERVE_NEW_ENTITY_IDENTIFIER(listener)
+        .RESERVE_NEW_ENTITY_IDENTIFIER(listener, eid=eid)
     if eidr is None:
         return  # full
     eid = eidr.identifier_string

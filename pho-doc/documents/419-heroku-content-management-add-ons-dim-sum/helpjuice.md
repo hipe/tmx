@@ -6,9 +6,9 @@
 
 ## overview
 
-  - #UNFORGIVEABLY-UGLY
-  - #beta
-  - #last-updated:2016-12-15
+  - \#UNFORGIVEABLY-UGLY
+  - \#beta
+  - \#last-updated:2016-12-15
   - [Helpjuice](https://devcenter.heroku.com/articles/helpjuice)
 
 
@@ -22,4 +22,6 @@ too old. said "looks awful"
 
 
 ## (document-meta)
+
+  - annotation of edit: pelican-flavor syntax not hugo-flavor syntax
   - #born.

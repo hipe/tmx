@@ -6,7 +6,7 @@
 
 ## overview
 
-  - #last-updated:2018-04-09
+  - \#last-updated:2018-04-09
   - [Elegant CMS](https://devcenter.heroku.com/articles/elegant-cms)
 
 
@@ -21,4 +21,6 @@ feels railsy. maybe
 
 
 ## (document-meta)
+
+  - annotation of edit: pelican-flavor syntax not hugo-flavor syntax
   - #born.

@@ -167,8 +167,10 @@ class Case3845_200_document_tree_given_EID_huggo(Document_Tree_Given_EID):
         lines_itrs = tuple(tup[2] for tup in self.markdown_file_directives)
         liness = tuple(tuple(itr) for itr in lines_itrs)
 
-        self.assertIn(len(liness[0]), range(8, 10))
-        self.assertIn(len(liness[1]), range(5, 7))
+        # [#882.U] newilnes inserted
+
+        self.assertIn(len(liness[0]), range(10, 11))
+        self.assertIn(len(liness[1]), range(6, 7))
 
         big_s_1, big_s_2 = (''.join(a) for a in liness)
 
@@ -275,6 +277,7 @@ def _these_peloocan_lines():
     # (expecting needing a dividing blank line here)
     yield "Hello i am the body for 'Fd' KISS For now\n"
     yield "line 2\n"
+    yield "\n"  # new in [#882.U]
     yield "## Hello I am the heading for 'H'\n"
     yield "Hello i am the body for 'H' KISS For now\n"
     yield "line 2\n"

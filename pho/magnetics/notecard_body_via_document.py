@@ -14,15 +14,28 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
         if 0 == len(memo):
             _init_memo(memo)
 
-        idener = produce_idener()
-        iden = idener(iden_expr)
-        dir_abspath = produce_directory_abspath()
-        dindex = produce_directory_index(dir_abspath)
-        doc_abspath = procure_doc_abspath(iden, dindex, dir_abspath)
+        if '[' == iden_expr[0]:
+            doc_abspath = expand_path_from_identifier()
+        elif _re.match(r'[A-Za-z0-9_-]+\.md\Z', iden_expr):  # ..
+            doc_abspath = _os_path.join(produce_directory_abspath(), iden_expr)
+        elif _re.match(r'[A-Za-z0-9_./-]+\.md\Z', iden_expr):
+            cranky = _os_path.join(produce_directory_abspath(), iden_expr)
+            doc_abspath = _os_path.realpath(cranky)
+        else:
+            _whine_about_shape(listener, iden_expr)
+            return
+
         s = _notecard_body_via_document_path(doc_abspath, listener)
         if not s:
             xx('hmmmm wat do, mabye return none')
         return (s,)  # wrapped value
+
+    def expand_path_from_identifier():
+        idener = produce_idener()
+        iden = idener(iden_expr)
+        dir_abspath = produce_directory_abspath()
+        dindex = produce_directory_index(dir_abspath)
+        return procure_doc_abspath(iden, dindex, dir_abspath)
 
     def procure_doc_abspath(iden, dindex, dir_abspath):
         key = iden.to_inner_string_()
@@ -113,9 +126,11 @@ def _notecard_body_lines_via_document_path(path):
     if sections and 'document-meta' == sections[-1].header.label_text:
         sections.pop()
 
-    for sect in (sections or ()):
-        for line in sect.to_normalized_lines():
-            yield line
+    from pho.magnetics_.abstract_document_via_native_markdown_lines \
+        import AbstractDocument_ as func
+
+    ad = func(None, tuple(sections), path=path)
+    return ad.TO_HOPEFULLY_AGNOSTIC_MARKDOWN_LINES()
 
 
 def _FM_lines_and_sects_via_lines(lines, path):
@@ -158,6 +173,13 @@ def _whine_big(iden, dindex, dir_abspath):
         yield '. '.join((head, sentence))
 
     yield ''.join(('Directory: ', dir_abspath))
+
+
+def _whine_about_shape(listener, expr):
+    def lines():
+        yield ("should look like node identifier ([#123]) or path entry: "
+               f"{expr!r}")
+    listener('error', 'expression', 'identifier_is_bad', lines)
 
 
 def _init_memo(memo):

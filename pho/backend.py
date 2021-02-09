@@ -121,7 +121,7 @@ def update_notecard(sin, sout, serr, argp, efx):
 @command
 def create_notecard(sin, sout, serr, argp, efx):
 
-    is_dry = False
+    ncid, is_dry = None, False
 
     while True:
         arg, es = argp.parse_one_argument('option or notecards path')
@@ -132,6 +132,12 @@ def create_notecard(sin, sout, serr, argp, efx):
             break
         if _dry_run_flag == arg:
             is_dry = True
+            continue
+        if '-NCID' == arg:
+            arg, es = argp.parse_one_argument('NCID value')
+            if es:
+                return es
+            ncid = arg
             continue
         serr.write(f"not an option for 'create_notecard': '{arg}'\n")
         return 5
@@ -161,7 +167,7 @@ def create_notecard(sin, sout, serr, argp, efx):
         if argp.is_empty():
             break
 
-    nc = ncs.create_notecard(dct, mon.listener, is_dry=is_dry)
+    nc = ncs.create_notecard(dct, mon.listener, is_dry=is_dry, eid=ncid)
     if nc is None:
         return mon.exitstatus
 
@@ -311,9 +317,9 @@ def _build(ting):
     return use
 
 
-def _mutable_notecards(path, _listener):
+def _mutable_notecards(path, listener):
     from pho import mutable_business_collection_via_path_NOT_COVERED as func
-    return func(path)
+    return func(path, listener)
 
 
 def _read_only_notecards(path, listener):

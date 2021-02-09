@@ -1,3 +1,13 @@
+(This is a "pho issues"-style markdown table that demonstates the ability
+of nodes to model associations with other nodes through our extended
+hashtag syntax. This can then be used to generate a GraphViz dotfile:)
+
+
+```bash
+pho issues graph -r pho-doc/documents/406-everything.md
+```
+
+
 |ID|main tag|content|
 |---|---|---|
 |[#879.11]|       | end game #part-of:[#879.1] #after:[#879.10]

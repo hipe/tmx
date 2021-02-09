@@ -749,7 +749,7 @@ def _parse_schema_file_when_you_know_SA_already(cci, sa, listener):
     coll_path = cci.mixed_collection_identifier
     opened = _open_schema_file(coll_path, listener)
     if opened is None:
-        xx("WHAT IS YOUR ERRROR MODEL")
+        return
 
     def main(out, fx):
         sfs = out.schema_file_scanner

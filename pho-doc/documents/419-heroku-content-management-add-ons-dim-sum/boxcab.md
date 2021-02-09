@@ -6,10 +6,10 @@
 
 ## overview
 
-  - #rough:body-copy
-  - #last-updated:2017-10-02
-  - #platform:rails
-  - #CDN:cloudflare
+  - \#rough:body-copy
+  - \#last-updated:2017-10-02
+  - \#platform:rails
+  - \#CDN:cloudflare
   - [Boxcab](https://devcenter.heroku.com/articles/boxcab)
 
 
@@ -23,4 +23,5 @@
 
 
 ## (document-meta)
+  - annotation of edit: pelican-flavor syntax not hugo-flavor syntax
   - #born.

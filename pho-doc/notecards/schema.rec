@@ -5,6 +5,11 @@
 storage_adapter: eno
 storage_schema: 32x32x32
 
+value_function: get_body_from_document pho.magnetics.notecard_body_via_document.func
+value_function_variable: pho_docs_dir ../documents
+value_function_variable: heroku_dir ../documents/419-heroku-content-management-add-ons-dim-sum
+
+# #history-B.4 enter body functions
 # #history-A.3
 # #history-A.2
 # #history-A.1

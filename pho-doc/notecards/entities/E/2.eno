@@ -118,7 +118,7 @@ High hopes for [this todo app][5]. Thank god that worked.
 [2]: https://github.com/electron/electron-quick-start
 [1]: https://www.electronjs.org/docs
 -- body
-next: EL8
+
 
 # document-meta
 -- string_as_comment

@@ -1,7 +1,7 @@
 # entity: 48H: attributes
 hierarchical_container_type: document
-parent: PBC
-heading: Cocoa/Swift Overview
+parent: PBJ
+heading: GUI toolkit: Cocoa and Swift
 -- body
 # Status: waylaid
 
@@ -58,6 +58,8 @@ for about one minute.)
 
 [1]: https://www.raywenderlich.com/731-macos-development-for-beginners-part-1
 -- body
+
+
 # document-meta
 -- string_as_comment
 # #born.

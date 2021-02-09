@@ -1,0 +1,253 @@
+# entity: PH2: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: There are many SSG's
+body_function: get_body_from_document(pho_docs_dir, [#401])
+
+
+
+# entity: PH4: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: SSG: hugo
+body: (one day say something about hugo)
+children:
+- PHL
+- PHU
+- PHV
+- PHW
+
+
+# entity: PH5: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: TMX Notebook internals
+body_function: get_body_from_document(pho_docs_dir, [#882])
+children:
+- PHH
+
+
+# entity: PH6: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Meet TMX Notebook
+body_function: get_body_from_document(pho_docs_dir, ../README.md)
+
+
+
+# entity: PHA: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Web backend: Scala and Play
+body_function: get_body_from_document(pho_docs_dir, [#402])
+children:
+- PHD
+
+
+# entity: PHB: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: TMX Notebook deep objectives
+body_function: get_body_from_document(pho_docs_dir, [#403])
+
+
+# entity: PHC: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Comparison of wikis
+body_function: get_body_from_document(pho_docs_dir, [#404])
+
+
+# entity: PHD: attributes
+hierarchical_container_type: document
+parent: PHA
+heading: Web framework play tutorial notes
+body_function: get_body_from_document(pho_docs_dir, [#405])
+
+
+# entity: PHE: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Everything
+body_function: get_body_from_document(pho_docs_dir, [#406])
+
+
+# entity: PHF: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: SSG: pelican
+body_function: get_body_from_document(pho_docs_dir, [#409.2])
+children:
+- PHJ
+
+
+# entity: PHG: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying file watchers
+body_function: get_body_from_document(pho_docs_dir, [#409.3])
+
+
+# entity: PHH: attributes
+hierarchical_container_type: document
+parent: PH5
+heading: pseudocode for service for editing
+body_function: get_body_from_document(pho_docs_dir, [#409.5])
+
+
+# entity: PHJ: attributes
+hierarchical_container_type: document
+parent: PHF
+heading: pelican theme notes
+body_function: get_body_from_document(pho_docs_dir, [#409.7])
+
+
+# entity: PHK: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying a CMS
+-- body
+Ultimately we decided for now that we wanted an experience that was SSG-like
+rather than CMS-like; at least, from the perspective of its backend and
+implementation.
+
+All the usual justifictions for using an SSG were compelling to us: keeping
+a CMS running for years is more work than keeping a static site running for
+years (depending, of course, on whether you *can* meet your requirements
+with an SSG alone).
+
+But nonetheless we did an exhaustive survey of available CMS-like plugins
+available on the heroku platform.
+
+The many documents of this section, then, are essentially archival and for
+posterity, about that dalliance.
+
+-- body
+children:
+- PBN
+- PHM
+- PHN
+- PHP
+- PHQ
+- PHR
+- PHS
+
+
+
+
+# entity: PHL: attributes
+hierarchical_container_type: document
+parent: PH4
+heading: hugo everyday usage
+body_function: get_body_from_document(pho_docs_dir, [#418])
+
+
+# entity: PHM: attributes
+hierarchical_container_type: document
+parent: PHK
+heading: Heroku CMS add on:boxcab
+body_function: get_body_from_document(heroku_dir, boxcab.md)
+
+
+# entity: PHN: attributes
+hierarchical_container_type: document
+parent: PHK
+heading: Heroku CMS add on:butter CMS
+body_function: get_body_from_document(heroku_dir, butter-CMS.md)
+
+
+# entity: PHP: attributes
+hierarchical_container_type: document
+parent: PHK
+heading: Heroku CMS add on:elegant CMS
+body_function: get_body_from_document(heroku_dir, elegant-CMS.md)
+
+
+# entity: PHQ: attributes
+hierarchical_container_type: document
+parent: PHK
+heading: Heroku CMS add on:helpjuice
+body_function: get_body_from_document(heroku_dir, helpjuice.md)
+
+
+# entity: PHR: attributes
+hierarchical_container_type: document
+parent: PHK
+heading: Heroku CMS add on:prismic io CMS backend
+body_function: get_body_from_document(heroku_dir, prismic-io-CMS-backend.md)
+
+
+# entity: PHS: attributes
+hierarchical_container_type: document
+parent: PH8
+heading: Heroku CMS add on:shogun
+body_function: get_body_from_document(heroku_dir, shogun.md)
+
+
+# entity: PHT: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Design: adventures in CSS
+body_function: get_body_from_document(pho_docs_dir, [#420])
+
+
+# entity: PHU: attributes
+hierarchical_container_type: document
+parent: PH4
+heading: hugo reading notes
+body_function: get_body_from_document(pho_docs_dir, [#421])
+
+
+# entity: PHV: attributes
+hierarchical_container_type: document
+parent: PH4
+heading: hugo theme survey
+body_function: get_body_from_document(pho_docs_dir, [#422])
+
+
+# entity: PHW: attributes
+hierarchical_container_type: document
+parent: PH4
+heading: theme notes
+body_function: get_body_from_document(pho_docs_dir, [#424])
+
+
+# entity: PHX: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Process: dev workflow notes
+body_function: get_body_from_document(pho_docs_dir, [#425])
+
+
+# entity: PHY: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: A list of roadmaps
+body_function: get_body_from_document(pho_docs_dir, [#881.3])
+
+
+# entity: PHZ: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Justifying a wiki
+-- body
+
+A wiki isn't justified.
+
+There are features wikis have that we want to draw from (like revision
+history, like the ease of linking to and creating other documents), but
+the relative simplicity of SSG's and the familiarity with markdown syntax
+in the end won out.
+
+We are not opposed to targeting or otherwise integrating with one or more
+wikis in the future if we ever find it compelling.
+
+Nonetheless, for posterity we have kept our reading notes surveying various
+wikis which follow.
+
+-- body
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

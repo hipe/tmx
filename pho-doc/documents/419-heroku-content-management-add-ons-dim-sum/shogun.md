@@ -6,8 +6,8 @@
 
 ## overview
 
-  - #OUT-OF-THE-RUNNING
-  - #last-updated:2015-10-13
+  - \#OUT-OF-THE-RUNNING
+  - \#last-updated:2015-10-13
   - [Shogun](https://devcenter.heroku.com/articles/shogun)
 
 
@@ -21,4 +21,6 @@ no. too old
 
 
 ## (document-meta)
+
+  - annotation of edit: pelican-flavor syntax not hugo-flavor syntax
   - #born.

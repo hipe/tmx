@@ -1,14 +1,17 @@
-def mutable_business_collection_via_path_NOT_COVERED(collection_path):
+def mutable_business_collection_via_path_NOT_COVERED(
+        collection_path, listener=None):
     def rng(pool_size):
         from random import randrange
         return randrange(1, pool_size)  # avoid 222 #open [#867.V]
-    return _mutable_business_collection_via(collection_path, rng)
+    return _mutable_business_collection_via(
+            collection_path, rng, listener=listener)
 
 
-def _mutable_business_collection_via(collection_path, rng):  # #testpoint
+def _mutable_business_collection_via(
+        collection_path, rng, listener=None):  # #testpoint
     from kiss_rdb.storage_adapters_.eno import \
         mutable_eno_collection_via as func
-    coll = func(collection_path, rng=rng)
+    coll = func(collection_path, rng=rng, listener=listener)
     return coll and _Notecards(coll)
 
 
@@ -21,7 +24,7 @@ def read_only_business_collection_via_path_(collection_path, listener=None):
     from kiss_rdb.storage_adapters_.eno import \
         EXPERIMENTAL_caching_collection as func
     coll = func(collection_path, listener=listener)
-    return _Notecards(coll)
+    return coll and _Notecards(coll)
 
 
 class _Notecards:  # #testpoint
@@ -40,22 +43,20 @@ class _Notecards:  # #testpoint
         return bpf.APPLY_PATCHES(listener, is_dry=is_dry)
 
     def _big_patchfile_for_update(self, eid, cuds, listener):
-        assert(isinstance(eid, str))  # #[#011]
-        eid_tup = ('update_entity', eid)
-        return self._big_patchfile(eid_tup, cuds, listener)
+        assert isinstance(eid, str)  # #[#011]
+        return self._big_patchfile(('update_entity', eid), cuds, listener)
 
     # -- Create
 
-    def create_notecard(self, dct, listener, is_dry):
-        bpf = self._big_patchfile_for_create(dct, listener)
+    def create_notecard(self, dct, listener, is_dry, eid=None):
+        bpf = self._big_patchfile_for_create(dct, listener, eid=eid)
         if bpf is None:
             return
         return bpf.APPLY_PATCHES(listener, is_dry=is_dry)
 
-    def _big_patchfile_for_create(self, dct, listener):
+    def _big_patchfile_for_create(self, dct, listener, eid=None):
         # cuds = tuple(('create_attribute', k, v) for k, v in dct.items())
-        eid_tup = ('create_entity',)
-        return self._big_patchfile(eid_tup, dct, listener)
+        return self._big_patchfile(('create_entity', eid), dct, listener)
 
     # -- Delete
 
@@ -66,13 +67,12 @@ class _Notecards:  # #testpoint
         return bpf.APPLY_PATCHES(listener, is_dry=is_dry)
 
     def _big_patchfile_for_delete(self, eid, listener):  # #testpoint
-        assert(isinstance(eid, str))  # #[#011]
-        eid_tup = ('delete_entity', eid)
-        return self._big_patchfile(eid_tup, (), listener)
+        assert isinstance(eid, str)  # #[#011]
+        return self._big_patchfile(('delete_entity', eid), (), listener)
 
-    def _big_patchfile(self, eid_tup, mixed, listener):
+    def _big_patchfile(self, direc, mixed, listener):
 
-        edit = self._prepare_edit(eid_tup, mixed, listener)
+        edit = self._prepare_edit(direc, mixed, listener)
         if edit is None:
             return
         cf = self._coll.custom_functions
@@ -96,14 +96,14 @@ class _Notecards:  # #testpoint
             result_document_entityer=lambda: bent,
             order=order, listener=listener)
 
-    def _prepare_edit(self, eid_tup, mixed, listener):  # #testpoint
+    def _prepare_edit(self, direc, mixed, listener):  # #testpoint
         from .notecards_.edited_notecard_via_request_and_notecards \
-                import prepare_edit_
-        return prepare_edit_(eid_tup, mixed, self, listener)
+                import prepare_edit_ as func
+        return func(direc, mixed, self, listener)
 
     # == Read-Only Methods
 
-    def abstract_document_via_notecards(self, ncs, listener=None):
+    def abstract_document_via_notecards(self, ncs, listener):
         from .notecards_.abstract_document_via_notecards import \
                 abstract_document_via_notecards_iterator_ as func
         return func(iter(ncs), self, listener)
@@ -115,12 +115,25 @@ class _Notecards:  # #testpoint
         return func(bent, expression_string,
                     self._custom_func_memo, self, listener)
 
-    def build_big_index_(self, listener=None):
+    def build_big_index_(self, listener=None, NCID=None):
+        if NCID is None:
+            return self._BBI_many(listener)
+        return self._BBI_one(NCID, listener)
+
+    def _BBI_many(self, listener):
         from .notecards_.big_index_via_collection import \
             big_index_for_many as func
 
         with self.open_EID_traversal_EXPERIMENTAL(listener) as eids:
             return func(eids, self, listener)
+
+    def _BBI_one(self, NCID, listener):
+        from .notecards_.big_index_via_collection import \
+            big_index_for_one as func, higher_level_functions as fxer
+        items = func(NCID, self, listener)
+        if items is None:
+            return
+        return fxer().pretend_big_index(NCID, items)
 
     def retrieve_notecard(self, ncid, listener):
         ent = self._coll.retrieve_entity(ncid, listener)

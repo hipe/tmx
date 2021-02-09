@@ -2,7 +2,15 @@
 title: "sakin agac - broad objectives"
 date: 2018-04-06T18:11:58-04:00
 ---
-# "sakin agac"
+
+(This document predates its current host project by 14 months. It started
+as the README for a now dissolved & re-absorbed project that was essentially
+"TMX Notebook" before we realized that's what it was; at which point we
+proto-fitted to this project. Although not on the surface, in deep form this
+will read as highly redundant with the current README of the project
+(the previous document).)
+
+
 
 ## overview: broad objectives
 

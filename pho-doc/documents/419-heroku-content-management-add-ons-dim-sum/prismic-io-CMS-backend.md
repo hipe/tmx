@@ -6,8 +6,8 @@
 
 ## overview
 
-  - #beta
-  - #last-updated:2018-01-31
+  - \#beta
+  - \#last-updated:2018-01-31
   - [prismic.io CMS backend](https://devcenter.heroku.com/articles/prismic)
 
 
@@ -22,4 +22,6 @@ has a whole-ass website that claims a bunch of fancy comapnies use it.
 
 
 ## (document-meta)
+
+  - annotation of edit: pelican-flavor syntax not hugo-flavor syntax
   - #born.

@@ -3,6 +3,11 @@ title: known issues discussion
 date: 2020-08-10T21:35:03-04:00
 ---
 
+This section is for discussions (around issues) of lower-level and
+architecture-related concerns of TMX notebook.
+
+
+
 # :[#882.K]: Known holes in our data integrity checks
 
 The known holes are concerned with preventing cycles. We discuss the two

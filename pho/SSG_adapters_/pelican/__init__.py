@@ -95,7 +95,7 @@ class _SSG_Controller:
         if ad is None:
             return 123
 
-        two = _entry_and_lines_via_abstract_document(ad)
+        two = _entry_and_lines_via_abstract_document(ad, listener)
         if two is None:
             return 122
 
@@ -192,23 +192,63 @@ def _when_directory_not_ready(listener, status, need, path):
     listener('error', 'expression', 'source_directory_not_ready', lines)
 
 
-def generate_markdown(collection_path, listener, NCID=None):
-    """(adapter-specific hello goes here)
+def generate_markdown(
+        collection_path, listener,
+        NCID=None,
+        recurse: bool = False
+        ):
+    """
+    Generate pelican-targeted markdown files for the selected documents.
 
     example output directory: zz-zz/content/pages
 
     Args:
-        NCID: If notecard ID is a document head, output only that document.
-              If it's a part of a document, same.
-              If it's a document container type (book, book part, chapter,
-              chapter section etc), outputs the documents in order.
-              If none, attempt to produce every document in the collection.
+        NCID: Select a document by pointing this to the document's head or
+              any "section node" in the document body. Use --recurse to select
+              the any child documents of this document. Otherwise, if the
+              not-in-document node has document nodes below it, it's a "dewey"
+              node (like a chapter section, chapter, book part, book and so on)
+              and selecting it selects all its documents in order. Otherwise
+              (and the node has no documents above nor below it), then it's
+              "unaffiliated" and we do nothing but emit a notice. With no
+              --NCID, we attempt to produce every document in the collection
+              (which probably requires that all documents in the collection
+              exist under a single tree).
+        recurse: Used in conjunction with NCID to indicate that any children
+              documents of any selected document should also be selected.
     """
     # (NOTE the above is parsed and merged in to UI (CLI) (all experimental))
 
     def main():
+        """
+        as rule table:
+
+        |recurse?| node is…         | say this then…          | do this
+        |--------|------------------|-------------------------|--------------
+        |    yes | dewey            | say it's implied        | do dewey
+        |    yes | part of document | (maybe) note if no cx   | do document +R
+        |    yes | document-less    | complain about doc-less |      -
+        |    yes | not specified    | say it's implied        | do collection
+        |     no | dewey            |           -             | same
+        |     no | part of document |           -             | do document -R
+        |     no | document-less    | same                    | same
+        |     no | not specified    |           -             | same
+        """
+
+        if recurse:
+            if o.node_is_specified_and_part_of_document:
+                return do_single_document_yes_recurse()
+            if o.node_is_specified_and_document_tree:
+                note_recurse_is_implied_when('node is "dewey" type')
+                return do_multiple_documents()
+            if NCID:
+                o.complain_about_no_container()
+                raise stop_running()
+            note_recurse_is_implied_when('traversing whole collection')
+            return attempt_every_document()
+
         if o.node_is_specified_and_part_of_document:
-            return do_single_document()
+            return do_single_document_no_recurse()
         if o.node_is_specified_and_document_tree:
             return do_multiple_documents()
         if NCID:
@@ -220,7 +260,7 @@ def generate_markdown(collection_path, listener, NCID=None):
         return do_document_tree(o.PROCURE_EXACTLY_ONE_DOCUMENT_TREE())
 
     def do_multiple_documents():
-        ti = o.RELEASE_DOCUMENT_TREE()
+        ti = o.RELEASE_DOCUMENT_TREE_INDEX()
         return do_document_tree(ti)
 
     def do_document_tree(ti):
@@ -236,15 +276,41 @@ def generate_markdown(collection_path, listener, NCID=None):
             listener('info', 'expression', 'deep_document_tree', lines)
 
         bcoll = o.read_only_business_collection
+        itr = ti.ABSTRACT_DOCUMENTS(bcoll, listener)
+        return directives_via_contextualized_ADs(itr)
+
+    def do_single_document_yes_recurse():
+        itr = o.RELEASE_CONTEXTUALIZED_ABSTRACT_DOCUMENTS_RECURSIVE()
+        return directives_via_contextualized_ADs(itr)
+
+    def directives_via_contextualized_ADs(itr):
         directiver = _directiverer(listener)
-        for ptup, ad in ti.TO_ABSTRACT_DOCUMENTS(bcoll):
+        for ptup, ad in itr:
+            if not ad:
+                note_skipping(ptup)
+                yield ('adapter_error',)
+                continue
             for direc in directiver(ptup, ad):
                 yield direc
 
-    def do_single_document():
-        ad = o.RELEASE_ABSTRACT_DOCUMENT()
+    def do_single_document_no_recurse():
+        two = o.RELEASE_CONTEXTUALIZED_ABSTRACT_DOCUMENT()
+        if two is None:
+            return
+        ptup, ad = two
         func = _directiverer(listener)
-        return func((), ad)
+        return func(ptup, ad)
+
+    def note_recurse_is_implied_when(when_what):
+        def lines():
+            yield f'(when {when_what}, recurse is already implied)'
+        listener('notice', 'expression', 'recurse_unnecessary', lines)
+
+    def note_skipping(ptup):
+        def lines():
+            yikes = ''.join((_path_join(*ptup), '.md'))  # eew
+            yield f'SKIPPING because of above - {yikes}'
+        listener('notice', 'expression', 'skipping_document', lines)
 
     class stop_running(RuntimeError):
         pass
@@ -285,9 +351,9 @@ def _directiverer(listener):
     return directiver
 
 
-def _entry_and_lines_via_abstract_document(ad, listener=None):
+def _entry_and_lines_via_abstract_document(ad, listener):
     from .native_lines_via_abstract_document import func
-    o = func(ad, listener=None)
+    o = func(ad, listener=listener)
     if o is None:
         return
     return o.entry, o.write_lines  # skipping o.title in the middle

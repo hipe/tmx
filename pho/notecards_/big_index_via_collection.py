@@ -108,6 +108,9 @@ significant ordering with its siblings.
 """
 
 
+from dataclasses import dataclass as _dataclass
+
+
 # == BEGIN narrative facilitator
 
 def _narrative_property(attr):  # #[#510.6] custom memoizer decorator
@@ -123,6 +126,9 @@ def _narrative_property(attr):  # #[#510.6] custom memoizer decorator
             return val
         return property(use_f)
     return decorator
+
+
+# ti = tree index
 
 
 class NarrativeFacilitator:
@@ -155,15 +161,11 @@ class NarrativeFacilitator:
 
     @property
     def node_is_specified_and_document_tree(self):
-        if self._NCID is None:
-            return False
-        return 'this_is_a_document_tree_index' == self._my_personal_index[0]
+        return 'my_state_1_node_is_dewey_node' == self._private_index[0]
 
     @property
     def node_is_specified_and_part_of_document(self):
-        if self._NCID is None:
-            return False
-        return 'these_are_notecards' == self._my_personal_index[0]
+        return 'my_state_2_node_is_part_of_document' == self._private_index[0]
 
     # (possibly mutating) Getters (as appropriate for condition)
 
@@ -179,36 +181,62 @@ class NarrativeFacilitator:
         (k, ti), = bi.to_node_tree_index_items()
 
         assert ti.business_entity_cache is None  # the worst, meh
-        ti = ti._replace(business_entity_cache=bi.cache)
+        ti.business_entity_cache = bi.cache
 
         return ti
 
-    def RELEASE_DOCUMENT_TREE(self):
-        typ, x = self._release_thing()
-        assert 'this_is_a_document_tree_index' == typ
-        return x
+    def RELEASE_DOCUMENT_TREE_INDEX(self):
+        tup = self._release_thing()
+        typ = tup[0]
+        assert 'my_state_1_node_is_dewey_node' == typ
+        ti, = tup[1:]
+        return ti
 
-    def RELEASE_ABSTRACT_DOCUMENT(self):
+    def RELEASE_CONTEXTUALIZED_ABSTRACT_DOCUMENT(self):
+        itr = self._release_this_one_iterator()
+        two = next(itr)  # YIKES
+        ptup, ad = two
+        if ad is None:
+            return
+        return ptup, ad
+
+    def RELEASE_CONTEXTUALIZED_ABSTRACT_DOCUMENTS_RECURSIVE(self):
+        return self._release_this_one_iterator()  # #hi.
+
+    def _release_this_one_iterator(self):
         bcoll = self._read_only_collection
-        typ, x = self._release_thing()
-        assert 'these_are_notecards' == typ
-        ncs = (nc for (nc, depth) in x)  # ignoring depth for now
-        return bcoll.abstract_document_via_notecards(ncs, self._listener)
+        tup = self._release_thing()
+        typ = tup[0]
+        assert 'my_state_2_node_is_part_of_document' == typ
+
+        listener = self._throwing_listener  # not sure
+
+        subtyp = tup[1]
+        if 'by_way_of_tree_index' == subtyp:
+            ti, = tup[2:]
+            return ti.ABSTRACT_DOCUMENTS(bcoll, listener)
+
+        assert 'by_way_of_look_up' == subtyp
+        xx('have fun, will be easy, is third value')
+        # ncs = (nc for (nc, depth) in x)  # ignoring depth for now
+        # return bcoll.abstract_document_via_notecards(ncs, listener)
 
     def _release_thing(self):
-        typ, x = self._my_personal_index_value
+        res = self._my_personal_index_value
         del self._my_personal_index_value
-        return typ, x
+        return res
 
     @_narrative_property('_my_personal_index_value')
-    def _my_personal_index(self):
+    def _private_index(self):
         eid = self._NCID
-        assert eid is not None
+        if eid is None:
+            return ('my_state_4_node_was_not_specified',)
 
         # Build the big index under the node
         bcoll = self._read_only_collection
         itr = big_index_for_one(eid, bcoll, self._listener)
-        # ..
+        if itr is None:
+            raise self._stop()
         func = higher_level_functions().tree_index_via
         tree_index = func(eid, itr)
 
@@ -217,18 +245,25 @@ class NarrativeFacilitator:
             # This node is not a document, no documents within the tree.
             # We try this older "look up" way second because if it fails
             # it emits and doing it second allows us not to hack a listener
-            return self._ting_ting()
+            return self._look_upwards()
 
-        return 'this_is_a_document_tree_index', tree_index
+        shallowest_depth, deepest_depth = ddmm
+        if 0 == shallowest_depth:
+            return 'my_state_2_node_is_part_of_document', 'by_way_of_tree_index', tree_index  # noqa: E501
 
-    def _ting_ting(self):
+        assert 0 < shallowest_depth
+        return 'my_state_1_node_is_dewey_node', tree_index
+
+    def _look_upwards(self):
         from .abstract_document_via_notecards import \
             document_notecards_in_order_via_any_arbitrary_start_node_ as func
 
         itr = func(self._NCID, self._read_only_collection, self._listener)
         if itr is None:
+            # was gonna be 'my_state_3_node_has_no_documents_above_or_below'
             raise self._stop()
-        return 'these_are_notecards', itr
+
+        return 'my_state_2_node_is_part_of_document', 'by_way_of_look_up', itr
 
     @property
     def notecard_NOT_USED(self):
@@ -255,6 +290,16 @@ class NarrativeFacilitator:
     def _read_only_collection(self):
         from pho import read_only_business_collection_via_path_ as func
         return func(self._collection_path, listener=self._listener)
+
+    @_narrative_property('_TL')
+    def _throwing_listener(self):
+        def use_listener(sev, *rest):
+            listener(sev, *rest)
+            if 'error' == sev:
+                raise self._stop()
+        listener = self._listener
+        assert listener
+        return use_listener
 
     @property
     def read_only_business_collection(self):
@@ -398,8 +443,25 @@ def big_index_for_one(argument_EID, bcoll, listener):
     - you should never retrieve the same eid more than once
     """
 
+    def retrieve(eid):
+        if eid in seen:
+            xx(f"Is graph cycling vertically? already seen: {eid!r}")
+        bent = do_retrieve(eid)
+        if bent is None:
+            return
+        seen[eid] = bent
+        return bent
+
+    do_retrieve = _build_retriever(bcoll, listener)
+    seen = {}
+
+    # ==
+
+    argument_node = retrieve(argument_EID)
+    if argument_node is None:
+        return
+
     def main():
-        argument_node = retrieve(argument_EID)
         is_doc = _is_document(argument_node)
         my_type = 'doc' if is_doc else 'dewey'  # #here2
         descend = _build_descender(retrieve)
@@ -408,15 +470,6 @@ def big_index_for_one(argument_EID, bcoll, listener):
             yield k, v
         yield 'business_entity_cache', seen
 
-    def retrieve(eid):
-        if eid in seen:
-            xx(f"Is graph cycling vertically? already seen: {eid!r}")
-        bent = do_retrieve(eid)
-        seen[eid] = bent
-        return bent
-
-    do_retrieve = _build_retriever(bcoll, listener)
-    seen = {}
     return main()
 
 
@@ -477,11 +530,16 @@ def _define_higher_level_functions():
 
     def export():
         yield 'public', 'tree_index_via', tree_index_via
+        yield 'public', 'pretend_big_index', pretend_big_index
         yield 'protected', '_named_tuple_for_big_index', _BigIndex
 
     def to_node_tree_index_items(self):
         return ((k, tree_index_via(k, tup))
                 for k, tup in self.built.items())
+
+    def pretend_big_index(root_EID, items):
+        ti = tree_index_via(root_EID, items)
+        return _NOT_SURE(root_EID, ti)
 
     def tree_index_via(root_EID, items):
         slots, cx_of = {k: None for k in simple_fields}, {}
@@ -505,17 +563,6 @@ def _define_higher_level_functions():
         document_depth_minmax overall_depth business_entity_cache
     """.split()
 
-    _TreeIndex = _nt('_TreeIndex', ('root_EID', *simple_fields, 'children_of'))
-
-    def TO_ABSTRACT_DOCUMENTS(self, bcoll):
-        return _abstract_documents_via_tree_index(self, bcoll)
-
-    def count(self):
-        return sum(len(v) for v in self.children_of.values()) + 1
-
-    _TreeIndex.TO_ABSTRACT_DOCUMENTS = TO_ABSTRACT_DOCUMENTS
-    _TreeIndex.to_node_count = count
-
     pub_dct, prot_dct = {}, []
     for visi, k, v in export():
         if 'public' == visi:
@@ -530,7 +577,34 @@ def _define_higher_level_functions():
     return cls(** pub_dct)
 
 
-def _abstract_documents_via_tree_index(ti, bcoll):
+@_dataclass
+class _TreeIndex:
+    root_EID: str
+    document_depth_minmax: tuple
+    overall_depth: int
+    children_of: dict
+    business_entity_cache: dict
+
+    def ABSTRACT_DOCUMENTS(self, bcoll, listener):
+        return _abstract_documents_via_tree_index(self, bcoll, listener)
+
+    def to_node_count(self):
+        return sum(len(v) for v in self.children_of.values()) + 1
+
+
+class _NOT_SURE:  # #todo away this
+    def __init__(self, eid, ti):
+        self._result = ((eid, ti),)
+
+    def to_node_tree_index_items(self):
+        return self._result
+
+    @property
+    def cache(self):
+        return self._result[0][1].business_entity_cache
+
+
+def _abstract_documents_via_tree_index(ti, bcoll, listener):
     """
     This is the essential [#882.D] document-within-document implementation/
     late integrity check. 19½ months after project birth (at #history-B.6)
@@ -557,7 +631,7 @@ def _abstract_documents_via_tree_index(ti, bcoll):
 
         # Because we're insane we stream the section nodes into the abstract
         # document maker while accumulating the child documents; rather than
-        # patition-flushing the stream ourselves into two lists.
+        # partition-flushing the stream ourselves into two lists.
 
         def flatten():
             yield node
@@ -569,15 +643,21 @@ def _abstract_documents_via_tree_index(ti, bcoll):
                 child_document_head_nodes.append(ch_node)
 
         child_document_head_nodes = []
-        ad = bcoll.abstract_document_via_notecards(flatten())
+
+        this_ptup = ptup_plus(node, parent_ptup)
+
+        ad = bcoll.abstract_document_via_notecards(flatten(), listener)
+        if not ad:
+            yield this_ptup, None
+            return  # or we could stay and do children [#882.V]
+
         child_document_head_nodes = tuple(child_document_head_nodes)
         ad.CHILDREN_DOCUMENT_HEAD_NODES = child_document_head_nodes
-        this_ptup = ptup_plus(node, parent_ptup)
         yield parent_ptup, ad
 
         for ch_node in child_document_head_nodes:
-            for two in recurse_into_document(ch_node, this_ptup):
-                yield two
+            for ptup, ad in recurse_into_document(ch_node, this_ptup):
+                yield ptup, ad
 
     def do_recurse_into_document(k):
         if (cx := cx_of.get(k)) is None:
@@ -625,7 +705,7 @@ def _build_retriever(bcoll, listener):
     def retrieve(eid):
         node = bcoll.retrieve_notecard(eid, listener)
         if node is None:
-            xx(f"oops didn't resolve as a node (should have emitted) {eid!r}")
+            return
         assert eid == node.identifier_string  # else something is very wrong
         return node
     return retrieve

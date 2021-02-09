@@ -261,10 +261,18 @@ def _find_document_root_node(eid, notecards, listener=None):
 def abstract_document_via_notecards_iterator_(itr, bcoll, listener):
     first_notecard = next(itr)
 
-    def these():
-        yield first_notecard.heading, body_of(first_notecard)
+    def main():
+        for nc in rewound():
+            s = body_of(nc)
+            if s is None:
+                main.OK = None
+                return
+            yield nc.heading, s
+
+    def rewound():
+        yield first_notecard
         for nc in itr:
-            yield nc.heading, body_of(nc)
+            yield nc
 
     def body_of(nc):
         # (we said we woud do this rule table somewhere [#882.S.2])
@@ -279,14 +287,13 @@ def abstract_document_via_notecards_iterator_(itr, bcoll, listener):
         if s is not None:
             xx(f"{nc.identifier_string!r} has both 'body' and 'body_function'")
 
-        s = bcoll.call_value_function_(bf, nc, listener)
-        if not s:
-            xx("cover this - wat do when fail this late")
-        return s
+        return bcoll.call_value_function_(bf, nc, listener)
 
     kw = {'ncid': first_notecard.identifier_string}
     kw['datetime'] = first_notecard.document_datetime
-    return _do_abstract_document_via_notecards(these(), **kw)
+    main.OK = True
+    ad = _do_abstract_document_via_notecards(main(), **kw)
+    return main.OK and ad
 
 
 def _do_abstract_document_via_notecards(notecards, ncid=None, datetime=None):
@@ -299,7 +306,14 @@ def _do_abstract_document_via_notecards(notecards, ncid=None, datetime=None):
     # #testpoint
 
     itr = _final_sexps(notecards)
-    typ, title = next(itr)
+
+    first = None
+    for first in itr:  # #once
+        break
+    if not first:
+        return  # #here6
+
+    typ, title = first
     assert 'document_title' == typ
 
     def sects():
@@ -395,7 +409,10 @@ def _final_sexps(notecards):
     # Build the notecard scanner (that accumulates RSL definitons)
     # The first notecard in the document is special: we use its heading as a ti
     notecard_scn = scanner(each_notecard())
-    assert notecard_scn.more  # no notecards or no notecard bodies
+
+    if notecard_scn.empty:
+        return  # #here6
+
     heading, section_scn = notecard_scn.next()
     assert heading  # every document-root notecard needs a heading [#883.2]
     yield 'document_title', heading

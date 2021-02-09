@@ -6,6 +6,7 @@ date: "2018-04-04T13:55:22-04:00"
 ## objective & scope
 
 (For posterity, the original objectives of this whole host package:)
+
   - learn react.
   - experiment with unobtrusive static pages
   - do that one static thing with tables
