@@ -141,7 +141,7 @@ class Case3492_top_help_screen(CommonCase):
 
     def test_400_something_about_arguments(self):
         act = self.section('arguments').body_line_count
-        self.assertEqual(act, 2)
+        self.assertEqual(act, 3)
 
     def test_500_something_about_options(self):
         act = self.section('options').body_line_count

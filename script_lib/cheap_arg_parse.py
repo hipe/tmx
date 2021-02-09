@@ -361,20 +361,26 @@ def _help_lines(foz, doc=None, description_valueser=None):
     pcs, maxi = [foz.program_name], 0
     opt_rows, arg_rows, cx_rows = [], [], []
 
+    def write_desc(rows, cel1A, cel1B, colC):
+        itr = iter(colC)
+        rows.append((cel1A, cel1B, next(itr)))
+        for cel in itr:
+            rows.append(('', '', cel))
+
     for fo in foz.formal_options:
         moniker = fo._long_for_column_B()
         leng = len(moniker)
         if maxi < leng:
             maxi = leng
         pcs.append(f'[{fo.short_for_help}]')
-        opt_rows.append(((fo.short or ''), moniker, fo.descs[0]))
+        write_desc(opt_rows, (fo.short or ''), moniker, fo.descs)
 
     for fo in foz.formal_positionals:
         leng = len(fo.moniker)
         if maxi < leng:
             maxi = leng
         pcs.append(fo.surface_expression)
-        arg_rows.append(('', fo.moniker, fo.descs[0]))
+        write_desc(arg_rows, '', fo.moniker, fo.descs)
 
     yield ''.join(('usage: ', (' '.join(pcs)), '\n'))
 

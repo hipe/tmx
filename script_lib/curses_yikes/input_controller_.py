@@ -286,7 +286,7 @@ class InputController__:
         An implicit premise is that there is is always exactly one component
         with focus (sort of). Imagine an interface where this is not so: What
         should UP or DOWN do if there is no focused component to start with?
-        UP or DOWN from where? :[#608.N]
+        UP or DOWN from where? :[#608.P]
 
         At first, the solution might seem to be just to automatically give
         focus to first focusable component every time you construct a branch

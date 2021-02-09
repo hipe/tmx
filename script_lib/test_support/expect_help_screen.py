@@ -3,6 +3,8 @@
 (:[#601.4])
 """
 
+import re as _regex
+
 
 def parse_help_screen(lines):
     lines = _dont_trust_lines(lines)
@@ -61,9 +63,17 @@ def _build_option_index(section):
 
 
 def _do_build_option_index(lines):
-    for line in lines:
-        o = _parse_option_line(line)
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    scn = func(lines)
+    while True:
+        o = _parse_option_line(scn.next())
+        additional_desc_lines = []
+        while scn.more and _regex.match(r'^[ ]+[^- ]', scn.peek):
+            additional_desc_lines.append(scn.next())
+        o.additional_desc_lines_NOT_USED = tuple(additional_desc_lines)  # meh
         yield o.main_long_switch, o
+        if scn.empty:
+            break
 
 
 def _parse_option_line(line):
@@ -166,7 +176,7 @@ def _parse_option_line(line):
     haystack_s = line[0:here].strip()
     desc_first_line = line[here+2:-1]
 
-    re = _re()
+    re = _regex
     kwargs = {k: v for k, v in main()}
     return _OptionLine(**kwargs)
 
@@ -215,7 +225,7 @@ def _build_section_key_parser():
         md = rx.match(line)
         head = md['this_fellow']
         return f"{head}s" if md['plural_thing'] else head
-    re = _re()
+    re = _regex
     rx = re.compile(r'''
       (?P<this_fellow>
         (?:[a-z]+[ ])*             # zero or more (word then space)
@@ -236,7 +246,7 @@ def _dont_trust_lines(lines):
     # now that this testlib is used against our own generated help screens,
     # we no longer have to turn ONE BIG STRING into a line stream.
 
-    line_rx = _re().compile(r'^.*\n\Z')
+    line_rx = _regex.compile(r'^.*\n\Z')
     for line in lines:
         if line_rx.match(line):
             yield line
@@ -254,10 +264,6 @@ def _treelib():
     from . import expect_treelike_screen as module
     return module
 
-
-def _re():
-    import re
-    return re
 
 # #history-B.2 full rewrite to simplify
 # #born.

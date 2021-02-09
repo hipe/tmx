@@ -341,7 +341,7 @@ class _ConcreteOrderableList(_InteractableComponent):
     # == END add
 
     def _DELETE(self):
-        # The row with focus is being deleted. [#608.N] explains (sort of)
+        # The row with focus is being deleted. [#608.P] explains (sort of)
         # that, in order to give a visual indication of what UP and DOWN will
         # do, there must always be a component with focus. So we must move the
         # focus. As it works out, what should be the "obvious" behavior is

@@ -67,13 +67,9 @@ def CLI(sin, sout, serr, argv, efx):  # efx = external functions
         efx = _production_external_functions
 
     if efx:
-        class use_efx:  # #class-as-namespace
-            def produce_values_stack():
-                environ = efx.enver()
-                return environ, vals
-            apply_patch = efx.apply_patch
-            produce_open_function = efx.produce_open_function
-
+        use_efx = _build_external_functions(
+            serr, vals, efx.enver,
+            efx.apply_patch, efx.produce_open_function)
     else:
         use_efx = None
     # == TO
@@ -84,7 +80,7 @@ def CLI(sin, sout, serr, argv, efx):  # efx = external functions
 def _formals_for_open():
     yield '-n', '--dry-run', 'dry run'
     yield '-v', '--verbose', 'bold new verbose mode (experimental)'
-    yield '-h', '--help', 'this screen'
+    yield _formal_for_help
     yield '<message>', 'any one line of some appropriate length'
 
 
@@ -100,9 +96,6 @@ def _subcommand_open(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_open.__doc__)
 
-    if (readme := _resolve_readme(serr, efx)) is None:
-        return 4
-
     # == BEGIN experiment
     def listener(chan, *rest):
         if 'verbose' != chan:
@@ -116,7 +109,12 @@ def _subcommand_open(sin, sout, serr, argv, efx):
     dct = {'main_tag': '#open', 'content': vals['message']}
     is_dry = vals.get('dry_run', False)
     opn = efx.produce_open_function()
-    mon = _error_monitor(serr)
+    mon = efx.emission_monitor
+
+    readme = efx.resolve_issues_file_path()
+    if readme is None:
+        return 4
+
     from pho._issues.edit import open_issue as func
     cs = func(readme, dct, listener, be_verbose=be_verbose, opn=opn)
     # cs = custom struct
@@ -144,7 +142,7 @@ def _subcommand_open(sin, sout, serr, argv, efx):
 
 def _formals_for_close():
     yield '-n', '--dry-run', 'dry run'
-    yield '-h', '--help', 'this screen'
+    yield _formal_for_help
     yield '<identifier>', 'whomst ("123" or "#123" or "[#123]" all OK)'
 
 
@@ -164,14 +162,16 @@ def _subcommand_close(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_close.__doc__)
 
-    if (readme := _resolve_readme(serr, efx)) is None:
-        return 4
-
     eid = vals['identifier']
 
     is_dry = vals.get('dry_run', False)
-    mon = _error_monitor(serr)
+    mon = efx.emission_monitor
     listener = mon.listener
+
+    readme = efx.resolve_issues_file_path()
+    if readme is None:
+        return 4
+
     from pho._issues.edit import close_issue as func
     cs = func(readme, eid, listener, efx.produce_open_function())
     if cs is None:
@@ -187,7 +187,7 @@ def _formals_for_top():
     yield _batch_opt
     yield '-f', '--format=FMT', 'output format. {json|table} (default: table)'
     yield '-<number>', _build_int_matcher, 'show the top N items (default: 3)'
-    yield '-h', '--help', 'this screen'
+    yield _formal_for_help
     yield '[query […]]', "default: '#open'. Currently limited to 1 tag."
 
 
@@ -224,7 +224,7 @@ def _formals_for_list():
     yield _batch_opt
     yield '-f', '--format=FMT', '{json|table} (default varies)'
     yield '-<number>', _build_int_matcher, 'show the top N items'
-    yield '-h', '--help', 'this screen'
+    yield _formal_for_help
     yield '[query […]]', "e.g '#open'. Currently limited to 1 tag."
 
 
@@ -259,7 +259,8 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
     elif vals.get('newest_first'):
         sort_by_time = 'DESCENDING'
 
-    if (readme := _resolve_readme(serr, efx)) is None:
+    readme = efx.resolve_issues_file_path()
+    if readme is None:
         return 4
 
     readme_is_dash = '-' == readme
@@ -267,7 +268,7 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
     query = vals.get('query')
 
     # Resolve query
-    mon = _error_monitor(serr)
+    mon = efx.emission_monitor
     if query is not None:
         from pho._issues import parse_query_ as func
         if (query := func(query, mon.listener)) is None:
@@ -475,7 +476,7 @@ def _subcommand_which(sin, sout, serr, argv, efx):
     """Which readme is being used? (per env variable 'PHO_README')"""
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    formals = (('-h', '--help', 'this screen'),)
+    formals = (_formal_for_help,)
     foz = _formals_via(formals, lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
@@ -484,13 +485,20 @@ def _subcommand_which(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_which.__doc__)
 
-    if (readme := _resolve_readme(serr, efx)) is None:
+    readme = efx.resolve_issues_file_path(be_verbose=True)
+    if readme is None:
         serr.write("no readme selected.\n")
         return 4
 
     sout.write(readme)
     sout.write('\n')
     return 0
+
+
+def _formals_for_use():
+    yield '-w', '--write', f"attempts to write the value to ~/{_dotfile_entry}"
+    yield _formal_for_help
+    yield '<readme>', 'path to file'
 
 
 def _subcommand_use(sin, sout, serr, argv, efx):
@@ -502,8 +510,7 @@ def _subcommand_use(sin, sout, serr, argv, efx):
     """
 
     prog_name = (bash_argv := list(reversed(argv))).pop()
-    formals = (('-h', '--help', 'this screen'), ('<readme>', 'path to file'))
-    foz = _formals_via(formals, lambda: prog_name)
+    foz = _formals_via(_formals_for_use(), lambda: prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return es
@@ -511,29 +518,28 @@ def _subcommand_use(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_use.__doc__)
 
-    readme = vals['readme']
-    from shlex import quote
+    readme = vals.pop('readme')
+    do_write = vals.pop('write', False)
+    assert not vals
 
-    from os import stat
-    try:
-        st = stat(readme)
-    except FileNotFoundError as e:
-        serr.write(str(e))
-        serr.write('\n')
-        return e.errno
-    from stat import S_ISREG
-    if not S_ISREG(st.st_mode):
-        serr.write(f"Not a file: {quote(readme)}. {foz.invite_line}")
-        return 4
-    sout.write(''.join(('export PHO_README=', quote(readme), '\n')))
-    return 0
+    mon = efx.emission_monitor
+    from pho._issues.dotfile_ import write_dotfile as func
+
+    here = efx.produce_dotfile_path()
+
+    for line in func(here, readme, do_write, mon.listener):
+        sout.write(line)
+        if not line or '\n' != line[-1]:
+            sout.write('\n')
+
+    return mon.returncode
 
 
 def _formals_for_graph():
     yield '-i', '--show-identifiers', 'whether or not to output "[#123.4]"'
     yield '-g', '--show-group-nodes', 'without this, prettier groups'
     yield '-t', '--add-target=IDENTIFIER*', 'output only the subgraphs etc'
-    yield '-h', '--help', 'this screen'
+    yield _formal_for_help
 
 
 def _subcommand_graph(sin, sout, serr, argv, efx):
@@ -551,11 +557,11 @@ def _subcommand_graph(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_graph.__doc__)
 
-    if (readme := _resolve_readme(serr, efx)) is None:
+    readme = efx.resolve_issues_file_path()
+    if readme is None:
         return 4
 
-    mon = _error_monitor(serr)
-
+    mon = efx.emission_monitor
     from pho._issues import issues_collection_via_ as func
     ic = func(readme, mon.listener)
     # ..
@@ -573,13 +579,89 @@ def _subcommand_graph(sin, sout, serr, argv, efx):
 
 # == Support
 
-def _resolve_readme(serr, efx):
-    env_stack = efx.produce_values_stack()
+def _resolve_issues_file(efx, listener):
 
-    readme = env_stack[1].get('readme') or env_stack[0].get('PHO_README')
-    if readme:
-        return readme
-    serr.write("please use -r or PHO_README for now.\n")
+    # If it's set in the parent CLI values, use that
+    if (path := efx.parent_CLI_values.get('readme')):
+        def lines():
+            yield "via parameter"
+        listener('verbose', 'expression', 'via_param', lines)
+        return path
+
+    # If it's set in the env var, use that
+    path = efx.environ.get('PHO_README')
+    if path:
+        def lines():
+            yield "via PHO_README environment variable"
+        listener('verbose', 'expression', 'via_env_var', lines)
+        return path
+
+    # If this dotfile exists, ham town
+    rfile = None
+    dotpath = efx.produce_dotfile_path()
+    try:
+        rfile = open(dotpath, 'r')
+    except FileNotFoundError:
+        pass
+    if rfile is None:
+        return
+
+    from pho._issues.dotfile_ import read_issues_file_path_from_dotfile as func
+    path = func(rfile, listener)
+    if path:
+        def lines():
+            yield f"via {dotpath}"
+        listener('verbose', 'expression', 'via_dotfile', lines)
+    return path
+
+
+def _build_external_functions(
+        serr, CLI_vals, enver,
+        apply_patch, produce_open_function):
+
+    def memoized_property(orig_f):  # #[#510.4]
+        def use_f(self):
+            if not hasattr(o, fname):
+                setattr(o, fname, orig_f(self))
+            return getattr(o, fname)
+        fname = orig_f.__name__
+        o = memoized_property
+        return property(use_f)
+
+    class ExternalFunctions:
+
+        def __init__(o):
+            o.apply_patch = apply_patch
+            o.produce_open_function = produce_open_function
+            o.parent_CLI_values = CLI_vals
+            o._once = False
+
+        def resolve_issues_file_path(self, be_verbose=False):
+            assert not self._once
+            self._once = True
+
+            listener = _verbosify_listener(
+                be_verbose, self.emission_monitor.listener)
+
+            readme = _resolve_issues_file(self, listener)
+            if readme:
+                return readme
+            serr.write("please use -r or PHO_README or 'use --write'.\n")
+
+        def produce_dotfile_path(self):
+            env = self.environ
+            from os.path import join as _path_join
+            return _path_join(env['HOME'], '.tmx-pho-issues.rec')
+
+        @memoized_property
+        def emission_monitor(_):
+            return _error_monitor(serr)
+
+        @memoized_property
+        def environ(_):
+            return enver()
+
+    return ExternalFunctions()
 
 
 def _build_int_matcher():
@@ -589,6 +671,10 @@ def _build_int_matcher():
         return int(md[1])
     import re
     return match
+
+
+_formal_for_help = '-h', '--help', 'this screen'
+_dotfile_entry = ".tmx-pho-issues.rec"
 
 
 # == Dispatchers
@@ -604,6 +690,17 @@ def _error_monitor(serr):
 
 
 # == Smalls
+
+def _verbosify_listener(be_verbose, listener):
+    if be_verbose:
+        return listener
+
+    def use_listener(sev, *rest):
+        if 'verbose' == sev:
+            return
+        listener(sev, *rest)
+    return use_listener
+
 
 def _pass_thru_context_manager(lines):
     from contextlib import nullcontext as func

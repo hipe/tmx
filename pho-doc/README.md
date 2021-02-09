@@ -165,7 +165,7 @@ when you click create
 |[#882.T]                   | #trak | two somewhat redunant implementations of parsing a function call
 |[#882.S]                   | #trak | namespace for tracking provisions of "body function"
 |[#882.R]                   | #wish | tree visualization needs to be able to specify document tree
-|[#882.Q]                   | #open | our internal reference to [#605.6], help screen option desc lines
+|[#882.Q]                   | #open | This tracks an issue that is now closed there maybe we can close it here
 |[#882.P]                   | #trak | [graph via collection]
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
 |[#882.M]                   | #trak | formal attributes (the model) is balkanized

@@ -23,9 +23,7 @@ the related API that preceded this one.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
-|[#608.N]                   |       | curses yikes: a point about focus
-|[#608.13]                  | #wish | argument arity `<like-this>?`
-|[#608.L]                   |       | curses event model
+|[#608.P]                   |       | curses yikes: a point about focus
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.M]                   | #prov | curses yikes: #provision: topmost interactable starts as selected
 |[#608.L]                   |       | curses yikes event model
@@ -38,8 +36,7 @@ the related API that preceded this one.)
 |[#608.5]                   |       | SUNSETTED this one approach to a library interface
 |[#608.4]                   | #trak | "mad parse" (whatever that is)
 |[#608.3]                   | #trak | in the future DRY up places where you do this common isatty thing |
-|[#608.2.C]                 |       | magic names like 'buttons'
-|[#608.2]                   |       | [see]
+|[#608.2]                   |       | [see]  [#608.2.C]: magic names like 'buttons'
 |[#607.P]                   | #open | curses yikes: prune unused functions in tests and assets
 |[#607.N]                   | #wish | stylesheet
 |[#607.M]                   | #wish | conditional buttons
@@ -56,7 +53,6 @@ the related API that preceded this one.)
 |[#607.B]                   |       | as referenced |
 |[#607]                     |       | [internal tracking] |
 |[#606]                     | #open | [the unified diff parser]
-|[#605.6]                   | #open | help screen desc lines for options only show first desc line
 |[#605.6]                   | #open | [resourceser] needs specification/objective/scope. currently inconsistent & not DRY
 |[#605.5]                   | #trak | end state with runs (diff stdout & stderr) moves
 |[#605.4]                   | #trak | mock STDIN that plays back lines
