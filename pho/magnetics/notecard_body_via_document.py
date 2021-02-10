@@ -8,12 +8,31 @@ import os.path as _os_path
 import re as _re
 
 
+def REMOTE_NOTECARD_BODY(
+        relpath, quoted_iden_expr, bent, memo, bcoll, listener):
+
+    """this is a XXX [#882.Z] multiple collections.
+    """
+
+    md = _re.match(r'"([2-9A-HJ-LP-Z]{2,})"\Z', quoted_iden_expr)
+    if md is None:
+        def lines():
+            yield (f"expected e.g '\"ABC\"' (use double quotes). had:"
+                   f" {quoted_iden_expr!r}")
+        listener('error', 'expression', 'value_function_value_error', lines)
+        return
+    eid, = md.groups()
+
+    valueser = _value_producer_controller(listener, memo, bcoll)
+    coll = valueser.collection_via_relpath(relpath)
+    body = coll.retrieve_entity(eid, listener).core_attributes['body']
+    assert body
+    return (body,)
+
+
 def func(directory, iden_expr, bent, memo, bcoll, listener):
 
     def main():
-        if 0 == len(memo):
-            _init_memo(memo)
-
         if '[' == iden_expr[0]:
             doc_abspath = expand_path_from_identifier()
         elif _re.match(r'[A-Za-z0-9_-]+\.md\Z', iden_expr):  # ..
@@ -31,10 +50,8 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
         return (s,)  # wrapped value
 
     def expand_path_from_identifier():
-        idener = produce_idener()
-        iden = idener(iden_expr)
-        dir_abspath = produce_directory_abspath()
-        dindex = produce_directory_index(dir_abspath)
+        iden = valueser.identifier_via_expression(iden_expr)
+        dindex, dir_abspath = valueser.directory_index_and_abspath(directory)
         return procure_doc_abspath(iden, dindex, dir_abspath)
 
     def procure_doc_abspath(iden, dindex, dir_abspath):
@@ -43,6 +60,50 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
             return doc_abspath
         lines = tuple(_whine_big(iden, dindex, dir_abspath))
         xx(' '.join(lines))
+
+    def produce_directory_abspath():
+        return valueser.abspath_via_relpath(directory)
+
+    valueser = _value_producer_controller(listener, memo, bcoll)
+
+    try:
+        return main()
+    except _Stop:
+        pass
+
+
+def _value_producer_controller(listener, memo, bcoll):
+
+    if 0 == len(memo):
+        _init_memo(memo)
+
+    class value_producer_controller:  # #class-as-namespace
+
+        def collection_via_relpath(relpath):
+            abspath = abspath_via_relpath(relpath)
+            return produce_collection(abspath)
+
+        def directory_index_and_abspath(dir_expr):
+            dir_abspath = abspath_via_relpath(dir_expr)
+            dindex = produce_directory_index(dir_abspath)
+            return dindex, dir_abspath
+
+        def identifier_via_expression(iden_expr):
+            return produce_idener()(iden_expr)
+
+    def produce_collection(abspath):
+        dct = memo['remote_collection_via_abspath']
+        if (coll := dct.get(abspath)):
+            return coll
+        coll = build_collection(abspath)
+        if coll:
+            dct[abspath] = coll
+        return coll
+
+    def build_collection(abspath):
+        from kiss_rdb import \
+            collection_via_storage_adapter_name_and_path as func
+        return func('eno', abspath, listener)
 
     def produce_directory_index(absdir):
         mdct = memo['directory_listing_index_via_abspath']
@@ -70,7 +131,7 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
             dct[ss] = abspath
         return dct
 
-    def produce_directory_abspath():
+    def abspath_via_relpath(directory):
         dct = memo['abs_path_via_doc_path']
         if (s := dct.get(directory)):
             return s
@@ -78,6 +139,8 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
         abspath = _os_path.realpath(cranky)  # (see [#882.S.4])
         dct[directory] = abspath
         return abspath
+
+    value_producer_controller.abspath_via_relpath = abspath_via_relpath
 
     def produce_idener():
         idener = memo.get('idener')
@@ -101,10 +164,7 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
         vendor = func(listener)
         return idener
 
-    try:
-        return main()
-    except _Stop:
-        pass
+    return value_producer_controller
 
 
 def _notecard_body_via_document_path(path, listener):
@@ -184,6 +244,7 @@ def _whine_about_shape(listener, expr):
 
 def _init_memo(memo):
     memo['abs_path_via_doc_path'] = {}
+    memo['remote_collection_via_abspath'] = {}
     memo['directory_listing_index_via_abspath'] = {}
 
 

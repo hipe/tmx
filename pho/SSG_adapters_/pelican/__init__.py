@@ -200,7 +200,7 @@ def generate_markdown(
     """
     Generate pelican-targeted markdown files for the selected documents.
 
-    example output directory: zz-zz/content/pages
+    example output directory: z/zz-zz/output
 
     Args:
         NCID: Select a document by pointing this to the document's head or

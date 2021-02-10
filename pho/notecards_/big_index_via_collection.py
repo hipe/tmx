@@ -383,6 +383,8 @@ def _big_index_when_many(argument_ncids, bcoll, listener):
             if eid in seen:
                 continue
             node = retrieve(eid)
+            if node is None:
+                return  # e.g it fails structural validation
             if node.parent_identifier_string is not None:
                 postponed.append(eid)
                 continue

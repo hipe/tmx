@@ -4,6 +4,8 @@
 8 (                              H               R)
  8
 W (2)
+ 9
+7 (              9)
  A
 Z (                    C)
  D
@@ -14,3 +16,6 @@ L (            8           E)
  P
 B (                    C D         J K L M N     R)
 H (2   4 5 6       A B C D E F G H J K L M N P Q R S T U V W X Y Z)
+ V
+W (      5)
+X (    4 5   7       B C D E F   H J K         Q           W)

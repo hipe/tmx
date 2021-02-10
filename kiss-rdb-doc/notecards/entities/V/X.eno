@@ -1,7 +1,7 @@
 # entity: VXW: attributes
 heading: recfiles intro (and other stuff)
 -- body
-👉 the [recutils splashpage] has a feature tree that would be fun to scrape.
+👉 the [recutils splashpage][4] has a feature tree that would be fun to scrape.
 
 
 matt asked me if i had heard of [jq][2] (if there was one for parsing
@@ -14,6 +14,7 @@ carlos said of [rq][3],
 
 
 
+[4]: https://www.gnu.org/software/recutils/
 [3]: https://github.com/dflemstr/rq
 [2]: https://stedolan.github.io/jq/
 [1]: https://www.gnu.org/software/recutils/

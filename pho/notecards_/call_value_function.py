@@ -257,7 +257,7 @@ _parse_function_call = _build_function_call_parser()
 
 _simple_name_then_value_rx = _re.compile(r"""
     (?P<component_name>
-        [a-z_]+
+        [A-Za-z_]+
     )
     [ ]+
     (?P<right_hand_side>

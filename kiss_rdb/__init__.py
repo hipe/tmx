@@ -42,6 +42,15 @@ def hub_mod_name_and_mod_dir():
     return '.'.join(pcs), path_join(dn(dn(__file__)), *pcs)
 
 
+def collection_via_storage_adapter_name_and_path(mod_name, x, listener, **kw):
+    from importlib import import_module
+    sa_mod = import_module(f"kiss_rdb.storage_adapters_.{mod_name}")
+
+    from .magnetics_.collection_via_path import \
+        collection_via_storage_adapter_module_and_path_ as func
+    return func(sa_mod, x, listener, kw)
+
+
 def collection_via_storage_adapter_and_path(sa_mod, x, listener, **kw):
     """If you have the SA already and don't want to load the whole hub"""
     # (Case3459DP)

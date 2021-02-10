@@ -96,7 +96,7 @@ _(skimmed each page. no idea what anything meant.)_
 
   - alternative container runtimes (really?)
   - thing about "which speeds up local experiments"
-  - #TYPO: says "`docker-env command`" should be "`docker-env` command"
+  - \#TYPO: says "`docker-env command`" should be "`docker-env` command"
   - summary: #come-back we want to understand `#use-local-images-by-re-using-the-docker-daemon`
 
 ## Validate Node Setup

@@ -1,0 +1,12 @@
+# entity: 979: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: let's do eno
+body_function: REMOTE_NOTECARD_BODY(kiss_rdb_notecards, "979")
+
+> This is nutso
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

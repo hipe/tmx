@@ -214,7 +214,7 @@ be *that* bad..
 
 givens:
 
-  - #edit [#866.B] change all this
+  - \#edit [#866.B] change all this
 
   - assume you have some N lines (possibly zero) of the _body_ of your
     document entity (table).
@@ -223,7 +223,7 @@ givens:
     tail-anchored substring that constitutes everything after the
     equals sign (and one (for now) requisite space character).
 
-  - #multi-line strings will complicate this. for now, imagine
+  - \#multi-line strings will complicate this. for now, imagine
     they are not supported.
 
 now, parsing this in python is _very_ short and easy with the toml library

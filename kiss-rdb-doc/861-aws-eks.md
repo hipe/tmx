@@ -3,15 +3,16 @@ title: 'aws eks'
 date: 2019-01-01T19:43:00-05:00
 ---
 
-read this: https://aws.amazon.com/ec2/
+read this: [https://aws.amazon.com/ec2/](https://aws.amazon.com/ec2/)
 
 then we're in to spot instances,
 
-then read this: https://aws.amazon.com/ec2/spot/
+then read this: [https://aws.amazon.com/ec2/spot/](https://aws.amazon.com/ec2/spot/)
 
 saw ECS mentioned there, so googled "amazon ECS" Elastic Container Service
 
-https://aws.amazon.com/ecs/
+[https://aws.amazon.com/ecs/](https://aws.amazon.com/ecs/)
+
 
 ECS is a container management services that supports (only) docker.
 

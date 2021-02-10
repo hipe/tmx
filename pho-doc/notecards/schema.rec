@@ -6,8 +6,14 @@ storage_adapter: eno
 storage_schema: 32x32x32
 
 value_function: get_body_from_document pho.magnetics.notecard_body_via_document.func
+value_function: REMOTE_NOTECARD_BODY pho.magnetics.notecard_body_via_document.REMOTE_NOTECARD_BODY
+
 value_function_variable: pho_docs_dir ../documents
 value_function_variable: heroku_dir ../documents/419-heroku-content-management-add-ons-dim-sum
+
+value_function_variable: kiss_docs_dir ../../kiss-rdb-doc
+value_function_variable: kiss_rdb_notecards ../../kiss-rdb-doc/notecards
+
 
 # #history-B.4 enter body functions
 # #history-A.3

@@ -157,6 +157,7 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
             scn.advance()
 
         while scn.more:
+
             ent = scn.peek
             iden = ent.identifier
 
@@ -168,7 +169,13 @@ def _provision_identifier(away_soon, fh, listener):  # #testpoint
                 last_iden_tagged_as_hole = iden
             was_under_branch = branch
             jump_distance, branch = compare(above_iden, iden, branch)
+
+            if jump_distance < 0:
+                reason = f"{above_iden.to_string()} then {iden.to_string()}"
+                xx(reason)
+
             assert -1 < jump_distance
+
             if 0 == jump_distance:
                 # The header node at the bottom of a bunch of compound issues
                 assert was_under_branch and not branch

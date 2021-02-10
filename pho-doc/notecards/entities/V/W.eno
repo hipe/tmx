@@ -1,0 +1,20 @@
+# entity: VW5: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Meet kiss-rdb
+body_function: get_body_from_document(kiss_docs_dir, README.md)
+children:
+- VX4
+- VX5
+- VX7
+- VXH
+- VXJ
+- VXK
+- VXQ
+- 979
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

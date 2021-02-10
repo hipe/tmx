@@ -278,8 +278,9 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
                 return edit_funcs._open_coll_for_passthru_write(listener)
 
         if do_read:
-            @parse_identifier
-            def retrieve_entity(iden, listener):
+            def retrieve_entity(eid, listener=None):
+                if (iden := iden_er_er(listener)(eid)) is None:
+                    return
                 return read_funcs.retrieve_entity_via_identifier(iden, listener)  # noqa: E501
 
             def retrieve_entity_via_identifier(iden, listener):

@@ -155,12 +155,12 @@ when you click create
 
 (Our range: [#876-#900))
 ([#401-431] is (formally) the range for "TMX notebook" (app) SSG research)
-(Put new issues in this range: [#882.A-#883))
+(Put new issues in this range: [#887.A-#888))
 
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
-|[#899.Q]                   | #exmp | This is an example issue.
-|[#887]                     | #hole |
+|[#899]                     | #exmp | This is an example issue.
+|[#887.A]                   | #open | index file stuff with pelican
 |[#886]                     | #open | jagged alignment of multiline descs (see "close") #is:[#603.2]
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
@@ -168,6 +168,9 @@ when you click create
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
 |[#883]                     |       | (internal provisions)
+|[#882.Z]                   | #open | multiple collections
+|[#882.Y]                   | #open | pho issues open breaks if eg row has minor component
+|[#882.X]                   | #open | RSL parsing is too strict
 |[#882.W]                   | #open | get placeholder AUTHOR and TIMEZONE out
 |[#882.V]                   | #trak | track where we attempt to skip errors
 |[#882.U]                   | #trak | where we insert or normalize newlines in generated markdown

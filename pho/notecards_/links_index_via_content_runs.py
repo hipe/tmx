@@ -15,11 +15,11 @@ notecard-by-notecard.
 import re as _re
 
 
-def these_two():
+def sectionser_and_RSL_definition_index():
     return _sections_w_reprovisioned_RSLs, _RSL_Definition_Index()
 
 
-def _sections_w_reprovisioned_RSLs(rsl_def_index, special_itr):
+def _sections_w_reprovisioned_RSLs(rsl_def_index, special_itr, listener):
 
     # Traverse the whole body before you do name replacements
     sections_future = next(special_itr)
@@ -27,7 +27,7 @@ def _sections_w_reprovisioned_RSLs(rsl_def_index, special_itr):
     dct = {k: v for k, v in _traverse_body(rsl_def_index, itr)}
 
     # Now that we have traversed the body looking for defs, do replacements
-    do = _build_replacer(dct)
+    do = _build_replacer(dct, listener)
     for header_sx, content_runs in sections_future():
         use_crs = content_runs and tuple(do(cr) for cr in content_runs)
         yield header_sx, use_crs
@@ -35,14 +35,14 @@ def _sections_w_reprovisioned_RSLs(rsl_def_index, special_itr):
 
 # == Build Replacer
 
-def _build_replacer(new_name_via_old_name):
+def _build_replacer(new_name_via_old_name, listener):
     def do(sx):
         typ, value = sx  # ..
         if _do_skip_replace[typ]:
             return sx
         new_value = tuple(replace_line(line) for line in value)
         return 'content_run', new_value
-    replace_line = _build_line_replacer(new_name_via_old_name)
+    replace_line = _build_line_replacer(new_name_via_old_name, listener)
     return do
 
 
@@ -50,7 +50,7 @@ _do_skip_replace = {
     'content_run': False, 'blank_line_run': True, 'code_fence_run': True}
 
 
-def _build_line_replacer(new_name_via_old_name):
+def _build_line_replacer(new_name_via_old_name, listener):
 
     def func(line):
         return ''.join(pieces(line))
@@ -64,8 +64,13 @@ def _build_line_replacer(new_name_via_old_name):
             old_key = line[name_begin:name_end]
             new_name = new_name_via_old_name.get(old_key)
             if new_name is None:
-                xx(f"RSL identifier used but not defined: {old_key!r} {line!r}")  # noqa: E501
-            yield new_name
+                reason = f"RSL identifier used but not defined: {old_key!r} {line!r}"  # noqa: E501
+                lineser = (lambda s: lambda: (s,))(reason)  # close it
+                listener('error', 'expression', 'lets_go', lineser)
+                yield old_key
+            else:
+                yield new_name
+
             yield line[name_end:match_end]  # always just ']'
             cursor = match_end
         leng = len(line)
@@ -89,6 +94,9 @@ _RSL_rx = _re.compile(''.join((
     '(?P<RSL_identifier>', _inside, ')',
     r'\]',  # a literal close bracket
 )), _re.VERBOSE)
+
+
+# rsld = reference-style link definition
 
 
 # == Traverse Body

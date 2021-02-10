@@ -1,0 +1,135 @@
+# entity: VX4: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: ID system overview
+body_function: get_body_from_document(kiss_docs_dir, [#852])
+
+
+# entity: VX5: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: filetree schemas
+body_function: get_body_from_document(kiss_docs_dir, [#853])
+
+
+> placehold plugin architecture 854 6
+
+
+# entity: VX7: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: not really SQL
+body_function: get_body_from_document(kiss_docs_dir, [#855])
+
+
+> placehold n10as data model 856 8
+
+> placehold backd roadmap 856 9
+
+> placehold backd roadmap 857.D A
+
+
+# entity: VXB: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: AWS journal
+body_function: get_body_from_document(kiss_docs_dir, [#858])
+children:
+- VXE
+- VXF
+
+
+# entity: VXC: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: kubernetes journal
+body_function: get_body_from_document(kiss_docs_dir, [#859])
+children:
+- VXD
+
+
+# entity: VXD: attributes
+hierarchical_container_type: document
+parent: VXC
+heading: kubernetes journey notes
+body_function: get_body_from_document(kiss_docs_dir, [#860])
+
+
+# entity: VXE: attributes
+hierarchical_container_type: document
+parent: VXB
+heading: AWS eks
+body_function: get_body_from_document(kiss_docs_dir, [#861])
+
+
+# entity: VXF: attributes
+hierarchical_container_type: document
+parent: VXB
+heading: AWS ec2
+body_function: get_body_from_document(kiss_docs_dir, [#862])
+
+
+> placehold coarse parse toml state dot G
+
+
+# entity: VXH: attributes
+hierarchical_container_type: document
+parent: VW5
+heading: the toml adaptation for entities
+body_function: get_body_from_document(kiss_docs_dir, [#864])
+
+
+# entity: VXJ: attributes
+hierarchical_container_type: document
+parent: VW5
+heading: the toml adaptation for attributes
+body_function: get_body_from_document(kiss_docs_dir, [#865])
+
+
+# entity: VXK: attributes
+hierarchical_container_type: document
+parent: VW5
+heading: the hack for determining inline comments
+body_function: get_body_from_document(kiss_docs_dir, [#866])
+
+
+> placehold CUD entities roadmap L
+
+> placehold unified test case number scheme sketch M
+
+> placehold near term end game N
+
+> placehold backend roadmap again P
+
+
+# entity: VXQ: attributes
+hierarchical_container_type: document
+parent: VW5
+heading: multi-line strings
+body_function: get_body_from_document(kiss_docs_dir, [#872])
+
+
+> placehold md table line state machine R
+
+> placehold md multi-table encoding state machine S
+
+> placehold ersatz paring a md document for tables T
+
+> future U
+
+> future V
+
+
+> BEGIN copy paste do not edit
+
+# entity: VXW: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: storage format: recfiles
+body_function: REMOTE_NOTECARD_BODY(kiss_rdb_notecards, "VXW")
+
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

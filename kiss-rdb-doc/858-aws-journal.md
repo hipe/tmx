@@ -271,7 +271,7 @@ Request would have succeeded, but DryRun flag is set.
 [doc3]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/get-set-up-for-amazon-ecr.html
 [doc4]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_GetStarted.html
 [doc5]: https://docs.docker.com/docker-for-aws/persistent-data-volumes/
-[doc6]: https://www.stratoscale.com/blog/kubernetes/ec2-container-service-vs-kubernetes/ (near) 'For microservice architectures, this creates an additional overhead every service you deploy.'
+[doc6]: https://www.stratoscale.com/blog/kubernetes/ec2-container-service-vs-kubernetes/ "(near) 'For microservice architectures, this creates an additional overhead every service you deploy.'"
 [doc7]: https://kubernetes.io/docs/concepts/storage/volumes/
 [doc8]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 [doc9]: https://blog.rackspace.com/aws-101-regions-availability-zones

@@ -267,7 +267,7 @@ def abstract_document_via_notecards_iterator_(itr, bcoll, listener):
             if s is None:
                 main.OK = None
                 return
-            yield nc.heading, s
+            yield nc.identifier_string, nc.heading, s  # #here7
 
     def rewound():
         yield first_notecard
@@ -292,11 +292,13 @@ def abstract_document_via_notecards_iterator_(itr, bcoll, listener):
     kw = {'ncid': first_notecard.identifier_string}
     kw['datetime'] = first_notecard.document_datetime
     main.OK = True
-    ad = _do_abstract_document_via_notecards(main(), **kw)
+    ad = _do_abstract_document_via_notecards(main(), listener, **kw)
     return main.OK and ad
 
 
-def _do_abstract_document_via_notecards(notecards, ncid=None, datetime=None):
+def _do_abstract_document_via_notecards(
+        notecards, listener, ncid=None, datetime=None):
+
     # Flat map each notecard body into its N sections while:
     # - emitting a special s-expression just for the heading-derived title
     # - re-provisioning RSL names to be correct in the scope of the document
@@ -305,7 +307,7 @@ def _do_abstract_document_via_notecards(notecards, ncid=None, datetime=None):
     # - normalizing header depth based on the above
     # #testpoint
 
-    itr = _final_sexps(notecards)
+    itr = _final_sexps(notecards, listener)
 
     first = None
     for first in itr:  # #once
@@ -389,19 +391,37 @@ def _lines_via_content_runs(crs):
         assert()
 
 
-def _final_sexps(notecards):
+def _final_sexps(notecards, listener):  # #testpoint
 
     def each_notecard():
+
+        # == BEGIN
+
+        def use_listen(*emi):
+            if ('error', 'expression') != emi[:2]:
+                return listener(*emi)
+            (*chan, lineser) = emi
+
+            def use_lineser():
+                for line in lineser():
+                    yield line
+                yield f"humongous chungus: {closed()!r}"
+
+            closed = (lambda x: lambda: x)(ncid)  # it's in a loop. don't assum
+            listener(*chan, use_lineser)
+
+        # == END
 
         def cstacker():
             return ({'heading': heading},)
 
-        for heading, body in notecards:
+        for ncid, heading, body in notecards:  # #here7
             itr = _sections_future_and_each_RSL_definition_run(body, cstacker)
-            itr = sections_w_reprovisioned_RSLs(rsl_def_index, itr)
+            itr = sections_w_reprovisioned_RSLs(rsl_def_index, itr, use_listen)
             yield heading, scanner(itr)
 
-    from pho.notecards_.links_index_via_content_runs import these_two as func
+    from pho.notecards_.links_index_via_content_runs import \
+        sectionser_and_RSL_definition_index as func
     sections_w_reprovisioned_RSLs, rsl_def_index = func()
 
     from text_lib.magnetics.scanner_via import scanner_via_iterator as scanner

@@ -53,8 +53,10 @@ def the_method_called_test_for_the_sexp_case(self):
 # ==
 
 def document_state_via_notecards(frag_itr):
-    use_itr = ((h, _body_via_lines(lines)) for h, lines in frag_itr)
-    ad = subject_module()._do_abstract_document_via_notecards(use_itr)
+    no_see = 'NO_SEE_EID'
+    use_itr = ((no_see, h, _body_via_lines(lines)) for h, lines in frag_itr)
+    listen = _produce_throwing_listener()
+    ad = subject_module()._do_abstract_document_via_notecards(use_itr, listen)
 
     # NOTE for now we're just trying to bridge back to 17 month old code
     # to get old tests to pass (asserting still current specs). But when
@@ -82,11 +84,23 @@ def document_state_via_notecards(frag_itr):
 
 def final_sexps_via_notecards(notecards):
 
-    def these():
-        for heading, lines in notecards:
-            yield heading, _body_via_lines(lines)
+    first = next(notecards)
+    if 2 == len(first):
+        def use_notecards():
+            yield no_see, *first
+            for _2, _3 in notecards:
+                yield no_see, _2, _3
+        no_see = 'NO_SEE_NCID'
+    else:
+        xx()
 
-    sxs = tuple(subject_module()._final_sexps(these()))
+    def these():
+        for ncid, heading, lines in use_notecards():
+            yield ncid, heading, _body_via_lines(lines)
+
+    func = subject_module()._final_sexps
+
+    sxs = tuple(func(these(), _produce_throwing_listener()))
     return _SexpAccessor(sxs)
 
 
@@ -132,6 +146,14 @@ def _add_newline(s):
     # but let's add a sanity check because this breaks a deep convention
     assert(0 == len(s) or '\n' != s[-1])
     return f'{s}\n'
+
+
+def _produce_throwing_listener():
+    return _throwing_listener
+
+
+def _throwing_listener(*chan, rest):
+    xx(f"no: {chan!r}")
 
 
 # ==
