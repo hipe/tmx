@@ -811,7 +811,7 @@ _RSL_definition_rx = _re.compile(r'''     # NOTE all var names are #testpoint
         (?P<margin>[ ]{0,3})              # Gruber says up to 3 spaces
         \[
             (?P<link_identifier>
-                [a-zA-Z0-9][a-zA-Z0-9_]*  # Gruber doesn't say the rules here
+                [a-zA-Z0-9][a-zA-Z0-9_-]*  # Gruber doesn't say the rules here
             )
         \]
         :

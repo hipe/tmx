@@ -234,8 +234,8 @@ body_function: get_body_from_document(pho_docs_dir, [#424])
 
 # entity: PHX: attributes
 hierarchical_container_type: document
-parent: PBJ
-heading: Process: dev workflow notes
+parent: TNM
+heading: Technique: git bisect
 body_function: get_body_from_document(pho_docs_dir, [#425])
 
 

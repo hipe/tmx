@@ -39,15 +39,7 @@ state has one sort of systemic family of bugs); it was a good detour.
 # entity: PBJ: attributes
 hierarchical_container_type: document
 heading: index
--- body
-# Welcome to TMX reading notes
-
-EDIT One day we'll introduce TMX (python) by linking the topmost README.
-
-For now please enjoy perusing the documentation to TMX Notebook 👈 🤗
-
-
--- body
+body_function: get_body_from_document(mono_repo_dir, README.md)
 children:
 - PH6
 - VW5
@@ -60,8 +52,8 @@ children:
 - TM2
 - TM5
 - PHT
-- PHX
 - PHE
+- TNM
 
 
 

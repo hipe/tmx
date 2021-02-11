@@ -37,7 +37,7 @@ we've got:
   - [paranoiacally-private method names](#c)
   - [broadly utilized class-name conventions refined](#d)
   - [project-private method names](#e)
-  - [regression-friendly test ordering][#6]
+  - [regression-friendly test ordering](#6)
 
 
 
@@ -350,6 +350,8 @@ not much step (2) though).
 
 
 [semver]: http://semver.org
+
+
 
 ## (document-meta)
 

@@ -1,0 +1,67 @@
+# entity: TN9: attributes
+hierarchical_container_type: document
+parent: TNM
+heading: Convention: Using the node table
+body_function: get_body_from_document(top_level_doc_dir, [#002])
+
+
+
+# entity: TNC: attributes
+hierarchical_container_type: document
+parent: TNM
+heading: Convention: Using the TODO stack
+body_function: get_body_from_document(top_level_doc_dir, [#004])
+
+
+
+# entity: TNF: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Conventions: introduction
+body_function: get_body_from_document(top_level_doc_dir, [#010])
+
+
+
+# entity: TNJ: attributes
+hierarchical_container_type: document
+parent: TNM
+heading: Convention: Test case numbering
+body_function: get_body_from_document(top_level_doc_dir, [#010.7])
+
+
+
+# entity: TNM: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Environment: setting up python
+body_function: get_body_from_document(top_level_doc_dir, [#018])
+children:
+- TNF
+- TNQ
+- TNT
+- TNJ
+- TN9
+- TNC
+- PHX
+
+
+
+# entity: TNQ: attributes
+hierarchical_container_type: document
+parent: TNM
+heading: Convention: package vis-a-vis filesystem
+body_function: get_body_from_document(top_level_doc_dir, [#019])
+
+
+
+# entity: TNT: attributes
+hierarchical_container_type: document
+parent: TNM
+heading: Convention: "magnetics"
+body_function: get_body_from_document(top_level_doc_dir, [#019.3])
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

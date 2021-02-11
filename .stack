@@ -4,3 +4,5 @@ cover yes schema file but no ent entites dir
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
 there are todo's
+make sure these are in there: dates, double-deep tree
+add a "priority" tag criteria element to "issues list"

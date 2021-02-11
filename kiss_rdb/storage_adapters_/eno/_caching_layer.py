@@ -96,7 +96,9 @@ class Caching_FS_Reader_:  # #testpoint
 
         # If you already have an FR for this path, then entity not exist
         if path in self._file_reader_via_path:
-            xx("file exist but entity not exist. hole. do same as other.")
+            xx(f"The file for {iden.to_string()!r} exists but that entity"
+               " is not in the file.\n"
+               f"path: {path}")
 
         # Resolve a file reader from the path
         def main():
