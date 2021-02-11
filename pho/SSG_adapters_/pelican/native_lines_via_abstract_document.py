@@ -45,7 +45,7 @@ def native_lines_via_abstract_document(ad, listener):
         # want to repeat that same text in a smaller header immediately after
         sections[0] = sections[0].replace_header(None)
 
-    assert '"' not in title
+    # assert '"' not in title
 
     # Vendor will etc but we want to etc
     entry = _entry_via_title(title, listener)

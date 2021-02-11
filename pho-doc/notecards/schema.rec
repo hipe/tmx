@@ -14,6 +14,13 @@ value_function_variable: heroku_dir ../documents/419-heroku-content-management-a
 value_function_variable: kiss_docs_dir ../../kiss-rdb-doc
 value_function_variable: kiss_rdb_notecards ../../kiss-rdb-doc/notecards
 
+value_function_variable: data_pipes_docs_dir ../../data-pipes-doc/documents
+value_function_variable: script_lib_doc_dir ../../script-lib-doc
+value_function_variable: microservice_lib_doc_dir ../../microservice-lib-doc
+value_function_variable: tag_lyfe_doc_dir ../../tag-lyfe-doc
+value_function_variable: UB_doc_dir ../../upload-bot-doc
+value_function_variable: mono_repo_dir ../..
+
 
 # #history-B.4 enter body functions
 # #history-A.3

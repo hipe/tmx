@@ -819,6 +819,8 @@ def _build_descender(retrieve, WRAP_DESCEND_EXPERIMENTAL=None):
     def do_expand_children(cx, peid):  # note [#882.E] will explain
         for eid in cx:
             node = retrieve(eid)
+            if node is None:
+                xx("see above emission")
             if node.previous_identifier_string:
                 xx(_when_big_problems(node, peid))
             yield node

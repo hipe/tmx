@@ -31,7 +31,7 @@ body_function: get_body_from_document(kiss_docs_dir, [#855])
 
 # entity: VXB: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: VWS
 heading: AWS journal
 body_function: get_body_from_document(kiss_docs_dir, [#858])
 children:
@@ -41,7 +41,7 @@ children:
 
 # entity: VXC: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: VWS
 heading: kubernetes journal
 body_function: get_body_from_document(kiss_docs_dir, [#859])
 children:
@@ -75,20 +75,26 @@ body_function: get_body_from_document(kiss_docs_dir, [#862])
 # entity: VXH: attributes
 hierarchical_container_type: document
 parent: VW5
-heading: the toml adaptation for entities
+heading: Datastore: toml
+> formerly: the tom adaptation for entities
 body_function: get_body_from_document(kiss_docs_dir, [#864])
+children:
+- VXJ
+- VXK
+- VXQ
 
 
 # entity: VXJ: attributes
 hierarchical_container_type: document
-parent: VW5
+parent: VXH
 heading: the toml adaptation for attributes
 body_function: get_body_from_document(kiss_docs_dir, [#865])
 
 
+
 # entity: VXK: attributes
 hierarchical_container_type: document
-parent: VW5
+parent: VXK
 heading: the hack for determining inline comments
 body_function: get_body_from_document(kiss_docs_dir, [#866])
 
@@ -104,7 +110,7 @@ body_function: get_body_from_document(kiss_docs_dir, [#866])
 
 # entity: VXQ: attributes
 hierarchical_container_type: document
-parent: VW5
+parent: VXH
 heading: multi-line strings
 body_function: get_body_from_document(kiss_docs_dir, [#872])
 
@@ -124,8 +130,8 @@ body_function: get_body_from_document(kiss_docs_dir, [#872])
 
 # entity: VXW: attributes
 hierarchical_container_type: document
-parent: PBJ
-heading: storage format: recfiles
+parent: VW5
+heading: Datastore: recfiles
 body_function: REMOTE_NOTECARD_BODY(kiss_rdb_notecards, "VXW")
 
 

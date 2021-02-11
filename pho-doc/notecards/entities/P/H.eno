@@ -1,6 +1,6 @@
 # entity: PH2: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: There are many SSG's
 body_function: get_body_from_document(pho_docs_dir, [#401])
 
@@ -8,7 +8,7 @@ body_function: get_body_from_document(pho_docs_dir, [#401])
 
 # entity: PH4: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: SSG: hugo
 body: (one day say something about hugo)
 children:
@@ -20,7 +20,7 @@ children:
 
 # entity: PH5: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: TMX Notebook internals
 body_function: get_body_from_document(pho_docs_dir, [#882])
 children:
@@ -30,14 +30,32 @@ children:
 # entity: PH6: attributes
 hierarchical_container_type: document
 parent: PBJ
-heading: Meet TMX Notebook
+heading: Project: TMX Notebook
 body_function: get_body_from_document(pho_docs_dir, ../README.md)
+children:
+- PHB
+- PBM
+- PHA
+- PHK
+- PHZ
+- PHC
+- PBL
+- PBC
+- PBD
+- 48H
+- ELE
+- PBK
+- PH2
+- PH4
+- PHF
+- PHG
+- PH5
 
 
 
 # entity: PHA: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Web backend: Scala and Play
 body_function: get_body_from_document(pho_docs_dir, [#402])
 children:
@@ -46,14 +64,14 @@ children:
 
 # entity: PHB: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PHG
 heading: TMX Notebook deep objectives
 body_function: get_body_from_document(pho_docs_dir, [#403])
 
 
 # entity: PHC: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Comparison of wikis
 body_function: get_body_from_document(pho_docs_dir, [#404])
 
@@ -70,11 +88,13 @@ hierarchical_container_type: document
 parent: PBJ
 heading: Everything
 body_function: get_body_from_document(pho_docs_dir, [#406])
+children:
+- PHY
 
 
 # entity: PHF: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: SSG: pelican
 body_function: get_body_from_document(pho_docs_dir, [#409.2])
 children:
@@ -83,7 +103,7 @@ children:
 
 # entity: PHG: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Justifying file watchers
 body_function: get_body_from_document(pho_docs_dir, [#409.3])
 
@@ -104,7 +124,7 @@ body_function: get_body_from_document(pho_docs_dir, [#409.7])
 
 # entity: PHK: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PHK
 heading: Justifying a CMS
 -- body
 Ultimately we decided for now that we wanted an experience that was SSG-like
@@ -221,14 +241,14 @@ body_function: get_body_from_document(pho_docs_dir, [#425])
 
 # entity: PHY: attributes
 hierarchical_container_type: document
-parent: PBJ
-heading: A list of roadmaps
+parent: PHE
+heading: Meta: A list of roadmaps
 body_function: get_body_from_document(pho_docs_dir, [#881.3])
 
 
 # entity: PHZ: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Justifying a wiki
 -- body
 

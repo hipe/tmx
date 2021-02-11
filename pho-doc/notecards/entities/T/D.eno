@@ -1,0 +1,67 @@
+# entity: TD7: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "data pipes"
+body_function: get_body_from_document(data_pipes_docs_dir, ../README.md)
+children:
+- TDC
+- TDF
+- TDJ
+- TDM
+- TDQ
+- TDT
+
+
+
+# entity: TDC: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: Algorithm: collection synchronization
+body_function: get_body_from_document(data_pipes_docs_dir, [#447])
+
+
+
+# entity: TDF: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: Applying the sync algo to md tables
+body_function: get_body_from_document(data_pipes_docs_dir, [#448])
+
+
+
+# entity: TDJ: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: tag lyfe central conceits
+body_function: get_body_from_document(data_pipes_docs_dir, [#457])
+
+
+
+# entity: TDM: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: tag lyfe patterns and provisions
+body_function: get_body_from_document(data_pipes_docs_dir, [#458])
+
+
+
+# entity: TDQ: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: Idiom: Functional pipelines
+body_function: get_body_from_document(data_pipes_docs_dir, [#463])
+
+
+
+# entity: TDT: attributes
+hierarchical_container_type: document
+parent: TD7
+heading: Multi-tablism
+body_function: get_body_from_document(data_pipes_docs_dir, [#472])
+
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

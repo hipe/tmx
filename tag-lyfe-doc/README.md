@@ -63,7 +63,7 @@ for example:
     ./script/filter_by.py '#open' and not '#boring' tag-lyfe-doc/README.md
 
 
-the above pares down the below [node table][#nt] (in this same document)
+the above pares down the below [node table](#nt) (in this same document)
 and ouputs (at writing):
 
     {"id": "#709.D", "main_tag": "#open", "content": "integrate queries and .."}

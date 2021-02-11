@@ -39,7 +39,7 @@ annotated_entity_revisions:
 
 # entity: ELE: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: GUI toolkit: Electron
 document_datetime: 2019-11-20 18:43:00-0400
 -- body

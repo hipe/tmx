@@ -1,0 +1,67 @@
+# entity: TU7: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Project: upload bot
+body_function: get_body_from_document(UB_doc_dir, README.md)
+children:
+- TUA
+- TUC
+- TUF
+- TUK
+- TUN
+- TUR
+
+
+
+# entity: TUA: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: Testing our webserver with postman
+body_function: get_body_from_document(UB_doc_dir, [#303])
+
+
+
+# entity: TUC: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: Tunneling thru ngrok
+body_function: get_body_from_document(UB_doc_dir,  [#305])
+
+
+
+# entity: TUF: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: Environment variable TMI
+body_function: get_body_from_document(UB_doc_dir,  [#306])
+
+
+
+# entity: TUK: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: What is: Celery
+body_function: get_body_from_document(UB_doc_dir, [#307])
+
+
+
+# entity: TUN: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: Datastore: redis
+body_function: get_body_from_document(UB_doc_dir, [#308])
+
+
+
+# entity: TUR: attributes
+hierarchical_container_type: document
+parent: TU7
+heading: Message queue: rabbitmq
+body_function: get_body_from_document(UB_doc_dir, [#309])
+
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

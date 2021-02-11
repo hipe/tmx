@@ -25,7 +25,7 @@ annotated_entity_revisions:
 
 # entity: PBD: attributes
 hierarchical_container_type: document
-parent: PBR
+parent: PB6
 heading: para-GUI toolkit: ncurses
 -- body
 We did a lot with ncurses that we should document and link to here…
@@ -50,37 +50,24 @@ For now please enjoy perusing the documentation to TMX Notebook 👈 🤗
 -- body
 children:
 - PH6
-- PHB
-- PBM
-- PHA
-- PHK
-- PHZ
-- PHC
-- PBL
-- PBC
-- PBD
-- 48H
-- ELE
-- PBK
-- PH2
-- PH4
-- PHF
-- PHG
 - VW5
-- VXW
-- VXB
-- VXC
+- TU7
+- TMZ
+- TMH
+- TM8
+- TD7
+- TMS
+- TM2
+- TM5
 - PHT
 - PHX
-- PHY
 - PHE
-- PH5
 
 
 
 # entity: PBK: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Justifying a SSG
 -- body
 
@@ -100,7 +87,7 @@ has adapters for two of these SSG's).
 
 # entity: PBL: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Justifying a GUI
 -- body
 
@@ -123,7 +110,7 @@ then Electron. We achieved this and saw that it was good.
 
 # entity: PBM: attributes
 hierarchical_container_type: document
-parent: PBJ
+parent: PH6
 heading: Justifying a web backend
 -- body
 

@@ -1,0 +1,110 @@
+# entity: TM2: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "modality agnostic"
+body_function: get_body_from_document(mono_repo_dir, modality-agnostic-doc/README.md)
+
+
+
+# entity: TM5: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "text lib"
+body_function: get_body_from_document(mono_repo_dir, text-lib-doc/README.md)
+
+
+
+# entity: TM8: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "microservice lib"
+body_function: get_body_from_document(microservice_lib_doc_dir, README.md)
+children:
+- TMB
+- TME
+
+
+
+# entity: TMB: attributes
+hierarchical_container_type: document
+parent: TMB
+heading: How I Learned Python part 1
+body_function: get_body_from_document(microservice_lib_doc_dir, [#015])
+
+
+
+# entity: TME: attributes
+hierarchical_container_type: document
+parent: TMB
+heading: How I learned Python part 2
+body_function: get_body_from_document(microservice_lib_doc_dir, [#016])
+
+
+
+# entity: TMH: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "script lib"
+body_function: get_body_from_document(script_lib_doc_dir, README.md)
+children:
+- TML
+
+
+
+# entity: TML: attributes
+hierarchical_container_type: document
+parent: TMH
+heading: Library: curses yikes
+body_function: get_body_from_document(script_lib_doc_dir, [#608.2])
+children:
+- TMP
+
+
+
+# entity: TMP: attributes
+hierarchical_container_type: document
+parent: TML
+heading: curses yikes event model
+body_function: get_body_from_document(script_lib_doc_dir, [#608.L])
+
+
+
+# entity: TMS: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Library: "tag lyfe"
+body_function: get_body_from_document(tag_lyfe_doc_dir, README.md)
+children:
+- TMV
+- TMY
+
+
+
+# entity: TMV: attributes
+hierarchical_container_type: document
+parent: TMS
+heading: Comparison of Parser Generators
+body_function: get_body_from_document(tag_lyfe_doc_dir, [#702])
+
+
+
+# entity: TMY: attributes
+hierarchical_container_type: document
+parent: TMS
+heading: tag lyfe implementation notes
+body_function: get_body_from_document(tag_lyfe_doc_dir, [#703])
+
+
+
+# entity: TMZ: attributes
+hierarchical_container_type: document
+parent: PBJ
+heading: Project: grep dump
+body_function: get_body_from_document(mono_repo_dir, grep-dump-doc/README.md)
+
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

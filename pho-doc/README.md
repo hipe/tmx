@@ -160,6 +160,7 @@ when you click create
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
 |[#899]                     | #exmp | This is an example issue.
+|[#887.B]                   | #open | images (and etc)
 |[#887.A]                   | #open | index file stuff with pelican
 |[#886]                     | #open | jagged alignment of multiline descs (see "close") #is:[#603.2]
 |[#885.2]                   |       | this one UI sketch
