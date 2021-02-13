@@ -99,7 +99,7 @@ consumed by arbitrary other processes.
 |                   #707.I  | #hole |
 |                   #707.H  |       | #provision: don't use default whitespace handling
 |                   #707.G  |       | #provision: isolate parser-generator specifics
-|                   #707.F  | #trak | the "wordables" micro API
+|                   #707.F  | #hole |
 |                   #707.E  | #trak | quoted string terminal nodes in taggings & queries
 |                   #707.D  | #trak | the catch-22 of development order (see)
 |                   #707.C  | #trak | when we formalize allowable tag names

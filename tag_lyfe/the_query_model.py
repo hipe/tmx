@@ -8,7 +8,7 @@ the query model:
     for real queries (but put workers in magnets. this is a cold model.)
 
 the idea is that :[#707.G]:
-  - the model we use in our business code can avoid the peculiaries and
+  - the model we use in our business code can avoid the peculiarities and
     particularities of whatever class of grammars happens to be supported by
     whatever parser generator we happen to be using. so for example, in our
     business code we can work with plain old recursive (tree-like) lists
@@ -45,41 +45,29 @@ why lossless?
 """
 
 
+# ==
+
+def simplified_matcher_via_sexp_(sx):
+    # experimental new 33 month later thing
+
+    typ = sx[0]
+    if 'simple_tag' == typ:
+        surface, = sx[1:]
+        return _SimplifiedTag(surface)
+
+    cx = tuple(_simplified_matcher_children_of_compound(sx))
+    return _simplified_compound_matcher(typ, cx)
+
+
+def _simplified_matcher_children_of_compound(sx):
+    for i in range(1, len(sx)):
+        yield simplified_matcher_via_sexp_(sx[i])  # recurse
+
+
 # == support (early because etc)
 
-""".:#here3: :[#707.F]: "wordables" is an experimental local micro-API:
-
-a "wordable" is a component-ish that:
-  - exposes `to_string()` which produces a string that
-  - can be joined with other such strings meaningfully with a space and
-  - probably dosn't contain any such separator spaces itself
-
-for example, the name "Ta Nahesi Coates" would constist of three wordable
-objects. one object's `to_string()` method would produce "Ta"; another
-object would produce "Nahesi", etc. (we would prefer that a wordable not
-output a string like "Ta Nahesi" because we would prefer that the client
-(not the wordable) chose the separator character.)
-
-this micro-API is useful because it:
-  - trivializes the implementation of `to_string` for macro-components (that
-    is, components that consist of only other components).
-"""
-
-
-def to_string_using_wordables_(self):
-    """
-    (see #here3 the "wordables" API of which we are perhaps the sole client)
-    here we don't use NULL_BYTE_ we use space because we can and it's prettier
-    """
-
-    return ' '.join(x.to_string() for x in self.wordables_())
-
-
-def wordable_via_string_(s):
-    class x:  # #class-as-namespace
-        def to_string():
-            return s
-    return x
+def _to_string_using_words(self):  # #history-B.4 buries overlong explanation
+    return ' '.join(self.to_words())
 
 
 # == parenthesized group
@@ -104,17 +92,14 @@ class _ParenthesizedGroup:
     def yes_no_match_via_tag_subtree(self, subtree):  # just simple passthru
         return self._list.yes_no_match_via_tag_subtree(subtree)
 
-    to_string = to_string_using_wordables_
+    to_string = _to_string_using_words
 
-    def wordables_(self):  # for #here3
-        yield _open_paren_as_wordable
-        for w in self._list.wordables_():
+    def to_words(self):
+        # (at #history-B.4, no longer does its own parenthesis)
+        for w in self._list.to_words():
             yield w
-        yield _close_paren_as_wordable
 
-
-_open_paren_as_wordable = wordable_via_string_('(')
-_close_paren_as_wordable = wordable_via_string_(')')
+    is_compound_matcher = True
 
 
 # == AND lists and OR lists
@@ -192,31 +177,57 @@ class UnsanitizedList:
         return _cls(sani_nodes)
 
 
+def _simplified_compound_matcher(and_or_or, cx):
+    if 'and' == and_or_or:
+        return AND_List(cx)
+    assert 'or' == and_or_or
+    return OR_List(cx)
+
+
 class _AND_or_OR_List:
 
     def __init__(self, nodes_tup):
         self.children = nodes_tup
 
-    to_string = to_string_using_wordables_
+    def to_ASCII_tree_lines(self):
+        return _ASCII_tree_lines_via_branch_node(self)
 
-    def wordables_(self):  # for #here3
+    to_string = _to_string_using_words
 
-        conj_wordable = _wordable_via_conjunction[self.conjunction]
-
-        childs = iter(self.children)
-        for w in next(childs).wordables_():
+    def to_words(self):
+        itr = iter(self.children)
+        for w in next(itr).to_words():
             yield w
-        for child in childs:
-            yield conj_wordable
-            for w in child.wordables_():
+        for child in itr:
+            yield self._conjunction_as_string
+            if child.is_compound_matcher:
+                yield '('
+            for w in child.to_words():
                 yield w
+            if child.is_compound_matcher:
+                yield ')'
+
+    is_compound_matcher, is_leaf_matcher = True, False
 
 
-AND = 1
-OR = 2
+def _AND_together_somehow(left, right):
+    # Assume left is *not* an AND_List
+    # Axiom: AND-ing together any matcher and an AND-list is the same as
+    # prepending the matcher to the AND-list
+
+    if right.is_compound_matcher and 'and' == right._conjunction_as_string:
+        return right.__class__((left, *right.children))
+
+    return AND_List((left, right))
 
 
 class AND_List(_AND_or_OR_List):
+
+    def AND_matcher(self, m):
+        m.is_compound_matcher  # [#022]-like
+
+        # Axiom: any AND-list can be AND'ed to by appending the matcher
+        return self.__class__((*self.children, m))
 
     def yes_no_match_via_tag_subtree(self, subtree):
         yes = True
@@ -227,10 +238,89 @@ class AND_List(_AND_or_OR_List):
                 break
         return yes
 
-    conjunction = AND
+    def matchdatas_against_strings(self, strings):
+        """You're not satisfied unless all your children are
+
+        When no matches, result is None. Otherwise (and matches), result
+        is a dictionary of one or more entries whose values are platform `re`
+        matchdatas, and whose keys are whatever keys the child matchers employ
+        (probably "tag surface strings"); probably something like:
+
+            {'#apple': <re.Match object … >,
+             '#banana': <re.Match object … >}
+
+        There's a minor corollary to the above that can probably be safely
+        ignored for most applications:
+
+        The result structure is a flat dictionary of key-matchdata entries;
+        whereas the query structure is a tree. So the result structure does
+        not "isomorph" cleanly with the query structure. (We considered
+        it but decided the complexity wasn't yet justified.)
+
+        Rather, names that exist deeply in the query tree all "float up"
+        to share the same flat namespace in the result structure.
+
+        As such, it's possible to make a query tree that (while in the process
+        of matching) produces multiple matchdatas under the same key (tag
+        surface string) that each overwrite (shadow, clobber) the previous.
+
+        This only happens if the query tree has re-ocurrences of the same tag
+        (surface string), and other cases of short-circuiting and argument
+        string occur.
+
+        Probably such an occurrence is of no logical concern because the
+        matchdatas, while different objects, are otherwise identical. (But
+        it may suggest a sub-optimal query that squanders resources.)
+
+        Superficially, it may seem that this only occurs with query trees
+        that "don't make sense", like:
+
+            "#apple and #banana and ( #pear or #apple )"
+
+                     AND
+                    / | \
+                   /  |  OR --- #pear
+                  /   |     \
+            #apple  #banana  +-- #apple
+
+        For all cases where argument strings match against the above,
+        if the argument has "#pear" somewhwere in it, the second "#apple" is
+        never considered, and so the first "#apple" is always the one that
+        "won".
+
+        (The way it breaks down is the "OR" node says "look for #pear in
+        each input string. No? now look for #apple" in each.".)
+
+        However, this will match against simply ("I love", "#banana + #apple"),
+        in which case the matchdata from the query tree's *second* "#apple"
+        is redundantly produced and overwrites the matchdata from the first.
+
+        Probably a minor point.
+        """
+
+        matchdatas = None
+
+        for offst, child in enumerate(self.children):
+            ch_mds = child.matchdatas_against_strings(strings)
+            if not ch_mds:
+                return
+            if matchdatas is None:
+                matchdatas = ch_mds
+            else:
+                matchdatas.update(ch_mds)  # #here1
+
+        assert matchdatas
+        return matchdatas
+
+    _ASCII_tree_label = 'AND'
+    _conjunction_as_string = 'and'
 
 
 class OR_List(_AND_or_OR_List):
+
+    def AND_matcher(self, m):
+        m.is_compound_matcher  # [#022]-like
+        return _AND_together_somehow(self, m)
 
     def yes_no_match_via_tag_subtree(self, subtree):
         for child in self.children:
@@ -239,13 +329,16 @@ class OR_List(_AND_or_OR_List):
                 break
         return yes
 
-    conjunction = OR
+    def matchdatas_against_strings(self, strings):
+        """Short circuit after any first match"""
 
+        for offst, child in enumerate(self.children):
+            mixed = child.matchdatas_against_strings(strings)
+            if mixed:
+                return mixed
 
-_wordable_via_conjunction = {
-        AND: wordable_via_string_('and'),
-        OR: wordable_via_string_('or'),
-        }
+    _ASCII_tree_label = 'OR'
+    _conjunction_as_string = 'or'
 
 
 _AND_list_or_OR_list_via_conjunction_string = {
@@ -278,15 +371,14 @@ class _Negation:
         _yes = self._function.yes_no_match_via_tag_subtree(subtree)
         return not _yes
 
-    to_string = to_string_using_wordables_
+    to_string = _to_string_using_words
 
-    def wordables_(self):  # for #here3
-        yield _NOT_AS_WORDABLE
-        for x in self._function.wordables_():
-            yield x
+    def to_words(self):
+        yield 'not'
+        for w in self._function.to_words():
+            yield w
 
-
-_NOT_AS_WORDABLE = wordable_via_string_('not')
+    is_compound_matcher = False
 
 
 # == tag as name chain (unsanitized then sanitized)
@@ -502,8 +594,8 @@ class _NameChainNode:
         self.dig_recursive_ = entrypoint_for_dig
         self._do_dig_recursive = do_dig_recursive
 
-    def wordables_(self):  # for #here3
-        yield self
+    def to_words(self):
+        return (self.to_string(),)
 
     def to_string(self):  # BUILDS STRING ANEW AT EACH CALL.
         return ''.join(self._piece_strings())
@@ -515,6 +607,8 @@ class _NameChainNode:
             for s in self._child._piece_strings():
                 yield s
 
+    is_compound_matcher = False
+
 
 class _TagNameChainHeadNode(_NameChainNode):
 
@@ -524,6 +618,54 @@ class _TagNameChainHeadNode(_NameChainNode):
 class _TagNameChainNonHeadNode(_NameChainNode):
 
     _glyph_thing = ':'
+
+
+class _SimplifiedTag:
+
+    def __init__(self, tag):
+        import re
+        self._regex = re.compile(''.join((r'(?:^|\s|[|(.])(', tag, r')\b')))
+        # ("#ting" yes  "|#ting" yes  "(#ting" yes  ".#ting" yes   "##ting" no)
+
+        self.as_surface_string = tag
+
+    def AND_matcher(self, m):
+        m.is_compound_matcher  # [#022]-like
+        return _AND_together_somehow(self, m)
+
+    def matchdatas_against_strings(self, strings):
+        """Short-circuit after regex matches against any first argument string
+
+        Result in None if no matches. Otherwise (and matched) result is a
+        dictionary with one element whose value is the platform matchdata
+        and whose key is your surface string
+
+        If this matcher is a child of a compound matcher, this dictionary
+        may be commandeered (mutated) by a caller #here1
+
+        The platform matchdata exposes a property that allows you to know
+        which string was matched against (by content or by object ID).
+        """
+
+        assert isinstance(strings, tuple)  # [#022]
+        for string in strings:
+            if (md := self._regex.search(string)):
+                break
+        if md is None:  # tacit assertion of nonzero length argument tuple
+            return
+        return {self.as_surface_string: md}
+
+    def to_ASCII_tree_lines(self):
+        return _ASCII_tree_lines_via_branch_node(self)  # exercise it
+
+    def to_words(self):
+        return (self.as_surface_string,)
+
+    @property
+    def _ASCII_tree_label(self):
+        return self.as_surface_string
+
+    is_compound_matcher, is_leaf_matcher = False, True
 
 
 # == the in suffix
@@ -569,17 +711,14 @@ class _InSuffixedTagging:
         self._in_suffix_payload = in_suffix_payload
         self._tagging_query = tagging_query
 
-    to_string = to_string_using_wordables_
+    to_string = _to_string_using_words
 
-    def wordables_(self):  # hook-in for [#707.F] wordables
-        for w in self._tagging_query.wordables_():
+    def to_words(self):
+        for w in self._tagging_query.to_words():
             yield w
-        yield _in_wordable
-        for w in self._in_suffix_payload.wordables_():
+        yield 'in'
+        for w in self._in_suffix_payload.to_words():
             yield w
-
-
-_in_wordable = wordable_via_string_('in')
 
 
 # == suffixed modifier: with or without value
@@ -622,13 +761,13 @@ class _WithOrWithoutValue:
     def yes_no_match_via_tag_subtree(self, subtree):  # ##here2
         return in_subtree_match_any_one_(subtree, self._this_test)
 
-    to_string = to_string_using_wordables_
+    to_string = _to_string_using_words
 
-    def wordables_(self):  # for #here3
-        for w in self._child.wordables_():
+    def to_words(self):
+        for w in self._child.to_words():
             yield w
-        yield self._keyword_wordable
-        yield _value_as_wordable
+        yield self._keyword
+        yield 'value'
 
 
 class _WithValue(_WithOrWithoutValue):
@@ -636,7 +775,7 @@ class _WithValue(_WithOrWithoutValue):
     def _my_test(tagging_node):
         return tagging_node.is_deep
 
-    _keyword_wordable = wordable_via_string_('with')
+    _keyword = 'with'
 
 
 class _WithoutValue(_WithOrWithoutValue):
@@ -644,10 +783,37 @@ class _WithoutValue(_WithOrWithoutValue):
     def _my_test(tagging_node):
         return not tagging_node.is_deep
 
-    _keyword_wordable = wordable_via_string_('without')
+    _keyword = 'without'
 
 
-_value_as_wordable = wordable_via_string_('value')
+# == xx
+
+
+def _ASCII_tree_lines_via_branch_node(root_node):  # #[#612.8] one of two
+    return _ASCII_tree_recursive('', '', root_node)
+
+
+def _ASCII_tree_recursive(head, smear, node):
+    yield f"{head}{node._ASCII_tree_label}\n"
+    if node.is_leaf_matcher:
+        return
+    cx = node.children
+    leng = len(cx)
+    assert leng
+    last = leng - 1
+    if last:
+        ch_head = f"{smear}├──"
+        ch_smear = f"{smear}|  "
+
+    last_ch_head = f"{smear}└──"
+    last_ch_smear = f"{smear}  "
+
+    for i in range(0, leng):
+        if last == i:
+            ch_head = last_ch_head
+            ch_smear = last_ch_smear
+        for line in _ASCII_tree_recursive(ch_head, ch_smear, cx[i]):
+            yield line
 
 
 # == support
@@ -670,6 +836,12 @@ def pop_property(o, attr):
     delattr(o, attr)
     return x
 
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
+
+
+# #history-B.4 spike hand-written simplification as replacement for vendor
 # #history-B.3: accomodate new simplified sexp pattern
 # #history-A.1: deep vs shallow distinction out. simplified name-chain model in
 # #born.

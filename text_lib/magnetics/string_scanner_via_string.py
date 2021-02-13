@@ -1,6 +1,22 @@
 import re
 
 
+def build_throwing_string_scanner_and_friends(listener, cstacker=None):
+
+    def build_scanner(piece):
+        return StringScanner(piece, throwing_listener, cstacker)
+
+    def throwing_listener(sev, *rest):
+        listener(sev, *rest)
+        if 'error' == sev:
+            raise stop()
+
+    class stop(RuntimeError):
+        pass
+
+    return pattern_via_description_and_regex_string, build_scanner, stop
+
+
 class StringScanner:  # see also [#611] the scanner library
     """many others like it, but this one is ours
 

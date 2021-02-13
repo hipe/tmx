@@ -103,8 +103,8 @@ class _InRegexFunction:
     def yes_no_match_via_tag_subtree(self, subtree):
         return in_subtree_match_any_one_(subtree, self._test)
 
-    def wordables_(self):  # hook-in for [#707.F] wordables
-        yield self
+    def to_words(self):
+        return (self.to_string(),)
 
     def to_string(self):
         return f'/{self._regex_string}/'

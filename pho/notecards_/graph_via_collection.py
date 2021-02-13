@@ -118,7 +118,7 @@ def tree_ASCII_art_lines_via(big_index):
     return _tree_ASCII_art_lines_via(normal_tree)
 
 
-def _tree_ASCII_art_lines_via(top_normal_tree):
+def _tree_ASCII_art_lines_via(top_normal_tree):  # #[#612.8] one of two
 
     def main():
         return recurse('', '', *top_normal_tree)

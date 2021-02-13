@@ -1,5 +1,4 @@
-from tag_lyfe.the_query_model import \
-        in_subtree_match_any_one_, wordable_via_string_
+from tag_lyfe.the_query_model import in_subtree_match_any_one_
 
 
 class UnsanitizedInValuesFunction:
@@ -42,15 +41,11 @@ class _InValuesFunction:
     def yes_no_match_via_tag_subtree(self, subtree):
         return in_subtree_match_any_one_(subtree, self._test)
 
-    def wordables_(self):  # hook-in for [#707.F] wordables
-        yield _open_paren_wordable
-        for s in self._strings:
-            yield wordable_via_string_(s)  # ick/meh
-        yield _close_paren_wordable
-
-
-_open_paren_wordable = wordable_via_string_('(')
-_close_paren_wordable = wordable_via_string_(')')
+    def to_words(self):
+        yield '('
+        for w in self._strings:
+            yield w
+        yield ')'
 
 
 # #born.
