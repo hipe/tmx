@@ -1,14 +1,21 @@
+from dataclasses import dataclass as _dataclass
+from collections import namedtuple as _namedtuple
+
+
 def records_via_query_(
-        opened, sort_by_time, tag_query, do_batch, listener, opn=None):
+        opened, user_query_tokens, sort_by, do_batch, listener, opn=None):
 
     class counts:  # #class-as-namespace
-        items = 0
-        files = 0
-
-    yield _jsonerer, counts
+        items, files = 0, 0
 
     records_via_readme = _build_records_via_readme(
-            counts, sort_by_time, tag_query, listener, opn)
+            counts, user_query_tokens, sort_by, listener, opn)
+
+    if records_via_readme is None:
+        yield None
+        return
+
+    yield _jsonerer, counts  # #provision [#883.E] (covered)
 
     readmes = _readmes_via_opened(opened, do_batch)
     for readme in readmes:
@@ -25,7 +32,10 @@ def _jsonerer(sout, do_time):
         if do_time:
             dct['mtime'] = rec.mtime.strftime(strftime_fmt)
         ent = rec.row_AST
-        dct['identifier'] = ent.nonblank_identifier_primitive
+
+        # dct['identifier'] = ent.nonblank_identifier_primitive
+        # (redundant with leftmost column with user's choice name..)
+
         dct2 = ent.core_attributes
         for k, v in dct2.items():
             assert k not in dct
@@ -41,7 +51,9 @@ def _jsonerer(sout, do_time):
     class self:
         is_subsequent = False
 
-    from kiss_rdb.vcs_adapters.git import DATETIME_FORMAT as strftime_fmt
+    if do_time:
+        from kiss_rdb.vcs_adapters.git import DATETIME_FORMAT as strftime_fmt
+
     from json import dump as json_dump
     return output_json
 
@@ -66,10 +78,13 @@ def _readmes_via_opened(opened, do_batch):
             yield readme
 
 
-def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
-    rec = _named_tuple('Record', ('mtime', 'row_AST', 'readme'))
+# ct = collection traversal
+
+def _build_records_via_readme(
+        counts, user_query_tokens, sort_by, listener, opn):
 
     def records_via_readme(readme):
+
         counts.files += 1
         ic = issues_collection_via_(readme, listener, opn)
 
@@ -81,111 +96,285 @@ def _build_records_via_readme(counts, sort_by_time, tag_query, listener, opn):
             if ents is None:  # (tested visually, return code is nonzero)
                 return
 
-            for rec in records_via(sch, ents, readme):
+            for rec in records_via(_CollectionTraversal(sch, ents, readme)):
                 yield rec
 
-    def records_via(sch, ents, readme):
-        # If some kind of failure (eg {file|table} not found), None not iter
-        if ents is None:
-            return
+    """Rule table (explained in more detail in huge comment below)
 
-        body_keys = sch.field_name_keys[1:]  # [#871.1]
+    (in the rightmost cel, imagine every value starts with "all ents ->")
 
-        # If there is no filter and no sort, you are done
-        if tag_query is None and sort_by_time is None:
-            return (rec(None, ent, readme) for ent in ents)  # #here5
+    | UQ?|  sort by | Q?| S?|
+    | -  |     -    |   |   | map to recs
+    | -  |   mtime  |   | S | map to recs while add mtime to each -> sort
+    | -  | priority | Q | S | map reduce to recs w priority -> sort
+    | UQ |     -    | Q |   | reduce by query -> map to recs
+    | UQ |   mtime  | Q | S | reduce by query -> map to (same) -> sort
+    | UQ | priority | Q | S | reduce by query and map to rec -> sort
 
-        # Maybe filter by tag query
-        if tag_query is not None:
-            assert isinstance(tag_query, str)  # for now
-            ent_does_match = _build_matcher(tag_query, body_keys)
-            ents = (ent for ent in ents if ent_does_match(ent))
+    (UQ = user query, Q? = "do we need a query?", S? = "do we sort?"
+    """
 
-        # If no sort by mtime, you are done
-        if sort_by_time is None:
-            return (rec(None, ent, readme) for ent in ents)  # #here5
+    def records_via():
+        if user_query_tokens:
+            uqt = user_query_tokens
+            if yes_priority:
+                return sort(_when_UQ_and_priority(uqt, listener))
+            if yes_mtime:
+                return sort(_when_UQ_and_mtime(uqt, opn, listener))
+            return _when_UQ(uqt, listener)
 
-        # The rest is the heavy lift. Lazily once per file get this badboy
-        from kiss_rdb.vcs_adapters.git import blame_index_via_path as func
-        vcs_index = func(readme, listener, opn)
-        if vcs_index is None:
-            xx("maybe the file isn't in version control?")
+        if yes_priority:
+            return sort(_when_priority(listener))
+        if yes_mtime:
+            return sort(_when_mtime(opn, listener))
+        return _when_totally_unadorned()
 
-        mtime = vcs_index.datetime_for_lineno  # #here5 (below)
-        unordered = (rec(mtime(ent.lineno), ent, readme) for ent in ents)
-        # (we can imagine some world where we return it unsorted but not here)
-        return sorted(unordered, **sort_kwargs)
-
-    if sort_by_time is not None:
-        sort_kwargs = {'key': lambda rec: rec.mtime}
-        if 'DESCENDING' == sort_by_time:
-            sort_kwargs['reverse'] = True
+    yes_priority, yes_mtime = False, False
+    if sort_by:
+        sort_kw = {}
+        by_what, ASC_or_DESC = sort_by
+        if 'by_priority' == by_what:
+            sort_kw['key'] = lambda rec: rec.priority
+            assert 'ASCENDING' == ASC_or_DESC
+            yes_priority = True
         else:
-            assert 'ASCENDING' == sort_by_time
+            assert 'by_time' == by_what
+            sort_kw['key'] = lambda rec: rec.mtime
+            if 'DESCENDING' == ASC_or_DESC:
+                sort_kw['reverse'] = True
+            else:
+                assert 'ASCENDING' == ASC_or_DESC
+            yes_mtime = True
+
+        def sort(recordser):
+            def use_recordser(ct):
+                records = recordser(ct)
+                return sorted(records, **sort_kw)
+            return use_recordser
+
+    try:
+        records_via = records_via()
+    except _Stop:  # #here3
+        return
 
     return records_via_readme
 
 
-# == Fast Query
+# == Six Permutations
 
-def _build_matcher(query_string, body_keys):
-    def match_yn(row_AST):
+"""If you're thinking, "why is this so un-DRY?"
+
+Ideally:
+
+    ents = all_entities()
+
+    if yes_some_cheaper_reduce():
+        ents = (ent for ent in ents if some_test(ent))
+
+    if yes_some_more_expensive_reduce():
+        ents = (ent for ent in ents if expensive_test(ent))
+
+    if has_this_one_sort_by():
+        ents = sorted(ents, **sorted_kw)
+
+    return (RecordStructure(ent) for ent in ents)
+
+Ideally the generator is created all in one place, having filters and maps and
+sorts progressively added to it as necessary based on user arguments.
+
+This gets high marks for clarity and also efficiency: The code has clear
+intent. As well, it has the efficiency of only ever traversing a collection
+once, as well as the efficiency of avoiding redundant branching at traversal
+time (i.e., you don't want to be doing IF statements about user arguments at
+every entity traversed, probably).
+
+And before #history-B.5 this was how we did it. But that all changed when
+adding priority, which put us past some threshold of complexity:
+
+At first, "#priority" is just like any other user-queryable tag (imagine
+"#open"). Tag-querying is expensive: for multiple cels of every row, traverse
+every regex in the query testing each regex separately against each cel (as
+necessary based on the boolean conjunctor (AND or OR) of each node of the
+query tree).
+
+It's expensive enough that we absolutely will *not* run two separate queries
+for cases when we have both a user query and a priority reduce-sort (which
+is the most common real-word use case). So in these cases we AND together the
+two queries (using a feature added to the external library just for this) so
+that we only ever do one traversal and we delegate to the tag query library
+to manage the boolean conjuction rather than hard-coded AND logic.
+
+But the priority tag needs custom processing for value after it matches
+(which can fail in numerous ways and we want to be able to skip over). IFF
+it didn't fail we want to map out this custom value (in this case a float)
+alongside the entity (quite like we do with mapping out an mtime when that
+option is engaged) so that it will be in the record struct and sorted against.
+
+At writing, all this is too much to keep track of while still keeping the
+code DRY *and* transparent. Later when we establish coverage for the below
+six (because why six?) we can try to tighten it back up
+"""
+
+
+# uqt = user query tokens
+
+def _when_UQ_and_priority(uqt, listener):
+    def records_via(ct):
+        readme = ct.readme
+        pass_filter = pass_filter_er(ct.schema)
+        for priority_float, ent in pass_filter(ct.entities):
+            yield _Record(ent, readme, priority=priority_float)
+    pass_filter_er = _build_build_priority_pass_filter(listener, uqt)
+    return records_via
+
+
+def _when_UQ_and_mtime(uqt, opn, listener):
+    def records_via(ct):
+        readme = ct.readme
+        mtime = mtime_via_lineno_via_readme(readme)
+        UQ_pass_filter = UQ_pass_filter_er(ct.schema)
+        ents = UQ_pass_filter(ct.entities)
+        return (_Record(ent, readme, mtime=mtime(ent.lineno)) for ent in ents)
+    UQ_pass_filter_er = _build_build_user_query_pass_filter(uqt, listener)
+    mtime_via_lineno_via_readme = _build_mtime_function_function(opn, listener)
+    return records_via
+
+
+def _when_UQ(uqt, listener):
+    def records_via(ct):
+        readme = ct.readme
+        UQ_pass_filter = UQ_pass_filter_er(ct.schema)
+        return (_Record(ent, readme) for ent in UQ_pass_filter(ct.entities))
+    UQ_pass_filter_er = _build_build_user_query_pass_filter(uqt, listener)
+    return records_via
+
+
+def _when_priority(listener):
+    def records_via(ct):
+        readme = ct.readme
+        priority_pass_filter = priority_pass_filter_er(ct.schema)
+        for priority_float, ent in priority_pass_filter(ct.entities):
+            yield _Record(ent, readme, priority=priority_float)
+    priority_pass_filter_er = _build_build_priority_pass_filter(listener)
+    return records_via
+
+
+def _when_mtime(opn, listener):
+    def records_via(ct):
+        ents, readme = ct.entities, ct.readme
+        mtime = mtime_via_lineno_via_readme(readme)
+        return (_Record(ent, readme, mtime=mtime(ent.lineno)) for ent in ents)
+    mtime_via_lineno_via_readme = _build_mtime_function_function(opn, listener)
+    return records_via
+
+
+def _when_totally_unadorned():
+    def records_via(ct):
+        readme = ct.readme
+        return (_Record(ent, readme) for ent in ct.entities)
+    return records_via
+
+
+# == Support for the permutations
+
+# spp = stateful priority parser
+
+def _build_build_priority_pass_filter(listener, uqt=None):
+    def build_UQ_plus_priority_pass_filter(schema):
+        def pass_filter(entities):
+            for ent in entities:
+                mds = matchdatas_via_ent(ent)
+                if mds is None:
+                    continue
+                flot = spp(mds['#priority'])
+                if flot is None:
+                    continue
+                yield flot, ent
+        matchdatas_via_ent = _build_matchdatas_via_row_AST(schema, matcher)
+        return pass_filter
+    spp = _build_stateful_priority_parser(listener)
+    if uqt:
+        """(put the query node for priority to the LEFT of that for user query
+        because in practice it usually lets you short-circuit out of the
+        expensive tag query engine sooner: issues with '#priority' are
+        typically a subset of '#open' issues (and in any case usually smaller
+        in number), so if you do that criteria first you knock candidates out
+        of the running sooner. It's like a basketball playoff bracket (is it?);
+        or like if you had to find all people who are gemini and have purple
+        hair; you will do less work if you check hair color first before
+        astrological sign; in a world where purple hair is rarer than gemini.)
+        """
+
+        user_matcher = _build_user_query_matcher(uqt, listener)  # #here3
+        matcher = _produce_priority_matcher().AND_matcher(user_matcher)
+    else:
+        matcher = _produce_priority_matcher()
+    return build_UQ_plus_priority_pass_filter
+
+
+def _build_build_user_query_pass_filter(uqt, listener):
+    def build_user_query_pass_filter(schema):
+        def pass_filter(entites):
+            return (ent for ent in entites if yes_no(ent))
+        yes_no = _build_matchdatas_via_row_AST(schema, matcher)
+        return pass_filter
+    matcher = _build_user_query_matcher(uqt, listener)
+    return build_user_query_pass_filter
+
+
+def _build_user_query_matcher(uqt, listener):
+    matcher = _matcher_via_tokens(uqt, listener)
+    if matcher is None:
+        raise _Stop()
+    return matcher
+
+
+def _produce_priority_matcher():
+    return _matcher_via_tokens(('#priority',))
+
+
+def _matcher_via_tokens(tokens, listener=None):
+    from tag_lyfe.magnetics.query_via_token_stream import \
+        EXPERIMENTAL_NEW_WAY as func
+    return func(tokens, listener)
+
+
+def _build_mtime_function_function(opn, listener):
+    def mtime_via_lineno_via_readme(readme):
+        vcs_index = do_index_via(readme, listener, opn_for_git)
+        if vcs_index is None:
+            xx("maybe the file isn't in version control?")
+        return vcs_index.datetime_for_lineno
+    from kiss_rdb.vcs_adapters.git import blame_index_via_path as do_index_via
+    opn_for_git = (opn and opn.open_for_git)
+    return mtime_via_lineno_via_readme
+
+
+# ==
+
+def _build_matchdatas_via_row_AST(schema, matcher):
+    def matchdatas_via_row_AST(row_AST):
         dct = row_AST.core_attributes
-        for k in body_keys:
-            if (cel_content := dct.get(k)) is None:
-                continue
-            if match_cel_yn(cel_content):
-                return True
-    match_cel_yn = _build_cel_matcher(query_string)
-    return match_yn
+        any_cel_strings = (dct.get(k) for k in body_keys)
+        cel_strings = (s for s in any_cel_strings if s)
+        cel_strings = tuple(cel_strings)  # necessary in case multiple matchers
+        return matcher.matchdatas_against_strings(cel_strings)
+    body_keys = schema.field_name_keys[1:]  # [#871.1]
+    return matchdatas_via_row_AST
 
 
-def _build_cel_matcher(query_string):
-    def match_cel_yn(cel_content):
-        if -1 == cel_content.find('#'):
-            return  # optimization lol
-        return rx.search(cel_content)
-    import re
-    rx = re.compile(''.join(('(^|[ ])', query_string, r'\b')))  # assume #here4
-    return match_cel_yn
+# ==
+
+_CollectionTraversal = _namedtuple(
+    '_CollectionTraversal', ('schema', 'entities', 'readme'))
 
 
-def parse_query_(query, listener):
-    if query is None:
-        return
-
-    def main():
-        parse_the_first_token()
-        if_theres_more_than_one_token_whine_for_now()
-        return tok
-
-    def parse_the_first_token():  # all #here4
-        begin = scn.pos  # probably zero
-        scn.skip_required(leading_octothorpe)
-        scn.skip_required(tag_body)
-        scn.skip_required(the_end)
-        assert 0 == begin and scn.empty and scn.pos == len(tok)
-
-    def if_theres_more_than_one_token_whine_for_now():
-        if not len(hstack):
-            return
-        msg = f"Sorry, no compound queries yet in this version: {hstack[-1]!r}"
-        listener('error', 'expression', 'not_yet', lambda: (msg,))
-        raise stop()
-
-    o, build_string_scanner, stop = _throwing_string_scan(listener)
-    leading_octothorpe = o("'#'", '#')
-    tag_body = o('tag body ([-a-z]..)', '[a-z]+(?:-[a-z]+)*')
-    the_end = o('end of tag', r'\Z')
-
-    hstack = list(reversed(query))
-    tok = hstack.pop()  # guaranteed because #here3
-    scn = build_string_scanner(tok)
-
-    try:
-        return main()
-    except stop:
-        pass
+@_dataclass
+class _Record:
+    row_AST: object
+    readme: str
+    priority: float = None
+    mtime: object = None
 
 
 # ==
@@ -234,6 +423,81 @@ def _real_apply_diff(itr, listener):
     from text_lib.diff_and_patch import apply_patch_via_lines as func
     is_dry, cwd = False, None
     return func(itr, is_dry, listener, cwd)
+
+
+# ==
+
+def _build_stateful_priority_parser(listener):
+
+    def spp(md):
+        string = md.string
+        _start, pos = md.span()
+        md = rx.match(string, pos)
+        dct = {k: v for k, v in _parse_priority(md, pos)}
+        reason = dct.get('reason')
+        if reason is None:
+            flot = dct['value_float_value']
+            if flot in seen:
+                reason = "Can't re-use the same priority number. Already seen:"
+        if reason:
+            return whine_about(reason, dct.get('pos', pos), string)
+        seen.add(flot)
+        return flot
+
+    def whine_about(reason, pos, string):
+        def lines():
+            yield reason
+            yield ''.join((margin, string))
+            yield ''.join((margin, ('-'*pos), '^'))
+        margin = '    '
+        listener('error', 'expression', 'parse_error', lines)
+
+    from re import compile as re_compile, VERBOSE
+    rx = re_compile(r"""
+        : (?P<right_hand_side>                          # a colon followed by
+            (?P<priority_name> [a-z]+(?:-[a-z]+)* )     # words ("extra-high")
+            |                                           # or an integer or flot
+            (?P<priority_number> -? [0-9] + (?P<flot_part> \. [0-9]+ )? )
+        )?
+    """, VERBOSE)
+    seen = set()
+    return spp
+
+
+def _parse_priority(md, pos):
+    if md is None:
+        yield 'reason', "Expecting colon (\":\")"
+        return
+
+    pos += 1  # advance pointer over the colon
+    yield 'pos', pos
+
+    if md['right_hand_side'] is None:
+        yield 'reason', "Expecting priority value (e.g \"0.123\")"
+        return
+
+    if md['priority_name']:
+        yield 'reason', "No support for string names yet, use numbers"
+        return
+
+    yield 'pos', md.span('right_hand_side')[1] - 1  # advance to point to after
+
+    if md['flot_part'] is None:
+        yield 'reason', "Must be a floating point number"
+        return
+
+    flot = float(md['priority_number'])
+    if flot <= 0.0:
+        yield 'reason', "Priority value cannot be negative or 0.0"
+        return
+
+    if 1.0 <= flot:
+        yield 'reason', "Priority value must be less than 1.0"
+        return
+
+    yield 'value_float_value', flot  # whew!
+
+# ==
 
 
 def build_identifier_parser_(listener, cstacker=None):  # #testpoint
@@ -390,7 +654,10 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
             return iden
         return _IdentifierRange(*rang, *open_and_close_bracket_type)
 
-    o, build_string_scanner, stop = _throwing_string_scan(listener, cstacker)
+    from text_lib.magnetics.string_scanner_via_string import \
+        build_throwing_string_scanner_and_friends as func
+    o, build_string_scanner, stop = func(listener, cstacker)
+
     fnetd = o('for now exactly three digits', '[0-9]{3}')
     dot = o('"."', r'\.')
     octothorpe = o('octothorpe', '#')
@@ -402,24 +669,6 @@ def build_identifier_parser_(listener, cstacker=None):  # #testpoint
     close_bracket = o('close bracket', r']')
     close_parenthesis = o('close parenthesis', r'\)')
     return identifier_via_string
-
-
-def _throwing_string_scan(listener, cstacker=None):
-    def build_scanner(piece):
-        return StringScanner(piece, throwing_listener, cstacker)
-
-    def throwing_listener(sev, *rest):
-        listener(sev, *rest)
-        if 'error' == sev:
-            raise stop()
-
-    from text_lib.magnetics.string_scanner_via_string import \
-        StringScanner, pattern_via_description_and_regex_string as o
-
-    class stop(RuntimeError):
-        pass
-
-    return o, build_scanner, stop
 
 
 # == Models
@@ -550,13 +799,13 @@ class _Identifier:
     is_range = False
 
 
-def _named_tuple(s, t):
-    from collections import namedtuple as nt
-    return nt(s, t)
-
-
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+
+class _Stop(RuntimeError):
+    pass
+
+# #history-B.5
 # #history-B.4
 # #born.

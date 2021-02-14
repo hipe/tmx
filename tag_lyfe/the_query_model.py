@@ -648,10 +648,11 @@ class _SimplifiedTag:
         """
 
         assert isinstance(strings, tuple)  # [#022]
+        md = None  # maybe no strings
         for string in strings:
             if (md := self._regex.search(string)):
                 break
-        if md is None:  # tacit assertion of nonzero length argument tuple
+        if md is None:
             return
         return {self.as_surface_string: md}
 

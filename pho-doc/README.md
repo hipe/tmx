@@ -160,11 +160,12 @@ when you click create
 |Id                         | Main Tag | Content  |
 |---------------------------|:-----:|----|
 |[#899]                     | #exmp | This is an example issue.
-|[#887.B]                   | #open | images (and etc)
-|[#887.A]                   | #open | index file stuff with pelican
+|[#887.B]                   | #open | images (and etc) #priority:0.75
+|[#887.A]                   | #open | double-deep nav-tree #priority:0.25
 |[#886]                     | #open | jagged alignment of multiline descs (see "close") #is:[#603.2]
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
+|[#883.E]                   | #trak | in-place
 |[#883.4]                   |       | provision: TEMPORARY document demarcation
 |[#883.3]                   |       | provision: we never use the 1-depth header
 |[#883.2]                   |       | the first fragment in a doc will have a heading
@@ -177,7 +178,7 @@ when you click create
 |[#882.U]                   | #trak | where we insert or normalize newlines in generated markdown
 |[#882.T]                   | #trak | two somewhat redunant implementations of parsing a function call
 |[#882.S]                   | #trak | namespace for tracking provisions of "body function"
-|[#882.R]                   | #wish | tree visualization needs to be able to specify document tree
+|[#882.R]                   | #open | dates! the date edited behemoth #priority:0.50
 |[#882.Q]                   | #open | service
 |[#882.P]                   | #trak | [graph via collection]
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences

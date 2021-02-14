@@ -182,8 +182,8 @@ def _subcommand_close(sin, sout, serr, argv, efx):
 
 
 def _formals_for_top():
-    yield '-M', '--newest-first', 'opposite of default (oldest first)'
-    yield '-q', '--quick', 'take away sort by mtime. overrides above'
+    yield '-m', '--oldest-first', 'override default of select/sort by priority'
+    yield '-M', '--newest-first', 'override default of select/sort by priority'
     yield _batch_opt
     yield '-f', '--format=FMT', 'output format. {json|table} (default: table)'
     yield '-<number>', _build_int_matcher, 'show the top N items (default: 3)'
@@ -192,7 +192,7 @@ def _formals_for_top():
 
 
 def _subcommand_top(sin, sout, serr, argv, efx):
-    "`list` with popular defaults"
+    "`list` with favorite defaults: '#open' --highest-priority-first -3"
 
     bash_argv = list(reversed(argv))
     prog_name = bash_argv.pop()
@@ -204,21 +204,19 @@ def _subcommand_top(sin, sout, serr, argv, efx):
     if vals.get('help'):
         return foz.write_help_into(serr, _subcommand_top.__doc__)
 
+    # "By hand", put this default in
+    if 'oldest_first' not in vals and 'newest_first' not in vals:
+        vals['highest_priority_first'] = True
+
     easy_defaults = {'format': 'table', 'number': 3, 'query': ('#open',)}
     easy_defaults.update(vals)
     vals = easy_defaults
-
-    if 'newest_first' not in vals:
-        vals['oldest_first'] = True
-
-    if vals.get('quick'):
-        vals.pop('oldest_first', None)
-        vals.pop('newest_first', None)
 
     return _top_or_list(sin, sout, serr, vals, foz, efx)
 
 
 def _formals_for_list():
+    yield '-p', '--highest-priority-first', * _desc_lines_for_priority()
     yield '-m', '--oldest-first', 'sort by time last modified (acc. to VCS)'
     yield '-M', '--newest-first', 'sort by time last modified (acc. to VCS)'
     yield _batch_opt
@@ -249,30 +247,41 @@ def _subcommand_list(sin, sout, serr, argv, efx):
 
 def _top_or_list(sin, sout, serr, vals, foz, efx):
 
-    # Local variables via vals
-    sort_by_time = None
-    if vals.get('oldest_first'):
-        if vals.get('newest_first'):
-            serr.write(f"-m and -M are mutually exclusive. {foz.invite_line}")
-            return 4
-        sort_by_time = 'ASCENDING'
-    elif vals.get('newest_first'):
-        sort_by_time = 'DESCENDING'
+    # Mutex on these
 
+    def these():
+        def highest_priority_first():
+            return 'by_priority', 'ASCENDING'
+
+        def oldest_first():
+            return 'by_time', 'ASCENDING'
+
+        def newest_first():
+            return 'by_time', 'DESCENDING'
+
+        return locals().items()
+
+    these = tuple((k, v()) for (k, v) in these() if vals.pop(k, False))
+    if 1 < (leng := len(these)):
+        # hack-back the long version of the option. foz has short somewhere
+        as_opts = (''.join(('--', tup[0].replace('_', '-'))) for tup in these)
+        and_list = ' and '.join(as_opts)
+        serr.write(f"{and_list} are mutually exclusive. {foz.invite_line}")
+        return 4
+    sort_by = these[0][1] if leng else None
+
+    # Resolve the data file itself
     readme = efx.resolve_issues_file_path()
     if readme is None:
         return 4
 
     readme_is_dash = '-' == readme
     do_batch = vals.get('batch')
-    query = vals.get('query')
 
     # Resolve query
     mon = efx.emission_monitor
-    if query is not None:
-        from pho._issues import parse_query_ as func
-        if (query := func(query, mon.listener)) is None:
-            return 4
+    user_query_tokens = vals.pop('query', None)
+    # (used to parse the query here before #history-B.4)
 
     # Quad table
     if do_batch:
@@ -291,11 +300,17 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
 
     # Run the query
     from pho._issues import records_via_query_ as func
-    itr = func(opened, sort_by_time, query, do_batch, mon.listener)
-    jsoner, counts = next(itr)
+    itr = func(opened, user_query_tokens, sort_by, do_batch, mon.listener)
+    two = next(itr)
+    if two is None:
+        return mon.returncode
+    jsoner, counts = two
 
     # Prepare for output
-    is_complicated = do_batch or sort_by_time is not None
+    is_by_time = sort_by and 'by_time' == sort_by[0]
+    is_complicated = do_batch or is_by_time
+    # being "complicated" means needing strange columns
+
     if (fmt := vals.get('format')) is not None:
         allow = 'json', 'table'
         if fmt not in allow:
@@ -306,7 +321,7 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
         if 'table' == fmt:
             fmt = 'most_complicated' if is_complicated else 'simplest'
     else:
-        fmt = 'json' if sort_by_time else 'simplest'
+        fmt = 'json' if is_by_time else 'simplest'
 
     # Prepare to limit output
     if (num := vals.get('number')) is None:
@@ -317,7 +332,7 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
             return num == counts.items
 
     # Output results
-    oa = getattr(_output_adapters, fmt)(sout, do_batch, sort_by_time, jsoner)
+    oa = getattr(_output_adapters, fmt)(sout, do_batch, sort_by, jsoner)
     oa.at_beginning_of_output_collection()
     curr_readme = None
     for rec in itr:
@@ -336,37 +351,98 @@ def _top_or_list(sin, sout, serr, vals, foz, efx):
     return mon.exitstatus
 
 
-def _build_most_complicated_output_adapter(sout, do_batch, do_time, jsoner):
+# == Output adapters
 
-    assert do_time or do_batch
-    if do_time and do_batch:
-        def pieces(rec):
-            yield cel_for_time(rec)
-            yield chomped_orig_line(rec)
-            yield cel_for_readme(rec)
-            yield '\n'
-    elif do_time:
-        def pieces(rec):
-            yield cel_for_time(rec)
-            yield rec.row_AST.to_line()
-    else:
-        def pieces(rec):
-            yield chomped_orig_line(rec)
-            yield cel_for_readme(rec)
-            yield '\n'
-        assert do_batch
+def _output_adapter(k):
+    def decorator(func):
+        setattr(_output_adapters, k, func)
+    return decorator
+
+
+_output_adapters = _output_adapter  # #watch-the-world-burn
+
+
+@_output_adapter('most_complicated')
+def _(sout, do_batch, sort_by, jsoner):
+    """
+    What follows is the "formal" order for the pieces that make up a line.
+    We say "formal" because you will never have all these pieces in one
+    actual line because mtime and priority are mutex. The formal order:
+
+    1) any mtime cel goes first because fixed width & looks best leftmost
+    2) the original line (chomped IFF it has something after it)
+    3) any priority idk
+    4) any readme
+    5) a newline IFF you did (3) and/or (4)
+
+    We build up a row renderer dynamically (once per collection) that is
+    a list of cel renderers. At render time the cel renderers are looped
+    through once per row (so a loop within a loop, in effect).
+
+    .#history-B.4 buries code where we wrote different permutations
+    "by hand" so we could avoid this inner loop. But the performance gain
+    of doing this was probably unnoticable, and it came with code that
+    became unreasonably complex-looking when we added priority.
+    """
+
+    yes_no = {k: False for k in ('by_time', 'orig_line', 'by_priority', 'readme')}  # noqa: E501
+
+    # If there was a sort by, turn on the particular cel to display the value
+    if sort_by:
+        by_what, _asc_desc = sort_by
+        yes_no[by_what]
+        yes_no[by_what] = True
+
+    # Display which readme the issue came from IFF you're doing batch mode
+    if do_batch:
+        yes_no['readme'] = True
+
+    # Always display the original line (sort of)
+    yes_no['orig_line'] = True
+
+    # Determine whether we chomp the newline off the original line
+    for last_cel in (k for k, v in yes_no.items() if v):
+        pass
+    orig_line_is_rightmost_cel = 'orig_line' == last_cel
+
+    def cel_renderers():
+
+        if yes_no['by_time']:
+            yield cel_for_time
+
+        if orig_line_is_rightmost_cel:
+            yield orig_line_as_is
+        else:
+            yield chomped_orig_line
+
+        if yes_no['by_priority']:
+            # (do nothing, it's already in the orig line (thank goodness))
+            pass
+
+        if yes_no['readme']:
+            yield cel_for_readme
+
+        if not orig_line_is_rightmost_cel:
+            yield lambda _: '\n'
+
+    def pieces(rec):
+        return (func(rec) for func in cel_renderers)
 
     def cel_for_time(rec):
         return rec.mtime.strftime(use_strftime_fmt)
 
+    if yes_no['by_time']:
+        from kiss_rdb.vcs_adapters.git import DATETIME_FORMAT as strftime_fmt
+        use_strftime_fmt = f"| {strftime_fmt} "
+
     def cel_for_readme(rec):
         return ''.join((' | ', rec.readme))
 
-    from kiss_rdb.vcs_adapters.git import DATETIME_FORMAT as strftime_fmt
-    use_strftime_fmt = f"| {strftime_fmt} "
-
     def chomped_orig_line(rec):
         return rec.row_AST.to_line()[:-1]
+
+    def orig_line_as_is(rec):
+        return rec.row_AST.to_line()
 
     class lets_go:  # #class-as-namespace
         at_beginning_of_output_collection = _niladic_no_op
@@ -377,10 +453,14 @@ def _build_most_complicated_output_adapter(sout, do_batch, do_time, jsoner):
 
         at_ending_of_output_collection = _niladic_no_op
 
+    cel_renderers = tuple(cel_renderers())
+
     return lets_go
 
 
-def _build_json_output_adapter(sout, do_batch, do_time, jsoner):
+@_output_adapter('json')
+def _(sout, do_batch, sort_by, jsoner):
+
     class json_output_adapter:  # #class-as-namespace
         def at_beginning_of_output_collection():
             sout.write('[')
@@ -388,7 +468,7 @@ def _build_json_output_adapter(sout, do_batch, do_time, jsoner):
         def maybe_output_header(_):
             pass
 
-        output_record = jsoner(sout, do_time)
+        output_record = jsoner(sout, 'by_time' == sort_by[0])
 
         def at_ending_of_output_collection():
             sout.write(']\n')
@@ -396,7 +476,9 @@ def _build_json_output_adapter(sout, do_batch, do_time, jsoner):
     return json_output_adapter
 
 
-def _build_simplest_output_adapter(sout, do_batch, do_time, jsoner):
+@_output_adapter('simplest')
+def _(sout, do_batch, sort_by, jsoner):
+
     def output_header(rec):
         if subsequent():
             sout.write('\n')
@@ -422,11 +504,7 @@ def _build_simplest_output_adapter(sout, do_batch, do_time, jsoner):
     return simplest_output_adapter
 
 
-class _output_adapters:
-    most_complicated = _build_most_complicated_output_adapter
-    json = _build_json_output_adapter
-    simplest = _build_simplest_output_adapter
-
+# ==
 
 def _formals_for_find_readmes():
     yield '-h', '--help', 'This screen'
@@ -673,6 +751,19 @@ def _build_int_matcher():
     return match
 
 
+def _desc_lines_for_priority():
+    return (
+        'Issues with a #priority tag should have a value between 0.0 and 1.0',
+        'EXCLUSIVE like "#priority:0.3" and a value unique to the collection.',
+        'The lower the number, the *higher* the priority. (Think of it',
+        'as a measure of distance from your immediate attention.)',
+        'Ordering by priority implies selecting only those issues tagged',
+        'with this tag. As such, it cannot be used in combination with other',
+        'sort criteria because a secondary criteria would never be engaged.',
+        'EXPERIMENTAL. We may prefer a dependency graph feature over this.',
+        'We may flip the polarity so higher numbers are higher priority.')
+
+
 _formal_for_help = '-h', '--help', 'this screen'
 _dotfile_entry = ".tmx-pho-issues.rec"
 
@@ -724,4 +815,5 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(CLI(stdin, stdout, stderr, argv, efx))
 
+# #history-B.4
 # #born
