@@ -2,6 +2,173 @@
 
 {% block nav_for_article_PLACEMENT_IS_EXPERIMENTAL %}
 
+{#
+DISCUSSION from #history-B.4:
+We're not happy with how opaque and cluttered this is starting to feel.
+Some thoughts, mostly disjoint:
+
+- but for now it's just a means to an end (the whole point of the project)
+- soon we can *use* the project to fix itself
+- if the HTML that it produces is structurally correct, then the problem
+  we're discussing has a scope limited to developers who see this file
+- at least now we're using macros
+- ideally there would be only one place that produces <li> and one <ul>
+- we *just* discovered how jinja lets you recurse into loops. Seems relevant
+  but it's too much to attempt just yet (perhaps not enough control)
+#}
+
+{% macro when_nothing_selected(nav_tree) %}
+  {# (We wanted to put this somewhere:
+     `double_deep_nodes_before` and `double_deep_nodes_after` aren't
+     a part of this one structure but the context where it's used make it
+     look as if they are because jinja is permissive like that. At writing
+     this is used for about 1 out of 99 articles.) #}
+
+   {% for title, url, cx in nav_tree.double_deep_nodes %}
+     {{ double_deep_top_node(title, url, cx) }}
+   {% endfor %}
+{% endmacro %}
+
+
+{% macro double_deep_top_node(title, url, children) %}
+  <li>
+    {{ link(title, url) }}
+    {% if children %}
+      {{ children_all_clickable(children, 'G') }}
+    {% endif %}
+  </li>
+{% endmacro %}
+
+
+{% macro silo_with_top_node_selected(nav_tree) %}
+  <li>
+    {{ current_node( nav_tree.current_node_title ) }}
+    {{ children_all_clickable(nav_tree.children_of_current_node, 'H') }}
+  </li>
+{% endmacro %}
+
+
+{% macro silo_with_second_level_node_selected(nav_tree) %}
+  <li>
+    {{ link(nav_tree.silo_top_node_title, nav_tree.silo_top_node_url) }}
+    <ul>
+    {# this is in the sawtooth so always there are 0-N pre and post sibs #}
+
+    {{ children_items_all_clickable(nav_tree.sibling_nodes_before, 'A') }}
+
+      <li>
+        {{ current_node( nav_tree.current_node_title ) }}
+        {% if nav_tree.children_of_current_node %}
+          {{ children_all_clickable(nav_tree.children_of_current_node, 'I') }}
+        {% endif %}
+      </li>
+
+    {{ children_items_all_clickable(nav_tree.sibling_nodes_after, 'B') }}
+    </ul>
+  </li>
+{% endmacro %}
+
+
+{% macro silo_with_deep_node_selected(nav_tree) %}
+
+  <li>
+    {{ link(nav_tree.silo_top_node_title, nav_tree.silo_top_node_url) }}
+    <ul>
+      {{ children_items_all_clickable(nav_tree.second_level_nodes_before, 'C') }}
+      <li>
+
+        {{ link(nav_tree.silo_second_level_node_title, nav_tree.silo_second_level_node_url) }}
+
+        {% for title, url in nav_tree.depth_trail %}
+          <ul><!-- push one depth node -->
+            <li>
+              {{ link(title, url) }}
+        {% endfor %}
+
+              <ul><!-- innermost ul -->
+        {% if nav_tree.children_of_current_node %}
+          <li>
+            {{ current_node( nav_tree.current_node_title ) }}
+            {{ children_all_clickable(nav_tree.children_of_current_node, 'J') }}
+          </li>
+        {% else %}
+          {{ children_items_all_clickable(nav_tree.sibling_nodes_before, 'D') }}
+
+          <li>{{ current_node( nav_tree.current_node_title ) }}</li>
+
+          {{ children_items_all_clickable(nav_tree.sibling_nodes_after, 'E') }}
+        {% endif %}
+              </ul><!-- end innermost ul -->
+
+        {% for _ in nav_tree.depth_trail %}
+          </li></ul><!-- pop one depth node -->
+        {% endfor %}
+
+      </li>
+      {{ children_items_all_clickable(nav_tree.second_level_nodes_after, 'E') }}
+    </ul>
+  </li>
+
+{% endmacro %}
+
+
+{% macro children_all_clickable(children, letter) %}
+    <ul>
+    {{ children_items_all_clickable(children, letter) }}
+    </ul>
+{% endmacro %}
+
+
+{%+ macro children_items_all_clickable(children, _letter) %}
+  {% for title, url in children %}
+      <li>
+        {{ link(title, url) }}
+      </li>
+  {% endfor %}
+{% endmacro %}
+
+
+{% macro link(title, url) %}
+        <a href="{{ url }}">{{ title }}</a>
+{% endmacro %}
+
+
+{% macro current_node(title) %}
+        «&nbsp;{{title}}&nbsp;»
+{% endmacro %}
+
+{% set nav_tree = article.nav_tree %}
+{% set my_silo_type = nav_tree.my_silo_type %}
+
+
+{# grandfather-in new double-deep tree (ELSE is #here1 lol) #}
+{% if 'legacy_single_depth_tree' != my_silo_type %}
+
+  {# do top nodes before #}
+  {% for title, url, cx in nav_tree.double_deep_nodes_before %}
+    {{ double_deep_top_node(title, url, cx) }}
+  {% endfor %}
+
+  {# do my silo #}
+  {% if 'silo_type_top_node_selected' == my_silo_type %}
+    {{ silo_with_top_node_selected(nav_tree) }}
+  {% elif 'silo_type_second_level_node_selected' == my_silo_type %}
+    {{ silo_with_second_level_node_selected(nav_tree) }}
+  {% elif 'silo_type_deeply_selected' == my_silo_type %}
+    {{ silo_with_deep_node_selected(nav_tree) }}
+  {% elif 'silo_type_nothing_selected' == my_silo_type %}
+    {{ when_nothing_selected(nav_tree) }}
+  {% endif %}
+
+  {# do top nodes after #}
+  {% for title, url, cx in nav_tree.double_deep_nodes_after %}
+    {{ double_deep_top_node(title, url, cx) }}
+  {% endfor %}
+
+
+{# grandfathered in: the ELSE for #here1 lol #}
+{% else %}
+
 {# 0-N top-level nodes before #}
 {% for title, url in article.nav_tree.top_level_nodes_before %}
     <li><a href="{{ url }}">{{ title }}</a></li>
@@ -54,8 +221,12 @@
     <li><a href="{{ url }}">{{ title }}</a></li>
 {% endfor %}
 
+{# grandfathered in for single- vs- double-depth. end #here1 lol #}
+{% endif %}
+
 {% endblock %}
 
 {#
+#history-B.4 double-deep
 #born
 #}

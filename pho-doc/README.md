@@ -161,7 +161,7 @@ when you click create
 |---------------------------|:-----:|----|
 |[#899]                     | #exmp | This is an example issue.
 |[#887.B]                   | #open | images (and etc) #priority:0.75
-|[#887.A]                   | #open | double-deep nav-tree #priority:0.25
+|[#887.A]                   | #hole |
 |[#886]                     | #open | jagged alignment of multiline descs (see "close") #is:[#603.2]
 |[#885.2]                   |       | this one UI sketch
 |[#884]                     |       | facets towards publication (graph)
