@@ -165,6 +165,45 @@ then in your 'main' terminal:
 
 
 
+## Developing with tests (doctest)
+
+This is out of scope for this readme, but apparently we don't have a
+dedicated document on the subject yet, so we're stowing this away in here
+for now: Whirlwind tour of how to doctest:
+
+In the asset code:
+
+```python
+def my_ting():
+    """
+    >>> my_ting(('A', 'B', 'C'))
+    'A, B and C'
+    """
+```
+
+At the bottom of the asset file:
+
+```python
+def _run_doctest():
+    from doctest import testmod as func
+    func()
+
+
+if __name__ == "__main__":
+    _run_doctest()
+```
+
+And, to get these to run from some proximal unit-test file:
+
+```python
+
+def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
+    from doctest import DocTestSuite
+    tests.addTests(DocTestSuite(subject_module()))
+    return tests
+``
+
+
 
 ## <a name=aliases></a>(these aliases)
 

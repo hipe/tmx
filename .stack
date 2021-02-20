@@ -4,3 +4,11 @@ cover yes schema file but no ent entites dir
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
 there are todo's
+you still need a plugin. massive massive amounts of integration
+figure out what the datamodel is. insanely what if you store the datamodel *in* the dotfile
+review that one function from the service and imagine a new whitepaper
+  (reminder `git --log --patch` on a whole directory (notecards or documents) stitch to already indexed)
+hack a quick and dirty dotfile2sqlite
+cover logfile expression(like) with an example lexicon
+put the whitepaper somewhere, break it up
+expressions of time

@@ -6,6 +6,10 @@ import unittest
 def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
     tests.addTests(DocTestSuite(subject_module()))
     # `oxford_join` hi.
+
+    from text_lib.magnetics import words_via_time as mod
+    tests.addTests(DocTestSuite(mod))
+
     return tests
 
 
