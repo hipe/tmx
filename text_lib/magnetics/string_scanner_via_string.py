@@ -39,7 +39,7 @@ class StringScanner:  # see also [#611] the scanner library
         self._position = 0
         self._line = line
         self._cstacker = cstacker
-        self._listener = listener
+        self.listener = listener
 
     # == SKIPS
 
@@ -91,6 +91,10 @@ class StringScanner:  # see also [#611] the scanner library
     def advance_by_one(self):
         self._position += 1
 
+    def advance_to_position(self, pos):
+        assert -1 < pos < self._length
+        self._position = pos
+
     # == READ ONLY things
 
     def peek(self, w):
@@ -111,10 +115,6 @@ class StringScanner:  # see also [#611] the scanner library
     @property
     def pos(self):
         return self._position
-
-    @property
-    def listener(self):
-        return self._listener
 
     # ==
 
@@ -163,7 +163,7 @@ class StringScanner:  # see also [#611] the scanner library
             for frame in cstack:
                 for k, v in frame.items():
                     yield k, v
-        self._listener('error', 'structure', 'input_error', details_struct)
+        self.listener('error', 'structure', 'input_error', details_struct)
 
 
 def two_lines_of_ascii_art_via_position_and_line(position, line):

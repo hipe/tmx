@@ -306,7 +306,7 @@ class Emission_:
         return (self.category,)
 
 
-class WriteOnceMutableStruct_:
+class WriteOnceMutableStruct_:  # #[#508.5] custom strict data structure
     # Experiment: dictionaries are the most powerful data structure but they
     # offer a freedom that becomes a liability for your use case. Make them
     # more strict and less fun by standing this client between you and the
@@ -332,7 +332,7 @@ class WriteOnceMutableStruct_:
         raise RuntimeError(reason)
 
 
-class MutableStruct_:  # see above
+class MutableStruct_:  # #[#508.5] custom strict data structure, & see above
 
     def __init__(self, dct):
         self._values = dct

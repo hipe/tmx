@@ -1,0 +1,21 @@
+# entity: SQB: attributes
+heading: sqlite notes (disjoint and sparse)
+-- body
+
+[reflection in sqlite][1]
+
+[main sqlite docs][2]
+
+[python sqlite][3]
+
+[3]: https://docs.python.org/3/library/sqlite3.html
+[2]: https://www.sqlite.org/doclist.html
+[1]: https://www.sqlitetutorial.net/sqlite-tutorial/sqlite-describe-table/
+
+-- body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

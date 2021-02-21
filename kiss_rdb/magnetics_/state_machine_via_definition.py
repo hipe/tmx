@@ -524,7 +524,10 @@ def re_emit_case_error_CRAZILY(listener, stack, emi_tup):  # EXPERIMENTAL
     sct_not_expr = ('expression', 'structure').index(emi.shape)
     if sct_not_expr:  # (Case3419DP)
         sct = emi.payloader()
-        msgs = [sct['reason']]  # #here2
+        msg = sct.get('reason')
+        if not msg:
+            msg = sct['reason_tail']
+        msgs = [msg]  # #here2
     else:
         msgs = list(emi.to_messages())
 
