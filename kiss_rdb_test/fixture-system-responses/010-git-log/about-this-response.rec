@@ -1,0 +1,9 @@
+# At present this is never actually loaded, but pretend it's real and try
+# to keep it accurate
+
+the_supposed_command_that_produces_this_response: git log --follow -L11,22:pretend-file/A/B.eno -- pretend-file/A/B.eno
+has_stdout_lines: true
+has_stderr_lines: false
+exitstatus: 0
+
+# #born

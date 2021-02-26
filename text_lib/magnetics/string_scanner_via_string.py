@@ -6,15 +6,20 @@ def build_throwing_string_scanner_and_friends(listener, cstacker=None):
     def build_scanner(piece):
         return StringScanner(piece, throwing_listener, cstacker)
 
+    class stop(RuntimeError):
+        pass
+
+    throwing_listener = build_throwing_listener(listener, stop, cstacker)
+
+    return pattern_via_description_and_regex_string, build_scanner, stop
+
+
+def build_throwing_listener(listener, stop, cstacker=None):
     def throwing_listener(sev, *rest):
         listener(sev, *rest)
         if 'error' == sev:
             raise stop()
-
-    class stop(RuntimeError):
-        pass
-
-    return pattern_via_description_and_regex_string, build_scanner, stop
+    return throwing_listener
 
 
 class StringScanner:  # see also [#611] the scanner library

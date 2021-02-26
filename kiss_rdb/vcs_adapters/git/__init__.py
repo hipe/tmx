@@ -138,28 +138,21 @@ def _metrics_and_line_cache(path, opn):
 
 
 def _tagged_response_parts_for_blame(path):
-    cwd, entry = _split_path(path)
-    args = _GIT_EXE, 'blame', entry
-
-    with _open_subprocess(args, cwd=cwd) as proc:
-
-        for line in proc.stdout:
-            yield 'sout', line
-
-        for line in proc.stderr:
-            yield 'serr', line
-
-        proc.wait()  # not terminate. timeout maybe one day
-        yield 'returncode', proc.returncode
+    cwd, entry = split_path_for_git_(path)
+    return open_git_subprocess_(('blame', entry), cwd=cwd)
 
 
 def _tagged_response_parts_for_diff(path, listener, opn=None):
-    cmd = _GIT_EXE, 'diff', '--', path
+    return open_git_subprocess_(('diff', '--', path), opn=opn)
+
+
+def open_git_subprocess_(cmd_tail, cwd=None, opn=None):
+    cmd = _GIT_EXE, *cmd_tail
     if opn:
         for k, v in opn(cmd):
             yield k, v
         return
-    with _open_subprocess(cmd) as proc:
+    with _open_subprocess(cmd, cwd=cwd) as proc:
         for line in proc.stdout:
             yield 'sout', line
 
@@ -205,8 +198,10 @@ def _width(beg, end):
     return end - beg
 
 
-def _split_path(path):
-    # hackishly use git's ability to search upwards for the base dir
+def split_path_for_git_(path):
+    """
+    cd to the dirname of the path and let git search upwards for the repo
+    """
 
     from os.path import dirname, basename
     cwd = dirname(path)

@@ -1,0 +1,34 @@
+# This file is read by `modality_agnostic.fixture_system_responses`
+#
+# - This file is in a specialization of the "recfile" format: this file should
+#   parse with the GNU `recsel` utility (or friends) (for example); however
+#   our specialization of the format has its own spin on things:
+#
+# - One or more blank lines in a recfile designate a boundary between
+#   records (when they are between field lines); but here there are no
+#   "records" or "fields", only "directives"; and blanks lines are only
+#   cosmetic, to group related directives together visually
+#
+# - Here you either can or can't have multiple directives of the same name
+#   based on the directive name. Our parser will explain such failures
+#
+# - Order matters except where it doesn't. The parser will explain the
+#   failures. (Behind the scenes there's an FSA; so in effect there's an
+#   unpublished grammar.)
+#
+# This information (above) should be in documentation somewhere, but as long
+# as this is the only such file, here is where the documentation lives too
+
+
+this_is_all: in_a_temporary_directory
+
+copy_these_files: file-snapshot-[0-9]*.eno
+copy_this_file: set-up-the-directory.zsh
+
+run_this_script: set-up-the-directory.zsh
+
+filter_the_following_output_through: sed 's/the-file\.eno/pretend-file\/A\/B.eno/'
+represent_the_following_as_this_command: git log --follow -L11,22:pretend-file/A/B.eno -- pretend-file/A/B.eno
+this_is_the_command: git log --follow -L11,22:the-file.eno -- the-file.eno
+
+# #born

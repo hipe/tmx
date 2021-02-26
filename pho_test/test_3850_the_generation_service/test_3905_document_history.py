@@ -15,7 +15,23 @@ class CommonCase(unittest_TestCase):
         from datetime import datetime
         strptime = datetime.strptime
         func = subject_module()._words_via_business_items
-        return lines_via_words(func(these(), lexi))
+
+        """
+        This is how the asset does and doesn't inflect with respect to "now":
+        The asset produces expressions that will still read correctly
+        whether it's read tomorrow or 100 years from now; (so it does NOT
+        produce expressions like "3 days ago"); HOWEVER it DOES change the
+        precision with which it expresses times based on how long ago the
+        event is (from some "now"); SO, we have to pass in a "fixture now"
+        so that the asset doesn't change its behavior under test over time.
+
+        (We didn't realize this until the test broke "on its own" with the
+        passage of time whoopsie. The "fixture now" we are using happens to
+        be the minute we made the commit originally:)
+        """
+        from datetime import datetime
+        dt_now = datetime(2021, 2, 20, 0, 17, 39)
+        return lines_via_words(func(these(), lexi, datetime_now=dt_now))
 
 
 class Case1234_XXXX(CommonCase):

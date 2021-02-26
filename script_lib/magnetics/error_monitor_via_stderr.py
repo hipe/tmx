@@ -40,8 +40,15 @@ class func:  # error_monitor_via_stderr
 
     def __express_when_shape_is_structure(self, em):
         dct = em.payloader()
-        if (errno := dct.get('errno', None)) is not None:
-            self.see_exitstatus(errno)
+
+        seen = set()
+        for k in ('returncode', 'errno'):
+            if (n := dct.get(k, None)) is not None:
+                seen.add(n)
+
+        if seen:
+            n, = seen  # implicit assertion
+            self.see_exitstatus(n)
 
         write_line = self._write_line
         from .expression_via_structured_emission import \
@@ -77,6 +84,8 @@ class func:  # error_monitor_via_stderr
         elif 'verbose' == sev:
             ok = True
         elif 'notice' == sev:
+            ok = True
+        elif 'debug' == sev:
             ok = True
         else:
             # #[#508.4]: unified semantics would be nice here:

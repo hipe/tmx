@@ -1,0 +1,29 @@
+# entity: ABA: attributes
+
+zibby_one: one
+fibby_two: two
+-- bodicum
+line 1
+line 2
+-- bodicum
+
+
+# entity: ABC: attributes
+
+paramzo_two: two ver two
+paramzo_three: three
+
+-- bodicum
+body line 1
+body line 1.5
+body line 2
+-- bodicum
+
+
+# entity: OHA: attributes
+some: ting
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

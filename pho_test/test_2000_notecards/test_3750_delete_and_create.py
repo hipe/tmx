@@ -82,9 +82,11 @@ class Case3750_delete_entity(CommonCase):
     def test_400_removes_the_pointback_from_its_next(self):
         fp = self.the_fourth_patch.file_patch
         self.assertEqual(fp.mmm_line[-11:-1], 'es/P/B.eno')
-        hunk, = fp.hunks  # one hunk
+        hunks = fp.hunks
+        hunk = hunks[0]
         run, = hunk.to_remove_lines_runs()  # one run
         self.assertSequenceEqual(run.lines, ('-parent: 8W2\n',))
+        assert 1 == len(hunks)
 
     def given_work_that_produces_big_patchfile(self, busi_coll, listener):
         return busi_coll._big_patchfile_for_delete('8W2', listener)

@@ -10,6 +10,8 @@ preserving this "block scanner"-style interface for our one client.
 
 This is the external thing: [GNU Recutils][1] (and this [example][2]).
 
+Reminder: `recsel`
+
 
 [1]: https://www.gnu.org/software/recutils/
 [2]: https://www.gnu.org/software/recutils/manual/A-Little-Example.html

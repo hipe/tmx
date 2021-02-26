@@ -47,13 +47,19 @@ def field_line(var_name, string_value):
 # fsr = filesystem reader
 
 def EXPERIMENTAL_caching_collection(
-        directory, max_num_lines_to_cache=None, listener=None):
+        directory, max_num_lines_to_cache=None, listener=None,
+        do_load_schema_from_filesystem=True, opn=None):
+
     def fsr(ci):
-        return FS_reader_class(ci, max_num_lines_to_cache)
+        return FS_reader_class(ci, max_num_lines_to_cache, opn=opn)
+
     from ._caching_layer import Caching_FS_Reader_ as FS_reader_class, \
         ReadOnlyCollectionLayer_ as collection_class
+
     real_coll = mutable_eno_collection_via(
-        directory, fsr=fsr, listener=listener)
+        directory, fsr=fsr, listener=listener,
+        do_load_schema_from_filesystem=do_load_schema_from_filesystem)
+
     return real_coll and collection_class(real_coll)
 
 
@@ -207,6 +213,10 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
             return REMOVE_IDENTIFIER_FROM_INDEX_(
                     eid, directory, _THREE, listener)
 
+        def AUDIT_TRAIL_FOR(eid, mon, opn=None):
+            from ._audit_trail import func
+            return func(eid, self, mon, opn=opn)
+
         def retrieve_entity_via_identifier(iden, listener):
             with self.open_entities_via_identifiers((iden,), listener) as ents:
                 res, = ents
@@ -217,6 +227,9 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
             itr = fs_reader().entities_via_identifiers(idens, mon)
             from contextlib import nullcontext as func
             return func(itr)
+
+        def entity_retrievals(idens, mon):  # low-level access to all
+            return fs_reader().entity_retrievals_via_identifiers(idens, mon)
 
         def open_identifier_traversal(listener):
             from contextlib import nullcontext
@@ -289,30 +302,36 @@ class _FS_Reader:
         self._back = ci
 
     def entities_via_identifiers(self, idens, mon):
-        work = RetrieveEntity_(None, mon, self._back)
+        works = self.entity_retrievals_via_identifiers(idens, mon)
+        return (w.entity for w in works)
+
+    def entity_retrievals_via_identifiers(self, idens, mon):
         for iden in idens:
-            if iden is None:
-                yield None  # [#877.C]
+            work = RetrieveEntity_(iden, mon, self._back)
+            if iden is None:  # [#877.C]
+                work.entity = None
+                yield work
                 continue
-            work.identifier = iden
-            ent = work.execute()
-            yield ent
+            work.execute()
+            yield work
 
     def file_readers_via_monitor(self, mon):
         paths = self._back.to_file_paths_()
-        return file_readers_via_paths_(mon, paths, self._back)
+        return file_readers_via_paths_(paths, self._back, mon)
 
 
 class RetrieveEntity_:
 
-    def __init__(self, iden, mon, ci):
+    def __init__(self, iden, mon, ci, opn=None):
         self.identifier, self._monitor, self._back = iden, mon, ci
+        self._opn = opn
 
     def execute(o):
         def main():
             o.resolve_path_given_identifier()
             o.resolve_file_reader_given_path()
-            return o.procure_entity_given_file_reader()
+            o.resolve_entity_given_file_reader()
+            return o.entity
         return o.do(main)
 
     def do(self, main):
@@ -321,38 +340,45 @@ class RetrieveEntity_:
         except _Stop:
             pass
 
-    def procure_entity_given_file_reader(self):
+    def resolve_entity_given_file_reader(self):
+        self.resolve_entity_section_given_file_reader()
+        self._resolve_entity_given_entity_section()
+
+    def _resolve_entity_given_entity_section(self):
+        self.entity = read_only_entity_via_section_(
+            self.entity_section, self.identifier, self._monitor)
+
+    def resolve_entity_section_given_file_reader(self):
+        self.entity_section = self.procure_entity_section_given_file_reader()
+
+    def procure_entity_section_given_file_reader(self):
         # Maybe the file doesn't have the entity
         target_eid = self.identifier.to_string()
-        count, found = 0, None
+        count = 0
         for (eid, sect) in self.file_reader.to_entity_sections():
             if target_eid == eid:
-                found = sect
-                break
+                return sect
             count += 1
-        if not self._monitor.OK:
-            raise _Stop()
-        if not found:
+
+        # (If we encountered some error during section traversal, emitted)
+        if self._monitor.OK:
             _when_section_not_found(
                 self._listener, count, target_eid, self.path)
-            raise _Stop()
-        return read_only_entity_via_section_(
-                found, self.identifier, self._monitor)
+        raise _Stop()
 
     def resolve_file_reader_given_path(self):
         # Maybe there is no such file
         itr = file_readers_via_paths_(
-                self._monitor, (self.path,), self._back)
-        tup = None
+                (self.path,), self._back, self._monitor, opn=self._opn)
+        self.file_reader = None
         try:
-            tup = tuple(itr)
+            self.file_reader, = itr
+            return
         except FileNotFoundError as e:
             exc = e
-        if tup is None:
-            _when_entity_not_found_because_no_file(
-                self._listener, exc, exc.filename, self.identifier)
-            raise _Stop()
-        self.file_reader, = tup
+        _when_entity_not_found_because_no_file(
+            self._listener, exc, exc.filename, self.identifier)
+        raise _Stop()
 
     def resolve_path_given_identifier(self):
         # Maybe the identifier is too shallow/deep
@@ -363,17 +389,40 @@ class RetrieveEntity_:
         self.path = path
 
     @property
+    def body_of_text(self):
+        return self.file_reader.body_of_text
+
+    @property
     def _listener(self):
-        return self._monitor.listener
+        mon = self._monitor
+        return mon and mon.listener
+
+    entity = None  # in case it fails, ensure property exists
 
 
-def file_readers_via_paths_(mon, paths, back):
+def file_readers_via_paths_(paths, back, mon, opn=None):
+
+    def bot_kwargs_via_path(path): return {'path': path}
+
+    if opn:  # for (Case4857_250)
+        if (func := opn.body_of_text_keyword_args_via_path):
+            bot_kwargs_via_path = func  # noqa: F811  (this is erroneous)
+
+    docu_via = back.eno_document_via_
+    for path in paths:
+        bot_kwargs = bot_kwargs_via_path(path)
+        bot = body_of_text_(**bot_kwargs)
+        docu = docu_via(body_of_text=bot)  # throw for now, since #history-B.5
+        yield _file_reader_via(docu, bot, back, mon)
+
+
+def _file_reader_via(docu, body_of_text, back, mon):
 
     class file_reader:
 
-        def __init__(self, docu, path):
-            self._docu, self._path = docu, path
+        def __init__(self):
             self._idener = None
+            self.body_of_text = body_of_text  # used elsewhere
 
         def to_entities(self):
             idener = self.identifier_builder_
@@ -406,64 +455,73 @@ def file_readers_via_paths_(mon, paths, back):
                 assert()
 
         def to_section_elements(self):
-            return document_sections_of_(self._docu, self._path, mon)
+            return document_sections_of_(docu, body_of_text, mon)
 
         @property
         def identifier_builder_(self):
+            # (we can't memo this in the CI because it's bound to a listener)
             if self._idener is None:
                 self._idener = back.build_identifier_function_(listener)
             return self._idener
 
-    listener = mon.listener
-    docu_via = back.eno_document_via_
-    for path in paths:
-        docu = docu_via(path=path)  # throw for now, since #history-B.5
-        yield file_reader(docu, path)
+    listener = mon and mon.listener
+    return file_reader()
 
 
-def read_only_entity_via_section_(sect_el, ID, mon):
+def read_only_entity_via_section_(sect_el, identifier, monitor):
     section = sect_el.to_section()  # #here3
-    dct = {k: v for k, v in _attribute_keys_and_values(section, mon)}
-    if not mon.OK:
+    dct = {k: v for k, v in _attribute_keys_and_values(section, monitor)}
+    if not monitor.OK:
         return
 
-    class ReadOnlyEntity:  # #class-as-namespace
-
+    class read_only_entity:  # #class-as-namespace
         def to_dictionary_two_deep():
-            return {'identifier_string': ID.to_string(),
+            return {'identifier_string': identifier.to_string(),
                     'core_attributes': dct}
 
         core_attributes = dct
-        identifier = ID
-
         VENDOR_SECTION_ = section
 
-    return ReadOnlyEntity
+    read_only_entity.identifier = identifier
+    return read_only_entity
 
 
 def _attribute_keys_and_values(section, mon):
     for el in section.elements():  # #here2
-        use_key, value, _ = key_value_vendor_type_via_attribute_element_(el)
-        yield use_key, value
+        yield classify_attribute_element_(el)[:2]
 
 
-def key_value_vendor_type_via_attribute_element_(el):
+def classify_attribute_element_(el):
+    cx = _do_classified_attribute_element(el)
+
+    # (not specified anywhere, it's just an experimental sketch)
+    import re
+    if re.match('[a-z0-9_A-Z]+$', cx.key):
+        return cx
+
+    reason = f"field key is not up to current spec - {cx.key!r}"
+    raise AssertionError(reason)
+
+
+def _do_classified_attribute_element(el):
+    o = _do_classified_attribute_element
+    if o.x is None:
+        from collections import namedtuple
+        o.x = namedtuple('AttributeElementClassification',
+                         ('key', 'value', 'type'))
+
     typ = el._instruction['type']
     if el.yields_list():
         key, value = _key_and_value_via_list_attribute_element(el)
         value = tuple(value)  # ..
-    else:
-        key, value = _key_and_value_for_atomic_attribute_element(el)
-        if ('Field' != typ):
-            assert('Multiline Field Begin' == typ)
+        return o.x(key, tuple(value), typ)
 
-    # this is not specified anywhere, it's just an experimental sketch
-    import re
-    if not re.match('[a-z0-9_A-Z]+$', key):
-        msg = f"field key is not up to current spec - '{key}'"
-        raise AssertionError(msg)
+    key, value = _key_and_value_for_atomic_attribute_element(el)
+    assert typ in ('Field', 'Multiline Field Begin')
+    return o.x(key, value, typ)
 
-    return key, value, typ
+
+_do_classified_attribute_element.x = None
 
 
 def _key_and_value_via_list_attribute_element(el):
@@ -527,8 +585,8 @@ def _file_posix_paths_in_collection_directory(directory, depth):
             yield file_pp
 
 
-def document_sections_of_(document, path, mon):
-
+def document_sections_of_(document, body_of_text, mon):
+    bot = body_of_text
     state_machine = {  # [#008.2] custom state machine
             'start': {
                 'entity_section': lambda: change_from_start_to_main(),
@@ -563,11 +621,11 @@ def document_sections_of_(document, path, mon):
         # here it feels too easy (and fast) not to. but see #here4
 
         if len(eid) != state.length_of_first_identifier:
-            _when_inconsistent_depth(mon.listener, eid, sect_el, state, path)
+            _when_inconsistent_depth(mon.listener, eid, sect_el, state, bot)
             return
 
         if not (state.previous_identifier_string < eid):
-            _when_out_of_order(mon.listener, eid, sect_el, state, path)
+            _when_out_of_order(mon.listener, eid, sect_el, state, bot)
             return
 
         state.previous_identifier_string = eid
@@ -589,7 +647,7 @@ def document_sections_of_(document, path, mon):
     def try_to_transition_to(typ):
         call_me = state.current_state.get(typ)
         if call_me is None:
-            _when_no_state_transition(mon.listener, typ, sect_el, state, path)
+            _when_no_state_transition(mon.listener, typ, sect_el, state, bot)
             return
         call_me()
 
@@ -599,7 +657,7 @@ def document_sections_of_(document, path, mon):
         state.has_thing_to_yield = False
         return x
 
-    for typ, eid, sect_el in _tokenized_sections(document, path, mon.listener):  # noqa: E501
+    for typ, eid, sect_el in tokenized_sections_(document, bot, mon.listener):
         try_to_transition_to(typ)
 
         if not mon.OK:
@@ -617,11 +675,43 @@ def document_sections_of_(document, path, mon):
         yield release_thing_to_yield()
 
 
-def _tokenized_sections(document, path, listener):
+def tokenized_sections_(document, body_of_text, listener):
     # the only allowed sections in the document look like this
 
+    o = tokenized_sections_
+    if getattr(o, 'x', None) is None:
+        o.x = _build_tokenized_sections_via()
+    return o.x(document, body_of_text, listener)
+
+
+def _build_tokenized_sections_via():
+
+    def tokenized_sections_via(docu, body_of_text, listener):
+        throwing_listener = build_throwing_listener(listener, stop)
+        sect_els = _section_elements(docu, body_of_text, listener)
+        for section_el in sect_els:
+            key = section_el.string_key()
+            scn = StringScanner(key, throwing_listener)
+            try:
+                yield sexp_via_parse_section_key(scn, section_el)
+            except stop:
+                break
+
+    def sexp_via_parse_section_key(scn, section_el):
+        s = scn.scan_required(first_word)
+        if 'document-meta' == s:
+            scn.skip_required(eos)
+            return 'document_meta', None, section_el
+        scn.skip_required(colon)
+        eid = scn.scan_required(identifier)
+        scn.skip_required(colon)
+        scn.skip_required(attributes)
+        scn.skip_required(eos)
+        return 'entity_section', eid, section_el
+
     from text_lib.magnetics.string_scanner_via_string import \
-        StringScanner, pattern_via_description_and_regex_string as o
+        StringScanner, pattern_via_description_and_regex_string as o, \
+        build_throwing_listener
 
     first_word = o('entity|document-meta', r'(entity|document-meta)\b')
     eos = o('end of string', '$')
@@ -629,45 +719,21 @@ def _tokenized_sections(document, path, listener):
     identifier = o('identifier', '[A-Z0-9]{3}')  # ..
     attributes = o("'attributes' keyword", r'attributes\b')
 
-    for section_el in _section_elements(document, path, listener):
-        key = section_el.string_key()
-        scn = StringScanner(key, listener)
-        if (s := scn.scan_required(first_word)) is None:
-            return
-        if 'document-meta' == s:
-            if scn.skip_required(eos) is None:
-                return
-            yield 'document_meta', None, section_el
-            continue
-        if not scn.skip_required(colon):
-            return
+    class stop(RuntimeError):
+        pass  # make our own even thos there's one out there. safer
 
-        if (eid := scn.scan_required(identifier)) is None:
-            return
-
-        if not scn.skip_required(colon):
-            return
-
-        if not scn.skip_required(attributes):
-            return
-
-        if scn.skip_required(eos) is None:
-            return
-
-        yield 'entity_section', eid, section_el
+    return tokenized_sections_via
 
 
-def _section_elements(document, path, listener):
+def _section_elements(document, body_of_text, listener):
     # the only allowed element at the top level of the document is sections
 
-    from enolib.constants import PRETTY_TYPES
     for el in document.elements():  # #here2
-        o = el._instruction
-        typ = PRETTY_TYPES[o['type']]
-        if 'section' == typ:
+        typ = _vendor_type_of(el)
+        if 'Section' == typ:
             yield el  # #here3
             continue
-        _when_not_section(listener, typ, o, path)
+        _when_not_section(listener, typ, el, body_of_text)
         return
 
 
@@ -710,8 +776,7 @@ class _BodyOfText:  # catch FileNotFound error
                 with open(self.path) as lines:
                     self._lines = tuple(lines)
             else:
-                import re
-                self._lines = tuple(re.split(r'(?<=\n)(?!\Z)', self._big_string))  # noqa: E501
+                self._lines = self._big_string.splitlines(keepends=True)
         return self._lines
 
 
@@ -724,22 +789,24 @@ def _when_section_not_found(listener, count, target_ID_s, path):
     listener('error', 'structure', 'entity_not_found', _details(deets))
 
 
-def _when_out_of_order(listener, eid, section, state, path):
+def _when_out_of_order(listener, eid, section, state, body_of_text):
     def deets():
         _ = state.previous_identifier_string
         _ = f"entities are out of order. '{eid}' can't come after '{_}'."
         yield 'reason_tail', _
-        yield 'lineno', section._instruction['line'] + 1  # #here1
-        yield 'path', path
+        yield 'lineno', _start_lineno_via_vendor_element(section)
+        for k, v in _contextualize_body_of_text_for_detail(body_of_text):
+            yield k, v
 
     listener('error', 'structure', 'eno_file_integrity_error', _details(deets))
 
 
-def _when_inconsistent_depth(listener, eid, section, state, path):
+def _when_inconsistent_depth(listener, eid, section, state, body_of_text):
     def deets():
         yield 'reason_tail', ''.join(reason_pieces())
-        yield 'lineno', section._instruction['line'] + 1  # #here1
-        yield 'path', path
+        yield 'lineno', _start_lineno_via_vendor_element(section)
+        for k, v in _contextualize_body_of_text_for_detail(body_of_text):
+            yield k, v
 
     def reason_pieces():
         yield f"first identifier ('{state.first_identifier_string}') "
@@ -750,11 +817,12 @@ def _when_inconsistent_depth(listener, eid, section, state, path):
     listener('error', 'structure', 'eno_file_integrity_error', _details(deets))
 
 
-def _when_no_state_transition(listener, typ, section, state, path):
+def _when_no_state_transition(listener, typ, section, state, body_of_text):
     def deets():
         yield 'reason_tail', ''.join(reason_pieces())
-        yield 'lineno', section._instruction['line'] + 1  # #here1
-        yield 'path', path
+        yield 'lineno', _start_lineno_via_vendor_element(section)
+        for k, v in _contextualize_body_of_text_for_detail(body_of_text):
+            yield k, v
 
     def reason_pieces():
         yield f"did not expect to encounter '{typ}' "
@@ -767,13 +835,16 @@ def _when_no_state_transition(listener, typ, section, state, path):
     listener('error', 'structure', 'parse_error', _details(deets))
 
 
-def _when_not_section(listener, typ, o, path):
+def _when_not_section(listener, typ, el, body_of_text):
     @_details
     def deets():
         yield 'reason_tail', f"had '{typ}'"
         # yield 'position', o['ranges']][
-        yield 'lineno', o['line'] + 1  # #here1
-        yield 'path', path
+        yield 'lineno', lineno
+        for k, v in _contextualize_body_of_text_for_detail(body_of_text):
+            yield k, v
+
+    lineno = _start_lineno_via_vendor_element(el)
     listener('error', 'structure', 'parse_error', 'expecting_section', deets)
 
 
@@ -800,24 +871,42 @@ def _when_identifier_is_wrong_depth(listener, ID, depth, verb_string):
 def _details(orig_function):
     def use_function():
         kw = {k: v for k, v in orig_function()}
-        if 'lineno' in kw and 'path' in kw and 'line' not in kw:
-            _what_a_hack(kw)
+        if 'lineno' in kw and 'line' not in kw and 'body_of_text' in kw:
+            _add_line_to_context_via_body_of_text(kw)
         return kw
     return use_function
 
 
-def _what_a_hack(kw):
+def _add_line_to_context_via_body_of_text(kw):
     stop = kw['lineno']
     count = 0
     line = None
-    with open(kw['path']) as lines:
-        for line in lines:
+    if True:  # (used to be open(path) lol)
+        for line in kw['body_of_text'].lines:
             count += 1
             if stop == count:
                 break
     if count != stop:
         line = "(line content unknown)\n"
     kw['line'] = line
+
+
+def _contextualize_body_of_text_for_detail(bot):
+    if (path := bot.path):
+        yield 'path', path
+    yield 'body_of_text', bot  # experimental
+
+
+def _start_lineno_via_vendor_element(el):
+    return start_line_offset_via_vendor_element_(el) + 1
+
+
+def start_line_offset_via_vendor_element_(el):
+    return el._instruction['line']
+
+
+def _vendor_type_of(el):
+    return el._instruction['type']
 
 
 def _monitor_via_listener(listener):

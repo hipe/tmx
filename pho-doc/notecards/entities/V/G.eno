@@ -1,3 +1,7 @@
+# entity: VGZ: attributes
+hierarchical_container_type: document
+heading: (really rough notes about Gauss)
+-- body
 Love this [Khan's adademy article][1]; It's my dream as a boy and as a man.
 
 Synonyms for a distribution of values clustering around a mean:
@@ -43,5 +47,9 @@ I fucking know kung fu.
 
 
 [1]: https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/normal-distribution-of-random-numbers
+--body
 
+# document-meta
+-- string_as_comment
 # #born
+-- string_as_comment

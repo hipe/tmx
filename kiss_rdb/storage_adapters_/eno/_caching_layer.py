@@ -38,13 +38,18 @@ class ReadOnlyCollectionLayer_:
     def VALUE_FUNCTION_VARIABLE_RIGHT_HAND_SIDES(self):
         pass
 
+    @_property_from_back
+    def custom_functions(self):
+        pass
+
     # == END
 
 
 class Caching_FS_Reader_:  # #testpoint
 
-    def __init__(self, ci, max_num_lines_to_cache=None):
+    def __init__(self, ci, max_num_lines_to_cache=None, opn=None):
         self._back = ci
+        self._opn = opn
         self._cached_path_via_EID = {}  # #testpoint
         self._file_reader_via_path = {}  # #testpoint
         self._current_number_of_lines_cached = 0
@@ -61,6 +66,12 @@ class Caching_FS_Reader_:  # #testpoint
         self._doubly_linked_list = func()  # #[#510.15] one of several rotbuff
 
     def entities_via_identifiers(self, idens, mon):
+        return self._ting('dereference', idens, mon)
+
+    def entity_retrievals_via_identifiers(self, idens, mon):
+        return self._ting('produce_retrieval', idens, mon)
+
+    def _ting(self, which, idens, mon):
         for iden in idens:
             if iden is None:
                 yield None  # [#877.C]
@@ -69,7 +80,7 @@ class Caching_FS_Reader_:  # #testpoint
             if mfr is None:
                 yield None  # [#877.C]
                 continue
-            yield mfr.dereference(iden, mon)
+            yield getattr(mfr, which)(iden, mon)
 
     def _file_reader_for(self, iden, mon):
 
@@ -82,7 +93,7 @@ class Caching_FS_Reader_:  # #testpoint
 
         # Start this work object
         from . import RetrieveEntity_ as cls
-        o = cls(iden, mon, self._back)
+        o = cls(iden, mon, self._back, opn=self._opn)
 
         # Resolve a path from the identifier
         def main():
@@ -119,7 +130,7 @@ class Caching_FS_Reader_:  # #testpoint
 
             # .. then create the exact same emission you would without caching
             def main():
-                o.procure_entity_given_file_reader()
+                o.resolve_entity_given_file_reader()
                 return True
             found = o.do(main)
             assert found is None
@@ -135,7 +146,7 @@ class Caching_FS_Reader_:  # #testpoint
                 yield the_worst.pop()
         the_worst = []
         from . import file_readers_via_paths_ as func
-        itr = func(mon, forever(), self._back)
+        itr = func(forever(), self._back, mon)
 
         # For each path, either use your cached FR or build a new one
         dct = self._file_reader_via_path
@@ -244,15 +255,18 @@ def _build_my_file_reader(fr, path, mon):
     def idenerer(): return fr.identifier_builder_
 
     return _MyFileReader(
-        num_lines, section_offset_via_EID, sections, path, idenerer, mon)
+        num_lines, section_offset_via_EID,
+        sections, fr.body_of_text, path,
+        idenerer, mon)
 
 
 class _MyFileReader:
 
-    def __init__(self, num_lines, dct, sections, path, idenerer, mon):
+    def __init__(self, num_lines, dct, sections, bot, path, idenerer, mon):
         self.number_of_lines_in_file = num_lines
         self._section_offset_via_EID, self._sections = dct, sections
-        self.path, self._idenerer = path, idenerer
+        self.path, self._BoT, self._idenerer = path, bot, idenerer
+
         self._monitor = mon
 
         self._entity_cache = {}
@@ -272,6 +286,14 @@ class _MyFileReader:
         iden_via = self._idenerer()
         return (iden_via(eid) for eid in self.to_EIDs_in_file())
 
+    def produce_retrieval(self, iden, mon):
+        ent = self.dereference(iden, mon)
+        if ent is None:
+            return
+        eid = iden.to_string()
+        sect = self._section_via_EID(eid)
+        return _retrieval(ent, sect, self._BoT)
+
     def dereference(self, iden, mon):
 
         # If you've already produced the entity before, use that
@@ -281,19 +303,33 @@ class _MyFileReader:
             return ent
 
         # Build and cache the entity
-        section_offset = self._section_offset_via_EID[eid]  # must exist
-        sect = self._sections[section_offset]
+        sect = self._section_via_EID(eid)
         ent = self._build_entity(sect, iden, mon)
         if ent is None:
             return  # don't cache failures. punish the client over and over
         self._entity_cache[eid] = ent
         return ent
 
+    def _section_via_EID(self, eid):
+        section_offset = self._section_offset_via_EID[eid]  # must exist
+        return self._sections[section_offset]
+
     def to_EIDs_in_file(self):
         return self._section_offset_via_EID.keys()
 
     def has_section_for_EID(self, eid):
         return eid in self._section_offset_via_EID
+
+
+def _retrieval(entity, section, bot):
+    # (yes we use a RetrieveEntity_ object to retrieve entities but it's
+    # too complicated to touch here)
+
+    if (cls := getattr(_retrieval, 'x', None)) is None:
+        from collections import namedtuple as func
+        cls = func('_retrieval', ('entity', 'entity_section', 'body_of_text'))
+        _retrieval.x = cls
+    return cls(entity, section, bot)
 
 
 def xx(msg=None):

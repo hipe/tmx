@@ -4,14 +4,14 @@
 from dataclasses import dataclass
 
 
-def _words_via_business_items(items, lexicon):  # #testpoint
+def _words_via_business_items(items, lexicon, datetime_now=None):  # #testpoint
 
     # Flatten the table early because we're gonna operate from the end
     table = _GenericTable(assert_in_order(items))
 
     # Break the table into N precision chunks (low precision to high precision)
     oldest, last_3_months, very_recent = table.split_and_map(
-        maps_and_boundaries=_maps_and_boundaries(), reverse=True)
+        maps_and_boundaries=_maps_and_boundaries(datetime_now), reverse=True)
     precision_chunks = oldest, last_3_months, very_recent
     # (we hard-code the 3 chunks for clarity, just to say hello. but imagine
     #  it's just N chunks. note: everything is chronological left-to-right)
@@ -168,17 +168,17 @@ today or at some unimaginably far date in the future, like two years from now.
 """
 
 
-def _maps_and_boundaries():
+def _maps_and_boundaries(dt_now):
     o = _maps_and_boundaries
     if o.x is None:
-        o.x = tuple(_do_maps_and_boundaries())
+        o.x = tuple(_do_maps_and_boundaries(dt_now))
     return o.x
 
 
 _maps_and_boundaries.x = None
 
 
-def _do_maps_and_boundaries():
+def _do_maps_and_boundaries(now):
     # Break the table up into N tables by finding the following boundaries
     # (and also, map the items thru the provided corresponding maps) #here2
 
@@ -209,6 +209,8 @@ def _do_maps_and_boundaries():
 
     yield 'map', _map_via(_month_precision)
 
+    if now:
+        return
     from datetime import datetime
     now = datetime.now()
 

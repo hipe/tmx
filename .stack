@@ -5,7 +5,8 @@ cover yes schema file but no ent entites dir
 base actions perhaps not needed for that one actions
 there are todo's
 you still need a plugin. massive massive amounts of integration
+audit trail for document as-is
+aggregate the audit-trails of several notecards together for one document
+just-enough sqlite3 storage adapter for the surrouding work
 figure out what the datamodel is. insanely what if you store the datamodel *in* the dotfile
-review that one function from the service and imagine a new whitepaper
-  (reminder `git --log --patch` on a whole directory (notecards or documents) stitch to already indexed)
 hack a quick and dirty dotfile2sqlite

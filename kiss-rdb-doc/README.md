@@ -27,6 +27,7 @@ woah boy.
 ## (the identifier registry)
 
 (Our range is [#880-899], a narrow allocation range for now.)
+(EDIT: the above range needs an audit, search the world for [#!875])
 
 |Id                         | Main Tag | Content |
 |---------------------------|:------|:----|
@@ -35,6 +36,7 @@ woah boy.
 |[#877.C]                   | #trak | new pattern of holes in traversal streams that client can chose to skip
 |[#877.B]                   | #open | CUSTOM_FUNCTIONS_OLD_WAY .. not sure what do
 |[#877]                     |       | now, a third node for internal & external tracking
+|[#875.3]                   |       | [entity edit history whitepaper]
 |[#875.2]                   |       | digraph: LEGACY markdown parsing state machine
 |[#874.9]                   | #open | sign off on what to do with this file marked LEGACY
 |[#874.5]                   | #open | clean up the interface to this emitter

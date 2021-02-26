@@ -1,5 +1,48 @@
-# Parse unified diff files. In practice, just used in testing.
-# If this gets too frustrating, consider using `unidiff` instead.
+"""
+Our favorite functions so far:
+
+- `next_hunk_via_line_scanner`: Parse a single hunk (AST) out of a stream
+  (actually scanner) of lines. One day we'll justify why we don't use `unidiff`
+
+- `scanner_via_iterator`: convenience method exposed here typically used
+  with above, to convert an iterator of lines (e.g. an open filehandle)
+  into a line scanner with one element of lookahead, for parsing.
+
+- `apply_patch_via_lines`: passes input lines directly to the system's
+  `patch` utility. Uses an intermediate tempfile to avoid partial patchings.
+
+
+Our business lexicon (and other assumptions and provisions) for patches:
+
+- We input and output the "unified diff" format where not stated otherwise.
+  (The manpage for `patch` seems to imply that this is the same thing as
+  as a "context diff".)
+
+- We don't refer to our business objects as "patches" unqualified because
+  it's ambiguous what that means in regards to how big or little the
+  unit of diff is.
+
+- The part of a unified diff that starts with an '@@', the `patch` mangpage
+  calls that a "hunk" and so, so do we.
+
+- The expression "patch file" (as a noun) is a bit ambigious and we might
+  alter other language here to avoid the expression. Here we use it to mean
+  any series of lines in the "context diff" format; but note a single
+  "patch file" may have several "file patches" in it (yikes). We may prefer
+  simply "context diff".
+
+- We say a "file patch" to mean those lines of a context diff targeting
+  a specific, given file. In our VCS, such runs of lines are demarcated with
+  a line like `diff --git a/some/file.code b/some/file.code`, which `patch`
+  recognizes as a context diff header. A "file patch" is composed of some
+  header lines and one or more hunks.
+
+- We use the term "run" here (as in "a run of lines") to mean, within a
+  hunk, a … run of contiguous lines within a hunk of the same type (insert,
+  remove or context).
+"""
+
+# (old comments from pre #history-B.4 just about the test-support facilities):
 
 # Conceptually this was abstracted from [#873.23] a testing DSL we made
 # in one file for asserting the content of file patches. See there for
@@ -7,48 +50,76 @@
 # only #began-as-abstraction.
 
 
+from dataclasses import dataclass as _dataclass
+import re as _re
+
+
+# == BEGIN a small amount of CLI tooling just for dev assistance
+
 def cli_for_production():
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
 
+def _formals_for_CLI():
+    yield '-h', '--help', 'This screen'
+    yield 'WHICH_WAY', '{ "OLD_WAY" | "NEW_WAY" } There are two ways'
+    yield 'FILE', "A unifed diff in a file. pass '-' to read from STDIN."
+
+
 def _CLI(sin, sout, serr, argv):
     from script_lib.cheap_arg_parse import cheap_arg_parse
-    return cheap_arg_parse(
-            _do_CLI, sin, sout, serr, argv,
-            (
-                ('-h', '--help', 'this screen'),
-                ('file', 'zim zum')))
+    return cheap_arg_parse(_do_CLI, sin, sout, serr, argv, _formals_for_CLI())
 
 
-def _do_CLI(sin, sout, serr, path, _rscr):
+def _do_CLI(sin, sout, serr, which, path, _rscr):
     "experiment. just for testing patch files"
 
-    def work(lines):
-        for fp in file_patches_via_unified_diff_lines(lines):
-            for line in fp._to_debugging_lines():
-                serr.write(line)
+    do_new_way = ('OLD_WAY', 'NEW_WAY').index(which)
 
     if '-' == path:
-        work(sin)
+        from contextlib import nullcontext
+        opened = nullcontext(sin)
     else:
-        with open(path) as lines:
-            work(lines)
+        opened = open(path)
+
+    with opened as input_lines:
+        if do_new_way:
+            scn = scanner_via_iterator(input_lines)
+            while scn.more:
+                hunk = next_hunk_via_line_scanner(scn)
+                serr.writelines(hunk.to_summary_lines())
+        else:
+            for fp in file_patches_via_unified_diff_lines(input_lines):
+                serr.writelines(fp.to_summary_lines())
     return 0
 
+# == END CLI tooling
 
-# == no more CLI
 
-def lazy(orig_f):
+def lazy(orig_f):  # #decorator #[#510.6]
     def use_f():
-        if not len(pointer):
-            pointer.append(orig_f())
-        return pointer[0]
-    pointer = []
+        if orig_f.do_call:
+            orig_f.memoized_value = orig_f()
+        return orig_f.memoized_value
+    orig_f.do_call = True
     return use_f
 
 
 def file_patches_via_unified_diff_lines(lines):  # :[#606]
+    """NOTE probably use `next_hunk_via_line_scanner` (or a derivative)
+
+    instead for all new work. This older way is being maintained for now for
+    at least three reasons:
+
+    - No time to refactor the whole world right now
+    - The Old Way has multi-pass, opt-in progressive parsing (coarse pass
+      then fine pass) which has different behavior clients may prefer
+      (e.g unit tests). May have some performance benefit lol
+    - The Old Way uses a clever older parser generator below that we just
+      can't quit yet even though the new FSA pattern is the bee's knees.
+    """
+
     # The parse is lazy/streaming across two axes: one, it chunks the input
     # lines in to "file patches" with the really coarse parsing below, rather
     # than parsing the whole "big patchfile" in to memory all at once.
@@ -62,16 +133,23 @@ def file_patches_via_unified_diff_lines(lines):  # :[#606]
     # a flat tuple of raw lines, not an array of chunks; and similarly a
     # chunk with its runs.
 
-    scn = _line_scanner_via_lines(lines)
+    scn = scanner_via_iterator(lines)
+    return _file_patches_via_unified_diff_line_scanner_OLD_WAY(scn)
+
+
+def _file_patches_via_unified_diff_line_scanner_OLD_WAY(scn):
     line_cache = []
     while scn.more:
+
+        # Advance over the zero or more "junk" lines
+        # (keep going until you find the '@' line but don't consume it)
         while True:
             first_char = scn.peek[0]
             if '@' == first_char:
                 break
             assert(' ' != first_char)
             line_cache.append(scn.next())
-            assert not scn.empty
+            assert scn.more
 
         while True:
             line_cache.append(scn.next())
@@ -87,7 +165,7 @@ def file_patches_via_unified_diff_lines(lines):  # :[#606]
         yield _FilePatch(file_patch_lines)
 
 
-def requires_parse(orig_f):
+def requires_parse(orig_f):  # #decorator
     def use_f(self):
         if self._is_raw:
             self._is_raw = False
@@ -103,13 +181,13 @@ class _FilePatch:
         self._is_raw = True
 
     @requires_parse
-    def _to_debugging_lines(self):
+    def to_summary_lines(self):
         for line in self.junk_lines:
             yield f"JUNK LINE: {line}"
         yield f"MMM LINE: {self.mmm_line}"
         yield f"PPP LINE: {self.ppp_line}"
         for hunk in self.hunks:
-            for line in hunk._to_debugging_lines():
+            for line in hunk.to_summary_lines():
                 yield line
 
     @property
@@ -138,7 +216,7 @@ class _FilePatch:
     def _parse_hunks(self):
         asts = self._hunk_ASTs
         del self._hunk_ASTs
-        self._hunks = tuple(_Hunk(astt) for astt in asts)
+        self._hunks = tuple(_Hunk_OLD_WAY(astt) for astt in asts)
 
     def _parse(self):
         lines = self._lines
@@ -156,7 +234,7 @@ class _FilePatch:
         assert(not len(ast))
 
 
-class _Hunk:
+class _Hunk_OLD_WAY:
     def __init__(self, ast):
         self._at_at_line = ast.pop('at_at_line').string
         self._body_lines = tuple(md.string for md in ast.pop('body_line'))
@@ -183,7 +261,7 @@ class _Hunk:
             if cat == run.category_name:
                 yield run
 
-    def _to_debugging_lines(self):
+    def to_summary_lines(self):
         yield f'HUNK: {self._at_at_line}'
         for run in self.runs:
             cat_name = run.category_name
@@ -196,8 +274,7 @@ class _Hunk:
         return self._runs
 
     def to_the_four_integers(self):
-        import re
-        md = re.match(r'@@[ ]\-(\d+),(\d+)[ ]\+(\d+),(\d+)[ ]@@(?:$|[ ])', self._at_at_line)  # noqa: E501
+        md = _AT_AT_four_integers_rx.match(self._at_at_line)
         return tuple(int(s) for s in md.groups())
 
     def _parse(self):
@@ -390,6 +467,8 @@ def _parser_builder():
 
 
 def _define_grammar(g):
+    # (compare this to the next function for a 6 mo. later alternative)
+
     define = g.define
     sequence = g.sequence
     # alternation = g.alternation
@@ -414,7 +493,307 @@ def _define_grammar(g):
     define('body_line', regex(r'^[- +]'))
 
 
-def _line_scanner_via_lines(lines):
+def next_hunk_via_line_scanner(scn):
+    """(DEV NOTES: this is an alternative implementation of the above function,
+
+    one from six months later using the our new favorite pattern for parsing
+    (#[#508.5]), and one that has different properties and is for different
+    purposes.
+
+    This way is more robust because it counts down and asserts the acutal
+    number of hunk lines against what is declared at the hunk head line; and
+    also it's "more readable" in its way because it's self-contained pure
+    python with no external libraries; but the old way has a certain charm
+    which is why we're maintaining both for now...)
+    """
+
+    def from_ready_state():
+        yield if_does_not_start_with_AT, add_to_junk_lines
+        yield since_it_starts_with_AT, on_AT_AT_line
+
+    def if_does_not_start_with_AT():
+        return '@' != first_char
+
+    def add_to_junk_lines():
+        # (you've got to allow blank lines, space-indented lines)
+        store['junk_lines'].append(line)
+
+    def since_it_starts_with_AT():
+        assert '@' == first_char
+        return True
+
+    def on_AT_AT_line():
+        md = _AT_AT_four_integers_rx.match(line)
+        # ..
+        store['AT_AT_line'] = line
+        captures = md.groups()
+        these = 'before_start', 'before_length', 'after_start', 'after_length'
+        for i, k in enumerate(these):
+            store[k] = int(captures[i])
+
+        store['num_BEFORE_lines_remaining'] = store['before_length']
+        store['num_AFTER_lines_remaining'] = store['after_length']
+        assert 0 < expecting_this_many_more_hunk_lines()
+
+        store['hunk_body_line_sexps'] = []
+        move_to(from_expecting_another_hunk_line)
+
+    def from_expecting_another_hunk_line():
+        yield if_context_line, handle_context_line
+        yield if_remove_line, handle_remove_line
+        yield if_add_line, handle_insert_line
+
+    def if_context_line():
+        return ' ' == first_char
+
+    def if_remove_line():
+        return '-' == first_char
+
+    def if_add_line():
+        return '+' == first_char
+
+    def handle_context_line():
+        decrement('num_BEFORE_lines_remaining')
+        decrement('num_AFTER_lines_remaining')
+        return handle_hunk_line('context_line')
+
+    def handle_remove_line():
+        decrement('num_BEFORE_lines_remaining')
+        return handle_hunk_line('remove_line')
+
+    def handle_insert_line():
+        decrement('num_AFTER_lines_remaining')
+        return handle_hunk_line('insert_line')
+
+    def decrement(which):
+        num = store[which]
+        if num < 1:
+            _ = which.replace('_', ' ')
+            xx(f"malformed hunk header: Expected zero {_}, had one: {line!r}")
+        store.update_value(which, num - 1)
+
+    def handle_hunk_line(sexp_type):
+        store['hunk_body_line_sexps'].append((sexp_type, line))
+        num = expecting_this_many_more_hunk_lines()
+        if num:
+            return
+
+        # Once you are expecting no more lines in this hunk, you are done
+        assert 0 == num
+        store.pop('num_BEFORE_lines_remaining')
+        store.pop('num_AFTER_lines_remaining')
+        move_to(from_ready_state)
+        return 'return_this', _Hunk_NEW_WAY(**store)
+
+    def expecting_this_many_more_hunk_lines():
+        return store['num_BEFORE_lines_remaining'] + \
+               store['num_AFTER_lines_remaining']
+
+    def move_to(state_function):
+        stack[-1] = state_function
+
+    stack = [from_ready_state]  # (we never actually push to the stack for now)
+    store = _StrictDict()
+
+    store['junk_lines'] = []
+
+    def find_transition():
+        for test, action in stack[-1]():
+            yn = test()
+            if yn:
+                return action
+        from_where = stack[-1].__name__.replace('_', ' ')
+        lines = [f"Couldn't find a transition {from_where} for line:"]
+        lines.append(repr(line))
+        xx('\n'.join(lines))
+
+    while scn.more:
+        line = scn.peek
+        first_char = line[0]
+        action = find_transition()
+        scn.advance()  # (calling it before we call the action just b.c we can)
+        direc = action()
+        if direc is None:
+            continue
+        typ = direc[0]
+        assert 'return_this' == typ
+        return_this, = direc[1:]
+        return return_this
+
+    from_where = stack[-1].__name__.replace('_', ' ')
+    xx(f"{from_where}, expecting more input but had no more lines")
+
+
+@_dataclass
+class _Hunk_NEW_WAY:
+    junk_lines: tuple  # or list but not formally
+    AT_AT_line: str
+    before_start: int
+    before_length: int
+    after_start: int
+    after_length: int
+    hunk_body_line_sexps: tuple  # or list but not formally
+
+    def REVERT_LINES(self, current_lines):
+        return _APPLY_HUNK_IN_REVERSE_YOURSELF_OMG(
+            current_lines, self.hunk_body_line_sexps)
+
+    def to_git_hunk_run_header_AST(self):
+        scn = scanner_via_iterator(self.junk_lines)
+        p = _git_hunk_run_parser()
+        header_AST = p(scn)
+        assert scn.empty  # ..
+        return header_AST
+
+    def to_summary_lines(self, margin=''):
+        yield f"{margin}Hunk:\n"
+
+        num_junk_lines = len(self.junk_lines)
+        yield f"{margin}  ({num_junk_lines} junk lines)\n"
+        yield f"{margin}  {self.AT_AT_line}"
+        counts = {k: 0 for k in ('remove_line', 'insert_line', 'context_line')}
+        for k, _ in self.hunk_body_line_sexps:
+            counts[k] += 1
+        yield f"{margin}  {counts!r}\n"
+
+
+# ==
+
+@lazy
+def _git_hunk_run_parser():
+    def parse(scn):  # #[#508.5] favorite FSA pattern
+
+        def from_beginning_state():
+            yield if_match(SHA_line_rx), go(from_expecting_author_line)
+
+        def from_expecting_author_line():
+            yield if_match(author_line_rx), go(from_expecting_date_line)
+
+        def from_expecting_date_line():
+            yield if_match(date_line_rx), go(from_expecting_message)
+
+        def from_expecting_message():
+            yield if_line_is_blank_or_indented, append_message_line
+            yield if_match(DIFF_line_rx), go(from_expecting_MMM)
+
+        def if_line_is_blank_or_indented():
+            if '\n' == line:
+                return True
+            return ' ' == line[0]  # or rx. is it faster? #todo
+
+        def append_message_line():
+            store['message_lines'].append(line)
+
+        def from_expecting_MMM():
+            yield if_match(MMM_line_rx), go(from_expecting_PPP)
+
+        def from_expecting_PPP():
+            yield if_match(PPP_line_rx), MAYBE_DO_END
+
+        def MAYBE_DO_END():
+            store_last_matchdata()  # we just matched PPP line
+            return 'return_this', _Git_Hunk_Run_Header_AST(**store)
+
+        # ==
+
+        def if_match(rx):
+            def test():
+                md = rx.match(line)
+                if md is None:
+                    return
+                store['last_matchdata'] = md
+                return True
+            return test
+
+        def go(next_state_function):
+            def action():
+                store_last_matchdata()
+                stack[-1] = next_state_function
+            return action
+
+        def store_last_matchdata():
+            md = store.pop('last_matchdata')
+            for k, v in md.groupdict().items():
+                store[k] = v
+
+        def find_transition():
+            for test, action in stack[-1]():
+                yn = test()
+                if yn:
+                    return action
+            from_where = stack[-1].__name__.replace('_', ' ')
+            xx(f"No transition found {from_where} for line: {line!r}")
+
+        stack = [from_beginning_state]
+        store = _StrictDict()
+        store['message_lines'] = []
+
+        assert scn.more  # ..
+        while scn.more:
+            line = scn.peek
+            action = find_transition()
+            scn.advance()  # doing it before action just becase we can
+            direc = action()
+            if direc is None:
+                continue
+            typ = direc[0]
+            assert 'return_this' == typ
+            ret, = direc[1:]
+            # (leave the line scanner wherever it is)
+            return ret
+
+        xx('never reached the end state (the "plus plus plus" line)')
+
+    c = _re.compile
+    SHA_line_rx = c(r'commit (?P<SHA>[0-9a-z]{8,})$')
+    author_line_rx = c(r'Author:[ ](?P<author>.+)$')
+    date_line_rx = c(r'Date:[ ]+(?P<datetime_string>[^ ].+)$')
+    DIFF_line_rx = c(r'diff[ ]--git[ ](?P<A_path>[^ ]+)[ ](?P<B_path>\S+)$')
+    MMM_line_rx = c(r'---[ ](?P<MMM_path>\S+)$')
+    PPP_line_rx = c(r'\+\+\+[ ](?P<PPP_path>\S+)$')
+
+    return parse
+
+
+@_dataclass
+class _Git_Hunk_Run_Header_AST:
+    SHA: str
+    author: str
+    datetime_string: str
+    message_lines: tuple  # (or list)
+    A_path: str
+    B_path: str
+    MMM_path: str
+    PPP_path: str
+
+    def to_summary_lines(self, margin=''):
+        def these():
+            for line in self.message_lines:
+                line = rx.match(line)[1]
+                if '\n' == line:
+                    continue
+                yield line
+        rx = _re.compile(r'[ ]*(.+)', _re.DOTALL)
+        itr = these()
+        line1 = next(itr)
+        line2 = None
+        for line2 in itr:
+            break
+        yield f"{margin}Git hunk run header AST:\n"
+        yield f"{margin}  Commit: {self.SHA}\n"
+        yield f"{margin}  Datetime: {self.datetime_string}\n"
+        if True:
+            yield f"{margin}  Excerpt: {line1}"
+        if line2:
+            yield f"{margin}           {line2}"
+
+
+_ugh = 12
+
+
+# ==
+
+def scanner_via_iterator(lines):  # (used here, exposed for convenience)
     if not hasattr(lines, '__next__'):
         lines = iter(lines)  # we could do scanner_via_list but don't
     from text_lib.magnetics import scanner_via as scnlib
@@ -448,7 +827,72 @@ def patch_unit_of_work_via(before_lines, after_lines, path_tail, do_create):
     return o
 
 
+def _APPLY_HUNK_IN_REVERSE_YOURSELF_OMG(current_lines, hunk_body_line_sexps):
+    # this is written out of necessity and is not for general use
+    # no fuzzy matching hunks
+    # see next function for applying a patch using the system
+
+    def fail_when_unexpected_extra():
+        xx(f"Oops, unexpected extra line (input line {input_lineno}): {current_line!r}")  # noqa: E501
+
+    def prepare_operation():
+        typ, full_line = operation_stack[-1]
+        line_body = full_line[1:]  # not wasteful, never been done before here
+        return typ, line_body
+
+    input_lineno = 0
+    operation_stack = list(reversed(hunk_body_line_sexps))
+    for current_line in current_lines:
+        input_lineno += 1
+
+        while True:  # (loop while doing another operation on the same line)
+
+            if not operation_stack:
+                fail_when_unexpected_extra()
+
+            typ, line_body = prepare_operation()
+
+            # For context lines, output line as-is after confirming is same
+            if 'context_line' == typ:
+                if line_body == current_line:
+                    operation_stack.pop()
+                    yield current_line
+                    break
+                a = [f"context mismatch on input line {input_lineno}:"]
+                a.append(f"expected line: {line_body!r}")
+                a.append(f"input line:    {current_line!r}")
+                xx('\n'.join(a))
+
+            # Insert lines manifest as remove lines when reversed. Do not yield
+            if 'insert_line' == typ:
+                if line_body == current_line:
+                    # (do nothing, do not output the line. remember reversed)
+                    operation_stack.pop()
+                    break
+                a = [f"line mismatch for reversed insert (delete) on line {input_lineno}:"]  # noqa: E501
+                a.append(f"wanted to delete line: {line_body!r}")
+                a.append(f"but had line:          {current_line!r}")
+                xx('\n'.join(a))
+
+            # For each one or more removed line, output it (loop within loop)
+            assert 'remove_line' == typ
+            operation_stack.pop()
+            yield line_body
+
+            # (you outputted the content of the operation but no the current
+            #  input line, which still requires matching against operations)
+            pass  # hi. loop again!
+
+        # end while True loop
+    # end traverse current lines
+
+    if operation_stack:
+        wat = operation_stack[-1][1]
+        xx(f"oops, remaining instruction(s) at end of input: {wat!r}")
+
+
 def apply_patch_via_lines(lines, is_dry, listener, cwd=None):
+    # see previous function for a rough as hell "revert" written by hand
 
     from tempfile import NamedTemporaryFile
     with NamedTemporaryFile('w+') as fp:  # #[#508.3] this pattern
@@ -515,18 +959,39 @@ def _apply_big_patchfile(patchfile_path, is_dry, cwd, listener):
     serr(f"exitstatus from patch: {repr(es)}\n")
 
 
+# == Simple Support
+
+class _StrictDict(dict):  # #[#508.5] custom strict data structure
+    # Just like a dict but you have to be clear about intent
+
+    def __setitem__(self, k, v):
+        assert k not in self
+        return self._parent_set_item(k, v)
+
+    def update_value(self, k, v):
+        assert k in self
+        return self._parent_set_item(k, v)
+
+    _parent_set_item = dict.__setitem__
+
+
+_AT_AT_four_integers_rx = _re.compile(
+    r'@@[ ]\-(\d+),(\d+)[ ]\+(\d+),(\d+)[ ]@@(?:$|[ ])')
+
+
 _PATCH_EXE_NAME = 'patch'
 
 
 # ==
 
 def xx(msg=None):
-    raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
+    raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
 
 if '__main__' == __name__:
     cli_for_production()
 
 
+# #history-B.4 add passive option to parsing, rewrite to use FSA pattern
 # #history-B.2
 # #began-as-abstraction

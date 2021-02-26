@@ -16,14 +16,19 @@ Now the new way:
 """
 
 
+def _cli_for_production():
+    from sys import stdin, stdout, stderr, argv
+    exit(_CLI_for_crazy_visual_test(stdin, stdout, stderr, argv))
+
+
 def _CLI_for_crazy_visual_test(sin, sout, serr, argv):
     try:
-        return _do_crazy_CLI(sout, serr, argv)
+        return _do_toolkit_CLI(sout, serr, argv, _external_functions)
     except _Stop_On_CLI_Error as e:
         return e.exitstatus
 
 
-def _do_crazy_CLI(sout, serr, argv):
+def _do_toolkit_CLI(sout, serr, argv, efx):
 
     bash_argv = list(reversed(argv))
     long_prog_name = bash_argv.pop()
@@ -57,17 +62,34 @@ def _do_crazy_CLI(sout, serr, argv):
     tests = {}
 
     @command
+    def BIG_AUDIT_TRAIL():
+        eid = bash_argv_pop('<entity-id>')
+        mon = efx.monitor_via_stderr(serr)
+        return _big_audit_trail(sout, eid, coll, mon)
+
+    @command
     def TRAVERSE_AND_EXPLAIN():
         return _traverse_and_explain_whole_collection(sout, serr, coll)
 
     @command
     def RETRIEVE_ENTITY():
         entity_id = bash_argv_pop('<entity-id>')
-        listener = _listener_via_IO(serr)
         ent = _retrieve(entity_id, coll, listener)
         if not ent:
             return 3
         serr.write('(retrieve OK)\n')
+        return 0
+
+    @command
+    def ENTITY_RETRIEVAL():
+        entity_id = bash_argv_pop('<entity-id>')
+        retr = _retrieval(entity_id, coll, listener)
+        assert retr.entity
+        assert retr.entity_section
+        assert retr.file_reader
+        assert retr.file_reader.body_of_text
+        eid = retr.entity.identifier.to_string()
+        serr.write(f"(retrieval of {eid!r} exposed four things)\n")
         return 0
 
     @command
@@ -85,14 +107,42 @@ def _do_crazy_CLI(sout, serr, argv):
     test_name = bash_argv_pop('<test-name>')
     f = tests.get(test_name)
     if f is None:
-        serr.write(f'expecting {test_names_alternation()}')
-        serr.write(f' had {repr(test_name)}\n')
+        serr.write(f'{test_name!r} is not a test\n')
+        serr.write(f'Available tests: {test_names_alternation()}\n')
         return 3
+
+    listener = _listener_via_IO(serr)
 
     from kiss_rdb.storage_adapters_.eno import \
         mutable_eno_collection_via as func
-    coll = func(coll_path, rng=None)
+    coll = func(coll_path, rng=None, listener=listener)
+    if coll is None:
+        return 123
     return tests[test_name]()
+
+
+# ci = collection implementation
+
+
+def _big_audit_trail(sout, eid, coll, mon):
+    def summarize(o):
+        sout.writelines(o.to_summary_lines())
+
+    ci = coll.custom_functions
+    itr = ci.AUDIT_TRAIL_FOR(eid, mon)
+    if itr:
+        typ, o = next(itr)
+        assert 'entity_snapshot' == typ
+        summarize(o)
+
+        for typ, o in itr:
+            assert 'entity_edit' == typ
+            summarize(o)
+
+            typ, o = next(itr)
+            assert 'entity_snapshot' == typ
+
+    return mon.returncode
 
 
 def _traverse_and_explain_whole_collection(sout, serr, coll):  # #testpoint
@@ -106,7 +156,8 @@ def _traverse_and_explain_whole_collection(sout, serr, coll):  # #testpoint
 
     mon = cf.monitor_via_listener_(_listener_via_IO(serr))
 
-    from . import body_of_text_ as body_of_text_via
+    from kiss_rdb.storage_adapters_.eno import \
+        body_of_text_ as body_of_text_via
 
     for path in cf.to_file_paths_():
         serr.write(f'PATH: {path}\n')
@@ -169,7 +220,7 @@ class _Stop_On_CLI_Error(RuntimeError):
 
 # ==
 
-def _do_CLI(sin, sout, serr, file_path, rscr):
+def _do_CLI_NOT_USED(sin, sout, serr, file_path, rscr):
     """ad-hoc develoment utility for seeing a parsed eno document as a dump.
 
     not complete. (This was really just tooling to find the cause of a "bug"
@@ -238,7 +289,18 @@ def _retrieve(eid, coll, listener=None):
     >>> _retrieve('e', coll, lambda *_: None)
 
     """
+
     return coll.retrieve_entity(eid, listener)
+
+
+def _retrieval(eid, coll, listener=None):
+    ci = coll.custom_functions
+    idener = ci.build_identifier_function_(listener)
+    iden = idener(eid)
+    if iden is None:
+        return
+    retr, = ci.entity_retrievals((iden,), listener)
+    return retr
 
 
 def _open_traverse_idens(coll):
@@ -265,6 +327,16 @@ def _collection_via_dict(dct):
 
 # ==
 
+class _external_functions:  # #class-as-namespace
+
+    def monitor_via_stderr(serr):
+        from script_lib.magnetics.error_monitor_via_stderr import func
+        return func(serr, default_error_exitstatus=4)
+        # (keep the default returncode lower than git returncodes, (e.g 128))
+
+
+# ==
+
 def xx(msg=None):
     raise RuntimeError(f"write me{f': {msg}' if msg else ''}")
 
@@ -275,8 +347,7 @@ HELLO_I_AM_ENO_TOOLKIT_ = True  # #tespoint (only)
 
 
 if '__main__' == __name__:
-    import sys as o
-    exit(_CLI_for_crazy_visual_test(o.stdin, o.stdout, o.stderr, o.argv))
+    _cli_for_production()
 
 # #history-B.4
 # #history-A.1

@@ -23,7 +23,7 @@ def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
 
     # Help is here rather than deeper so we can pass trivially complicated doc
     if vals.get('help'):
-        for line in foz.help_lines(doc=None):
+        for line in foz.help_lines(doc=(descsr and descsr())):
             serr.write(line)
         return 0
 

@@ -1,0 +1,14 @@
+# entity: ABA: attributes
+
+zibby_one: one
+fibby_two: two
+-- bodicum
+line 1
+line 2
+-- bodicum
+
+
+# document-meta
+-- string_as_comment
+# #born.
+-- string_as_comment

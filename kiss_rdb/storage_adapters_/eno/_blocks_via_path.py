@@ -37,6 +37,9 @@
 # - semaphores!? concurrency yikes
 
 
+from dataclasses import dataclass as _dataclass
+
+
 # cf = collection facade
 
 def new_file_lines__(file_edit, cf, order, emi, **body_of_text):
@@ -455,23 +458,11 @@ def _existing_attribute_block(begin, end, el, line_index):
     # question, with some work :#here2
 
     from kiss_rdb.storage_adapters_.eno import \
-            key_value_vendor_type_via_attribute_element_
+        classify_attribute_element_ as cx_via
 
-    key, value, typ = key_value_vendor_type_via_attribute_element_(el)
+    key, value, typ = cx_via(el)
 
-    if 'Field' == typ:
-        _, end_char = el._instruction['ranges']['value']
-        middle = line_index.line_offset_via_character_offset(end_char) + 1
-        # the above is the offset of our last content line plus 1, so it's the
-        # offset of the first tail-anchored block of comment lines (or similar)
-        # #todo maybe we don't need the crazy reverse
-    elif 'Multiline Field Begin' == typ:
-        middle = el._instruction['end']['line'] + 1
-    else:
-        assert('List' == typ)
-        # we assume at least one item otherwise we wouldn't "know" it's a list
-        _, end_char = el._instruction['items'][-1]['ranges']['line']
-        middle = line_index.line_offset_via_character_offset(end_char) + 1
+    middle = line_index.stop_line_offset_of_vendor_element(el)
 
     lines = line_index.line_cache
 
@@ -547,7 +538,11 @@ def _eno_type_via_value(value):
     return 'List'
 
 
-def _line_index_via_lines(line_cache):
+class line_index_via_lines_:
+    """The eno lib wasn't designed to give you etc but we etc
+
+    """
+
     # Bridge the gap between character offsets (into the "big string" of
     # every character in the file) and line offsets. mainly serve #here2
 
@@ -566,33 +561,57 @@ def _line_index_via_lines(line_cache):
     # and *as the entity gets lower in the file*!. We could improve it with a
     # B-tree but why.
 
-    assert(isinstance(line_cache, tuple))  # #[#011]
+    def __init__(self, line_cache):
+        self.line_cache = line_cache
 
-    character_offsets = []
+    def stop_line_offset_of_vendor_element(self, el):
+        return self._stop_line_offset_via(el._instruction) + 1
+        # (plus one because stop not last)
+
+    def _stop_line_offset_via(self, inst):
+        typ = inst['type']
+
+        if 'Section' == typ:
+            return self._stop_line_offset_via(inst['elements'][-1])  # RECURSE
+
+        if 'Field' == typ:
+            _, end_line_char = inst['ranges']['line']
+            return self._line_offset_via_character_offset(end_line_char)
+
+        if 'Multiline Field Begin' == typ:
+            return inst['end']['line']
+
+        assert 'List' == typ
+        # (assume at least one item otherwise we wouldn't "know" it's a list)
+
+        _, end_line_char = inst['items'][-1]['ranges']['line']
+        return self._line_offset_via_character_offset(end_line_char)
+
+    def _line_offset_via_character_offset(self, char_offset):
+        self._line_offset_via_character_offset = _build_line_offsetter(
+            self.line_cache)
+        return self._line_offset_via_character_offset(char_offset)
+
+
+def _build_line_offsetter(line_cache):
+    def line_offset_via_character_offset(char_offset):
+        for line_offset in line_offset_range:
+            if character_offsets[line_offset] <= char_offset:
+                continue
+            return line_offset - 1
+        assert()
+    character_offsets = tuple(_build_character_offsets(line_cache))
+    line_offset_range = range(0, len(character_offsets))
+    return line_offset_via_character_offset
+
+
+def _build_character_offsets(line_cache):
+    assert isinstance(line_cache, (tuple, list))  # #[#011]
     total_characters_seen = 0
-
     for line in line_cache:
-        character_offsets.append(total_characters_seen)
+        yield total_characters_seen
         total_characters_seen += len(line)
-
-    character_offsets.append(total_characters_seen)  # #here1
-    character_offsets = tuple(character_offsets)
-    use_line_offset_range = range(0, len(character_offsets))
-
-    class line_index:
-
-        def line_offset_via_character_offset(_, char_offset):
-            for line_offset in use_line_offset_range:
-                if character_offsets[line_offset] <= char_offset:
-                    continue
-                return line_offset - 1
-            assert()
-
-        @property
-        def line_cache(_):
-            return line_cache
-
-    return line_index()
+    yield total_characters_seen  # #here1
 
 
 # == Read Existing Blocks
@@ -601,10 +620,11 @@ def document_sections_via_BoT_(bot, cf, mon):
 
     docu = cf.eno_document_via_(body_of_text=bot)  # throw FileNotFound, others
     from . import document_sections_of_ as func
-    itr = func(docu, bot.path, mon)
+    itr = func(docu, bot, mon)
     itr = _add_line_starts(itr)
-    line_index = _line_index_via_lines(bot.lines)
-    itr = _add_line_ends(len(line_index.line_cache), itr)
+    line_index = line_index_via_lines_(bot.lines)
+    num_lines_in_file = len(bot.lines)
+    itr = _add_line_ends(itr, num_lines_in_file)
     typ = None
 
     lines_pointer = []
@@ -613,6 +633,7 @@ def document_sections_via_BoT_(bot, cf, mon):
     iden_via = cf.build_identifier_function_(mon.listener)
 
     for typ, eid, vendor_sect, beg, end in itr:
+
         if 'entity_section' != typ:
             break
         iden = iden_via(eid)
@@ -651,6 +672,7 @@ def _break_off_lines(entb, matchdata):
 def _matchdata_for_slot_A_of_next_section(entb):
 
     attr_blocks = entb.attribute_blocks
+
     if len(attr_blocks):
         clines = attr_blocks[-1].to_tail_anchored_comment_or_whitespace_lines()
         clines = tuple(clines)
@@ -660,8 +682,8 @@ def _matchdata_for_slot_A_of_next_section(entb):
     if not len(clines):
         return
 
-    from ._machine_edit_check import MATCH_DATA
-    break_here = MATCH_DATA(clines)
+    from ._machine_edit_check import MATCH_DATA as func
+    break_here = func(clines)
     if break_here is None:
         return
 
@@ -669,7 +691,12 @@ def _matchdata_for_slot_A_of_next_section(entb):
     return _, break_here, clines
 
 
-def _add_line_ends(num_lines, itr):
+def _add_line_ends(itr, num_lines_in_file):
+    """(The stop line of each non-last section is the start line of the
+
+    the section after it. For the last section, use the number of lines in file
+    """
+
     prev = None
     for prev in itr:
         break
@@ -678,7 +705,10 @@ def _add_line_ends(num_lines, itr):
     for curr in itr:
         yield *prev, curr[-1]
         prev = curr
-    yield *prev, num_lines
+
+    typ, eid, vendor_el, start_lineno = prev
+    assert 'document_meta' == typ  # not actually necessary, just contact check
+    yield typ, eid, vendor_el, start_lineno, num_lines_in_file
 
 
 def _add_line_starts(itr):
@@ -688,7 +718,8 @@ def _add_line_starts(itr):
 
 
 def _first_line_offset_of(el):
-    return el._instruction['line']  # not okay, technically
+    from . import start_line_offset_via_vendor_element_ as func
+    return func(el)
 
 
 def _existing_entity_block(begin, end, ent, line_index):
@@ -734,22 +765,20 @@ def _existing_entity_block(begin, end, ent, line_index):
         entity=ent)
 
 
-def _to_attribute_block_stream(ent, end, line_index):
+def _to_attribute_block_stream(ent, stop, line_index):
+    els = ent.VENDOR_SECTION_.elements()
+    if 0 == len(els):
+        return
 
-    def flush(end):
-        el = previous_element.pop()
-        begin = _first_line_offset_of(el)
-        return _existing_attribute_block(begin, end, el, line_index)
+    with_starts = ((_first_line_offset_of(e), e) for e in els)
+    prev_start, prev_el = next(with_starts)
 
-    previous_element = []  # abuse
+    for here, el in with_starts:
+        yield _existing_attribute_block(prev_start, here, prev_el, line_index)
+        prev_start, prev_el = here, el
 
-    for el in ent.VENDOR_SECTION_.elements():
-        if len(previous_element):
-            yield flush(_first_line_offset_of(el))
-        previous_element.append(el)
-
-    if len(previous_element):
-        yield flush(end)
+    # (on the last attribute, use the argument stop)
+    yield _existing_attribute_block(prev_start, stop, prev_el, line_index)
 
 
 # == Models (that are not ad-hoc)
@@ -816,34 +845,29 @@ def _entity_block_via(
     return entity_block()
 
 
-def _attribute_block_via(dattr, value, typ, head_lineser, tail_lineser, begin):
+@_dataclass  # (#history-B.4 is a good use case justification of this)
+class _AttributeBlock:
+    key: str
+    value: object
+    eno_type: str
+    to_head_anchored_body_lines: callable
+    to_tail_anchored_comment_or_whitespace_lines: callable
+    begin: int
 
-    _value = value
-    _begin = begin
+    def but_with(self, tail_anchored_comment_or_whitespace_lines):
+        return self.__class__(
+            self.key, self.value, self.eno_type,
+            self.to_head_anchored_body_lines,
+            lambda: tail_anchored_comment_or_whitespace_lines, self.begin)
 
-    class attribute_block:  # #class-as-namespace
+    def to_lines(self):
+        for line in self.to_head_anchored_body_lines():
+            yield line
+        for line in self.to_tail_anchored_comment_or_whitespace_lines():
+            yield line
 
-        def but_with(tail_anchored_comment_or_whitespace_lines):
-            def use_tail_lineser():
-                return tail_anchored_comment_or_whitespace_lines
-            return _attribute_block_via(
-                dattr, value, typ, head_lineser, use_tail_lineser, begin)
 
-        def to_lines():
-            for line in self.to_head_anchored_body_lines():
-                yield line
-
-            for line in self.to_tail_anchored_comment_or_whitespace_lines():
-                yield line
-
-        to_head_anchored_body_lines = head_lineser
-        to_tail_anchored_comment_or_whitespace_lines = tail_lineser
-        key = dattr
-        value = _value
-        eno_type = typ
-        begin = _begin
-
-    return (self := attribute_block)
+_attribute_block_via = _AttributeBlock
 
 
 class _document_meta_section:
@@ -955,4 +979,5 @@ def xx(msg=None):
 class _OpenStruct:
     pass
 
+# #history-B.4
 # #birth

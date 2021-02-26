@@ -8,6 +8,10 @@ heading: sqlite notes (disjoint and sparse)
 
 [python sqlite][3]
 
+[sqlite indexing][4]
+
+
+[4]: https://www.sqlitetutorial.net/sqlite-index/
 [3]: https://docs.python.org/3/library/sqlite3.html
 [2]: https://www.sqlite.org/doclist.html
 [1]: https://www.sqlitetutorial.net/sqlite-tutorial/sqlite-describe-table/

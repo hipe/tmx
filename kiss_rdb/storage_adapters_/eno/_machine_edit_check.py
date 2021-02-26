@@ -95,14 +95,17 @@ def MATCH_DATA(clines):
 # == Signature stuff
 
 def _signature_via_comment_block(clines):
-    _ = ((_category_via_line(clines[i]), i) for i in range(0, len(clines)))
-    return tuple(_repeater_reducer_thing(_, lambda two: two[0]))
+    arr = []
+    for i, line in enumerate(clines):
+        cat = _category_via_line(line)
+        arr.append((cat, i))
+    return tuple(_repeater_reducer_thing(arr, lambda two: two[0]))
 
 
 def _category_via_line(line):
     if '\n' == line:
         return 'blank_lines'
-    assert('>' == line[0])  # big flex
+    assert '>' == line[0]  # big flex
     return 'comment_lines'
 
 
