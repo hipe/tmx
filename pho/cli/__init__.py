@@ -1,67 +1,70 @@
 def cli_for_production():
 
-    class efx:  # #class-as-namespace
+    class efx(_ExternalFunctions):
 
-        def produce_monitor():
+        def produce_monitor(_):
             from script_lib.magnetics.error_monitor_via_stderr import func
             return func(stderr, default_error_exitstatus=5678)
 
-        def produce_environ():
+        def produce_environ(_):
             from os import environ as result
             return result
 
     from sys import stdin, stdout, stderr, argv
-    exit(_CLI(stdin, stdout, stderr, argv, efx))
+    exit(_CLI(stdin, stdout, stderr, argv, efx()))
 
 
 def _CLI(sin, sout, serr, argv, efx):  # efx = external functions
     def line_contents():
         yield 'experiments in generating documents from "notecards"'
-    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+    func = _cheap_arg_parse_branch
     return func(sin, sout, serr, argv, _commands(), line_contents, efx)
 
 
-def _lazy(build):  # [#510.8] yet another take on "lazy"
-    class Lazy:
-        def __init__(self):
-            self._is_first = True
+def _memoized_property(orig_f):  # custom memoizy decorator #[#510.6]
+    def use_f(self):
+        if (dct := getattr(self, '_memo', None)) is None:
+            self._memo = (dct := {})
+        if key not in dct:
+            dct[key] = orig_f(self)
+        return dct[key]
+    key = orig_f.__name__
+    return property(use_f)
 
-        def __call__(self):
-            if self._is_first:
-                self._is_first = False
-                self._value = build()
-            return self._value
-    return Lazy()
+
+class _ExternalFunctions:
+
+    @_memoized_property
+    def collection_path_option_definition(self):
+        return self._coll_path_tools['build_coll_path_option_definition']()
+
+    def require_collection_path(self, listener, vals):
+        dct = self._coll_path_tools
+        return _require_collection_path(listener, vals, self, dct)
+
+    @_memoized_property
+    def _coll_path_tools(_):
+        return _build_collection_path_tools()
 
 
 def _build_collection_path_tools():
 
     coll_path_env_var_name = 'PHO_COLLECTION_PATH'
 
-    class collection_path_tools:
+    def build_coll_path_option_definition():
+        return '-c', '--collection-path=PATH', * descs()
 
-        @property
-        def descs(_):
+    def descs():
+        if True:
             yield 'The path to the directory with the notecards '
             yield '(the directory that contains the `entities` directory)'
             yield f'(or set the env var {coll_path_env_var_name})'
-
-        def require_collection_path(_, listener, efx):
-            env = efx.produce_environ()
-            collection_path = env.get(coll_path_env_var_name)
-            if collection_path is not None:
-                return collection_path, None
-            whine_about(listener)
-            return None, 134
 
     def whine_about(listener):
         listener('error', 'structure', 'parameter_is_currently_required',
                  lambda: {'reason_tail': '--collection-path'})
 
-    return collection_path_tools()
-
-
-collection_path_tools_ = _lazy(_build_collection_path_tools)
+    return locals()
 
 
 def _commands():
@@ -76,6 +79,7 @@ def _commands():
     yield 'watch', lambda: _watch_command
     yield 'connect', _load_the_connect_COMMAND
     yield 'generate', lambda: _load_commonly('generate')
+    yield 'history', lambda: _history_command
     yield 'static-webserver', lambda: _static_webserver_command
     yield 'toml2eno', lambda: _load_commonly('toml2eno')
 
@@ -224,6 +228,71 @@ def _load_the_connect_COMMAND():
     return func(_port, _foz_via)
 
 
+# == BEGIN history (not quite long enough for its own file, even tho a branch)
+
+def _history_commands():
+    yield 'update', lambda: _history_update_command
+
+
+def _history_command(sin, sout, serr, argv, efx):
+    """Interface to "document history" data warehousing (sqlite3 database)
+
+    Hopefully you won't need to interface with this direcly except during
+    development and when something goes wrong
+    """
+
+    cx = _history_commands()
+    def descrs(): return _history_command.__doc__
+    return _cheap_arg_parse_branch(sin, sout, serr, argv, cx, descrs, efx)
+
+
+def _formals_for_history_update(efx):
+    yield efx.collection_path_option_definition
+    yield '-h', '--help', 'this screen'
+
+
+def _history_update_command(sin, sout, serr, argv, efx):
+    """Create or update the sqlite3 database as necessary, for generating
+
+    document history. Ideally the plugin will just do this and you won't
+    have to interface with it directly.
+    """
+
+    bash_argv = list(reversed(argv))
+    long_prog_name = bash_argv.pop()
+
+    def prog_name():
+        from script_lib.cheap_arg_parse import shorten_long_program_name as fun
+        return fun(long_prog_name)
+
+    foz = _foz_via(_formals_for_history_update(efx), prog_name)
+
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        serr.writelines(foz.help_lines(doc=_history_update_command.__doc__))
+        return 0
+
+    mon = efx.produce_monitor()
+    listener = mon.listener
+
+    coll_path, rc = efx.require_collection_path(listener, vals)
+    if not coll_path:
+        return rc
+
+    assert not vals
+
+    from pho.document_history_ import func
+    res = func(coll_path, listener)
+    assert res is None
+
+    return mon.returncode
+
+# == END history
+
+
 def _formals_for_static_webserver():
     yield '-t', '--target=TARGET', '(pass thru to livereload)'
     yield '-p', '--port=PORT', 'port to listen on for http. there is a default'
@@ -261,9 +330,23 @@ def _static_webserver_command(sin, sout, serr, argv, efx):
     return mon.returncode
 
 
-def _foz_via(defs, pner, x=None):
-    from script_lib.cheap_arg_parse import formals_via_definitions as func
-    return func(defs, pner, x)
+def _require_collection_path(listener, vals, efx, tools):
+
+    # If it was passed as an argument, use that
+    val = vals.pop('collection_path', None)
+    if val is not None:
+        return val, None
+
+    # If it's set in the environment, use than
+    env_var_name = tools['coll_path_env_var_name']
+    env = efx.produce_environ()
+    collection_path = env.get(env_var_name)
+    if collection_path is not None:
+        return collection_path, None
+
+    # Whine about how you didn't find it
+    tools['whine_about'](listener)
+    return None, 134
 
 
 def parse_port_(serr, vals, default_port, foz):
@@ -298,6 +381,16 @@ def parse_positionals_(positionals, monikers, cmd_phrase):
         return iter((8, reason))
 
     assert req_len == act_len
+
+
+def _cheap_arg_parse_branch(sin, sout, serr, argv, cx, doc, efx):
+    from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
+    return func(sin, sout, serr, argv, cx, doc, efx)
+
+
+def _foz_via(defs, pner, x=None):
+    from script_lib.cheap_arg_parse import formals_via_definitions as func
+    return func(defs, pner, x)
 
 
 _port = 10_007  # purely arbitrary historical reasons

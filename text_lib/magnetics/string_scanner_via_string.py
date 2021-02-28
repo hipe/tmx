@@ -1,20 +1,22 @@
 import re
 
 
-def build_throwing_string_scanner_and_friends(listener, cstacker=None):
+def build_throwing_string_scanner_and_friends(
+        listener, cstacker=None, stop=None):
 
     def build_scanner(piece):
         return StringScanner(piece, throwing_listener, cstacker)
 
-    class stop(RuntimeError):
-        pass
+    if stop is None:
+        class stop(RuntimeError):
+            pass
 
-    throwing_listener = build_throwing_listener(listener, stop, cstacker)
+    throwing_listener = build_throwing_listener(listener, stop)
 
     return pattern_via_description_and_regex_string, build_scanner, stop
 
 
-def build_throwing_listener(listener, stop, cstacker=None):
+def build_throwing_listener(listener, stop):
     def throwing_listener(sev, *rest):
         listener(sev, *rest)
         if 'error' == sev:
@@ -155,6 +157,11 @@ class StringScanner:  # see also [#611] the scanner library
             yield 'expecting', (desc := descer())
             yield 'reason', f'expecting {desc}'
             yield 'position', pos
+
+            if '\n' in line:
+                # NOT SURE
+                line = line.replace('\n', '⏎')
+
             yield 'line', line
 
             def two_lines():

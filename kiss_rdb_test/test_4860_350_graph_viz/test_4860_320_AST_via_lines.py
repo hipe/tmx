@@ -62,7 +62,7 @@ class Case4860_316_this_file(CommonCase):
 
 
 def these_four(edge):
-    return edge[1:5]
+    return tuple((getattr(edge, attr) for attr in edge._fields[1:5]))
 
 
 EndState = namedtuple('EndState', 'node_expressions edge_expressions'.split())

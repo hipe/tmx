@@ -1,4 +1,33 @@
+def abstract_schema_via_sqlite3_connection(conn, listener):
+    lines = _schema_lines_as_if_one_full_monty_because_why_not(conn)
+    return abstract_schema_via_sqlite_SQL_lines(lines)
+
+
+def _schema_lines_as_if_one_full_monty_because_why_not(conn):
+    """Normalize the lines we get from the sqlite query to have semicolons
+
+    and newlines, and also munge all the lines together as if in one stream of
+    lines, because our parser is already designed to accomodate that
+    """
+
+    c = conn.cursor()
+    c.execute('SELECT sql FROM sqlite_master WHERE type = "table"')
+    for row in c:
+        big_string, = row
+        lines = big_string.splitlines(keepends=True)
+        last_char = lines[-1][-1]
+        assert '\n' != last_char
+        add_these = []
+        if ';' != last_char:
+            add_these.append(';')
+        add_these.append('\n')
+        lines[-1] = ''.join((lines[-1], *add_these))
+        for line in lines:
+            yield line
+
+
 def abstract_schema_via_sqlite_SQL_lines(lines):
+
     # (in impl, this func is just a light wrapper that breaks streaming)
     def tables():
         for typ, val in sxs:
@@ -44,7 +73,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
 
     def on_type_name_thats_also_valid_storage_class():
         assert 'from_expecting_type_name' == stack.pop().__name__
-        store['column_type_storage_class'] = token_value
+        store['column_type_storage_class'] = abstract_type_via[token_value]
         push_to(from_expecting_column_constraint_or_get_out)
 
     def from_expecting_column_constraint_or_get_out():
@@ -94,12 +123,42 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         kw = {}
         kw['column_name'] = store.pop('column_name')
         kw['column_type_storage_class'] = store.pop('column_type_storage_class')  # noqa: E501
-        kw['null_is_OK'] = not store.pop('not_null', False)
+
+        """In our practice, 'NOT NULL' is the norm by some significant margin.
+        So that it takes up less visual/cognitive space by not needing to state
+        itself explicitly everywhere, it's the default in our abstract modeling
+        (provision [#XXX.X]), and we expose a `null_is_OK` option there, one
+        that is not usually exercised.
+
+        With SQL (and so sqlite) on the other hand, "NULL OK" is the option,
+        and there is no "NULL OK" or equivalent.
+
+        This would all be fine and good if we simply start out 'null OK' as
+        true here and flip it to false if we parse 'NOT NULL'; but things
+        get tricky because we don't yet know this about sqlite:
+
+        is NOT NULL implied on INTEGER PRIMARY KEY?
+
+        For now we assume yes (hence the logic below) but this needs confirmati
+        """
+
+        is_prim = store.pop('is_primary_key', False)
+        if 'not_null' in store:
+            val = store.pop('not_null')
+            assert val is True
+            null_OK = False
+        else:
+            null_OK = not is_prim
+
+        kw['null_is_OK'] = null_OK
+
         references_who = store.pop('references_what_table', None)
         if references_who:
             kw['is_foreign_key_reference'] = True
             kw['referenced_table_name'] = references_who
-        kw['is_primary_key'] = store.pop('is_primary_key', False)
+
+        kw['is_primary_key'] = is_prim
+
         ac = abstract_column_via(**kw, listener=stopping_listener)
         store['column_definitions'].append(ac)
 
@@ -134,6 +193,8 @@ def _abstract_table_defs_via_sqlite_lines(lines):
     if_keyword_PRIMARY = if_keyword('PRIMARY')
     if_keyword_KEY = if_keyword('KEY')
     if_keyword_REFERENCES = if_keyword('REFERENCES')
+
+    abstract_type_via = {'INTEGER': 'int', 'TEXT': 'text'}
 
     # ==
 
@@ -251,7 +312,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
     o, build_scanner, stop = func(stopping_listener, cstacker)
     # (there's probably redundancy where both client and us raise stops on etc)
 
-    wordy_token = o('wordy token', '[a-zA-Z_][a-zA-Z0-9_]+')  # sure why not
+    wordy_token = o('wordy token', '[a-zA-Z_][a-zA-Z0-9_]*')  # sure why not
     punctuation = o('punctuation', r'[,();]')
     space_or_tabs = o('tab or space', r'[ \t]+')
     newline = o('newline', r'\n')

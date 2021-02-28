@@ -132,7 +132,7 @@ class Case1398_parse_error(CommonCase):
         self.emits_error_context(
                 lineno=1,
                 position=2,
-                line='xx yy zz\n')
+                line='xx yy zz⏎')
 
     def given_run(self, listener):
         return self.build_recfile_scanner().next_block(listener)
@@ -160,7 +160,7 @@ class Case1399_fields_with_no_content_will_not_even_parse(CommonCase):
         self.emits_error_context(
                 lineno=1,
                 position=13,
-                line='Some_Fellow: \n')
+                line='Some_Fellow: ⏎')
 
     def given_run(self, listener):
         return self.build_recfile_scanner().next_block(listener)

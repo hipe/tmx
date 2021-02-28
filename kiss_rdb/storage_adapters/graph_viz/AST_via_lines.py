@@ -1,16 +1,49 @@
-from collections import namedtuple as _namedtuple
+from dataclasses import dataclass as _dataclass
 
 
 # == Simple Models (above the sexp layer)
 
-_NodeSexp = _namedtuple('_NodeSexp', (
-    'sexp_type', 'node_identifier', 'attributes'))
+@_dataclass
+class _NodeSexp:
+    node_identifier: str
+    attributes: dict
+    lineno: int
+
+    def __getitem__(self, i):
+        assert 0 == i
+        return self.sexp_type
+
+    sexp_type = 'node_expression'
 
 
-_EdgeSexp = _namedtuple('_EdgeSexp', (
-    'sexp_type',
-    'left_node_ID', 'left_port', 'right_node_ID', 'right_port',
-    'attributes'))
+@_dataclass
+class _EdgeSexp:
+    left_node_ID: str
+    left_port: str
+    right_node_ID: str
+    right_port: str
+    attributes: dict
+    lineno: int
+
+    def to_string(self):
+        return ''.join(s for row in self._to_piece_rows() for s in row)
+
+    def _to_piece_rows(self):
+        yield self.left_node_ID, ':', self.left_port
+        yield ('->',)
+        yield self.right_node_ID, ':', self.right_port
+
+    def __iter__(self):
+        return (getattr(self, k) for k in self._fields)
+
+    def __getitem__(self, i):
+        assert 0 == i
+        return self.sexp_type
+
+    _fields = ('sexp_type', 'left_node_ID', 'left_port',
+               'right_node_ID', 'right_port', 'attributes', 'lineno')
+
+    sexp_type = 'edge_expression'
 
 
 def _finish_alist(alist):
@@ -101,6 +134,7 @@ def sexps_via_lines(lines, listener=None):
     # -- mess with line scanning
 
     def handle_line_that_begins_node_statement():
+        store['element_start_lineno'] = lineno
         store['current_entity_type'] = 'node'
 
         md = store.pop('last_match')
@@ -114,6 +148,7 @@ def sexps_via_lines(lines, listener=None):
         return parse_to_end_of_line()
 
     def handle_line_that_begins_edge_statement():
+        store['element_start_lineno'] = lineno
         store['current_entity_type'] = 'edge'
 
         md = store.pop('last_match')
@@ -212,14 +247,18 @@ def sexps_via_lines(lines, listener=None):
 
     def finish_node(alist):
         iden = store.pop('current_node_identifier')
-        sx = _NodeSexp('node_expression', iden, _finish_alist(alist))  # ..
+        this = _finish_alist(alist)  # ..
+        use_lineno = store.pop('element_start_lineno')
+        sx = _NodeSexp(iden, this, use_lineno)
         return 'yield_this', sx
 
     def finish_edge(alist):
         these = (
             store.pop('left_node_identifier'), store.pop('left_node_port'),
             store.pop('right_node_identifier'), store.pop('right_node_port'))
-        sx = _EdgeSexp('edge_expression', *these, _finish_alist(alist))  # ..
+        this = _finish_alist(alist)  # ..
+        use_lineno = store.pop('element_start_lineno')
+        sx = _EdgeSexp(*these, this, use_lineno)
         return 'yield_this', sx
 
     def close_digraph():
@@ -394,8 +433,10 @@ def sexps_via_lines(lines, listener=None):
     store = _NoClobberDict()
     stack = [from_beginning_state]
 
+    lineno = 0
     try:
         for line in lines:
+            lineno += 1
             while True:  # (there may be a 'redo' directive in the future)
                 action = find_transition()
                 direc = action()

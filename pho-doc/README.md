@@ -201,6 +201,7 @@ when you click create
 |[#881]                     |       | roadmap.dot
 |[#880.B]                   | #edit | edit documentation
 |[#880]                     |       | README
+|[#429.3] |       | algorithm: for document history data gathering
 |[#429.2] |       | spec: page history whitepaper
 |[#428]   |       | #see
 |[#427]   |       | #see

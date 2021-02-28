@@ -29,7 +29,7 @@ class Case6248_schema_parse_error(CommonCase):
         _expected = tuple(unindent('''
         input error: expecting colon
         in schema.rec
-           3:    xx yy zz
+           3:    xx yy zz⏎
                  --^
         '''))
         self.assertSequenceEqual(lines, _expected)

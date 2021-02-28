@@ -23,7 +23,11 @@ def read_only_business_collection_via_path_(collection_path, listener=None):
 
     from kiss_rdb.storage_adapters_.eno import \
         EXPERIMENTAL_caching_collection as func
-    coll = func(collection_path, listener=listener)
+
+    coll = func(
+        collection_path, max_num_lines_to_cache=None,
+        do_load_schema_from_filesystem=True, opn=None,
+        listener=listener)
     return coll and _Notecards(coll)
 
 

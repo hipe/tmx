@@ -205,7 +205,7 @@ class Case1414_schema_file_invalid(CommonCase):
         self.emits_error_context(
                 expecting='colon',
                 position=2,
-                line='xx yy zz\n',
+                line='xx yy zz⏎',
                 lineno=1)
 
     def given_fake_filesystem(self):

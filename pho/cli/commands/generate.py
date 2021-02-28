@@ -62,8 +62,8 @@ def _adapter_powered_command(method_name):
     return decorator
 
 
-def _base_formals_for_markdown():
-    yield _collection_path()
+def _base_formals_for_markdown(efx):
+    yield efx.collection_path_option_definition
     yield '-n', '--dry-run', "Doesn't actually write files"
     yield '-v', '--verbose', "Output one line per file"
     yield _help_this_screen  # they can request help again here, diff sig
@@ -71,7 +71,7 @@ def _base_formals_for_markdown():
 
 
 @_adapter_powered_command('generate_markdown')
-def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
+def _CLI_for_markdown(sin, sout, serr, bash_argv, efx):
     """Generate markdown tailored to the specific SSG.
 
     If you specify '-' for the output directory, lines are written to
@@ -83,7 +83,7 @@ def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
 
     tup, rc = _this_is_a_lot(
             sout, serr, bash_argv, efx,
-            _base_formals_for_markdown(), _CLI_for_markdown)
+            _base_formals_for_markdown(efx), _CLI_for_markdown)
     if tup is None:
         return rc
     adapter_func, vals, mon = tup  # #here5
@@ -169,9 +169,9 @@ def _CLI_for_markdown(sin, sout, serr, bash_argv, efx=None):
     return mon.returncode
 
 
-def _formals_for_dotfile():
+def _formals_for_dotfile(efx):
     yield _the_test_option
-    yield _collection_path()
+    yield efx.collection_path_option_definition
     yield _help_this_screen
 
 
@@ -200,10 +200,10 @@ def _CLI_for_dotfile(sin, sout, serr, bash_argv, efx=None):
     return mon.returncode
 
 
-def _formals_for_tree():
+def _formals_for_tree(efx):
     yield '--NCID=<ncid>', "use this node as root (see just a subtree)"
     yield _the_test_option
-    yield _collection_path()
+    yield efx.collection_path_option_definition
     yield _help_this_screen
 
 
@@ -231,8 +231,8 @@ def _CLI_for_tree(sin, sout, serr, bash_argv, efx=None):
     return 0
 
 
-def _formals_for_check():
-    yield _collection_path()
+def _formals_for_check(efx):
+    yield efx.collection_path_option_definition
     yield _help_this_screen
 
 
@@ -321,7 +321,7 @@ def _big_index_via(coll_path, listener, NCID, is_test):
 
 def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
     prog_name = bash_argv.pop()
-    foz = _foz_via(foz_func(), lambda: prog_name)
+    foz = _foz_via(foz_func(efx), lambda: prog_name)
     vals, rc = foz.terminal_parse(serr, bash_argv)
     if vals is None:
         return None, rc
@@ -329,7 +329,8 @@ def _common_start(sout, serr, bash_argv, efx, CLI_func, foz_func):
         rc = foz.write_help_into(sout, CLI_func.__doc__)
         return None, rc
     mon = efx.produce_monitor()
-    coll_path, rc = _require_collection_path(mon.listener, vals, efx)
+    listener = mon.listener
+    coll_path, rc = efx.require_collection_path(listener, vals)
     if coll_path is None:
         return None, rc
     return (coll_path, vals, foz, mon), None
@@ -453,9 +454,9 @@ def _this_is_a_lot(sout, serr, bash_argv, efx, base_formals, caller_func):
     # For now assume collection path is necessary just like every other command
     mon = efx.produce_monitor()
 
-    coll_path, es = _require_collection_path(mon.listener, vals, efx)
+    coll_path, rc = efx.require_collection_path(mon.listener, vals)
     if coll_path is None:
-        return None, 123
+        return None, rc
     vals['collection_path'] = coll_path  # put it back in probably lol
 
     if monitor_not_listener:
@@ -565,10 +566,6 @@ _aliases = {
 }
 
 
-def _collection_path():
-    return '-c', '--collection-path=PATH', *_CPT().descs
-
-
 _the_test_option = '-t', '--test', "(whether to load --collection-path as ..)"
 _help_this_screen = '-h', '--help', "This screen"
 
@@ -603,7 +600,6 @@ def _crazy_parse(arg_func):
     return pool, pi.desc_lines
 
 
-
 # == Delegations & smalls
 
 def _read_only_business_collection_via_fixture_path(fpath):
@@ -620,18 +616,6 @@ def _read_only_business_collection_via_fixture_path(fpath):
 def _read_only_business_collection(collection_path):
     from pho import read_only_business_collection_via_path_ as func
     return func(collection_path)
-
-
-def _require_collection_path(listener, vals, efx):
-    val = vals.pop('collection_path', None)
-    if val is not None:
-        return val, None
-    return _CPT().require_collection_path(listener, efx)
-
-
-def _CPT():
-    from pho.cli import collection_path_tools_ as func
-    return func()
 
 
 def _foz_via(defs, pner, x=None):

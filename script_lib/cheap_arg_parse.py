@@ -8,7 +8,7 @@ def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
     long_program_name = bash_argv.pop()
 
     def prog_name():
-        return _shorten_long_program_name(long_program_name)
+        return shorten_long_program_name(long_program_name)
 
     def formals():
         yield '-h', '--help', 'This screen'
@@ -47,7 +47,7 @@ def cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals,
     long_program_name = bash_argv.pop()
 
     def prog_name():
-        return _shorten_long_program_name(long_program_name)
+        return shorten_long_program_name(long_program_name)
 
     foz = formals_via_definitions(formals, prog_name)
     vals, es = foz.terminal_parse(serr, bash_argv)
@@ -72,7 +72,7 @@ def require_interactive(stderr, stdin, argv):
     w(_invite_line(argv[0]))
 
 
-def _shorten_long_program_name(long_program_name):
+def shorten_long_program_name(long_program_name):
     pcs = long_program_name.split(' ')
     from os.path import basename
     pcs[0] = basename(pcs[0])
