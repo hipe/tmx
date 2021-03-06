@@ -151,8 +151,8 @@ import re as _re
 def document_notecards_in_order_via_any_arbitrary_start_node_(  # #testpoint
         start_notecard_EID, notecards, listener=None):
 
-    doc_root_node = _find_document_root_node(
-            start_notecard_EID, notecards, listener)
+    doc_root_node = find_document_root_node(
+            start_notecard_EID, notecards, listener, no_doc_OK=False)
     if doc_root_node is None:
         return
     return _produce_all_document_notecards_depth_first_recursive(
@@ -219,7 +219,7 @@ def _produce_all_document_notecards_depth_first_recursive(
 _max_depth = 5  # html headers <H1> thru <H6>
 
 
-def _find_document_root_node(eid, notecards, listener=None):
+def find_document_root_node(eid, notecards, listener=None, no_doc_OK=True):
 
     curr = notecards.retrieve_notecard(eid, listener)
     if curr is None:
@@ -244,7 +244,7 @@ def _find_document_root_node(eid, notecards, listener=None):
 
         # If this node doesn't have a parent, this one error
         if predecessor_eid is None:
-            return _when_not_in_document(listener, len(seen), eid)
+            return _when_not_in_document(listener, no_doc_OK, len(seen), eid)
 
         curr = notecards.retrieve_notecard(predecessor_eid, listener)
         if curr is None:  # error was expressed above
@@ -749,14 +749,16 @@ def _sexps_via_lines(lines):  # #testpoint
 
 # == Whiners
 
-def _when_not_in_document(listener, num_hops, eid):
+def _when_not_in_document(listener, no_doc_OK, num_hops, eid):
     def lines():
         if num_hops:
             and_what = f"and none of its {num_hops} predecessor(s) are either"
         else:
             and_what = "and it has no parents"
         yield f"'{eid}' is not in a document: it is not a document root node {and_what}"  # noqa: E501
-    listener('error', 'expression', 'node_not_in_document', lines)
+
+    sev = 'info' if no_doc_OK else 'error'
+    listener(sev, 'expression', 'node_not_in_document', lines)
 
 
 # == Smalls

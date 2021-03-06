@@ -9,6 +9,11 @@ class _NodeSexp:
     attributes: dict
     lineno: int
 
+    def to_description_lines(self):
+        yield f"Node: {self.node_identifier!r} (line {self.lineno})\n"
+        for line in _attr_lines(self.attributes):
+            yield line
+
     def __getitem__(self, i):
         assert 0 == i
         return self.sexp_type
@@ -24,6 +29,12 @@ class _EdgeSexp:
     right_port: str
     attributes: dict
     lineno: int
+
+    def to_description_lines(self):
+        moniker = self.to_string()
+        yield f"Edge: {moniker} (line {self.lineno})\n"
+        for line in _attr_lines(self.attributes):
+            yield line
 
     def to_string(self):
         return ''.join(s for row in self._to_piece_rows() for s in row)
@@ -44,6 +55,14 @@ class _EdgeSexp:
                'right_node_ID', 'right_port', 'attributes', 'lineno')
 
     sexp_type = 'edge_expression'
+
+
+def _attr_lines(attrs):
+    if 0 == len(attrs):
+        return
+    yield "  Attributes:\n"
+    for k, v in attrs.items():
+        yield f"    {k}: {v!r}\n"
 
 
 def _finish_alist(alist):
@@ -90,6 +109,8 @@ def sexps_via_lines(lines, listener=None):
 
     However, wherever it was a good fit, we tried to use names from the
     published grammar
+
+    There's a CLI-exposed toolkit for developing this under `kst`
     """
 
     # == States [#008.2]
@@ -165,11 +186,16 @@ def sexps_via_lines(lines, listener=None):
             rhs_port = scn.scan_required(identifier)
         store['right_node_port'] = rhs_port
 
-        scn.skip_required(open_square_bracket)
         store['current_attribute_list'] = []
 
-        push_to(from_inside_attribute_list)
-        return parse_to_end_of_line()
+        # If the edge has attributes, parse them, else you're done with line
+        if scn.skip(open_square_bracket):
+            push_to(from_inside_attribute_list)
+            return parse_to_end_of_line()
+
+        skip_required_end_of_line(scn)
+        store.pop('current_string_scanner')
+        return finish_edge_or_node()  # (but we know it's edge)
 
     def push_to_attr_value():
         store['current_attribute_name']  # sanity check, catch it early
@@ -237,6 +263,9 @@ def sexps_via_lines(lines, listener=None):
     def pop_out_of_attr_list_kinda_big_deal():
         assert 'from_inside_attribute_list' == stack[-1].__name__
         stack.pop()
+        return finish_edge_or_node()
+
+    def finish_edge_or_node():
         assert 'from_inside_digraph' == stack[-1].__name__  # or not
         typ = store.pop('current_entity_type')
         alist = store.pop('current_attribute_list')
@@ -342,12 +371,14 @@ def sexps_via_lines(lines, listener=None):
         yes = scn.skip(close_square_bracket)
         if not yes:
             return
-        # == BEGIN _skip_some_kind_of_end_of_line
-        if '\n' == scn.peek(1):
-            scn.advance_by_one()
-            return True
+        skip_required_end_of_line(scn)
+        return True
+
+    def skip_required_end_of_line(scn):
+        if scn.skip(newline):
+            assert scn.empty
+            return
         xx(f"Maybe this is an end-of-line comment which is allowed: {scn.rest()}")  # noqa: E501
-        # == END
 
     def if_close_clurly():
         return '}\n' == line  # meh
@@ -361,13 +392,18 @@ def sexps_via_lines(lines, listener=None):
 
     # ==
 
+    def build_scanner(line):
+        return StringScanner(line, tlistener, cstacker)
+
     def cstacker():
-        return ({'line': line},)
+        return ({'line': line, 'lineno': lineno},)
 
     from text_lib.magnetics.string_scanner_via_string import \
-        build_throwing_string_scanner_and_friends as func
-    o, build_scanner, stop = func(listener, cstacker)
-    assert 'pattern_via_description_and_regex_string' == o.__name__
+        StringScanner, \
+        pattern_via_description_and_regex_string as o, \
+        build_throwing_listener
+
+    tlistener = build_throwing_listener(listener, _Stop)
 
     identifier = o('identifier', iden_rsx)
     open_square_bracket = o('open square bracket', r'\[')
@@ -376,6 +412,7 @@ def sexps_via_lines(lines, listener=None):
     comma = o('comma', ',')
     close_square_bracket = o('close square bracket', r'\]')
     one_or_more_space_characters = o('spaces', '[ ]+')
+    newline = o('newline', r'\n')
 
     # ==
 

@@ -39,14 +39,14 @@ class Case4860_410_via_lines(CommonCase):
         return self.build_end_state_for_AST_via_lines()
 
     def given_lines(_):
-        yield "CREATE TABLE artist (\n"
+        yield "CREATE TABLE 'artist' (\n"
         yield "artist_ID INTEGER PRIMARY KEY,\n"
         yield "desc TEXT NOT NULL);\n"
         yield "\n"
-        yield "CREATE TABLE track (\n"
+        yield "CREATE TABLE 'track' (\n"
         yield "track_ID INTEGER PRIMARY KEY,\n"
         yield "desc TEXT NOT NULL,\n"
-        yield "artist_ID INTEGER NOT NULL REFERENCES artist\n"
+        yield "artist_ID INTEGER NOT NULL REFERENCES 'artist'\n"
         yield ");\n"
 
 
@@ -139,13 +139,13 @@ class Case4860_415_up_to_date(BigCase):
 
     def given_sqlite_schema_indented_big_string(_):
         return """
-        CREATE TABLE artist (
+        CREATE TABLE 'artist' (
           artist_ID INTEGER PRIMARY KEY,
           artist_title TEXT NOT NULL);
-        CREATE TABLE track (
+        CREATE TABLE 'track' (
           track_ID INTEGER PRIMARY KEY,
           track_title TEXT NOT NULL,
-          artist_ID INTEGER NOT NULL REFERENCES artist);
+          artist_ID INTEGER NOT NULL REFERENCES 'artist');
         """
 
 
@@ -156,10 +156,10 @@ class Case4860_419_add_a_table(BigCase):
 
     def expected_SQL_lines(_):
         return unindent_big_string("""
-        CREATE TABLE track (
+        CREATE TABLE 'track' (
           track_ID INTEGER PRIMARY KEY,
           track_title TEXT NOT NULL,
-          artist_ID INTEGER NOT NULL REFERENCES artist);
+          artist_ID INTEGER NOT NULL REFERENCES 'artist');
         """)
 
     def given_graph_viz_indented_big_string(_):
@@ -183,7 +183,7 @@ class Case4860_419_add_a_table(BigCase):
 
     def given_sqlite_schema_indented_big_string(_):
         return """
-        CREATE TABLE artist (
+        CREATE TABLE 'artist' (
           artist_ID INTEGER PRIMARY KEY,
           artist_title TEXT NOT NULL);
         """
@@ -222,7 +222,7 @@ class Case4860_432_when_missing_column(BigCase):
 
     def given_sqlite_schema_indented_big_string(_):
         return """
-        CREATE TABLE artist (
+        CREATE TABLE 'artist' (
           artist_ID INTEGER PRIMARY KEY,
           artist_title TEXT NOT NULL);
         """
@@ -270,14 +270,14 @@ class Case4860_436_when_extra_table(BigCase):
 
     def given_sqlite_schema_indented_big_string(_):
         return """
-        CREATE TABLE artist (
+        CREATE TABLE 'artist' (
           artist_ID INTEGER PRIMARY KEY,
           artist_title TEXT NOT NULL);
-        CREATE TABLE track (
+        CREATE TABLE 'track' (
           track_ID INTEGER PRIMARY KEY,
           track_title TEXT NOT NULL,
-          artist_ID INTEGER NOT NULL REFERENCES artist);
-        CREATE TABLE genre (
+          artist_ID INTEGER NOT NULL REFERENCES 'artist');
+        CREATE TABLE 'genre' (
           track_ID INTEGER PRIMARY KEY,
           name TEXT NOT NULL);
         """
@@ -318,7 +318,7 @@ class Case4860_440_when_a_single_column_attrib(BigCase):
 
     def given_sqlite_schema_indented_big_string(_):
         return """
-        CREATE TABLE track (
+        CREATE TABLE 'track' (
           track_ID INTEGER PRIMARY KEY,
           track_title TEXT NOT NULL);
         """

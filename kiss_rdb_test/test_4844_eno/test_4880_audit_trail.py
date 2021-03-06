@@ -64,9 +64,9 @@ class Case4857_250_wahoo(CommonCase):
         hh_AST = self.end_state[1][1].hunk_header_AST
         lines = hh_AST.message_lines
         assert 1 < len(lines)
-        assert '\n' == lines[0]
-        assert '\n' == lines[-1]
-        self.assertEqual(lines[1], '    Commit number 5.\n')
+        sig = tuple('N' if '    \n' == line else 'C' for line in lines)
+        self.assertSequenceEqual(sig, 'C N C C'.split())
+        self.assertEqual(lines[0], '    Commit number 5.\n')
 
     def test_110_the_core_attributes_look_correct_over_time(self):
         dcts = tuple(sx[1].core_attributes for sx in self.end_state[0::2])

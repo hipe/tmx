@@ -2,19 +2,79 @@ digraph g {
 
 rankdir=LR
 
-node1[label="artist|
-<artist_ID> artist_ID int primary key|
-<artist_title> artist_title text" shape=record]
+node00[label="singleton_integer|
+name text unique|
+value int" shape=record]
 
-node2[label="track|
-<track_ID> track_ID int primary key|
-<track_title> track_title text|
-<artist_ID> artist_ID int" shape=record]
 
-node1:artist_ID->node2:artist_ID[arrowhead=odot]
+node01[label="singleton_text|
+name text unique|
+value text" shape=record]
+
+
+node10[label="commit|
+<pk> commit_ID int primary key|
+<parent_ID> parent_ID int null_ok|
+<child_ID> child_ID int null_ok|
+SHA text unique|
+datetime text|
+message text" shape=record]
+
+node10:parent_ID->node10:pk
+node10:child_ID->node10:pk
+
+
+node30[label="changed_file_queue|
+<pk> item_ID int primary key|
+file_path text unique|
+does_exist int|
+<fk> next_item_ID int null_ok unique" shape=record]
+
+node30:fk->node30:pk
+
+
+node40[label="notecard|
+<pk> notecard_ID int primary key|
+entity_identifier text unique|
+state text" shape=record]
+
+
+node50[label="notecard_commit|
+notecard_commit_ID int primary key|
+<fk1> notecard_ID int|
+<fk2> commit_ID int|
+verb text|
+number_of_lines_inserted int|
+number_of_lines_deleted int|
+state text" shape=record]
+
+
+node40:pk->node50:fk1[arrowhead=odot]
+node10:pk->node50:fk2[arrowhead=odot]
+
+
+node60[label="notecard_based_document|
+<pk> notecard_based_document_ID int primary key|
+head_notecard_EID text unique" shape=record]
+
+
+node70[label="notecard_based_document_commit|
+notecard_based_document_commit_ID int primary key|
+<fk1> notecard_based_document_ID int|
+<fk2> commit_ID int|
+normal_datetime text|
+tzinfo text|
+number_of_lines_inserted int|
+number_of_lines_deleted int|
+number_of_notecards int" shape=record]
+
+
+node60:pk->node70:fk1[arrowhead=odot]
+node70:fk2->node10:pk
 
 }
 
 /*
+# #history-B.4 spike usefulness
 # #born
 */

@@ -66,12 +66,12 @@ class Caching_FS_Reader_:  # #testpoint
         self._doubly_linked_list = func()  # #[#510.15] one of several rotbuff
 
     def entities_via_identifiers(self, idens, mon):
-        return self._ting('dereference', idens, mon)
+        return self._traverse_and('dereference', idens, mon)
 
     def entity_retrievals_via_identifiers(self, idens, mon):
-        return self._ting('produce_retrieval', idens, mon)
+        return self._traverse_and('produce_retrieval', idens, mon)
 
-    def _ting(self, which, idens, mon):
+    def _traverse_and(self, which, idens, mon):
         for iden in idens:
             if iden is None:
                 yield None  # [#877.C]
@@ -92,8 +92,7 @@ class Caching_FS_Reader_:  # #testpoint
             return self._file_reader_via_path[path]
 
         # Start this work object
-        from . import RetrieveEntity_ as cls
-        o = cls(iden, mon, self._back, opn=self._opn)
+        o = self._start_work_object(mon, identifier=iden)
 
         # Resolve a path from the identifier
         def main():
@@ -111,19 +110,11 @@ class Caching_FS_Reader_:  # #testpoint
                " is not in the file.\n"
                f"path: {path}")
 
-        # Resolve a file reader from the path
-        def main():
-            o.resolve_file_reader_given_path()
-            return o.file_reader
-        fr = o.do(main)
+        mfr = self._resolve_my_file_reader_given_work_with_path(o, mon)
 
         # If no FR, probably no path (and it emitted)
-        if fr is None:
+        if not mfr:
             return
-
-        # Build the FR and rotate it in to the cache
-        mfr = _build_my_file_reader(fr, path, mon)
-        self._rotate_stock(mfr)
 
         # There's no guarantee that the file has the entity (could be hole)
         if not mfr.has_section_for_EID(eid):
@@ -164,6 +155,33 @@ class Caching_FS_Reader_:  # #testpoint
             mfr = _build_my_file_reader(fr, path, mon)
             self._rotate_stock(mfr)
             yield mfr
+
+    def PRODUCE_FILE_READER_FOR_PATH(self, path, mon):
+        # (courtesy for [pho] for document history, so no re-parsing)
+
+        mfr = self._file_reader_via_path.get(path)
+        if mfr:
+            return mfr  # unlikely in practice
+        o = self._start_work_object(mon)
+        o.path = path
+        return self._resolve_my_file_reader_given_work_with_path(o, mon)
+
+    def _resolve_my_file_reader_given_work_with_path(self, o, mon):
+
+        # Resolve a file reader from the path
+        def main():
+            o.resolve_file_reader_given_path()
+            return o.file_reader
+        fr = o.do(main)
+
+        # If no FR, probably no path (and it emitted)
+        if fr is None:
+            return
+
+        # Build the "my FR" and rotate it in to the cache
+        mfr = _build_my_file_reader(fr, o.path, mon)
+        self._rotate_stock(mfr)
+        return mfr
 
     def _rotate_stock(self, mfr):
 
@@ -226,6 +244,10 @@ class Caching_FS_Reader_:  # #testpoint
         num = fr.number_of_lines_in_file
         assert 0 < num
         self._current_number_of_lines_cached -= num
+
+    def _start_work_object(self, mon, identifier=None):
+        from . import RetrieveEntity_ as cls
+        return cls(identifier, mon, self._back, opn=self._opn)
 
 
 def _build_my_file_reader(fr, path, mon):

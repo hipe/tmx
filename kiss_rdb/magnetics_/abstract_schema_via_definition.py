@@ -47,7 +47,10 @@ def _abstract_column_via_my_column(mcd):
         column_type_storage_class=mcd.col_abs_typ,
         is_foreign_key_reference=(is_fk or False),
         referenced_table_name=(is_fk and mcd.parent_table_name),
-        is_primary_key=mcd.is_prim)
+        referenced_column_name=(is_fk and mcd.parent_column_name),
+        is_primary_key=mcd.is_prim,
+        null_is_OK=mcd.null_OK,
+        is_unique=mcd.is_uniq)
 
 
 def _do_foreign_keys(all_elements, offset_via_node_name,
@@ -57,7 +60,7 @@ def _do_foreign_keys(all_elements, offset_via_node_name,
 
     - Each edge must be mono-directional
     - Each edge must point right
-    - Each edge must be of type 'odot'
+    - Each edge must be of type 'odot' or be not specified (this is WIP)
     - The left side of each edge must be <parent_table>:<its_primary_key>
       (so assert that it is in fact the primary key of that table)
     - The right side of each edge indicates the foreign key (table:field)
@@ -82,27 +85,41 @@ def _do_foreign_keys(all_elements, offset_via_node_name,
         typ, L_iden, L_port, R_iden, R_port, attrs, lineno = ast
 
         assert 'edge_expression' == typ
-        assert 'odot' == attrs['arrowhead']  # ..
 
         my_left_table = dereference_table(L_iden)
         my_right_table = dereference_table(R_iden)
 
-        my_col = my_left_table.my_column_via_port(L_port, tlistener)
+        left_col = my_left_table.my_column_via_port(L_port, tlistener)
+        right_col = my_right_table.my_column_via_port(R_port, tlistener)
 
-        if not my_col.is_prim:
+        # Oh boy: if it looks like this: "-𐩑" the right side is the
+        # child table and the left side is the parent table, and
+        # if it looks like this "→" it's the opposite
+
+        shape = attrs.get('arrowhead')
+        if shape:
+            assert 'odot' == shape
+            remote_table = my_left_table
+            remote_col, local_col = left_col, right_col
+        else:
+            remote_table = my_right_table
+            local_col, remote_col = left_col, right_col
+
+        remote_table_name = remote_table.table_name
+
+        if not remote_col.is_prim:
             s = ast.to_string()
-            xx(f"{my_col.col_name!r} must be primary key: {s!r}")
+            xx(f"remote key {remote_col.col_name!r} must be primary key: {s!r}")  # noqa: E501
 
-        left_table_name = my_left_table.table_name
-        left_primary_key = my_col.col_name
+        # While we have all this stuff out, eliminate the unnecessary
+        # column name when it is unnecessary
 
-        my_col = my_right_table.my_column_via_port(R_port, tlistener)
+        if local_col.col_name == remote_col.col_name:
+            use_remote_col_name = None
+        else:
+            use_remote_col_name = remote_col.col_name
 
-        if my_col.col_name != left_primary_key:
-            s = ast.to_string()
-            xx(f"This may change, but for now don't change the field name: {s!r}")  # noqa: E501
-
-        my_col.recv_is_foreign_key(left_table_name)
+        local_col.recv_is_foreign_key(remote_table_name, use_remote_col_name)
 
 
 def _each_element(graph_viz_schema_lines, tlistener):
@@ -143,26 +160,53 @@ def _build_element_parser(tlistener, path=None):
 
     def parse_column_definition(scn):
 
-        # Parse the port name
-        scn.skip_required(less_than)
-        port_name = scn.scan_required(identifier)
-        scn.skip_required(greater_than)
+        # Parse any port name
+        port_name = None
+        if scn.skip(less_than):
+            port_name = scn.scan_required(identifier)
+            scn.skip_required(greater_than)
+            scn.skip_required(space)
 
         # Parse the column name and type (very strict for now)
-        scn.skip_required(space)
         col_name = scn.scan_required(identifier)
         scn.skip_required(space)
         col_abs_typ = scn.scan_required(abstract_types)
 
-        # Parse primary key
-        is_prim = False
-        if scn.skip(primary):
-            scn.skip_required(key_token)
-            is_prim = True
+        # Constraints
+        kw = {'is_prim': False, 'null_OK': False, 'is_uniq': False}
+        pool = {'is_prim': primary, 'is_uniq': unique, 'null_OK': null_ok}  # o
 
-        scn.skip_required(end_of_column_def)
+        def find_first_one():
+            for k, v in pool.items():
+                yn = scn.scan(v)
+                if yn:
+                    return k
 
-        return _MyColDef(port_name, col_name, col_abs_typ, is_prim=is_prim)
+        while pool:
+            # Do you match any constraint in the pool from this point?
+            k = find_first_one()
+
+            # If you matched no constraints, forget the pool, you're done
+            if k is None:
+                break
+
+            # (special handling for this one that's a two-token sequence meh)
+            if 'is_prim' == k:
+                scn.skip_required(key_token)
+
+            # While every attribute is false by default this is easier
+            assert kw[k] is False
+            kw[k] = True
+
+            # Keep looking for more constraints as long as you have unused ones
+            pool.pop(k)
+
+        w = scn.skip(end_of_column_def)
+        if w is None:
+            oh_boy = (primary, unique, null_ok, end_of_column_def)
+            scn.whine_about_expecting(*oh_boy)
+
+        return _MyColDef(port_name, col_name, col_abs_typ, **kw)
 
     def cstacker_via_AST(ast):
         def cstacker():
@@ -183,15 +227,22 @@ def _build_element_parser(tlistener, path=None):
     less_than = o('less_than than', '<')
     greater_than = o('greater than', '>')
 
+    # (The below follow the order of here just because:)
+    # https://www.sqlite.org/lang_createtable.html
+
     # Type
     abstract_types = o("'int' or 'text'", '(?:int|text)')
 
-    # Prim
+    # Primary or "null OK" or Unique
     primary = o('primary', r'[ ]primary\b')
+    null_ok = o('null_ok', r'[ ]null_ok\b')
+    unique = o('unique', r'[ ]unique\b')
     key_token = o('key', r'[ ]key\b')
 
     # Common
-    identifier = o('identifier', '[a-zA-Z]+(?:_[a-zA-Z]+)*')  # strict for now
+    identifier = o(
+        'identifier',
+        '[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z][a-zA-Z0-9]*)*')
     space = o('space', '[ ]')
     pipe_and_newline = o('pipe and newline', r'\|\n')  # redundant w/ next
     end_of_column_def = o('pipe and newline or end of string', r'(?:\|\n|$)')
@@ -211,7 +262,8 @@ class _MyTableDef:
         for my_col in self.my_cols:
             if port == my_col.port_name:
                 return my_col
-        xx()
+        _ = ', '.join(s for s in (mc.port_name for mc in self.my_cols) if s)
+        xx(f'port {port!r} not found. had ({_})')
 
 
 @_dataclass
@@ -221,11 +273,14 @@ class _MyColDef:
     col_abs_typ: str
     is_foreign_key_ref: bool = False
     is_prim: bool = False
+    null_OK: bool = False
+    is_uniq: bool = False
 
-    def recv_is_foreign_key(self, parent_table_name):
+    def recv_is_foreign_key(self, parent_table_name, parent_col_name=None):
         assert not self.is_foreign_key_ref
         self.is_foreign_key_ref = True
         self.parent_table_name = parent_table_name
+        self.parent_column_name = parent_col_name
 
 
 # == Schema diff
@@ -267,6 +322,35 @@ class _SchemaDiff:
     table_diffs: dict
     tables_in_right_not_in_left: dict
 
+    def to_description_lines(self):
+        yield "Schema diff:\n"
+        left = self.tables_in_left_not_in_right
+        mid = self.table_diffs
+        right = self.tables_in_right_not_in_left
+        if not any((left, mid, right)):
+            yield "  no difference in the two schemas\n"
+            return
+
+        def same(dct, line_head):
+            if not dct:
+                return
+            _ = ', '.join(repr(s) for s in dct.keys())
+            line_tail = ''.join(('(', _, ')\n'))
+            yield ''.join((line_head, line_tail))
+
+        for line in same(left, '  Tables in left not right:'):
+            yield line
+
+        for line in same(right, '  Tables in right not left:'):
+            yield line
+
+        if not mid:
+            return
+
+        for tdiff in mid.values():
+            for line in tdiff.to_description_lines():
+                yield ''.join(('  ', line))
+
 
 # == Whole Schema
 
@@ -283,6 +367,11 @@ def abstract_schema_via_abstract_tables(tables):
 class _AbstractSchema:
     def __init__(self, dct):
         self._tables = dct
+
+    def to_description_lines(self):
+        for table in self.to_tables():
+            for line in table.to_description_lines():
+                yield line
 
     def to_tables(self):
         return self._tables.values()
@@ -442,6 +531,12 @@ class _AbstractTable:
         self._columns = dct
         self._FOREIGN_KEYS = tuple(fks) if fks else None
 
+    def to_description_lines(self):
+        yield f"Abstract table: {self.table_name!r}\n"
+        for col in self._columns.values():
+            for line in col.to_description_lines():
+                yield line
+
     def to_columns(self):
         return self._columns.values()
 
@@ -517,14 +612,36 @@ def abstract_column_via(
 class _AbstractColumn:
     column_name: str
     column_type_storage_class: str
+    is_primary_key: bool = False  # mutex with `is_unique` per #here2
     null_is_OK: bool = False  # API provis: NOT NULL is default at #history-B.4
+    is_unique: bool = False  # mutex with `is_primary_key` per #here2
     is_foreign_key_reference: bool = False
-    is_primary_key: bool = False
     referenced_table_name: str = None
+    referenced_column_name: str = None
+
+    def to_description_lines(self):
+        mm = '  '
+        ch_m = '    '
+        typ = self.column_type_storage_class
+        yield f"{mm}Abstract column: {self.column_name!r} {typ}\n"
+        if self.null_is_OK:
+            yield f"{ch_m}NULL is OK\n"
+        if self.is_primary_key:
+            yield f"{ch_m}Is primary key\n"
+        elif self.is_unique:
+            yield f"{ch_m}Is unique\n"
+        if not self.is_foreign_key_reference:
+            return
+        pcs = [self.referenced_table_name]
+        if self.referenced_column_name:
+            pcs.append(''.join(('(', self.referenced_column_name, ')')))
+        yield f"{ch_m}Foreign key: {' '.join(pcs)!r}\n"
 
     _fields = (
         'column_type_storage_class', 'null_is_OK',
-        'is_foreign_key_reference', 'is_primary_key', 'referenced_table_name')
+        'is_foreign_key_reference',
+        'is_primary_key', 'is_unique',  # mutex
+        'referenced_table_name', 'referenced_column_name')
 
 
 _abstract_types = {k: None for k in 'int text'.split()}
@@ -551,5 +668,6 @@ class _Stop(RuntimeError):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #history-B.5
 # #history-B.4 spike "via graph viz lines"
 # #born

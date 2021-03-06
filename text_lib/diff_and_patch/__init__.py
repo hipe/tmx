@@ -497,7 +497,7 @@ def next_hunk_via_line_scanner(scn):
     """(DEV NOTES: this is an alternative implementation of the above function,
 
     one from six months later using the our new favorite pattern for parsing
-    (#[#508.5]), and one that has different properties and is for different
+    (#[#008.2]), and one that has different properties and is for different
     purposes.
 
     This way is more robust because it counts down and asserts the acutal
@@ -593,7 +593,7 @@ def next_hunk_via_line_scanner(scn):
         stack[-1] = state_function
 
     stack = [from_ready_state]  # (we never actually push to the stack for now)
-    store = _StrictDict()
+    store = StrictDict_()
 
     store['junk_lines'] = []
 
@@ -640,7 +640,8 @@ class _Hunk_NEW_WAY:
 
     def to_git_hunk_run_header_AST(self):
         scn = scanner_via_iterator(self.junk_lines)
-        p = _git_hunk_run_parser()
+        from .parse import produce_default_git_log_parser_ as func
+        p = func()
         header_AST = p(scn)
         assert scn.empty  # ..
         return header_AST
@@ -655,140 +656,6 @@ class _Hunk_NEW_WAY:
         for k, _ in self.hunk_body_line_sexps:
             counts[k] += 1
         yield f"{margin}  {counts!r}\n"
-
-
-# ==
-
-@lazy
-def _git_hunk_run_parser():
-    def parse(scn):  # #[#508.5] favorite FSA pattern
-
-        def from_beginning_state():
-            yield if_match(SHA_line_rx), go(from_expecting_author_line)
-
-        def from_expecting_author_line():
-            yield if_match(author_line_rx), go(from_expecting_date_line)
-
-        def from_expecting_date_line():
-            yield if_match(date_line_rx), go(from_expecting_message)
-
-        def from_expecting_message():
-            yield if_line_is_blank_or_indented, append_message_line
-            yield if_match(DIFF_line_rx), go(from_expecting_MMM)
-
-        def if_line_is_blank_or_indented():
-            if '\n' == line:
-                return True
-            return ' ' == line[0]  # or rx. is it faster? #todo
-
-        def append_message_line():
-            store['message_lines'].append(line)
-
-        def from_expecting_MMM():
-            yield if_match(MMM_line_rx), go(from_expecting_PPP)
-
-        def from_expecting_PPP():
-            yield if_match(PPP_line_rx), MAYBE_DO_END
-
-        def MAYBE_DO_END():
-            store_last_matchdata()  # we just matched PPP line
-            return 'return_this', _Git_Hunk_Run_Header_AST(**store)
-
-        # ==
-
-        def if_match(rx):
-            def test():
-                md = rx.match(line)
-                if md is None:
-                    return
-                store['last_matchdata'] = md
-                return True
-            return test
-
-        def go(next_state_function):
-            def action():
-                store_last_matchdata()
-                stack[-1] = next_state_function
-            return action
-
-        def store_last_matchdata():
-            md = store.pop('last_matchdata')
-            for k, v in md.groupdict().items():
-                store[k] = v
-
-        def find_transition():
-            for test, action in stack[-1]():
-                yn = test()
-                if yn:
-                    return action
-            from_where = stack[-1].__name__.replace('_', ' ')
-            xx(f"No transition found {from_where} for line: {line!r}")
-
-        stack = [from_beginning_state]
-        store = _StrictDict()
-        store['message_lines'] = []
-
-        assert scn.more  # ..
-        while scn.more:
-            line = scn.peek
-            action = find_transition()
-            scn.advance()  # doing it before action just becase we can
-            direc = action()
-            if direc is None:
-                continue
-            typ = direc[0]
-            assert 'return_this' == typ
-            ret, = direc[1:]
-            # (leave the line scanner wherever it is)
-            return ret
-
-        xx('never reached the end state (the "plus plus plus" line)')
-
-    c = _re.compile
-    SHA_line_rx = c(r'commit (?P<SHA>[0-9a-z]{8,})$')
-    author_line_rx = c(r'Author:[ ](?P<author>.+)$')
-    date_line_rx = c(r'Date:[ ]+(?P<datetime_string>[^ ].+)$')
-    DIFF_line_rx = c(r'diff[ ]--git[ ](?P<A_path>[^ ]+)[ ](?P<B_path>\S+)$')
-    MMM_line_rx = c(r'---[ ](?P<MMM_path>\S+)$')
-    PPP_line_rx = c(r'\+\+\+[ ](?P<PPP_path>\S+)$')
-
-    return parse
-
-
-@_dataclass
-class _Git_Hunk_Run_Header_AST:
-    SHA: str
-    author: str
-    datetime_string: str
-    message_lines: tuple  # (or list)
-    A_path: str
-    B_path: str
-    MMM_path: str
-    PPP_path: str
-
-    def to_summary_lines(self, margin=''):
-        def these():
-            for line in self.message_lines:
-                line = rx.match(line)[1]
-                if '\n' == line:
-                    continue
-                yield line
-        rx = _re.compile(r'[ ]*(.+)', _re.DOTALL)
-        itr = these()
-        line1 = next(itr)
-        line2 = None
-        for line2 in itr:
-            break
-        yield f"{margin}Git hunk run header AST:\n"
-        yield f"{margin}  Commit: {self.SHA}\n"
-        yield f"{margin}  Datetime: {self.datetime_string}\n"
-        if True:
-            yield f"{margin}  Excerpt: {line1}"
-        if line2:
-            yield f"{margin}           {line2}"
-
-
-_ugh = 12
 
 
 # ==
@@ -961,7 +828,7 @@ def _apply_big_patchfile(patchfile_path, is_dry, cwd, listener):
 
 # == Simple Support
 
-class _StrictDict(dict):  # #[#508.5] custom strict data structure
+class StrictDict_(dict):  # #[#508.5] custom strict data structure
     # Just like a dict but you have to be clear about intent
 
     def __setitem__(self, k, v):
@@ -992,6 +859,7 @@ if '__main__' == __name__:
     cli_for_production()
 
 
+# #history-B.5 break one in-place FSA into two and abstract an engine
 # #history-B.4 add passive option to parsing, rewrite to use FSA pattern
 # #history-B.2
 # #began-as-abstraction

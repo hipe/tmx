@@ -200,8 +200,9 @@ def _stop_and_invite(orig_f):
     def use_f(foz, serr, bash_argv):
         try:
             return orig_f(foz, bash_argv)
-        except _Stop as stop:
-            return _write_stop_into(serr, foz, *stop.args)
+        except _Stop as e:
+            stop = e
+        return _write_stop_into(serr, foz, *stop.args)
     return use_f
 
 

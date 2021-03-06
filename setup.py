@@ -74,6 +74,9 @@ setup(
             pho=pho.cli:cli_for_production
             tmx-dot2cytoscape=pho.cli.dot2cytoscape:cli_for_production
             tmx-timestamp=pho.cli.timestamp:cli_for_production
+            ''' \
+            # NOTE if you take away `kst`, it's referenced in docs
+            '''kst=kiss_rdb.storage_adapters.sqlite3.toolkit:cli_for_production
             kss=kiss_rdb.cli:cli_for_production
             dp=data_pipes.cli:cli_for_production
         ''')

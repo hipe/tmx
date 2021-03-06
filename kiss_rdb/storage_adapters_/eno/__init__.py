@@ -279,19 +279,22 @@ def _collection_implementation(directory, fsr=None, rng=None, opn=None):
         mon = _monitor_via_listener(listener)
         return fs_reader().file_readers_via_monitor(mon)
 
+    self = collection_implementation
+
     if fsr:
         def fs_reader():
             o = fs_reader
-            if o.x is None:
+            if not hasattr(o, 'x'):  # [#510.4]
                 o.x = fsr(self)  # stateful (long-running) but hidden for now
             return o.x
 
-        fs_reader.x = None  # [#510.4]
+        self.PRODUCE_FILESYSTEM_READER = fs_reader
+        # (expose this to [pho] for document history so no re-parsing files)
+
     else:
         def fs_reader():
             return _FS_Reader(self)
 
-    self = collection_implementation
     self.eno_document_via_ = eno_document_via_
     return self
 
@@ -468,7 +471,9 @@ def _file_reader_via(docu, body_of_text, back, mon):
     return file_reader()
 
 
-def read_only_entity_via_section_(sect_el, identifier, monitor):
+def read_only_entity_via_section_(
+        sect_el, identifier, monitor, correct_old_key_names=False):
+
     section = sect_el.to_section()  # #here3
     dct = {k: v for k, v in _attribute_keys_and_values(section, monitor)}
     if not monitor.OK:
@@ -498,6 +503,10 @@ def classify_attribute_element_(el):
     import re
     if re.match('[a-z0-9_A-Z]+$', cx.key):
         return cx
+
+    # (hotfix retroactively for some ancient encoding in audit trail)
+    if re.match('[a-z0-9_A-Z ]+$', cx.key):
+        return cx._replace(key=cx.key.replace(' ', '_'))
 
     reason = f"field key is not up to current spec - {cx.key!r}"
     raise AssertionError(reason)

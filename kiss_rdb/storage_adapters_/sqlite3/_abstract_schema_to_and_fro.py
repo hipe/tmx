@@ -55,7 +55,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         assert 'from_expect_TABLE_keyword' == stack.pop().__name__
         store['column_definitions'] = []
         expect_sequence(
-            ('wordy_token', 'as', 'table_name'),
+            ('string_literal', 'as', 'table_name'),  # was once 'wordy_token'
             ('punctuation', '('),
             ('then_call_this', lambda: push_to(from_expecting_column_def)))
 
@@ -82,17 +82,37 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         yield if_keyword_PRIMARY, lambda: push_to(from_expecting_KEY_after_PRIMARY)  # noqa: E501
         yield if_close_paren, handle_close_parenthesis_of_table
         yield if_keyword_REFERENCES, lambda: push_to(from_inside_FK_clause)
+        yield if_keyword_UNIQUE, handle_UNIQUE
 
     def handle_comma_after_column_def():
         roll_over_column_def()
         move_to(from_expecting_column_def)  # look up
 
     def from_inside_FK_clause():
-        yield if_wordy_token, handle_FK
+        yield if_string_literal, handle_FK
 
     def handle_FK():
         store['references_what_table'] = token_value
-        assert 'from_inside_FK_clause' == stack.pop().__name__
+        assert 'from_inside_FK_clause' == stack[-1].__name__
+        move_to(from_maybe_FK_column)
+
+    def from_maybe_FK_column():
+        yield if_open_paren, handle_foreign_key_column
+        yield otherwise, when_no_zub_zub
+
+    def handle_foreign_key_column():
+        expect_sequence(
+            ('wordy_token', 'as', 'referenced_column_name'),
+            ('punctuation', ')'),
+            ('then_call_this', after_FK))
+
+    def when_no_zub_zub():
+        after_FK()
+        return ('retry',)
+
+    def after_FK():
+        assert 'from_maybe_FK_column' == stack.pop().__name__
+        assert 'from_expecting_column_constraint_or_get_out' == stack[-1].__name__  # noqa: E501
 
     def from_expecting_NULL_after_NOT():
         yield if_keyword_NULL, handle_not_null
@@ -100,6 +120,9 @@ def _abstract_table_defs_via_sqlite_lines(lines):
     def handle_not_null():
         store['not_null'] = True
         assert 'from_expecting_NULL_after_NOT' == stack.pop().__name__
+
+    def handle_UNIQUE():
+        store['is_unique'] = True
 
     def from_expecting_KEY_after_PRIMARY():
         yield if_keyword_KEY, handle_primary_key
@@ -152,10 +175,15 @@ def _abstract_table_defs_via_sqlite_lines(lines):
 
         kw['null_is_OK'] = null_OK
 
+        is_uniq = store.pop('is_unique', False)
+        kw['is_unique'] = is_uniq
+
         references_who = store.pop('references_what_table', None)
         if references_who:
             kw['is_foreign_key_reference'] = True
             kw['referenced_table_name'] = references_who
+            maybe = store.pop('referenced_column_name', None)
+            kw['referenced_column_name'] = maybe
 
         kw['is_primary_key'] = is_prim
 
@@ -183,6 +211,9 @@ def _abstract_table_defs_via_sqlite_lines(lines):
             return 'wordy_token' == token_type and kw == token_value
         return func
 
+    def if_string_literal():
+        return 'string_literal' == token_type
+
     def if_wordy_token():
         return 'wordy_token' == token_type
 
@@ -190,6 +221,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
     if_keyword_TEXT = if_keyword('TEXT')
     if_keyword_NOT = if_keyword('NOT')
     if_keyword_NULL = if_keyword('NULL')
+    if_keyword_UNIQUE = if_keyword('UNIQUE')
     if_keyword_PRIMARY = if_keyword('PRIMARY')
     if_keyword_KEY = if_keyword('KEY')
     if_keyword_REFERENCES = if_keyword('REFERENCES')
@@ -204,6 +236,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         return func
 
     if_comma = if_punctuation(',')
+    if_open_paren = if_punctuation('(')
     if_close_paren = if_punctuation(')')
     if_semicolon = if_punctuation(';')
 
@@ -216,18 +249,20 @@ def _abstract_table_defs_via_sqlite_lines(lines):
 
         def from_custom_state():
             typ = my_stack[-1][0]
+            if 'string_literal' == typ:
+                return when_wordesque_token(if_string_literal)
             if 'wordy_token' == typ:
-                return when_wordy_token()
+                return when_wordesque_token(if_wordy_token)
             assert 'punctuation' == typ
             return when_punct()
 
-        def when_wordy_token():
+        def when_wordesque_token(if_what):
             def action():
                 store[store_as] = token_value
                 my_stack.pop()
                 return maybe_pop()
             as_kw, store_as = my_stack[-1][1:]
-            yield if_wordy_token, action
+            yield if_what, action
 
         def when_punct():
             def action():
@@ -249,6 +284,9 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         my_stack = list(reversed(directives))
         push_to(from_custom_state)
 
+    def otherwise():
+        return True
+
     # ==
 
     def move_to(state_function):
@@ -267,6 +305,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         lines = [f"for {token_type} token {token_value!r},"]
         from_where = stack[-1].__name__.replace('_', ' ')
         lines.append(f"didn't find a transition {from_where}.")
+        lines.append(f"from line {tokens.line_offset + 1}: {tokens.line!r}")
         xx(' '.join(lines))
 
     store = _NoClobberDict()
@@ -313,6 +352,8 @@ def _abstract_table_defs_via_sqlite_lines(lines):
     # (there's probably redundancy where both client and us raise stops on etc)
 
     wordy_token = o('wordy token', '[a-zA-Z_][a-zA-Z0-9_]*')  # sure why not
+    rxs = ''.join(("'", wordy_token.regex.pattern, "'"))
+    single_quoted_fella = o('sinqle quoted fella', rxs)
     punctuation = o('punctuation', r'[,();]')
     space_or_tabs = o('tab or space', r'[ \t]+')
     newline = o('newline', r'\n')
@@ -326,8 +367,8 @@ def _abstract_table_defs_via_sqlite_lines(lines):
             assert scn.empty
             return True
 
-        for lineno, line in enumerate(lines):
-            tokens.line_offset, tokens.line = lineno, line
+        for line_offset, line in enumerate(lines):
+            tokens.line_offset, tokens.line = line_offset, line
 
             scn = build_scanner(line)
             while True:  # the only way out is #here1
@@ -336,6 +377,12 @@ def _abstract_table_defs_via_sqlite_lines(lines):
                 value = scn.scan(wordy_token)
                 if value:
                     yield 'wordy_token', value
+                    scn.skip(space_or_tabs)  # (it's frequently followed by ws)
+                    continue  # (it's frequently followed by another wordy)
+
+                sqf = scn.scan(single_quoted_fella)
+                if sqf:
+                    yield 'string_literal', sqf[1:-1]
                     scn.skip(space_or_tabs)  # (it's frequently followed by ws)
                     continue  # (it's frequently followed by another wordy)
 
@@ -372,17 +419,136 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         """
 
         for token_type, token_value in tokens():
-            action = find_transition()
-            direc = action()
-            if direc is None:
-                continue
-            typ = direc[0]
-            assert 'yield_this' == typ
-            sx, = direc[1:]
-            yield sx
+            while True:
+                action = find_transition()
+                direc = action()
+                if direc is None:
+                    break  # next token
+                typ = direc[0]
+                if 'yield_this' == typ:
+                    sx, = direc[1:]
+                    yield sx
+                    break
+                assert 'retry' == typ
 
     if 1 < len(stack):
         xx('stream ended early, exected sometong')
+
+# ==
+
+
+def SQL_lineses_for_CREATE_TABLEs_(abstract_tables, listener):
+    # it's gonna throw an sqlite3.OperationalError on any syntax errors
+
+    for at in abstract_tables:
+        yield _SQL_lines_for_CREATE_TABLE(at)
+
+
+def _SQL_lines_for_CREATE_TABLE(at):
+    s = at.table_name
+    _sanity_check_table_name(s)
+    s = _single_quote(s)
+
+    """We think this is a sqlite bug #todo:
+    We need to put the below in quotes (single or double, doesn't seem to
+    matter) because our table name might be a keyword (like 'commit')
+    but when we use quotes, the .schema command adds an IF NOT EXISTS,
+    but only for the .schema command not for sqlite_master.sql
+    """
+
+    yield f"CREATE TABLE {s} (\n"
+
+    assert at._columns  # ..
+    prev_line = None
+    for col in at.to_columns():
+        if prev_line:
+            yield ''.join(('  ', prev_line, ',\n'))
+        prev_line = _CREATE_TABLE_column_line_no_end_for(col)
+    yield ''.join(('  ', prev_line, ');\n'))
+
+
+def _CREATE_TABLE_column_line_no_end_for(col):
+    words = (w for row in _column_words(col) for w in row)
+    return ' '.join(words)
+
+
+def _column_words(col):
+    """
+    (sqlite (and the adjacent SQL ISO standard) gives you flexibility in what
+    order you put a lot of the clauses here. For lack of any formal guidelines,
+    we're going to follow the cosmetic, surface order as presented in the
+    visuals [here][1] at the time of writing, just so we produce SQL that is
+    self-consistent and hopefully "sounds natural".)
+
+    [1]: https://www.sqlite.org/lang_createtable.html
+    """
+
+    s = col.column_name
+    _sanity_check_column_name(s)
+    yield (s,)
+
+    abs_typ = col.column_type_storage_class
+
+    if col.is_primary_key:
+        assert 'int' == abs_typ
+        assert not col.is_foreign_key_reference
+        assert not col.null_is_OK
+        yield 'INTEGER', 'PRIMARY', 'KEY'
+        return
+
+    if 'int' == abs_typ:
+        yield ('INTEGER',)
+    else:
+        assert 'text' == abs_typ
+        yield ('TEXT',)
+
+    if not col.null_is_OK:
+        yield 'NOT', 'NULL'
+
+    if col.is_unique:
+        yield ('UNIQUE',)
+
+    if col.is_foreign_key_reference:
+        s = col.referenced_table_name
+        _sanity_check_table_name(s)
+        yield 'REFERENCES', _single_quote(s)
+        s = col.referenced_column_name
+        if s:
+            _sanity_check_column_name(s)
+            yield (''.join(('(', s, ')')),)
+
+    # 'INDEX' stuff will be a hoot
+
+
+def _single_quote(s):
+    # this was a necessity for us because table names were keywords (COMMIT)
+
+    assert "'" not in s
+    return ''.join(("'", s, "'"))
+
+
+def _sanity_check_table_name(s):
+    return _sanity_check(s, 'table name')
+
+
+def _sanity_check_column_name(s):
+    return _sanity_check(s, 'column name')
+
+
+def _sanity_check(s, surface_noun_phrase):
+    o = _sanity_check
+    if not hasattr(o, 'x'):
+        o.x = {k: v for k, v in _build_sanity_check()}
+    rx = o.x[surface_noun_phrase]
+    if rx.match(s):
+        return
+    xx(f"malformed {surface_noun_phrase}? {s!r}")
+
+
+def _build_sanity_check():
+    import re
+    yield 'table name', re.compile(r'[a-z]+(?:_[a-zA-Z]+)*\Z')
+    yield 'column name', re.compile(r'[a-zA-Z]+(?:_[a-zA-Z]+)*\Z')
 
 
 # ==

@@ -57,7 +57,7 @@ def audit_trail_via_EID_and_collection_implementation_(eid, ci, mon, opn=None):
     """
 
     def main():
-        build_entity_snapshot = _build_build_entity_snapshot(ci, mon)
+        build_entity_snapshot = _build_build_entity_snapshot(eid, ci, mon)
         entity_lines_now = body_of_text.lines[start_LO:stop_LO]
 
         # (the first entity snapshot we build, we don't need to build it like
@@ -248,14 +248,14 @@ def _create_entity_diff(before_snap, after_snap):
         attributes_changed=(attributes_changed or None))
 
 
-def _build_build_entity_snapshot(ci, mon):
+def _build_build_entity_snapshot(arg_EID, ci, mon):
 
     def build_entity_snapshot(entity_lines):
         bot = body_of_text_via(lines=entity_lines)
-        dct, reason = ting(bot)
+        dct, reason = these_via_body_of_text(bot)
         return _EntitySnapshot(entity_lines, dct, reason)
 
-    def ting(bot):
+    def these_via_body_of_text(bot):
         lines = bot.lines
         if 0 == len(lines):
             # (every entity will have no line when you're etc
@@ -270,9 +270,27 @@ def _build_build_entity_snapshot(ci, mon):
         # fr = file_reader_via(docu, bot, ci, mon)
 
         # WOULD FAIL IF THE RUN OF ENO DOESN"T LOOK LIKE THIS
-        (typ, eid, sect_el), = tokenized_sections(docu, bot, listener)
+        sects = tuple(tokenized_sections(docu, bot, listener))
+        leng = len(sects)
+        assert leng
+        if 1 == leng:
+            (typ, eid, sect_el), = sects
+            if arg_EID != eid:
+                reason = (f"NOTICE: When auditing {arg_EID!r} it flipped to"
+                          f" {eid!r}. Skipping this entity snapshot.")
+                return None, reason
+        else:
+            _say_ting(listener, sects, arg_EID)
+            found = False
+            for typ, eid, sect_el in sects:
+                if arg_EID == eid:
+                    found = True
+                    break
+            assert found
 
-        ent = entity_via(sect_el, identifier=None, monitor=mon)
+        ent = entity_via(
+            sect_el, identifier=None,
+            correct_old_key_names=True, monitor=mon)
 
         return ent.core_attributes, None
 
@@ -284,6 +302,15 @@ def _build_build_entity_snapshot(ci, mon):
     listener = mon.listener
 
     return build_entity_snapshot
+
+
+def _say_ting(listener, sects, arg_EID):
+    def lines():
+        yield (f"NOTICE: Found {len(sects)} sections on audit for {arg_EID} "
+               f"({these}), attempting to find the correct one")
+    eids = tuple(three[1] for three in sects)
+    these = ', '.join(eids)
+    listener('notice', 'expression', 'ting_ting', lines)
 
 
 @_dataclass

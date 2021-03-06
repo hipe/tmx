@@ -144,9 +144,19 @@ def cli_for_production():
             argv[i] = argv[i].encode('utf-8').decode('unicode_escape')  # ..
     # == END
 
-    from sys import stdin
+    from sys import stdin, argv
+
+    # == BEGIN #here1 done with click
+    if 1 < len(argv) and 'sqlite-toolkit' == argv[1]:
+        ch_pn = _child_program_name(* argv[:2])
+        ch_argv = ch_pn, * argv[2:]
+        from sys import stdout, stderr
+        func = _load_sqlite_toolkit_CLI_function()
+        exit(func(stdin, stdout, stderr, ch_argv))
+    # == END
+
     _inj = {'stdin': stdin, 'rng': rng, 'opn': opn}
-    _ = cli.main(obj=_inj)
+    _ = cli.main(args=argv, obj=_inj)
     xx(f'do you ever see this? {_}')
     return 0
 
@@ -425,9 +435,8 @@ def reindex(ctx, preview, i, collection_path):
 
     # Rebuild the argv with modifications 🙃
     from sys import argv as real_argv
-    from os.path import basename
-    use_program_name = ' '.join((basename(real_argv[0]), real_argv[1]))
-    use_argv = [use_program_name, collection_path]
+    ch_pn = _child_program_name(* real_argv[:2])
+    use_argv = [ch_pn, collection_path]
     if i:
         use_argv.append('-i')
 
@@ -443,7 +452,45 @@ def reindex(ctx, preview, i, collection_path):
     del rc
 
 
+@cli.command()
+def sqlite_toolkit():
+    """Development tooling commands for accessing `dot2sql` and the rest.
+    """
+
+    xx('this is never invoked, by design')  # see comment below
+
+
+"""Reminder to self:
+
+Due to limitations of our current CLI library (or just our understanding of
+it, but we think it's the former) we can't "mount" an arbitrary CLI command
+and pass it all of the remaining ARGV unparsed (option- and argument-looking
+tokens alike (no, `nargs=-1` isn't enough)). That is, that argument parser
+doesn't give us the option of parsing all the args ourselves (for a given
+child command).
+
+So for now, we just #[#867.L] wait to migrate off of click
+
+There's an awful workaround hack #here1 so we can still reach this command
+from here, because one of the main functions of these top-level CLI's is
+to serve as a high-level user-facing index of available endpoints.
+
+But the preferred workaround for now would be to use the `kst` (kiss
+sqlite tooling), a CLI endpoint installed by the top-level setup.py
+"""
+
+
+def _load_sqlite_toolkit_CLI_function():
+    from kiss_rdb.storage_adapters.sqlite3.toolkit import CLI as func
+    return func
+
+
 # == END commands
+
+
+def _child_program_name(token1, token2):
+    from os.path import basename as bn
+    return ' '.join((bn(token1), token2))
 
 
 class _Monitor:

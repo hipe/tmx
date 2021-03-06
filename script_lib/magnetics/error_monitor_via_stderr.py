@@ -1,4 +1,4 @@
-class func:  # error_monitor_via_stderr
+class error_monitor_via_stderr:
     """a common CLI-targeted expression strategy for emissions
 
     Its main useful exposure is a modality-specific implementation of a
@@ -128,6 +128,9 @@ class func:  # error_monitor_via_stderr
     @property
     def returncode(self):
         return self.exitstatus
+
+
+func = error_monitor_via_stderr
 
 
 def _line_writer_via_IO(io):  # (move this to wherever)

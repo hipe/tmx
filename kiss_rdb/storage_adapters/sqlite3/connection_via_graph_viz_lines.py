@@ -1,6 +1,3 @@
-import re as _re
-
-
 def connection_via_graph_viz_lines(
         database_path, graph_viz_schema_lines, listener=None):
     try:
@@ -77,81 +74,13 @@ def _SQL_lineses(  # #testpoint
     # Create tables if any need to be created
     if right_only:
         if create_tables_if_not_exist:
-            return _SQL_lineses_for_CREATE_TABLEs(right_only, listener)
+            abstract_tables = right_only.values()
+            from kiss_rdb.storage_adapters_.sqlite3.\
+                _abstract_schema_to_and_fro import \
+                SQL_lineses_for_CREATE_TABLEs_ as func
+            return func(abstract_tables, listener)
         return _when_missing_tables(listener, right_only, *context)
-
     return ()  # #here1
-
-
-def _SQL_lineses_for_CREATE_TABLEs(create_tables, listener):
-    # it's gonna throw an sqlite3.OperationalError on any syntax errors
-
-    for at in create_tables.values():
-        yield _SQL_lines_for_CREATE_TABLE(at)
-
-
-def _SQL_lines_for_CREATE_TABLE(at):
-    s = at.table_name
-    if not _re.match(r'[a-z]+(?:_[a-z]+)*\Z', s):
-        xx(f"malformed table name? {s!r}")
-    yield f"CREATE TABLE {s} (\n"
-    assert at._columns  # ..
-    prev_line = None
-    for col in at.to_columns():
-        if prev_line:
-            yield ''.join(('  ', prev_line, ',\n'))
-        prev_line = _CREATE_TABLE_column_line_no_end_for(col)
-    yield ''.join(('  ', prev_line, ');\n'))
-
-
-def _CREATE_TABLE_column_line_no_end_for(col):
-    words = (w for row in _column_words(col) for w in row)
-    return ' '.join(words)
-
-
-def _column_words(col):
-    """
-    (sqlite (and the adjacent SQL ISO standard) gives you flexibility in what
-    order you put a lot of the clauses here. For lack of any formal guidelines,
-    we're going to follow the cosmetic, surface order as presented in the
-    visuals [here][1] at the time of writing, just so we produce SQL that is
-    self-consistent and hopefully "sounds natural".)
-
-    [1]: https://www.sqlite.org/lang_createtable.html
-    """
-
-    s = col.column_name
-    if not _re.match(r'[a-zA-Z]+(?:_[a-zA-Z]+)*\Z', s):  # or w/e
-        xx(f"malformed column name? {s!r}")
-    yield (s,)
-
-    abs_typ = col.column_type_storage_class
-
-    if col.is_primary_key:
-        assert 'int' == abs_typ
-        assert not col.is_foreign_key_reference
-        assert not col.null_is_OK
-        yield 'INTEGER', 'PRIMARY', 'KEY'
-        return
-
-    if 'int' == abs_typ:
-        yield ('INTEGER',)
-    else:
-        assert 'text' == abs_typ
-        yield ('TEXT',)
-
-    if not col.null_is_OK:
-        yield 'NOT', 'NULL'
-
-    # 'UNIQUE' soon
-
-    if col.is_foreign_key_reference:
-        s = col.referenced_table_name
-        if not _re.match(r'[a-z]+(?:_[a-zA-Z]+)*\Z', s):
-            xx(f'malformed table name? {s!r}')
-        yield 'REFERENCES', s
-
-    # 'INDEX' stuff will be a hoot
 
 
 def _validate_extname(database_path, _listener):
