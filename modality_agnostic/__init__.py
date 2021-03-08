@@ -107,10 +107,15 @@ class write_only_IO_proxy:
     def __init__(self, write, on_OK_exit=None, flush=None, isatty=None):
         self._on_OK_exit = on_OK_exit
 
+        def writelines(lines):
+            for line in lines:
+                write(line)
+
         def use_write(s):
             write(s)
             return len(s)
 
+        self.writelines = writelines
         self.write = use_write
 
         if flush is not None:

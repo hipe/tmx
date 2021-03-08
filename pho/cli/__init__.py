@@ -93,7 +93,7 @@ def _formals_for_listen():
     yield '-c', '--command=CMD', "Don't run the server, invoke a command", \
             "against the config, like `foo.bar.baz`. type `list`"
     yield '-p', '--port=PORT', "the port to listen on (there is a default)"
-    yield '-h', '--help', 'this screen'
+    yield _the_help_option
     yield 'config-path?', 'not nec. to ping the server. nec. to generate files'
 
 
@@ -163,7 +163,7 @@ def _formals_for_watch():
     yield '-x', '--file-extension=EXT', '"md" or "eno" (default: "md")'
     yield '-p', '--port=PORT', 'how to reach the message broker (has default)'
     yield '-v', '--verbose', 'turn on verbose output (probably to vendor)'
-    yield '-h', '--help', 'this screen'
+    yield _the_help_option
     yield '<dir>', 'the directory to watch'
 
 
@@ -232,6 +232,7 @@ def _load_the_connect_COMMAND():
 
 def _history_commands():
     yield 'update', lambda: _history_update_command
+    yield 'stats', lambda: _history_stats_command
 
 
 def _history_command(sin, sout, serr, argv, efx):
@@ -248,7 +249,7 @@ def _history_command(sin, sout, serr, argv, efx):
 
 def _formals_for_history_update(efx):
     yield efx.collection_path_option_definition
-    yield '-h', '--help', 'this screen'
+    yield _the_help_option
 
 
 def _history_update_command(sin, sout, serr, argv, efx):
@@ -258,45 +259,46 @@ def _history_update_command(sin, sout, serr, argv, efx):
     have to interface with it directly.
     """
 
-    bash_argv = list(reversed(argv))
-    long_prog_name = bash_argv.pop()
+    def functioner():
+        from pho.document_history_.update_data_warehouse import func
+        return func
 
-    def prog_name():
-        from script_lib.cheap_arg_parse import shorten_long_program_name as fun
-        return fun(long_prog_name)
+    return _common_execute(
+        serr, argv, efx, doc=_history_update_command.__doc__,
+        formals=_formals_for_history_update(efx),
+        functioner=functioner)
 
-    foz = _foz_via(_formals_for_history_update(efx), prog_name)
 
-    vals, es = foz.terminal_parse(serr, bash_argv)
-    if vals is None:
-        return es
+def _formals_for_history_stats(efx):
+    yield efx.collection_path_option_definition
+    yield '-n', '--dry-run', "Don't actually write to the database"
+    yield _the_help_option
 
-    if vals.get('help'):
-        serr.writelines(foz.help_lines(doc=_history_update_command.__doc__))
-        return 0
 
-    mon = efx.produce_monitor()
-    listener = mon.listener
+def _history_stats_command(sin, sout, serr, argv, efx):
+    """After having run 'update', generate the one statistic from the
 
-    coll_path, rc = efx.require_collection_path(listener, vals)
-    if not coll_path:
-        return rc
+    "data warehouse" of document history info: the standard deviation
+    of the amount of change (lines removed plus lines inserted) in each
+    document commit
+    """
 
-    assert not vals
+    def functioner():
+        from pho.document_history_ import do_them_stats as func
+        return func
 
-    from pho.document_history_ import func
-    res = func(coll_path, listener)
-    assert res is None
+    return _common_execute(
+        serr, argv, efx, doc=_history_stats_command.__doc__,
+        formals=_formals_for_history_stats(efx),
+        functioner=functioner)
 
-    return mon.returncode
 
 # == END history
-
 
 def _formals_for_static_webserver():
     yield '-t', '--target=TARGET', '(pass thru to livereload)'
     yield '-p', '--port=PORT', 'port to listen on for http. there is a default'
-    yield '-h', '--help', 'this screen'
+    yield _the_help_option
     yield 'document-root', 'path to the directory of static files'
 
 
@@ -327,6 +329,34 @@ def _static_webserver_command(sin, sout, serr, argv, efx):
     mon = efx.produce_monitor()
     from pho.web_adapters_.livereload import func
     func(path, mon.listener, port, **kw)
+    return mon.returncode
+
+
+def _common_execute(serr, argv, efx, doc, formals, functioner):
+    bash_argv = list(reversed(argv))
+    long_prog_name = bash_argv.pop()
+    prog_name = _prog_name_function_via(long_prog_name)
+    foz = _foz_via(formals, prog_name)
+
+    vals, es = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return es
+
+    if vals.get('help'):
+        serr.writelines(foz.help_lines(doc=doc))
+        return 0
+
+    mon = efx.produce_monitor()
+    listener = mon.listener
+
+    coll_path, rc = efx.require_collection_path(listener, vals)
+    if not coll_path:
+        return rc
+
+    func = functioner()
+    res = func(coll_path, listener=listener, **vals)
+    assert res is None
+
     return mon.returncode
 
 
@@ -383,6 +413,13 @@ def parse_positionals_(positionals, monikers, cmd_phrase):
     assert req_len == act_len
 
 
+def _prog_name_function_via(long_prog_name):
+    def prog_name():
+        from script_lib.cheap_arg_parse import shorten_long_program_name as fun
+        return fun(long_prog_name)
+    return prog_name
+
+
 def _cheap_arg_parse_branch(sin, sout, serr, argv, cx, doc, efx):
     from script_lib.cheap_arg_parse import cheap_arg_parse_branch as func
     return func(sin, sout, serr, argv, cx, doc, efx)
@@ -394,6 +431,8 @@ def _foz_via(defs, pner, x=None):
 
 
 _port = 10_007  # purely arbitrary historical reasons
+_the_help_option = '-h', '--help', 'this screnen'
+
 
 # #history-B.4
 # #history-A.1 rewrite during cheap arg parse not click

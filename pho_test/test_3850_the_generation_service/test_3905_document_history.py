@@ -1,12 +1,18 @@
-from modality_agnostic.test_support.common import lazy
+from modality_agnostic.test_support.common import lazy, \
+        dangerous_memoize_in_child_classes as shared_subect_in_child_classes
 from unittest import TestCase as unittest_TestCase, main as unittest_main
 from collections import namedtuple
 
 
 class CommonCase(unittest_TestCase):
 
+    @property
+    @shared_subect_in_child_classes
+    def end_state(self):
+        return tuple(self.build_end_state())
+
     def build_end_state(self):
-        def these():
+        def business_items():
             for verb_lexeme_key, dt_string in self.given_these():
                 dt = strptime(dt_string, '%Y-%m-%d %H:%M:%S')
                 yield business_item_via(verb_lexeme_key, dt)
@@ -14,7 +20,6 @@ class CommonCase(unittest_TestCase):
         lexi = this_lexicon()
         from datetime import datetime
         strptime = datetime.strptime
-        func = subject_module()._words_via_business_items
 
         """
         This is how the asset does and doesn't inflect with respect to "now":
@@ -29,15 +34,25 @@ class CommonCase(unittest_TestCase):
         passage of time whoopsie. The "fixture now" we are using happens to
         be the minute we made the commit originally:)
         """
-        from datetime import datetime
         dt_now = datetime(2021, 2, 20, 0, 17, 39)
-        return lines_via_words(func(these(), lexi, datetime_now=dt_now))
+
+        func = subject_module().time_bucket_expressers_via_business_items_
+        return func(business_items(), lexi, datetime_now=dt_now)
 
 
-class Case1234_XXXX(CommonCase):
+class Case3850_the_only_case(CommonCase):
 
-    def test_010_go(self):
-        act = tuple(self.build_end_state())
+    def test_010_each_time_bucket_you_can_see_earliest_and_latest_dateti(self):
+        tbe = self.end_state[-1]
+        dt1 = tbe.earliest_datetime
+        dt2 = tbe.latest_datetime
+        st1 = dt1.isoformat()
+        st2 = dt2.isoformat()
+        assert '2021-02-19T17:25:54' == st1
+        assert '2021-02-19T17:25:56' == st2
+
+    def test_090_TO_LINE_has_periods_but_no_newlines(self):
+        act = tuple(tb.to_line_no_end() for tb in self.end_state)
         exp = tuple(self.expected_lines())
         self.assertSequenceEqual(act, exp)
 
@@ -75,24 +90,12 @@ def this_lexicon():
             yield str(count), verb_lexeme_key, 'fishes'  # lol
 
     mod = subject_module()
-    words_of_oxford_join = mod._words_of_oxford_join
+    words_of_oxford_join = mod.words_of_oxford_join_
 
     from text_lib.magnetics.words_via_time import \
         prepositional_phrase_words_via_context_stack as pp_via_cstack
 
     return Lexicon()
-
-
-def lines_via_words(words):
-    cache = []
-    for w in words:
-        cache.append(w)
-        if -1 != w.rfind('.', -1):  # not robust
-            # (not terminating with newline just because no need here)
-            yield ' '.join(cache)
-            cache.clear()
-    if cache:
-        yield ' '.join(cache)
 
 
 business_item_via = namedtuple('_IDK', ('verb_lexeme_key', 'datetime'))

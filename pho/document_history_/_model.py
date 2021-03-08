@@ -32,6 +32,14 @@ class _SingletonTable(_Table):
             return self._insert_no_commit(k, num)
         return self._update_no_commit(k, num)
 
+    def update(self, k, num):
+        self._update_no_commit(k, num)
+        self._commit()
+
+    def insert(self, k, num):
+        self._insert_no_commit(k, num)
+        self._commit()
+
     def _update_no_commit(self, k, num):
         self._execute(self._SQL_for_UPDATE, (num, k))
 
@@ -53,6 +61,8 @@ class _SingletonTable(_Table):
             return
         val, = row
         return val
+
+    get = _get
 
 
 class _SingletonInteger(_SingletonTable):
@@ -373,16 +383,28 @@ _NotecardCommitRecord_CUSTOM = _nt(
 class _NotecardBasedDocumentTable(_Table):
 
     def touch_via_head_EID(self, peid):
+        row = self.get_via_document_head_EID(peid)
+        if row:
+            return self.record_via_row(row)
+        return self.insert_NB_document(peid)
+
+    def insert_NB_document(self, peid, vendor_document_title=None):
+        if vendor_document_title is None:
+            vendor_document_title = ''  # NOTE unique constraint will bite you
+
+        c = self._execute('INSERT INTO notecard_based_document '
+                          'VALUES (NULL, ?, ?)', (peid, vendor_document_title))
+        self._commit()
+        return self.record_via_row((c.lastrowid, peid, vendor_document_title))
+
+    def get_via_document_head_EID(self, peid):
         c = self._execute('SELECT * from notecard_based_document '
                           'WHERE head_notecard_EID=?', (peid,))
         row = c.fetchone()
-        if row:
-            assert c.fetchone() is None
-            return self.record_via_row(row)  # #no-object-mapper
-        c = self._execute('INSERT INTO notecard_based_document '
-                          'VALUES (NULL,  ?)', (peid,))
-        self._commit()
-        return self.record_via_row((c.lastrowid, peid))
+        if row is None:
+            return
+        assert c.fetchone() is None
+        return self.record_via_row(row)  # #no-object-mapper
 
     def record_via_row(self, row):
         return _NotecardBasedDocumentRecord(*row)
@@ -390,12 +412,13 @@ class _NotecardBasedDocumentTable(_Table):
 
 _NotecardBasedDocumentRecord = _nt(
     '_NotecardBasedDocumentRecord',
-    ('notecard_based_document_ID', 'head_notecard_EID'))
+    ('notecard_based_document_ID',
+     'head_notecard_EID', 'document_title_from_vendor'))
 
 
 class _NotecardBasedDocumentCommitTable(_Table):
 
-    def touch(self, NB_docu_ID, ci):
+    def touch_NBDC(self, NB_docu_ID, ci):
         ci_ID = ci.commit_ID
         c = self._execute('SELECT * FROM notecard_based_document_commit '
                           'WHERE notecard_based_document_ID=?  '
@@ -426,15 +449,14 @@ class _NotecardBasedDocumentCommitTable(_Table):
         norm_dt_s = dt.strftime('%Y-%m-%d %H:%M:%S')
         tzinfo = str(dt.tzinfo)
 
-        norm_dt_s = ci.datetime
         row = [None, NB_docu_ID, ci_ID, norm_dt_s, tzinfo, 0, 0, 0]
         c = self._execute('INSERT INTO notecard_based_document_commit '
                           'VALUES (?, ?, ?, ?, ?, ?, ?, ?)', row)
         # (no commit till #commit3)
         row[0] = c.lastrowid
-        return True, self._via_row(row)
+        return True, self.NBD_CI_via_row_(row)
 
-    def _via_row(self, row):
+    def NBD_CI_via_row_(self, row):
         return _NC_Based_Docu_CI_Record(*row)
 
 
@@ -508,6 +530,44 @@ class Database_:
 :#no-object-mapper: maybe we are making the same record over and over
 but meh. we don't have "object mapper" and it would be nontrivial
 """
+
+
+def database_after_updating_schema_(coll_path, listener):
+
+    db_path = _database_path_via_collection_path(coll_path)
+    schema_path = _build_schema_path()
+
+    from kiss_rdb.storage_adapters.sqlite3.connection_via_graph_viz_lines \
+        import func
+
+    with open(schema_path) as lines:
+        db_conn = func(db_path, lines, listener)
+
+    if not db_conn:
+        return
+    # from sqlite3 import Row
+    # db_conn.row_factory = Row  # #todo this is cool but not used
+    return Database_(db_conn)
+
+
+def database_via_collection_path_(coll_path):
+    """(Alternative to the above that skips the schema update)"""
+
+    db_path = _database_path_via_collection_path(coll_path)
+    from sqlite3 import connect  # meh. redundant w/ elsewhere
+    return Database_(connect(db_path))
+
+
+def _database_path_via_collection_path(coll_path):
+    from os.path import join as _path_join
+    return _path_join(coll_path, 'document-history-cache.sqlite3')
+
+
+def _build_schema_path():
+    from os.path import dirname as dn, join as _path_join
+    mono_repo = dn(dn(dn(__file__)))
+    return _path_join(
+        mono_repo, 'pho-doc', 'documents', '429.4-document-history-schema.dot')
 
 
 def xx(msg=None):

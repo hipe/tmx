@@ -4,7 +4,6 @@ cover yes schema file but no ent entites dir
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
 there are todo's
-you still need a plugin. massive massive amounts of integration
 audit trail for document as-is
 make sure you short-circuit out of audit trail in that one place
-stats
+get rid of author and category unless is special

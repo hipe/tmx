@@ -102,5 +102,4 @@ def nodes_in_order_via(start_eid, coll, listener):
 if __name__ == '__main__':
     unittest.main()
 
-# #pending-rename: this & many others: consider following asset file structure
 # #born

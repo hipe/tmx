@@ -4,6 +4,53 @@
 from dataclasses import dataclass as _dataclass
 
 
+def do_them_stats(coll_path, listener, dry_run=False):
+
+    # Do the query
+    db = _database_via_collection_path(coll_path, listener)
+    c = db.conn.execute(
+        'SELECT number_of_lines_inserted + number_of_lines_deleted '
+        'FROM notecard_based_document_commit')
+
+    def only_value(row):
+        ocd, = row
+        return ocd
+
+    # Calculate them (bruskly for now)
+    nums = tuple((only_value(row) for row in c))
+    from numpy import std as std_via, mean as mean_via
+    mean = mean_via(nums)
+    std = std_via(nums)
+
+    # Read existing
+    table = db.singleton_text
+    k = 'mean_and_std'
+    one_string_before = table.get(k)
+    one_string_now = ' '.join((str(mean), str(std)))
+
+    # Expresss
+    def lines():
+        if one_string_before:
+            use = one_string_before
+        else:
+            use = '(none)'
+        yield f"Mean and standard deviation before: {use}"
+        yield f"Mean and standard deviation now:    {one_string_now}"
+    listener('info', 'expression', 'mean_and_std', lines)
+
+    # Maybe save
+    if dry_run:
+        return
+    if one_string_before:
+        table.update(k, one_string_now)
+        verb = 'updated'
+    else:
+        table.insert(k, one_string_now)
+        verb = 'inserted'
+
+    listener('info', 'expression', 'stored', lambda: (f"({verb} values)",))
+
+
 def update_document_history(coll_path, listener):
     try:
         return _main(coll_path, listener)
@@ -15,9 +62,8 @@ func = update_document_history
 
 
 def _main(coll_path, listener):
-    conn = _connection_after_updating_schema(coll_path, listener)
-    from ._model import Database_ as cls
-    db = cls(conn)
+
+    db = _database_via_collection_path(coll_path, listener)
 
     # First pass: load changed file queue from any new commits from HEAD
     num = _populate_temporary_table(db, coll_path, listener)
@@ -64,12 +110,6 @@ def _update_document_commit_table(bcoll, db, listener):
 
     set_of_seen_docu_heads = set()
 
-    def parent_NC_EID_of(eid):
-        nc = find_document_root_node(eid, bcoll, listener)  # :#here4
-        if nc is None:
-            return
-        return nc.identifier_string
-
     from pho.notecards_.abstract_document_via_notecards import \
         find_document_root_node
 
@@ -77,31 +117,50 @@ def _update_document_commit_table(bcoll, db, listener):
             'notecard_ID integer unique, '
             'notecard_based_document_ID integer not null)')
 
+    def touch_the_associated_document(nc):
+        # notecards are one-to-many to documents so maybe we saw it already
+        # #no-object-mapper
+        # peid = parent entity identifier (document head EID)
+
+        # Do the vendor lookup to determine peid (imagine it's expensive)
+        doc_head_notecard = find_document_root_node(
+                nc.entity_identifier, bcoll, listener)  # :#here4
+        if doc_head_notecard:
+            peid = doc_head_notecard.identifier_string
+            set_of_seen_docu_heads.add(peid)
+        else:
+            # If notecard is not part of a document do #hack10 for explained
+            peid = '222'  # the number zero, in kiss-code
+
+        # If we already had one in the table, use that
+        docu_rec = NB_docu_table.get_via_document_head_EID(peid)
+        if docu_rec:
+            return docu_rec
+
+        # Since we don't have one, do more work to determine the title
+
+        # (How the SSG vendor adapter comes up with a title is … complicated
+        # but, pray that this simple way keeps working while it's working)
+
+        use_title = doc_head_notecard.heading
+        assert use_title
+
+        return NB_docu_table.insert_NB_document(peid, use_title)
+
     def document_via_notecard(nc):
 
         # If you already have an entry in the temp table, join it and done
-        c = execute('SELECT * from notecard_based_document '
+        c = execute('SELECT nbd.* from notecard_based_document AS nbd '
                     'JOIN temp.notecard_parent '
                     'USING (notecard_based_document_ID) '
                     'WHERE notecard_parent.notecard_ID=?', (nc.notecard_ID,))
         row = c.fetchone()
         assert c.fetchone() is None
         if row:
-            return NB_docu_table.record_via_row(row[:-1])
-            # (we don't know how to get the joined column out of the results)
+            return NB_docu_table.record_via_row(row)
             # #no-object-mapper
 
-        # Do the vendor lookup (image it's expensive)
-        peid = parent_NC_EID_of(nc.entity_identifier)
-
-        # If notecard is not part of a document do #hack10 for explained
-        if peid is None:
-            peid = '222'   # the number zero, in kiss-code
-        else:
-            set_of_seen_docu_heads.add(peid)
-
-        # Touch such a document (many childs to one parent so maybe we saw it)
-        docu_rec = NB_docu_table.touch_via_head_EID(peid)
+        docu_rec = touch_the_associated_document(nc)
         NB_doc_ID = docu_rec.notecard_based_document_ID
 
         # Now add the relationship to the temp table so we find it subsequently
@@ -142,7 +201,7 @@ def _update_document_commit_table(bcoll, db, listener):
         for NB_docu, nc_ci in these:
 
             # Touch the final target product record
-            did_create, docu_ci = NB_docu_ci_table.touch(
+            did_create, docu_ci = NB_docu_ci_table.touch_NBDC(
                 NB_docu.notecard_based_document_ID, ci)
             if did_create:
                 num_d_ci += 1
@@ -484,21 +543,7 @@ def _populate_temporary_table(db, coll_path, listener):
     return return_this(count)
 
 
-def _connection_after_updating_schema(coll_path, listener):
-    from os.path import dirname as dn, join as _path_join
-    db_path = _path_join(coll_path, 'document-history-cache.sqlite3')
-    mono_repo = dn(dn(dn(__file__)))
-    schema_path = _path_join(
-        mono_repo, 'pho-doc', 'documents', '429.4-document-history-schema.dot')
-    from kiss_rdb.storage_adapters.sqlite3.connection_via_graph_viz_lines \
-        import func
-    with open(schema_path) as fh:
-        db_conn = func(db_path, fh, listener)
-    if db_conn:
-        # from sqlite3 import Row
-        # db_conn.row_factory = Row  # #todo this is cool but not used
-        return db_conn
-    raise _Stop()
+
 
 
 # == Git Layer
@@ -709,6 +754,14 @@ def _resolve_business_collection(coll_path, listener):
     if bcoll:
         return bcoll
     raise _Stop()
+
+
+def _database_via_collection_path(coll_path, listener):
+    from ._model import database_after_updating_schema_ as func
+    db = func(coll_path, listener)
+    if db is None:
+        raise _Stop()
+    return db
 
 
 def _open_subprocess(cmd, cwd=None):  # c/p

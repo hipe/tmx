@@ -55,7 +55,8 @@ node10:pk->node50:fk2[arrowhead=odot]
 
 node60[label="notecard_based_document|
 <pk> notecard_based_document_ID int primary key|
-head_notecard_EID text unique" shape=record]
+head_notecard_EID text unique|
+document_title_from_vendor text unique" shape=record]
 
 
 node70[label="notecard_based_document_commit|

@@ -46,7 +46,7 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
 
         s = _notecard_body_via_document_path(doc_abspath, listener)
         if not s:
-            xx('hmmmm wat do, mabye return none')
+            xx('hmmmm wat do, maybe return none')
         return (s,)  # wrapped value
 
     def expand_path_from_identifier():

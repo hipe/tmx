@@ -251,8 +251,7 @@ def xx():
 
 if __name__ == '__main__':
     from sys import argv
-    tok = argv[1]
-    if tok[:7] == '--wahoo':
+    if 1 < len(argv) and (tok := argv[1])[:7] == '--wahoo':
         path = None
         if 7 < len(tok):
             assert '=' == tok[7]

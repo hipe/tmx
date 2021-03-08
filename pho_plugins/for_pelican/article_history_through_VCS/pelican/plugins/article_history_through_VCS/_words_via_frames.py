@@ -1,10 +1,11 @@
 """NOTE all interfaces are VERY subject to change! just a rough proof of con"""
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass as _dataclass
 
 
-def _words_via_business_items(items, lexicon, datetime_now=None):  # #testpoint
+def time_bucket_expressers_via_business_items_(
+        items, lexicon, datetime_now=None):  # #testpoint
 
     # Flatten the table early because we're gonna operate from the end
     table = _GenericTable(assert_in_order(items))
@@ -25,16 +26,18 @@ def _words_via_business_items(items, lexicon, datetime_now=None):  # #testpoint
     # appropriate for what level of detail we want for that event, given how
     # old it is. Whew!
 
-    def these():
+    def time_buckets():
         for table in precision_chunks:
             for sub_table in table.chunk_on_attribute('context_stack'):
                 yield sub_table
 
     # Now, each of these tables has events that can be AND'ed together
-    return _words_via_timebucket_chunks(these(), lexicon)
+
+    return _time_bucket_expressers_via_bucketed_tables(
+        time_buckets(), lexicon)
 
 
-def _words_via_timebucket_chunks(tables, lexicon):
+def _time_bucket_expressers_via_bucketed_tables(tables, lexicon):
     """There is an excellent exercise in orthogonality that happens here:
 
     Each next table is definitely a "jump" in timebucket (e.g. "March 21"
@@ -81,22 +84,51 @@ def _words_via_timebucket_chunks(tables, lexicon):
 
     prev_context_stack = first_table[0].context_stack
 
-    for w in _words_via_timebucket(prev_context_stack, first_table, lexicon):
-        yield w
+    yield _time_bucket_expresser(prev_context_stack, first_table, lexicon)
 
     for table in itr:
         this_context_stack = table[0].context_stack
         USE_context_stack = _TRIM_CONTEXT_STACK_FROM_HEAD(
                 this_context_stack, prev_context_stack)
         prev_context_stack = this_context_stack
-        for w in _words_via_timebucket(USE_context_stack, table, lexicon):
-            yield w
+        yield _time_bucket_expresser(USE_context_stack, table, lexicon)
 
 
-def _words_via_timebucket(relevant_context, table, lexicon):
+def _time_bucket_expresser(relevant_context, table, lexicon):
     these_keys = tuple(frame.verb_lexeme_key for frame in table)
+    early = table[0].business_item.datetime  # earliest datettime
+    late = table[-1].business_item.datetime  # latest datetime
     counts = _crunch_into_counts(these_keys)
-    return lexicon.words_via_frame_ish(relevant_context, counts)
+    return _TimeBucketExpresser(relevant_context, counts, early, late, lexicon)
+
+
+@_dataclass
+class _TimeBucketExpresser:
+    relevant_context: tuple
+    counts: dict
+    earliest_datetime: object
+    latest_datetime: object
+    lexicon: object
+
+    def to_line_with_end(self):
+        return ''.join(self._to_pieces_for_line(True))
+
+    def to_line_no_end(self):
+        return ''.join(self._to_pieces_for_line(False))
+
+    def _to_pieces_for_line(self, do_newline):
+        itr = iter(self.to_words())
+        for w in itr:
+            yield w
+            for w in itr:
+                yield ' '
+                yield w
+            if do_newline:
+                yield '\n'
+
+    def to_words(self):
+        return self.lexicon.words_via_frame_ish(
+                self.relevant_context, self.counts)
 
 
 def _crunch_into_counts(verb_lexeme_keys):
@@ -176,6 +208,9 @@ def _maps_and_boundaries(dt_now):
 
 
 _maps_and_boundaries.x = None
+
+
+# bi = business item
 
 
 def _do_maps_and_boundaries(now):
@@ -393,14 +428,14 @@ def _chunk_on_attribute(attr, table):
 
 # ==
 
-@dataclass
+@_dataclass
 class _Frame:
     verb_lexeme_key: str
     context_stack: list
     business_item: object
 
 
-@dataclass
+@_dataclass
 class _BusinessItem:
     verb_lexeme_key: str
     datetime: object
@@ -408,7 +443,7 @@ class _BusinessItem:
 
 # == (imagine in [place 1] or [place 2])
 
-def _words_of_oxford_join(slug_words_es, sep):  # #testpoint
+def words_of_oxford_join_(slug_words_es, sep):  # #testpoint
     rows = _do_words_of_oxford_join(slug_words_es, sep)
     return (w for row in rows for w in row)
 

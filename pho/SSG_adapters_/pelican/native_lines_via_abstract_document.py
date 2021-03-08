@@ -110,7 +110,7 @@ def _entry_via_title(title, listener):  # #testpoint
     from frontmatter title to filesystem entry (filename (just basename)).
     (In peloogan it's `util.slugify` plus settings.)
 
-    The thing is, we need to be sure we know what filesystem entry (slug plus)
+    The thing is, we need to be sure we know what filesystem entry (slug plus
     extension) the SSG will derive from its frontmatter, because we use
     filesystem paths (not frontmatter titles) to specify which outputted html
     document we want to reload on. If the strings don't line up, we will
@@ -143,13 +143,10 @@ def _vendor_entry_via_title(title):
 
 
 def _sluggerer():  # #testpoint
-    o = _sluggerer
-    if o.x is None:
-        o.x = _build_slugger()
-    return o.x
-
-
-_sluggerer.x = None  # [#510.4]
+    if (x := getattr(_sluggerer, 'x', None)):  # [#510.4]
+        return x
+    _sluggerer.x = _build_slugger()
+    return _sluggerer.x
 
 
 def _build_slugger():

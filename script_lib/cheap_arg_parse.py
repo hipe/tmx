@@ -1,10 +1,45 @@
 import re
 
 
-def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
-    # Trying to be exemplary (if you need to roll your own)
+def cheap_arg_parse_branch(sin, sout, serr, argv, cx, docer=None, efx=None):
+    func_argv, rc = prepare_tail_call_for_branch(serr, argv, cx, docer)
+    if not func_argv:
+        return rc
+    func, ch_argv = func_argv
+    rc = func(sin, sout, serr, ch_argv, efx)
+    assert isinstance(rc, int)
+    return rc
+
+
+def prepare_tail_call_for_branch(serr, argv, cx, docer):
 
     bash_argv = list(reversed(argv))
+    foz = _formals_for_branch(bash_argv, cx)
+
+    vals, rc = foz.nonterminal_parse(serr, bash_argv)
+    if vals is None:
+        return None, rc
+
+    # Help is here rather than deeper so we can pass trivially complicated doc
+    if vals.get('help'):
+        serr.writelines(foz.help_lines(doc=(docer and docer())))
+        return None, 0
+
+    # The Ultra-Sexy Mounting of an Alternation Component:
+    cmd_tup = vals.pop('command')  # our grammar specifies at least one
+    head_cmd, *rest = cmd_tup
+    cmd_name, cmd_funcer, rc = foz.parse_alternation_fuzzily(serr, head_cmd)
+    if not cmd_name:
+        return None, rc
+
+    cmd_func = cmd_funcer()
+    ch_pn = ' '.join((foz.program_name, cmd_name))  # we don't love it, but meh
+    ch_argv = ch_pn, *rest
+    return (cmd_func, ch_argv), None
+
+
+def _formals_for_branch(bash_argv, cx):
+
     long_program_name = bash_argv.pop()
 
     def prog_name():
@@ -15,53 +50,46 @@ def cheap_arg_parse_branch(sin, sout, serr, argv, cx, descsr=None, efx=None):
         yield '<command> [..]', "One of the below"
 
     # Marrying the prog_name to the formals lets it emit and invite ~15 errors
-    foz = formals_via_definitions(formals(), prog_name, lambda: cx)
-
-    vals, es = foz.nonterminal_parse(serr, bash_argv)
-    if vals is None:
-        return es
-
-    # Help is here rather than deeper so we can pass trivially complicated doc
-    if vals.get('help'):
-        for line in foz.help_lines(doc=(descsr and descsr())):
-            serr.write(line)
-        return 0
-
-    # The Ultra-Sexy Mounting of an Alternation Component:
-    cmd_tup = vals.pop('command')  # our grammar specifies at least one
-    cmd_name, cmd_funcer, es = foz.parse_alternation_fuzzily(serr, cmd_tup[0])
-    if not cmd_name:
-        return es
-
-    ch_pn = ' '.join((prog_name(), cmd_name))  # we don't love it, but later
-    ch_argv = (ch_pn, * cmd_tup[1:])
-
-    es = cmd_funcer()(sin, sout, serr, ch_argv, efx)
-    assert isinstance(es, int)
-    return es
+    return formals_via_definitions(formals(), prog_name, lambda: cx)
 
 
 def cheap_arg_parse(do_CLI, sin, sout, serr, argv, formals,
                     efx=None, description_valueser=None):
-    bash_argv = list(reversed(argv))
-    long_program_name = bash_argv.pop()
 
-    def prog_name():
-        return shorten_long_program_name(long_program_name)
-
-    foz = formals_via_definitions(formals, prog_name)
-    vals, es = foz.terminal_parse(serr, bash_argv)
-    if vals is None:
-        return es
-
-    if vals.get('help'):
-        for line in foz.help_lines(do_CLI.__doc__, description_valueser):
-            serr.write(line)
-        return 0
-
+    def docr(): return do_CLI.__doc__
+    fv, rc = prepare_tail_call_for_terminal(
+            serr, argv, formals, docr, description_valueser)
+    if fv is None:
+        return rc
+    foz, vals = fv
     opts, args = foz.sparse_tuples_in_grammar_order_via_consume_values(vals)
     flat = (sin, sout, serr, *opts, *args, efx)
     return do_CLI(*flat)
+
+
+def prepare_tail_call_for_terminal(
+        serr, argv, defns, docer, description_valueser=None):
+
+    bash_argv = list(reversed(argv))
+    long_pname = bash_argv.pop()
+
+    def prog_name():
+        if ' ' in long_pname:
+            return long_pname  # e.g. child command already qualified
+        return shorten_long_program_name(long_pname)
+
+    foz = formals_via_definitions(defns, prog_name)
+
+    vals, rc = foz.terminal_parse(serr, bash_argv)
+    if vals is None:
+        return None, rc
+
+    if vals.get('help'):
+        lines = foz.help_lines(docer(), description_valueser)
+        serr.writelines(lines)
+        return None, 0
+
+    return (foz, vals), None
 
 
 def require_interactive(stderr, stdin, argv):

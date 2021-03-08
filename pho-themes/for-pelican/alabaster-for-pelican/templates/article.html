@@ -227,6 +227,16 @@ Some thoughts, mostly disjoint:
 {% endblock %}
 
 {% block content %}
+{# NOTE we copy-pasted this in at #history-B.5 thinking we needed to modify
+the "footer" (HTML element) part of the template to accomodate our byzantine
+"document history" expression; but in fact it looks like we can retrofit
+the one in to the other (which is GREAT) SO we don't need this block here
+BUT we're leaving it in AS LONG AS you be sure to check it periodically
+that it looks like the simple theme still; or just take it out later.
+
+We're keeping it in for now because it's relevant to our near work with
+stuff like author and category
+#}
 <section id="content" class="body">
   <header>
     <h2 class="entry-title">
@@ -236,6 +246,7 @@ Some thoughts, mostly disjoint:
  {{ translations.translations_for(article) }}
   </header>
   <footer class="post-info">
+
     <time class="published" datetime="{{ article.date.isoformat() }}">
       {{ article.locale_date }}
     </time>
@@ -243,6 +254,7 @@ Some thoughts, mostly disjoint:
     <time class="modified" datetime="{{ article.modified.isoformat() }}">
       {{ article.locale_modified }}
     </time>
+
     {% endif %}
     {% if article.authors %}
     <address class="vcard author">
