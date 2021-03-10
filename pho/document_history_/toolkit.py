@@ -81,9 +81,12 @@ def _command_zizzy(sin, sout, serr, argv, efx):
         nli = rec.number_of_lines_inserted
         nld = rec.number_of_lines_deleted
 
-        nlis = ''.join(('+', str(nli))) if nld else ''
+        nlis = ''.join(('+', str(nli))) if nli else ''
         nlds = ''.join(('-', str(nld))) if nld else ''
         pcs.append(" %4s  %4s" % (nlis, nlds))
+
+        pcs.append('  ')
+        pcs.append(o.record.SHA[:8])
 
         if 'docu_type_common' == rec.document_type:
             n = rec.number_of_notecards

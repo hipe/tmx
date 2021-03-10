@@ -6,6 +6,12 @@ def _lets_get_slizzy(articles_generator):
             maybe_MUTATE_article(article)
 
     def maybe_MUTATE_article(article):
+
+        # Sneaking this in: get rid of author when it's default (me) (FOR NOW)
+        auths = article.authors
+        if 1 == len(auths) and default_author == auths[0].name:
+            delattr(article, 'authors')
+
         tup = time_bucket_expressers_for_article(article)
         if not tup:
             # (leaving it as-is for now but in the future we might do more)
@@ -83,6 +89,8 @@ def _lets_get_slizzy(articles_generator):
 
     self = main  # #watch-the-word-burn
     conf = articles_generator.settings
+
+    default_author = conf['AUTHOR']
 
     coll_path = conf['PHO_COLLECTION_PATH']  # ..
     from pho.document_history_.toolkit import \

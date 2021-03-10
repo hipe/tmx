@@ -10,15 +10,9 @@ def time_bucket_expressers_via_business_items_(
     # Flatten the table early because we're gonna operate from the end
     table = _GenericTable(assert_in_order(items))
 
-    # Break the table into N precision chunks (low precision to high precision)
-    oldest, last_3_months, very_recent = table.split_and_map(
-        maps_and_boundaries=_maps_and_boundaries(datetime_now), reverse=True)
-    precision_chunks = oldest, last_3_months, very_recent
-    # (we hard-code the 3 chunks for clarity, just to say hello. but imagine
-    #  it's just N chunks. note: everything is chronological left-to-right)
-
     # The context stack of each frame is just a quantization of the datetime
     # for that event, to some particular level of precision as decided #here2.
+    # For example, (('year', 2021), ('month', 4))
     # We intentionally reduce the precision the farther back in time we go
     # (e.g.; events from yesterday are to-the-minute, events from a year ago
     # are to-the-month etc.) so that we can now "chunk by" context stack
@@ -26,15 +20,47 @@ def time_bucket_expressers_via_business_items_(
     # appropriate for what level of detail we want for that event, given how
     # old it is. Whew!
 
-    def time_buckets():
-        for table in precision_chunks:
-            for sub_table in table.chunk_on_attribute('context_stack'):
-                yield sub_table
+    def attempt(which):
+        return _time_bucketify(table, which, lexicon, datetime_now)
 
-    # Now, each of these tables has events that can be AND'ed together
+    res = tuple(attempt(_time_buckets_FIRST_ATTEMPT))
 
-    return _time_bucket_expressers_via_bucketed_tables(
-        time_buckets(), lexicon)
+    if len(res) <= _MANY_EXPRESSERS:
+        return res
+
+    # (Keep the higher precision first component YIKES)
+    keep = res[0]
+    res = list(attempt(_time_buckets_SECOND_ATTEMPT))
+    res[0] = keep
+    return res
+
+
+"""Heuristics:
+
+In our real life output at writing, time bucket expressers end up expressing
+at about 3 or 4 per "line". (On our browser with our theme right now, there's
+around 90 characters per line.)
+
+For example, a real line right now (it's "long" so we broke it up)
+
+    4 small edits in March. 6 small edits and edit in April. \
+        2 small edits in May. 3 small edits
+
+Note 4 expressers' expressions are shown (one is cut off).
+
+As a very general heuristic, having document history ramble on for more
+than 2 lines feels a litle too verbose.
+
+As such, (2 lines) x (3.5 expressers per line) = ~ 7 expressers
+
+For now we might say that 8 is our max result expressers, the threshold
+at which we retry with bigger buckets.
+
+Of course we could make this all parameterized
+"""
+
+
+_MANY_EXPRESSERS = 8
 
 
 def _time_bucket_expressers_via_bucketed_tables(tables, lexicon):
@@ -200,20 +226,58 @@ today or at some unimaginably far date in the future, like two years from now.
 """
 
 
-def _maps_and_boundaries(dt_now):
-    o = _maps_and_boundaries
-    if o.x is None:
-        o.x = tuple(_do_maps_and_boundaries(dt_now))
-    return o.x
-
-
-_maps_and_boundaries.x = None
+def _lazy(orig_f):  # [#510.4]
+    def use_f():
+        if not hasattr(use_f, 'x'):
+            use_f.x = orig_f()
+        return use_f.x
+    return use_f
 
 
 # bi = business item
 
 
-def _do_maps_and_boundaries(now):
+def _time_bucketify(table, which, lexicon, datetime_now):
+
+    # Resovle the bucketing definition (which may be memoized)
+    map_test_map_etc = _time_buckets(which, datetime_now)
+
+    # Break the table into N buckets (low precision to high precision)
+    N_buckets = table.split_and_map(map_test_map_etc, reverse=True)
+
+    # Now, each of these buckets has events that can be AND'ed together
+    def time_buckets():
+        for table in N_buckets:
+            for sub_table in table.chunk_on_attribute('context_stack'):
+                yield sub_table
+
+    return _time_bucket_expressers_via_bucketed_tables(time_buckets(), lexicon)
+
+
+def _time_buckets(def_func, datetime_now):
+    # (Don't build the same buckets over and over meh)
+
+    use_memoization = not datetime_now
+    if use_memoization:
+        o = _time_buckets
+        if not hasattr(o, 'x'):
+            o.x = {}
+        k = def_func.__name__  # ..
+        res = o.x.get(k)
+        if res:
+            return res
+
+    use_now = datetime_now or _datetime_now()
+    res = def_func(use_now)
+
+    if use_memoization:
+        res = tuple(res)
+        o.x[k] = res
+
+    return res
+
+
+def _time_buckets_FIRST_ATTEMPT(now):
     # Break the table up into N tables by finding the following boundaries
     # (and also, map the items thru the provided corresponding maps) #here2
 
@@ -224,9 +288,7 @@ def _do_maps_and_boundaries(now):
     def test(bi):
         # Towards finding the first event "more than 2 days ago"
         difference = now - bi.datetime
-        return number_of_seconds_in_two_days < difference.total_seconds()
-
-    number_of_seconds_in_two_days = 48 * 60 * 60
+        return _number_of_seconds_in_two_days < difference.total_seconds()
 
     yield 'test', test
 
@@ -244,10 +306,41 @@ def _do_maps_and_boundaries(now):
 
     yield 'map', _map_via(_month_precision)
 
-    if now:
-        return
+
+def _time_buckets_SECOND_ATTEMPT(now):
+
+    # First bucket: Same as above
+
+    yield 'map', _map_via(_minute_precision)
+
+    def test(bi):
+        difference = now - bi.datetime
+        return _number_of_seconds_in_two_days < difference.total_seconds()
+
+    yield 'test', test
+
+    # Then, those from the last 90 days, show to-the-MONTH precision
+
+    yield 'map', _map_via(_month_precision)
+
+    def test(bi):
+        difference = now - bi.datetime
+        return 90 < difference.days  # if off-by-one meh
+
+    yield 'test', test
+
+    # Then, for the last group, show to-the-YEAR precision
+
+    yield 'map', _map_via(_year_precision)
+
+
+_number_of_seconds_in_two_days = 48 * 60 * 60
+
+
+@_lazy
+def _datetime_now():
     from datetime import datetime
-    now = datetime.now()
+    return datetime.now()
 
 
 def _map_via(context_components_via_datetime):
@@ -273,6 +366,10 @@ def _day_precision(dt):
 def _month_precision(dt):
     yield 'year', dt.year
     yield 'month', dt.month
+
+
+def _year_precision(dt):
+    yield 'year', dt.year
 
 
 def assert_in_order(items):

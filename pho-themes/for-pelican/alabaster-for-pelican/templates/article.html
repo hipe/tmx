@@ -263,7 +263,7 @@ stuff like author and category
         {% endfor %}
     </address>
     {% endif %}
-    {% if article.category %}
+    {% if article.category and 'misc' != article.category.name %}
     <div class="category">
         Category: <a href="{{ SITEURL }}/{{ article.category.url }}">{{ article.category }}</a>
     </div>
