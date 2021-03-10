@@ -32,6 +32,8 @@ class _SingletonTable(_Table):
             return self._insert_no_commit(k, num)
         return self._update_no_commit(k, num)
 
+    set_no_commit = _set_no_commit
+
     def update(self, k, num):
         self._update_no_commit(k, num)
         self._commit()
@@ -386,16 +388,20 @@ class _NotecardBasedDocumentTable(_Table):
         row = self.get_via_document_head_EID(peid)
         if row:
             return self.record_via_row(row)
-        return self.insert_NB_document(peid)
+        return self.insert_NB_document(peid, 'docu_type_common')
 
-    def insert_NB_document(self, peid, vendor_document_title=None):
+    def insert_NB_document(self, peid, typ, vendor_document_title=None):
         if vendor_document_title is None:
             vendor_document_title = ''  # NOTE unique constraint will bite you
 
+        assert typ in ('docu_type_common', 'docu_type_rigged')
+
+        these = peid, typ, vendor_document_title
+
         c = self._execute('INSERT INTO notecard_based_document '
-                          'VALUES (NULL, ?, ?)', (peid, vendor_document_title))
+                          'VALUES (NULL, ?, ?, ?)', these)
         self._commit()
-        return self.record_via_row((c.lastrowid, peid, vendor_document_title))
+        return self.record_via_row((c.lastrowid, *these))
 
     def get_via_document_head_EID(self, peid):
         c = self._execute('SELECT * from notecard_based_document '
@@ -413,7 +419,9 @@ class _NotecardBasedDocumentTable(_Table):
 _NotecardBasedDocumentRecord = _nt(
     '_NotecardBasedDocumentRecord',
     ('notecard_based_document_ID',
-     'head_notecard_EID', 'document_title_from_vendor'))
+     'head_notecard_EID',
+     'just_kidding_document_type',
+     'document_title_from_vendor'))
 
 
 class _NotecardBasedDocumentCommitTable(_Table):
@@ -428,26 +436,8 @@ class _NotecardBasedDocumentCommitTable(_Table):
             assert c.fetchone() is None
             return False, self._via_row(row)
 
-        """NORMALIZE datetime
-
-        We want to store the commit datetime in a way that sqlite can work
-        with with its datetime functions, so we're trying to follow [here][1]
-
-        We're parsing the datetimes exactly as we got them from git-log, which
-        formats them locale-specifically so this will break in production:
-        The below is hard-coded to parse dates as git produces them in
-        our locale, e.g.: 'Sun Feb 28 15:20:56 2021 -0500'
-
-        Also we don't know how we want to handle timezone stuff so we're
-        just throwing a string into a cell for now
-
-        [1]: https://sqlite.org/quirks.html#no_separate_datetime_datatype
-        """
-
-        from datetime import datetime as lib
-        dt = lib.strptime(ci.datetime, '%a %b %d %H:%M:%S %Y %z')
-        norm_dt_s = dt.strftime('%Y-%m-%d %H:%M:%S')
-        tzinfo = str(dt.tzinfo)
+        from ._common import normalize_datetime_from_git_ as func
+        norm_dt_s, tzinfo = func(ci.datetime)
 
         row = [None, NB_docu_ID, ci_ID, norm_dt_s, tzinfo, 0, 0, 0]
         c = self._execute('INSERT INTO notecard_based_document_commit '
@@ -466,6 +456,45 @@ _NC_Based_Docu_CI_Record = _nt(
      'normal_datetime', 'tzinfo',
      'number_of_lines_inserted', 'number_of_lines_deleted',
      'number_of_notecards'))
+
+
+_NC_Based_Docu_CI_Record.document_type = 'docu_type_common'
+
+
+RiggedDocumentCommitRecord_ = _nt(
+    'RiggedDocumentCommitRecord_',
+    ('rigged_document_commit_ID', 'rigged_document_ID', 'SHA',
+     'normal_datetime', 'tzinfo',
+     'number_of_lines_inserted', 'number_of_lines_deleted', 'next_ID'))
+
+
+RiggedDocumentCommitRecord_.document_type = 'docu_type_rigged'
+
+
+class _RiggedDocumentTable(_Table):
+
+    def to_every_stale_record(self):
+        c = self._execute('SELECT * FROM rigged_document '
+                          'WHERE state="stale"')
+        return self._records(c)
+
+    def to_EVERY_record(self):
+        c = self._execute('SELECT * FROM rigged_document')
+        return self._records(c)
+
+    def _records(self, c):
+        return (_RiggedDocumentRecord(*row) for row in c)
+
+    def record_via_row(self, row):
+        return _RiggedDocumentRecord(*row)
+
+
+_RiggedDocumentRecord = _nt(
+    '_RiggedDocumentRecord',
+    ('rigged_document_ID',
+     'document_title_from_vendor', 'file_path', 'state',
+     'parentmost_rigged_document_commit_ID',
+     'childmost_rigged_document_commit_ID'))
 
 
 def _table(cls):  # #decorator
@@ -523,6 +552,10 @@ class Database_:
 
     @_table(_NotecardBasedDocumentCommitTable)
     def notecard_based_document_commit_table(self):
+        pass
+
+    @_table(_RiggedDocumentTable)
+    def rigged_document_table(self):
         pass
 
 

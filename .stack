@@ -4,6 +4,4 @@ cover yes schema file but no ent entites dir
 "business schema" that has a primitive types section
 base actions perhaps not needed for that one actions
 there are todo's
-audit trail for document as-is
-make sure you short-circuit out of audit trail in that one place
 get rid of author and category unless is special

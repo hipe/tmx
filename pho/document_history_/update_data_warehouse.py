@@ -1,16 +1,32 @@
 """(based entirely on the pseudocode in [#429.3])"""
 
 
-from dataclasses import dataclass as _dataclass
+def do_them_stats(coll_path, listener, rigged_only=False, dry_run=False):
+    db = _database_via_collection_path(coll_path, listener)
+    _do_stats_for_RD(db, listener, dry_run)
+    if rigged_only:
+        return
+    _do_stats_for_NB(db, listener, dry_run)
 
 
-def do_them_stats(coll_path, listener, dry_run=False):
+def _do_stats_for_RD(db, listener, dry_run):
+    _stats_common(
+        db, 'rigged_document_commit', 'mean_and_std_for_rigged',
+        listener, dry_run)
+
+
+def _do_stats_for_NB(db, listener, dry_run):
+    _stats_common(
+        db, 'notecard_based_document_commit', 'mean_and_std',
+        listener, dry_run)
+
+
+def _stats_common(db, table_name, k, listener, dry_run):
 
     # Do the query
-    db = _database_via_collection_path(coll_path, listener)
     c = db.conn.execute(
         'SELECT number_of_lines_inserted + number_of_lines_deleted '
-        'FROM notecard_based_document_commit')
+        f'FROM {table_name}')
 
     def only_value(row):
         ocd, = row
@@ -18,13 +34,19 @@ def do_them_stats(coll_path, listener, dry_run=False):
 
     # Calculate them (bruskly for now)
     nums = tuple((only_value(row) for row in c))
+
+    if 0 == len(nums):
+        def lines():
+            yield f"Can't do stats for {table_name!r}: empty table?"
+        listener('error', 'expression', 'empty_database', lines)
+        return
+
     from numpy import std as std_via, mean as mean_via
     mean = mean_via(nums)
     std = std_via(nums)
 
     # Read existing
     table = db.singleton_text
-    k = 'mean_and_std'
     one_string_before = table.get(k)
     one_string_now = ' '.join((str(mean), str(std)))
 
@@ -34,6 +56,7 @@ def do_them_stats(coll_path, listener, dry_run=False):
             use = one_string_before
         else:
             use = '(none)'
+        yield f"For {table_name}:"
         yield f"Mean and standard deviation before: {use}"
         yield f"Mean and standard deviation now:    {one_string_now}"
     listener('info', 'expression', 'mean_and_std', lines)
@@ -51,9 +74,9 @@ def do_them_stats(coll_path, listener, dry_run=False):
     listener('info', 'expression', 'stored', lambda: (f"({verb} values)",))
 
 
-def update_document_history(coll_path, listener):
+def update_document_history(coll_path, listener, rigged_only=False):
     try:
-        return _main(coll_path, listener)
+        return _main(coll_path, listener, rigged_only)
     except _Stop:
         pass
 
@@ -61,9 +84,24 @@ def update_document_history(coll_path, listener):
 func = update_document_history
 
 
-def _main(coll_path, listener):
+# bcoll = business collection
+
+
+def _main(coll_path, listener, do_rigged_only):
 
     db = _database_via_collection_path(coll_path, listener)
+
+    def these():
+        from modality_agnostic import ModalityAgnosticErrorMonitor as cls
+        mon = cls(listener)
+        bcoll = _resolve_business_collection(coll_path, listener)
+        return bcoll, mon
+
+    if do_rigged_only:
+        bcoll, _mon = these()
+        from ._update_rigged_documents import func
+        func(db, bcoll, _Stop, listener)
+        return
 
     # First pass: load changed file queue from any new commits from HEAD
     num = _populate_temporary_table(db, coll_path, listener)
@@ -75,9 +113,7 @@ def _main(coll_path, listener):
         _say_number_of_new_changed_files(listener, num)
 
     # Second pass: touch and stale notecard records from changed file queue
-    from modality_agnostic import ModalityAgnosticErrorMonitor as cls
-    mon = cls(listener)
-    bcoll = _resolve_business_collection(coll_path, listener)
+    bcoll, mon = these()
     nnn, nn, n = _index_each_file_that_changed(db, bcoll, mon)
     _say_number_of_entities_to_audit(listener, nnn, nn, n)
 
@@ -88,6 +124,10 @@ def _main(coll_path, listener):
     # Fourth pass: populate document & document ci tables via unseen commits
     nnn, nn, n = _update_document_commit_table(bcoll, db, listener)
     _say_document_commits(listener, nnn, nn, n)
+
+    # Pass four-point-five lol:
+    from ._update_rigged_documents import func
+    func(db, bcoll, _Stop, listener)
 
 
 # === The Four or so Big Passes in the Algorithm ===
@@ -137,15 +177,21 @@ def _update_document_commit_table(bcoll, db, listener):
         if docu_rec:
             return docu_rec
 
+        # Represent whether the document is rigged or notecard-based
+        # (will fail [silently] if this type changes mid-lifetime, probably)
+        if doc_head_notecard.body_function:
+            typ = 'docu_type_rigged'
+        else:
+            typ = 'docu_type_common'
+
         # Since we don't have one, do more work to determine the title
 
         # (How the SSG vendor adapter comes up with a title is … complicated
         # but, pray that this simple way keeps working while it's working)
-
         use_title = doc_head_notecard.heading
         assert use_title
 
-        return NB_docu_table.insert_NB_document(peid, use_title)
+        return NB_docu_table.insert_NB_document(peid, typ, use_title)
 
     def document_via_notecard(nc):
 
@@ -543,144 +589,19 @@ def _populate_temporary_table(db, coll_path, listener):
     return return_this(count)
 
 
-
-
-
 # == Git Layer
-
-def _lazy(orig_f):  # #[#510.4]
-    def use_f():
-        if not hasattr(use_f, 'x'):
-            use_f.x = orig_f()
-        return use_f.x
-    return use_f
-
 
 def _scanner_of_commits_not_in_the_commits_table(HEAD_SHA, coll_path):
     itr = _commits_not_in_the_commits_table(HEAD_SHA, coll_path)
-    proc = next(itr)  # #here1
+    proc = next(itr)  # #HERE1 hack to get the proc from a stream
     scn = _scanner_via_iterator(itr)
     return proc, scn
 
 
 def _commits_not_in_the_commits_table(HEAD_SHA, coll_path):
-
-    # Start the git-log subprocess
-    sout_lines = _STDOUT_lines_via_git_subprocess(
-        ('log', '--numstat', '--', 'entities'), cwd=coll_path)
-    # #open #todo we need to normalize datetime format
-
-    yield next(sout_lines)  # #here1
-
-    # There should always be at least one commit in the git log
-    scn = _scanner_via_iterator(sout_lines)
-    assert scn.more
-
-    # Here is how we determine when to stop walking the git log
-    if HEAD_SHA is None:
-        def this_commit_is_already_in_the_commit_table():
-            return False
-    else:
-        def this_commit_is_already_in_the_commit_table():
-            assert HEAD_SHA_leng == len(hdr.SHA)  # every time meh
-            return HEAD_SHA == hdr.SHA
-        HEAD_SHA_leng = len(HEAD_SHA)
-
-    # Here is how we parse out the file paths (will happen 2x meh #here2)
-    import re as _re
-    rx = _re.compile(r"""
-        (?P<before_num_lines>\d+)
-        \t
-        (?P<after_num_lines>\d+)
-        \t
-        (?P<file_path>\S+)
-        \n\Z
-    """, _re.VERBOSE)
-
-    def parse_file_paths():
-        assert scn.more
-        md = rx.match(scn.peek)
-        assert md
-        yield md['file_path']
-        while True:
-            scn.advance()
-
-            # The only time you get to an empty scanner is when you've just
-            # finished parsing the parent-most commit ever in git-log
-            if scn.empty:
-                break
-
-            # If it matches another file, this is normal
-            md = rx.match(scn.peek)
-            if md:
-                yield md['file_path']
-                continue
-
-            # Otherwise, it must be a separator between this commit and the
-            # next one:
-            assert '\n' == scn.peek
-            scn.advance()
-            break
-
-    # Money
-    parse_header_lines = _produce_git_patch_header_parser()
-    while scn.more:
-        hdr = parse_header_lines(scn)
-        yn = this_commit_is_already_in_the_commit_table()
-        if yn:
-            break
-        file_paths = tuple(parse_file_paths())
-        yield _RealCommit(hdr, file_paths)
-
-
-@_dataclass
-class _RealCommit:
-    header: object
-    file_paths: tuple
-
-    @property
-    def SHA(self):
-        return self.header.SHA
-
-
-@_lazy
-def _produce_git_patch_header_parser():
-    from text_lib.diff_and_patch.parse import \
-        produce_git_patch_header_parser as func
-    return func()
-
-
-def _STDOUT_lines_via_git_subprocess(cmd_tail, cwd=None):
-    itr = _open_git_subprocess(cmd_tail, cwd)
-    yield next(itr)  # #here1
-
-    for typ, val in itr:
-        if 'sout' == typ:
-            yield val
-            continue
-
-        if 'serr' == typ:
-            xx(f"Oops handle failure here: {val!r}")
-
-        assert 'done' == typ
-        break
-
-
-def _open_git_subprocess(cmd_tail, cwd=None):
-    # (this is supposed to be in [kiss] but we hack some things)
-
-    cmd = 'git', *cmd_tail
-    with _open_subprocess(cmd, cwd=cwd) as proc:
-
-        yield proc  # #here1
-
-        for line in proc.stdout:
-            yield 'sout', line
-
-        for line in proc.stderr:
-            yield 'serr', line
-
-        yield 'done', None
+    from ._common import GIT_LOG_NUMSTAT_ as func
+    return func(
+        coll_path, HEAD_SHA, ('git', 'log', '--numstat', '--', 'entities'))
 
 
 # == Whiners and related
@@ -688,7 +609,7 @@ def _open_git_subprocess(cmd_tail, cwd=None):
 def _say_document_commits(listener, num_d_ci, num_d, num_ci):
     def lines():
         if 0 == num_ci:
-            yield "All commits already reflected in document commits table"
+            yield "All commits (already) reflected in document commits table"
             return
         yield (f"{num_ci} new commit(s) turned in to {num_d_ci} "
                f"document commit(s) across {num_d} document(s)")
@@ -764,23 +685,10 @@ def _database_via_collection_path(coll_path, listener):
     return db
 
 
-def _open_subprocess(cmd, cwd=None):  # c/p
-    import subprocess as sp
-    return sp.Popen(
-        args=cmd, stdin=sp.DEVNULL, stdout=sp.PIPE, stderr=sp.PIPE,
-        text=True,  # don't give me binary, give me utf-8 strings
-        cwd=cwd)  # None means pwd
-
-
 def _scanner_via_iterator(itr):
     assert hasattr(itr, '__next__')
-    return _scanner_via_iterator_function()(itr)
-
-
-@_lazy
-def _scanner_via_iterator_function():
     from text_lib.magnetics.scanner_via import scanner_via_iterator as func
-    return func
+    return func(itr)
 
 
 class _Stop(RuntimeError):

@@ -112,12 +112,12 @@ class _Notecards:  # #testpoint
                 abstract_document_via_notecards_iterator_ as func
         return func(iter(ncs), self, listener)
 
-    def call_value_function_(self, expression_string, bent, listener):
+    def call_value_function_(self, expression_string, bent, listener, **kw):
         if not hasattr(self, '_custom_func_memo'):
             self._custom_func_memo = {}
         from .notecards_.call_value_function import func
         return func(bent, expression_string,
-                    self._custom_func_memo, self, listener)
+                    self._custom_func_memo, self, listener, kw)
 
     def build_big_index_(self, listener=None, NCID=None):
         if NCID is None:
@@ -192,7 +192,7 @@ class _Notecards:  # #testpoint
 
     @property
     def collection_path(self):
-        return self._coll.MIXED_COLLECTION_IDENTIFIER
+        return self._coll.mixed_collection_identifier
 
     @property
     def KISS_COLLECTION_(self):

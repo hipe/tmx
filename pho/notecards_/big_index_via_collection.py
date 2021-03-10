@@ -328,7 +328,7 @@ def big_index_for_many(argument_ncids, bcoll, listener):
     they appear in the ressult structure.
     """
 
-    coll_path = bcoll.collection_path  # out here until [#882.G]
+    coll_path = bcoll.collection_path
     num, x = _peek_length_of_iterator(argument_ncids)
     if 0 == num:
         # #cover-me (developed visually)

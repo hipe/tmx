@@ -56,6 +56,7 @@ node10:pk->node50:fk2[arrowhead=odot]
 node60[label="notecard_based_document|
 <pk> notecard_based_document_ID int primary key|
 head_notecard_EID text unique|
+just_kidding_document_type text|
 document_title_from_vendor text unique" shape=record]
 
 
@@ -73,9 +74,38 @@ number_of_notecards int" shape=record]
 node60:pk->node70:fk1[arrowhead=odot]
 node70:fk2->node10:pk
 
+
+node80[label="rigged_document|
+<pk> rigged_document_ID int primary key|
+document_title_from_vendor text unique|
+file_path text unique|
+state text|
+<fkp> parentmost_rigged_document_commit_ID int unique null_ok|
+<fkch> childmost_rigged_document_commit_ID int unique null_ok" shape=record]
+
+
+node80:fkp->node90:pk
+node80:fkch->node90:pk
+
+
+node90[label="rigged_document_commit|
+<pk> rigged_document_commit_ID int primary key|
+<fk> rigged_document_ID int|
+SHA text|
+normal_datetime text|
+tzinfo text|
+number_of_lines_inserted int|
+number_of_lines_deleted int|
+<sfk> next_ID int unique null_ok" shape=record]
+
+
+node80:pk->node90:fk[arrowhead=odot]
+node90:sfk->node90:pk
+
 }
 
 /*
+# #history-B.5 add tables for rigged
 # #history-B.4 spike usefulness
 # #born
 */

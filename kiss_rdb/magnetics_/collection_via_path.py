@@ -327,7 +327,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
         VALUE_FUNCTION_RIGHT_HAND_SIDES = not_sure
         VALUE_FUNCTION_VARIABLE_RIGHT_HAND_SIDES = if_here
 
-        MIXED_COLLECTION_IDENTIFIER = x  # used by [pho] #cover-me
+        mixed_collection_identifier = x  # used by [pho] #cover-me
         storage_adapter = sa
 
     if has_custom_functions:

@@ -238,8 +238,8 @@ def _history_commands():
 def _history_command(sin, sout, serr, argv, efx):
     """Interface to "document history" data warehousing (sqlite3 database)
 
-    Hopefully you won't need to interface with this direcly except during
-    development and when something goes wrong
+    While the feature is in development, it's the necessary precursor to
+    using the `article_history_through_VCS` plugin.
     """
 
     cx = _history_commands()
@@ -248,6 +248,7 @@ def _history_command(sin, sout, serr, argv, efx):
 
 
 def _formals_for_history_update(efx):
+    yield '-r', '--rigged-only', 'for development, do only rigged documents'
     yield efx.collection_path_option_definition
     yield _the_help_option
 
@@ -255,8 +256,8 @@ def _formals_for_history_update(efx):
 def _history_update_command(sin, sout, serr, argv, efx):
     """Create or update the sqlite3 database as necessary, for generating
 
-    document history. Ideally the plugin will just do this and you won't
-    have to interface with it directly.
+    document history. Maybe one day the plugin will just do this for you
+    but for now we need to ask it to update manually.
     """
 
     def functioner():
@@ -270,6 +271,7 @@ def _history_update_command(sin, sout, serr, argv, efx):
 
 
 def _formals_for_history_stats(efx):
+    yield '-r', '--rigged-only', 'for development, do stats for rigged only'
     yield efx.collection_path_option_definition
     yield '-n', '--dry-run', "Don't actually write to the database"
     yield _the_help_option
@@ -284,7 +286,8 @@ def _history_stats_command(sin, sout, serr, argv, efx):
     """
 
     def functioner():
-        from pho.document_history_ import do_them_stats as func
+        from pho.document_history_.update_data_warehouse \
+            import do_them_stats as func
         return func
 
     return _common_execute(

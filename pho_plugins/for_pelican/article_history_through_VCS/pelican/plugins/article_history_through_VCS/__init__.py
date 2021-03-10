@@ -66,7 +66,19 @@ def _lets_get_slizzy(articles_generator):
         itr = document_commits_via_title(article.title)
         if not itr:
             return
-        business_items = (business_item_via(doc_ci) for doc_ci in itr)
+        doc_ci = next(itr)
+        if 'docu_type_common' == doc_ci.document_type:
+            use = business_item_for_common
+        else:
+            assert 'docu_type_rigged' == doc_ci.document_type
+            use = business_item_for_rigged
+
+        def business_items():
+            yield use(doc_ci)
+            for dci in itr:
+                yield use(dci)
+
+        business_items = business_items()
         return tuple(time_bucket_expressers_via(business_items))
 
     self = main  # #watch-the-word-burn
@@ -89,27 +101,42 @@ def _lets_get_slizzy(articles_generator):
 
     # Business item via
 
-    def business_item_via(doc_ci):
-        dt, verb, rec = doc_ci
-        amount_of_change = (
-            rec.number_of_lines_inserted + rec.number_of_lines_deleted)
-        dist = abs(float(amount_of_change) - mean)
-        if dist < std:
-            size = 'small'
-        elif dist < two_std:
-            size = 'medium'
-        else:
-            size = 'large'
-        if 'create' == verb:
-            verb_lexeme_key = 'document_creation', None
-        else:
-            assert 'edit' == verb
-            verb_lexeme_key = 'document_edit', size
+    def build(mean, std):
+        def business_item_via(doc_ci):
 
-        return business_item(dt, verb_lexeme_key)
+            # The deviation of each number is its distance from the mean
+            dt, verb, rec, _ = doc_ci
 
-    mean, std = stater.mean, stater.std
-    two_std = 2.0 * std
+            amount_of_change = (
+                rec.number_of_lines_inserted + rec.number_of_lines_deleted)
+
+            devi = abs(float(amount_of_change) - mean)
+            size = adjective_via_deviation(devi)
+
+            if 'create' == verb:
+                verb_lexeme_key = 'document_creation', None
+            else:
+                assert 'edit' == verb
+                verb_lexeme_key = 'document_edit', size
+
+            return business_item(dt, verb_lexeme_key)
+
+        def adjective_via_deviation(devi):
+            if devi < std:
+                return 'small'
+            if devi < two_std:
+                return 'medium'
+            return 'large'
+
+        two_std = 2.0 * std
+        return business_item_via
+
+    mean_for_common, std_for_common = stater.mean, stater.std
+    mean_for_rigged, std_for_rigged = \
+        stater.mean_for_rigged, stater.std_for_rigged
+
+    business_item_for_rigged = build(mean_for_rigged, std_for_rigged)
+    business_item_for_common = build(mean_for_common, std_for_common)
 
     from collections import namedtuple as _nt
     business_item = _nt('_BusinessItem', ('datetime', 'verb_lexeme_key'))

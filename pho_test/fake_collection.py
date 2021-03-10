@@ -49,7 +49,7 @@ class _omg_bcoll_via_ASCII_art_graph:
         return dereference
 
     @property
-    def MIXED_COLLECTION_IDENTIFIER(self):
+    def mixed_collection_identifier(self):
         return '/this/collection-made-by-an-ASCII-graph'
 
 

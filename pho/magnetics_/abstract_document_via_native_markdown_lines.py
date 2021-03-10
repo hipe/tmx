@@ -71,7 +71,7 @@ def PARSE_DOCUMENT_NEW_WAY_(lines, path=None):
     from_beginning.when_EOS = lambda: complain_about_empty_file()
     from_frontmatter_state.when_EOS = lambda: complain_ended_mid('frontmatter')
     from_body_state.when_EOS = lambda: yield_any_final_section()
-    from_code_block_state.when_EOS = lambda: complain_ended_mid('a code block')
+    from_code_block_state.when_EOS = lambda: complain_ended_mid_code_block()
 
     # == Actions
 
@@ -100,6 +100,7 @@ def PARSE_DOCUMENT_NEW_WAY_(lines, path=None):
         return 'yield_this_and_retry_current_line', tup
 
     def enter_code_block_state():
+        state.code_block_started_on = lineno
         add_line()
         stack.append(from_code_block_state)
 
@@ -161,11 +162,26 @@ def PARSE_DOCUMENT_NEW_WAY_(lines, path=None):
 
     # == Whiney actions
 
+    def complain_ended_mid_code_block():
+        long_line = ' '.join(do_complain_ended_mid_code_block())
+        xx(long_line)
+
+    def do_complain_ended_mid_code_block():
+        yield f"File ended on line {lineno} while in the middle of code block"
+        yield f"(code block started on line {state.code_block_started_on})"
+        if path:
+            yield f"file: {path}"
+
     def complain_about_empty_file():
-        xx("empty file!")
+        xx(f"empty file!{say_path()}")
 
     def complain_ended_mid(what):
-        xx(f"file ended while in the middle of {what}")
+        xx(f"file ended while in the middle of {what}{say_path()}")
+
+    def say_path():
+        if path is None:
+            return f"line {lineno}"
+        return ''.join((' - ', path, ':', str(lineno)))
 
     # ==
 
@@ -178,7 +194,9 @@ def PARSE_DOCUMENT_NEW_WAY_(lines, path=None):
             if yn:
                 return action
 
+    lineno = 0
     for line in lines:
+        lineno += 1
         while True:
             found = find_action()
             if not found:

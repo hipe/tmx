@@ -27,7 +27,7 @@ class ReadOnlyCollectionLayer_:
     # == BEGIN #cover-me [pho]
 
     @_property_from_back
-    def MIXED_COLLECTION_IDENTIFIER(self):
+    def mixed_collection_identifier(self):
         pass
 
     @_property_from_back

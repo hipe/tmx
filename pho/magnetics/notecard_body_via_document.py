@@ -30,7 +30,7 @@ def REMOTE_NOTECARD_BODY(
     return (body,)
 
 
-def func(directory, iden_expr, bent, memo, bcoll, listener):
+def func(directory, iden_expr, bent, memo, bcoll, listener, just_path=False):
 
     def main():
         if '[' == iden_expr[0]:
@@ -43,6 +43,9 @@ def func(directory, iden_expr, bent, memo, bcoll, listener):
         else:
             _whine_about_shape(listener, iden_expr)
             return
+
+        if just_path:
+            return (doc_abspath,)  # wrapped value
 
         s = _notecard_body_via_document_path(doc_abspath, listener)
         if not s:

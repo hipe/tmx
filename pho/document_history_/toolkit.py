@@ -4,7 +4,7 @@ def cli_for_production():
 
 
 def _commands():
-    yield 'things-for-document', lambda: _command_zizzy
+    yield 'docu-hist', lambda: _command_zizzy
 
 
 def CLI(sin, sout, serr, argv):
@@ -78,11 +78,20 @@ def _command_zizzy(sin, sout, serr, argv, efx):
         pcs.append(o.datetime.isoformat())
         pcs.append('%7s' % (o.verb,))
         rec = o.record
-        amt = rec.number_of_lines_inserted + rec.number_of_lines_deleted
-        n = rec.number_of_notecards
-        pcs.append(" ±%3d" % (amt,))
-        if 1 != n:
-            pcs.append(f"in {n} notecards")
+        nli = rec.number_of_lines_inserted
+        nld = rec.number_of_lines_deleted
+
+        nlis = ''.join(('+', str(nli))) if nld else ''
+        nlds = ''.join(('-', str(nld))) if nld else ''
+        pcs.append(" %4s  %4s" % (nlis, nlds))
+
+        if 'docu_type_common' == rec.document_type:
+            n = rec.number_of_notecards
+            if 1 != n:
+                pcs.append(f"in {n} notecards")
+        else:
+            assert 'docu_type_rigged' == rec.document_type
+
         sout.write(' '.join(pcs))
         pcs.clear()
         sout.write('\n')
@@ -114,43 +123,101 @@ def _ExternalFunctions(serr):
 def statistitican_via_collection_path(coll_path):
 
     def document_commits_via_title(vendor_document_title):
+        """(before #history-B.4 we could get the history in one commit
+        with a JOIN. but now (to accomodate rigged documents) we do it in
+        two which is fine.)
+        """
+
         c = execute(
-            'SELECT NBDC.* FROM notecard_based_document_commit as NBDC '
-            'JOIN notecard_based_document AS NBD '
-            'USING (notecard_based_document_ID) '
-            'WHERE NBD.document_title_from_vendor=? '
-            'ORDER BY datetime(NBDC.normal_datetime)',
+            'SELECT notecard_based_document_ID, just_kidding_document_type '
+            'FROM notecard_based_document '
+            'WHERE document_title_from_vendor=?',
             (vendor_document_title,))
 
+        # Maybe we have no record of this document at all (strange)
         first_row = c.fetchone()
         if first_row is None:
             return
+        assert c.fetchone() is None
 
-        def rows():
-            yield first_row
-            for row in c:
-                yield row
+        docu_ID, typ, = first_row
+
+        if 'docu_type_common' == typ:
+            return for_notecard_based_document(docu_ID)
+        assert 'docu_type_rigged' == typ
+        return for_rigged_document(vendor_document_title)  # ick/meh
+
+    def for_rigged_document(vendor_document_title):
+        c = execute(
+            'SELECT RDC.* '
+            'FROM rigged_document_commit AS RDC '
+            'JOIN rigged_document AS RD USING (rigged_document_ID) '
+            'WHERE RD.document_title_from_vendor=? '
+            'ORDER BY datetime(RDC.normal_datetime) ',
+            (vendor_document_title,))
+
+        # (we want to make it be commit-graph order not chrono order,
+        #  but not badly enough to do it knowing that it's not covered)
 
         def mutable_threes():
-            for row in rows():
-                rec = rec_via_row(row)
-                rec.tzinfo  # hi
-                dt = strptime(rec.normal_datetime, '%Y-%m-%d %H:%M:%S')
+            while True:
+                row = c.fetchone()
+                if not row:
+                    break
+                rec = RD_commit_record(*row)
+                dt = datetime_via_record(rec)
                 yield [dt, 'edit', rec]
 
-        def use_these():
-            itr = mutable_threes()
-            first = next(itr)
-            first[1] = 'create'
-            yield first
-            for this in itr:
-                yield this
+        scn = _scanner_via_iterator(mutable_threes())
 
-        return (_DocumentCommit(*ary) for ary in use_these())
+        # If there are no commits in the database for this docu, strange
+        if scn.empty:
+            return
 
+        return docu_CIs_via_threes_scanner(scn, 'docu_type_rigged')
+
+    def for_notecard_based_document(docu_ID):
+        c = execute(
+            'SELECT NBDC.* FROM notecard_based_document_commit as NBDC '
+            'WHERE NBDC.notecard_based_document_ID=? '
+            'ORDER BY datetime(NBDC.normal_datetime)',
+            (docu_ID,))
+
+        def mutable_threes():
+            while True:
+                row = c.fetchone()
+                if not row:
+                    break
+                rec = NB_commit_rec_via_row(row)
+                dt = datetime_via_record(rec)
+                yield [dt, 'edit', rec]
+
+        scn = _scanner_via_iterator(mutable_threes())
+
+        # If there are no commits in the database for this docu, strange
+        if scn.empty:
+            return
+
+        return docu_CIs_via_threes_scanner(scn, 'docu_type_common')
+
+    def docu_CIs_via_threes_scanner(scn, typ):
+
+        scn.peek[1] = 'create'  # meh
+
+        while True:
+            three = scn.next()
+            yield _DocumentCommit(*three, typ)
+            if scn.empty:
+                break
+
+    # Datetime via record
+    def datetime_via_record(rec):
+        rec.tzinfo  # hi
+        return strptime(rec.normal_datetime, '%Y-%m-%d %H:%M:%S')
     from datetime import datetime as _
     strptime = _.strptime
 
+    # Connect to database
     from pho.document_history_._model import \
         database_via_collection_path_ as func
     # (it's a sibling file to us but we are an entrypoint file)
@@ -160,6 +227,7 @@ def statistitican_via_collection_path(coll_path):
 
     # Prepare statistics
     sing = db.singleton_text
+
     k = 'mean_and_std'
     two_as_string = sing.get(k)
     if two_as_string is None:
@@ -167,7 +235,19 @@ def statistitican_via_collection_path(coll_path):
     mean_s, std_s = two_as_string.split(' ')
     mean, std = float(mean_s), float(std_s)
 
-    rec_via_row = db.notecard_based_document_commit_table.NBD_CI_via_row_
+    k = 'mean_and_std_for_rigged'
+    two_as_string = sing.get(k)
+    if two_as_string is None:
+        xx(f"Did you generate the statistics? Not found: {k!r}")
+    mean_s, std_s = two_as_string.split(' ')
+    mean_for_rigged, std_for_rigged = float(mean_s), float(std_s)
+
+    from pho.document_history_._model import \
+        RiggedDocumentCommitRecord_ as RD_commit_record
+
+    NB_commit_rec_via_row = \
+        db.notecard_based_document_commit_table.NBD_CI_via_row_
+
     execute = db.conn.execute
 
     # == BEGIN meh
@@ -178,12 +258,30 @@ def statistitican_via_collection_path(coll_path):
     class _Statistician:
         mean: float
         std: float
+        mean_for_rigged: float
+        std_for_rigged: float
         document_commits_via_title: callable
         db: object
-    _DocumentCommit = _nt('_DocumentCommit', ('datetime', 'verb', 'record'))
+
+    _DocumentCommit = _nt(
+        '_DocumentCommit',
+        ('datetime', 'verb', 'record', 'document_type'))
+
     # == END
 
-    return _Statistician(mean, std, document_commits_via_title, db)
+    return _Statistician(
+        mean=mean,
+        std=std,
+        mean_for_rigged=mean_for_rigged,
+        std_for_rigged=std_for_rigged,
+        document_commits_via_title=document_commits_via_title,
+        db=db)
+
+
+def _scanner_via_iterator(itr):
+    assert hasattr(itr, '__next__')
+    from text_lib.magnetics.scanner_via import scanner_via_iterator as func
+    return func(itr)
 
 
 # ==
@@ -195,4 +293,5 @@ def xx(msg=None):
 if '__main__' == __name__:
     cli_for_production()
 
+# #history-B.4
 # #born

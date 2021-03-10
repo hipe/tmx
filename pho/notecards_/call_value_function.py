@@ -3,7 +3,7 @@ from collections import namedtuple as _nt
 import re as _re
 
 
-def func(bent, expression_string, memo, bcoll, listener):
+def func(bent, expression_string, memo, bcoll, listener, kw):
 
     def main():
         func_name, args_parse_tree = resolve_function_name_and_args()
@@ -14,7 +14,7 @@ def func(bent, expression_string, memo, bcoll, listener):
 
     def call_function(args, funco):
         func, memo_yikes = funco.func, funco.memo_yikes
-        wval = func(*args, bent, memo_yikes, bcoll, listener)
+        wval = func(*args, bent, memo_yikes, bcoll, listener, **kw)
         if wval is None:
             return
         x, = wval  # ..
@@ -119,6 +119,12 @@ def _validate_signature(func, locator):
 
         param = act_stack.pop()
 
+        while True:
+            # If this one has a default, assume it's an optional kw arg at end
+            if param.default == param.empty:
+                break
+            param = act_stack.pop()
+
         if exp_name != param.name:
             xx("this will probably change but very strict for now: "
                f"{locator!r} parameter {param.name!r} should be "
@@ -160,7 +166,7 @@ def _produce_raw_dict(memo, schema_varname, mem_k, attr, bcoll, listener):
     if (dct := memo.get(mem_k)) is not None:
         return dct
 
-    coll_path = bcoll.KISS_COLLECTION_.MIXED_COLLECTION_IDENTIFIER
+    coll_path = bcoll.KISS_COLLECTION_.mixed_collection_identifier
     lines = getattr(bcoll._coll, attr)
     if not lines:
         xx(f"needs to but doesn't define a {schema_varname} - {coll_path}")
