@@ -1,0 +1,62 @@
+# entity: TK2: attributes
+hierarchical_container_type: document
+heading: (uncontextualized notes on tilex)
+
+--body
+## npm vs yarn
+
+We liked the idea of using yarn over npm because of our sort of "shiny thing"
+impulse of wanting to be on the vanguard (remmmber when we got bit by
+using `poetry` instead of `pip`)?
+
+But this [blog article][nvy] makes it sound like the hop between yarn 1 and
+yarn 2 had negative side-effects that didn't jive with parts of the node
+ecosystem (including React Native, which we might use), and in the mean time
+npm tried to address some of the shortcomings that lead to yarn in the first
+place.
+
+[Here] shows (something)
+
+Notwithstanding, we apprecaite the architectural ideas of yarn 2, and have
+nothing to lose by trying it on this greenfield environment.
+
+
+## setting up environment
+
+[Here][env] was the simple way to download the zip file and copy the big
+(2K SLOC) file over and import it into your web page.
+
+But (a decision we'll probably change later) We'll start with [yarn][yar]
+
+
+```bash
+npm install -g yarn
+```
+
+(and upgraded npm with `npm install -g npm` to get: `6.14.9 → 7.5.2`)
+
+Then:
+
+```bash
+yarn set version berry
+```
+
+We followed [which yarn files should be ignored][yig] (the "Zero-installs"
+one.)
+
+
+
+
+
+[yig]: https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+[yar]: https://yarnpkg.com/getting-started/install
+[env]: https://www.tutorialsteacher.com/d3js/setup-d3js-development-environment
+[whi]: https://www.whitesourcesoftware.com/free-developer-tools/blog/npm-vs-yarn-which-should-you-choose/
+[nvy]: https://njbmartin.medium.com/whats-the-problem-with-yarn-2-ca59e3fabc9f
+--body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

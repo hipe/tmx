@@ -89,7 +89,6 @@ _coll_hub_env_var = 'KSS_HUB'
 
 
 def cli_for_production():
-
     """this is where all the magic happens that we can't/don't test:
 
     where:
@@ -156,7 +155,8 @@ def cli_for_production():
     # == END
 
     _inj = {'stdin': stdin, 'rng': rng, 'opn': opn}
-    _ = cli.main(args=argv, obj=_inj)
+    prog_name, *args = argv
+    _ = cli.main(prog_name=prog_name, args=args, obj=_inj)
     xx(f'do you ever see this? {_}')
     return 0
 

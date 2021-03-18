@@ -18,8 +18,12 @@ B (                    C D         J K L M N     R)
 H (2   4 5 6       A B C D E F G H J K L M N P Q R S T U V W X Y Z)
  T
 D (          7         C     F     J     M     Q     T)
+J (2)
+K (2)
 M (2     5     8     B     E     H     L     P     S     V     Y Z)
+N (              9     C     F     J     M     Q     T)
 U (          7     A   C     F       K     N     R)
  V
+G (                                                              Z)
 W (      5)
 X (    4 5   7       B C D E F   H J K         Q           W)

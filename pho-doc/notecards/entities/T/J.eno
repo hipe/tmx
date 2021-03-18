@@ -1,0 +1,148 @@
+# entity: TJ2: attributes
+hierarchical_container_type: document
+heading: (uncontextualized notes on tilex)
+
+--body
+Background (leading up to now):
+
+- Oishi told me about cables.gl (20 minute phone call yeserday at 12:30 pm)
+- This AM I looked at it for about an hour, decided that I don't want
+  cables itself but a very slimmed down version of its UI
+- Figured out from viewing source etc that it's an SVG element that has
+  the stuff
+- Looking at d3 because still it's a strong lib for workign with SVG's
+- Googled "d3 draggable nodes", found [this][this]
+
+It sounds like we are making a "topology builder"
+
+Googled "d3 topology builder" and found this [d3 topology graph][drag] which
+under its "more from this collection" section we found [drag][drag]
+
+This is the closest to what we want so far: [Drag & Zoom][dnz] directly from d3
+
+OK now we have a work stack we'd like to attempt:
+
+1. take some d3 tutorial and hello world just to get our environment set up
+   and versioned (commit)
+1. d3 drag and zoom working as-is (make safety backup)
+1. d3 drag and zoom but with squares and arbitrary data?
+1. fold in detect click (commit)
+
+
+
+
+From [Tutorials][tuts]:
+
+| num | duration |
+|  ---|       ---|
+| 8.  |  8:04 |
+| 7.  | 15:25 |
+| 6.  |  8:06 |
+| 5.  |  7:57 |
+| 4.  |  8:37 |
+| 3.  |  7:10 |
+| 2.  |  6:43 |
+| 1.  |  6:17 |
+
+
+(How we determine the total time of above:)
+
+```bash
+dp select  --format markdown-table THIS_FILE duration '|' cc -t csv - - > x
+
+# remove first line
+
+ awk -F: '{sum1 += $1 ; sum2 += $2} END {print ((60 * sum1) + sum2)/60 }' x
+```
+
+> 60.25
+
+(It's just over an hour of video (across 8 videos).)
+
+
+## 1 of 8:
+
+- a "notebook" is the thing
+- a notebook (like a page) is compose of "cells"
+- each cell is basically javascript code
+- you can edit the code in any cell, no matter who you are
+
+
+(Random idea that came up while watching #1: Try making your node
+editor a toolkit that's purely abstracted from your use case. Of course
+that's the end goal but now we're imaginging just making a prototyped
+UI to start, one that is quite abstract.)
+
+
+## 2 of 8:
+
+(We are very impressed with the design of Observable notebooks. It's
+the kind of design we would have wanted to come up with for TMX Notebook.)
+
+
+## 3 of 8:
+
+For the first two minutes I'm like, "Yes yes, OK. it's a dependency graph.
+OK. got it." But then they introduce "mini-map" and I'm like "Damn, shawty,
+okay"
+
+
+- "mini-map"
+- "dependency order" a.k.a "topological order"
+- "reactive dataflow" is the cascading updates
+
+
+## 4 of 8: Interactivity
+
+- HTML elements are immutable
+- SPEECH RECOGNITION
+
+
+## 5 of 8: Javascript & Observable
+
+- Javascript for Python programmers (was my idea etc etc)
+- `yield` from inside a code block is useful for animations
+- Good resources and further reading here (all linked to in [lesson5][vid5]):
+  - Observable's not Javascript
+  - Introduction to require
+  - Module require debugger
+  - anti-patterns & code smells
+  - javascript for python programmers
+
+It was a good section.
+
+
+## 6 of 8: Imports & Remixing Cells
+
+- `import` and `as` and `with`
+
+It was good.
+
+
+## 7 of 8:
+
+- I forgot about Airtable
+- It mentions the intro to promises notebook
+- Databases
+
+
+## 8 of 8
+
+- Holy shet what? Download entire notebook as an ES module?
+
+
+
+[vid5]: https://observablehq.com/@observablehq/javascript-and-observable?collection=@observablehq/learning-observable
+[tuts]: https://observablehq.com/tutorials
+[d3doc]: https://github.com/d3/d3/wiki
+[dnc]: https://observablehq.com/@d3/click-vs-drag?collection=@d3/d3-drag
+[dnz]: https://observablehq.com/@d3/drag-zoom
+[drag]: https://observablehq.com/@d3/hello-d3-drag?collection=@d3/d3-drag
+[topo] https://observablehq.com/@d3/force-directed-graph
+[this]: https://javascript.plainenglish.io/how-to-implement-drag-and-drop-from-react-to-svg-d3-16700f01470c
+--body
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment
