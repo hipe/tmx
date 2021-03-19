@@ -3,31 +3,145 @@ hierarchical_container_type: document
 heading: (uncontextualized notes on tilex)
 
 --body
-## npm vs yarn
+
+# Near-term milestone: d3 hello world
+
+Following the [d3 install instructions][d3i] we immediately slammed in to
+the wall of our existing ignorance: it explains how you can install d3 with
+npm **or yarn**, and "yarn" is a thing we knew that we didn't know about.
+(At all.)
+
+Somehow we found (d3 creator) Mike Bostock's [bl.ocks article][bos] showing
+how you can use "rollup" (whatever that is, we thought to ourselves)
+to make a d3 "custom bundle" (whatever that is) which
+
+> can be optimized to contain only the code you need
+
+which sounds great.
+
+The article was only 7 months older but as we will see it had already gone
+stale. But regardless, the end achieved there serves as the main exit
+criteria for the document we are writing here: get a d3 "hello world" working
+by having made a custom bundle from the vendor library.
+
+What these words mean and how we get there is the focus of the remainder of
+this document.
+
+
+
+# What is the crux of our ignorance?
+
+Now, with the benefit of one's days worth of hindsight, we can hopefully
+lay out a landscape for the one day's worth of work ahead of us.
+
+As it works out, the subject matter that follows is at the crux of our
+current ignorance, what stands between our "old ways" and the "new way":
+
+We found this Gasim Gasimzada [medium article][old] that although a whopping
+_45_ months old, was still valuable to us for getting our heads around the
+new landscape. (The article had been updated so it was only 15 months stale.)
+In it, Gasim writes:
+
+> Most of us […] started from building normal websites using libraries
+> such as jQuery
+
+Now with the state of the ecosystem in 2021, it's gotten a lot more
+complicated than simply pulling in one or two libraries like jquery in
+from a local minified version, or a CDN, and writing plain old javascript
+inline in your html files.
+
+This same older medium article helped us get a cursory understanding
+of what these pieces are and how they fit together: NPM, Yarn, Babel, Webpack.
+
+Putting it more broadly, the crux of our current ignorance is
+dependency management, transpiling (sometimes), bundling and tasks.
+
+
+
+# Can I just have a d3 development environment right now?
+
+No.
+
+In this anemic, popup-filled article with no date) called
+[Setup D3.js Development Environment][env],
+they suggest either using a CDN or doing a crude
+"by hand" procedure we'll attack shortly.
+
+It's our quaint belief that if we are developing a website, we should
+have the providence to have all the parts of the website working locally
+on our development machine, without necessarily having an internet connection
+at the moment.
+
+If the software can't work (in development) without connecting to external
+services, we see that as an overly coupled design that is a smell of
+bad software engineering.
+
+As such, we aren't going to hard-code our website to link to a CDN.
+
+The article explains how you can just get a zipfile of the latest
+d3 (latest from when?), unzip it, and copy the minified file into
+somewhere in the document root of your website and pull it in, etc.
+
+This approach might get us through the day, but it's not a viable or
+sustainable for the long-term:
+
+  - It doesn't track what version of the vendor library beyond
+    just having hand-written instructions
+  - It's not automated enough to be a reasonable procedure for
+    setting up new environments (development, test or production)
+    (deploying, on-boarding other developers)
+
+For a flash of a moment we considered writing a bash script that would
+`curl` the zipile and upzip it and move it into our document root; but
+we immediately realized we were re-inventing way too much of a wheel
+there, and that what we need is the same dependency management everyone
+else is already using now:
+
+
+
+# In 2021 we need package managers, transpilers (sometimes) and bundlers
+
+[A Guide to Dependency Management in Front-End Development][wbd]
+(15 months older) is a good introduction to the whole "new" landscape
+we're talking about, what they characterize broadly as "dependency management"
+they break down as being either part of or distinct from:
+
+1. package managers (npm, yarn, pnpm)
+1. task runners (grunt, gulp)
+1. JS module loaders (RequireJS, Browserify)
+1. static module bundlers (webpack, parcel)
+
+
+Because dependency management (interchangeable with "package management" here)
+will get us all the other things, we'll focus on that first.
+
+
+
+# How we chose a package manager
+
+Only 7 months older,
+[NPM vs. Yarn: Which Package Manager Should You Choose?][whi]
+offers a good in-depth comparison and origin-story narrative of yarn
+against npm, and shows benchmarks.
 
 We liked the idea of using yarn over npm because of our sort of "shiny thing"
-impulse of wanting to be on the vanguard (remmmber when we got bit by
+impulse of wanting to be on the vanguard (remember when we got bit by
 using `poetry` instead of `pip`)?
 
-But this [blog article][nvy] makes it sound like the hop between yarn 1 and
+But in the blog article ["what is the problem with yarn 2"][nvy],
+it makes it sound like the hop between yarn 1 and
 yarn 2 had negative side-effects that didn't jive with parts of the node
 ecosystem (including React Native, which we might use), and in the mean time
 npm tried to address some of the shortcomings that lead to yarn in the first
 place.
 
-[Here] shows (something)
-
-Notwithstanding, we apprecaite the architectural ideas of yarn 2, and have
+Notwithstanding, we appreciate the architectural ideas of yarn 2, and have
 nothing to lose by trying it on this greenfield environment.
 
 
-## setting up environment
+## Setting up our yarn environment
 
-[Here][env] was the simple way to download the zip file and copy the big
-(2K SLOC) file over and import it into your web page.
-
-But (a decision we'll probably change later) We'll start with [yarn][yar]
-
+Following the yarn [documentation][yar] itself (a wiki):
 
 ```bash
 npm install -g yarn
@@ -44,15 +158,237 @@ yarn set version berry
 We followed [which yarn files should be ignored][yig] (the "Zero-installs"
 one.)
 
+Then:
+
+```bash
+yarn init
+yarn install
+```
+
+OK, now that we have a yarn environment, we can pick (back) up with
+the [d3 install instructions][d3i].
+
+```bash
+yarn add d3
+```
+
+# Now that we have a package manager, we can install a static webserver
+
+We already have one we used for our [pho] project, but we want to
+get used to the feeling of using the de-facto standard tools for frontend
+development. (Note we will use Webpack for its popular static webserver,
+but the remainder of this article will contain a lot about how we are *not*
+using Webpack for bundling.
+
+We follow [Gasim][old] again (modified):
+
+```bash
+yarn add --dev webpack-cli webpack-dev-server webpack
+```
+
+(EDIT: we are in the middle of the above but we need to flush notes)
+
+
+# Now that we have package management, do we really need a bundler?
+
+Having "installed" d3 in this manner, we wanted to try not overcomplicating
+things, and revisited the "crude" instructions from the "anemic" article above.
+
+After all, all we needed was the minified d3 core library, right? so where
+is it? We saw that under yarn 2, there is no 'node_modules' but rather yarn's
+cache of zipfiles. OK, no problem, we unzip the contents of what we hackishly
+figured out was the core d3 library into a temporary directory, and there
+it was, our `d3.min.js` file or whatever. So no problem, just move that file
+into our document root and we're done, right?
+
+But now we're back to the same problem we had above. This is a messy,
+unreliable setup procedure to have to do "by hand". We still didn't know the
+right way to do it, but we knew this way was wrong.
+
+Furthermore, d3 creator Mike Bostock's above demonstration seemed like
+the right path to be on since he's the d3 creator, and "shaking the tree"
+seemed like too compelling a feature not to want.
+
+
+
+# Since we need a bundler, what is bundling and which one do we want?
+
+First we construct a brief history of bundling for our own edification.
+
+The history in this section is entirely founded on
+Paul Sweeny's extremely helpful (11 months older) [medium article][swe]
+explaining why he chose "Rollup" over "Webpack" and "Parcel",
+but we're getting ahead of ourselves: we don't yet know what those
+are, or even what _kind_ of things those are.
+
+Because we're effectively unfrozen cavemen here, we augment Paul's
+timeline with some supplemental historical context so that it links us back
+narratively to the last time we really understood everything: the late 90's lol
+
+- ### The first server-side Javascript is introduced by Netscape (1996?)
+  LiveWire Pro Web is introduced but server-side JS doesn't really take off yet
+
+- ### Chrome and V8 engine introduced by Lars Bak (via Google) (2008, September)
+  The floodgates are open now that server-side javascript has backing of google
+
+- ### node.js introduced by Ryan Dahl (2009, November)
+  as an answer to the limitations of the apache's poor concurrency
+  and the sequential programming of most web applications at the time.
+
+- ### npm is born (2010, january)
+
+- ### browserify is born (2011, June)
+  conceived so developers could get the NodeJS the wrote for node
+  to work also in the browser. It accomplished this through concatting.
+
+- ### bower created by twitter (2012)
+  Conceived of as the "package manager for the web", like npm but for the
+  frontend. Spoiler: deprecates around 2017
+
+- ### webpack (2014, February)
+  ...was conceived to extend the concept of concatting from browserify,
+  while adding the idea of bundling assets (like styles and images)
+  into the payload too. Presumably there's a good story about why webpack
+  was created when bower was right there, but we don't know yet. (In one
+  place we saw the former categorized as a "frontend package manager"
+  whereas the latter was seen as a "JS build tool/task runner".)
+
+
+# Webpack (vs. the other two), in light of the above history
+
+To fill in more detail to the above with some content from Paul,
+bundlers like Broswerify would parse NodeJS-style code looking for
+`require()` and `module.exports`,
+and put it all in one file and wrap it in some runtime, in order to:
+
+- retrofit the newfangled "CommonJS" style (whatever that is) to
+  work in older browsers
+- save on network latency by sending only one big file instead of
+  several smaller files
+
+But (as Paul explains) some of the catalyzing features of Webpack are now
+obviated:
+
+- browsers now natively support ES modules (whatever those are)
+- HTTP/2 speeds up network performance by multiplexing
+
+He adds that a tool like Webpack
+
+> added a bunch of other features that we now take for granted, such as dev
+> servers with Hot Module Replacement, and code-splitting
+
+(Hot Module Replacement = "HMR". See Paul for an introduction to the feature.)
+
+Amusingly, although Webpack comes at the end of a long line of tools above,
+it's 5 years older from writing, and so of course it's now "legacy".
+
+But it endures, because (in part):
+
+> many third party libraries, even though they are written in ESM, are
+> published to npm as CJS modules, so we still need to concatenate them
+
+so we still have to speak bundling even when it is not technically necessary.
+
+Also:
+
+- bundlers do stuff with resolving package identifiers
+  that we otherwise couldn't
+- bundlers do stuff with managing assets (images etc) that we otherwise couldn't
+
+Paul makes a compelling demonstration of some Webpack flaws and costs:
+unreadably complex config, extraneous function scopes
+
+
+# Parcel (vs. the other two)
+
+Parcel made popular the idea of zero config for bundlers (Paul), but
+doesn't scale up to Paul's needs. We trust Paul that we will have
+similar needs.
+
+
+# Rollup (vs. the other two)
+
+They keep using this term "ES Modules" but I don't know what they mean.
+
+OK so in the new way (ESM), `import` and `export` are language features
+(syntax) evaluated at parse time. In the old way (CommonJS), `require()`
+was a function and `module.exports` got written to at runtime.
+
+This ends up being of big benefit to static analyzers, which lets us
+do stuff like "tree shaking" (which we haven't explained yet).
+
+Scope-hoisting, which I just barely know what that is.
 
 
 
 
+## hot module replacement
+
+## third party libraries
+
+
+
+
+
+# (Additional reading)
+
+[Bundlers 2020: rollup vs parcel vs webpack][log] is excellent, and:
+
+- as an aside, this article seems to have an excellent mechanic
+  that sounds really close to our vaporware "dim sum" project.
+
+But of course, these comparison articles never make the decision for you.
+
+
+
+
+
+
+
+
+too.
+
+
+
+
+One point for [rollup][rol] is that Bostock was using it (in at least _some_
+capacity) as recently as 7 months prior to writing.
+
+From same, rollup:
+
+> [..] uses the new standardized format for code modules included in the ES6
+> revision of JavaScript, instead of previous idiosyncratic solutions such
+> as CommonJS and AMD.
+
+
+
+
+# Exciting future reading
+
+This/these links touch on subjects that are relevant to our interests
+probably in the very near term
+but ended up not fitting in to the immediate flow of our objectives here.
+
+- "Building […] With Lerna, YARN And React […]" [here][vel] introduces
+  (to us) "Lerna" which sounds identical to a vaporware project we started
+  on "the other hemisphere". Also React.
+
+
+
+
+[swe]: https://medium.com/@PepsRyuu/why-i-use-rollup-and-not-webpack-e3ab163f4fd3
+[log]: https://blog.logrocket.com/benchmarking-bundlers-2020-rollup-parcel-webpack/
+[wbd]: https://webdesign.tutsplus.com/tutorials/a-guide-to-dependency-management-in-front-end-development--cms-33963
+[vel]: https://www.velotio.com/engineering-blog/scalable-front-end-with-lerna-yarn-react
+[bos]: https://bl.ocks.org/mbostock/bb09af4c39c79cffcde4
+[old]: https://medium.com/front-end-weekly/what-are-npm-yarn-babel-and-webpack-and-how-to-properly-use-them-d835a758f987
+[rol]: https://rollupjs.org/guide/en/
 [yig]: https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
 [yar]: https://yarnpkg.com/getting-started/install
 [env]: https://www.tutorialsteacher.com/d3js/setup-d3js-development-environment
 [whi]: https://www.whitesourcesoftware.com/free-developer-tools/blog/npm-vs-yarn-which-should-you-choose/
 [nvy]: https://njbmartin.medium.com/whats-the-problem-with-yarn-2-ca59e3fabc9f
+[d3i]: https://github.com/d3/d3/wiki
 --body
 
 

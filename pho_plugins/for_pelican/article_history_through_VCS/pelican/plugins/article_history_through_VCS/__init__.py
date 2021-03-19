@@ -92,10 +92,34 @@ def _lets_get_slizzy(articles_generator):
 
     default_author = conf['AUTHOR']
 
-    coll_path = conf['PHO_COLLECTION_PATH']  # ..
+    def no_hist_because(reason):
+        log = build_logger()
+        log.warn(f"No article history for you because {reason}")
+
+    def build_logger():
+        from logging import getLogger as func
+        return func(__file__)
+
+    k = 'PHO_COLLECTION_PATH'
+    coll_path = conf.get(k)
+    if coll_path is None:
+        no_hist_because(f"no setting in conf file: {k}")
+        return
+
+    from sqlite3 import OperationalError as oe
     from pho.document_history_.toolkit import \
         statistitican_via_collection_path as func
-    stater = func(coll_path)
+
+    exe = None
+    try:
+        stater = func(coll_path)
+    except oe as e:
+        exe = e
+
+    if exe:
+        no_hist_because(f"did we forget to init/update database? {exe}")
+        return
+
     document_commits_via_title = stater.document_commits_via_title
 
     def time_bucket_expressers_via(business_items):

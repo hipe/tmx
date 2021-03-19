@@ -273,7 +273,12 @@ def _build_build_nav_tree_for_double_deep(big_index):
         return article.title, article.url
 
     root_key, children_of, parent_of, article_via_key = big_index
-    level_one_keys = children_of[root_key]
+
+    if len(children_of):
+        level_one_keys = children_of[root_key]
+    else:
+        level_one_keys = ()  # allow single-article sites
+
     offset_via_level_one_key = {k: i for i, k in enumerate(level_one_keys)}
 
     # == FROM
