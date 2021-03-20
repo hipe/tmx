@@ -1,7 +1,7 @@
 {
   "name": "TMX Tilex",
   "scripts": {
-    "gd-all": "cd grep_dump && rollup -c",
+    "gd-start": "cd grep_dump && rollup -c -w",
     "ti-clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
     "ti-build": "cd tilex && rollup -c",
     "ti-start": "serve -d tilex/public"
