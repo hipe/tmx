@@ -4,6 +4,7 @@
     "start": "serve -d tilex/public"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^11.2.0",
     "d3-selection": "^2.0.0",
     "serve": "^11.3.2"
   }
