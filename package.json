@@ -1,3 +1,9 @@
 {
-  "name": "TMX Tilex"
+  "name": "TMX Tilex",
+  "scripts": {
+    "start": "serve -d tilex/public"
+  },
+  "devDependencies": {
+    "serve": "^11.3.2"
+  }
 }
