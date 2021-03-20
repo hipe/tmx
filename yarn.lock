@@ -16,6 +16,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "TMX Tilex@workspace:."
   dependencies:
+    d3-selection: ^2.0.0
     serve: ^11.3.2
   languageName: unknown
   linkType: soft
@@ -228,6 +229,13 @@ __metadata:
     shebang-command: ^1.2.0
     which: ^1.2.9
   checksum: 96018c42a94a2f69e27c11688db638c343109e4eda5cc6586a83a1d2f102ef2ef4d184919593036748d386ddb67cc3e66658fefec85a4659958cde792f1a9ddc
+  languageName: node
+  linkType: hard
+
+"d3-selection@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "d3-selection@npm:2.0.0"
+  checksum: 9e6ef7ebf84f1c42bf0ff69c157f3f6f7991be7adc1fe1f56e71c4678a9a0c0143376265fca78edcaf2c69b15fa3dbd034be658ea5f0a81f86e7cd5837fcd05e
   languageName: node
   linkType: hard
 
