@@ -6,6 +6,8 @@
     "start": "serve -d tilex/public"
   },
   "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/preset-react": "^7.12.13",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "d3-selection": "^2.0.0",
     "react": "^17.0.1",
