@@ -67,7 +67,11 @@ def to_graph_lines_(
     yield f'{_tab_string}rankdir=BT;\n'
 
     # (maybe one day not hard-coded:)
-    allow = {'part-of': 'part_of', 'after': 'after'}
+    allow = {
+        'after': ('association_type', 'after'),
+        'part-of': ('association_type', 'part_of'),
+        'priority': ('do_ignore_this_tagging', None),
+    }
 
     def main():
         # tivl = tags index via lineno
@@ -510,6 +514,8 @@ def _flat_list_of_assocs_and(ic, allow, listener):
                 continue
 
             for oo in rti.classified_deep_taggings:
+                if oo.ignore_this_tagging:
+                    continue
                 if oo.deep_tag_head_stem_not_recognized:
                     deep_tags_not_recognized.append(oo)
                     continue
@@ -663,9 +669,18 @@ def _build_row_tag_indexer(allow, cstacker):
 
     def classify_deep_tagging(dtag):
         # Maybe the head stem of the deep tag isn't of a recognized type
-        if (assoc_typ := allow.get(dtag.head_stem)) is None:
+
+        assoc_two = allow.get(dtag.head_stem)
+        if assoc_two is None:
             yield 'deep_tag_head_stem_not_recognized', True
             return  # (Case3907)
+
+        typ, assoc_typ = assoc_two
+        if 'do_ignore_this_tagging' == typ:
+            yield 'ignore_this_tagging', True
+            return
+
+        assert 'association_type' == typ
 
         # Maybe the deep tag is too deep
         if 1 < len(cx := dtag.subcomponents):
@@ -1009,14 +1024,20 @@ class _NodeAssociations:
         self.afters = afters
 
 
-class _ClassifiedTagging:
+class _ClassifiedTagging:  # #todo would be better as dataclass
+
     def __init__(
             self, dtag, row,
+            ignore_this_tagging=None,
             association_type=None, RHS_identifier=None,
             deep_tag_head_stem_not_recognized=None, deep_tag_is_too_deep=None,
             failed_to_parse_identifier=None, emission=None):
         self.deep_tagging, self.row = dtag, row
         # fast and loose
+
+        self.ignore_this_tagging = ignore_this_tagging
+        if self.ignore_this_tagging:
+            return
 
         self.deep_tag_head_stem_not_recognized = \
             deep_tag_head_stem_not_recognized

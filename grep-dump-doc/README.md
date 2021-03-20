@@ -95,7 +95,7 @@ xxx
 
   - the full test suite must pass at every commit to master (every "pull request").
 
-  - currently we are *not* testing the web front but this is [\[#202\]](#202) in the works.
+  - currently we are *not* testing the web front but this is [#202] in the works.
 
   - generally every major piece of backend work should take the form of
     a "magnetic" (a.k.a "magnet"), and every magnet should be covered.
@@ -135,12 +135,53 @@ to run the whole test suite:
 (this table is explained at [\[#002\]] using the node table.)
 
 | Id                        | Main Tag | Content |
-|---------------------------|:-----:|-
+|---------------------------|:-----:|---
+| [#299.99] | #eg   | example
+| [#219]    | #open | get main out of the bundle names #priority:0.40
+| [#218]    | #open | get purple ranger etc out #after:[#219] #priority:0.45
+| [#217]    | #open | mocked frontend for indexing #after:[#218] #priority:0.50
+| [#216]    | #open | real backend for indexing #after:[#217] #priority:0.55
+| [#215]    | #open | integrate with front #after:[#216] #priority:0.60
+| [#214]    | #open | dummy ajax interface for "indexing" #after:[#215] #priority:0.65
+| [#213]    | #open | implement & cover real backend for "indexing" #after:[#214] #priority:0.7
+| [#212]    | #open | integrate (& redesign as necessary) full integration for indexing #after:[#213] #priority:0.75
+| [#211]    | #open | integrate dummy story: no pagination, hard-coded limit #after:[#212] #priority:0.8
+| [#210]    | #open | integrate dummy story: ajax-pagination YIKES #after:[#211] #priority:0.85
+| [#209]    | #open | implement & cover real backend for search #after:[#210] #priority:0.9
+| [#208]    | #open | integrate real search #after:[#209] #priority:0.95
 |                   [#207.C]| #open | hack for file touch
 |                   [#207.B]| #open | secret key is in version control
 |                [#204]     |       | (not sure what was intended with this)
 |                [#203]     |       | [code node]
-|<a name=202></a>[#202]     | #open | enzyme/mocha tests for web front like [bedjango1]
+| [#202]    | #open | enzyme/mocha tests for web front like [bedjango1]
+
+
+
+### Historical note on some of the above issues:
+
+A note on ~14 of the above issues: in a spike that occurred on #history-B.4,
+these issues took only the last of several hops:
+
+- First, they were originally housed in what is now the modern-day ".stack" file.
+- Then they moved to a "roadmap"-style dotfile.
+- Then (at cited historical moment) we sunsetted the dotfile and put the
+  content of these items into this issues file.
+
+We were able to move this issues to here (the "correctmost" place) because we
+finally realized the "isomorphicism" where README.md-style issues can be
+rendered to a GraphViz graph when they use the `#after` tag. See:
+
+    python3 pho/cli/commands/issues.py graph --help
+
+The items were conceived on these four dates: 2018 02-13, 02-19, 03-13, 03-21.
+We have arranged them in the order they originally occured in the .todo file.
+
+However, (and here is perhaps the main point of all this) we should see the
+issues as mainly provided for historical context. The only objective for now
+is to reproduce the list of items as they originally occurred (in the original
+order with the original body-copy) as they existed some three years ago.
+
+We will probably rearrange them, delete some etc in forthcoming commits.
 
 
 
@@ -159,4 +200,5 @@ to run the whole test suite:
 
 ## (document meta)
 
+  - #history-B.4: absorbed dotfile that had original creation dates of issues
   - #born.

@@ -1,0 +1,24 @@
+# entity: TL2: attributes
+hierarchical_container_type: document
+heading: (uncontextualized notes on react)
+
+--body
+
+Googled "react rollup". got Nathan Sebhastian [medium article][seb] (less
+than a month older).
+
+God bless this developer. The hello world worked (at notecard file birth).
+
+
+
+[seb]: https://blog.bitsrc.io/trying-rollup-for-react-applications-d3c2304d16bf
+
+
+
+--body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

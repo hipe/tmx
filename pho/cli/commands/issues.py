@@ -461,6 +461,11 @@ def _(sout, do_batch, sort_by, jsoner):
 @_output_adapter('json')
 def _(sout, do_batch, sort_by, jsoner):
 
+    do_sort_by_time = False
+    if sort_by:
+        typ, asc_desc = sort_by
+        do_sort_by_time = 'by_time' == typ
+
     class json_output_adapter:  # #class-as-namespace
         def at_beginning_of_output_collection():
             sout.write('[')
@@ -468,7 +473,7 @@ def _(sout, do_batch, sort_by, jsoner):
         def maybe_output_header(_):
             pass
 
-        output_record = jsoner(sout, 'by_time' == sort_by[0])
+        output_record = jsoner(sout, do_sort_by_time)
 
         def at_ending_of_output_collection():
             sout.write(']\n')

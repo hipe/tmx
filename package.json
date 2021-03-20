@@ -1,9 +1,10 @@
 {
   "name": "TMX Tilex",
   "scripts": {
-    "clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
-    "build": "cd tilex && rollup -c",
-    "start": "serve -d tilex/public"
+    "gd-all": "cd grep_dump && rollup -c",
+    "ti-clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
+    "ti-build": "cd tilex && rollup -c",
+    "ti-start": "serve -d tilex/public"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
