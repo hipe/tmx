@@ -1,11 +1,14 @@
 {
   "name": "TMX Tilex",
   "scripts": {
+    "clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
+    "build": "cd tilex && rollup -c",
     "start": "serve -d tilex/public"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^11.2.0",
     "d3-selection": "^2.0.0",
+    "rollup": "^2.42.1",
     "serve": "^11.3.2"
   }
 }
