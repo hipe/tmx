@@ -2,6 +2,8 @@
   "name": "TMX Tilex",
   "scripts": {
     "gd-start": "cd grep_dump && rollup -c -w",
+    "new-start": "cd grep_dump_3 && react-scripts start .",
+    "new-build": "cd grep_dump_3 && react-scripts build .",
     "ti-clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
     "ti-build": "cd tilex && rollup -c",
     "ti-start": "serve -d tilex/public"
@@ -14,14 +16,18 @@
     "@rollup/plugin-image": "^2.0.6",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "@rollup/plugin-replace": "^2.4.1",
+    "create-react-app": "^4.0.3",
     "d3-selection": "^2.0.0",
+    "eslint-config-react-app": "^6.0.0",
     "postcss": "^8.2.8",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-scripts": "^4.0.3",
     "rollup": "^2.42.1",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-serve": "^1.1.0",
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "web-vitals": "^1.1.1"
   }
 }
