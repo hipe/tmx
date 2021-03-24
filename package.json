@@ -27,7 +27,6 @@
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-serve": "^1.1.0",
-    "serve": "^11.3.2",
-    "web-vitals": "^1.1.1"
+    "serve": "^11.3.2"
   }
 }
