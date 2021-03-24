@@ -1,9 +1,9 @@
 {
   "name": "TMX Tilex",
   "scripts": {
-    "gd-start": "cd grep_dump && rollup -c -w",
-    "new-start": "cd grep_dump_3 && react-scripts start .",
-    "new-build": "cd grep_dump_3 && react-scripts build .",
+    "gd-start": "cd grep_dump && react-scripts start -FAST_REFRESH .",
+    "gd-start-OLD-ROLLUP": "cd grep_dump && rollup -c -w",
+    "gd-build": "cd grep_dump && react-scripts build .",
     "ti-clean": "rm tilex/public/bundles/*.js && >&2 echo 'Cleaned tilex/public/bundles.'",
     "ti-build": "cd tilex && rollup -c",
     "ti-start": "serve -d tilex/public"

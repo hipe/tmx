@@ -1,7 +1,5 @@
 import './App.css';
 import logo from './logo.svg';
-import React from 'react';
-
 
 function App(){
   return (
@@ -25,7 +23,9 @@ function App(){
 }
 
 export default App;
+
 /*
+# #history-B.5: sign-off that this is CRA
 # #history-B.4: add image and style
 # #born
 */

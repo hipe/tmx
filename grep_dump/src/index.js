@@ -1,11 +1,13 @@
 // (lines from the previous hello world are commented out and marked "#here1")
+// (temporary changes to reinstate CRA are marked with #here2)
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import App from './App';  #here1
 import './index.css'
+import App from './App';
+import reportWebVitals from './reportWebVitals';
 
-
+// eslint-disable-next-line
 class Game extends React.Component {
   render() {
     return (
@@ -22,6 +24,7 @@ class Game extends React.Component {
   }
 }
 
+// eslint-disable-next-line
 class Board extends React.Component {
   render() {
     const status = 'Next player: X';
@@ -53,6 +56,7 @@ class Board extends React.Component {
   }
 }
 
+// eslint-disable-next-line
 class Square extends React.Component {
   render() {
     return (
@@ -67,12 +71,27 @@ class Square extends React.Component {
 
 // ReactDOM.render(<App />, document.querySelector('#root'));   # #here1
 
+/* #here2
 ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
+*/
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
 
 /*
+# #history-B.5: reinstate CRA temporarily
 # #history-B.4: begin tic tac toe
 # #born
 */
