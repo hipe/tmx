@@ -11,6 +11,12 @@ God bless this developer. The hello world worked (at notecard file birth).
 
 OK now the react [tutorial][tut]
 
+What we learned:
+
+  - sublcassing React.Component lets you write <ItsName /> elsewhere
+  - components “remember” things with state
+  - shared state or component messenging happens thru parent components
+
 
 
 [tut]: https://reactjs.org/tutorial/tutorial.html
