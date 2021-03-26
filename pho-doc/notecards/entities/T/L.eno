@@ -16,6 +16,9 @@ What we learned:
   - sublcassing React.Component lets you write <ItsName /> elsewhere
   - components “remember” things with state
   - shared state or component messenging happens thru parent components
+  - like we do already, avoid mutation. they justify it with undo/redo
+    - there's this idea of "pure components" in React
+  - function components (when the component is stateless and simple)
 
 
 
