@@ -1,0 +1,87 @@
+# entity: TP2: attributes
+heading: (uncontextualized notes on react: advanced topics)
+
+--body
+
+| title |
+|---|
+| Accessibility
+| Code-Splitting
+| Context
+| Error Boundaries
+| Forwarding Refs
+| Fragments
+| Higher-Order Components
+| Integrating with Other Libraries
+| JSX In Depth
+| Optimizing Performance
+| Portals
+| Profiler
+| React Without ES6
+| React Without JSX
+| Reconciliation
+| Refs and the DOM
+| Render Props
+| Static Type Checking
+| Strict Mode
+| Typechecking With PropTypes
+| Uncontrolled Components
+| Web Components
+
+
+# Stuff I learnt:
+
+- Accessibility
+  - Understand all of this
+- Code-Splitting
+  - again #here3
+- Context
+  - less annoying than props passing down props etc
+- Error Boundaries
+  - advanced concept, maybe later
+- Forwarding Refs
+  - is #here1. Describes common use cases. too advanced for right now
+- Fragments
+  - for when you need to return an array of DOM elements
+- Higher-Order Components
+  - interesting but too advanced for right now
+- Integrating with Other Libraries
+  - integrating with jQuery or Backbone (yikes!) not today
+- JSX In Depth
+  - interesting
+- Optimizing Performance
+  - this has rollup instructions #here3
+- Portals
+  - complicated modal & overflow cases
+- Profiler
+  - not today
+- React without ES6
+  - not relevant
+- React without JSX
+  - okay
+- Reconciliation
+  - boring details about how trees are rendered efficiently
+- Refs and the DOM
+  - like "Uncontrolled Components" below  #here1
+- Render Props
+  - seems good
+- Strict Mode
+  - e.g Flow, TypeScript
+  - Flow seems good 👀 #here2
+- Typechecking With PropTypes
+  - sounds good 👀
+  - but they recommend static type checkers instead (above) #here2
+- Uncontrolled Components:
+  - idk. 'ref'. part of #here1
+- Web Components:
+  - Oh, Web Components are distinct from React.
+  - > Most people who use React don’t use Web Components
+
+
+--body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

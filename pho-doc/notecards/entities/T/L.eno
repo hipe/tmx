@@ -11,6 +11,9 @@ God bless this developer. The hello world worked (at notecard file birth).
 
 OK now the react [tutorial][tut]
 
+(There is tutotrial and a step-by-step guide (they are separate). We do the
+tutorial first and then the step-by-step guide in a later section below.)
+
 What we learned:
 
   - sublcassing React.Component lets you write <ItsName /> elsewhere
@@ -21,7 +24,37 @@ What we learned:
   - function components (when the component is stateless and simple)
 
 
+# The step-by-step guide
 
+[(here)][sbs]
+
+| ordinal | title |
+|----|----
+| 1  | Hello World                 |
+| 2  | Introducing JSX             |
+| 3  | Rendering Elements          |
+| 4  | Components and Props        |
+| 5  | State and Lifecycle         |
+| 6  | Handling Events             |
+| 7  | Conditional Rendering       |
+| 8  | Lists and Keys              |
+| 9  | Forms                       |
+| 10 | Lifting State Up            |
+| 11 | Composition vs Inheritance  |
+| 12 | Thinking In React           |
+
+
+
+Objectives (accoding to me):
+
+- ## Understand vaguely what JSX is
+- ## The form itself, and sending it back and forth
+
+
+# Stuff I learnt:
+
+
+[sbs]: https://reactjs.org/docs/hello-world.html
 [tut]: https://reactjs.org/tutorial/tutorial.html
 [seb]: https://blog.bitsrc.io/trying-rollup-for-react-applications-d3c2304d16bf
 

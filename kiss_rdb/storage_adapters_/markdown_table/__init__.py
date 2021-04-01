@@ -474,7 +474,8 @@ def complete_schema_via_(
 
     def key_via_cell(cell):
         s = normal_field_name_via_string(cell.value_string)
-        assert(len(s))  # ..
+        if not len(s):
+            xx(f'Failed to derive normal field name from label: {s!r}')
         return s
     from kiss_rdb import normal_field_name_via_string
 
@@ -1030,7 +1031,7 @@ def _scnlib():
 
 
 def xx(msg=None):
-    raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
+    raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
 # #history-B.5
 # #history-B.4
