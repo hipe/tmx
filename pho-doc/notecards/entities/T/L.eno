@@ -53,10 +53,34 @@ Objectives (accoding to me):
 
 # Stuff I learnt:
 
+- Introducing JSX
+  - it's "neither a string nor HTML", it's a "syntax extension to JavaScript"
+  - Rather than separating by *technologies* it separates by "concerns"
+  - JSX compiles to regular JS function calls & evaluate to JS objects
+  - use camelCase in attribute names
+  - "JSX Prevents Injection Attacks"
+- Rendering Elements (took: 5 min)
+  - React elements are cheaper than DOM elements to create
+  - "Applications built with just React usually have a single root DOM node"
+  - ~"thinking about how the UI should look at any moment, rather than
+    how to change it over time, eliminates a whole class of bugs"
+- Components and Props (took: 10 min)
+  - components are like functions: params <-> result <=> props <-> react elems
+  - start component names with a capital letter, DOM tags with lowercase.
+  - break down components and prefer component-centered names from business names
+  - react components must never mutate their props
+- State and Lifecycle (started: 11:47)
+  - REMINDER: here: https://reactjs.org/docs/state-and-lifecycle.html
+  - lifecycle methods like componentDidMount and componentWillUnmount
+  - you are free to use any property name other than `props` and `state`
+
+
+
 
 [sbs]: https://reactjs.org/docs/hello-world.html
 [tut]: https://reactjs.org/tutorial/tutorial.html
 [seb]: https://blog.bitsrc.io/trying-rollup-for-react-applications-d3c2304d16bf
+
 
 
 
