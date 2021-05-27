@@ -188,7 +188,7 @@ when you click create
 |[#882.J]                   | #trak | timetrack syncing: local vs remote, time field
 |[#882.I]                   | #edit | edits to do in fragments
 |[#882.H]                   | #wish | feature: fswatch vs. everybody else
-|[#882.G]                   | #hole |
+|[#882.7]                   |       | Moodboards recfile
 |[#882.F]                   | #open | we need proper markdown parsing
 |[#882.E]                   | #trak | [at writing this is a note in an unversioned document lol]
 |[#882.D]                   | #feat | track implementation for feature: documents inside documents

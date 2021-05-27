@@ -12,6 +12,7 @@ This is the external thing: [GNU Recutils][1] (and this [example][2]).
 
 Reminder: `recsel`
 
+And so yes, at #history-B.4 we spike a not-covered prototype of collectionism
 
 [1]: https://www.gnu.org/software/recutils/
 [2]: https://www.gnu.org/software/recutils/manual/A-Little-Example.html
@@ -30,16 +31,72 @@ STORAGE_ADAPTER_IS_AVAILABLE = True
 def FUNCTIONSER_FOR_SINGLE_FILES():
     class fxr:  # #class-as-namespace
         PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE = None
-        PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE = None
+
+        def PRODUCE_READ_ONLY_FUNCTIONS_FOR_SINGLE_FILE():
+            return _read_funcs
+
         PRODUCE_IDENTIFIER_FUNCTIONER = None
     return fxr
 
 
-class _FakeCollection_USE_ME:
+# == BEGIN #cover-me all of #history-B.4
 
-    def __init__(self, collection_path):
-        self.collection_path = collection_path  # (Case3425DP)
+class _read_funcs:  # #class-as-namespace
 
+    def schema_and_entities_via_lines(lines, listener):
+        return _schema_and_entities_via_lines(lines, listener)
+
+
+def _schema_and_entities_via_lines(lines, listener):
+    scn = ErsatzScanner(lines)
+    itr = _chunks_of_fields(scn, listener)
+
+    def entities():
+        for chunk in itr:
+
+            dct = {}
+            for fld in chunk:
+                k = fld.field_name
+                if k in dct:
+                    raise RuntimeError(f"wat do: collision: {k!r}")
+                dct[k] = fld.field_value_string
+
+            yield _MinimalIdentitylessEntity(dct)
+
+    return None, entities()
+
+
+class _MinimalIdentitylessEntity:
+    def __init__(self, core_attrs):
+        self.core_attributes = core_attrs
+
+
+def _chunks_of_fields(scn, listener):
+
+    cache = []
+
+    def flush():
+        ret = tuple(cache)
+        cache.clear()
+        return ret
+
+    while True:
+        blk = scn.next_block(listener)
+        if blk.is_field_line:
+            cache.append(blk)
+            continue
+        if blk.is_separator_block:
+            if cache:
+                yield flush()
+            continue
+        if blk.is_end_of_file:
+            break
+
+    if cache:
+        yield flush()
+
+
+# == END
 
 class ErsatzScanner:
 
@@ -211,4 +268,5 @@ def _tokenize_lines(lines):
     line = None
     yield 'end_of_line_stream', None
 
+# #history-B.4
 # #born.

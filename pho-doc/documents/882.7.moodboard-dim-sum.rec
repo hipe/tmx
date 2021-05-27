@@ -1,0 +1,50 @@
+# The objective of this collection is to pick a mood board software
+# for our needs, whatever those needs end up being.
+#
+# (It looks like what we used this for was to recommend a friend our favorite
+# spots to see in North Campus)
+
+# This collection can be used with the tools of "data-pipes" (`dp`),
+# for example:
+#
+#     dp filter-by-tags moodboard.rec '#red' and not '#blue'
+
+# Until otherwise noted, the records below are all from:
+# https://www.studiobinder.com/blog/mood-board-apps-with-free-template/
+
+informal_name: Canva
+
+informal_name: Evernote
+thoughts: yes
+
+informal_name: GoMoodboard
+
+informal_name: The Matboard
+discussion: as an alternative to Pinterest
+
+informal_name: Mural
+tags: #not-free
+
+informal_name: Pinterest
+
+informal_name: Polyvore
+
+informal_name: PatternTap
+
+informal_name: StudioBinder
+
+
+# == from here:
+# https://www.creativebloq.com/graphic-design/16-great-tools-creating-mood-boards-91412793
+
+informal_name: Milanote
+
+
+# == Other sources
+
+informal_name: Morpholio Board
+reason_for_exclusion: mainly for interior design. industry software
+
+
+# (actual born timestamp (ctime) was 2021-04-05 11:22)
+# #born
