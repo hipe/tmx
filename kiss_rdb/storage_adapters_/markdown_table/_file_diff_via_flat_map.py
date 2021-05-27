@@ -32,7 +32,7 @@ def sync_agent_(all_sexpser, coll_path):
             count += 1
             orig_sxs.append(sx)
         orig_sxs = tuple(orig_sxs)
-        orig_lines = tuple(_lines_via_sexps(orig_sxs))
+        orig_lines = tuple(_lines_via_sexps(iter(orig_sxs)))
 
         # Read new sexps (then lines) in to memory
         new_sxs = _new_sexps(iter(orig_sxs), flat_map, listener)
@@ -71,86 +71,92 @@ def sync_agent_(all_sexpser, coll_path):
 
 
 def _lines_via_sexps(new_sexps):
-    def normal(sexp):
-        return sexp[1]
 
-    stack = [
-        ('end_of_file', None),
-        ('table_schema_line_ONE_of_two', xx),
-        ('other_line', normal),
-        ('business_row_AST', lambda sexp: sexp[1].to_line()),
-        ('table_schema_line_TWO_of_two', normal),
-        ('table_schema_line_ONE_of_two', normal),
-        ('head_line', normal),
-        ('beginning_of_file', None)]
+    assert hasattr(new_sexps, '__next__')  # [#022]
 
-    from . import action_stack_popper_
-    popper = action_stack_popper_(stack, lambda fra: fra[1:])
+    # #open [#877.E]
 
-    for sx in new_sexps:
-        frame = popper(sx[0])
-        if frame:
-            func, = frame
-            skip = func is None
-        if skip:
-            continue
-        yield func(sx)
+    for typ, *rest in new_sexps:
+        if 'non_table_line' != typ:
+            break
+        line, = rest
+        yield line
+
+
+    assert 'complete_schema' == typ
+    sch, = rest
+    row1, row2 = sch.rows_
+    yield row1.to_line()
+    yield row2.to_line()
+
+    for typ, *rest in new_sexps:
+        if 'business_row_AST' != typ:
+            assert 'non_table_line' == typ
+            line, = rest
+            yield line
+            break
+        ast, _ = rest
+        yield ast.to_line()
+
+    for typ, *rest in new_sexps:
+        assert 'non_table_line' == typ
+        line, = rest
+        yield line
 
 
 def _new_sexps(itr, flat_map, listener):
     # Output zero or more head lines (lines before the table)
     # #todo this was written before action stacks and could be cleaned up
 
-    use_eg_row, actual_eg_row = None, None
-    sexps_after_table_on_deck = []
+    assert hasattr(itr, '__next__')  # [#022]
 
-    sx = next(itr)
-    assert 'beginning_of_file' == sx[0]
+    # #open [#877.E]
+
+    for sx in itr:
+        if 'non_table_line' != sx[0]:
+            break
+        yield sx
+
+    assert 'complete_schema' == sx[0]
     yield sx
 
-    after_table = {'other_line', 'end_of_file'}
+    sch, = sx[1:]
+    mixed_err = flat_map.receive_schema(sch)
+    if mixed_err is not None:
+        listener(xx('hole is upstream too'))
+        return
 
-    for tsl1_sx in itr:
-        if 'head_line' == tsl1_sx[0]:
-            yield tsl1_sx
-            continue
-        yield tsl1_sx  # table_schema_line_ONE_of_two
-        for tsl2_sx in itr:
-            yield tsl2_sx  # table_schema_line_TWO_of_two
-            cs = tsl2_sx[2]  # yikes
-            if (d := flat_map.receive_schema(cs)) is not None:
-                assert 'error' == d[0][0]  # #here3
-                listener(*d[0])
-                return
-            for eg_row_sx in itr:
-                if (typ := eg_row_sx[0]) in after_table:
-                    sexps_after_table_on_deck.append(eg_row_sx)
-                    use_eg_row = cs.rows_[0]  # undocumented
-                    break
-                assert 'business_row_AST' == typ
-                use_eg_row = (actual_eg_row := eg_row_sx[1])
-                break
-            break
+    use_eg_row, actual_eg_sx = None, None
+    sexps_after_table_on_deck = []
+
+    # PEEK ONE YUCK
+    for sx in itr:
+        if 'business_row_AST' == sx[0]:
+            use_eg_row = sx[1]
+            actual_eg_sx = sx
+        else:
+            assert 'non_table_line' == sx[0]
+            sexps_after_table_on_deck.append(sx)
         break
 
     if use_eg_row is None:
-        xx("can't sync without example row")
+        use_eg_row = sch.rows_[0]  # undocumented
 
     # Always output the example row manually, keeping it always topmost
-    if actual_eg_row:
-        yield 'business_row_AST', actual_eg_row
+    if actual_eg_sx:
+        yield actual_eg_sx
 
     # == SPOT B
 
     process_directives_during, process_directives_at_end = \
-        _build_directives_processer(use_eg_row, cs, listener)
+        _build_directives_processer(use_eg_row, sch, listener)
 
     # Traverse over zero or more table lines, doing sync stuff
     for sx in itr:
-        if (typ := sx[0]) in after_table:
+        if 'business_row_AST' != sx[0]:
+            assert 'non_table_line' == sx[0]
             sexps_after_table_on_deck.append(sx)
             break
-        assert 'business_row_AST' == typ
         ent = sx[1]
 
         # == SPOT C
@@ -196,7 +202,7 @@ def _build_directives_processer(eg_row, cs, listener):
                 if counts:  # #here5
                     eid = sx[1].nonblank_identifier_primitive
                     _emit_edited(listener, counts, eid, 'updated')
-                yield 'business_row_AST', row
+                yield 'business_row_AST', row, None
                 continue
             if 'give_me_the_AST_please' == typ:
                 directive[1](sx[1])
@@ -220,7 +226,7 @@ def _build_directives_processer(eg_row, cs, listener):
         row = new_row_via(dct.items(), listener)
         if 2 < len(directive):
             directive[2](row)
-        return 'business_row_AST', row
+        return 'business_row_AST', row, None
 
     from ._prototype_row_via_example_row_and_complete_schema import \
         BUILD_CREATE_AND_UPDATE_FUNCTIONS_ as build_funcs
@@ -332,6 +338,7 @@ def _emit_edited(listener, UCDs, eid, preterite):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.4
 # #history-B.3
 # #history-B.1 blind rewrite
 # #history-A.2: big refactor, go gung-ho with context managers. extracted.

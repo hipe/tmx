@@ -71,7 +71,7 @@ collection_via_resource = _collection_via_resource
 def tagged_row_ASTs_or_lines_via_lines():
     def tagged_row_ASTs_or_lines_via_lines(fp, listener):
         assert hasattr(fp, '__next__')  # [#022]
-        sxs_er = func(fp, iden_er_er)
+        sxs_er = func(fp, which_table=None, iden_er_er=iden_er_er)
         sxs = sxs_er(listener)
         try:
             for sx in sxs:
@@ -79,7 +79,7 @@ def tagged_row_ASTs_or_lines_via_lines():
         except stop:
             pass
     sa = _adapter_module()
-    func = sa._build_sexps_via_listener
+    func = sa._build_sexps_one_table
     iden_er_er = sa._build_identifier_builder
     stop = sa._Stop
     return tagged_row_ASTs_or_lines_via_lines

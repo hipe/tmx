@@ -35,6 +35,7 @@ def _build_identifier_builder(_listener, _cstacker=None):  # #testpoint
 def FUNCTIONSER_FOR_SINGLE_FILES(
         opn=None,
         iden_er_er=_build_identifier_builder,
+        which_table=None,
         file_grows_downwards=True,
         ):
     # #watch [#857.6] we don't love `opn`
@@ -45,7 +46,7 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
 
         def SYNC_AGENT_FOR_DATA_PIPES(opener):
             def all_sxs_er_er(fh):
-                return _build_sexps_via_listener(fh, iden_er_er)
+                return _build_sexps_one_table(fh, which_table, iden_er_er)
             from ._file_diff_via_flat_map import sync_agent_builder_ as func
             return func(opener, all_sxs_er_er)
 
@@ -64,7 +65,7 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
             return func(schema, ents, listener)
 
     def cud(typ, fh, listener, identity_args, attr_args=None):
-        all_sxser = _build_sexps_via_listener(fh, iden_er_er)
+        all_sxser = _build_sexps_one_table(fh, which_table, iden_er_er)
         use_filename = fh.name
         from ._flat_map_via_edit import CUD_markdown_ as func
         return func(
@@ -76,10 +77,11 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
     class read_funcs:  # #class-as-namespace
 
         def RETRIEVE_VIA_FILEHANDLE(fh, iden, listener):
-            return _retrieve(fh, iden, listener, iden_er_er)
+            return _retrieve(fh, iden, which_table, iden_er_er, listener)
 
         def schema_and_entities_via_lines(fh, listener):
-            return _schema_and_entities_via_lines(fh, listener, iden_er_er)
+            return _schema_and_entities_via_lines(
+                    fh, which_table, iden_er_er, listener)
 
     class fxr:  # #class-as-namespace
         def PRODUCE_EDIT_FUNCTIONS_FOR_SINGLE_FILE():
@@ -90,7 +92,9 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
 
         class CUSTOM_FUNCTIONS_VERY_EXPERIMENTAL:  # noqa: E501
             def open_schema_and_RAW_entity_traversal(fh, listener):
-                return _schema_and_RAW_entities(fh, listener, iden_er_er)
+                return _schema_and_RAW_entities(
+                    fh, which_table=which_table,
+                    iden_er_er=iden_er_er, listener=listener)
             open_schema_and_RAW_entity_traversal.is_reader = True
 
         def PRODUCE_IDENTIFIER_FUNCTIONER():
@@ -100,8 +104,9 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
 
 # == RETRIEVE
 
-def _retrieve(fh, iden, listener, iden_er_er):
-    _sch, ents = _schema_and_entities_via_lines(fh, listener, iden_er_er)
+def _retrieve(fh, iden, which_table, iden_er_er, listener):
+    _sch, ents = _schema_and_entities_via_lines(
+            fh, which_table, iden_er_er, listener)
     if ents is None:
         return
 
@@ -130,10 +135,10 @@ def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
 
 # == New Way
 
-def _schema_and_entities_via_lines(fh, listener, iden_er_er):
+def _schema_and_entities_via_lines(fh, which_table, iden_er_er, listener):
     # Exclude any eg row. Exclude ents with empty identif. (both (Case2451))
 
-    sch, ents = _schema_and_RAW_entities(fh, listener, iden_er_er)
+    sch, ents = _schema_and_RAW_entities(fh, which_table, iden_er_er, listener)
     if ents is None:
         return sch, ents
 
@@ -145,50 +150,219 @@ def _schema_and_entities_via_lines(fh, listener, iden_er_er):
     return sch, (ent for ent in ents if ent.nonblank_identifier_primitive)
 
 
-def _schema_and_RAW_entities(fh, listener, iden_er_er):
+def _schema_and_RAW_entities(fh, which_table, iden_er_er, listener):
     # Include example row. Include "entities" with empty identifier
+    # all this changes after thing #todo2
 
-    astack = _action_stack_for_schema_and_entities()
-    sxs = _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er)
+    itr = _sexps_focus_one_table(fh, which_table, iden_er_er, listener)
 
-    # See if you get as far as parsing the two schema rows
-    sr2_sx = None
+    # Advance over non-participating lines
+    should_be_complete_schema_sexp = None
     try:
-        for sr2_sx in sxs:
+        for sx in itr:
+            if 'non_table_line' == sx[0]:
+                continue
+            should_be_complete_schema_sexp = sx
             break
     except _Stop:
         pass
 
-    # If you didn't get that far, you still owe the client a two-tuple
-    if sr2_sx is None:
-        return None, None
+    if should_be_complete_schema_sexp is None:
+        return None, None  # would have complained
 
-    # Now you can give the client the schema and the zero or more entities
+    typ, *rest = should_be_complete_schema_sexp
+    assert 'complete_schema' == typ
+    sch, = rest
+
     def entities():
+        next_sexp = None
         try:
-            for sx in sxs:
-                yield sx[1]
+            for sx in itr:
+                typ, *rest = sx
+                if 'business_row_AST' == typ:
+                    ast, _away_me = rest
+                    yield ast
+                    continue
+                next_sexp = sx
+                break
         except _Stop:
             pass
+        if next_sexp is None:
+            return
+        assert 'non_table_line' == next_sexp[0]
+        for sx in itr:
+            assert 'non_table_line' == sx[0]
 
-    return sr2_sx[2], entities()
+    return sch, entities()
 
 
 # == Stream SEXP's
 
-def _build_sexps_via_listener(fh, iden_er_er):  # #testpoint
+# == BEGIN if you're reading this, refactor it FROM HERE to END:
+#
+#    This is a pseudo feature add / refactor that begins at #history-B.6.A.
+#
+#    Refactor in these ways:
+#    - Merge the two FSA's
+#    - Probably a "document scanner"
+#    - every #todo2 (in this file)
+#
+#    The reason we didn't do this refactor in one commit is to "prove" the
+#    justificaiton of the document scanner.
+#
+#    "Action Stacks" were useful but they suffered from two shortcomings:
+#    1) too much declarative API for clients to learn
+#    2) not usable on multiple-table-having files
+#
+#    This proposed replacement/improvement is a highter-level streaming
+#    sexp grammar for All Files.
+#
+#    (In the below notation we weirdly use square brackets to signify tuples,
+#    and parenthesis to signfify grammatical groupings.)
+#
+#    ['non_table_line', x]*
+#    (
+#       ['complete_schema', x+],
+#       ['business_row_AST', x+]*
+#       ['non_table_line', x]*
+#    )*
+#
+#    NOTE this doesn't add much to the upstream, we will probably merge
+
+
+def _build_sexps_one_table(fh, which_table, iden_er_er):  # #testpoint
     def all_sexps_via_listener(listener):
-        memo.count += 1
-        if 1 < memo.count:
-            xx("something changed at #history-B.4")
-        astack = _action_stack_for_all()
-        return _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er)  # noqa: E501
-    memo = all_sexps_via_listener
-    memo.count = 0
+        return _sexps_focus_one_table(fh, which_table, iden_er_er, listener)
     return all_sexps_via_listener
 
 
-def _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er):  # th
+def _sexps_focus_one_table(fh, which_table, iden_er_er, listener):
+
+    if which_table is not None:
+        xx("implement me: #table-locators")
+
+    this_table_matches_the_locator = _build_this_table_matches_the_locator()
+
+    # == States and their Transitions #[#008.2]
+
+    def in_before_the_one_table():
+        yield 'non_table_line', pass_thru_as_is
+        yield 'complete_schema', decide_whether_it_is_the_one_table
+
+    def in_table_being_ignored_before():
+        yield 'business_row_AST', pass_thru_business_row_as_line
+        yield 'non_table_line', will_move_to(in_before_the_one_table)
+
+    def in_the_one_table():
+        yield 'business_row_AST', pass_thru_as_is
+        yield 'non_table_line', will_move_to(in_after_the_one_table)
+
+    def in_after_the_one_table():
+        yield 'non_table_line', pass_thru_as_is
+        yield 'complete_schema', assert_it_is_not_the_one_table
+
+    def in_table_being_ignored_after():
+        yield 'business_row_AST', pass_thru_business_row_as_line
+        yield 'non_table_line', will_move_to(in_after_the_one_table)
+
+    # == At end of input (or put one line in an action. but this avoids state)
+
+    in_before_the_one_table.saw_table = False
+    in_table_being_ignored_before.saw_table = False
+    in_the_one_table.saw_table = True
+    in_after_the_one_table.saw_table = True
+    in_table_being_ignored_after.saw_table = True
+
+    # == Actions
+
+    def decide_whether_it_is_the_one_table():
+        sch, = current_sexp_rest
+        yes = this_table_matches_the_locator(sch)
+        if yes:
+            yield 'yield_this', current_sexp
+            yield 'move_to', in_the_one_table
+            return
+        for direc in directives_for_schema_to_lines(sch):
+            yield direc
+        yield 'move_to', in_table_being_ignored_before
+
+    def pass_thru_business_row_as_line():
+        ast, _away_me = current_sexp_rest
+        yield 'yield_this', ('non_table_line', ast.to_line())
+
+    def assert_it_is_not_the_one_table():
+        sch, = current_sexp_rest
+        yes = this_table_matches_the_locator(sch)
+        if yes:
+            _whine_about_too_many_tables(listener, parse_context)
+            yield 'stop_because_errored', None
+            return
+        for direc in directives_for_schema_to_lines(sch):
+            yield direc
+        yield 'move_to', in_table_being_ignored_after
+
+    def will_move_to(f):
+        def action():
+            yield 'yield_this', current_sexp
+            yield 'move_to', f
+        return action
+
+    def pass_thru_as_is():
+        yield 'yield_this', current_sexp
+
+    def directives_for_schema_to_lines(sch):
+        line1, line2 = (ast.to_line() for ast in sch.rows_)
+        yield 'yield_this', ('non_table_line', line1)
+        yield 'yield_this', ('non_table_line', line2)
+
+    def find_action(typ):
+        for this_typ, action_function in current_state_function():
+            if typ == this_typ:
+                return action_function
+        name = current_state_function.__name__
+        xx(f"when {name}, no transition for `{typ}`")
+
+    itr = _table_not_tables_via_lines(fh, listener, iden_er_er)
+    parse_context = next(itr)  # #here1
+
+    current_state_function = in_before_the_one_table
+    for current_sexp in itr:
+        typ, *current_sexp_rest = current_sexp
+        action = find_action(typ)
+        for direc, arg in action():
+            if 'yield_this' == direc:
+                yield arg
+                continue
+            if 'move_to' == direc:
+                current_state_function = arg
+                continue
+            assert 'stop_because_errored' == direc
+            return
+
+    if current_state_function.saw_table:
+        return
+    _whine_about_table_not_found(listener, parse_context)
+
+
+def _build_this_table_matches_the_locator():
+    # for now, a hard-coded "directive" for ignoring a table
+
+    import re
+    rx = re.compile(r'^\(ignore this table\b')
+
+    def yes_this_table(sch):
+        for line in sch.interstitial_lines:
+            if '\n' == line:
+                continue
+            if rx.match(line):
+                return False
+        return True
+    return yes_this_table
+
+
+def _table_not_tables_via_lines(fh, listener, iden_er_er):
+    # [#877.E]
+
     context_stack = ({'path': _path_via_lines(fh)},)
 
     # Resolve tagged lines via lines
@@ -196,119 +370,76 @@ def _sexps_via_lines_and_action_stack(fh, astack, listener, iden_er_er):  # th
 
     # Resolve line sexps via tagged lines
     raw_sxs = _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er)  # noqa: E501
+    raw_sxs, counter = _scnlib().add_counter_to_iterator(raw_sxs)
 
-    # Merge the argument stack into the one we always use
-    use_astack = _action_stack_for_check_single_table()
-    _merge_stack_in_to_stack(use_astack, astack)
+    parse_context = _ParseContext(lambda: counter.count, context_stack)
+    yield parse_context  # #here1
 
-    return _sexps_via_stack(raw_sxs, use_astack, context_stack, listener)
+    # == States [#008.2]
 
+    def from_beginning_of_file():
+        yield 'head_line', emit_non_table_line
+        yield 'table_schema_line_ONE_of_two', move_to_pre_table
 
-# == **EXPERIMENTAL** "Action Stacks":
-#    Associate with "symbols" in the "grammar" an "action" that is triggered
-#    when the state is first transitioned into. Unlike "parse actions" in a
-#    grammar, these stacks are injected into traversal as an argument.
-#    Actions can for example turn on and off sexp echoing, perform validations,
-#    and stop the traversal early. Note that if we ever #here2 support multiple
-#    tables, this will undergo a possibly destructive re-architecting, because
-#    currently it's written assuming a straight sequence of symbols rather than
-#    the looping that happens in documents with multiple tables. Still neat tho
+    def from_pre_table():
+        yield 'table_schema_line_TWO_of_two', emit_schema_and_move
 
-def _action_stack_for_schema_and_entities():
-    return [
-        ('end_of_file', lambda o: o.turn_yield_off()),  # don't yield this pc
-        ('table_schema_line_ONE_of_two',),
-        ('other_line', lambda o: o.turn_yield_off()),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two', lambda o: o.turn_yield_on()),
-        ('table_schema_line_ONE_of_two',), ('head_line',),
-        ('beginning_of_file',)]
+    def from_table_body():
+        yield 'business_row_AST', emit_same
+        yield 'other_line', emit_and_move_to_after_table
 
+    def from_after_table():
+        yield 'other_line', emit_non_table_line
+        yield 'table_schema_line_ONE_of_two', move_to_pre_table  # voila
 
-def _action_stack_for_all():
-    return [('beginning_of_file', lambda o: o.turn_yield_on())]
+    # == Actions
 
+    def emit_non_table_line():
+        line, = current_sexp_rest
+        yield 'emit_this', ('non_table_line', line)
 
-def _action_stack_for_check_single_table():
-    # Either we #here2 support multiple tables and a table locator wasn't
-    # passed, or we don't yet support multiple tables. Either way, it's rude
-    # to assume the first table is The One while ignoring the existence of any
-    # subsequent table(s). As such, this action stack is (for now) the base
-    # into which *all* argument action stacks are merged, so that whether we're
-    # rewriting the file or (in theory) merely retrieving one item, we check.
+    def move_to_pre_table():
+        yield 'move_to', from_pre_table
 
-    def at_table_1(_):
-        memo.found_table_1 = True
+    def emit_schema_and_move():
+        _line, complete_schema = current_sexp_rest
+        parse_context.current_complete_schema = complete_schema
+        yield 'emit_this', ('complete_schema', complete_schema)
+        yield 'move_to', from_table_body
 
-    def at_table_2(o):
-        frame = {'line': o.sexp()[1], 'lineno': o.counter.count}
-        frame['reason'] = 'for now can only have one table'
-        sct = _flatten_context_stack((*o.context_stack, frame))
-        o.listener('error', 'structure', 'multiple_tables', lambda: sct)
-        o.stop()
+    def emit_same():
+        yield 'emit_this', current_sexp
 
-    def at_end_of_file(o):
-        if memo.found_table_1:
-            return
-        msg = f"no markdown table found in {o.counter.count} lines"
-        sct = _flatten_context_stack((*o.context_stack, {'reason': msg}))
-        o.listener('error', 'structure', 'cannot_load_collection', lambda: sct)
+    def emit_and_move_to_after_table():
+        line, = current_sexp_rest
+        yield 'emit_this', ('non_table_line', line)
+        yield 'move_to', from_after_table
 
-    class memo:  # #class-as-namespace
-        found_table_1 = False
+    # ==
 
-    return [
-        ('end_of_file', at_end_of_file),
-        ('table_schema_line_ONE_of_two', at_table_2),
-        ('other_line',),
-        ('business_row_AST',),
-        ('table_schema_line_TWO_of_two',),
-        ('table_schema_line_ONE_of_two', at_table_1),
-        ('head_line',),
-        ('beginning_of_file',)]
+    def find_action(this_token_type):
+        for token_type, action_function in current_state_function():
+            if this_token_type == token_type:
+                return action_function
+        state_func_name = current_state_function.__name__
+        xx(f"no transition defined from '{state_func_name}' state "
+           f"for '{this_token_type}' token")
+
+    current_state_function = from_beginning_of_file
+
+    for current_sexp in raw_sxs:
+        typ, *current_sexp_rest = current_sexp
+        action_function = find_action(typ)
+
+        for directive_type, directive_arg in action_function():
+            if 'emit_this' == directive_type:
+                yield directive_arg
+                continue
+            assert 'move_to' == directive_type
+            current_state_function = directive_arg
 
 
-def _sexps_via_stack(sexps, stack, cstack, listener):
-
-    class controller:  # #class-as-namespace
-        def turn_yield_on():
-            self._do_yield = True
-
-        def turn_yield_off():
-            self._do_yield = False
-
-        def stop():
-            self._do_stop = True
-
-        def sexp():
-            return sx
-
-        _do_stop = False
-        _do_yield = False
-
-    self = (o := controller)  # ..
-    o.context_stack = cstack
-    o.listener = listener
-
-    sexps, o.counter = _scnlib().add_counter_to_iterator(sexps)
-    # dup #here1 meh
-
-    def expanded_sexps():
-        yield ('beginning_of_file',)
-        for sexp in sexps:
-            yield sexp
-        yield ('end_of_file',)
-
-    popper = action_stack_popper_(stack)
-
-    for sx in expanded_sexps():
-        func = popper(sx[0])
-        if func:
-            func(o)
-            if o._do_stop:
-                break
-        if o._do_yield:
-            yield sx
+# == END
 
 
 # == Pseudo-Models
@@ -697,7 +828,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
     def on_schema_line_two():
         tip = state.table_in_progress
         tsl1of2_ast = tip.table_schema_line_ONE_of_two_AST
-        tsl2of2_ast = schema_row_AST_via_line(line, 0)
+        tsl2of2_ast = schema_row_AST_via_line(line, lineno=None)
 
         # Make sure the two schema lines accord
         ((count1, has1), (count2, has2)) = \
@@ -722,7 +853,7 @@ def _line_sexps_via(tagged_lines, context_stack, listener, iden_er_er):
 
         move_to_state(from_after_second_schema_line)
 
-        out = 'table_schema_line_TWO_of_two', line, complete_schema  # #here3
+        out = 'table_schema_line_TWO_of_two', line, complete_schema
         return 'yield_this', out
 
     def enter_table_body_state_and_handle_item_row():
@@ -847,7 +978,7 @@ class _TableInProgress:
     line: str
     interstitial_lines: list[str] = _field(default_factory=list)
 
-    def to_context_frame(self):  # maybe used in #here2
+    def to_context_frame(self):
         kw = {'line': self.line, 'lineno': self.lineno}
         if (s := self.table_header_line):
             kw['table_header_line'] = s
@@ -931,7 +1062,39 @@ def _tagged_lines_via_lines(lines):
             break
 
 
+# == Whiners
+
+def _whine_about_too_many_tables(listener, parse_context):
+    sct = parse_context.flatten_context_stack()
+    sch = parse_context.current_complete_schema
+    sct['line'] = sch.rows_[1].to_line()
+    sct['lineno'] = parse_context.line_count - 1  # not schema row 2 yikes
+    sct['reason'] = 'for now can only have one table'
+    listener('error', 'structure', 'multiple_tables', lambda: sct)
+
+
+def _whine_about_table_not_found(listener, parse_context):
+    sct = parse_context.flatten_context_stack()
+    num = parse_context.line_count
+    sct['reason'] = f"no markdown table found in {num} lines"
+    listener('error', 'structure', 'cannot_load_collection', lambda: sct)
+
+
 # == Expression Support
+
+class _ParseContext:
+
+    def __init__(self, lc, cstck):
+        self._line_counter, self._context_stack = lc, cstck
+        self.did_find_the_one_table = False
+
+    def flatten_context_stack(self):
+        return _flatten_context_stack(self._context_stack)
+
+    @property
+    def line_count(self):
+        return self._line_counter()
+
 
 def _message_via_wordruns(orig_f):  # #decorator
     def use_f():
@@ -946,65 +1109,6 @@ def _str_via_iden(iden):
     return iden
 
 
-# == Action Stacks (experiment)
-
-def _any_2nd_of_max_two(frame):
-    _, *rest = frame
-    if len(rest):
-        res, = rest
-        return res
-
-
-def action_stack_popper_(stack, result_via_frame=_any_2nd_of_max_two):
-    # simply detect when sexp type changed, and pop the stack till find match
-
-    def popper(typ):
-        if is_same(typ):
-            return
-        while True:
-            frame = stack.pop()  # ..
-            if typ == frame[0]:
-                return result_via_frame(frame)
-
-    is_same = _build_change_detector()
-    return popper
-
-
-def _build_change_detector(initial_type=None):  # #[#508.2] chunker
-    def is_same(typ):
-        if memo.current_type == typ:
-            return True
-        memo.current_type = typ
-        return False
-
-    class memo:  # #class-as-namespace
-        current_type = initial_type
-
-    return is_same
-
-
-def _merge_stack_in_to_stack(main_stack, second_stack):  # goofy experiment
-    main_offset = len(main_stack)
-    while len(second_stack):
-        main_offset -= 1
-        assert 0 <= main_offset
-        second_frame = second_stack.pop()
-        main_frame = main_stack[main_offset]
-        typ1, *rest1 = main_frame
-        typ2, *rest2 = second_frame
-        assert typ1 == typ2
-        if not len(rest2):  # no content in 2nd frame, just placeholder
-            continue
-        f2, = rest2
-        if not len(rest1):  # no content in main frame, easy
-            main_stack[main_offset] = (typ1, f2)
-            continue
-        f1, = rest1
-        # there's a goddam action in main AND second stack
-        f3 = _combine_two_monadics(f1, f2)  # order might matter w/ stop
-        main_stack[main_offset] = (typ1, f3)
-
-
 # == Smalls
 
 def _path_via_lines(fh):
@@ -1012,13 +1116,6 @@ def _path_via_lines(fh):
         return fh.name
     assert hasattr(fh, '__next__')
     return "«line generator, not path»"
-
-
-def _combine_two_monadics(f1, f2):
-    def f3(arg):
-        f1(arg)
-        f2(arg)
-    return f3
 
 
 def _flatten_context_stack(context_stack):  # #[#510.14]
@@ -1033,6 +1130,7 @@ def _scnlib():
 def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
+# #history-B.6.A
 # #history-B.5
 # #history-B.4
 # #history-B.1: blind rewrite. absorb four modules

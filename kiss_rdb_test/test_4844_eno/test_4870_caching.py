@@ -86,7 +86,7 @@ class CommonCase(unittest.TestCase):
     def given_EID(_):
         pass
 
-    do_debug = True
+    do_debug = False
 
 
 # [4854-4860]  👀
@@ -286,8 +286,6 @@ class Case4855_400_traverse_when_caching(CommonCase):
 
     def take_snapshot_after(_, myfsr):
         return num_cached_paths_and_num_cached_entities_of(myfsr)
-
-    do_debug = True
 
 
 def num_cached_paths_and_num_cached_entities_of(myfsr):

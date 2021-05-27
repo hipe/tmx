@@ -393,10 +393,13 @@ def issues_collection_via_(readme, listener, opn=None):
                 if enx is None:
                     return
                 body_ks = sch.field_name_keys[1:]
-                if ('main_tag', 'content') != body_ks:
-                    raise RuntimeError(f"This is fine but hello: {body_ks!r}")
+                if fixed_for_now != body_ks:
+                    reason = f"expected {fixed_for_now!r} had {body_ks!r}"
+                    raise RuntimeError(reason)
                 yield sch, enx
         return cm()
+
+    fixed_for_now = 'main_tag', 'content'
 
     class issues_collection:  # #class-as-namespace
         def to_graph_lines(listener=listener, **kw):

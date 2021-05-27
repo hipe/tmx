@@ -51,8 +51,6 @@ class CommonCase(unittest.TestCase):
 
         assert not dct
 
-    do_debug = True
-
 
 class Case4145_intro(CommonCase):
 

@@ -5,7 +5,7 @@ import unittest
 
 
 class CommonCase(unittest.TestCase):
-    do_debug = True
+    do_debug = False
 
 
 class Case1610_ASCII_tree_intro(CommonCase):

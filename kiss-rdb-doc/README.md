@@ -32,6 +32,7 @@ woah boy.
 |Id                         | Main Tag | Content |
 |---------------------------|:------|:----|
 |[#899.Z]                   | #eg   | eg
+|[#877.E]                   |       | refactor this next
 |[#877.4]                   | #trak | do we want to make string identifiers the default?
 |[#877.C]                   | #trak | new pattern of holes in traversal streams that client can chose to skip
 |[#877.B]                   | #open | CUSTOM_FUNCTIONS_OLD_WAY .. not sure what do

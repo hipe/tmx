@@ -28,37 +28,38 @@ class CommonCase(unittest.TestCase):
 
     # -- assist in test assertions
 
-    def _schema_lines_OK(self):
-        self.run_length('table_schema_line_ONE_of_two', 1)
-        self.run_length('table_schema_line_TWO_of_two', 1)
-
-    def _head_lines_this_many(self, num):
-        self.run_length('head_line', num)
-
-    def _tail_lines_this_many(self, num):
-        self.run_length('other_line', num)
-
-    def _main_lines_this_many(self, num):
-        self.run_length('business_row_AST', num)
-
-    def _items(self):
-        return self.business_run().items
-
-    def run_length(self, typ, num):
-        actual = self.runs_index[typ].count
-        self.assertEqual(actual, num)
-
     def this_one_business_object_row(self):
-        return self.business_run().items[1]
+        return self.items[1]
 
-    def business_run(self):
-        return self.runs_index['business_row_AST']
+    @property
+    def items(self):
+        return self.only_run('business_row_AST')
+
+    def first_run(self, typ):
+        for run in self.runs:
+            if typ == run.type:
+                return run.items
+        assert()
+
+    def last_run(self, typ):
+        found = None
+        for run in self.runs:
+            if typ == run.type:
+                found = run.items
+        assert found
+        return found
+
+    def only_run(self, typ):
+        found = None
+        for run in self.runs:
+            if typ == run.type:
+                if found:
+                    assert()
+                found = run.items
+        assert found
+        return found
 
     # -- build end state
-
-    @custom_dangerous_memoize
-    def runs_index(self):
-        return runs_index_via(self.runs)
 
     @custom_dangerous_memoize
     def runs(self):
@@ -117,17 +118,17 @@ class Case3356DP_adds_only(CommonCase):
         self.assertIsNotNone(self.runs)
 
     def test_020_head_lines_count(self):
-        self._head_lines_this_many(3)
+        assert 3 == len(self.first_run('non_table_line'))
 
     def test_030_schema(self):
-        self._schema_lines_OK()
+        assert 1 == len(self.only_run('complete_schema'))
 
     def test_040_main_lines_count(self):
-        self._main_lines_this_many(3)
+        assert 3 == len(self.only_run('business_row_AST'))
 
     def test_050_the_first_and_last_items_are_as_in_the_original(self):
 
-        items = self._items()
+        items = self.items
 
         _line_one = line_via_row(items[0])
         _line_two = line_via_row(items[-1])
@@ -146,7 +147,7 @@ class Case3356DP_adds_only(CommonCase):
           - what happens with content overflow (Case3359DP)
         """
 
-        items = self._items()
+        items = self.items
         row = items[1]
 
         pcs = split_row_line(row)
@@ -162,7 +163,7 @@ class Case3356DP_adds_only(CommonCase):
         # because those are (Case2478KR) (Case2479KR)
 
     def test_070_tail_lines_count(self):
-        self._tail_lines_this_many(4)
+        assert 4 == len(self.last_run('non_table_line'))
 
     def given_far_dictionaries(_):
         return case_100_far_dictionaries()
@@ -174,7 +175,7 @@ class Case3359DP_MERGE(CommonCase):
         self.assertIsNotNone(self.runs)
 
     def test_020_the_after_content_is_right(self):
-        items = self._items()
+        items = self.items
         self.assertEqual(len(items), 2)
         row = items[1]
 
@@ -197,8 +198,8 @@ class Case3362DP_what_if_no_business_attrs_besides_ID(CommonCase):
     # Even though there is nothing to do, this sync happens [#458.7]
 
     def test_100_whoopsie_the_changed_cell_takes_on_the_EG_styling(self):
-        runs = self.runs_index
-        act_line = line_via_row(runs['business_row_AST'].items[1])
+
+        act_line = self.only_run('business_row_AST')[1].to_line()
         self.assertEqual(act_line, '| zub   | x2\n')  # not the example format
 
     def given_far_dictionaries(_):
@@ -333,30 +334,14 @@ def line_via_row(row):
 
 # == End State Support (would be better in its own module)
 
-def runs_index_via(runs):
-    """in a separate pass, ensure that sections (runs) don't repeat"""
-
-    dct = {}
-    for section in runs:
-        typ = section.type
-        if typ in dct:
-            raise Exception('collision')
-        dct[typ] = section
-    return dct
-
-
 def runs_via_sync_via(sorted_far_dcts, mixed_near, two_keyerers, listn):
     # (rewritten at #history-A.4 to be less crazy)
 
     # Chunk the sexps by their type
     sxs = new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listn)
-    itr = chunks_via(sxs, type_of=lambda s: s[0])
-    chunks = tuple(itr)
+    use_chunks = chunks_via(sxs, type_of=lambda s: s[0])
 
-    # Get rid of these special sexps that don't have payloads
-    begin = 1 if 'beginning_of_file' == chunks[0][0] else 0
-    end = -1 if 'end_of_file' == chunks[-1][0] else 0
-    use_chunks = (chunks[i] for i in range(begin, len(chunks)+end))
+    # (snip handling for beginning_of_file end_of_file)
 
     # Produce only the payloads, not the whole sexps, in each chunk
     return (TypeRun(ty, tuple(sx[1] for sx in sxs)) for ty, sxs in use_chunks)
@@ -481,9 +466,7 @@ def simplify_and_add_guillemets(k):
 
 class TypeRun:
     def __init__(self, typ, items):
-        self.count = len(items)
-        self.type = typ
-        self.items = items
+        self.type, self.items = typ, items
 
 
 # == Chunking (experimental, should abstract to DP)

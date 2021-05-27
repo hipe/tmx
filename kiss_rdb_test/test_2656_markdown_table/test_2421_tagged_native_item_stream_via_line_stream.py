@@ -24,23 +24,8 @@ class CommonCase(unittest.TestCase):
         act_s_a = self.end_state.error_messages
         self.assertEqual(act_s_a, (s,))
 
-    def _expect_all_normal_transitions(self):
-        self._expect_these_transitions(_all_possible_transitions)
-
-    def _expect_these_transitions(self, these):
-        act = tuple((tup[0] for tup in self.end_state.STATE_AND_COUNTS))
-        self.assertEqual(act, these)
-
-    def _expect_this_many_head_and_tail_lines(self, hl, tl):
-        self._expect_this_many('head_line', hl)
-        self._expect_this_many('other_line', tl)
-
     def _expect_this_many_rows(self, n):
         self._expect_this_many('business_row_AST', n)
-
-    def _expect_this_many(self, k, n):
-        act = self.end_state.COUNT_VIA_STATE[k]
-        self.assertEqual(act, n)
 
     @property
     @shared_subj_in_children
@@ -104,13 +89,20 @@ class Case2422_minimal_working(CommonCase):
         self._succeeds()
 
     def test_020_transitioned_as_expected(self):
-        self._expect_all_normal_transitions()
+        es = self.end_state
+        act = tuple(sx[0] for sx in es.contiguous_sexp_type_and_counts)
+        exp = 'non_table_line', 'complete_schema', \
+              'business_row_AST', 'non_table_line'
+        self.assertSequenceEqual(act, exp)
 
     def test_030_expect_head_and_tail_lines_came_thru(self):
-        self._expect_this_many_head_and_tail_lines(3, 4)
+        _1, _, _, _2 = self.end_state.contiguous_sexp_type_and_counts
+        assert _1[1] == 3
+        assert _2[1] == 4
 
     def test_040_expect_all_the_rows_came_thru(self):
-        self._expect_this_many_rows(2)
+        act = self.end_state.count_via_sexp_type['business_row_AST']
+        assert act == 2
 
     def build_end_state(self):
         return self.build_end_state_expecting_no_emissions()
@@ -124,10 +116,10 @@ class Case2424_table_header(CommonCase):
     def test_010_hi(self):
         es = self.end_state
         assert es.did_succeed
-        tup = es.tuples[4]
-        assert 'table_schema_line_TWO_of_two' == tup[0]
-        ast = tup[2]
-        act = ast.table_cstack_[-1]['table_header_line']  # eek
+        typ, *rest = es.tuples[2]
+        assert 'complete_schema' == typ
+        sch, = rest
+        act = sch.table_cstack_[-1]['table_header_line']  # eek
         assert "# Zib Zub super table\n" == act
 
     def build_end_state(self):
@@ -182,7 +174,7 @@ class Case2428_030_end_early(CommonCase):
         """)
 
 
-class Case2428_040_multi_table(CommonCase):
+class Case2428_040_multi_table_not_okay_normally(CommonCase):
 
     def test_010_not_yes(self):
         es = self.end_state
@@ -195,7 +187,10 @@ class Case2428_040_multi_table(CommonCase):
 
     def given_markdown_lines(_):
         return unindent("""
+        Shamonay
+
         # 1
+        (zig zug)
 
         |aa|bb|cc|
         |---|---|---
@@ -207,6 +202,53 @@ class Case2428_040_multi_table(CommonCase):
         |dd|ee|ff|
         |---|---|---
         |x|x|x
+        """)
+
+
+class Case2428_050_multi_table_okay_with_directives(CommonCase):
+
+    def test_010_not_yes(self):
+        current_type = None
+        counts = []
+        for sx in self.end_state.tuples:
+            typ = sx[0]
+            if current_type != typ:
+                counts.append([typ, 0])
+                current_type = typ
+            counts[-1][1] += 1
+
+        exp = ['non_table_line', 10], ['complete_schema', 1], \
+              ['business_row_AST', 1], ['non_table_line', 9]
+
+        self.assertSequenceEqual(counts, exp)
+
+    def build_end_state(self):
+        return self.build_end_state_expecting_no_emissions()
+
+    def given_markdown_lines(_):
+        return unindent("""
+        Shamonay
+
+        # 1
+        (ignore this table: ohai)
+
+        |aa|bb|cc|
+        |---|---|---
+        |one|two|
+
+        ## 2
+        |dd|ee|ff|
+        |---|---|---
+        |x1|x2|x3
+
+        ## 3
+
+        (ignore this table)
+        |hh|ii|
+        |---|---|
+        |y1|y2
+
+        yup
         """)
 
 
@@ -230,16 +272,17 @@ def _common_execute(lines_or_file, listener):
 
 class _EndState:
     def __init__(self, tuples, error_messages=None):
-        if error_messages is None:
-            self.did_succeed = True
-            self.tuples = tuples
-            _calculate_state_statistics(self, tuples)
-        else:
-            self.did_succeed = False
+        if error_messages is not None:
             self.error_messages = tuple(error_messages)
+            self.did_succeed = False
+            return
+        for k, x in _calculate_state_statistics(tuples):
+            setattr(self, k, x)
+        self.tuples = tuples
+        self.did_succeed = True
 
 
-def _calculate_state_statistics(wat, tuples):
+def _calculate_state_statistics(tuples):
     """answer questions about state transitions.
 
     questions like:
@@ -290,18 +333,8 @@ def _calculate_state_statistics(wat, tuples):
 
     self._change_state(None)
 
-    wat.STATE_AND_COUNTS = tuple(result_tuples)
-    wat.COUNT_VIA_STATE = {k: v for (k, v) in result_tuples}
-
-
-_all_possible_transitions = (
-        'beginning_of_file',
-        'head_line',
-        'table_schema_line_ONE_of_two',
-        'table_schema_line_TWO_of_two',
-        'business_row_AST',
-        'other_line',
-        'end_of_file')
+    yield 'contiguous_sexp_type_and_counts', tuple(result_tuples)
+    yield 'count_via_sexp_type', {k: v for (k, v) in result_tuples}
 
 
 def lines_via_indendted_big_string(big_string):

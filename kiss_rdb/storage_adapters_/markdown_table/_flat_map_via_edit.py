@@ -144,7 +144,7 @@ def _create_no_see(state, dct, grow_downwards, listener):
         iden_key = ks[0]  # [#871.1] leftmost is the one
         if iden_key not in dct:
             xx("whine about how you need an identifier in the arg dict")
-            return (('error', '..'),)  # #here3
+            return (('error', '..'),)
         new_eid = dct[iden_key]
         new_iden = sch.identifier_class_(new_eid)
         state.new_eid = new_eid

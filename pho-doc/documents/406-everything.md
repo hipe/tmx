@@ -8,6 +8,20 @@ pho issues graph -r pho-doc/documents/406-everything.md
 ```
 
 
+## I am some table
+
+(do not ignore this table (temporary for this commit))
+
+|ID|main tag|content|
+|---|---|---|
+|[#888.02]|       | Thing B #part-of:[#888.01]
+|[#888.01]|       | Thing A
+
+
+## I am some table
+
+(ignore this table)
+
 |ID|main tag|content|
 |---|---|---|
 |[#879.11]|       | end game #part-of:[#879.1] #after:[#879.10]

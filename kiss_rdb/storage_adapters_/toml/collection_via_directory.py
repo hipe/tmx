@@ -152,7 +152,7 @@ class collection_implementation_via_directory_and_schema:
                 locked_file = _pass_thru_context_manager(indexy_file.handle)
                 yes_do_cleanup = False
 
-            elif os_path.exists(path):  # :#here3
+            elif os_path.exists(path):
                 locked_file = self._open_locked_mutable_entities_file(path)
                 yes_do_cleanup = False
 
