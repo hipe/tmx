@@ -1,3 +1,6 @@
+"""This is the more complicated :[#504]. See also the minimal [#505]"""
+
+
 from collections import namedtuple as _nt
 
 

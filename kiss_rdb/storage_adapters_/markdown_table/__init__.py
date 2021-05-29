@@ -14,6 +14,7 @@ older one. At #history-B.1 we unified the strains.
 :[#873.N]:
 """
 
+from modality_agnostic.minimal_FSA import Minimal_Formal_FSA as _Minimal_FSA
 from dataclasses import dataclass as _dataclass
 
 
@@ -107,8 +108,7 @@ def FUNCTIONSER_FOR_SINGLE_FILES(
     return fxr
 
 
-# == Experimental "Minimal FSA" lib (makes decorators) (very likely to move)
-#    (we desperately want to move it to [#505] but it's too early)
+# ==
 
 class _Experimental_FSA_Client:
 
@@ -130,129 +130,7 @@ class _Experimental_FSA_Client:
         return self._fsa.state_name
 
 
-class _Minimal_FSA:
-
-    def __init__(self, ffsa):
-        self._state_name = ffsa.initial_state_name
-        self._transitions_dict = ffsa.transitions_dictionary
-        self._is_mutable = True
-
-    def move_to(self, state_name):
-        if self._is_locked:
-            raise _FSA_Error(' '.join(_FSA_s_s('move to', state_name, self)))
-        if state_name not in self._transitions_dict[self._state_name]:
-            s_s = _sentences_for_FSA_transition_not_allowed(
-                state_name, self._state_name, self._transitions_dict)
-            raise _FSA_Error(' '.join(s_s))
-        self._transitions_dict[state_name]  # runtime validate meh #here7
-        self._state_name = state_name
-
-    def open_lock(self, lock_name):
-        if self._is_locked:
-            raise _FSA_Error(' '.join(_FSA_s_s('open lock', lock_name, self)))
-
-        from contextlib import contextmanager as _contextmanager
-
-        @_contextmanager
-        def do_open_lock():
-            self.enter_lock(lock_name)
-            yield
-            self.exit_lock(lock_name)  # not sure if this covers it
-        return do_open_lock()
-
-    def enter_lock(self, lock_name):
-        if self._is_locked:
-            raise _FSA_Error(' '.join(_FSA_s_s('lock as', lock_name, self)))
-        self._is_mutable, self._lock_is_mutable = False, True
-        self._state_name_when_unlocked = self._state_name
-        self._state_name = lock_name
-
-    def exit_lock(self, lock_name):
-        if self._is_mutable:
-            return self._cannot_exit_lock(lock_name)
-        if self._lock_is_permanant:
-            return self._cannot_exit_lock(lock_name)
-        if self._state_name != lock_name:
-            return self._cannot_exit_lock(lock_name)
-        self._state_name = self._state_name_when_unlocked
-        del self._state_name_when_unlocked
-        del self._lock_is_mutable
-        self._is_mutable = True
-
-    def _cannot_exit_lock(self, lock_name):
-        raise _FSA_s_s(' '.join(_FSA_s_s('exit lock', lock_name, self)))
-
-    def failure_lock(self, lock_name):
-        # you can enter failure lock (which is permanent) from any internal
-        # state except if you are already failure-locked
-
-        if self._is_locked and self._lock_is_permanant:
-            msg = ' '.join(_FSA_s_s('failure lock as', lock_name, self))
-            raise _FSA_Error(msg)
-        self._is_mutable, self._lock_is_mutable = False, False
-        self._state_name = lock_name
-
-    @property
-    def state_name(self):
-        return self._state_name
-
-    @property
-    def _lock_is_permanant(self):  # assumed locked
-        return not self._lock_is_mutable
-
-    @property
-    def _is_locked(self):
-        return not self._is_mutable
-
-
-class _Minimal_Formal_FSA:
-
-    def __init__(self, **dct):
-        keys = tuple(dct.keys())
-        self.initial_state_name = keys[0]  # ..
-        for k in keys:
-            tup = dct[k]
-            if not isinstance(tup, tuple):
-                raise RuntimeError(f"must be tuple: {tup!r}")
-            for kk in tup:
-                if kk not in dct:
-                    raise RuntimeError(f"not in left hand side: {kk!r}")
-                assert kk in dct
-        self.transitions_dictionary = dct
-
-    def build_precondition_decorator(self, state_attr_name):
-        return _build_FSA_precondition_decorator(
-                state_attr_name, self.transitions_dictionary)
-
-    def build_FSA(self):
-        return _Minimal_FSA(self)
-
-
-def _build_FSA_precondition_decorator(state_attr_name, dct):
-    def decorator_maker(required_state_name):
-        assert required_state_name in dct
-
-        def decorator(orig_func):
-            def use_func(self):
-                assert self.ok  # VERY experimental
-                state_name = getattr(self, state_attr_name)
-                if required_state_name == state_name:
-                    return orig_func(self)
-                s_s = _sentences_for_FSA_method_precondition_failure(
-                    orig_func.__name__, state_name, required_state_name)
-                raise _FSA_Error(' '.join(s_s))
-            return use_func
-        return decorator
-    return decorator_maker
-
-
-class _FSA_Error(RuntimeError):
-    pass
-
-
-# ==
-
-single_table_document_FFSA_ = _Minimal_Formal_FSA(
+single_table_document_FFSA_ = _Minimal_FSA(
     before_leading_non_table_lines=('before_complete_schema',),
     before_complete_schema=('before_business_ASTs',),
     before_business_ASTs=('before_trailing_non_table_lines',),
@@ -272,12 +150,6 @@ def _build_iterator_stops_decorator(stop, on_stop=None):
             return _do_catch_iterator_stops(itr, stop, use_on_stop)
         return use_func
     return decorator
-
-
-def _USE_ME_build_catch_iterator_stops_(stop, on_stop=None):
-    def catch_iterator_stops(itr):
-        return _do_catch_iterator_stops(itr, stop, on_stop)
-    return catch_iterator_stops
 
 
 def _do_catch_iterator_stops(itr, stop, on_stop):
@@ -330,8 +202,10 @@ def _retrieve(fh, iden, which_table, iden_er_er, listener):
 
 
 def emission_components_for_entity_not_found_(eid, count, verb_stem_phrz=None):
-    @_message_via_wordruns
     def rsn():
+        return ' '.join(reason_words())
+
+    def reason_words():
         if verb_stem_phrz is not None:
             yield f"cannot {verb_stem_phrz} because"
         ies = 'y' if 1 == count else 'ies'
@@ -528,7 +402,7 @@ def _build_this_table_matches_the_locator():
     return yes_this_table
 
 
-_MTDSFFSA = _Minimal_Formal_FSA(
+_MTDSFFSA = _Minimal_FSA(
     before_lines_before_table=('complete_schema_on_deck',),
     complete_schema_on_deck=(
         'reached_end_of_input_stream',
@@ -1172,47 +1046,7 @@ def _line_about_cell_count_delta(actual_count, formal_count):
            f'(had {actual_count}, needed {formal_count}.)'
 
 
-def _sentences_for_FSA_method_precondition_failure(
-        func_name, state_name, required_state_name):
-    yield f"Can't call '{func_name}' in current state."
-    yield f"Must be in state '{required_state_name}' but state"\
-          f" in '{state_name}'."
-
-
-def _sentences_for_FSA_transition_not_allowed(
-        arg_state_name, state_name, trans_dict):
-
-    yield f"Can't transition from '{state_name}' to '{arg_state_name}'."
-    if (splay := trans_dict.get(arg_state_name)) is None:
-        yield "That state isn't even defined."
-    elif 0 == (leng := len(splay)):
-        yield "The current state is a terminal state (no way out)."
-    elif 1 == leng:
-        yield f"Can only transition to '{splay[0]}' from that state."
-    else:
-        yield f"There are {leng} other transitions to choose from."
-
-
-def _FSA_s_s(verb_phrase_head, mixed_name, fsa):
-    yield f"Can't {verb_phrase_head} {mixed_name!r}."
-    noun_phrase = "FSA"  # placeholder for the idea
-    if fsa._is_mutable:
-        yield "{noun_phrase} is not locked."
-    else:
-        lock_name = fsa._state_name
-        if fsa._lock_is_mutable:
-            yield f"{noun_phrase} is locked as {lock_name!r}."
-        else:
-            yield f"{noun_phrase} is failure-locked as {lock_name!r}."
-
-
 # == Expression Support
-
-def _message_via_wordruns(orig_f):  # #decorator
-    def use_f():
-        return ' '.join(orig_f())
-    return use_f
-
 
 def _str_via_iden(iden):
     if hasattr(iden, 'to_string'):
