@@ -68,32 +68,24 @@ collection_via_resource = _collection_via_resource
 # == Resolve Smaller Components
 
 @_lazy_function
-def tagged_row_ASTs_or_lines_via_lines():
-    def tagged_row_ASTs_or_lines_via_lines(fp, listener):
+def single_table_document_scanner_via_lines():
+    def do(fp, listener):
         assert hasattr(fp, '__next__')  # [#022]
-        sxs_er = func(fp, which_table=None, iden_er_er=iden_er_er)
-        sxs = sxs_er(listener)
-        try:
-            for sx in sxs:
-                yield sx
-        except stop:
-            pass
+        return func(fp, listener, which_table=None, iden_er_er=iden_er_er)
     sa = _adapter_module()
-    func = sa._build_sexps_one_table
+    func = sa._single_table_doc_scanner_via_lines
     iden_er_er = sa._build_identifier_builder
-    stop = sa._Stop
-    return tagged_row_ASTs_or_lines_via_lines
+    return do
 
 
 @_lazy_function
 def row_AST_via_line():
     def use_func(line, listener):
-        asset_func = build_asset_func(listener, context_stack)
+        asset_func = build_asset_func(listener)
         try:
             return asset_func(line, 0)  # catch stop?
         except stop:
             pass
-    context_stack = ({'ohai': __file__},)
     mod = _adapter_module()
     build_asset_func = mod._build_row_AST_via_line
     stop = mod._Stop

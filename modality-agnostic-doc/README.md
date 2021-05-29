@@ -65,7 +65,7 @@ only in modeling interfaces for this purpose.
 |[#507.C]                   | #open | one day look in to "data class" instead of named tuple [here][1]
 |[#507.2]                   |       | where we want strong typing
 |[#507]                     |       | (internal tracking/small issues)
-|[#505]                     | #hole |
+|[#505]                     |       | FSA minimal state-machine
 |[#504]                     |       | [placeholder for [#008.2] state-machine and "case" support]
 |[#503.B]                   |       | does wicked require that the file exist? yes
 |[#503]                     |       | [wicked]

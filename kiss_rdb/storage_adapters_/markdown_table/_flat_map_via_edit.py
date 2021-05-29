@@ -5,7 +5,7 @@ def CUD_markdown_(  # 1x
         create_update_or_delete: str,  # enum-like {'create'|'update'|'delete'}
         identity_arguments,  # iden if UPDATE or DELETE, tuple if CREATE
         attribute_arguments,  # dict if CREATE, kv tuple if UPDATE, none if DEL
-        all_sexpser,  # callable that produces the stream of existing AST-likes
+        ST_document_scanner_via_listener,  # single-table document scanner
         collection_path: str,  # the filename or similar that produce the above
         grow_downwards: bool,  # whether or not new items get added to the end
         opn, listener  # the common idioms
@@ -26,7 +26,7 @@ def CUD_markdown_(  # 1x
 
     flat_map, state = _flat_map_and_state[typ](req, grow_downwards, listener)
     from ._file_diff_via_flat_map import sync_agent_ as func
-    sa = func(all_sexpser, collection_path)
+    sa = func(ST_document_scanner_via_listener, collection_path)
     diff_lines = sa.DIFF_LINES_VIA(flat_map, listener)
     if diff_lines is None:
         return
@@ -116,7 +116,7 @@ def _update_no_see(state, needle_iden, edit, grow_downwards, listener):
             return (direc,)
         assert needle_iden == iden
         state.recv_iden = _pass_thru_remaining_items  # done
-        return (('give_me_the_AST_please', recv_before_AST),
+        return (('delete_item', recv_before_AST),
                 ('update_item', edit, recv_edited))
 
     def at_end():  # exactly as delete #here4
@@ -187,7 +187,7 @@ def _delete_no_see(state, needle_iden, grow_downwards, listener):
         if needle_iden != iden:  # #here1
             return _pass_through
         state.recv_iden = _pass_thru_remaining_items  # Don't keep lo
-        return (('give_me_the_AST_please', receive_deleted_AST),)
+        return (('delete_item', receive_deleted_AST),)
 
     def receive_deleted_AST(ast):  # Tell the traversal you want the whole AST
         state.result_value = ast

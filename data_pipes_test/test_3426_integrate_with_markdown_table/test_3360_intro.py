@@ -4,6 +4,7 @@ from modality_agnostic.test_support.common import \
         throwing_listener, dangerous_memoize as shared_subject
 import modality_agnostic.test_support.common as em
 import unittest
+from dataclasses import dataclass
 
 
 # == Test Case Precursors
@@ -33,53 +34,27 @@ class CommonCase(unittest.TestCase):
 
     @property
     def items(self):
-        return self.only_run('business_row_AST')
-
-    def first_run(self, typ):
-        for run in self.runs:
-            if typ == run.type:
-                return run.items
-        assert()
-
-    def last_run(self, typ):
-        found = None
-        for run in self.runs:
-            if typ == run.type:
-                found = run.items
-        assert found
-        return found
-
-    def only_run(self, typ):
-        found = None
-        for run in self.runs:
-            if typ == run.type:
-                if found:
-                    assert()
-                found = run.items
-        assert found
-        return found
+        return self.end_state.business_row_ASTs_tuple
 
     # -- build end state
 
     @custom_dangerous_memoize
-    def runs(self):
-        return self.common_run(throwing_listener)
+    def end_state(self):
+        return self.build_end_state(throwing_listener)
 
-    def build_runs_expecting_emissions(self):
+    def build_end_state_SORT_OF_expecting_ONE_emission(self):
         li, done = em.listener_and_done_via(self.expected_emissions(), self)
-        tup = self.common_run(li)
-        assert len(tup)  # or not
+        es = self.build_end_state(li)
+        assert not es.did_succeed
         emis_dct = done()
-        ks = tuple(emis_dct.keys())
-        k, = ks
-        return emis_dct[k],
+        emi, = emis_dct.values()
+        return emi
 
-    def common_run(self, li):
+    def build_end_state(self, lisn):
         sorted_far_dcts = self.given_far_dictionaries()
         mixed_near = self.given_markdown()
         two_keyerers = self.given_two_keyerers()
-        runs = runs_via_sync_via(sorted_far_dcts, mixed_near, two_keyerers, li)
-        return tuple(runs)
+        return end_state_via(sorted_far_dcts, mixed_near, two_keyerers, lisn)
 
     # -- defaults to build end state
 
@@ -98,7 +73,7 @@ class CommonCase(unittest.TestCase):
 class Case3353DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCase):  # noqa: E501
 
     def test_020_it_just_throws_a_key_error(self):
-        emi, = self.build_runs_expecting_emissions()
+        emi = self.build_end_state_SORT_OF_expecting_ONE_emission()
         msg, = emi.to_messages()
         exp = "Unrecognized attributes ('chalupa fupa', 'propecia alameda')"
         self.assertIn(exp, msg)
@@ -115,16 +90,16 @@ class Case3353DP_far_field_names_have_to_be_subset_of_near_field_names(CommonCas
 class Case3356DP_adds_only(CommonCase):
 
     def test_002_does_not_fail(self):
-        self.assertIsNotNone(self.runs)
+        assert self.end_state
 
     def test_020_head_lines_count(self):
-        assert 3 == len(self.first_run('non_table_line'))
+        assert 3 == len(self.end_state.leading_non_table_lines_tuple)
 
     def test_030_schema(self):
-        assert 1 == len(self.only_run('complete_schema'))
+        assert self.end_state.complete_schema
 
     def test_040_main_lines_count(self):
-        assert 3 == len(self.only_run('business_row_AST'))
+        assert 3 == len(self.end_state.business_row_ASTs_tuple)
 
     def test_050_the_first_and_last_items_are_as_in_the_original(self):
 
@@ -163,7 +138,7 @@ class Case3356DP_adds_only(CommonCase):
         # because those are (Case2478KR) (Case2479KR)
 
     def test_070_tail_lines_count(self):
-        assert 4 == len(self.last_run('non_table_line'))
+        assert 4 == len(self.end_state.trailing_non_table_lines_tuple)
 
     def given_far_dictionaries(_):
         return case_100_far_dictionaries()
@@ -172,7 +147,7 @@ class Case3356DP_adds_only(CommonCase):
 class Case3359DP_MERGE(CommonCase):
 
     def test_010_does_not_fail(self):
-        self.assertIsNotNone(self.runs)
+        assert self.end_state
 
     def test_020_the_after_content_is_right(self):
         items = self.items
@@ -198,8 +173,8 @@ class Case3362DP_what_if_no_business_attrs_besides_ID(CommonCase):
     # Even though there is nothing to do, this sync happens [#458.7]
 
     def test_100_whoopsie_the_changed_cell_takes_on_the_EG_styling(self):
-
-        act_line = self.only_run('business_row_AST')[1].to_line()
+        ast1, ast2 = self.end_state.business_row_ASTs_tuple
+        act_line = ast2.to_line()
         self.assertEqual(act_line, '| zub   | x2\n')  # not the example format
 
     def given_far_dictionaries(_):
@@ -334,21 +309,24 @@ def line_via_row(row):
 
 # == End State Support (would be better in its own module)
 
-def runs_via_sync_via(sorted_far_dcts, mixed_near, two_keyerers, listn):
-    # (rewritten at #history-A.4 to be less crazy)
+def end_state_via(sorted_far_dcts, mixed_near, two_keyerers, lisn):
+    # (rewrite for enter document scanner at #history-B.2)
+    # (got rid of redundant impl of [#459.2] sync) at #history-B.1)
+    # (rewritten to be less crazy at #history-A.4)
 
-    # Chunk the sexps by their type
-    sxs = new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listn)
-    use_chunks = chunks_via(sxs, type_of=lambda s: s[0])
+    itr = end_state_components(sorted_far_dcts, mixed_near, two_keyerers, lisn)
+    dct = {k: v for k, v in itr}
 
     # (snip handling for beginning_of_file end_of_file)
 
-    # Produce only the payloads, not the whole sexps, in each chunk
-    return (TypeRun(ty, tuple(sx[1] for sx in sxs)) for ty, sxs in use_chunks)
+    if not dct['did_succeed']:
+        return DID_NOT_SUCCEED
+
+    dct.pop('did_succeed')
+    return EndState(**dct)
 
 
-def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
-    # (at #history-B.1 got rid of redundant impl of [#459.2] sync)
+def end_state_components(sorted_far_dcts, mixed_near, two_keyerers, listener):
 
     # fsfs = far stream for sync
 
@@ -363,9 +341,46 @@ def new_sexps_via_sync(sorted_far_dcts, mixed_near, two_keyerers, listener):
 
     # Resolve the sync agent
     sa = sync_agent_via_mixed_near(mixed_near)
+
+    yield 'did_succeed', False  # watch
     with sa.open_sync_session() as sess:
-        for sx in sess.NEW_SEXPS_VIA(flat_map, listener):
-            yield sx
+        try:
+            for k, x in _do_ting(sess, flat_map, listener):
+                yield k, x
+        except _Stop:
+            return
+        yield 'did_succeed', True
+
+
+def _do_ting(sess, flat_map, arg_listener):
+
+    # build_throwing_listener_
+    def listener(sev, *rest):
+        arg_listener(sev, *rest)
+        if 'error' == sev:
+            raise _Stop()
+
+    dscn = sess.NEW_DOCUMENT_SCANNER_VIA(flat_map, listener)
+    lines = tuple(dscn.release_leading_non_table_lines())
+    yield 'leading_non_table_lines_tuple', lines
+    yield 'complete_schema', dscn.release_complete_schema()
+    asts = tuple(dscn.release_business_row_ASTs_for_modified_document())
+    yield 'business_row_ASTs_tuple', asts
+    lines = tuple(dscn.release_trailing_non_table_lines())
+    yield 'trailing_non_table_lines_tuple', lines
+
+
+@dataclass
+class EndState:
+    leading_non_table_lines_tuple: tuple[str]
+    complete_schema: object
+    business_row_ASTs_tuple: tuple[object]
+    trailing_non_table_lines_tuple: tuple[str]
+    did_succeed = True
+
+
+class DID_NOT_SUCCEED:  # #class-as-namespace
+    did_succeed = False
 
 
 def these_2_via_these_2(sorted_far_dcts, two_keyerers):
@@ -469,43 +484,15 @@ class TypeRun:
         self.type, self.items = typ, items
 
 
-# == Chunking (experimental, should abstract to DP)
-
-def _identity(x):
-    return x
-
-
-def chunks_via(items, type_of, payload_of=_identity):  # close to #[#508.2]
-    def flush(typ):
-        tup = tuple(cache)
-        cache.clear()
-        return typ, tup
-    cache = []
-    is_changed = build_change_detector()
-    for item in items:
-        if is_changed(type_of(item)) and len(cache):
-            yield flush(is_changed.previous_type)
-        cache.append(payload_of(item))
-    if len(cache):
-        yield flush(is_changed.current_type)
-
-
-class build_change_detector:  # #[#508.2] chunker #todo make this the one
-
-    def __init__(self, initial_type=None):
-        self.current_type = initial_type
-
-    def __call__(self, typ):  # is_changed
-        if self.current_type == typ:
-            return False
-        self.previous_type = self.current_type
-        self.current_type = typ
-        return True
+class _Stop(RuntimeError):
+    pass
 
 
 if __name__ == '__main__':
     unittest.main()
 
+
+# #history-B.2
 # #history-B.1
 # #history-A.4: no more sync-side item-mapping
 # #history-A.3: broke symmetry between near and far keyerer

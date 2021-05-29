@@ -1,4 +1,8 @@
-def sync_agent_builder_(opener, all_sxs_er_er):
+from . import single_table_document_FFSA_ as _STD_FFSA, \
+        build_throwing_listener_
+
+
+def sync_agent_builder_(opener, ST_doc_scn_via_lines):
 
     def do_open_sync_session():
         from contextlib import contextmanager as cm
@@ -9,8 +13,11 @@ def sync_agent_builder_(opener, all_sxs_er_er):
                 yield None
                 return
             with opened as fh:
-                all_sxs_er = all_sxs_er_er(fh)
-                yield sync_agent_(all_sxs_er, fh.name)
+
+                def ST_doc_scn_via_listener(listener):
+                    return ST_doc_scn_via_lines(fh, listener)
+
+                yield sync_agent_(ST_doc_scn_via_listener, fh.name)
         return cm()
 
     class sync_agent_builder:  # #class-as-namespace
@@ -19,28 +26,106 @@ def sync_agent_builder_(opener, all_sxs_er_er):
     return sync_agent_builder
 
 
-def sync_agent_(all_sexpser, coll_path):
-    all_sexpser = _experiment_2(all_sexpser)
+def sync_agent_(ST_document_scanner_via_listener, coll_path):
 
-    def _diff_lines_via(flat_map, listener):
-        # Read original sexps (then lines) in to memory
-        orig_sx_itr = all_sexpser(listener)
-        orig_sxs, count, sanity = [], 0, 274  # ~ num lines in longest README
-        for sx in orig_sx_itr:
-            if count == sanity:
-                xx("is there memory saved by doing diff on the filesystem?")
-            count += 1
-            orig_sxs.append(sx)
-        orig_sxs = tuple(orig_sxs)
-        orig_lines = tuple(_lines_via_sexps(iter(orig_sxs)))
+    class sync_agent:  # #class-as-namespace
 
-        # Read new sexps (then lines) in to memory
-        new_sxs = _new_sexps(iter(orig_sxs), flat_map, listener)
-        new_lines = tuple(_lines_via_sexps(new_sxs))
+        def DIFF_LINES_VIA(flat_map, listener):  # (Case2641) (2/2)
+            modi = modi_docu_scn_via(flat_map, listener)
+            try:
+                itr = _diff_lines_via(modi, coll_path)
+            except _Stop:
+                return
+            return itr  # wee, pray
 
+        def NEW_LINES_VIA(flat_map, listener):
+            itr = _new_lines_via(modi_docu_scn_via(flat_map, listener))
+            try:
+                for line in itr:
+                    yield line
+            except _Stop:
+                return
+
+        def NEW_DOCUMENT_SCANNER_VIA(flat_map, listener):
+            return modi_docu_scn_via(flat_map, listener)  # hi.
+
+    def modi_docu_scn_via(flat_map, listener):
+        listener = build_throwing_listener_(listener, _Stop)
+        upstream_docu_scn = ST_document_scanner_via_listener(listener)
+        return _ModifiedSingleTableDocumentScanner(
+            upstream_docu_scn, flat_map, listener)
+
+    return sync_agent
+
+
+class _Stop(RuntimeError):
+    pass
+
+
+# _catch_iterator_stops = build_catch_iterator_stops_(_Stop)
+
+
+def _diff_lines_via(modi, coll_path):
+
+    def sentences(maximum):
+        yield f"This readme exceeds {maximum} lines in length."
+        yield "As part of its behavioral contract, [kiss-rdb] constrains "\
+              "itself against reading \"very large\" files all into memory."
+        yield "We need to cover the use case of larger files, possibly by "\
+              "doing the diff on the filesystem or otherwise making this "\
+              "algorithm smarter."
+        yield f"File: {coll_path}"
+
+    counter = _SanityCounter(
+        maximum=274,  # approx num lines in longest README circa #history-B.1
+        failure_sentences_via=sentences)
+
+    # Leading non-table lines (they don't change)
+    leading_non_table_lines = []
+    for line in modi.release_leading_non_table_lines():
+        counter.increment_by_one()
+        leading_non_table_lines.append(line)
+
+    # Schema lines (they don't change)
+    cs = modi.release_complete_schema()
+    schema_lines = tuple(cs.to_lines())
+    counter.increment_by(len(schema_lines))
+
+    # Get down to business
+    business_lines_before, business_lines_after = [], []
+    sexps = modi._RELEASE_MY_OWN_INTERNAL_SEXP_THING_()
+
+    for typ, ast in sexps:
+        counter.increment_by_one()  # not totally "fair" for many edits but meh
+        line = ast.to_line()
+        if 'both' == typ:
+            business_lines_before.append(line)
+            business_lines_after.append(line)
+            continue
+        if 'this_line_is_in_the_after_file_only' == typ:
+            business_lines_after.append(line)
+            continue
+        assert 'this_line_is_in_the_before_file_only' == typ
+        business_lines_before.append(line)
+
+    # Trailing non-table lines (they don't change)
+    trailing_non_table_lines = []
+    for line in modi.release_trailing_non_table_lines():
+        counter.increment_by_one()
+        trailing_non_table_lines.append(line)
+
+    orig_lines = (
+        *leading_non_table_lines, *schema_lines, *business_lines_before,
+        *trailing_non_table_lines)
+    new_lines = (
+        *leading_non_table_lines, *schema_lines, *business_lines_after,
+        *trailing_non_table_lines)
+
+    if True:  # retain history for now lol
         # Make the Diff!
         if orig_lines == new_lines:
             xx('no change, no diff to make')
+
         from os.path import isabs
         if isabs(coll_path):
             from script_lib import build_path_relativizer as build
@@ -51,161 +136,152 @@ def sync_agent_(all_sexpser, coll_path):
         from difflib import unified_diff
         return unified_diff(orig_lines, new_lines, pathA, pathB)
 
-    def _new_lines_via(flat_map, listener):
-        try:
-            for line in _lines_via_sexps(_new_sexps_via(flat_map, listener)):
-                yield line
-        except _Stop:
-            pass
 
-    def _new_sexps_via(flat_map, listener):
-        orig_sxs = all_sexpser(listener)
-        return _new_sexps(orig_sxs, flat_map, listener)
+def _new_lines_via(modi):
 
-    class sync_agent:  # #class-as-namespace
-        DIFF_LINES_VIA = _experiment_1(_diff_lines_via)  # (Case2641) (2/2)
-        NEW_LINES_VIA = _new_lines_via
-        NEW_SEXPS_VIA = _experiment_3(_new_sexps_via)
-
-    return sync_agent
-
-
-def _lines_via_sexps(new_sexps):
-
-    assert hasattr(new_sexps, '__next__')  # [#022]
-
-    # #open [#877.E]
-
-    for typ, *rest in new_sexps:
-        if 'non_table_line' != typ:
-            break
-        line, = rest
+    for line in modi.release_leading_non_table_lines():
         yield line
 
+    cs = modi.release_complete_schema()
+    for line in cs.to_lines():
+        yield line
 
-    assert 'complete_schema' == typ
-    sch, = rest
-    row1, row2 = sch.rows_
-    yield row1.to_line()
-    yield row2.to_line()
-
-    for typ, *rest in new_sexps:
-        if 'business_row_AST' != typ:
-            assert 'non_table_line' == typ
-            line, = rest
-            yield line
-            break
-        ast, _ = rest
+    for ast in modi.release_business_row_ASTs_for_modified_document():
         yield ast.to_line()
 
-    for typ, *rest in new_sexps:
-        assert 'non_table_line' == typ
-        line, = rest
+    for line in modi.release_trailing_non_table_lines():
         yield line
 
 
-def _new_sexps(itr, flat_map, listener):
-    # Output zero or more head lines (lines before the table)
-    # #todo this was written before action stacks and could be cleaned up
+_must_be_in_state = _STD_FFSA.build_precondition_decorator('_state_name')
 
-    assert hasattr(itr, '__next__')  # [#022]
 
-    # #open [#877.E]
+class _ModifiedSingleTableDocumentScanner:
 
-    for sx in itr:
-        if 'non_table_line' != sx[0]:
-            break
-        yield sx
+    def __init__(self, upstream, flat_map, listener):
+        self._upstream, self._flat_map = upstream, flat_map
+        self._listener = listener
+        self._fsa, self.ok = _STD_FFSA.build_FSA(), True
 
-    assert 'complete_schema' == sx[0]
-    yield sx
+    @_must_be_in_state('before_leading_non_table_lines')
+    def release_leading_non_table_lines(self):
+        with self._fsa.open_lock('leading_iteration_in_progress'):
+            for line in self._upstream.release_leading_non_table_lines():
+                yield line
+        self._move_to('before_complete_schema')
 
-    sch, = sx[1:]
-    mixed_err = flat_map.receive_schema(sch)
-    if mixed_err is not None:
-        listener(xx('hole is upstream too'))
-        return
+    @_must_be_in_state('before_complete_schema')
+    def release_complete_schema(self):
+        cs = self._upstream.release_complete_schema()
+        self._cs = cs
+        self._move_to('before_business_ASTs')
+        return cs
 
-    use_eg_row, actual_eg_sx = None, None
-    sexps_after_table_on_deck = []
+    def release_business_row_ASTs_for_modified_document(self):
+        yes_or_no = {
+            'this_line_is_in_the_after_file_only': True,
+            'this_line_is_in_the_before_file_only': False,
+            'both': True}
+        for typ, ast in self._RELEASE_MY_OWN_INTERNAL_SEXP_THING_():
+            if yes_or_no[typ]:
+                yield ast
 
-    # PEEK ONE YUCK
-    for sx in itr:
-        if 'business_row_AST' == sx[0]:
-            use_eg_row = sx[1]
-            actual_eg_sx = sx
-        else:
-            assert 'non_table_line' == sx[0]
-            sexps_after_table_on_deck.append(sx)
+    @_must_be_in_state('before_business_ASTs')
+    def _RELEASE_MY_OWN_INTERNAL_SEXP_THING_(self):
+        with self._fsa.open_lock('doing_the_big_thing'):
+            asts = self._upstream.release_business_row_ASTs()
+            sxs = _CUSTOM_ASS_SEXP_THING(
+                    self._cs, asts, self._flat_map, self._listener)
+            for sx in sxs:
+                yield sx
+        self._move_to('before_trailing_non_table_lines')
+
+    @_must_be_in_state('before_trailing_non_table_lines')
+    def release_trailing_non_table_lines(self):
+        with self._fsa.open_lock('trailing_iteration_in_progress'):
+            for line in self._upstream.release_trailing_non_table_lines():
+                yield line
+        self._move_to('reached_end_of_output')
+
+    def _move_to(self, state_name):
+        self._fsa.move_to(state_name)
+
+    @property
+    def _state_name(self):
+        return self._fsa.state_name
+
+
+def _CUSTOM_ASS_SEXP_THING(cs, asts, flat_map, listener):
+    mixed_err = flat_map.receive_schema(cs)
+    assert not mixed_err  # should have raised stop upstream?
+
+    assert hasattr(asts, '__next__')  # [#022]
+
+    # For an example row, use either the first business row or 1st schema row
+    first_ast = None
+    for first_ast in asts:
         break
+    if first_ast:
+        use_eg_ast = first_ast
+    else:
+        use_eg_ast = cs.rows_[0]  # undocumented
 
-    if use_eg_row is None:
-        use_eg_row = sch.rows_[0]  # undocumented
-
-    # Always output the example row manually, keeping it always topmost
-    if actual_eg_sx:
-        yield actual_eg_sx
-
-    # == SPOT B
+    # Always pass-thru the example item (keeping it topmost)
+    if first_ast:
+        yield 'both', first_ast
 
     process_directives_during, process_directives_at_end = \
-        _build_directives_processer(use_eg_row, sch, listener)
+        _build_directives_processer(cs, use_eg_ast, listener)
 
     # Traverse over zero or more table lines, doing sync stuff
-    for sx in itr:
-        if 'business_row_AST' != sx[0]:
-            assert 'non_table_line' == sx[0]
-            sexps_after_table_on_deck.append(sx)
-            break
-        ent = sx[1]
-
-        # == SPOT C
-
-        directives = flat_map.receive_item(ent)
-        for sx in process_directives_during(directives, sx):
+    for ast in asts:
+        directives = flat_map.receive_item(ast)
+        for sx in process_directives_during(directives, ast):
             yield sx
 
     # After finishing your own table, ask flat map for any remaining items
     for sx in process_directives_at_end(flat_map.receive_end()):
         yield sx
 
-    # Any of these that we cached
-    for sx in sexps_after_table_on_deck:
-        yield sx
 
-    # Flush any remaining file
-    for sx in itr:
-        yield sx
+def _build_directives_processer(cs, eg_row, listener):
 
-
-def _build_directives_processer(eg_row, cs, listener):
-    def process_directives_during(directives, sx):
+    def process_directives_during(directives, before_ast):
         for directive in directives:
-            if 'pass_through' == (typ := directive[0]):
-                yield sx
+            typ, *direc_args = directive
+            if 'pass_through' == typ:
+                assert not direc_args
+                yield 'both', before_ast
                 continue
             if 'insert_item' == typ:
-                yield sexp_for_insert_item(directive)
+                yield sexp_for_insert_item(*direc_args)
+                continue
+            if 'delete_item' == typ:
+                please_give_me_the_deleted_item, = direc_args
+                yield 'this_line_is_in_the_before_file_only', before_ast
+                please_give_me_the_deleted_item(before_ast)
                 continue
             if typ in ('merge_with_item', 'update_item'):
-                exi_row, counts = sx[1], None
+                direc_stack = list(reversed(direc_args))
+                counts = None
                 if 'update_item' == typ:
-                    assert isinstance(edit := directive[1], tuple)
-                    exi_dct = exi_row.core_attributes
+                    edit = direc_stack.pop()
+                    assert isinstance(edit, tuple)
+                    exi_dct = before_ast.core_attributes
                     dct, counts = _dct_via_edit(edit, exi_dct, cs, listener)
                 else:
                     assert 'merge_with_item' == typ
-                    assert isinstance(dct := directive[1], dict)
-                row = updated_row_via(dct.items(), exi_row, listener)
-                if 2 < len(directive):
-                    directive[2](row)
+                    yield 'this_line_is_in_the_before_file_only', before_ast
+                    dct = direc_stack.pop()
+                    assert isinstance(dct, dict)
+                row = updated_row_via(dct.items(), before_ast, listener)
+                if direc_stack:
+                    recv, = direc_stack
+                    recv(row)
                 if counts:  # #here5
-                    eid = sx[1].nonblank_identifier_primitive
+                    eid = before_ast.nonblank_identifier_primitive
                     _emit_edited(listener, counts, eid, 'updated')
-                yield 'business_row_AST', row, None
-                continue
-            if 'give_me_the_AST_please' == typ:
-                directive[1](sx[1])
+                yield 'this_line_is_in_the_after_file_only', row
                 continue
             assert 'error' == typ
             listener(*directive)
@@ -215,25 +291,25 @@ def _build_directives_processer(eg_row, cs, listener):
         for directive in directives:
             typ = directive[0]
             if 'insert_item' == typ:
-                yield sexp_for_insert_item(directive)
+                yield sexp_for_insert_item(* directive[1:])
                 continue
             assert 'error' == typ
             listener(*directive)
             raise _Stop()  # (Case2641) (1/2)
 
-    def sexp_for_insert_item(directive):
-        assert isinstance(dct := directive[1], dict)
+    def sexp_for_insert_item(dct, recv=None):
+        assert isinstance(dct, dict)
         row = new_row_via(dct.items(), listener)
-        if 2 < len(directive):
-            directive[2](row)
-        return 'business_row_AST', row, None
+        if recv:
+            recv(row)
+        return 'this_line_is_in_the_after_file_only', row
 
     from ._prototype_row_via_example_row_and_complete_schema import \
         BUILD_CREATE_AND_UPDATE_FUNCTIONS_ as build_funcs
 
     new_row_via, updated_row_via = build_funcs(eg_row, cs)
-    new_row_via = _experiment_2(new_row_via)
-    updated_row_via = _experiment_2(updated_row_via)
+    # new_row_via = _raise_stop_if_none(new_row_via)
+    # updated_row_via = _raise_stop_if_none(updated_row_via)
 
     return process_directives_during, process_directives_at_end
 
@@ -289,42 +365,25 @@ def _dct_via_edit(edit, exi_dct, cs, listener):
     return arg_dct, counts
 
 
-# == SPOT A
+# == A Custom Counter #[#510.13]
 
+class _SanityCounter:
+    def __init__(self, maximum, failure_sentences_via):
+        self._maximum = maximum
+        self._failure_sentences_via = failure_sentences_via
+        self._count = 0
 
-# == Low-Level Support
+    def increment_by_one(self):
+        self.increment_by(1)
 
-def _experiment_3(orig_f):
-    def use_f(*a, **kw):
-        itr = orig_f(*a, **kw)
-        try:
-            for item in itr:
-                yield item
-        except _Stop:
-            pass
-    return use_f
-
-
-def _experiment_2(orig_f):
-    def use_f(*a):
-        x = orig_f(*a)
-        if x is None:
-            raise _Stop()
-        return x
-    return use_f
-
-
-def _experiment_1(orig_f):
-    def use_f(*a):
-        try:
-            return orig_f(*a)
-        except _Stop:
-            pass
-    return use_f
-
-
-class _Stop(RuntimeError):
-    pass
+    def increment_by(self, amount):
+        assert 0 < amount
+        next_count = self._count + amount
+        if next_count <= self._maximum:
+            self._count = next_count
+            return
+        s_s = self._failure_sentences_via(maximum=self._maximum)
+        raise RuntimeError(' '.join(s_s))
 
 
 # == Delegations
@@ -338,6 +397,7 @@ def _emit_edited(listener, UCDs, eid, preterite):
 def xx(msg=None):
     raise RuntimeError('write me' + ('' if msg is None else f": {msg}"))
 
+# #history-B.5 document scanners not procedural mish-mash against sexp streams
 # #history-B.4
 # #history-B.3
 # #history-B.1 blind rewrite

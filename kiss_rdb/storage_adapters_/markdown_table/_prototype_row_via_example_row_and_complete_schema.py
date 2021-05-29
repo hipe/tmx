@@ -167,9 +167,9 @@ def BUILD_CREATE_AND_UPDATE_FUNCTIONS_(eg_row, complete_schema):  # #testpoint
 
     def row_via_parts(parts):
         mutable_sexps, line = _sexps_and_line_via_parts(parts)
-        return row_AST_via_three(mutable_sexps, line, 0)
+        return row_AST_via_sexps(mutable_sexps, line, 0)
 
-    row_AST_via_three = complete_schema.row_AST_via_three_
+    row_AST_via_sexps = complete_schema.row_AST_via_sexps_
 
     class stop(RuntimeError):
         pass
@@ -183,8 +183,8 @@ def _when_extra(bads, goods, u_or_c, cs):
             y = 1 == len(bads)
             s, these, do = ('', 'This', 'does') if y else ('s', 'These', 'do')
             yield f"Unrecognized attribute{s}", _keys_join(bads)
-            yield these, f"field{s}", do, "not apear in"
-            h = dct.get('table_header_line')
+            yield these, f"field{s}", do, "not appear in"
+            h = cs.table_header_line
             yield ('"', re.match('^# (.+)', h)[1], '"') if h else "the table"
             if len(ks := set(cs.field_name_keys) - set(goods)):
                 yield "Did you mean", ox.oxford_OR(ox.keys_map(ks)), '?'
