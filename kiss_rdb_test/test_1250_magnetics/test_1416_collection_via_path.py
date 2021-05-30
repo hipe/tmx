@@ -214,6 +214,7 @@ class Case1414_schema_file_invalid(CommonCase):
             # yield '' adding 1 or more blank/comments covers a nearby spot
             # yield '#'
             yield 'xx yy zz'
+            yield 'one more line of lookahead'
             raise Exception('no see')
 
         return build_fake_filesystem(
@@ -283,6 +284,7 @@ class Case1418_schema_does_not_indicate_SA_in_first_field(CommonCase):
             yield '# comment'
             yield ''
             yield 'favorite_food: hommous'
+            yield 'one more line of lookahead'
             raise Exception('no see')
         return build_fake_filesystem(
                 ('directory', 'abc/xyz'),
@@ -314,6 +316,7 @@ class Case1419_has_schema_that_indicates_SA_but_unknown_SA(CommonCase):
             yield '# comment'
             yield ''
             yield 'storage_adapter: xx yy'
+            yield 'one more line'
             raise Exception('no see')
 
         return build_fake_filesystem(
@@ -346,6 +349,7 @@ class Case1421_schema_indicates_SA_thats_single_file_only(CommonCase):
         def these_lines():
             yield ''
             yield 'storage_adapter:     storo_adapto_2'  # #wish1
+            yield 'one more line of lookahead'
             raise Exception('no see')
 
         return build_fake_filesystem(

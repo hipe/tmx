@@ -39,7 +39,7 @@ pho issues graph -r pho-doc/documents/406-everything.md
 |[#881.T]|       | assets off broken phone #after:[#881.V] #after:[#880.E]
 |[#881.S]|       | video editing DIM-SUM #after:[#881.A]
 |[#881.R]|       | research asset management #after:[#881.A]
-|[#881.Q]|       | working assset management solution #after:[#881.R]
+|[#881.Q]|       | working asset management solution #after:[#881.R]
 |[#881.P]|       | assets off all phones #after:[#881.T] #after:[#881.U]
 |[#881.H]|       | Content generated w (e.g) DaVinci (write code) #after:[#881.Q] #after:[#881.S] #after:[#881.P]
 |[#881.E]|       | (a lot, toon boom etc) #after:[#881.A]

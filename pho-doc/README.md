@@ -181,6 +181,7 @@ when you click create
 |[#882.R]                   | #open | dates! the date edited behemoth #priority:0.50
 |[#882.Q]                   | #open | service
 |[#882.P]                   | #trak | [graph via collection]
+|[#882.15]                  |       | video editing dim-sum recfile
 |[#882.N]                   | #open | someone is escaping newlines. we are accidentally supporting escape sequences
 |[#882.M]                   | #trak | formal attributes (the model) is balkanized
 |[#882.L]                   | #trak | really fragile DOM navigation but we don't want jquery

@@ -71,7 +71,7 @@ class _MinimalIdentitylessEntity:
         self.core_attributes = core_attrs
 
 
-def _chunks_of_fields(scn, listener):
+def _chunks_of_fields(scn, listener):  # #[#508.2] chunker
 
     cache = []
 
@@ -101,63 +101,92 @@ def _chunks_of_fields(scn, listener):
 class ErsatzScanner:
 
     def __init__(self, open_filehandle):
-        toks = _tokenize_lines(open_filehandle)
-        self._lineno_via = next(toks)
-        self._line_via = next(toks)
-        self._tokens = toks
-        self.path = open_filehandle.name  # as parser_state
-        self._has_on_deck = False
+        self._lines = _LineTokenizer(open_filehandle)
+        self.path = open_filehandle.name  # #here1
 
     def next_block(self, listener):
+        if self._lines.empty:
+            del self._lines
+            return _END
+        typ = self._lines.line_type
+        if 'content_line' == typ:
+            return self._finish_field(listener)
 
-        which, line = self.__next_which_and_line()
+        assert 'separator_line' == typ
+        return self._finish_separator_block()
 
-        if 'content' == which:
+    def _finish_field(self, listener):
+        """
+        SHAMELESSLY HACKING MULTI-LINE FIELDS
+        (but we really need proper vendor parsing!)
+
+        Interestingly, the vendor parser has to parse "field" lines
+        right-to-left, because whether or not the line ends with a '\'
+        determines whether to etc or to etc
+        """
+
+        tox = self._lines
+        scn = tox._LINE_SCANNER_
+        line = scn.peek
+
+        # Take a snapshot of the "parser state" (line and linenumber) now,
+        # for any errors that occur in creating the field. (Parsing multiline
+        # field requires one line of lookahead so the line scanner is not a
+        # reliable steward of these two.) If this is ugly, just pass the
+        # line and line number as arguments to the requisite functions
+
+        self.line = line
+        self.lineno = tox.lineno
+        tox.advance()
+
+        if '\\' != line[-2]:  # (assume line has content)
             return _field_via_line(line, self, listener)
 
-        if 'separator' == which:
-            block = [line]
-            for which, line in self._tokens:
-                if 'separator' == which:
-                    block.append(line)
-                    continue
-                if 'content' == which:
-                    pass
-                else:
-                    assert('end_of_line_stream' == which)
-                    which = 'closed'
-                self._has_on_deck = True
-                self._on_deck = (which, line)
+        # MULTI-LINE
+
+        hax = _field_via_line(line, self, listener)
+        if hax is None:
+            return
+
+        pieces = [hax.field_value_string[:-1]]  # chop trailing backslash
+
+        while True:
+            scn.advance()
+            if scn.empty:
+                xx("above line was continuator, now is EOF. not covering this")
+            line = scn.peek
+            if '\n' == line:
+                xx("we don't want to support a blank line after contination "
+                   "for now because we haven't needed it yet")
+            if '+' == line[0]:
+                xx("no support for plus sign yet (but would be trivial) "
+                   "because we never needed it yet")
+            if '\\' == line[-2]:
+                # This line is the continuation of the above line,
+                # and also it is a continuator itself
+                pieces.append(line[:-2])
+                continue
+
+            # This line is the continuation of the above line but not
+            # itself a continuator
+            pieces.append(line[:-1])
+            scn.advance()
+            break
+
+        tox._UPDATE_()  # determine line type of current line
+        hax.field_value_string = ''.join(pieces)  # EEK
+        return hax
+
+    def _finish_separator_block(self):
+        lines = [self._lines.line]
+        while True:
+            self._lines.advance()
+            if self._lines.empty:
                 break
-            return _SeparatorBlock(tuple(block))
-
-        if 'end_of_line_stream' == which:
-            self._close()
-        else:
-            assert('closed' == which)
-        return _END
-
-    def __next_which_and_line(self):
-        if self._has_on_deck:
-            self._has_on_deck = False
-            which, line = self._on_deck
-            self._on_deck = None
-        else:
-            which, line = next(self._tokens)
-        return which, line
-
-    def _close(self):
-        self._tokens = None
-
-    # -- as `parser_state`
-
-    @property
-    def lineno(self):
-        return self._lineno_via()
-
-    @property
-    def line(self):
-        return self._line_via()
+            if 'separator_line' != self._lines.line_type:
+                break
+            lines.append(self._lines.line)
+        return _SeparatorBlock(tuple(lines))
 
 
 def _field_via_line(line, parse_state, listener):
@@ -195,7 +224,8 @@ def _field_via_line(line, parse_state, listener):
     if content_s is None:
         return
 
-    if content_s[0] in ('"', "'"):
+    if False and content_s[0] in ('"', "'"):
+        # allow literal quotes in values since #history-B.6
         raise Exception(  # #not-covered
             "Can we please just not bother with quotes ever? "
             "It seems they may neve be necessary for us in these files "
@@ -243,30 +273,68 @@ class _END:  # #as-namespace-only
     is_end_of_file = True
 
 
-def _tokenize_lines(lines):
+class _LineTokenizer:
 
-    def lineno_future():
-        return lineno
-    lineno = 0
-    yield lineno_future
+    def __init__(self, fh):
+        lib = _scnlib()
+        self._scn = lib.scanner_via_iterator(fh)
+        self._current_line_offset_via = lib.MUTATE_add_counter(self._scn)
+        # (we use "peek" to mean "current line" yikes)
+        self.line_type = None
+        self._update()
 
-    def line_future():
-        return line
-    line = None
-    yield line_future
+    def advance(self):
+        self._scn.advance()
+        self._update()
 
-    for line in lines:
-        lineno += 1
-        if '\n' == line:
-            yield 'separator', line
-            continue
-        if '#' == line[0]:
-            yield 'separator', line
-            continue
-        yield 'content', line
+    def _update(self):
+        if self._scn.empty:
+            del self.line_type
+            return
+        self.line_type = _line_type(self.line)
 
-    line = None
-    yield 'end_of_line_stream', None
+    _UPDATE_ = _update
 
+    @property
+    def line(self):
+        return self._scn.peek
+
+    @property
+    def lineno(self):
+        return self._current_line_offset_via() + 1
+
+    @property
+    def empty(self):
+        return self._scn.empty
+
+    @property
+    def more(self):
+        return self._scn.more
+
+    @property
+    def _LINE_SCANNER_(self):  # call UPDATE after advancing omg
+        return self._scn
+
+
+def _line_type(line):
+    if '\n' == line:
+        return 'separator_line'
+    if '#' == line[0]:
+        return 'separator_line'
+    return 'content_line'
+
+
+# ==
+
+def _scnlib():
+    from text_lib.magnetics import scanner_via as module
+    return module
+
+
+def xx(msg=None):
+    raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
+
+
+# #history-B.5
 # #history-B.4
 # #born.

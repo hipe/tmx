@@ -1,0 +1,94 @@
+# 2021-05-30, Sunday
+# Pretty sure we're gonna go with DaVinci but we wanted to do a little
+# due dilligence on whatever else is out there
+#
+# Reminder:
+#
+#     dp filter-by-tags this-file.rec '#red' and not '#blue'
+
+
+informal_name: Avidemux
+summary: "Best for Windows. Designed for making fairly simple changes \
+and spitting out a modified file." -2
+tags: #OS:windows #OS:mac #OS:linux #basic-features-only #no-because:basic
+sources: 2, 3
+
+informal_name: Blender
+summary: "Best for Mac. You can use it for 3D modeling, sculpting, painting, \
+animation, and much more." -2
+tags: #OS:windows #OS:mac #OS:linux #VFX
+sources: 2, 3
+
+informal_name: Cinelerra
+sources: 2
+tags: #OS:linux #tracking #no-because:OS
+
+informal_name: Flowblade
+summary: "Runner-Up, Best for Linux. Succeeds in creating a snappier loading \
+and operating experience than a lot of other editing software." -2
+tags: #OS:linux #no-because:OS
+sources: 2, 3
+
+informal_name: Kdenlive
+summary: "Best for Linux. An excellent and popular Linux video editing \
+solution and a top open-source editor in general." -2
+tags: #OS:linux #no-because:OS
+sources: 2, 3
+
+informal_name: LiVES
+summary: "Best for Real-Time Editing. \
+Incorporates a number of real-time editing features that let a VJ mix and \
+control video clips to go along with audio." -2
+tags: #OS:linux #no-because:OS
+notes: looks interesting for live production, VRChat rave scene
+sources: 2, 3
+
+informal_name: Losslesscut
+tags: #OS:windows #OS:mac #OS:linux #no-because:too-low-level
+
+informal_name: NATRON
+summary: "Best for VFX. Provides a powerful open-source way to take on \
+another important aspect of video production." -2
+tags: #OS:windows #OS:mac:has-DMG-installer #OS:linux \
+#interesting #shadertoy #gmic #OpenFX #VFX #tracker #keying
+sources: 2, 3
+
+informal_name: Olive
+summary: not released et
+sources: 2
+tags: #interesting
+notes: it opened for me!
+
+informal_name: OpenShot
+summary: "Runner-up, Best overall. Makes video editing easy for beginners \
+and experts alike." -2 \
+What's this about keyframe animation framework? (3)
+tags: #OS:windows #OS:mac:has-DMG-installer #OS:linux #interesting:keyframe
+sources: 2, 3
+
+informal_name: Pitivi
+sources: 2
+tags: #OS:linux #no-because:OS
+
+informal_name: Shotcut
+summary: "Best over all. A robust non-linear video editor with enough tools \
+to satisfy most levels of video editing skill." -2
+tags: #OS:windows #OS:mac #OS:linux #good-UI #interesting
+sources: 2, 3
+
+informal_name: VidCutter
+summary: "Best for Basic Editing. \
+Excels at doing just what its name suggests: cutting video." -2
+tags: #OS:windows #OS:mac #OS:linux #basic-features-only:(2) #no-because:basic
+sources: 2, 3
+
+
+# These first three sources are the first three hits from the search
+# "open source video editor".
+# They are:
+#
+# 1. www.openshot.org  (heh, a whole editor as the top hit)
+# 2. https://itsfoss.com/open-source-video-editors/
+# 3. https://www.lifewire.com/best-open-source-video-editing-software-4590219
+
+# #born
