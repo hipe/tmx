@@ -8,19 +8,55 @@ pho issues graph -r pho-doc/documents/406-everything.md
 ```
 
 
-## I am some table
+## "Everything"
 
-(do not ignore this table (temporary for this commit))
+(Our range is [#876-#900), a narrow allocation range)
+(do not ignore this table (here for toggling on and off))
 
 |ID|main tag|content|
 |---|---|---|
-|[#888.02]|       | Thing B #part-of:[#888.01]
-|[#888.01]|       | Thing A
+|[#886.F]|       | career #part-of:[#886.B] #after:[#884.M] #after:[#881.B] #after:[#882.D]
+|[#886.E]|       | art #part-of:[#886.B] #after:[#881.B] #after:[#882.D] #after:[#884.B]
+|[#886.D]|       | space #part-of:[#886.B] #after:[#882.G]
+|[#886.C]|       | body #part-of:[#886.B] #after:[#883.C] #after:[#883.B]
+|[#886.B]|       | Every day: body, space, art, career
+|[#886.A]|       | Maslow's Self-Actualization #part-of:[#886.B] #after:[#886.F] #after:[#886.E] #after:[#886.D] #after:[#886.C]
+|[#884.R]|       | finish React tut #after:[#880.D]
+|[#884.M]|       | That One Cables Application #after:[#884.R]
+|[#884.F]|       | (cook up in the lab) #after:[#884.M] #after:[#881.P]
+|[#884.B]|       | Mix 1 #after:[#884.F]
+|[#883.C]|       | Have Bike! #after:[#883.A] #after:[#882.G]
+|[#883.B]|       | Every day: weights & stretch #after:[#883.A]
+|[#883.A]|       | body #part-of:[#880.B] #after:[#880.C]
+|[#882.L]|       | The floor cleaned of trash in three rooms #after:[#882.A]
+|[#882.I]|       | Unify clothes across three rooms #after:[#882.L]
+|[#882.G]|       | Begin purge of maid's room #after:[#882.I]
+|[#882.D]|       | Castle of Dust (Minecraft) #after:[#882.G]
+|[#882.A]|       | space #part-of:[#880.B] #after:[#880.C]
+|[#881.W]|       | finish skimming "anim" book #after:[#881.A]
+|[#881.V]|       | external HDD #after:[#881.A]
+|[#881.U]|       | assets off old phone #after:[#881.V]
+|[#881.T]|       | assets off broken phone #after:[#881.V] #after:[#880.E]
+|[#881.S]|       | video editing DIM-SUM #after:[#881.A]
+|[#881.R]|       | research asset management #after:[#881.A]
+|[#881.Q]|       | working assset management solution #after:[#881.R]
+|[#881.P]|       | assets off all phones #after:[#881.T] #after:[#881.U]
+|[#881.H]|       | Content generated w (e.g) DaVinci (write code) #after:[#881.Q] #after:[#881.S] #after:[#881.P]
+|[#881.E]|       | (a lot, toon boom etc) #after:[#881.A]
+|[#881.D]|       | The Content (semi-dynamic) #after:[#881.H]
+|[#881.C]|       | Jamie Hewlett OP #after:[#881.E] #after:[#881.W]
+|[#881.B]|       | Story 1 (3 formats) #after:[#881.C] #after:[#881.D]
+|[#881.A]|       | art #part-of:[#880.B] #after:[#880.C]
+|[#880.F]|       | get paid how ??? #after:[#880.D]
+|[#880.E]|       | a paycheck lol #after:[#880.F]
+|[#880.D]|       | career #part-of:[#880.B] #after:[#880.C]
+|[#880.C]|       | Every day #part-of:[#880.B]
+|[#880.B]|       | Every day: body, space, art, career
 
 
-## I am some table
+## Issues and doc nodes
 
-(ignore this table)
+(ignore this table (here for toggling on and off))
 
 |ID|main tag|content|
 |---|---|---|
