@@ -21,6 +21,7 @@ class CreateCollection:
         def make_sure_collection_path_doesnt_exist():
             if not os_path.exists(self.coll_path):
                 return
+            # (Case4852_075)
             stop(f"directory cannot already exist - {coll_path}")
 
         def make_sure_dirname_exists():
@@ -30,7 +31,7 @@ class CreateCollection:
             if os_path.exists(dirname):
                 self.dirname = dirname
                 return
-            stop(f"directory must exist - {dirname}")
+            stop(f"directory must exist - {dirname}")  # (Case4852_050)
 
         stop = _stopper_via_listener(listener)
         from os import path as os_path
@@ -42,6 +43,25 @@ class CreateCollection:
 
 
 def _work(dirname, coll_dir, listener, is_dry):
+    ok = _apply_big_patchfile(dirname, coll_dir, listener, is_dry)
+    if not ok:
+        raise _Stop()
+
+    # Now we have made the changes on the filesystem.
+    # Do we want mutable or read-only collection? If mutable, we
+    # need all those special arguments like rng...
+
+    from kiss_rdb.storage_adapters_ import eno as sa_mod
+
+    kw = {'do_load_schema_from_filesystem': (not is_dry)}
+
+    from kiss_rdb.magnetics_.collection_via_path import \
+        collection_via_storage_adapter_module_and_path_ as func
+
+    return func(sa_mod, coll_dir, listener, kw)
+
+
+def _apply_big_patchfile(dirname, coll_dir, listener, is_dry):
     from ._big_patchfile_via_entities_uows import \
         APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_
     raw_lines = _these_special_lines_raw()

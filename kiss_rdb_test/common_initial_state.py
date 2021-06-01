@@ -340,11 +340,11 @@ class ___funcs_for_TOML(_FunctionsFor):
 
 @lazy
 def top_fixture_directories_directory():
-    return os_path.join(_top_test_dir(), 'fixture-directories')
+    return os_path.join(top_test_dir(), 'fixture-directories')
 
 
 @lazy
-def _top_test_dir():
+def top_test_dir():
     return os_path.dirname(os_path.abspath(__file__))
 
 # #history-A.1

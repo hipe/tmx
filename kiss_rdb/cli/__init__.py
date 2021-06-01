@@ -402,9 +402,10 @@ def create_collection(ctx, adapter_name, collection_path, dry_run):
 
     efx = ctx.obj
     listener = efx.build_monitor().listener
+    adapter_key = adapter_name.replace('-', '_')
     from kiss_rdb import collectionerer
     collrr = collectionerer()
-    sa = collrr.storage_adapter_via_format_name(adapter_name, listener)
+    sa = collrr.storage_adapter_via_key(adapter_key, listener)
     if sa is None:
         return
     coll = sa.CREATE_COLLECTION(collection_path, listener, dry_run)

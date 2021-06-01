@@ -103,9 +103,13 @@ def APPLY_BIG_PATCHFILE_WITH_DIRECTIVES_(
         return
     for direc_name, direc_value in full_direcs:
         assert('ERASE_THIS_FILE_AFTER_APPLYING_THE_PATCH' == direc_name)
-        if True:
-            from os import path as os_path, remove as os_remove
-            remove_me = os_path.join(dirname, direc_value)
+        from os import path as os_path, remove as os_remove
+        remove_me = os_path.join(dirname, direc_value)
+        if is_dry:
+            pass  # (if dry, the directory tree wasn't created (Case4852_100))
+        else:
+            # otherwise, remove the 'erase-me.txt' file
+            # (patches can't create empty directories)
             os_remove(remove_me)
     return ok
 

@@ -87,7 +87,7 @@ def _emission_receiver_via_limit(limit, tc=None):
     def expected_emissions():
         for _ in range(0, limit):
             yield ('?+',)  # match any channel (assert that channel >= 1 cmp)
-    assert(-1 < limit and limit < 4)  # just sanity check based on real world
+    assert(-1 < limit and limit < 5)  # just sanity check based on real world
     recv_emi, _ = _expectation_stack(expected_emissions(), tc)
     return recv_emi
 

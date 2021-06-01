@@ -11,8 +11,8 @@ def collectioner_via_storage_adapters_module(mod_name, mod_dir, *more):
         def SPLAY_STORAGE_ADAPTERS():
             return saidx._splay_storage_adapters()
 
-        def storage_adapter_via_key(k):  # ..
-            return saidx.storage_adapter_via_key(k, _listener)
+        def storage_adapter_via_key(k, listener=None):  # ..
+            return saidx.storage_adapter_via_key(k, listener or _listener)
 
     pairs = ((more[i], more[i+1]) for i in range(0, len(more), 2))
     saidx = _storage_adapter_index(((mod_name, mod_dir), *pairs))
@@ -1045,25 +1045,14 @@ def _classify_collection_identifier(x):  # #testpoint
 
 # == models
 
-class _StorageAdapter:  # move this to its own file if it gets big
+class _StorageAdapter:  # move this to its own file if it gets big.
 
-    def __init__(self, module, key):
-        self.module = module
-        self.key = key
+    def __init__(self, module, key):  # #testpoint
+        self.module, self.key = module, key
 
     def CREATE_COLLECTION(self, collection_path, listener, is_dry):
-        xx()
-        coll = self.module.CREATE_COLLECTION(collection_path, listener, is_dry)
-        if coll is None:
-            return
-        return _wrap_collection(coll)
-
-
-def _wrap_collection(impl):
-    if impl is None:
-        return
-    raise RuntimeError('xx')
-    # return _Collection(impl)
+        # (Case4852_100)
+        return self.module.CREATE_COLLECTION(collection_path, listener, is_dry)
 
 
 # == The Case Experiment (will move to [#504] soon as we want it elsewhere)
