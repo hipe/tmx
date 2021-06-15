@@ -32,6 +32,7 @@ woah boy.
 |Id                         | Main Tag | Content |
 |---------------------------|:------|:----|
 |[#899.Z]                   | #eg   | eg
+|[#877.6]                   | #open | when you create a new eno collection too deep, relative dirs are broken
 |[#877.E]                   | #open | collection wrapping is so complicated
 |[#877.4]                   | #trak | do we want to make string identifiers the default?
 |[#877.C]                   | #trak | new pattern of holes in traversal streams that client can chose to skip

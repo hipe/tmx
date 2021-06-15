@@ -1,0 +1,63 @@
+# entity: UNJ: attributes
+heading: Unity getting started
+-- body
+
+This is the very beginning of our Unity journey lol. We haven't even installed
+it yet. We are starting with the ["getting started" page][1].
+
+They give us a choice of "Self-guided", "Structured" or "The most complete".
+
+"The most complete" seems like an up-sell. It is beyond our means at this time.
+
+"Self-guided" seems like it's for those who want to start making any game
+on their own right now. We would rather have API-style documentation rather
+than some free-for-all that requires creativity.
+
+This leaves us with the only choice, the "Structured learning path".
+
+We may have abandoned this path because all of it seems like upsells.
+
+Somewhere on this page (in conjuction with wanting to abandon all the upsells
+above), we found ["Scripting in Unity for experienced programmers"][2],
+which seems appropriate for us.
+
+## Scripting intro
+
+- You can do _object-oriented design_ or _data-oriented design_. The latter
+  is the cool new, but we'll stick with the traditional for now.
+- (We know from experience that we have an okay time reading C#. The material
+  explains why it prefers C# to C++, and it's a fine with us, that choice.)
+- All gameplay is from these 3 things: GameObjects, Components and Variables.
+- It seems like GameObjects are the "physical" things, and effects.
+- GameObjects do nothing on their own. Attach _components_ to GameObjects
+  to define & control their behavior.
+
+Hit a dead end, but somehow found [Unity Learn][3].
+
+
+LTS Discrepancy: (2019.4, 2020.3)
+
+Breaking from the tutorial ("pathway") on the website, we're gonna go thru
+the tutorial that comes in the editor.
+
+
+On tutorial 2, "Project Window" reminds me of the way they do iMovie, and
+that whole common interface idiom.
+
+
+- Flythrough mode: hold down right mouse click (two fingers) and use WASD/QE
+- "F" to focus on a game object
+
+
+
+[3]: https://learn.unity.com/pathway/unity-essentials
+[2]: https://unity.com/how-to/programming-unity
+[1]: https://unity.com/learn/get-started
+
+-- body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment

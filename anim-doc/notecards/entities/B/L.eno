@@ -1,0 +1,15 @@
+# entity: ACU: attributes
+heading: (begin researching blender for video editing)
+-- body
+[5]: https://urchn.org/post/adventures-in-blenders-video-sequence-editor
+[4]: https://www.youtube.com/user/NativLang
+[3]: https://github.com/Botmasher/blender-vse-customizations
+[2]: https://blender.stackexchange.com/questions/99951/blender-videoediting-use-python-batch-save-mp4-save-all-the-cut-small-videos-in
+[1]: https://github.com/Botmasher/blender-vse-customizations
+-- body
+
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment
