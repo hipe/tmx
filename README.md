@@ -261,6 +261,7 @@ alias pi='py pho/cli/commands/issues.py'
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
+|[#900]-[#910]              |       | (anim)
 |[#876]-[#899]              |       | (pho)
 |[#851]-[#875]              |       | (kiss-rdb)
 |[#802]-[#850]              |       | (reserved for [#406] CMS app for now)

@@ -22,6 +22,15 @@ be something mnemonic.)
 
 
 
+## (the identifier registry)
+
+(Our range: [#900-910])
+
+|ID|main tag|content|
+|---|---|---|
+|[#900.2]| #xxx | xxx
+
+
 
 ## (document-meta)
 

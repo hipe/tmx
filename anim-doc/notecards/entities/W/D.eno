@@ -1,0 +1,867 @@
+# entity: WD2: attributes
+heading: (the walking demo as a whole document embedded here in a notecard lol)
+-- body
+
+The "Walking Demo" will mainly be a portal viewing a 3D stick figure or
+simple polyonal figure:
+
+
+    +-------------+
+    |             |
+    |      O      |
+    |    +---+    |
+    |   /  |  \   |
+    |  /   |   \  |
+    |  |   |   |  |
+    |  | +---+ |  |
+    |  ^ |   | ^  |
+    |    |   |    |
+    |    |   |    |
+    |    _   _    |
+    |             |
+    +-------------+
+
+The main objectives of this tooling is described a few sections below.
+First we describe the interface elements.
+
+There will be these two main controls:
+
+- A "stretchable arrow" control
+- A rotatable camera
+
+
+# The stretchable arrow control
+
+will look something like this:
+
+
+    +----------------+
+    |                |
+    |      O         |
+    |    +--+        |
+    |   /  | \       |
+    |   |  |  \      |
+    |   | +-+ \      |
+    |   ^ | | ^      |
+    |     | |        |
+    |     _   _      |
+    |                |
+    |                |
+    |      O         |
+    |      \ \       |
+    |    ___\  \___  |
+    |    \.... .../  |
+    |       .....    |
+    |         .      |
+    +----------------+
+
+Here we imagine that the human figure is standing at the top of the 3-point
+line in a basketball court, facing the hoop.
+
+We then imagine that there is an arrow painted on the "floor" a few feet
+in front of the figure. We imagine the arrow's center is at the center of
+the free throw circle.
+
+The arrow is anchored to this imaginary anchorpoint. If you mouse (or finger)
+down on the arrowhead (anywhere within the implied triangle of the arrowhead),
+the arrow can be rotated and stretched (all the while remaining flat on the
+"floor" (plane)), a bit like the hand of an analog clock, if you could
+stretch the hand.
+
+Normally the arrow is stretched to half the radius of the circle, but it
+can be stretched up to the full radius, and perhaps un-stretched to 0 radius:
+
+
+    +----------------------------+
+    |                            |
+    |         (===O===)          |   (the human figure, viewed from above)
+    |           v   v            |
+    |                            |
+    |           _____            |
+    |       ...... ....          |
+    |    ....        ....        |
+    |  ....             ...      |
+    |...                  ...    |
+    |.                      ..   |
+    |           ....         .   |   (an arrow inside of an imaginary
+    |           |  |         ..  |    bounding circle)
+    |.         _|  |_         .  |
+    |.         \    /        ..  |
+    | ..        \  /       ...   |
+    |  ...       \/      ...     |
+    |   .. ...        ....       |
+    |    .. .............        |
+    |     ..............         |
+    |                            |
+    +----------------------------+
+
+
+# The arrow can be positioned to different rotations:
+
+         _......._              _......._            _......._
+       +          +            +         +          +    ^    +
+      /             \        /            \        /     x     \
+     |               |      |              |      |      x      |
+    |                 |    |   /            |    |       x       |
+    |        x        |    | < xxxxxx       |    |       x       |
+    |        x        |    |   \            |    |               |
+     |       x       |      |              |      |             |
+      \     \ /     /        \             /       \           /
+       +_    v    _+          +_         _+         +_       _+
+          .......               ....V....             .......
+
+     arrow at figure's         3 o'clock             6 o'clock
+     12 o'clock
+
+
+- The "o-clock" positions are always oriented to the figure's facing:
+  In the basketball court metaphor, the figure is always at the 3-point line,
+  always facing the hoop, and it's as if the hour values (1 o'clock, 2 o'clock)
+  are painted directly on the floor around the free throw circle.
+- The arrow always stays anchored to the center of the imaginary
+  bounding circle.
+- We could have an arbitrary level of rotational precision
+  (more than just 1, 2, 3 o'clock etc.)
+- Whether the angle is expressed in clock hours, degrees, radians
+  or other is uninteresting.
+
+
+# The arrow can also be stretched and shortened:
+
+         _......._              _......._            _......._
+       +          +            +         +          +         +
+      /             \        /            \        /           \
+     |               |      |              |      |             |
+    |                 |    |                |    |               |
+    |        x        |    |        x       |    |      \x/      |
+    |        x        |    |        x       |    |       v       |
+     |      \ /      |      |       x      |      |             |
+      \      V      /        \      x      /       \           /
+       +_         _+          +_   \ /   _+         +_       _+
+          .......               ....V....             .......
+
+     arrow in default,         arrow fully          arrow pushed
+     half-stretched            stretched to         back so it's
+     length                    the whole            fully compressed
+                               radius
+
+- The maxium the arrow can be stretched is to one radius.
+  (It can't leave the bounding circle.)
+- The minimum the arrow can be compressed is to zero (the center of the
+  circle). (The arrowhead is always visible and doesn't distort, regardless
+  of arrow length.)
+- Again, arbitrary level of precision. Imagine it's a floating point number
+  between 0.0 and 1.0, inclusive.
+- In practice we will probably want the arrow to "snap to" 0 and 1, because
+  otherwise it would be annoying to have to drag the control pixel-perfectly.
+  (Because the arrow can be rotated too, this will be annoying to accidentaly
+  have the arrow change its rotation when all you're trying to do is shorten
+  it.)
+
+
+# In summary (for the stretchable arrow):
+
+Any point within the bouding circle that is clicked (or dragged to) implies
+a two-dimensional vector:
+- A single angle (in degrees, radians, what have you)
+- A magnitude (between 0.0 and 1.0, inclusive)
+
+
+# The camera control
+
+..is straightforward and uninteresting for now. This control lets you view
+the figure from different perspectives (but does not give unlimited control
+of the camera):
+
+Drag the mouse (or finger) across a non-meaningful part of the projection to
+rotate the camera, in a trackball-type mechanic:
+
+- Drag left or right on the screen to rotate the camera around the
+  figure's body. (Actually the camera pivots around along an imaginary sphere,
+  around an imaginary anchor point probably in the figure's solar plexus.)
+- Drag downward will have the feel of dragging downward on the figure: which
+  in face mean to pivot the camera up so it's eventually looking down at the
+  figure, in a bird's-eye-view. (Keep dragging and you would eventually see
+  the figure upside-down! And keep dragging ..)
+- Drag upward to look up the figure's skirt, so to speak; etc.
+
+We want always the full bounding circle for the stretchable arrow to be
+fully within the portal, and likewise the full figure. Maintaining this
+constraint, frame-by-frame, through camera rotations will be really tricky.
+
+It would look sort of awkward (but still be okay?) when we are looking
+up through the floor of the basketball court, and we still need to be able
+to stretch the control arrow.
+
+Likewise we would want to avoid (or not?) leaving the camera where the
+control circle (when projected on to the portal) is completely (or nearly)
+flattened; that is, when the control circle is perpendicular to the camera
+and the camera is looking thru it, like a camera floating on the surface
+of the water, halfway submerged and pointing to the horizon. In such a state
+(and states close to it), the control arrow head would no longer be
+practically draggable. (We may think of workarounds to this if necessary.)
+
+
+# Other controls (and values):
+
+This takes out out of the immediate scope of the tooling, and bleeds more
+into a character customization UI, but it's absolutely thrilling; and
+"should be easy" to scale-out into these multiple aspects once we have
+the underlying system in place to integrate any one.
+
+These controls would probably be bolted to the portal window
+(not the "basketball court"), and probably be show/hideable
+
+We are imagining something like:
+
+- A slider for taller/shorter (head stays the same size)
+- A slider for thick frame/smaller frame (like tall/short but
+  horizontal. This is distinct from bodyfat (below).)
+- A slider for estrogen
+- A slider for testosterone
+- A slider for muscular/atrophied
+- A slider for bodyfat
+
+Each slider would have units that make sense for the aspect; like "height"
+would be feet/inches (or localized to cm), "bodyfat" could be
+"percent bodyfat", etc.
+
+The physical centerpoint of each slider should always be some kind of
+"average" that makes sense for the aspect, and reflects targeted cultural
+values (body positivity, probably).
+
+The possibile permutations of all the sliders make for fun and not
+totally forseeable composites:
+
+- If you were trying for a Simone Biles body, you might do:
+  shorter, medium-to-thick frame (same as professoinal vollyball players
+  would have, swimmers, divers); average woman amount of estrogen (or
+  maybe less because gymanstics), slightly more than average testosterone
+  for an average woman, quite high muscularity (but not full), very very
+  low bodyfat.
+- Leo DiCaprio "dad bod" might be: Start out with average male for everything,
+  then tip the height up to six feet. Maybe make the frame sligtly more
+  narrow.
+
+The difference between "muscularity" and "testosterone" is understandably
+confusing: "muscularity" would be like "how much you work out (fast-twitch
+muscle fiber (lifting weights)); whereas testosterone would effect more
+the bodyfat distribution and some aspects of the frame.
+
+- To get a Seth Rogan (who looks masculine but doesn't look like he works
+  out a ton), start with an average male, up the frame to thicker (60th
+  percentile?), up the percent bodyfat to about 60th or 70th. Note we didn't
+  up the testosterone to greater than a normal male level.
+- Low testo & low estro should make an androgen
+- High tetso & high estro should make a female bodybuilder (plus muscles)
+
+Note we are omitting these aspects:
+
+- Age
+- Skin color (ethnicity etc)
+- Other, more detailed body part specifics (breast size, male genital size)
+- Binary gender
+
+This is because our main interest for the time being is those aspects that
+effect animation and the skeleton and wireframe. (Although age certainly
+has an expressive impact: the difference in the way a human moves at
+age 12, 16, and 30 can be remarkably different even if the geometry of
+their body is mostly the same. But again, we'll try to limit our scope.)
+
+
+# Why did we do all this?
+
+The main purpose of all this is to test our animation blending system, which,
+in turn, we want to be the cornerstone dimension to our game.
+
+The "anim" book has a name for the kind of thing we're attempting to make,
+but we forget it at this time, and we'll come back late and fill in the two
+words.
+
+What we're imagining is a "heavily trained" IK system.
+
+As we write this, we imagine yet another collection of sliders:
+
+- "Grade" (incline)
+- Stair height. (smaller than an inch is like no stairs). (We say "stairs"
+  not "steps" to avoid confusion with the human locomotion component; but
+  imagine that these steps might be the craggy rocks that play a central
+  mechanic in Death Stranding.)
+- Facing relative to stairs (12 o'clock: facing up stairs. 6'o'clock:
+  facing down stairs. 3 o'clock: go up (or down or sideways along) the
+  stairs facing neither up the stairs or down the stairs but perpendicular
+  to them.
+
+
+There's another aspect we'll introduce now:
+
+- Stochastics
+
+But we won't go in to any depth of what we'll use that. But it is essential.
+
+The central ideas are that:
+
+- We're *always* blending. Assume that you're never seeing a "pure" animation
+  cycle exactly as the human animator modeled it.
+- "no frame rate". It's a misfeature to bake a conception of frame rate
+  deep into the movement system. The overhead should be negligible to
+  intersect bezier curves or make keypoints snap to nearest frames or whatever,
+  when we need to target animations to a target frame rate.
+  The way that movement is stored and reproduced should be orthogonal to
+  frame rate in the same way that vector graphics should not need knowledge
+  of their target screen resolution.
+  In the context of modeling animations, we refer to time in seconds and
+  fractions of a second (to some arbitrary precision, but probably milliseconds
+  would be the smallest increment we would need in practice.)
+- The blending system should be flexible enough to blend-in arbitary new
+  inputs. The number of inputs should itself be dynamic, changeable at
+  runtime.
+
+
+# Locomotion types are not hard-coded in the system
+
+The most typical, exemplary, and didactic (lol) use-case here might be looking
+at a blend between a walk cycle and a run cycle: The idea is that we animate
+and model a really clean walk cycle, and a really clean run cycle, then we
+can "blend" between the two to get a new cycle, (say "give me 75% walk and
+25% run"). This in itself is amazing, that this ever works in the first place.
+
+One major aspect of our system is that the idea of "walk" and "run" won't
+be hard-coded into our system. Those two words are just "labels" that we
+use for two different "cycles". Because it's convenient to do so for our
+purpose, these two cycles are grouped together to live in one "cycle tree"
+together.
+
+
+# Cycles can be placed on a scalar dimension relative to each other
+
+We may consider a "cycle tree" sort of like a "skill tree" in an RPG:
+In a skill tree, you may be able to combine two different acquired skills
+to produce some desired attack (say, "fire" and "throw" to project a
+fireball). But our "cycle tree" will have some other concepts that typical
+skill trees don't:
+
+In our cycle tree, we can position different cycles on a "scalar dimension"
+relative to each other. The only "scalar dimension" that we care to know
+about at this moment is speed: here, we would position the walk cycle
+to the "left" of the run cycle on the scalar dimension, so the system knows
+that "run" is faster than "walk".
+
+
+# Again, the number of cycles in one dimension is arbitary.
+
+Human locomotion types we might work with are ideas like "tiptoeing",
+walking, running, sprinting. But the main point here is that any cycle
+tree can have any number of cycles with different labels placed into this
+one scalar dimension:
+
+Your tree may only have two cycles (walk, run), or maybe these three:
+(tiptoe, walk, run) or maybe this other list of three: (walk, jog, sprint)
+or maybe even seven (tiptoe, slow walk, walk, brisk walk, jog, run, sprint).
+
+The point is that all such cycle trees should be purely data-driven: there
+will be no concept of a "walk" (as distinct from "run") built directly into
+the system.
+
+What labels you use for each cycle and how many cycles you have is totally
+a design decision and can vary from cycle tree to cycle tree. And whether your
+game has one cycle tree per character you design, or one cycle tree for your
+whole game, that question might just be outside of the scope of this system!
+
+
+# The number of cycles you need along (e.g) your "speed" dimension may be a practical concern
+
+As a thought experiment, if you made a perfect "tiptoe" cycle, and a perfect
+"sprint" cycle, then you tried a blend between the two; the result may be
+really interesting but it seems highly unlikely that this blend would produce
+a good walk cycle. (In the _Anim_ book this *may* refer to this
+general idea as "fidelity" but we aren't sure.)
+
+We might end up going really deep with this rabbit hole: a realistic jog
+probably has a lot of character (curves) to that that's totally different from
+a realistic sprint. (Contrast Samus's sprint in Super Metroid to a video of
+me jogging from the camera to the chin-up bar.)
+
+It may even be useful to subdivide the spectrum even more around the walk:
+maybe break the walk into two cycles (slow walk, fast walk) or even three!
+
+
+# There could be other dimensions other than "speed"
+
+N64 Mario had a tiptoe cycle and a walk cycle and a run cycle (at least these
+three). The playback of the cycles would vary in speed based on the magnitude
+of the analog joystick pull, and then "snap" from one cycle to the other at
+various pre-determined threshold points along the spectrum. (But note they
+didn't blend cycles yet back then, so you would see the "snap". Nonetheless,
+what Nintendo was doing here with animation was way classier and more
+expressive that what was happening with PS1 Lara Croft back then.)
+
+But we may find that something like a "tiptoe" cycle has a cartoony quality
+that we may not want our character to express in every circumstance. It may
+be that we want "tip toe" when both: 1) the character is moving slow and 2)
+the character is trying to be quiet (because it's in a dungeon near enemies,
+say).
+
+
+# So how do we take different inputs on different dimensions to get one blend?
+
+So it may be that the inputs for "which cycle blend to make?" are more than
+simply the input of "what speed are we targeting?". It may be that the
+cycles are arranged into a conceptual graph like this:
+
+               ^         |
+               |         |
+          (more sneaky)  |    (tiptoe)
+    (sneakiness)         |         :...
+          (less sneaky)  |            :::::: (slow walk) :: (normal walk) ::
+               |         |         ....
+               V         |    (very slow
+                         |     walk)
+                         +___________________________________________________
+
+                                        (speed)
+                               <-- (slower)  (faster) -->
+
+That is:
+
+                         |
+                         |
+                         |    ( )
+                         |       \
+                         |        ==------- ( ) ------ ( ) ------ ...
+                         |       /
+                         |    ( )
+                         |
+                         +___________________________________________________
+
+Note that graph is no longer a simple spectrum with one dimension (speed),
+now it has two (speed and sneakiness).
+
+So, to find the right blend for the animation in this cycle tree,
+the inputs are:
+
+  - Is the character trying to sneak?
+  - How fast is the character trying to go?
+
+
+Interstingly, we'll be doing nearest match *along the dimensions tree*, and
+there may not always be a match that will end up expressing all of the inputs.
+Let's answer our questions and with those inputs, draw our "ideal target point"
+in our "multi-dimensional vector space":
+
+  - Is the character trying to sneak? YES
+  - How fast is the character trying to go? VERY FAST
+
+                         |
+                YES      |                                  X
+                         |    ( )
+                         |       \
+            (sneaking?)  |        ==------- ( ) ------ ( ) ------ ( ) ---..
+                         |       /
+                         |    ( )
+                NO       |
+                         +___________________________________________________
+                                   SLOWER  (how fast?)  FASTER
+
+
+Note that the "X" (our ideal point for a blend) lands somwhere strange off
+in space away from cycle tree. This is typical. Now we have to find a closest
+match from the "X" to the body of the tree:
+
+                         |
+                YES      |                                  X
+                         |    ( )                           |
+                         |       \                          V
+            (sneaking?)  |        ==------- ( ) ------ ( ) ------ ( ) ---..
+                         |       /
+                         |    ( )
+                NO       |
+                         +___________________________________________________
+                                   SLOWER  (how fast?)  FASTER
+
+In practice we should assume that our "X" never lands exactly on top of one
+hand-designed cycles. What we do is find where on the graph's "body" is the
+closest point to the "X" (this will be kind of messy unless we hack some
+efficiently in to it). Every point along the graph's body implies a blend of
+two OR MORE cycles, with particular percentages of each.
+
+Interestingly, in the example above, "sneakiness" doesn't get expressed in
+the produced blend.
+
+
+# How a cycle tree maps to speed will be a function of character geometry
+
+The general theme we're developing here is that the question of "which blend?"
+will be a "function of" *several* inputs.
+
+We saw above that we find the closes match of a point in multi-dimensional
+vector space to our cycle tree in order to find a cycle blend that tries to
+express "sneakiness" along with "target speed".
+
+An essential consideration when developing speed targeting is that the
+character's geometry effects their speed: For example, a very short character
+sprinting may be the same speed as a very tall character walking.
+
+In a similar vein, it may be that a gargantuan character can't sprint per se
+because of the exponentionally more energy it takes to move larger mass.
+
+Compare how many flaps-per-second in a mosquito's wings versus that of a
+shoebill stork.
+
+An elephant's leg may be 1000x more massive than a cheetah's; but maybe it
+takes a million times calories to make it snap from all the way back to
+all the way forward in the same time. Nature (being an expert engineer) takes
+all of this Netwonian physics in to account and makes it so a charging elephant
+has legs that "beat" much slower than a sprinting cheetah (again in terms of
+milliseconds per beat).
+
+(There's a lot of other concerns of scale we are ignoring in this thought
+experiment: let's say a whale needs to be able to go as fast as the schools
+of fish it eats. All other things being equal (if hydro dynamics scale up
+and down to infinitely large and small swimmers), the whale will have to
+beat its pectoral fins at a much slower rate than the tiny fish in the school,
+to go the same speed, because of how much more massive the whale is. But this
+is certainly an oversimplification that's ignoring other important dimensions
+to that space.)
+
+Rather than see this as a limitation ("you can't sprint because physics",
+"you can't swim fast because you're too huge"), we see this as an important
+expressive dimension that should be utilized to make the animations serve the
+characters more effectively:
+
+Consider the memorable scene from Hayao Miyazaki's _Spirited Away_ where the
+Forest Spirit awakens and walks through the forest. It takes these long,
+leaden steps, much slower (in terms of seconds per step) than a typical
+human walk cycle. Rather than make the creature look slow and oafish; this
+cycle (in concert with all the other essential elements; things like character
+design, color, music etc) has the effect of making the creature look regal
+and larger-than-life.
+
+(The effect of seeing a moose up close for the first time is similar, IMO.)
+
+
+As such, how the cycle tree falls into the speed vector space will be
+different based on character geometry:
+
+
+    (smaller/shorter character)
+
+    |
+    |(walking)   (jogging)   (sprinting)
+    |
+    +--------------------------------------------
+         1.4 mps                        3.0 mps
+      <-- (slower)    target speed   (faster) -->
+
+
+    (larger/taller character)
+
+    |
+    |    (walking)                     (jogging)              (sprinting)
+    |
+    +--------------------------------------------
+         1.4 mps                        3.0 mps
+      <-- (slower)    target speed   (faster) -->
+
+
+    (absurdly gargantuan character (kaiju))
+
+    |
+    |                                        (very slow walk)  (walking) |
+    |
+    +--------------------------------------------
+         1.4 mps                        3.0 mps
+      <-- (slower)    target speed   (faster) -->
+
+
+Note that a short humanoid character may have to sprint to keep up with
+the taller character going only at a jog, and both of these characters
+would be going slower than a kaiju on a very slow walk.
+
+Note for the absurdly large character, we don't even have a sprint cycle.
+As explained above, this is both for realism and for expressiveness.
+
+
+# How we blend a cycle will also be a function of terrain
+
+We haven't talked about terrain yet but it's interlaced with all the other
+concerns above.
+
+It's relevant to consider all the types of "terrain" (in the broadest sense)
+our distant ancestors traversed: for the first few hundreds of millions of
+years, we (as lifeforms) only swam in water. Then eventually we evolved to
+locomote over _literal_ terrain, and eventually took to the trees and even
+the skies.
+
+All these broad categories of locomotion may be relevant to us as animators:
+swimming, walking (or quadrupedal crawling/galloping etc), climbing, and
+(for flighted animals) flying.
+
+Now comes some practical concerns, crashing in like a wrecking ball, but they
+are also tactical:
+
+For the time being, we are going to ignore swimming for a few reasons, one of
+which is that we don't yet find it interesting. But part of the whole point of
+the system we are developing is that there's nothing too special about
+swimming that we couldn't produce blended cycles for it as well as the other
+types of locomotion explored here.
+
+(Swimming (and flying) may be more forgiving than walking and climbing because
+with the former, you don't have to worry foot-sliding and other rigid body
+IK stuff; but still the same broad concern would be there: that of wanting to
+respect hydro- (or aero-) dyamics enough to make the animation look
+integrated enough to the reality with respect to movement through space. So,
+the same IK concerns are there, but the concerns are "nerfed" when we're
+targeting swimming and flying.)
+
+This leaves the walk-like locomotions and climbing as the two remaining
+categories we will focus on.
+
+
+# A bold proposal
+
+This is a bold proposal we aren't sure about:
+
+- Accept as an axiom that free-climbing exists. (Imagine a climbing gym
+  wall, it (unlike nature) has discrete, pre-ordained hand-holds. Imagine
+  that it may overhang over the figure like a cavern wall. It may be that
+  the wall is fully overhead (so, a ceiling).)
+- We can model "mokey-bars"-type locomotion as a specialized sub-category
+  of free-climbing; one where both legs are fully dangling, with all the
+  weight being held up by one or two hands.
+- We can model going up a ladder as a specialized sub-category of free
+  climbing; one where all the handholds and footholds occur at regular
+  intervals.
+- We can model going up a very steep (45° grade) hill of the sort you
+  see at ditches on the side of some train tracks, covered in trees
+  and brush) as a specialized sub-category of free-climbing; one where
+  you're mostly on your feet and only on your hands some of the time.
+  In its way this is the counterpart to the monkeybars simplification:
+  but instead of always on your hands you're always on your feet.
+- We can model going up "craggy" rocks as a specialized sub-category
+  of the above (climb-hiking), one where you're almost never using
+  your hands directly to locomote. But otherwise, appreciate how similar
+  the problem is, looking for each next foothold at each step is like
+  looking for each next handhold at a climbing gym (or nature).
+- We can model going up stairs as a specialized sub-category of going up
+  a craggy incline; one where each next step (probably) occurs at a regular
+  spatial interval.
+- WE CAN MODEL GOING UP OVER ANY OTHER INCLINED OR IRREGULAR TERRAIN
+  as like going up stairs but the stair-height is so small that we don't
+  have to feature-match individual stairs, but rather where-to-step can
+  be a function of things like our gait.
+- We can model walking (and running and the rest) on flat terrain as a
+  specialized subcatgory of walking (and the rest) over irregular terrain
+
+
+In this way, we have defined every type of locomotion we are after as a
+specialization of free-climbing. If we can solve for free-climbing, hopefully
+we can more easily solve for all the rest.
+
+To review:
+
+- Free-climbing exists
+- Monkey bars is like free-climbing but legs hang
+- Going up a ladder is like free-climbing but spatially regular
+- Going up a very steep hill (hike-climbing) is like free-climbing
+- Going up craggy rocks is like hike-climbing but no hands
+- Going up stairs is like going up craggy rocks but regular
+- Going over irregular terrain is like going up stairs but no stairs
+- Going over flat terrain is like going over irregular terrain but regular
+
+
+# Developing strafing, and doing terrain with vector spaces
+
+In a typical imagining, the character faces in whatever direction they are
+traveling. (N64 Mario and PS1 Lara Croft always faced the direction of travel.)
+
+Out in most real worlds, you'll probably see that 99.9% of humans out moving
+around on sidewalks etc are this way too. (But watch a typical FIFA game
+and the numbers will be much diffrent!)
+
+Initially, we didn't care much for strafing. Our 1.0 target for this system
+was "N64 Mario but blending between the cycles."
+
+But strafing (for the player character) has been an essential game mechanic
+since at least Quake in the mid 90's; one that would make FPS's basically
+unplayable without; and now with newfangled Switches and double joysticks
+and the rest, it's become a requirement.
+
+So we take it on as a challenge for our 1.0 target, seeing it as
+"just another product of blending."
+
+This is what our control arrow (from way above) is rotatable: Move the arrow
+to 3 o'clock (or 9 o'clock) and the character walks perpendicular to the way
+they are facing ("strafing"). 6 o'clock and the character walks (or runs etc)
+backwards.
+
+
+# Introducing (and then deconstructing) "grade-heading" and "facing-heading"
+
+If we forget everything we said in our "bold proposal" above, and just imagine
+that we're only ever walking (or similar) over a locally flat plane (but
+perhaps one that's on an incline); then we have this idea of "grade-heading":
+
+Here, the "grade" is the incline of the terrain, and it's measured in percent:
+A "6% grade" means that for every 100 feet of travel, the elevation changes
+6 feet. So it's simply the slope or "steep-ness" of the plane, measured in
+change in Y divided by change in X.
+
+The higher the percent, the steeper the terrain. The famously most steep
+street in San Franciso, Filbert, has a grade of 31.5%.
+
+But here we weirdly use "grade" to mean an imaginary arrow (vector),
+pointing "up" the "hill". Your "heading" is the direction you're traveling in,
+so here, "grade-heading" is a measurement of how much you're going "straight
+up the hill".
+
+We'll measure this angle in "o'clocks" here, but but if you instead use
+radians or degrees, that is unintersting to us.
+
+The point is you can have an arbitrary grade-heading, and that will effect
+both how we blend cycles and how we do any final IK.
+
+Futhermore (and this is crucial to introduce strafing), we introduce the
+idea of "heading-facing". The idea here is that you have 360° of freedom
+of which direction to point your body while you are walking (or similar)
+through space. Again, we'll use "o'clock's", just because we recently saw
+an anime with fighter jets in it.
+
+We introduced (but didn't name) the idea of facing-heading above, near where
+we mentioned FIFA. Here's some examples of how it's used:
+
+- The facing-heading describes the character's direction of travel relative
+  to the direction they are facing; so (like in real life) their "watch"
+  is always locked to the direction they are facing. If they ever hold their
+  watch up to read it, they are always facing at their 12 o'clock. This is
+  just always true, axiomatically (and empirically).
+- Normally the character's facing-heading is at their 12 o'clock: the
+  are traveling in the same direction that they are facing.
+- With a facing-heading of 3 o'clock, the character is walking to their
+  right, perpendicular to the direction they are facing. (We call
+  facing-heading of 3 o'clock and 6 o'clock "strafing right" and "strafing
+  left", respectively.)
+- A facing-heading of 6 o'clock and the character is walking backwards.
+
+Now, there's also grade-heading:
+
+- A grade-heading of 12 o'clock means the character is going straight up
+  the hill (or stairs, etc).
+- In real life, we may find that we go up a grade with a grade-heading
+  of something like 10 o'clock or 2 o'clock if it's steep; as I did this
+  last winter up a small, icy, steep hill my nephews were sledding on.
+
+How this all relates to producing blended cycles is this:
+
+- facing-heading can constrain speed: you probably can't run sideways
+  and backwards as fast as you can run forwards. (But leave it to IG
+  to show me some bro's who have challenged this on treadmills.)
+  This is another dimension we can add to our vector space.
+- grade-heading is yet another dimension in our vector space. (Note we
+  can probably simplify grade-heading to just grade: Going up a 45° grade
+  but at a 10:30 o'clock cross-cut (ok, a 45° cross-cut) reduces the
+  "perceived grade" with some simple trigonometry, probably. But it's not
+  totally that simple, because on such a steep grade, there will be a
+  noticably higher foot and lower foot (depending on the facing-heading). 
+
+- facing-heading as it effects graded bipedal locomoting.
+
+A contrived but not impossible to imagine example: Imagine the character is
+tiptoeing up the hill backwards. Now imagine they are turned to their
+3 o'clock (but still with the same heading, of going up the hill.) Now imagine
+instead of going straight up the hill, they cross-cut it to a 45° approach
+(spiralling upward if the hill is a cone).
+
+If it's easier, imagine it's someone going up the Capital steps. They're
+tiptoeing up the steps, but with a facing-heading of 3'clock (so their body
+is pointed North towards Constitution Ave, but they are traveling East up
+the steps); but skew their travel to 45° so they're going due north-east.
+
+At a 90° skew of travel, they would be moving along the steps fully
+perpendicularly, not going up or down the stairs, but rather just staying
+on the same stair.
+
+Now, consider all the inputs it took to produce this wild blend:
+
+- moving slow because maybe that's in input, to try to go 5 mph.
+- tiptoeing (not just walking slow) because maybe they're trying to be quiet
+- facing-heading of 3 o'clock (traveling east-ish but facing north)
+- grade-heading of 10:30 o'clock (or 9 o'clock if you prefer (45° or 90°))
+  (so actually, traveling north-east)
+
+If we want to really try and simplify it, we could say that
+the planar bipedal locomtion blend is a function of:
+
+- grade
+- facing
+- target speed
+- "mood" (whether sneaking)
+
+(In this summation, we have reduced grade-heading away into grade, which
+might bite us with some IK stuff depending.)
+
+
+It's important to note that how you constrain and fail to meet different
+components of a target criteria is a design consideration. If you can't
+go up a hill facing a strange way at a fast speed, maybe you have to snap
+the character to be heading-facing; if you still can't meet the target speed
+because the hill is too steep, maybe you have to snap the character to slower.
+
+Alternately, maybe you never want to violate the constraint of facing, so,
+in order for the character to maintain the facing and still go up the hill,
+it will only be able to do it very slowly.
+
+Or maybe the character can't go up a hill with strange facing but can't
+break the facing; so it has to just stand there weirdly not moving.
+
+How to find best-fit for all the criteria should be somehow modeled by
+the cycle tree; it should not be hard-coded into the blend system. Given
+that this is such a high-level game-design concern, it's best to keep it
+away from our low-level work here.
+
+
+# Wishlist/free-association sketches of notes for the future
+
+We want locomotion types to be soft- (not hard-) coded; but when it comes
+to "terrain types" (including climbing walls, overhanging walls, etc),
+it is certain that this is a solved problem, and a wheel we don't want to
+reinvent, from the perspective of the engine.
+
+And what the operative terrain type is will be the first input in
+determining which relevant branches to follow in the cycle tree.
+
+This does not nullify any of the work we have done above, but it does show
+that not all locomotion types (soft) will necessarily exist on the same
+spectrum: if you have (for example) free-climbing and hang-climbing, it
+will only be applicable at certain terrain types and grade-ranges.
+
+Higher-speed locomotion types could be capped to certain grades: there may be
+jogging, but no sprinting up steep moutains.
+
+Again, this dynamic needs to be coded for as a capability of kinds of
+constraints that can be modeled, but the constraints themselves musn't
+be hard-coded.
+
+Continuing this theme, there will likely be locomotive permutations that
+you can imagine but that you do not want to allow: imagine climbing a wall-like
+surface with 360 degrees of freedom, such that your head could be to the
+side or below your body while you're there climbing the wall.
+
+Geckos, insects and spiders can do this, but it seems unlikely that we would
+want to model this locomotion in humans (unless we had a *really* compelling
+narrative or gameplay reason to).
+
+The point is, there will probably be locomotive permutations that we can
+imagine but that we wouldn't want to allow in the given system. This is
+what constraints are for, and they are soft-coded.
+
+(EDIT: we met with oishi and he showed us [mechanim][1])
+
+[1]: https://docs.unity3d.com/460/Documentation/Manual/MecanimAnimationSystem.html
+
+-- body
+
+# document-meta
+-- string_as_comment
+# #born
+-- string_as_comment
