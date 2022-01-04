@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+progname=make-links
+options=$(getopt -o fhn --long dry,force,help --name $progname -- "$@")
+
+the_dir="versioned-data/dotfiles/for/ubuntu/templates"
+dest_relpath='xx'
+
+if [ $? != 0 ] ; then
+  echo "try '$progname -h' for help" >&2
+  exit 3
+fi
+
+# (I *think* this sets stdin to what's in the variable)
+eval set -- "$options"
+
+use_force=false
+show_help=false
+is_dry=false
+
+while true; do
+  case "$1" in
+    -f | --force ) use_force=true; shift ;;
+    -h | --help ) show_help=true; shift ;;
+    -n | --dry ) is_dry=true; shift ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+if [ "$show_help" == true ]; then
+  echo "usage: $progname [-f] [-h] [-n]"
+  echo ""
+  echo "description: make symlinks to things"
+  echo ""
+  echo "options:"
+  echo "-a --alpha    I am the description"
+  exit 0
+fi
+
+if [ ! -d "$the_dir" ]; then
+  >&2 echo "run this from the root of the project"
+  >&2 echo "not a directory (?) -- $the_dir"
+  exit 4
+fi
+
+glob="$the_dir/*"
+for f in $glob; do
+  bn=$(basename "$f")
+
+  # Assert something about the template file's extension
+  # Resolve the extension by splitting on period and getting the second field
+  en=$(echo "$bn" | cut -d'.' -f2)
+  if [ "$en" != "zsh" ]; then
+    >&2 echo "skip: expecting \"zsh\", had \"$en\" in \"$bn\""
+  fi
+
+  # Assert that the template file's basename starts with "dot-"
+  head=$(echo "$bn" | cut -c 1-4)
+  if [ "$head" != "dot-" ]; then
+    >&2 echo "fatal: expecting \"dot-\", had \"$head\" in \"$bn\"" 
+    exit 6
+  fi
+
+  # Get the part of the entry after the "dot-" OR do it with string replacement
+  # tail=$(echo "$bn" | cut -c 5-)
+
+  # Replace the head-anchored "dot-" with an actual period
+  target_entry="${bn/#dot-/.}"
+  target="$HOME/$target_entry"
+
+  # We can't find a good way to do this:
+  # - using "-e" in a separate step has a gap
+  # - writing to files then reading is ugly and also has a gap
+
+  file_type=$(stat --format=%F $target 2>/tmp/error)
+  if [ "$?" -eq 0 ]; then
+    # Then the file exists
+    if [ 'symbolic link' == "$file_type" ]; then
+      # The file is a symlink
+      existing_target=$(readlink -f "$target")
+      # (this might not work as planned unless we normalize things..)
+      tail="\"$target\" -> \"$existing_target\""
+      if [ "$existing_target" == "$f" ]; then
+        >&2 echo "(OK:   symlink is good: $tail)"
+      else
+        >&2 echo "(skip: symlink points to something else: $tail)"
+      fi
+    else
+      echo >&2 "(skip: is '$file_type': $target)"
+    fi
+  else
+    msg=$(</tmp/error)
+    if [[ "$msg" == *": No such file "* ]]; then
+      echo -n "ln -s $f $target"
+      if [ false=="$is_dry" ]; then
+        echo "WAHOO"
+      else
+        echo " (dry)"
+      fi
+    else
+      >&2 echo "$msg"
+    fi
+  fi
+
+  # BEGIN STACK
+  # first:
+  # - dry run only
+  # - make actual links
+  # - refactor to use functions
+  # END STACK
+
+  # resolve the target filename
+  # if the target file exists
+  #   say it exits and skip
+  # else
+  #   make the symlink
+done
+
+echo "done!"
+
+# #born
