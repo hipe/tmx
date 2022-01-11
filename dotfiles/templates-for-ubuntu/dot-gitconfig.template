@@ -5,4 +5,16 @@
 	name = USER_VALUE
 	email = USER_VALUE
 
+[alias]
+	a = add
+	b = branch
+	ci = commit
+	co = checkout
+	d = diff
+	h = stash
+	l = log
+	rs = reset
+	rb = rebase
+	st = status
+
 # #born
