@@ -3,14 +3,18 @@
   directory for now
 
 
-# Objective & Scope
+# Objective, Scope & Features
 
 Keep dotfiles in version control.
+
+Features:
+  - For most dotfiles, installer simply makes symlinks to files versioned here
+  - Minimal templating
 
 
 # Wishlist/Issues
 
-  - templates
+  - Templating is a hack (but we want to keep it simple)
 
 
 # (document-meta)

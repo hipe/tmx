@@ -49,7 +49,7 @@ done
 
 
 show_help_and_exit () {
-  echo "usage: $progname [-n]"
+  echo "usage: $progname [-n|-l] [--name PATTERN]"
   echo ""
   echo "description: make symlinks to things"
   echo ""
@@ -101,10 +101,17 @@ if [ ! -z "$name_pattern" ]; then
 
   # (now, the pattern might fail because it has bad pattern syntax, but
   # (hopefully) it can't have injections that break out of our intended logic.)
+  # (putting the pattern in "@()" avoids it expanding as a file glob (e.g ".git*"))
 
-  matcher_code="if [[ \$1 == $name_pattern ]]; then echo 'yes'; else echo 'no'; fi"
+  matcher_code="if [[ \"\$1\" == @($name_pattern) ]]; then echo 'yes'; else echo 'no'; fi"
   matcher_function () {
+    local ec
     matcher_result=$(eval $matcher_code)
+    ec="$?"
+    if [ "$ec" != 0 ]; then
+      >&2 echo "what went wrong? -- $matcher_code"
+      return "$ec"
+    fi
   }
 else
   matcher_function () {
@@ -166,13 +173,11 @@ process_entry () {
   matcher_function "$output_entry"
   if [[ ! "$matcher_result" == @(yes|no) ]]; then
     >&2 echo "strange: '$yn'"
-    return 4
+    return 3
   fi
   if [ 'no' == "$matcher_result" ]; then
     return 0
   fi
-
-  local output_path="$HOME/$output_entry"
 
   # If the execution mode is "do list", list and done
   if [ "$do_list" == true ]; then
@@ -180,12 +185,292 @@ process_entry () {
     return 0
   fi
 
+  local output_path="$HOME/$output_entry"
+
+  local use_last_input_file_seen="$GLOBAL_last_input_file_seen"
+  GLOBAL_last_input_file_seen="$f"
+
   if [ "$is_template" == true ]; then
+    if [ ! -z "$use_last_input_file_seen" ]; then
+      >&2 echo "Because they write to stdout, template files must be run one at a time."
+      >&2 echo "Can't run template file after the previous file:"
+      >&2 echo "  PREVIOUS FILE: $use_last_input_file_seen"
+      >&2 echo "  TEMPLATE FILE: $f"
+      return 3
+    fi
+
     process_template_entry "$f" "$output_path"
     return "$?"
   fi
   process_symbolic_link_entry "$f" "$output_path"
   return "$?"
+}
+
+process_template_entry () {
+  # This is mostly a placeholder for whatever way the "right" way is to do
+  # this, while being an expression of our requirements for such a thing,
+  # *as* a proof-of-concept/rough prototype.
+  #
+  # The target use-case is when you want to keep *most* of a config file
+  # in version control, but not *all* of it. For example, you may want
+  # to version *most* of your config, but not config values specific to a
+  # particular project, workstation, etc; and probably you don't want to
+  # version config values that are personally identifying or otherwise
+  # sensitive.
+  #
+  # Currently our proposal is a simple (and very limited) template system
+  # using special keywords as placeholders in a template file: for the file
+  # to be allowed to produce the new output, A) the output file must
+  # already exist and B) the output file must have *all* the placeholder
+  # values already in it.
+  #
+  # In implementation this will be multi-pass, without having to read every
+  # line of every file in to memory all at once. (We will instead use
+  # tempfiles).
+  #
+  # In the first pass, classify each line of the template file: For each line,
+  # either it is a blank line ("BLANK"), a comment line ("COMMENT"), a line
+  # declaring the open of a section ("SECTION"), or a name-value line
+  # ("ASSIGNMENT").
+  #
+  # (It will be truly fortuitous if we can use the same classifier/
+  # parser for both zsh dotfiles and git config files (even though their
+  # syntaxes are certainly not the same).)
+  #
+  # For those lines that are ASSIGNMENT lines, see if value surface-string
+  # is the special keyword. (Experimentally we'll use "USER_VALUE" (but not
+  # in quotes in the file)). We might instead classify these lines as
+  # "TEMPLATE_VALUE").
+  #
+  # As you traverse and classify each line of the template file, write it
+  # to a tempfile (be sure to start the tempfile as empty) with the line
+  # type prepended as the first "field" of the tempfile. (Probably we'll
+  # do a fixed-width first field, to make the lines line up.)
+  # (Actually we don't use a tempfile, we just parse the same file twice.)
+  #
+  # For each template value, add the value name to an in-memory dictionary
+  # (associative array), asserting we aren't clobbering an existing key.
+  #
+  # Once you have traversed the template file, now traverse the existing
+  # file with the same parser, but only with this intent:
+  #   - Make a "diminishing pool" copy of the dictionary of template
+  #     variable names.
+  #   - Each "ASSIGNMENT" line that you encounter, determine y/n whether
+  #     it is in your dictionary of template variables. If no, next.
+  #   - Since "yes", assert the key is in the diminishing pool and remove
+  #     it from that dictionary.
+  #   - Store the surface value (including quotes etc, all the way to the
+  #     end of the line) in a dedicated hash for holding user values.
+  #
+  # Once you have traversed the existing file, assert every template
+  # variable (key) was assigned to in the existing file. Now that we have
+  # made all these assertions, we can read each line of our tempfile,
+  # drawing from our in-memory dictionary of user values as we encounter
+  # them in order to generate output lines. That's it!
+  #
+  # ISSUES/WISHLIST
+  #  - This isn't a robust parser but a hack
+  #  - Supporting different config formats might take work/specification
+  #  - This will in-effect destroy values that are in the existing
+  #    file but not in the new file. (Except those specified by "USER_VALUE"
+  #    in the template file.)
+  #  - One day we imagine a --sync-backwards option but getting such a "stich"
+  #    algorithm will be nontrivial.
+  #  - It would be nice to be able to specify in the template file
+  #    whole sections to pass through that are in the existing file
+  #  - This will push the appropriate limits of bash scripting, which does
+  #    not have multidimensional arrays
+
+  local f="$1"
+  local output_path="$2"
+
+  assert_the_output_path_exists "$output_path"
+
+  # Traverse the template file to derive the template variable names
+  local var_names
+  declare -A var_names=()
+  traverse_template_file_first_time var_names "$f"
+
+  # Traverse the existing file to derive the template variable values
+  local var_values
+  declare -A var_values=()
+  traverse_the_existing_file var_values var_names "$output_path"
+
+  # Traverse the template file again for final output
+  output_output_lines "$f" var_values
+}
+
+output_output_lines () {
+  local f="$1"
+  local -n var_vals=$2
+
+  declare -A line_parse_tree=()
+  while read -r line ; do
+    parse_line_simple line_parse_tree "$line"
+
+    # For those lines that have the special string, build the new output line
+    if [ 'yes' == $(is_template_variable line_parse_tree) ]; then
+      local lhs="${line_parse_tree[left_hand_side]}"
+      local k="${line_parse_tree[compound_variable_name]}"
+      local use_rhs=${var_vals[$k]}
+      local new_line="${lhs}=${use_rhs}"
+      echo "$new_line"
+    else
+      echo "$line"
+    fi
+  done <"$f"
+}
+
+traverse_the_existing_file () {
+  local -n var_vals=$1
+  local -n var_names_=$2
+  local output_path="$3"
+
+  # Populate a "diminishing pool" that we'll use to check at the end
+  declare -A dim_pool=()
+  for k in "${!var_names_[@]}"; do
+    dim_pool[$k]=true
+  done
+
+  # Traverse the existing file getting values for the template variables
+  local line_parse_tree
+  declare -A line_parse_tree=()
+  while read -r line; do
+    parse_line_simple line_parse_tree "$line"
+    local typ=${line_parse_tree[type]}
+    if [ "$typ" == 'ASSIGNMENT' ]; then
+      local k=${line_parse_tree[compound_variable_name]}
+      local yn=${var_names_[$k]}
+      if [ 'true' == "${var_names_[$k]}" ]; then
+        var_vals[$k]="${line_parse_tree[right_hand_side]}"
+
+        # Unset the value in the dim pool to indicate we found it
+        unset dim_pool[$k]
+      fi
+    fi
+  done <"$output_path"
+
+  # Bork out if the existing file failed to set any template variable values
+  if [ 0 == ${#dim_pool[@]} ]; then
+    return
+  fi
+  for k in "${!dim_pool[@]}"; do
+    >&2 echo "existing file needs a config setting for '$k'"
+  done
+  >&2 echo "existing file: $output_path"
+  exit 3
+}
+
+traverse_template_file_first_time () {
+  local -n vnames=$1
+  local f="$2"
+
+  declare -A line_parse_tree=()
+  while read -r line ; do
+    parse_line_simple line_parse_tree "$line"
+
+    # For those assignment lines that have the special string, note the var name
+    if [ 'yes' == $(is_template_variable line_parse_tree) ]; then
+      vnames[${line_parse_tree[compound_variable_name]}]=true
+    fi
+  done <"$f"
+}
+
+is_template_variable () {
+  local -n tree=$1
+
+  if [ ${tree[type]} != 'ASSIGNMENT' ]; then
+    echo 'no'
+    return
+  fi
+
+  local needle="${tree[right_hand_side]}"
+  if [[ "$needle" =~ (^|[^[:alnum:]_])USER_VALUE([^[:alnum:]_]|$) ]]; then
+    echo 'yes'
+  else
+    echo 'no'
+  fi
+}
+
+parse_line_simple () {
+  do_parse_line_simple "$1" "$2"
+  local es="$?"
+  if [ 0 != "$es" ]; then
+    exit "$es"
+  fi
+}
+
+do_parse_line_simple () {
+  # (implmentation is directly from the pseudocode way above)
+  local -n result=$1
+  local line="$2"
+  if [ '' == "$line" ]; then
+    result[type]='BLANK'
+    return
+  fi
+  local first_char=${line:0:1}
+  if [[ '#' == "$first_char" || ';' == "$first_char" ]]; then
+    result[type]='COMMENT'
+    return
+  fi
+  if [ '[' == "$first_char" ]; then
+    parse_section_line_simple result "$line"
+    return "$?"
+  fi
+  parse_assignment_line_simple result "$line"
+  return "$?"
+}
+
+parse_assignment_line_simple () {
+  local -n res=$1
+  local line="$2"
+  local left_hand_side=${line/=*/}
+  if [ ${#line} == ${#left_hand_side} ]; then
+    >&2 echo "Couldn't find '=' anywhere in assignment line -- $line"
+    return 3
+  fi
+  local inner=$(echo "$left_hand_side" | sed 's/^[ \t]\+\|[ \t]\+$//g')
+  if [[ ! "$inner" =~ ^[a-z_]+$ ]]; then
+    >&2 echo "For now, value names must be [a-z_]+: \"$inner\""
+    return 3
+  fi
+  local sect_name="${res[last_section_name]}"
+  if [ '' == "$sect_name" ]; then
+    >&2 echo "Cant's handle assignment not in section -- $line"
+    return 3
+  fi
+  res[type]='ASSIGNMENT'
+  res[left_hand_side]="$left_hand_side"
+  res[compound_variable_name]="${sect_name}.${inner}"
+  res[right_hand_side]=${line:(( 1 + ${#left_hand_side} ))}
+}
+
+parse_section_line_simple () {
+  # (assume line begins with '[')
+
+  local -n res=$1
+  local line="$2"
+  local last_char=${line: -1}
+  if [ ']' != "$last_char" ]; then
+    >&2 echo "expected ']' had '$last_char' in section line -- $line"
+    return 3
+  fi
+  local inside=${line:1:-1}
+  if [[ ! "$inside" =~ ^[a-z]+$ ]]; then
+    >&2 echo "for now, section name pattern is maximally restrictive"
+    >&2 echo "must match '^[a-z]+$' -- $inside"
+    return 3
+  fi
+  res[type]='SECTION'
+  res[last_section_name]="$inside"
+}
+
+assert_the_output_path_exists () {
+  if [ -e "$1" ]; then
+    return
+  fi
+  >&2 echo "For templates, output path must already exist: $1"
+  exit 3
 }
 
 process_symbolic_link_entry () {
@@ -248,11 +533,15 @@ process_symbolic_link_entry () {
   return 3
 }
 
+main () {
+  local GLOBAL_last_input_file_seen=''
+  local glob="$the_dir_absolute/*"
+  for f in $glob; do
+    process_entry "$f"
+  done
+}
 
-glob="$the_dir_absolute/*"
-for f in $glob; do
-  process_entry "$f"
-done
+main
 
 >&2 echo "(done.)"
 
