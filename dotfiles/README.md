@@ -17,6 +17,20 @@ Features:
   - Templating is a hack (but we want to keep it simple)
 
 
+# Notes
+
+Files that were described by (Stack Exchange #71253)[1] but don't get called
+on our machine:
+
+  - .zprofile
+  - .zlogin
+  - .zlogout
+
+
+[1]: https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
+
+
 # (document-meta)
 
   - #born
+

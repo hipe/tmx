@@ -1,0 +1,44 @@
+# REMINDER: this file is intended to exist as a file in version control
+# and a symlink pointing to it from the typical dotfile location.
+# As you make edits here, you should commit the changes to the target file,
+# or (as appropriate) move the edits to an appropriate unversioned file.
+
+# For those lines added "by human", you may be able to "git blame" and read
+# the corresponding commit message associated with the line for more info
+# about that change.
+
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+setopt extendedglob nomatch notify
+unsetopt autocd beep
+bindkey -v
+# End of lines configured by zsh-newuser-install
+
+# The following lines were added by compinstall
+# (modified by human to remove literal username)
+zstyle :compinstall filename "$HOME/.zshrc"
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+
+# Lines added by human
+PROMPT='%~%# '
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_verify
+setopt share_history
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
+bindkey '^[OA' history-beginning-search-backward
+bindkey '^[OB' history-beginning-search-forward
+
+if [ -e ~/.zshrc.local ]; then
+  source ~/.zshrc.local
+fi
+# End of lines added by human
+
+# #born
