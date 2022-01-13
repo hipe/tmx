@@ -7,12 +7,15 @@
 " - You will note that most lines in this file don't have comments.
 "   Experimentally, comments explaining each config setting will be in
 "   the corresponding commit in version control. Use `git blame` etc.
+"
+" Reminder: `:source ~/.vimrc` to reload this without restarting the editor
 
 let mapleader = ","
 inoremap sd <esc>
 nnoremap <leader>gg :GitGutterToggle<cr>
 nnoremap <leader>nn :NERDTreeToggle<cr>
 nnoremap <leader>r :NERDTreeFind<cr>
+nnoremap <c-t> :tabnew<cr>
 nnoremap cp :let @+ = expand("%")<cr>
 nnoremap <c-j> :wincmd j<cr>
 nnoremap <c-k> :wincmd k<cr>
@@ -27,6 +30,19 @@ nnoremap ² 2gt
 nnoremap ³ 3gt
 nnoremap ´ 4gt
 nnoremap µ 5gt
-nnoremap <c-w> :q<cr>
+
+" (don't get in the way of NERDTree split panes)
+" nnoremap <c-w> :q<cr>
+
+set list
+set listchars=tab:▸_,trail:·
+set number
+set colorcolumn=80
+set autoindent
+set tabstop=8
+set softtabstop=0
+set expandtab
+set shiftwidth=2
+set smarttab
 
 " #born
