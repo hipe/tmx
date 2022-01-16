@@ -1,6 +1,9 @@
 # This is Git's per-user configuration file.
 # This file is generated. Edits may be lost.
 
+[core]
+	excludesFile = USER_VALUE
+
 [user]
 	name = USER_VALUE
 	email = USER_VALUE

@@ -430,8 +430,8 @@ parse_assignment_line_simple () {
     return 3
   fi
   local inner=$(echo "$left_hand_side" | sed 's/^[ \t]\+\|[ \t]\+$//g')
-  if [[ ! "$inner" =~ ^[a-z_]+$ ]]; then
-    >&2 echo "For now, value names must be [a-z_]+: \"$inner\""
+  if [[ ! "$inner" =~ ^[a-zA-Z_]+$ ]]; then
+    >&2 echo "For now, value names must be [a-zA-Z_]+: \"$inner\""
     return 3
   fi
   local sect_name="${res[last_section_name]}"
