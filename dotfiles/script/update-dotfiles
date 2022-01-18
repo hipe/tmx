@@ -1,122 +1,259 @@
 #!/usr/bin/env bash
 
-progname=make-links
-options=$(getopt -o fhn --long dry,force,help --name $progname -- "$@")
+progname=update-dotfiles
+the_dir="dotfiles/templates-for-ubuntu"
 
-the_dir="versioned-data/dotfiles/for/ubuntu/templates"
-dest_relpath='xx'
+options=$(getopt -o hln --long dry-run,help,list,name: --name $progname -- "$@")
+exitstatus="$?"
 
-if [ $? != 0 ] ; then
-  echo "try '$progname -h' for help" >&2
+required_argc=0
+
+invite_and_exit () {
+  >&2 echo "Try '$progname -h' for help."
   exit 3
+}
+
+if [ "$exitstatus" != 0 ] ; then
+  invite_and_exit
 fi
+
+# (argumented options)
+name_pattern=""
+
+# (operational modal booleans)
+do_list=false
+do_show_help=false
+
+
+# (behavioral booleans)
+is_dry=false
 
 # (I *think* this sets stdin to what's in the variable)
 eval set -- "$options"
-
-use_force=false
-show_help=false
-is_dry=false
-
 while true; do
   case "$1" in
-    -f | --force ) use_force=true; shift ;;
-    -h | --help ) show_help=true; shift ;;
-    -n | --dry ) is_dry=true; shift ;;
-    -- ) shift; break ;;
-    * ) break ;;
+         --name )
+      if [ ! -z "$name_pattern" ]; then
+        >&2 echo "(clobbering existing name pattern. boolean OR not yet supported)"
+      fi
+      shift
+      name_pattern=$1
+      shift ;;
+    -l | --list ) do_list=true; shift ;;
+    -n | --dry-run ) is_dry=true; shift ;;
+    -h | --help ) do_show_help=true; shift ;;
+    -- ) shift ; break ;;
+    * ) >&2 echo "strange: $1"; exit 3 ;;
   esac
 done
 
-if [ "$show_help" == true ]; then
-  echo "usage: $progname [-f] [-h] [-n]"
+
+show_help_and_exit () {
+  echo "usage: $progname [-n]"
   echo ""
   echo "description: make symlinks to things"
   echo ""
   echo "options:"
-  echo "-a --alpha    I am the description"
+  echo "  -n --dry-run       Don't actually make changes"
+  echo "  -l --list          Just list the matched files"
+  echo "     --name=PATTERN  Only use templates that match PATTERN"
+  echo "                     (enclose in quotes to avoid shell exp.)"
   exit 0
+}
+
+if [ "$do_show_help" != false ]; then
+  show_help_and_exit
 fi
 
+# Validate positional arguments
+# (do this after help, allow help to be invoked with wrong number of args
+
+positionals=("$@")
+actual_argc="${#positionals[@]}"
+
+if [ "$actual_argc" -ne "$required_argc" ]; then
+  >&2 echo "Need $required_argc had $actual_argc argument(s)."
+  invite_and_exit
+fi
+
+# Preprocess any name pattern
+
+if [ ! -z "$name_pattern" ]; then
+
+  # Ensure that every character of the pattern is in a whitelist.
+  # (we use `eval` on a user-provided value, which is insanely vulnerable,
+  # so we attempt to safeguard against "injection" (or otherwise unintended
+  # handling of the value). Our goal is not to support all pattern features
+  # bash supports.)
+
+  LC_COLLATE=C  # make [a-c] be equivalent to [abc] not [aAbCcC]
+  len=${#name_pattern}
+  let len=len-1
+  code="for ii in {0..$len}; do echo \"\$ii\"; done"
+  for i in $(eval $code); do
+    char=${name_pattern:$i:1}
+    if [[ ! $char == [-a-zA-Z0-9_.?*] ]]; then
+      >&2 echo -n "Pattern argument has unsupported character at [$i]: '$char': "
+      >&2 echo "$name_pattern"
+      exit 3
+    fi
+  done
+
+  # (now, the pattern might fail because it has bad pattern syntax, but
+  # (hopefully) it can't have injections that break out of our intended logic.)
+
+  matcher_code="if [[ \$1 == $name_pattern ]]; then echo 'yes'; else echo 'no'; fi"
+  matcher_function () {
+    matcher_result=$(eval $matcher_code)
+  }
+else
+  matcher_function () {
+    :  # google "bash noop"
+  }
+  matcher_result='yes'
+fi
+
+# Validate things about path arguments vis-a-vis the filesystem
+
 if [ ! -d "$the_dir" ]; then
-  >&2 echo "run this from the root of the project"
-  >&2 echo "not a directory (?) -- $the_dir"
+  >&2 echo "This must be run from the root of the project for now."
+  >&2 echo "Not a directory (?) -- $the_dir"
   exit 4
 fi
 
-glob="$the_dir/*"
-for f in $glob; do
-  bn=$(basename "$f")
+the_dir_absolute="$(pwd)/$the_dir"
+if [ ! -d "$the_dir_absolute" ]; then
+  >&2 echo "sanity: not exist: $the_dir_absolute"
+  exit 4
+fi
 
-  # Assert something about the template file's extension
-  # Resolve the extension by splitting on period and getting the second field
-  en=$(echo "$bn" | cut -d'.' -f2)
-  if [ "$en" != "zsh" ]; then
-    >&2 echo "skip: expecting \"zsh\", had \"$en\" in \"$bn\""
+# Main work
+
+process_entry () {
+  local f="$1"
+  local bn=$(basename "$f")
+
+  # Skip entries that start with an underscore (helpful for development)
+  if [ ${bn:0:1} == "_" ]; then
+    return 0
   fi
 
-  # Assert that the template file's basename starts with "dot-"
-  head=$(echo "$bn" | cut -c 1-4)
-  if [ "$head" != "dot-" ]; then
-    >&2 echo "fatal: expecting \"dot-\", had \"$head\" in \"$bn\"" 
-    exit 6
+  # Assert something about the head of the entry (for now) (SEE NEXT)
+  local head=${bn:0:4}
+  if [ !"$head" = "dot-" ]; then
+    >&2 echo "error: expecting \"dot-\", had \"$head\" in \"$bn\""
+    return 3
   fi
 
-  # Get the part of the entry after the "dot-" OR do it with string replacement
-  # tail=$(echo "$bn" | cut -c 5-)
+  # Get the part of the entry after the "dot-" (ick)
+  local tail="${bn:4}"
 
-  # Replace the head-anchored "dot-" with an actual period
-  target_entry="${bn/#dot-/.}"
-  target="$HOME/$target_entry"
+  if [[ "$tail" == *.template.* ]]; then
+    local use_tail=${tail/.template./.}
+    local is_template=true
+  elif [[ "$tail" == *.template ]]; then
+    # (this branch has a hole: above anchors to end, below does not)
+    local use_tail=${tail/.template/}
+    local is_template=true
+  else
+    local use_tail="$tail"
+    local is_template=false
+  fi
+
+  local output_entry=".$use_tail"
+
+  # Apply any name filter before effecting modal behaviors
+  matcher_function "$output_entry"
+  if [[ ! "$matcher_result" == @(yes|no) ]]; then
+    >&2 echo "strange: '$yn'"
+    return 4
+  fi
+  if [ 'no' == "$matcher_result" ]; then
+    return 0
+  fi
+
+  local output_path="$HOME/$output_entry"
+
+  # If the execution mode is "do list", list and done
+  if [ "$do_list" == true ]; then
+    echo "$output_entry"
+    return 0
+  fi
+
+  if [ "$is_template" == true ]; then
+    process_template_entry "$f" "$output_path"
+    return "$?"
+  fi
+  process_symbolic_link_entry "$f" "$output_path"
+  return "$?"
+}
+
+process_symbolic_link_entry () {
+  local f="$1"
+  local output_path="$2"
 
   # We can't find a good way to do this:
   # - using "-e" in a separate step has a gap
   # - writing to files then reading is ugly and also has a gap
 
-  file_type=$(stat --format=%F $target 2>/tmp/error)
-  if [ "$?" -eq 0 ]; then
-    # Then the file exists
-    if [ 'symbolic link' == "$file_type" ]; then
-      # The file is a symlink
-      existing_target=$(readlink -f "$target")
-      # (this might not work as planned unless we normalize things..)
-      tail="\"$target\" -> \"$existing_target\""
-      if [ "$existing_target" == "$f" ]; then
-        >&2 echo "(OK:   symlink is good: $tail)"
-      else
-        >&2 echo "(skip: symlink points to something else: $tail)"
-      fi
-    else
-      echo >&2 "(skip: is '$file_type': $target)"
-    fi
-  else
+  # (putting "local" in the same line overwrites "$?")
+  local file_type
+  file_type=$(stat --format=%F $output_path 2>/tmp/error)
+  local exitstatus="$?"
+
+  # If the stat expression failed
+  if [ "$exitstatus" -ne 0 ]; then
+
+    # If the reason it failed is something other than noent, it's strange and skip
     msg=$(</tmp/error)
-    if [[ "$msg" == *": No such file "* ]]; then
-      echo -n "ln -s $f $target"
-      if [ false=="$is_dry" ]; then
-        echo "WAHOO"
-      else
-        echo " (dry)"
-      fi
-    else
+    if [[ "$msg" != *": No such file "* ]]; then
       >&2 echo "$msg"
+      return 3
     fi
+
+    # The target path is noent. This is normal. Procede.
+    # Write the start of the message
+    echo -n "ln -s $f $output_path"
+
+    if [ false != "$is_dry" ]; then
+      echo " (dry)"
+      return 0
+    fi
+
+    echo ""
+    ln -s "$f" "$output_path"
+    return 0
   fi
 
-  # BEGIN STACK
-  # first:
-  # - dry run only
-  # - make actual links
-  # - refactor to use functions
-  # END STACK
+  # The file exists. We can't make the symlink. Express the reason.
 
-  # resolve the target filename
-  # if the target file exists
-  #   say it exits and skip
-  # else
-  #   make the symlink
+  # If the file is something other than a symlink, skip
+  if [ 'symbolic link' != "$file_type" ]; then
+    echo >&2 "(skip: exists, is '$file_type': $output_path)"
+    return 3
+  fi
+
+  # The file is a symlink
+  local existing_target=$(readlink -f "$output_path")
+  # (this might not work as planned unless we normalize things..)
+  local tail="\"$output_path\" -> \"$existing_target\""
+
+  # If the file is already the right symlink, then good.
+  if [ "$existing_target" == "$f" ]; then
+    >&2 echo "(OK:   symlink is good: $tail)"
+    return 0
+  fi
+
+  >&2 echo "(skip: symlink points to something else: $tail)"
+  return 3
+}
+
+
+glob="$the_dir_absolute/*"
+for f in $glob; do
+  process_entry "$f"
 done
 
-echo "done!"
+>&2 echo "(done.)"
 
 # #born

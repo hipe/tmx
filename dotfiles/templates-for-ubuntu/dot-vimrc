@@ -1,0 +1,32 @@
+" NOTE:
+" - At writing, the "dotfile" form of this file is meant to be a symlink
+"   that points to an "actual" version of the file that lives in version
+"   control.
+" - If you edit this file, you probably want to commit those changes
+"   into the project that the actual file lives in.
+" - You will note that most lines in this file don't have comments.
+"   Experimentally, comments explaining each config setting will be in
+"   the corresponding commit in version control. Use `git blame` etc.
+
+let mapleader = ","
+inoremap sd <esc>
+nnoremap <leader>gg :GitGutterToggle<cr>
+nnoremap <leader>nn :NERDTreeToggle<cr>
+nnoremap <leader>r :NERDTreeFind<cr>
+nnoremap cp :let @+ = expand("%")<cr>
+nnoremap <c-j> :wincmd j<cr>
+nnoremap <c-k> :wincmd k<cr>
+nnoremap <c-h> :wincmd h<cr>
+nnoremap <c-l> :wincmd l<cr>
+syntax on
+colorscheme slate
+nnoremap <c-v> "+p
+inoremap <c-v> <esc>"+p
+nnoremap ± 1gt
+nnoremap ² 2gt
+nnoremap ³ 3gt
+nnoremap ´ 4gt
+nnoremap µ 5gt
+nnoremap <c-w> :q<cr>
+
+" #born
