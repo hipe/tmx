@@ -29,4 +29,5 @@ Get all tests passing wow! (make a floating commit)
 Redistribute commits of big issues file out to respective commits
 Melt "_FLOATING_.dot" into the issues thing, also these issues to "HERE"
 Be able to generate digraphs from big issues thing
-Melt _DID_ into setup documentation
+How to pyenv and virtualenv
+Do EDITs in [#018]

@@ -4,7 +4,7 @@ hashtag syntax. This can then be used to generate a GraphViz dotfile:)
 
 
 ```bash
-pho issues graph -r pho-doc/documents/406-everything.md
+pho issues -r pho-doc/documents/406-everything.md graph
 ```
 
 

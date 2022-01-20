@@ -242,7 +242,10 @@ class Case020_Locking(CommonCase):
                 inner._lockfile_filehandle.close()  # dirty - avoid warning
                 outer.exit()
 
-        self.assertEqual('[Errno 35] Resource temporarily unavailable', str(e))
+        msg = str(e)
+        self.assertIn("Resource temporarily unavailable", msg)
+        # was "[Errno 35]" on OS X, "[Errno 11]" on ubuntu
+
         assert(memo.count)
 
 

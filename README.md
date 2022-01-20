@@ -67,18 +67,46 @@ however, these principles apply across the sub-projects:
 
 ## <a name="sub-projects"></a> what's a “sub-project” (and why sub-projects)?
 
-if you are familiar with the term "mono-repo", that's what's going on here.
+The repository that this document lives in has many directories at its top
+level. The remainder of this section describes the charactersitics these
+directories tend to share, and how they tend to relate to each other; all
+towards reaching an understanding of the "architecture" of this repository:
 
-  - mainly we use the term "sub-project" to avoid confusion with the term “project” which
-    we use to mean _this_ directory tree we keep in version control (at the
-    top of which this README file sits). (we may now prefer to use the term
-    "mono-repo" instead of "project".)
+  - Each of these directories is frequently (but not always) some sort of
+    software module. So in essence, this repository is mainly a collection of
+    software modules.
 
-  - a sub-project can be as small as a single-file one-off, or as large as
-    a full-stack application. to place sub-projects into the same project
-    indicates the aspiration to share a significant portion of code (or
-    documention, etc) across those sub-projects (code or documention that
-    itself is under active development).
+  - These software modules do not necessarily exist in the same universe with
+    each other; that is, they are not necessarily intended to all be in the
+    same "runtime". Some of the modules may be written in python; others in
+    ruby. Some may be written with a compiled language, others may be for
+    Angular or React.
+
+  - (However, there's no reason we can't hypothetically chain together
+    several scripts meaningfully across "platform" boundaries (for exmaple,
+    piping the output of a ruby script into a python script).)
+
+  - We'll call these directories "sub-projects", not "modules": calling them
+    all "modules" may mistakenly confer the idea that (one) they are all
+    software (more below on this) and (two) they all exist in the same
+    universe with each other. Ditto "packages".
+
+  - We'll avoid the term "project" because without context, it's ambiguous
+    whether it means "the one big project" or a particular sub-project.
+    Rather, we call this one big directory "the mono-repo".
+
+  - A sub-project can be as small as a single-file one-off or as large as
+    a full-stack application.
+
+  - A sub-project isn't necessarily software at all: it may simply be
+    documentation (e.g., reading notes) or other text-adjacent assets we
+    want to keep in version contorl for whatever reason.
+
+  - For those sub-projects that *do* depend on others here, the rule is that
+    these dependencies must not cycle (they must be acyclic): any given
+    module here that depends on other modules here must do so as a "stack",
+    with the module in question at the "top" and its depended-upon modules
+    "below" it.
 
   - as for why in the world we maintain this one big repository and not
     several smaller ones, here is the rationale: we want the sub-projects
@@ -111,6 +139,19 @@ if you are familiar with the term "mono-repo", that's what's going on here.
     (i.e., there are no sub-sub-projects, etc.)
 
 
+## running the tests for a specific sub-project
+
+For a sub-project called "foo_bar", run the corresponding test suite
+"foo_bar_test" with `pud foo_bar_test` (using an alias described
+the [below section on aliases](#aliases). For example, for the "grep_dump"
+sub-project:
+
+```bash
+pud grep_dump_test
+```
+
+That's all.
+
 
 
 ## <a name='running-all-the-tests'></a>overview of running the tests
@@ -118,15 +159,17 @@ if you are familiar with the term "mono-repo", that's what's going on here.
 We're currently experimenting with different ways we run the whole test
 suite universe-wide (something we don't usually do at each commit).
 
+The below uses an alias described in the [relevant section](#aliases).
+
 This is the current sketch:
 
 ```bash
 cat mono-repo.test-these.list | while read line ; do echo -n " $line " >&2 ; pud -fq "$line" 2>&1; if [ $? -ne 0 ] ; then ; echo "ERRRORRED" >&2 ; break ; fi ; done | awk '/^Ran ([0-9]+) test/ { printf "+%d", $2}'
 ```
 
-This ☝️ used `pud` from the [below aliases](#aliases). It gives progressive
+This gives progressive
 output only of each sub-project name as it _starts_ and doesn't show a stack
-track. (If the test suite X failed, just do `pud -vf X` to see details).
+trace. (If the test suite X failed, just do `pud -vf X` to see details).
 
 
 
@@ -206,6 +249,8 @@ def load_tests(loader, tests, ignore):  # (this is a unittest API hook-in)
 
 
 ## <a name=aliases></a>(these aliases)
+
+These aliases are now installed by the "dotfiles" sub-project (see).
 
 ### alias for executing python:
 
