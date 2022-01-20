@@ -1,0 +1,16 @@
+# REMINDER: this file is intended to exist as a file in version control
+# and a symlink pointing to it from the typical dotfile location.
+# As you make edits here, you should commit the changes to the target file,
+# or (as appropriate) move the edits to an appropriate unversioned file.
+
+alias g=git
+alias gb="git branch"
+alias gd="git diff"
+alias gs="git status"
+alias gw="git log --oneline -25"
+alias p=patch
+alias pi='py ./pho/cli/commands/issues.py'
+alias pud='py -m unittest discover'
+alias py='python3 -W error::Warning::0'
+
+# #born

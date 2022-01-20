@@ -36,6 +36,8 @@ bindkey '^E' end-of-line
 bindkey '^[OA' history-beginning-search-backward
 bindkey '^[OB' history-beginning-search-forward
 
+source ~/.aliases
+
 if [ -e ~/.zshrc.local ]; then
   source ~/.zshrc.local
 fi
