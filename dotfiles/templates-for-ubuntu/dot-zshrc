@@ -36,6 +36,21 @@ bindkey '^E' end-of-line
 bindkey '^[OA' history-beginning-search-backward
 bindkey '^[OB' history-beginning-search-forward
 
+# Lines added for python, pyenv
+if [[ "$PATH" == */.pyenv/* ]] ; then
+  >&2 echo "(skipping pyenv config because it appears configed already)"
+else
+  >&2 echo "(beginning pyenv config)"
+  export PYTHONPATH='.'
+  PYENV_ROOT="$HOME/.pyenv"
+  PATH="$PYENV_ROOT/bin:$PATH"
+  eval $(pyenv init --path)
+  eval $(pyenv init -)
+  eval $(pyenv virtualenv-init -)
+  >&2 echo "(finished with pyenv config)"
+fi
+# End lines added for python, pyenv
+
 source ~/.aliases
 
 if [ -e ~/.zshrc.local ]; then

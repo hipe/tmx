@@ -37,7 +37,7 @@ def grammar_path_():
 def _walk_using_this(which, input_string):
     walker = getattr(_walkers(), which)
     model = _query_parser().parse(
-            text=input_string,
+            input_string,
             whitespace='')  # we do our own whitespace. see #here2
     return walker.walk(model)
 

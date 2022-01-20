@@ -40,7 +40,6 @@ class TaggingCommonCase:
 
         _given_string = self.given_string()
         from tag_lyfe.magnetics import tagging_subtree_via_string as mag
-
         return mag.doc_pairs_via_string(_given_string)
 
     do_trace_only = False

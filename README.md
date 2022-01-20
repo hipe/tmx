@@ -164,7 +164,7 @@ The below uses an alias described in the [relevant section](#aliases).
 This is the current sketch:
 
 ```bash
-cat mono-repo.test-these.list | while read line ; do echo -n " $line " >&2 ; pud -fq "$line" 2>&1; if [ $? -ne 0 ] ; then ; echo "ERRRORRED" >&2 ; break ; fi ; done | awk '/^Ran ([0-9]+) test/ { printf "+%d", $2}'
+cat mono-repo.test-these.list | while read line; do >&2 echo -n " $line "; 2>&1 pud -fq "$line"; if [ $? -ne 0 ]; then; >&2 echo "ERRRORRED"; break; fi; done | awk '/^Ran ([0-9]+) test/ { printf "+%d", $2}'
 ```
 
 This gives progressive

@@ -1,0 +1,39 @@
+digraph g {
+label="\nfig. 108.2) Touching the Requisite Python Environment"
+node[shape=rect]
+action_start[label="start here"]
+action_start->yn_IPI
+yn_IPI[label="is pyenv\ninstalled?" shape=diamond]
+yn_IPI->action_IP[label=no]
+yn_IPI->yn_IRPBV[label=yes]
+action_IP[label="install\npyenv"]
+action_IP->yn_IRPBV
+yn_IRPBV[label="is the requisite\npython version\nbuilt?" shape=diamond]
+yn_IRPBV->action_BRP[label=no]
+yn_IRPBV->yn_IPVEI[label=yes]
+action_BRP[label="build\nrequisite\npython"]
+action_BRP->yn_IPVEI
+yn_IPVEI[label="is pyenv-virtualenv\ninstalled?" shape=diamond]
+yn_IPVEI->yn_IRVEI[label="(should be\nalways yes)"]
+yn_IRVEI[label="is the requisite\nvirtual environment\ncreated?" shape=diamond]
+yn_IRVEI->action_BRVE[label=no]
+yn_IRVEI->yn_UVES[label=yes]
+action_BRVE[label="create the requisite\nvirtual environment"]
+action_BRVE->yn_UVES[label=yes]
+yn_UVES[label="do you need to\nupdate the virtual\nenvironment (string)?" shape=diamond]
+yn_UVES->yn_IR[label=no]
+yn_UVES->action_UVE[label=yes]
+action_UVE[label="update local\nvirtual environment\n(string)"]
+action_UVE->yn_IR
+yn_IR[label="do you need\nto install the\nrequired packages?" shape=diamond]
+yn_IR->action_IR[label=no]
+yn_IR->action_party[label=yes]
+action_IR[label="install the\nrequired packages"]
+action_IR->action_party
+action_party[label="it's time\nto party"]
+}
+
+
+/*
+# #born
+*/

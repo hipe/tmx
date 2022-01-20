@@ -3,13 +3,18 @@ title: installing and deploying python
 date: 2018-03-08T13:22:09-05:00
 ---
 
-# Objective, Scope & History
+# Objective of this document
+
+Setting up a new machine "should be easy", but XX
+
+
+# Scope & History of this document
 
 The current significance of this document is that it .. documents exactly
 what we did (to the best of our records) to get our Ubuntu workstation
 (laptop) tuned to our developer's muscle-memory, starting "from scratch"
 on a clean install (Pop!\_OS 21.10 on a System76 Galago Pro, what we refer
-to more generically as "Ubuntu" below).
+below more generically as "Ubuntu").
 
 More specifically, at #history-A.4 the scope of this document changed in
 these two ways:
@@ -50,7 +55,7 @@ scripts and similar.
 
 # What order to set things up in
 
-Setting up a new system mostly involves:
+Setting up a new system involves mostly:
 1. typing (or pasting) things into a shell to install packages and
 1. typing (or otherwise installing) config info in config files
 
@@ -74,10 +79,12 @@ the shell, then our editor, then our development runtime.
 We type the "Ctrl" key a lot (in combination with other keys).
 
 It's apparently a common thing for Linux users to change the
-rarely-used but prominently placed "Caps Lock" key to instead serve as
+rarely-used but prominently-placed "Caps Lock" key to instead serve as
 another "Ctrl" key. We do this and find it useful.
 
-To make this change, follow these (ask ubuntu instructions)[clctrl]).
+To make this change on Ubuntu, follow these (ask ubuntu instructions)[clctrl]).
+
+(We made this change on OS X before, but didn't document it.)
 
 Now we can go on to setting up our shell.
 
@@ -116,7 +123,18 @@ chsh -s $(which zsh)
 is a well-documented topic.)
 
 
-## (Historical Note)
+## Configuring your zsh
+
+We now keep our zsh configuration files in version control and we
+now have a dedicated sub-project for this ("dotfiles").
+
+Every line in the versioned zsh configuration files corresponds to
+a commit that explains what the line does and why we use that configuration.
+
+Please see that sub-project.
+
+
+## ("oh-my-zsh": A historical footnote)
 
 We used to use "oh-my-zsh" but we opted not to this time because it overloaded
 our alias space and more generally our cognitive space: it did so much stuff
@@ -125,6 +143,28 @@ our alias space and more generally our cognitive space: it did so much stuff
 This time (experimentally) we want to cherry-pick those things from
 oh-my-zsh that we wish we (again) had, and write them "by hand" into our
 dotfiles.
+
+(After writing this, we discovered that [this blog][zsh3] feels the same way.)
+
+
+## A Terminal Nicety: xsel or xclip or pbcopy
+
+It's nice to be able to pipe text into the clipboard:
+
+```bash
+sudo apt-get install xsel
+```
+
+Then get something into the clipboard with:
+
+```bash
+echo "foo" | xsel -ib
+```
+
+(On OS X the comparable executable is "pbcopy".)
+
+(We chose `xsel` over `xcopy` only because the equivalent command
+is shorter in `xsel`. `xcopy` supposedly has some benefits over `xsel`.)
 
 
 # Setting up `vim`
@@ -138,9 +178,10 @@ of the following:
   I learned first."
 
 - A matter of personal philosophy:
+  "I use only FOSS editors because 'free' as in 'freedom'." Or:
   "I use emacs (not vim) because it's more powerful (I can watch youtubes
   in one of my split-window panes). Also, Richard M Stallman is a personal
-  friend of mine. And, 'free' as in 'freedom'."
+  friend of mine."
 
 - A matter of certain IDE's being de-facto required for the particular
   kind of development: Android Studio for android, XCode for iPhone,
@@ -164,23 +205,27 @@ The configuration of a `vim` consits entirely of:
 1. the config as written in the `.vimrc` file and
 1. what plugins are installed (plugins are just directories in a directory)
 
-The next two sections correspond to these two aspects (in the opposite
-order of above, because the config file references plugin things).
+(There are more complicated ways to do config involving multiple files,
+but fortunately we don't need or use such a config architecture yet.)
+
+Since the config file configs plugin-related settings, below we cover
+the plugins first then the config file.
 
 Formally, these instructions document our recent experience on Ubuntu,
 but as far as we remember, these instructions "should" work for OS X as well
 (because all we were doing was trying to mimic our old OS X environment
 on our new Ubuntu machine).
 
-Because config in the config file will refer back to installed plugins,
-we'll do the plugins first before we look at the config.
-
 
 ## The `vim` plugins
 
-EDIT order in terms of perceived primacy (i.e., the order is meaningless)
+Because of vim's new-ish plugin architecture, the installation of most vim
+plugins involves simply doing a git checkout into a particular directory.
 
-INstallation generally EDIT
+The linked-to instructions below will all be variations on this theme.
+
+These are in order of our personal perception of their primacy (which is
+mostly meaningless):
 
 1. (nerdtree)[nt1]: as directed but `plugins` not `vendor`
 1. (mru)[mru1]: as directed but `plugins` not `downloads`
@@ -197,100 +242,303 @@ INstallation generally EDIT
 
 ## The `.vimrc`
 
-We "install" the `.vimrc` as provided by our "dotfiles" sub-project (see).
+We house our `.vimrc` in version control with the (correct) assumption
+that we will want changes to our vim config to travel with us easily
+from machine to machine, in "both" directions: (one) we want to be able
+to "pull" the config from the "cloud" on to a new machine, and (two)
+as we employ new config settings, we want to be able to "push" those
+changes up to the cloud to more easily keep our desired config synced
+across machines.
 
-We let our `.vimrc` "live" in this sub-project to ease the pain of future
-development machine migrations.
+To this end, you can install a `.vimrc` on to a new machine using
+the installer script at the "dotfiles" sub-project (see).
 
 
-# have correct python version (once per version per system)
+# Installing the requisite python environment
 
-The requisite python version lives in .python-version.
+In order to reach the correct version of python and the necessary
+packages, we use `pyenv` to employ virtual environments. How we do so
+is covered in the following sections. Typically you only have to do this
+once per machine, and then parts of it again as the requisite python
+version changes, or requisite package versions change or packages are
+added or removed.
 
-The following sections will guide us through how we get
-this version of python installed.
+To manage our own sanity in documenting this, we created [#018.2]
+this flowchart, which may come in handy to refer to as you read this,
+because the flowchart served as the outline this documentation was
+built around.
 
+
+## Is pyenv installed?
+
+On a brand new system, `pyenv` probably isn't already installed.
+
+You can check if it is installed (correctly) with:
+
+```bash
+which pyenv
+```
+
+To install it, follow [their instructions][pyenv1]; which is basically just
+doing a git checkout into a certain directory and adding lines to your
+`.zshrc` or `.bashrc` or similar to alter your `PATH` (more on this below).
+
+Duplicating those instructions at writing, this was:
+
+```bash
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+```
+
+(At #history-B.1 we removed instructions for how we had originally installed
+it on OS X, assuming that the above instructions are more up-to-date
+than the curl-pipe-to-bash way.)
+
+We let the "dotfiles" sub-project house the `.zshrc` file we use.
+
+If you set up your `zsh` as described above, then your `.zshrc` should
+have some lines something like:
+
+```bash
+eval $(pyenv init --path)
+eval $(pyenv init -)
+```
+
+After this and restarting your shell (`exec "$SHELL"`), you should
+be able to see that pyenv is installed with the above check.
+
+
+## Is the requisite python version built?
+
+On a new machine, you will have to build the requisite version of python once.
+(More precisely, you will have to build a python once per machine per requisite
+version of python.)
+
+The requisite version of python is expressed within the contents of the
+`.python-version` file at the root of the mono-repo. (At #history-B.1 the
+contents of this file changed from being _the_ requisite python version,
+to being an arbitrary name that _contains_ the requisite python version.)
+
+
+### To see what local python version(s) pyenv already knows about:
+
+```bash
+pyenv local
+```
+
+On a brand new machine, the outputted list would be empty.
+
+
+### To see what python versions are available in the world:
+
+You may want to do this if you don't see the requisite python version
+on this machine, and you want to confirm that it's a python version that
+exists out in the world.
+
+Also you  may want to check to check if there's a python version newer than
+the one you're currently targeting. (But NOTE that targeting a new python
+version can take a nontrivial amount of work, to handle breaking changes
+it introduces (especially to our depended packages, but maybe to our own
+code too).
+
+```bash
+pyenv install --list
+```
+
+This will output a long list of available versions.
+
+
+## To build a version of python
+
+Again, you should only need to do this once per machine per python version.
+
+(On our Debian, we also had to install these, per [here][here]:)
+
+```bash
+sudo apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils \
+    tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+```
+
+Build the requisite python version:
+
+```bash
+pyenv install 3.10.1
+```
+
+This took about 5 minutes on our machine the last time we did it.
+
+Below, we will create a virtual environment that uses this install
+of python and confirm that we can reach it.
+
+
+## Is `pyenv-virtualenv` installed?
+
+As far as we can tell, pyenv-virtualenv is now distributed with pyenv,
+so if you've been following along, it should be installed by now.
+
+But, to check:
+
+```bash
+pyenv virtualenv --help
+```
+
+In case we're wrong (and you need to install it),
+the instructions of the (pyenv-virtualenv)[pvenv1] docs are something like:
+
+
+```bash
+cd "$(pyenv root)
+git clone https://github.com/pyenv/pyenv-virtualenv.git
+```
+
+A line like this should already be in your `.zshrc` if you installed it
+with our "dotfiles" sub-project as describe above:
+
+```bash
+eval $(pyenv virtualenv-init -)
+```
+
+## Is the requisite virtual environment created?
+
+The contents of the `.python-version` file consist entirely of the
+virtual environment name, which is arbitrary. (This has changed from
+what it was before (just the python version) at #history-B.1, as mentioned
+above.)
+
+We need to create a virtual environment that points to our requisite
+version of python (built above).
+
+To see a list of the virtual environments that pyenv knows about on this
+machine:
+
+```bash
+pyenv virtualenvs
+```
+
+This should output nothing on a new machine. If it's a new machine,
+or you're XX
+
+
+## (To delete an existing virtual environment)
+
+This may come in handy during development, if you're trying to start
+from scratch (to rebuild from nothing, because requirements are broken
+after an upgrade, for example), or maybe you just want to change the name.
+
+```bash
+pyenv virtualenv-delete <virtual-environment-name>
+```
+
+It will ask you to confirm this. To confirm it, enter `y`.
+
+
+## To create the requisite virtual environment
+
+Now that we have the requisite python version built (above), we create
+a virtual environment that corresponds to the requisite build of python.
+
+The command we will issue consists of four tokens:
+
+```bash
+pyenv virtualenv <python-version> <virtual-environment-name>
+```
+
+The third token is the requisite version of python. The fourth token is
+an arbitrary name we chose for the virtual environment. Although we
+keep saying that the name is "arbitrary", what name you choose here
+is significant:
+
+If you're simply creating a virtual environment to correspond to the
+one in the `.python-version` file (for example, on a new machine),
+then use the virtual environment name exactly as it appears in that
+file for the virtual environment name in the command you issue here. Once
+you finish this section, *skip the next section*, instead go directly to
+the section after that.
+
+Otherwise, you're probably trying to upgrade the python version on your
+development tree. After you complete this section, continue to the next one.
+In such a case, chose a name for your virtual environment that has the
+requisite python version.
+
+Issue the command (with the appropriate virtual environment name) now:
+
+```bash
+pyenv virtualenv 3.10.1 my-main-venv-3.10.1
+
+```
+
+(This takes maybe 4 seconds to complete on the current machine.)
+
+(At #history-B.1 we stopped using the `virtualenv` command directly.)
+
+If we run the same command from the previous section to see the
+virtual environments pyenv knows about, you will now see this name
+you chose in the output.
+
+Now either continue to the next section or the section after that
+as appropriate.
+
+
+## To update the virtual environment string in `.python-version`
+
+We want the string in `.python-version` to match exactly our virtual
+environment name. (In effect, the string in that file is what "selects"
+our virtual environment.)
+
+If you're attempting to upgrade your python version, you will need to
+change the string in `.python-version` to match exactly the name of your
+new virtual environment.
+
+The end-result of this command is simply to overwrite the string
+in that file. But it has the additional added benefit of validating
+that the name you enter corresponds to an existing virtual environment.
+
+```bash
+pyenv local my-main-venv-3.10.1
+```
+
+(We last did this in (#history-B.1).)
+
+Now, we want to confirm that our new virtual environment is active.
+
+
+## To confirm that the requisite virtual environment is active
+
+To confirm that your virtual environment is activated (accomplished by
+the previous section), you can do:
+
+```bash
+which python3
+```
+
+It should say something about "../.pyenv/shims..". If it does not,
+
+1. Ensure that you are in a directory that has the `.python-version`
+   file in it (the mono-repo directory).
+1. Review review the last section again, and read the vendor documentation more
+   closely, because it may have changed since we last updated this document.
+
+With this done, we can now install our required python packages as necessary
+which we cover in the following sections.
 
 
 ## have "pip" somehow
 
-On Ubuntu, we did:
+At writing, the "pip" we have now comes along with the virtual envrionment
+when we activate it. So if you have followed the instructions so far,
+doing `which pip` should now show the same kind of path as `which python3`,
+that is, one from the `../shims/..` directory.
+
+(We archived how we used to get "pip" at #history-B.1)
+
+You may, however, want to check for updates:
 
 ```bash
-sudo apt install python3-pip
+pip install --upgrade pip
 ```
 
-On OS X, we don't remember how we got it or if it was pre-installed.
 
-
-
-## install pyenv (once per system)
-
-    curl https://pyenv.run | bash
-    # (above worked on OSX and Ubuntu)
-    # (also worked:) brew upgrade pyenv
-
-EDIT the remainder of this section to reflect dotfiles
-
-Add to ~/.zshrc
-
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-
-Restart shell:
-
-    exec "$SHELL"
-
-
-
-## to see what python version(s) pyenv has installed:
-
-    pyenv local
-
-
-
-## to see if newer python versions exist in the world:
-
-    pyenv install --list
-
-
-
-## (debian: we had do to this to install the requisite python at writing)
-
-(from [here][here]:)
-
-    sudo apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev \
-        libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils \
-        tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-
-
-
-## build target python version (once per version per system)
-
-    pyenv install 3.10.1  # might take 5 minutes
-    pyenv local 3.10.1  # writes .python-version
-    py -V  # confirm this says the right version (uses aliases in README.md)
-
-
-
-# virtual environment stuff
-
-EDIT change this section to reflect pyenv-virtualenv
-
-
-## create your virtualenv (once per project directory)
-
-    virtualenv --python=python3 my-venv
-
-
-
-## enter your virtualenv (once per work session (terminal))
-
-    source my-venv/bin/activate
-
-
-
-## one per virtual environment per (set of dependencies)
+## To install the mono-repo's requirements with `pip`
 
     pip install -r requirements.txt
 
@@ -302,34 +550,95 @@ EDIT change this section to reflect pyenv-virtualenv
 (☝️ this takes some time, like at least 5 minutes)
 
 
+## (To see what versions of a package are available in the world)
 
-# Other ancillaries and auxiliaries
+```bash
+pip index versions pelican
+```
 
-All of this is for Ubuntu for now.
+(where "pelican" is the name of the package)
 
-If you want to view the GraphViz dotfiles generated by some sub-projects,
+(note this became available only in a recent version of pip at writing)
+
+(from [here][here])
+
+
+## (To see what dependencies a package brings with it)
+
+Current pip at writing does not do this elegantly.
+See this [stack overflow post][pip1].
+
+
+# Other Niceties
+
+## A Development Nicety: GraphViz for viewing "\*.dot" files
+
+There are dozens of GraphViz files ("\*.dot") spread throughout the
+documentation of the sub-projects. Some of our libraries _generate_
+GraphViz files from other sources (like "pho-issues" which can generate
+dependency graphs from collections of issues).
+
+To view these files, we use GraphViz, available on OS X and Linux.
+
+On Ubuntu:
 
 ```bash
 sudo apt install xdot
 ```
 
-We don't remember why we needed these (but we seem to have):
+(On OS X we installed it with their installer, and got a binary called
+`dot` somehow.)
+
+Then to open (on Ubuntu):
+
+```bash
+xdot <file.dot>
+```
+
+Or (when everything is aligned correctly) (Ubuntu and OS X) simply:
+
+```bash
+open <file.dot>
+```
+
+
+## A Development Nicety: patchutils
+
+We use a tool in this library only rarely, but when we need it we're glad
+we have it.
+
+```bash
+sudo apt-get install patchutils
+```
+
+From this library, we use `splitdiff` which breaks up a larger patchfile
+into smaller patchfiles, one for each file the patch patches.
+
+We employ this technique of keeping the XX git stashes XX
+
+
+## Other Niceties
+
+We don't remember why we needed this (but we seem to have):
 
 ```bash
 sudo apt install gnome-tweak-tool
 ```
 
-
 [clctrl]: https://askubuntu.com/questions/33773/how-do-i-remap-the-caps-lock-and-ctrl-keys
 [here]: https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+[pip1]: https://stackoverflow.com/questions/11147667/is-there-a-way-to-list-pip-dependencies-requirements
+[pvenv1]: https://github.com/pyenv/pyenv-virtualenv
 [pyenv1]: https://github.com/pyenv/pyenv
 [this_page]: https://github.com/googleapis/google-api-python-client
 [zsh1]: https://scriptingosx.com/2019/07/moving-to-zsh-06-customizing-the-zsh-prompt/
 [zsh2]: https://askubuntu.com/questions/131823/how-to-make-zsh-the-default-shell
+[zsh3]: https://dev.to/rossijonas/how-to-set-up-history-based-autocompletion-in-zsh-k7o
 
 
 ## <a name='document-meta'></a>document-meta
 
+  - #history-B.1: pyenv virtualenv not just virtualenv
   - #history-A.4
   - #history-A.3: virtualenv & pip, not poetry
   - #history-A.2: upgrade to 3.8.0. poetry not pipenv. sunset lots of configs

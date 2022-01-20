@@ -12,15 +12,15 @@ install this with:
 |grep_dump_test          | (none)
 |upload_bot_test         | (none)
 |modality_agnostic_test  | (none)
-|script_lib_test         | (none)
+|text_lib_test           | (none)
 |microservice_lib_test   | (none)
+|script_lib_test         | (none)
 |tag_lyfe_test           | tatsu
-|kiss_rdb_test           | toml, enolib, click
+|kiss_rdb_test           | enolib, toml, click
 |^ google sheets         | google-api-python-client, google-auth-httplib2,
 |                        | google-auth-oauthlib
-|data_pipes_test         | soupsieve, bs4
-|sakin_agac_test         | (none)
-|pho_test                | (none)
+|data_pipes_test         | bs4
+|pho_test                | pelican
 
 
 
