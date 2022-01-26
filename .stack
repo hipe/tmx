@@ -28,8 +28,3 @@ Something about ssh keys and bitbucket
 Get photos off phone
 You have this WIP from November, something about animation and recfiles notes
 Figure out the right way to configure vim in a per-file way
-Make sure every vim plugin is documented or scripted
-Redistribute commits of big issues file out to respective commits
-Melt "_FLOATING_.dot" into the issues thing, also these issues to "HERE"
-Be able to generate digraphs from big issues thing
-Do EDITs in [#018]

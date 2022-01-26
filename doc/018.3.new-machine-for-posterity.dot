@@ -1,0 +1,51 @@
+digraph g {
+/* discussion:
+This document was created just for us to organize our strategy for
+where to start with getting set up on a new machine..
+
+It sort of relates to the nearby "timesheet".
+
+Originally we had planned on "melting" the content in this document into
+[#406] the "everything" graph (by retroactively inter-splicing activity
+on that graph with the commits that relate to the nodes), so that we could
+animate our efforts here in context with the big picture (and show it in
+context with the bigger graph).
+
+But now that we have gotten to the end of that effort, we realize that such
+a retro-active melting would be superfluous and inelegant. But we couldn't
+bring ourselves to just delete the document so here it is.)
+*/
+node[shape="rect"]
+thing_12[label="1: map caps\nlock to ctrl"]
+thing_12->thing_05
+thing_05[label="2 (2): install\nvim (why?)"]
+thing_05->thing_09
+thing_09[label="3: custom\nmapping\nof ESC\nto \"sd\""]
+thing_09->thing_07
+thing_07[label="4: install\ngvim"]
+thing_07->thing_06
+thing_06[label="tpope\nthing"]
+thing_06->thing_08
+thing_08[label="NERDTree"]
+thing_08->thing_01
+thing_06->thing_10
+thing_10[label="ctrl-P"]
+thing_10->thing_01
+thing_06->thing_11
+thing_11[label="MRE"]
+thing_11->thing_01
+thing_01[label="vi\nmuscle\nmemoratic"]
+thing_01->thing_03
+thing_04[label="zsh for\ntoken expansion"]
+thing_04->thing_02
+thing_02[label="shell and OS\nmuscle\nmemoratic"]
+thing_02->thing_03
+thing_03[label="can write\ngraph viz'es\nthe raw way"]
+thing_03->thing_14
+thing_14[label="set up\npython\nenvironment"]
+thing_14->thing_13
+thing_13[label="can write\ngraph viz'es\nthe cool way"]
+}
+/*
+# #born
+*/

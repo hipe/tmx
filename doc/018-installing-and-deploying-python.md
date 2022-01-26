@@ -5,7 +5,17 @@ date: 2018-03-08T13:22:09-05:00
 
 # Objective of this document
 
-Setting up a new machine "should be easy", but XX
+Setting up a new machine "should be easy", but in fact a developer spends
+years and decades building up muscle memory for many dozens of utilities
+and configurations that they may very well take for granted until the time
+comes that they find themselves on a new machine they have to set up from
+scratch as a development workstation (possibly even on a new operating
+system yikes!).
+
+(For posterity, we have [#018.3] a rough flowchart and [#018.4] a timesheet
+that we used to guide this effort and track the project. To look at the
+commit dates around this time, you can see that this timesheet alone does
+not reflect the full amount of effort that was expended to this end.)
 
 
 # Scope & History of this document
@@ -416,7 +426,9 @@ pyenv virtualenvs
 ```
 
 This should output nothing on a new machine. If it's a new machine,
-or you're XX
+or you're upgrading versions of python or otherwise troubleshooting
+some package issues; the next two sections will guide you through
+creating (and deleting) virtual environments.
 
 
 ## (To delete an existing virtual environment)
@@ -439,6 +451,9 @@ virtual environment of packages.)
 
 Now that we have the requisite python version built (above), we create
 a virtual environment that corresponds to the requisite build of python.
+
+(See also a script in the "dotfiles" sub-project, which does what is
+covered in this section in a more scripted way.)
 
 The command we will issue consists of four tokens:
 
@@ -617,7 +632,16 @@ sudo apt-get install patchutils
 From this library, we use `splitdiff` which breaks up a larger patchfile
 into smaller patchfiles, one for each file the patch patches.
 
-We employ this technique of keeping the XX git stashes XX
+We find this technique useful in cases close to the use cases of "git stash"
+or a branch, but your work is nicely contained in one patchfile and you are
+willing to let it drift from its parent commit for whatever reason (for
+example because lots of development has gone on since doing this work, so
+you anticipate you will have to do lots of work to re-integrate the patch).
+
+Working with a series of relatively small patch-files can facilitate a
+divide-and-conquer approach to a large integration in a manner that can be
+less cumbersome and awkward than when trying to do the equivalent by
+resolving lots and lots of merge conflicts in the usual way.
 
 
 ## Other Niceties
