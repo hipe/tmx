@@ -431,6 +431,9 @@ pyenv virtualenv-delete <virtual-environment-name>
 
 It will ask you to confirm this. To confirm it, enter `y`.
 
+(See also a script in the "dotfiles" sub-project for clearing out your
+virtual environment of packages.)
+
 
 ## To create the requisite virtual environment
 

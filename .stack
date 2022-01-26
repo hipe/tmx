@@ -32,6 +32,4 @@ Make sure every vim plugin is documented or scripted
 Redistribute commits of big issues file out to respective commits
 Melt "_FLOATING_.dot" into the issues thing, also these issues to "HERE"
 Be able to generate digraphs from big issues thing
-How to pyenv and virtualenv
 Do EDITs in [#018]
-From an empty environment, install using instructions from setup.py (update)
