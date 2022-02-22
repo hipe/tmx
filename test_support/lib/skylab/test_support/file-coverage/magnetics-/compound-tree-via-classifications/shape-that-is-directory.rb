@@ -57,7 +57,8 @@ module Skylab::TestSupport
           end
         end
 
-        TYPE_FILE___ = %w( -type file )
+        # TYPE_FILE___ = %w( -type file )  # #history-B.1
+        TYPE_FILE___ = %w( -type f )
 
         def __when_none_found command
           @on_event_selectively_.call :error, :expression, :no_files_found do |y|
@@ -274,3 +275,4 @@ module Skylab::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

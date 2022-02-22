@@ -1,0 +1,6 @@
+This is not actually a gif file.
+It's acting as a fixture, to demonstrate how
+certain files are skipped based on an allow-list of
+file extensions
+
+# #born

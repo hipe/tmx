@@ -118,7 +118,7 @@ module Skylab::Human
           if @_is_completion
             :Is_Lemmatic_Completion_XXX
           else
-            :Is_Lemmatic_Neutral_XXX
+            :Is_Add_Nothing
           end
         elsif @trilean.nil?
           if @_is_completion

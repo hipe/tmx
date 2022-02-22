@@ -15,8 +15,12 @@ module Skylab::System::TestSupport
         end
 
       act = _args.dup
-      act[ 3 ] = 'XX'
-      act == %w'find -H -f XX -- ( -name find_spec.* )' || fail
+      # == BEGIN at #history-B.1 (GNU find not BSD find) changed in these ways:
+      # - offset 2 not 3 YUCK
+      # - no more "--"
+      act[ 2 ] = 'XX'  # changed from 3 to 2 at #history-B.1 YUCK
+      act == %w'find -H XX ( -name find_spec.* )' || fail
+      # == END
     end
 
     it "emits an informational event upon request" do
@@ -81,3 +85,4 @@ module Skylab::System::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

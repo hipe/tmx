@@ -45,6 +45,47 @@ installation (suited, necessarily, for develpment). the remainder of the
 sections in this document cover these steps.
 
 
+## New installation notes for January, 2022 (on Ubuntu) EDIT
+
+XX Integrate this into the section that comes after it!!
+
+Seven years later, this section contains new notes that:
+- have NOT been integrated into this document yet
+- DO contradict the older instructions in this document
+
+("TMX-ruby" is such a legacy thing with mostly code-to-be-archived
+that we don't bother being pretty about these instructions at the moment..)
+
+Here in January 2022, we're experimenting with `asdf` intead of
+the other options discussed here, for managing ruby versions and
+virtual environments.
+
+Per [the asdf instructions][asdf1],
+
+```bash
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0
+```
+
+The remainder of the "Installation" section describes a line to put
+in your .zshrc, but at writing we have XX to the "dotfiles" sub-project
+of TMX-python.
+
+Then per [the asdf ruby instructions][asdf2], 
+
+```bash
+asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
+```
+
+Then
+
+```bash
+asdf install ruby VERSION
+```
+
+where VERSION is the one in `.tool-versions`.
+
+This took about 4 minutes (give or take) on our machine at writing.
+
 
 
 ## install the necessary version of ruby [#here.c]
@@ -103,6 +144,18 @@ directory.
 
 
 [zaiste.net]: https://zaiste.net/posts/towards_simplicity_from_rbenv_to_chruby/
+
+
+## other gems
+
+When we get around to running tests we'll need these:
+
+```bash
+gem install rspec
+```
+
+(it was 3.10.2) (but ..?? XX)
+
 
 ## using the installation scripts
 
@@ -243,6 +296,8 @@ ourselves of these softwares we can't do without:
     instructions, so do not get too attached to them :P
 
 
+[asdf1]: https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies
+[asdf2]: https://github.com/asdf-vm/asdf-ruby
 
 
 ## document-meta

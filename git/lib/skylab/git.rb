@@ -16,7 +16,7 @@ module Skylab::Git
 
   lazily :CLI do
 
-    class CLI < Home_.lib_.brazen::CLI
+    class CLI < Home_.lib_.brazen_NOUVEAU::CLI
 
       expose_executables_with_prefix 'tmx-git-'
 

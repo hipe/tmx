@@ -459,13 +459,17 @@ module Skylab::Common
         by() { p[] }
       end
 
-      def via_nonsparse_array a
+      def via_nonsparse_array a, & p
         d = -1 ; last = a.length - 1
-        by do
+        res = by do
           if d < last
             a.fetch d += 1
           end
         end
+        if block_given?
+          return res.map_reduce_by( & p )
+        end
+        return res
       end
     end  # >>
 

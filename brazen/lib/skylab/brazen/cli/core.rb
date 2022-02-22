@@ -2856,6 +2856,13 @@ module Skylab::Brazen
 
       def _finish argv, a
 
+        # == BEGIN #history-B.1
+        @EXPERIMENTAL_OPTIONS_HASH = nil
+        if 0 < argv.length and argv[-1].respond_to? :has_key?
+          @EXPERIMENTAL_OPTIONS_HASH = argv.pop
+        end
+        # == END
+
         @argv = argv
         if a
           __receive_bridges a
@@ -2889,6 +2896,10 @@ module Skylab::Brazen
         @argv = a
         @_is_finished = true
         NIL_
+      end
+
+      def RELEASE_EXPERIMENTAL_OPTIONS_HASH
+        remove_instance_variable :@EXPERIMENTAL_OPTIONS_HASH
       end
 
       # ~
@@ -3151,6 +3162,7 @@ module Skylab::Brazen
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-A.2 (can be temporary): commit comment as referenced
 # #history-A.1: begin splicing matryoshka-killer in to legacy file
 # #tombstone: re-entrancy

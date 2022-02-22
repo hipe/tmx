@@ -32,11 +32,17 @@ module Skylab::TestSupport::TestSupport
 
       ignore_these_common_emissions_
 
-      _hi = finish_by do |st|
+      res = finish_by do |st|
         st.gets
       end
 
-      false == _hi || fail
+      if res.nil?
+        # Ubuntu probably
+      elsif false == res
+        # OS X probably
+      else
+        fail "expected nil or false: #{ res.inspect }"
+      end
     end
 
     it "find self EXPLORATORY" do

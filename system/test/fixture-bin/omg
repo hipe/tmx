@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env -S ruby -W2
 
 # (we can read from stdin using just bash, but we can not `flock` in a
 #  sufficiently portable way, so we are using ruby for this guy too)

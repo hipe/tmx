@@ -8,10 +8,7 @@
 [#013] #open roundrobin and related ..
              ( #was: something about the flyweightism of font )
 
-[#012] #open specs are currently not faked so they're built assuming
-             particular fonts are found.. (but given the scope of this
-             utility, *maybe* it will be ok..)
-
+[#012] #hole
 
 [#011] #open this rewrite (i.e when #milestone-8)
 

@@ -2,6 +2,8 @@ require_relative '../test-support'
 
 module Skylab::MyTerm::TestSupport
 
+  same_dir = '005-fake-fonts-dir'
+
   describe "[my] iCLI - adapterful" do
 
     TS_[ self ]
@@ -46,6 +48,8 @@ module Skylab::MyTerm::TestSupport
       end
 
       context "(first screen)" do
+
+        fake_fonts_dir same_dir
 
         screen 0
 

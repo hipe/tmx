@@ -12,5 +12,7 @@ alias p=patch
 alias pi='py ./pho/cli/commands/issues.py'
 alias pud='py -m unittest discover'
 alias py='python3 -W error::Warning::0'
+alias st='~/Projects/TMX/tan_man/bin/tmx-tan-man-stack'
+alias ts='~/Projects/TMX/script/dev/timestamp'
 
 # #born

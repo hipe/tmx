@@ -15,7 +15,7 @@ module Skylab::Cull
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   lazily :CLI do
-    ::Class.new Brazen_::CLI
+    ::Class.new Home_.lib_.brazen::CLI
   end
 
   API = ::Module.new
@@ -287,7 +287,7 @@ module Skylab::Cull
 
     ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
-    Brazen_NOUVEAU = sidesys[ :Brazen ]  # for [sl]
+    Brazen = sidesys[ :Brazen ]  # for [sl]
     Fields = sidesys[ :Fields ]
     Parse_lib = sidesys[ :Parse ]
     System_lib = sidesys[ :System ]

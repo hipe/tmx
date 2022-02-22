@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from script_lib.cheap_arg_parse import cheap_arg_parse
-from script_lib.cheap_arg_parse_branch import cheap_arg_parse_branch
+from script_lib.cheap_arg_parse import cheap_arg_parse, cheap_arg_parse_branch
 
 
 _default_ts_path = 'z/times'
@@ -36,7 +35,7 @@ def _CLI(sin, sout, serr, argv, efx):
     def description():
         yield "(Currently this is just an API for other CLI's"
         yield "(in other environments) to call. BUT: this can be invoked"
-        yield "directly too. NOTE we are not marreid to this branch-node"
+        yield "directly too. NOTE we are not married to this branch-node"
         yield "design. experimental)"
 
     return cheap_arg_parse_branch(

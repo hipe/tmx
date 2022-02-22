@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Actions::Map < Action_
 
-      Brazen_::Modelesque.entity self,
+      Home_.lib_.brazen::Modelesque.entity self,
 
           :ad_hoc_normalizer, -> qkn, & p do
             if qkn.is_known_known

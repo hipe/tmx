@@ -53,7 +53,7 @@ module Skylab::DocTest
       if @_find.ok
         __build_index_via path, st
       else
-        path
+        @_find.ok
       end
     end
 

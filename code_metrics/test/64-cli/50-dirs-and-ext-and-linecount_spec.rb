@@ -37,12 +37,11 @@ module Skylab::CodeMetrics::TestSupport
         path[]
         path[]
         expect( st.gets ).to eql "(including blank lines and comment lines)\n"
-        expect( st.gets ).to match %r(\Awc -l \/)
+        expect( st.gets ).to match %r(\bwc -l \/)
         expect( st.gets ).to be_nil
       end
 
       it "headers" do
-
         expect( headers_ ).to eql(
          [ :file, :lines, :total_share, :normal_share, :_blank_header_ ] )
       end
@@ -75,8 +74,10 @@ module Skylab::CodeMetrics::TestSupport
       memoize_output_lines_ do
 
         # (was [#006], [#007.A])
-
-        invoke 'line-count', Fixture_file_directory_[], '-vvv'
+        invoke(
+          'line-count', Fixture_file_directory_[], '-vvv',
+          PATH_MAX_WIDTH: 68  # arrived at practically, based on fixture tree
+        )
       end
     end
 

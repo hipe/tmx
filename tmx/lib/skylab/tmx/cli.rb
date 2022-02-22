@@ -272,6 +272,9 @@ module Skylab::TMX
       def __describe_test_all y
         y << "[ts] \"slowie\"'s high-level test running and reporting operations"
         y << "with some trivial adaptations (e.g verbosity)"
+        y << nil
+        y << "Frequently you want `-order after -slice 1st third`, etc"
+        y << "Not sure why -order and -slice primaries are not showing up!"
       end
 
       def __bound_call_for_test_all

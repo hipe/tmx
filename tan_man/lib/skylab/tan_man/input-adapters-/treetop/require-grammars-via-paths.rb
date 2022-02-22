@@ -172,7 +172,10 @@ module Skylab::TanMan
         mkdir_p = uow.make_this_directory_minus_p
         if mkdir_p
           # the below is #open [#086]
-          Home_._COVER_ME__comment_this_line_out_one_time_when_you_start_from_an_empty_tmpdir__  # #todo
+          if :_not_set_ == @@_sanity_checker
+            @@_sanity_checker = SanityChecker__.new
+          end
+          @@_sanity_checker.check mkdir_p
           # see also the script in [sy] tagged with this
           # other options include:
           #   - don't emit its emission at all..
@@ -249,10 +252,44 @@ module Skylab::TanMan
         cls
       end
 
+      @@_sanity_checker = :_not_set_
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      class SanityChecker__
+        # Make sure that forever during this whole runtime, we only ever
+        # create grammar directories in the same arbitrary directory.
+        #
+        # So, whatever first directory we create, that dirname becomes
+        # THE direname.
+        #
+        # This is an extra-cautious precaution we take because we don't like
+        # the idea of buggy code creating aberrant temp directories
+        # in arbitrary locations throughout the filesystem.
+        #
+        # If this precaution conflicts with requirements, change it.
+        #
+        # refactored from something else at #history-B.1
+
+        def initialize
+          @_state = :_initial_state_
+        end
+
+        def check dir
+          this_dirname = ::File.dirname dir
+          if :_initial_state_ == @_state
+            @_THE_dir = this_dirname
+            @_state = :_subsequent_state_
+            return
+          end
+          :_subsequent_state_ == @_state or fail
+          this_dirname == @_THE_dir or fail "sanity check failed"
+        end
+      end
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-B: became magnetic
 # :#tombstone: crazy formal parameter class with directory / f.s "smarts" and..
 #              silly detailed error messages from requiring treetop parsers

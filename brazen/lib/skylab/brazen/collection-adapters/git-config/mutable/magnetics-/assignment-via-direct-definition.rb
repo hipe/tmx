@@ -90,7 +90,7 @@ module Skylab::Brazen
         end
 
         def __when_string
-          if 110 < @mixed_value.length
+          if 150 < @mixed_value.length
             self._COVER_ME__sanity_check__string_seems_quite_long__
           else
             s = @mixed_value.dup

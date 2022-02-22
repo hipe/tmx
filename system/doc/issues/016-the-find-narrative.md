@@ -16,6 +16,16 @@ then another renovation).
 ## requirements for this latest edition
 
 
+### Portability requirements (currently a wishlist item)
+
+- At #history-B.1 we changed development platform from OS X to Ubuntu.
+  This led to a change in the version of `find` from a (maybe) BSD version
+  to a GNU version, which meant a change in available features and syntax
+  and this broke everything.
+  See the corresponding code comments created in this commit and infer
+  the scope creep we could expand to.
+
+
 ### interface requirements
 
 • make find commands be built with iambic args of course, like
@@ -88,3 +98,8 @@ object, just to do this one ad-hoc task. (EDIT: just extend)
 when this would-be actor is finished it produces its result. that result
 in internalized into an ivar in the command object and it is frozen.
 crazy fun.
+
+
+## (document-meta)
+
+- #history-B.1: target Ubuntu not OS X

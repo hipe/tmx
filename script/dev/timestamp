@@ -20,7 +20,13 @@ ok=1
 
 
 # constants (""):
-file='z/times'
+
+default_file='z/times'
+if [ -z "$TMX_TIMESTAMP_FILE" ]; then
+  file="$default_file"
+else
+  file="$TMX_TIMESTAMP_FILE"
+fi
 
 
 
@@ -278,6 +284,9 @@ if [ "$do_help" ]; then
   echo "" >&2
   echo "description: append a timestamp line to ${file}" >&2
   echo "             (our minimal time tracking system)" >&2
+  echo "" >&2
+  echo "environmnent variables:" >&2
+  echo "    TMX_TIMESTAMP_FILE  the file to use (default: $default_file)" >&2
   echo "" >&2
   echo "options:" >&2
   echo "    -d    date. uglyly include month-day in timestamp" >&2

@@ -316,7 +316,9 @@ module Skylab::Zerk
           if h
             -> symbol_or_loadable_reference do
               # when a primary of a remote "mounted" operator, is symbol
-              ::Symbol === symbol_or_loadable_reference or self._OK_FINE
+              if not symbol_or_loadable_reference.is_a?( ::Symbol )
+                symbol_or_loadable_reference._HELLO_LOADABLE_REFERENCE_
+              end
               k = symbol_or_loadable_reference  # [#062] might be symbol, might be object
               h[ k ] || remote[ k ]
             end

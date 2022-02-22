@@ -20,7 +20,10 @@ module Skylab::DocTest::TestSupport
       want_emission :error, :find_error do |em|
 
         _lines = black_and_white_lines em
-        _lines.fetch(0).include? "not-here.d: No such file or directory" or fail
+        line = _lines.fetch(0)
+        # at #history-B.1, GNU find uses a single quote around the pathname
+        line.include? 'No such file or directory' or fail
+        line.include? 'not-here.d' or fail
       end
     end
 
@@ -152,3 +155,4 @@ module Skylab::DocTest::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

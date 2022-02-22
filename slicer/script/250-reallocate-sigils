@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env -S ruby -W2
 
 class Skylab_Slicer_OneOff_1___
 
@@ -222,7 +222,7 @@ class Skylab_Slicer_OneOff_1___
 
     require 'skylab/tmx' ; @TMX = ::Skylab::TMX  # sneak this in here
 
-    cmd = %w( find . -type f -depth 2 -name )
+    cmd = %w( find . -mindepth 2 -maxdepth 2 -type f -name )
     cmd.push @TMX::METADATA_FILENAME
 
     opts = {}

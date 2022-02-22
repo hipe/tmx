@@ -207,8 +207,10 @@ module Skylab::Git
       def __when_probably_output
 
         s = @_sout.gets
-        s_ = @_sout.gets
-        s_ and self._UNEXPECTED_LINE
+        unless s.nil?
+          s_ = @_sout.gets
+          s_ and self._UNEXPECTED_LINE
+        end
         @_wait.value.exitstatus.zero? or self._COVER_ME_nonzero_exitstatus_from_git
 
         if s

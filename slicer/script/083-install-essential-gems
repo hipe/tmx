@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env -S ruby -W2
 
 class Skylab_Slicer_OneOff_0  # Nx
 
@@ -507,6 +507,15 @@ class Skylab_Slicer_OneOff_0  # Nx
 
     def terminate_interaction exitstatus
       exitstatus
+    end
+
+    def download_reporter
+      @_download_reporter ||= _build_download_reporter
+    end
+
+    def _build_download_reporter
+      # require 'rubygems/user_interaction'
+      ::Gem::StreamUI::VerboseDownloadReporter.new @stderr
     end
   end
 

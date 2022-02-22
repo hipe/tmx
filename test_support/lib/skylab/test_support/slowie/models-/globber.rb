@@ -104,15 +104,18 @@ module Skylab::TestSupport
         write_wc, read_wc_out, read_wc_err, wc_wait = ::Open3.popen3( * WORDCOUNT_COMMAND___ )
           # ::Open3 is @system_conduit, but we are being clear we cannot mock this
 
-        _command = @_find_command.args
+        _command = @_find_command.to_command_tokens
 
         _pid = ::Kernel.spawn( * _command, out: write_wc, err: write_find_err )
 
         # -- find stuff
 
         ::Process.wait _pid
-        _find_wait_value = $?  # eew
-        _find_wait_value.exitstatus.zero? || fail
+        find_wait_value = $?  # eew
+
+        if not find_wait_value.exitstatus.zero?
+          raise "`find` failed (exitstatus: #{find_wait_value.exitstatus})"
+        end
 
         write_find_err.close
         read_find_err.gets && fail
@@ -133,8 +136,9 @@ module Skylab::TestSupport
         md[ :count_number ].to_i
       end
 
-      def to_path_stream
-        @_find_command.path_stream_via @system_conduit
+      def to_path_stream_probably_ordered
+        # probably not necessary on OS X but meh
+        @_find_command.path_stream_probably_ordered_via @system_conduit
       end
 
       def directory
@@ -152,4 +156,5 @@ module Skylab::TestSupport
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history: abstracted from what is at the time the "magnetics" node

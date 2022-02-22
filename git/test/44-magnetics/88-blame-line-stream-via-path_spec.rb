@@ -37,8 +37,10 @@ module Skylab::Git::TestSupport
         em = a.first
         em.channel_symbol_array == [ :error, :expression, :system_error ] || fail
         _msg = em.to_black_and_white_line
-
-        md = /\Afatal: '[^']+' is outside repository \(exitstatus: (\d+)\)\z/.match _msg
+        md = /\Afatal: '[^']+' is outside repository\b(?<rest>.+)\Z/.match _msg
+        md || fail
+        rest = md[:rest]
+        md = /\bexitstatus: (?<es>\d+)/.match rest
         md || fail
         md[1].to_i == same || fail
       end

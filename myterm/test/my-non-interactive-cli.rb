@@ -3,12 +3,13 @@ module Skylab::MyTerm::TestSupport
   module My_Non_Interactive_CLI
 
     def self.[] tcc
-      tcc.send :define_singleton_method, :given, Given___
+      tcc.extend ModuleMethods___
       tcc.include InstanceMethods
     end
 
-    Given___ = -> & p do
-
+    module ModuleMethods___
+      def given & p
+      # -
       yes = true ; x = nil
       define_method :niCLI_state do
         if yes
@@ -16,6 +17,14 @@ module Skylab::MyTerm::TestSupport
           x = instance_exec( & p )
         else
           x
+        end
+      end
+      # -
+      end
+
+      def fake_fonts_dir dir
+        define_method :_fake_fonts_dir do
+          dir
         end
       end
     end
@@ -57,7 +66,13 @@ module Skylab::MyTerm::TestSupport
       end
 
       def prepare_CLI_for_niCLI_ cli
-
+        dir = _fake_fonts_dir
+        cli.EXPERIMENTAL_SETUP_ACS_ = -> acs do
+          if dir
+            path = TS_::Qualified_fonts_dir_via[dir]
+            acs.kernel_.silo(:Installation).fonts_dir = path
+          end
+        end
         cli.filesystem_conduit = filesystem_conduit_for_niCLI_
         cli.system_conduit = system_conduit_for_niCLI_
         NIL_
@@ -81,6 +96,10 @@ module Skylab::MyTerm::TestSupport
 
       def subject_CLI
         Home_::CLI
+      end
+
+      def _fake_fonts_dir  # if one is not set explictly in test setup
+        NOTHING_
       end
     end
 

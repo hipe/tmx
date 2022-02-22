@@ -7,7 +7,7 @@ module Skylab::MyTerm::TestSupport
     TS_[ self ]
     use :my_API
 
-    # NOTE the below tests with shouts in their names are #open [#012]
+    same_dir = '005-fake-fonts-dir'
 
     context "if you try to set the font while no adapter is selected" do
 
@@ -24,17 +24,20 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    context "try to set a font that is not found (LIVE, FRAGILE)" do
+    context "try to set a font that is not found" do
+
+      fake_fonts_dir same_dir
 
       call_by do
-        call :adapter, COMMON_ADAPTER_CONST_, :background_font, :path, 'menlaco'
+        this = 'font-geta'
+        call :adapter, COMMON_ADAPTER_CONST_, :background_font, :path, this
       end
 
       it "fails" do
         fails
       end
 
-      it "explains skipped font files (LIVE, FRAGILE)" do
+      it "explains skipped font files" do
 
         _be_this = be_emission :info, :expression, :skipped do |y|
 
@@ -58,12 +61,16 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "says that your font wasn't recognized (NOTE contextualiztion removed)" do
-        expect( _msg_a.fetch( 0 ) ).to eql 'unrecognized font path "menlaco"'
+        expect( _msg_a.fetch( 0 ) ).to eql 'unrecognized font path "font-geta"'
       end
 
       it "offers around 3 levenshtein-based suggestions" do
 
         # #lends-coverage-to [#hu-008.2]
+
+        # #todo the below note is old now after #history-B.1; we're gonna
+        # leave it as-is because for now we don't have time to figure out
+        # how to trigger the desired behavior specifially.
 
         # NOTE this test anchors this whole test suite to the development
         # machine. when you make fixtures make them so that the [#ba-065.2]
@@ -71,22 +78,24 @@ module Skylab::MyTerm::TestSupport
         # a few others that are "far away" from them, to demonstrate that
         # the others are cut out of the final "winners" list.
 
-        _msg = _msg_a.fetch( -1 )
-        _msg == 'did you mean "menlo" or "monaco"?' || fail
+        msg = _msg_a.fetch( -1 )
+        msg == 'did you mean "font-beta", "font-delta" or "font-gamma"?' || fail
       end
     end
 
-    context "set the font using a good name (FRAGILE)" do
+    context "set the font using a good name" do
+
+      fake_fonts_dir same_dir
 
       call_by do
         call :adapter, COMMON_ADAPTER_CONST_,
-          :background_font, :path, 'monaco'
+          :background_font, :path, 'font-delta'
       end
 
       it "because succeeds, results in qk about the path" do
 
         _qk = root_ACS_result
-        expect( _qk.value ).to match %r(\bMonaco\.dfont\z)
+        expect( _qk.value ).to match %r(\bfont-delta\.ttf\z)
       end
 
       it "event sounds natural (but is not yet contextualized)" do

@@ -102,8 +102,17 @@ module Skylab::SubTree::TestSupport
         :path, %w( not-there ),
         :output_stream, io
 
-      want_not_OK_event :find_error,
-        'find: not-there: No such file or directory (exitstatus: 1)'
+      want_not_OK_event :find_error do |ev|
+        ev = ev.to_event
+        ea = Common_::Event.codifying_expression_agent_instance
+        msgs = ev.to_stream_of_lines_rendered_under(ea).to_a
+        1 == msgs.length or fail
+        msg, = msgs
+        # #history-B.1: GNU puts quotes around it, BSD no
+        msg.include? 'not-there' or fail
+        msg.include? 'No such file or directory' or fail
+        msg.include? '(exitstatus: 1)' or fail  # ..
+      end
 
       want_fail
     end
@@ -129,3 +138,4 @@ module Skylab::SubTree::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

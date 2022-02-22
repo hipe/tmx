@@ -108,7 +108,8 @@ module Skylab::TestSupport
         # (change `:path` to `:paths` for this to work on multiple files)
 
         _ = @_Search_and_Replace::API.call(
-          :ruby_regexp, RX___,
+          :ruby_regexp, RUBY_REGEXP__,
+          :egrep_pattern, EGREP_PATTERN__,
           :path, path,
           :search,
           :replacement_expression, REPLACEMENT_EXPRESSION___,
@@ -256,11 +257,17 @@ module Skylab::TestSupport
 
       # ==
 
-        RX___ = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
+      EGREP_PATTERN__ = '^([ ]+)describe "([^\\"]|\\.)+" do$'
+      # At #history-B.1 our use of egrep broke
+      # because 'grep (GNU grep) 3.7' doesn't support "(?:  )"
+      # and it took hours to figure this out
+
+      RUBY_REGEXP__ = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
 
         REPLACEMENT_EXPRESSION___ = '{{ $1 }}describe "{{ $2 }}", wip: true do'
       # ==
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #tombstone-A: "handler expresser"

@@ -89,7 +89,7 @@ module Skylab::Common
         self._COVER_ME
       else
         r = head.length .. -1
-        Home_::Stream.via_nonsparse_array paths do |path|
+        Home_::Stream.via_nonsparse_array( paths ).map_by do |path|
           path[ r ]
         end
       end
@@ -157,8 +157,7 @@ module Skylab::Common
     end
 
     def _to_stream_of_executables
-
-      Home_::Stream.via_nonsparse_array ::Dir[ @_exe_glob ] do |path|
+      Home_::Stream.via_nonsparse_array(::Dir[ @_exe_glob ]).map_by do |path|
         ::File.basename path  # be careful
       end
     end

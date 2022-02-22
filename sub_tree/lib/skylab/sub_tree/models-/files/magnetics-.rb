@@ -31,7 +31,8 @@ module Skylab::SubTree
           _ = Home_.lib_.system.find(
             :paths, @paths,
             * _pattern_part,
-            :freeform_query_infix_words, %w'-type file',
+            :freeform_query_infix_words, %w'-type f',
+            # (at #history-B.1, above wasn't portable as `-type file`)
             :when_command, IDENTITY_,
             & @listener )
 
@@ -80,3 +81,4 @@ module Skylab::SubTree
     end
   end
 end
+# #history-B.1: target Unbuntu not OS X

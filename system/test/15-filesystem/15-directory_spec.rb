@@ -23,11 +23,12 @@ module Skylab::System::TestSupport
 
       _given_stubbed_NON_empty_directory
 
+      # at #history-B.1, the subject began alphabetizing this
       _want_names(
-        :red_time,
-        :orange_pal,
-        :yellow_friend,
         :blue_buddy,
+        :orange_pal,
+        :red_time,
+        :yellow_friend,
       )
     end
 
@@ -39,9 +40,10 @@ module Skylab::System::TestSupport
         o.glob_entry = '*.yes'
       end
 
+      # at #history-B.1, the subject began alphabetizing this
       _want_names(
-        :orange_pal,
         :blue_buddy,
+        :orange_pal,
       )
     end
 
@@ -53,9 +55,10 @@ module Skylab::System::TestSupport
         o.filename_pattern = /\A(re|bl)/
       end
 
+      # at #history-B.1, the subject began alphabetizing this
       _want_names(
-        :red_time,
         :blue_buddy,
+        :red_time,
       )
     end
 
@@ -183,32 +186,32 @@ module Skylab::System::TestSupport
         st = ob.to_loadable_reference_stream
 
         first = st.gets
-        first.normal_symbol == :one || fail
+        first.normal_symbol == :A_one || fail
         second = st.gets
-        second.normal_symbol == :two || fail
+        second.normal_symbol == :B_two || fail
 
-        fourth_dereffed = ob.dereference :four
+        fourth_dereffed = ob.dereference :D_four
           # (this dereference pushes The One scanner forward)
         fourth_dereffed || fail
 
         third = st.gets
-        third.normal_symbol == :three || fail
+        third.normal_symbol == :C_three || fail
           # (but note this detached stream is consistent with itself)
 
         fourth = st.gets
-        fourth.normal_symbol == :four || fail
+        fourth.normal_symbol == :D_four || fail
 
         fifth = st.gets
-        fifth.normal_symbol == :five || fail
+        fifth.normal_symbol == :E_five || fail
 
-        first_dereffed = ob.dereference :one
+        first_dereffed = ob.dereference :A_one
           # (dereference an item from before we started dereferencing)
         first_dereffed || fail
 
         _wat = st.gets
         _wat && fail
 
-        fifth_dereffed = ob.dereference :five
+        fifth_dereffed = ob.dereference :E_five
           # (dereference an item from after our first dereference)
         fifth_dereffed || fail
 
@@ -391,7 +394,7 @@ module Skylab::System::TestSupport
       end,
 
       'severalz/*' => -> do
-        %w( one two three four five )
+        %w( A_one B_two C_three E_five D_four )
       end,
 
       'shibboleth-empty-dir/*' => -> { EMPTY_A_ },
@@ -406,6 +409,13 @@ module Skylab::System::TestSupport
 
     # ==
 
+    # discussion: at #history-B.1 when we changed from OS X to Ubuntu,
+    # we had to apply a "by hand" sort to directory listings. The below
+    # paths make it look like the filesystem presents them in this arbitrary
+    # order (which is apparently ROYGBIV), but now at writing we sort these
+    # paths from the filesystem "by hand" to have some platform-agnostic
+    # consistency. So the surface order won't be the below order
+
     X_fs_dir_THESE = %w(
       /blim/blam/red-time
       /blim/blam/orange-pal.yes
@@ -417,4 +427,5 @@ module Skylab::System::TestSupport
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-A: full rewrite during assimilation two nodes into one.

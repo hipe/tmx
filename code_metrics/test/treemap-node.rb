@@ -95,15 +95,10 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       def want_root_node_has_an_appropriate_label_string_
-
         s = treemap_node_.label_string
-
         s || fail
-
-        _d = Home_.lib_.basic::String.count_occurrences_in_string_of_string(
-          s, ::File::SEPARATOR )
-
-        ( 2..6 ).include? _d or fail  # shallowest is six
+        s.include? ::File::SEPARATOR or fail
+        11 < s.length || fail
       end
 
       def number_of_leaf_nodes_of_ node

@@ -9,8 +9,16 @@ class Skylab::Task
       end
 
       def execute
+        # == BEGIN fix for target Ubuntu #history-B.1
+        dir_obj = remove_instance_variable :@directory_object
+        unordered = dir_obj.entries
+        ordered = Home_.lib_.system.maybe_sort_filesystem_entries unordered
+        if 0 < ordered.length and '.' == ordered
+          ordered = ordered[2..-1]
+        end
+        @_entries_array = ordered
+        # == END
 
-        @_entries_array = remove_instance_variable( :@directory_object ).entries
         __init_prepared_entry_stream
         __init_token_stream_prototype
 
@@ -49,4 +57,5 @@ class Skylab::Task
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history: rewrote from old version

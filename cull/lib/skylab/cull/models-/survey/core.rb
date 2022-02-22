@@ -377,7 +377,7 @@ module Skylab::Cull
 
     Common_associations_ = Lazy_.call do
 
-      _ca = Home_.lib_.brazen_NOUVEAU::CommonAssociations.define do |o|
+      _ca = Home_.lib_.brazen::CommonAssociations.define do |o|
 
         o.property_grammatical_injection_by do
           MTk_::AssociationToolkit::Pluralton_powered_parameter_grammatical_injection[]
@@ -425,7 +425,7 @@ module Skylab::Cull
     # ==
 
     Git_config_ = Lazy_.call do
-      Home_.lib_.brazen_NOUVEAU::CollectionAdapters::GitConfig
+      Home_.lib_.brazen::CollectionAdapters::GitConfig
     end
 
     # ==

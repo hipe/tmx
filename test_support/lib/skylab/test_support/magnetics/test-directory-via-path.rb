@@ -95,7 +95,10 @@ module Skylab::TestSupport
 
         @__find = _.with(
           :filenames, @filenames,  # "always safe"
-          :freeform_query_infix_words, %w( -type dir -maxdepth 1 )
+          # == BEGIN GNU find has different syntax than BSD find YUCK
+          # :freeform_query_infix_words, %w( -type dir -maxdepth 1 )
+          :freeform_query_infix_words, %w( -maxdepth 1 -type d )
+          # == END
         ) do | * i_a, & ev_p |
 
           yes = true
@@ -119,7 +122,8 @@ module Skylab::TestSupport
 
         @did_find = false
 
-        st = @__find.with( :path, current_path ).to_path_stream
+        has_args = @__find.with(:path, current_path)
+        st = has_args.to_path_stream_probably_ordered
 
         if st
           one = st.gets
@@ -143,3 +147,4 @@ module Skylab::TestSupport
     end
   # -
 end
+# #history-B.1: target Ubuntu not OS X

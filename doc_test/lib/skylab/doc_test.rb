@@ -166,8 +166,8 @@ module Skylab::DocTest
     NIL_
   end
 
-  Stream_ = -> nonsparse_a do
-    Common_::Stream.via_nonsparse_array nonsparse_a
+  Stream_ = -> nonsparse_a, & p do
+    Common_::Stream.via_nonsparse_array nonsparse_a, & p
   end
 
   Scanner_ = -> a do

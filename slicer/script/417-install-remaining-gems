@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env -S ruby -W2
 
 require 'skylab/slicer'
 sli = Skylab::Slicer::API
@@ -36,7 +36,7 @@ invo = Skylab::Slicer::ScriptSupport_::Invocation.define do |o|
       out a shorter list from a longer list.
 
       (the `-order after` modification orders the sidesystems up roughly
-      from \"easiest\" to \"hardest\", so that easier to understand teset
+      from \"easiest\" to \"hardest\", so that easier to understand test
       failures generally occur before more complex test failures.
       our version of \"fail fast\" can be achieved with `-order after -reverse`.)
 

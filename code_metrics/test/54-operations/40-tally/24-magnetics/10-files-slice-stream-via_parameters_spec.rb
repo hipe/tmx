@@ -54,11 +54,9 @@ module Skylab::CodeMetrics::TestSupport
 
         expect( em.channel_symbol_array.last ).to eql :from_find
 
-        _ = "find: -egads-not-a-path-nor-an-operator: No such file or directory\n"
-
-        _act = em.to_black_and_white_line
-
-        _act == _ || fail
+        act = em.to_black_and_white_line
+        act.include? 'No such file or directory' or fail
+        act.include? '-egads-not-a-path-nor-an-operator' or fail
       end
     end
 

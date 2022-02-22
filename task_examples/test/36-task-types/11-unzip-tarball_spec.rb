@@ -153,9 +153,11 @@ module Skylab::TaskExamples::TestSupport
             expag.calculate s_a, & em.expression_proc
           end
 
-          expect( s_a.fetch 0 ).to eql "x mginy/"
-          expect( s_a.fetch 1 ).to eql "\nx mginy/README\n"  # weird chunking
-          2 == s_a.length or fail
+          # #history-B.1 accomodate the tar that's on Ubuntu
+          # OS X's tar emits a dedicated line for creating a directory,
+          # not so with Ubuntu's (tar (GNU tar) 1.34)
+          expect(s_a.fetch(-1)).to eql "(from tar) mginy/README\n"
+          (1..2).include?(s_a.length) or fail
         end
       end
     end
@@ -173,3 +175,4 @@ module Skylab::TaskExamples::TestSupport
     end
   end
 end
+# #history-B.1: migrate to Ubuntu from OS X

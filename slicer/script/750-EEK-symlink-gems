@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env -S ruby -W2
 
 require 'skylab/slicer'
 
@@ -15,6 +15,8 @@ invo = Skylab::Slicer::ScriptSupport_::Invocation.define do |o|
     y << "dry run is default. you have to set a special environment variable"
     y << "(recommendation: do it on the command line: `ENV_VAR=x the/command`)"
     y << "in order to turn dry-run off."
+    y << nil
+    y << "(the env var is \"TMX_OMG\". you have to set it to \"yes\")"
   end
 
   o.stdin = $stdin

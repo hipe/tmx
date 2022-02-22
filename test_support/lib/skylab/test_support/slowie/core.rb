@@ -377,6 +377,25 @@ module Skylab::TestSupport
         end
         NIL
       end
+
+      def DO_SOMETHING_WITH_CONFIG
+        # NOTE before #history-B.1 we used to rely on config files.
+        # currently we are experimenting with doing the config here
+        # so that this works out-of-the-box more
+
+        c = ::RSpec.configuration
+
+        # exclude wip
+        ef = c.exclusion_filter
+        unless ef.empty?
+          fail "we haven't decided how to reconcile this with that. config?"
+        end
+        c.exclusion_filter = {wip: true}
+
+        # order defined
+        c.order = :defined   # TODO we don't know if this works
+        NIL
+      end
     end
 
     # ==
@@ -440,6 +459,10 @@ module Skylab::TestSupport
       attr_reader(
         :name,
       )
+
+      def _HELLO_LOADABLE_REFERENCE_
+        NIL
+      end
     end
 
     class MethodBasedRouting___
@@ -465,6 +488,10 @@ module Skylab::TestSupport
       def bound_call_method_name
         :__bound_call_for_method_based_operation
       end
+
+      def _HELLO_LOADABLE_REFERENCE_
+        NIL
+      end
     end
 
     # ==
@@ -472,6 +499,7 @@ module Skylab::TestSupport
     Here_ = self
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #tombstone-C: well-rounded, linguistic expression agent
 # #tombstone-B: sunset orphanic adapter base class (adpaters are [#027])
 # #tombstone-A: sunset orphanic, storied "relish" adapter (b. 2013-07-03)

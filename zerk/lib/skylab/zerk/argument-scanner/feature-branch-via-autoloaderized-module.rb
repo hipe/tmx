@@ -77,7 +77,9 @@ module Skylab::Zerk
 
         def lookup_softly key_x  # #[#ze-051.1] "trueish item value"
 
-          ::Symbol === key_x || self._OK__but_just_checking__
+          if not key_x.is_a?(::Symbol)
+            key_x._HELLO_LOADABLE_REFERENCE_
+          end
 
           _slug = Slug_via_symbol__[ key_x.intern ]  # #here2
 

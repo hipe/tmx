@@ -36,7 +36,7 @@ whose only purpose is to glue together other such branches.
 
 ## installation
 
-see INSTALLATION.md for installation (TODO).
+Please see INSTALLATION.md for installation.
 
 
 

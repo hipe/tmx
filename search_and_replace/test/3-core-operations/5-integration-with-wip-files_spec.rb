@@ -82,7 +82,8 @@ module Skylab::SearchAndReplace::TestSupport
         o = _state
         o.seen_find_command_args == 1 || fail
         o.seen_grep_command_head == 1 || fail
-        o.seen_set_leaf_component == 3 || fail
+        num = o.seen_set_leaf_component
+        (3..4).include? num or fail  # #history-B.1
       end
 
       def __BIG_state
@@ -178,7 +179,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         s, o, e, w = ::Open3.popen3 'bash', chdir: @_path
 
-        s.puts 'git init .'
+        s.puts 'git init -b mayne .'
 
         _here = ::File.join @_path, '.git'
         _line = o.gets
@@ -196,7 +197,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         s.close
 
-        o.gets =~ %r(\A\[master \(root-commit\) ) or fail
+        o.gets =~ %r(\A\[mayne \(root-commit\) ) or fail
 
         w.value.exitstatus.zero? or fail
 

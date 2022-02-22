@@ -1,5 +1,6 @@
 /.coverage
 /*.egg-info
+*/*.gem
 /htmlcov
 /my-venv
 .pnp.js

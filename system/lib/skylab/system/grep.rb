@@ -414,6 +414,12 @@ module Skylab::System
       end
 
       def __hand_written_map_expand pcs
+
+        # == BEGIN
+        # necessary on Ubuntu-like but prob not on OS X, #history-B.1
+        pcs = __traverse_the_stream_and_sort_the_files(pcs)
+        # == END
+
         p = nil ; ok = nil ; reached_end_successfully = false
         close = -> { p = nil ; NOTHING_ }
         close_with_failure = -> { ok = false ; close[] }
@@ -503,6 +509,47 @@ module Skylab::System
           end
         end
       end
+
+      def __traverse_the_stream_and_sort_the_files pcs
+        lines = []
+        sanity = 1000
+        count = 0
+        begin
+          line = pcs.gets_one_stdout_line
+          if not line
+            reached_end_successfully = pcs.was_OK
+            break
+          end
+          if sanity == count
+            raise "reached #{sanity} files. streaming would be better"
+          end
+          count += 1
+          lines.push line
+          redo
+        end while above
+        lines = Home_.services.maybe_sort_filesystem_paths lines  # #history-B.1
+        ProcessFacade___.new(lines, reached_end_successfully)
+      end
+    end
+
+    # ==
+
+    class ProcessFacade___
+      # This is just for when we are on Ubuntu-like and the process that
+      # produces filesystem names doesn't do it in order so we have to
+      # exhaust the stream (process) and sort the files then pretend like
+      # we are a process
+
+      def initialize(lines, reached_end_successfully)
+        @_the_stream = Common_::Stream.via_nonsparse_array(lines)
+        @was_OK = reached_end_successfully
+      end
+
+      def gets_one_stdout_line
+        return @_the_stream.gets
+      end
+
+      attr_reader :was_OK
     end
 
     # ==
@@ -538,5 +585,6 @@ module Skylab::System
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-A.2: extract process stuff out to [sy]
 # #history-A.1: spike the pipe-find-to-grep experiment

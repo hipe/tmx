@@ -41,6 +41,7 @@ module Skylab::System
       end
 
       def initialize
+        @_filesystem_path_sorter = nil
         @_dereference = :__dereference_initially
       end
 
@@ -56,17 +57,38 @@ module Skylab::System
         _service :Environment
       end
 
+      def maybe_sort_filesystem_paths paths
+        _filesystem_path_sorter::Maybe_sort_filesystem_paths[paths]
+      end
+
+      def maybe_sort_filesystem_entries entries
+        _filesystem_path_sorter::Maybe_sort_filesystem_entries[entries]
+      end
+
+      def _filesystem_path_sorter
+        if @_filesystem_path_sorter.nil?
+          @_filesystem_path_sorter = _determine_FS_path_sorter
+        end
+        @_filesystem_path_sorter
+      end
+
+      def _determine_FS_path_sorter
+        if ::RUBY_PLATFORM.include? 'darwin'
+          NoOpPathSorter___
+        else
+          Home_::Filesystem::UbuntuPathSorter__
+        end
+      end
+
       def filesystem
         _service :Filesystem
       end
 
       def find * a, & p
-
         _lib( :Find ).against_mutable_ a, &p
       end
 
       def grep * a, & p
-
         _lib( :Grep ).against_mutable_ a, &p
       end
 
@@ -172,6 +194,17 @@ module Skylab::System
       end
     end
   # -
+
+  module NoOpPathSorter___  # see the other path sorter for doc
+
+    Maybe_sort_filesystem_paths = -> paths do
+      paths
+    end
+
+    Maybe_sort_filesystem_entries = -> entries do
+      entries
+    end
+  end
 
   # ==
 

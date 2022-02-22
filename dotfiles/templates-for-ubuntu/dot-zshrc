@@ -36,6 +36,15 @@ bindkey '^E' end-of-line
 bindkey '^[OA' history-beginning-search-backward
 bindkey '^[OB' history-beginning-search-forward
 
+# These
+# (doing asdf before pyenv so pyenv gets to the front of PATH (for no reason))
+if [[ "$PATH" == */.asdf/* ]]; then
+  >&2 echo "(skipping asdf config because it appears configed already)"
+else
+  . ~/.asdf/asdf.sh
+fi
+# End These
+
 # Lines added for python, pyenv
 if [[ "$PATH" == */.pyenv/* ]] ; then
   >&2 echo "(skipping pyenv config because it appears configed already)"

@@ -86,6 +86,8 @@ module Skylab::TestSupport
         else
           _mediator.receive_notification_of_intention_to_require_only
         end
+
+        _mediator.DO_SOMETHING_WITH_CONFIG
         NIL
       end
 

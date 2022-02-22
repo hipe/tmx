@@ -96,26 +96,26 @@ module Skylab::CodeMetrics
         end
 
         def receive__find_dirs_command__data i_a, & x_p
-
-          if _verbosity_is_at_level_for_commands
-
-            receive_event_on_channel x_p[], i_a
-          end
+          _receive_command_data i_a, x_p
         end
 
         def receive__find_files_command__data i_a, & x_p
-
-          if _verbosity_is_at_level_for_commands
-
-            receive_event_on_channel x_p[], i_a
-          end
+          _receive_command_data i_a, x_p
         end
 
-        def receive__line_count_command__data i_a, & ev_p
+        def receive__line_count_command__data i_a, & x_p
+          _receive_command_data i_a, x_p
+        end
 
+        def receive__wc_command__data i_a, & x_p
+          _receive_command_data i_a, x_p
+        end
+
+        def _receive_command_data i_a, x_p
           if _verbosity_is_at_level_for_commands
-
-            receive_event_on_channel ev_p[], i_a
+            x = x_p[]
+            ev = x.to_event
+            receive_event_on_channel ev, i_a
           end
         end
 
@@ -135,7 +135,7 @@ module Skylab::CodeMetrics
           end
         end
 
-        def receive__wc_command__data i_a, & x_p
+        def receive__wc_pipey_command_string__data i_a, & x_p  # not covered #todo
 
           if _verbosity_is_at_level_for_commands
 
@@ -194,7 +194,6 @@ module Skylab::CodeMetrics
         end
 
         def _express_totals_when_nonzero_children totes
-
           totes.finish
           __express_totals_as_table @resources.sout, totes
         end
@@ -215,7 +214,13 @@ module Skylab::CodeMetrics
 
           _mixed_tuple_stream = totes.to_value_stream.map_by do |subnode|
             a = ::Array.new number_of_columns
-            a[ column_for_path ] = subnode.slug
+
+            # == BEGIN #history-B.1
+            long_path = subnode.slug
+            short_path = _maybe_shorten_long_path long_path
+            a[ column_for_path ] = short_path
+            # == END
+
             a[ column_for_count ] = subnode.count
             a[ column_for_total_share ] = subnode.total_share * 100  # e.g 0.25
             a[ column_for_normal_share ] = subnode.normal_share * 100  # e.g 0.5
@@ -500,6 +505,39 @@ module Skylab::CodeMetrics
 
         # -- support for table rendering
 
+        # == BEGIN for #history-B.1, truncate long pathnames
+
+        def prepare_backstream_call iambic
+          @_path_max_width = nil
+          h = @resources.RELEASE_EXPERIMENTAL_OPTIONS_HASH
+          if not h
+            return ACHIEVED_
+          end
+          @_path_max_width = h.delete :PATH_MAX_WIDTH
+          6 < @_path_max_width or raise "path max width must be at least 7"
+          h.length.nonzero? and raise "unexpected option"
+          ACHIEVED_
+        end
+
+        def _maybe_shorten_long_path path
+          if @_path_max_width.nil?
+            return path
+          end
+          if path.length <= @_path_max_width
+            return path
+          end
+          mutable = path[ (-@_path_max_width) .. -1 ]
+          if ::File::SEPARATOR == path[0]  # preserve abs-path-lookiness (cov'd)
+            mutable[0] = ::File::SEPARATOR
+            mutable[1..5] = '[...]'
+          else
+            mutable[0..2] = '...'
+          end
+          return mutable
+        end
+
+       # == END
+
         def _lookup_expression_width
           Home_::CLI::HARD_CODED_WIDTH_
         end
@@ -509,7 +547,6 @@ module Skylab::CodeMetrics
         # the canonical levels: ( fatal error warning notice info trace )
 
         def _verbosity_is_at_least_NOTICE
-
           0 < _the_number_of_Vs
         end
 
@@ -558,3 +595,4 @@ module Skylab::CodeMetrics
     # -
   end
 end
+# #history-B.1: target Ubuntu not OS X

@@ -46,8 +46,11 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       def execute
-
-        @_st = Home_::Stream_[ @execution_snapshot.output_lines ]
+        out_lines = @execution_snapshot.output_lines
+        if out_lines.length.zero?
+          raise "Something went wrong. No output lines"
+        end
+        @_st = Home_::Stream_[ out_lines ]
 
         __resolve_contiguous_info_lines
         __resolve_headers

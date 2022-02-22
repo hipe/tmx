@@ -40,12 +40,58 @@ module Skylab::System
           end
         end
 
-      def statuser_by & p
-        Statuser__.new p
-      end
+        def statuser_by & p
+          Statuser__.new p
+        end
+
+        def _resolve_which_version_of_find
+          @@_which_version_of_find.nil? or fail("only call this once")
+          @@_which_version_of_find = _determine_which_version_of_find
+          return @@_which_version_of_find
+        end
+
+        def _determine_which_version_of_find
+          # This is a check to be run once per runtime.
+          # NOTE memoize the results of this so it is only ever run once.
+          # At #history-B.1 we changed our main development OS from OS X
+          # to Ubuntu. In so doing, the system version of `find` changed from
+          # a BSD version (we think) to a GNU version and everything broke.
+          # The syntax is different # between these variants in ways that are
+          # evidenced by the code below.
+          # At writing we are coding it "carefully" in attempt to retain the
+          # way it used to work on the BSD/OS X `find`, but there is no
+          # assurance that we have retained that old way until we cover it,
+          # which is beyond our resources at this time
+
+          _, o, e, thread = Home_.services.popen3(FIND__, '--version')
+          lines = []
+          begin
+            line = o.gets
+            if line.nil?
+              break
+            end
+            lines.push line
+          end while true
+          err_big_string = e.read
+          thread.terminate
+          if 0 == lines.length
+            first_err_line  = err_big_string[/^[^\n\r]*/]
+            fail("cover me (errput first line: #{first_err_line.inspect})")
+          end
+          line1 = lines[0]
+          if line1.include?('GNU findutils')
+            if not line1.include?(' 4.8.')
+              fail "probably ok but sign off on this find version: #{line1}"
+            end
+            return :GNU_find
+          end
+          fail "cover me, hopefully a BSD version of `find` on OS X: #{line}"
+        end
 
         private :new
       end  # >>
+
+      @@_which_version_of_find = nil
 
       # ->
 
@@ -63,7 +109,7 @@ module Skylab::System
         end
 
         WHEN_COMMAND___ = -> cmd do
-          cmd.to_path_stream.to_a
+          cmd.to_probably_ordered_path_stream.to_a
         end
 
         DEFAULT_ON_EVENT_SELECTIVELY___ = -> i, * _, & ev_p do
@@ -270,18 +316,42 @@ module Skylab::System
             :find_command_args, @args )
         end
 
-        def to_path_stream
-          path_stream_via Home_.lib_.open3
+        def to_path_stream_probably_ordered
+          if not @args
+            return  # act like pre #history-B.1
+          end
+          path_stream_probably_ordered_via Home_.lib_.open3
         end
 
-        def path_stream_via system_conduit
-          if @args
+        def path_stream_probably_ordered_via system_facade
+
+          # This is a nasty but hack that's a placeholder for the idea:
+          # On OS X, the filesystem seems to always order the entries, and
+          # likewise in its builtin `find` utility.
+          # On Ubuntu, no. the "probably" variant of these methods is to say
+          # "preserve streaming if we can based on an assumption"
+          # The fact that we're using which version of find to infer
+          # the operating system (filesystem, actually) is probably bad
+
+          unordered_st = _to_path_stream_unordered_via system_facade
+          case _which_version_of_find
+          when :BSD_find
+            unordered_st
+          when :GNU_find
+            unordered = unordered_st.to_a
+            ordered = Home_.services.maybe_sort_filesystem_paths unordered
+            Common_::Stream.via_nonsparse_array ordered
+          else
+            fail
+          end
+        end
+
+        def _to_path_stream_unordered_via system_conduit
             Find_::PathStream_via_SystemCommand___.call(
               @args,
               system_conduit,
               & @listener
             )
-          end
         end
 
         def __resolve_valid_command_args  # amazing hax #[#016.B]
@@ -336,7 +406,14 @@ module Skylab::System
 
             __add_paths
 
-            @y.push DOUBLE_DASH___
+            case _which_version_of_find
+            when :GNU_find
+              # nothing
+            when :BSD_find
+              @y.push DOUBLE_DASH___
+            else
+              fail
+            end
 
             if @unescaped_ignore_dir_a.length.nonzero?
               __add_ignore_dir_phrase
@@ -360,16 +437,28 @@ module Skylab::System
           end
 
           DOUBLE_DASH___ = '--'.freeze
-          FIND__ = 'find'.freeze
           FOLLOW_ARGUMENT_SYMLINKS___ = '-H'.freeze  # it's kind of gross
             # to hardcode this but it's what we need in one place [dt]
             # and probably what we want always. if not, can be optionized
 
           def __add_paths
-
-            @unescaped_path_a.each do | path |
-              @y.push F__, path.freeze  # ( we used to :+#escape here )
+            case _which_version_of_find
+            when :GNU_find
+              # when targeting Ubuntu, gnu findutils 4.8.0 doesn't have
+              # a '-f' option (indicating a startingpoint). So we don't know
+              # how we would target a file with a '-' as the first character
+              on_each_path = -> path do
+                @y.push path.freeze
+              end
+            when :BSD_find
+              on_each_path = -> path do
+                @y.push F__, path.freeze  # ( we used to :+#escape here )
+              end
+            else
+              fail
             end
+
+            @unescaped_path_a.each(& on_each_path)
             NIL_
           end
 
@@ -412,6 +501,15 @@ module Skylab::System
           OR_OPERATOR__ = '-o'.freeze
 
         end
+
+        def _which_version_of_find
+          if @@_which_version_of_find.nil?
+            Find_._resolve_which_version_of_find
+          end
+          return @@_which_version_of_find
+        end
+
+        FIND__ = 'find'.freeze
 
         Autoloader_[ Expression_Adapters = ::Module.new ]
 
@@ -459,5 +557,6 @@ module Skylab::System
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern
 # :+#posterity :+#tombstone the find node that used to be in [st] deleted

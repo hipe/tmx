@@ -50,6 +50,10 @@ module Skylab::MyTerm
         acs.system_conduit_knownness = @_SC_qk
       end
 
+      if (p = self.EXPERIMENTAL_SETUP_ACS_)
+        p[ acs ]
+      end
+
       cli = Zerk_::NonInteractiveCLI.begin
 
       cli.compound_custom_sections = -> hf do
@@ -155,6 +159,8 @@ module Skylab::MyTerm
         end
       end
     end
+
+    attr_accessor :EXPERIMENTAL_SETUP_ACS_
 
     Here_ = self
   end

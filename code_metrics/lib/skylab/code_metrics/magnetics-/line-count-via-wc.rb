@@ -1,7 +1,6 @@
 module Skylab::CodeMetrics
-
-    class Magnetics_::LineCount_via_WC  # read [#001]
-
+  class Magnetics_::LineCount_via_WC  # read [#001]
+    # -
       attr_writer(
 
         :file_array,
@@ -63,8 +62,6 @@ module Skylab::CodeMetrics
         @_command_string = cmd_s
         ACHIEVED_
       end
-
-      WC_Command___ = ::Struct.new :to_string
 
       def __via_command_string_resolve_output_lines
 
@@ -169,6 +166,23 @@ module Skylab::CodeMetrics
       def __say line
         "expecting integer token - #{ line }"
       end
+    # -
+
+    class WC_Command___
+
+      def initialize cmd_s
+        @_mine = cmd_s
+      end
+
+      def to_event
+        cmd_s = @_mine
+        Common_::Event.inline_OK_with(
+          [:info, :structure, :wordcount_command],
+          :command_string, @_mine,
+        ) do |y, ev|
+          y << "generated `wc` command: \"#{cmd_s}\""
+        end
+      end
     end
-  # -
+  end
 end

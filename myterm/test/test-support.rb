@@ -63,6 +63,12 @@ module Skylab::MyTerm::TestSupport
 
     def self.[] tcc
 
+      tcc.define_singleton_method :fake_fonts_dir do |dir|
+        define_method :_fake_fonts_dir do
+          dir
+        end
+      end
+
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
       _ = Zerk_test_support_[].lib :want_screens
       _[ tcc ]
@@ -84,7 +90,23 @@ module Skylab::MyTerm::TestSupport
       cli.filesystem_conduit = fc  # nil means assert none used
       cli.system_conduit = sc  # nil means assert none used
 
+      if (dir = self._fake_fonts_dir)
+
+        # (CLI does not memoize ACS by default)
+        acs = cli.root_ACS_proc[]
+        cli.root_ACS_by do
+          acs
+        end
+
+        path = Qualified_fonts_dir_via[dir]
+        acs.kernel_.silo(:Installation).fonts_dir = path
+      end
+
       NIL_
+    end
+
+    def _fake_fonts_dir
+      NOTHING_
     end
 
     def filesystem_conduit_for_iCLI_
@@ -107,12 +129,25 @@ module Skylab::MyTerm::TestSupport
     def self.[] tcc
       @_ ||= Zerk_test_support_[].lib :API
       @_[ tcc ]
+      tcc.extend My_API_Class_Methods___
       tcc.include self
     end
 
     def zerk_API_call p, x_a  # #spot-2
       @root_ACS = build_root_ACS_for_testing_
       Home_::Call_.call( x_a, @root_ACS ) { |_| p }
+    end
+
+    def _fonts_dir_set_by_user
+      NIL_
+    end
+  end
+
+  module My_API_Class_Methods___
+    def fake_fonts_dir x
+      define_method :_fonts_dir_set_by_user do
+        x
+      end
     end
   end
 
@@ -129,6 +164,11 @@ module Skylab::MyTerm::TestSupport
       kernel = acs.kernel_
 
       inst = kernel.silo :Installation
+
+      dir = _fonts_dir_set_by_user
+      unless dir.nil?
+        inst.fonts_dir = Qualified_fonts_dir_via[ dir ]
+      end
 
       inst.system_conduit = false  # never use real system conduit by default
       # ACTUALLY - *do* use real system conduit (..
@@ -168,6 +208,13 @@ module Skylab::MyTerm::TestSupport
         x
       end
     end
+  end
+
+  # ==
+
+  Qualified_fonts_dir_via = -> dir do
+    dir.include?( ::File::SEPARATOR ) and fail "are you sure? #{dir}"
+    ::File.join TS_.dir_path, 'fixture-directories', dir
   end
 
   # ==

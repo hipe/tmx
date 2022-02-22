@@ -25,7 +25,7 @@ module Skylab::Zerk
     end
 
     def root_ACS_by & p
-      @_root_ACS_proc = p
+      @root_ACS_proc = p
     end
 
     def system_conduit= x
@@ -121,7 +121,7 @@ module Skylab::Zerk
         vmm = @design[ vmm ]
       end
 
-      _el = Here_::Event_Loop___.new vmm, self, & @_root_ACS_proc
+      _el = Here_::Event_Loop___.new vmm, self, & @root_ACS_proc
 
       Common_::BoundCall.via_receiver_and_method_name _el, :run
     end
@@ -178,6 +178,8 @@ module Skylab::Zerk
         io.puts string
       end
     end
+
+    attr_reader :root_ACS_proc
 
     # ==
 

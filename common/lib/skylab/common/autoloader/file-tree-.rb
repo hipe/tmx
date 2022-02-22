@@ -178,6 +178,7 @@ module Skylab::Common
           __init_index_via_hit_the_filesystem
           if @_ok
             @_a.sort!  # don't let the filesystem determine the order. tests flicker
+            # (we don't use maybe_sort_filesystem_entries b.c circular)
             FilesystemHit___.new @_a, @_h, @node_path, @treer
           else
             send @_when_failed
@@ -213,7 +214,11 @@ module Skylab::Common
 
         def __each_entry  & p
           @_ok = true
-          @filesystem.foreach @node_path, & p
+          # == BEGIN hotfix for #history-B.1: Ubuntu listings are not sorted
+          sorted = @filesystem.foreach(@node_path).sort
+          # (we don't use maybe_sort_filesystem_entries b.c circular dep.)
+          sorted.each( & p )
+          # == END
           NIL
         rescue ::Errno::ENOENT => @_exception
           @_ok = false
@@ -505,4 +510,5 @@ module Skylab::Common
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history: broke out (and heavily refactored) from toplevel sidesys file

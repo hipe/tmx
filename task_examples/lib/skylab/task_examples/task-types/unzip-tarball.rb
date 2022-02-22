@@ -15,7 +15,6 @@ module Skylab::TaskExamples
     end
 
     def execute
-
       ok = __check_that_source_tarball_exists
       ok &&= __resolve_derivative_paths
       ok &&= __check_that_source_tarball_file_is_nonzero_length
@@ -38,32 +37,49 @@ module Skylab::TaskExamples
 
       _opt_h = { chdir: @build_dir }  # :#here
 
-      err = Home_::Library_::StringIO.new
+      # err = Home_::Library_::StringIO.new
 
       _ = Home_.lib_.system
 
-      bytes, seconds = _.open2 s_a, nil, nil, _opt_h do |on|
+      # == NEW
 
-        on.out do |s|
-          self._COVER_ME_probably_fine_to_just_output_this  # output this..
-        end
-
-        on.err do |s|  # usually just informational output
-          err.write s
+      t1 = ::Time.now
+      _in, sout, serr, waiter = _.popen3(*s_a, _opt_h)
+      bytes = 0
+      out_line = sout.gets
+      if not out_line.nil?
+        begin
+          bytes += out_line.length
           @_listener_.call :info, :expression do |y|
-            y << s
+            y << "(from tar) #{out_line}"  # not safe
           end
-        end
+          out_line = sout.gets
+          if out_line.nil?
+            break
+          end
+        end while false
       end
 
-      s = err.string
-
-      if s.length.nonzero?
-        _lines = s.split NEWLINE_
-        a = _lines.grep %r(\bunrecognized archive format\b)i
-        if a.length.nonzero?
-          err_s = a.fetch 0
+      serr_lines = []
+      begin
+        line = serr.gets
+        if line.nil?
+          break
         end
+        bytes += line.length
+        if '\n' == NEWLINE_
+          redo
+        end
+        @_listener_.call :info, :expression do |y|
+          y << line
+        end
+        serr_lines.push line
+      end while true
+      seconds = t1 - ::Time.now
+      err_s = nil
+      es = waiter.value.exitstatus
+      if es.nonzero?
+        err_s = serr_lines[0]  # meh
       end
 
       ___conclude err_s, seconds, bytes

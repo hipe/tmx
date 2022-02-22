@@ -11,6 +11,8 @@ module Skylab::MyTerm::TestSupport
 
       # NOTE - if this fails try regressing to sibling test file (2)
 
+      fake_fonts_dir '005-fake-fonts-dir'
+
       call_by do
         call :adapter, COMMON_ADAPTER_CONST_,
           :background_font, :list
@@ -57,3 +59,4 @@ module Skylab::MyTerm::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

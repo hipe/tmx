@@ -58,7 +58,9 @@ module Skylab::TaskExamples::TestSupport
 
     def fails_
       _x = state_.result
-      false == _x or fail
+      if false != _x
+        fail "expected false had #{_x.inspect}"
+      end
     end
 
     def state_for_want_emission
