@@ -24,35 +24,28 @@ module Skylab::SearchAndReplace
     end
 
     def execute  # formerly "to match stream"
-
       _ok = __resolve_file_session_stream
       _ok && ___via_file_session_stream
     end
 
     def ___via_file_session_stream
-
       @_file_session_stream.expand_by do | read_only_fsess |
-
         read_only_fsess.to_read_only_match_stream
       end
     end
 
     def __resolve_file_session_stream
-
       _ = __build_read_only_file_session_stream
-
       __store_trueish :@_file_session_stream, _
     end
 
     def __build_read_only_file_session_stream
-
       o = _begin_common_file_session_stream
       o.for = :read_only
       o.execute
     end
 
     def to_string_edit_session_stream_for__ repl_params_x  # highlight eventually
-
       o = _begin_common_file_session_stream
       o.for = :for_interactive_search_and_replace
       o.replacement_parameters = repl_params_x
@@ -60,7 +53,6 @@ module Skylab::SearchAndReplace
     end
 
     def _begin_common_file_session_stream
-
       o = Home_::Magnetics_::FileSession_Stream_via_Parameters.new( & @_listener )
       o.ruby_regexp = @ruby_regexp
       o.upstream_path_stream = @files_by_grep

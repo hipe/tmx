@@ -104,6 +104,8 @@ module Skylab::CodeMetrics
         if y.length.zero?
           NIL_
         else
+          y = Home_.lib_.system.maybe_sort_filesystem_paths y
+          # (#history-B.1)
           @file_array_ = y
           ACHIEVED_
         end
@@ -127,6 +129,8 @@ module Skylab::CodeMetrics
 
         _sin, sout, serr, wait = system_conduit_.popen3( * cmd.args )
 
+        orig_y = y
+        y = []
         d = y.length
 
         ok = Home_::ThroughputAdapters_::SynchronousRead.call(
@@ -144,6 +148,8 @@ module Skylab::CodeMetrics
           if d == y.length
             self._SQUAK_AND_COVER_ME
           end
+          orig_y.concat Home_.lib_.system.maybe_sort_filesystem_paths y
+          # (#history-B.1)
           ok
         else
           ok
@@ -152,3 +158,4 @@ module Skylab::CodeMetrics
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

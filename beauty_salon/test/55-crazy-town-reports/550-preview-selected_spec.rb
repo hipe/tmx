@@ -220,7 +220,7 @@ module Skylab::BeautySalon::TestSupport
       #  [
       #    { features_count: 3,
       #      lines_series: [ [1], [3,5], [7] ],
-      #      other: "ttoal: xx",
+      #      other: "total: xx",
       #    },
       #    ..
       #  ]

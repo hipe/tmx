@@ -34,13 +34,11 @@ module Skylab::CodeMetrics
       end
 
       def __totaller_via_extension_count_box
-
         _bx = __group_by_count
         __totaller_via_grouped_by_count _bx
       end
 
       def __group_by_count
-
         sp = remove_instance_variable :@_specials
         bx = remove_instance_variable :@_extension_box
         bx_ = Common_::Box.new
@@ -107,7 +105,6 @@ module Skylab::CodeMetrics
       COMMA___ = ', '
 
       def __resolve_extension_count_box
-
         ok = __resolve_find_files_command
         ok &&= __via_find_files_comand_resolve_file_stream
         ok && __via_file_stream_resolve_extension_count_box
@@ -117,6 +114,12 @@ module Skylab::CodeMetrics
 
         bx = Common_::Box.new
         specials = nil
+
+        # == BEGIN #history-B.1
+        unsorted = remove_instance_variable(:@_file_stream_unordered).to_a
+        sorted = Home_.lib_.system.maybe_sort_filesystem_paths unsorted
+        @_file_stream = Common_::Stream.via_nonsparse_array sorted
+        # == END
 
         @_file_stream.each do | file |
 
@@ -153,7 +156,7 @@ module Skylab::CodeMetrics
 
         st = line_upstream_via_system_command_ @_find_files_command.args
         if st
-          @_file_stream = st
+          @_file_stream_unordered = st
           ACHIEVED_
         else
           st
@@ -179,5 +182,5 @@ module Skylab::CodeMetrics
     end
   end
 end
-
+# #history-B.1: target Ubuntu not OS X
 # :+#tombstone: (please leave this line intact, below was *perfect* [#bs-010])

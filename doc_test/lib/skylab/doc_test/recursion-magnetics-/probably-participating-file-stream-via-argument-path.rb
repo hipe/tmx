@@ -134,7 +134,9 @@ module Skylab::DocTest
         & find
       )
 
-      _st = _command.path_stream_via @system_conduit
+      _st = _command.path_stream_probably_ordered_via @system_conduit
+      # #history-B.1
+
       _st || self._SANITY  # even when noent
       @_find_status = find
       @_find_stream = _st
@@ -165,3 +167,4 @@ module Skylab::DocTest
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

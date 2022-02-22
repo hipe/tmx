@@ -230,6 +230,7 @@ class Skylab::Task
           @_emitted = true
           @_succeeded = false
 
+          @_m = nil
           remove_instance_variable :@_m
           @ok = UNABLE_
 

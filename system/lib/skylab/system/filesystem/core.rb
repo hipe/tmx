@@ -70,6 +70,7 @@ module Skylab::System
       def entry_stream abs_path
 
         a = ::Dir.entries abs_path
+        a = Home_.services.maybe_sort_filesystem_entries a  # #history-B.1
         d = 0
         len = a.length
 
@@ -200,3 +201,4 @@ module Skylab::System
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X

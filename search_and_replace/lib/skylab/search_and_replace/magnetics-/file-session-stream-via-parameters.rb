@@ -20,28 +20,27 @@ module Skylab::SearchAndReplace
     attr_reader( * o.symbols( :_read ) )
 
     def execute
-
       _ok = __resolve_producer
       _ok && ___via_producer
     end
 
     def ___via_producer
+      unordered_stream = remove_instance_variable :@upstream_path_stream
+      possibly_unordered = unordered_stream.to_a
+      use_stream = Common_::Stream.via_nonsparse_array possibly_unordered
 
       producer = @_producer
 
       path_count = 0
-      @upstream_path_stream.map_reduce_by do |path|
+      use_stream.map_reduce_by do |path|
         path_count += 1
         producer.produce_file_session_via_ordinal_and_path path_count, path
       end
     end
 
     def __resolve_producer
-
       _producer_producer = FOR___.fetch( @for )[]
-
       _x = _producer_producer[ self, & @_listener ]
-
       __store_trueish :@_producer, _x
     end
 

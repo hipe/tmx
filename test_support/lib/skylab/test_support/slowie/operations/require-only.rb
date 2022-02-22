@@ -96,7 +96,7 @@ module Skylab::TestSupport
         globber_st = @test_directory_collection.to_globber_stream
         if globber_st
           @__test_file_stream = globber_st.expand_by do |globber|
-            globber.to_path_stream
+            globber.to_path_stream_probably_ordered  # #history-B.1
           end
           ACHIEVED_
         end
@@ -125,3 +125,4 @@ module Skylab::TestSupport
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

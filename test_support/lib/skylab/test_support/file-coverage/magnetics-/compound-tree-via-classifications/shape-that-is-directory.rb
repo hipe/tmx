@@ -35,7 +35,7 @@ module Skylab::TestSupport
             :when_command, IDENTITY_,
           )
 
-          _st = command.to_path_stream
+          _st = command.to_path_stream_probably_ordered
 
           r = @asset_local_range_
           _st_ = _st.map_by do |path|

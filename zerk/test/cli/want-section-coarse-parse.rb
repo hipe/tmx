@@ -540,7 +540,8 @@ module Skylab::Zerk::TestSupport
       end
 
       def _curate_finish_via_matchdata
-        if @_first_match_content
+        yes = instance_variable_defined? :@_first_match_content
+        if yes && @_first_match_content
           _actual_s = @_md[ 1 ]
           if _actual_s == @_first_match_content
             ACHIEVED_

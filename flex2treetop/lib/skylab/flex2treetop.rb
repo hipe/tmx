@@ -139,6 +139,9 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         path_a = ::Dir.glob( "#{ _path }/*.flex", ::File::FNM_PATHNAME )
 
+        path_a = Home_.lib_.system.maybe_sort_filesystem_paths path_a
+        # (necessary for Ubuntu #history-B.1)
+
         path = '[ other gems ]'
 
         ADDITIONAL_RECOMMENDED_VISUAL_TEST_FILES___.each do | universe_file |
@@ -1861,4 +1864,5 @@ end
 end
 GRAMMAR
 end
+# #history-B.1: Target Ubuntu not OS X
 # :+#tombstone: #!storypoint-210 explained how methodic actor may have been born here

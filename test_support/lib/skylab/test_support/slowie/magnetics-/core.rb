@@ -99,7 +99,7 @@ module Skylab::TestSupport
 
             _find = proto.with :path, test_directory_path
 
-            st_ = _find.to_path_stream
+            st_ = _find.to_probably_ordered_path_stream
 
             p = -> do
 

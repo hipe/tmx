@@ -155,8 +155,12 @@ module Skylab::SearchAndReplace
 
             set = ::Hash[ @custom_symbols.map { |i| [ i, true ] } ]
 
-            _entries = ::Dir.entries @functions_directory  # meh on ENOENT
-            scn = Scanner_[ _entries ]
+            # == BEGIN prob nec. on Ubuntu not OS X  #history-B.1
+            unordered = ::Dir.entries @functions_directory  # meh on ENOENT
+            ordered = Home_.lib_.system.maybe_sort_filesystem_entries unordered
+            scn = Scanner_[ ordered ]
+            # == END
+
             scn.gets_one == '.' || fail  # DOT_
             scn.gets_one == '..' || fail  # DOT_DOT_
 
@@ -326,3 +330,4 @@ module Skylab::SearchAndReplace
     end
   # -
 end
+# #history-B.1: target Ubuntu not OS X

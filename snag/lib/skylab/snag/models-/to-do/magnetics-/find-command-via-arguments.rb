@@ -8,21 +8,18 @@ module Skylab::Snag
       # (but sanity-check their arities anyway)
 
       def execute
-
         ok = __sanity_checks
         ok &&= __resolve_pattern_string_for_grep
         ok && __build
       end
 
       def __sanity_checks
-
         ok = @filename_patterns.nil? || @filename_patterns.length.nonzero?
         ok &&= @paths.length.nonzero?
         ok && @patterns.length.nonzero?
       end
 
       def __resolve_pattern_string_for_grep
-
         @pattern_string_for_grep = @patterns * PIPE_FOR_GREP___  # :+#security - this is a hole
         ACHIEVED_
       end

@@ -325,10 +325,15 @@ class Skylab::Task
       require 'strscan' ; ::StringScanner
     end
 
+    System = -> do
+      System_lib[].services
+    end
+
     ACS = sidesys[ :Arc ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
+    System_lib = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]
   end
 

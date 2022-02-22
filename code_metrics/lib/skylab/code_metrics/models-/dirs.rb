@@ -22,7 +22,6 @@ module Skylab::CodeMetrics
       )
 
       def produce_result
-
         _ok = __resolve_dirs
         _ok && __via_dirs
       end
@@ -65,7 +64,6 @@ module Skylab::CodeMetrics
       end
 
       def __visit_dir dir
-
         y = __produce_dir_files dir
         y and __visit_dir_via_files y, dir
       end
@@ -139,7 +137,11 @@ module Skylab::CodeMetrics
           end
           redo
         end while nil
-        ok && y
+        if ok
+          Home_.lib_.system.maybe_sort_filesystem_paths y  # #history-B.1
+        else
+          ok
+        end
       end
 
       def __resolve_dirs
@@ -173,7 +175,6 @@ module Skylab::CodeMetrics
         h = @argument_box.h_
 
         cmd = Home_.lib_.system.find(
-
           :path, h.fetch( :path ),
           :ignore_dirs, h.fetch( :exclude_dir ),
           :filenames, h[ :include_name ],
@@ -195,3 +196,4 @@ module Skylab::CodeMetrics
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

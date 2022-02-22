@@ -72,7 +72,6 @@ module Skylab::TanMan
     private
 
       def normalize  # near but not really the same as #[#fi-022] ..
-
         self.class::ATTRIBUTES.normalize_entity self  # handler?..
       end
 
@@ -162,13 +161,11 @@ module Skylab::TanMan
       end
 
       def __compile uow
-
         _ok = __mkdir_if_necessary uow
         _ok &&= __via_compiler_compile uow
       end
 
       def __mkdir_if_necessary uow
-
         mkdir_p = uow.make_this_directory_minus_p
         if mkdir_p
           # the below is #open [#086]

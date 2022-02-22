@@ -75,9 +75,7 @@ module Skylab::Git
       )
 
       def execute
-
         @system_conduit ||= Home_.lib_.system
-
         self._ETC
       end
     end
@@ -113,21 +111,18 @@ module Skylab::Git
       # --
 
       def status_via_path path, & p  # experimental newer inerface for [dt]
-
         chk = _begin_check p, path
         chk.extend StructureBased__
         chk.execute
       end
 
       def check path, & p
-
         chk = _begin_check p, path
         chk.extend EmissionBased___
         chk.execute
       end
 
       def _begin_check p, path
-
         _p = p || @_listener  # nil OK
         Check__.new path, @system_conduit, & _p
       end

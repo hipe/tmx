@@ -327,7 +327,7 @@ module Skylab::BeautySalon
             :filename, _PATTERN,
             :freeform_query_infix_words, _TYPE_FILE,
             & @listener
-          ).to_path_stream
+          ).to_path_stream_probably_ordered  # #history-B.1
           p = -> do
             path = use_st.gets
             if path
@@ -433,4 +433,5 @@ module Skylab::BeautySalon
     # ==
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #broke-out at #History-1

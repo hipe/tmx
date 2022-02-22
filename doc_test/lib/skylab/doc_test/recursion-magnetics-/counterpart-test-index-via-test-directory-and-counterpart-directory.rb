@@ -152,7 +152,9 @@ module Skylab::DocTest
         & @_find
       )
 
-      _st = _command.path_stream_via @system_conduit
+      _st = _command.path_stream_probably_ordered_via @system_conduit
+      # #history-B.1
+
       _st || self._SANITY  # even when noent
       @__path_stream = _st
       NIL
@@ -206,3 +208,4 @@ module Skylab::DocTest
     TYPE_FILE___ = %w( -type f )
   end
 end
+# #history-B.1: target Ubuntu not OS X

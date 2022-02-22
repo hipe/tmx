@@ -20,7 +20,6 @@ module Skylab::SearchAndReplace
     def execute
 
       cmd = Home_.lib_.system.find(
-
         :filenames, @filename_patterns,
         :paths, @paths,
         :freeform_query_infix_words, %w(-type f),
@@ -28,7 +27,7 @@ module Skylab::SearchAndReplace
         & @_listener )
 
       if cmd
-        cmd.to_path_stream
+        cmd.to_path_stream_probably_ordered
       else
         cmd
       end

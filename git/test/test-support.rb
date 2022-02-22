@@ -51,7 +51,6 @@ module Skylab::Git::TestSupport
     # ~ test-time configuration of the test-time environment
 
     define_method :memoized_tmpdir_, -> do
-
       o = nil
       -> do
         if o
@@ -72,11 +71,15 @@ module Skylab::Git::TestSupport
     end
 
     def dirs_in_ path
-      Home_::Stream_[ `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ ]
+      unordered = `cd #{ path } && find . -mindepth 1 -type d`.split NEWLINE_
+      ordered = Home_.lib_.system.maybe_sort_filesystem_paths unordered
+      Home_::Stream_[ ordered  ]  # #history-B.1
     end
 
     def files_in_ path
-      Home_::Stream_[ `cd #{ path } && find . -type f`.split NEWLINE_ ]
+      unordered = `cd #{ path } && find . -type f`.split NEWLINE_
+      ordered = Home_.lib_.system.maybe_sort_filesystem_paths unordered
+      Home_::Stream_[ ordered ]  # #history-B.1
     end
 
     def no_ent_path_
@@ -127,7 +130,6 @@ module Skylab::Git::TestSupport
   # --
 
   Want_Event = -> tcc do
-
     Common_.test_support::Want_Emission[ tcc ]
   end
 
@@ -167,4 +169,5 @@ module Skylab::Git::TestSupport
   UNDERSCORE_ = '_'
   Zerk_lib_ = Home_::Zerk_lib_
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-A.1: [br] used to do someting whacky changing expressions to events. no longer

@@ -7,7 +7,6 @@ module Skylab::System
   class << self
 
     def lib_
-
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end

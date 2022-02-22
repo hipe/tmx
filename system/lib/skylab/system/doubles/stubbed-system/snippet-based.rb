@@ -86,7 +86,6 @@ module Skylab::System
         end
 
         def _stream_via_array a
-
           Stubbed_IO_for_Read_.via_nonsparse_array a
         end
 

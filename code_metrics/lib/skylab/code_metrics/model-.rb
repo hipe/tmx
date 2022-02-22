@@ -23,13 +23,11 @@ module Skylab::CodeMetrics
         h = @argument_box.h_
 
         Home_.lib_.system.find(
-
           :paths, path_a,
           :ignore_dirs, h.fetch( :exclude_dir ),
           :filenames, h[ :include_name ],
           :freeform_query_infix_words, %w'-not -type d',
           :when_command, IDENTITY_
-
         ) do | * i_a, & ev_p |
 
           if :info != i_a.first

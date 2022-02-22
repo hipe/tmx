@@ -2099,7 +2099,6 @@ module Skylab::Brazen
       end
 
       def prepare_to_parse_parameters  # [ts]
-
         @mutable_backbound_iambic = []  # ivar name is #public-API
         @seen = Common_::Box.new  # ivar name is #public-API
         NIL_

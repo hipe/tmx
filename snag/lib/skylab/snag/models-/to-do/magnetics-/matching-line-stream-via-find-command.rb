@@ -26,6 +26,12 @@ module Skylab::Snag
 
         _i, o, e, t = system_conduit.popen3( * cmd.args )
 
+        # == BEGIN hotfix for #history-B.1
+        unsorted = Common_::Stream.by( & o.public_method(:gets) ).to_a
+        sorted = Home_.lib_.system.maybe_sort_filesystem_paths unsorted
+        o = Common_::Stream.via_nonsparse_array sorted
+        # == END
+
         p = -> do
 
           line_s = o.gets
@@ -71,3 +77,4 @@ module Skylab::Snag
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

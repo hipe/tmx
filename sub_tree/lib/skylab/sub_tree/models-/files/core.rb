@@ -47,7 +47,7 @@ module Skylab::SubTree
 
 
           :description, -> y do
-            y << "reduce the search with this pattern (passsed to `find -name`)"
+            y << "reduce the search with this pattern (passed to `find -name`)"
           end,
           # (used to be :single_letter 'P'
           :property, :pattern,

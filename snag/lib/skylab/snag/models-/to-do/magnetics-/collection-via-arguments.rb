@@ -39,7 +39,6 @@ module Skylab::Snag
       attr_reader :command
 
       def build_system_command
-
         otr = dup
         otr.extend Here_::Magnetics_::FindCommand_via_Arguments  # pattern #[#sl-003]
         otr.execute

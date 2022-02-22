@@ -101,7 +101,6 @@ module Skylab::TestSupport
           do_debug and debug_IO.puts "cd #{ path }"
           ::Dir.chdir path
         end
-
         @exitstatus = @invocation.execute
 
         if orig_pwd

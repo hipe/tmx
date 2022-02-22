@@ -11,7 +11,6 @@ module Skylab::Git
       # modality-specific rendering knowledge.
 
       def initialize style_x, stow, rsc, & p
-
         @listener = p
         @resources = rsc
         @style_x = style_x
@@ -21,17 +20,14 @@ module Skylab::Git
       Resources___ = ::Struct.new :system_conduit, :filesystem
 
       def to_styled_stat_line_stream
-
         to_tree_stat.to_styled_line_stream
       end
 
       def to_non_styled_patch_line_stream
-
         to_tree_stat.to_non_styled_patch_line_stream
       end
 
       def to_styled_patch_line_stream
-
         to_tree_stat.to_styled_patch_line_stream
       end
 
@@ -40,7 +36,6 @@ module Skylab::Git
       end
 
       def to_tree_stat
-
         Models_::TreeStat.new(
           @stow.path,
           @resources,

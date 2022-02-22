@@ -520,7 +520,9 @@ module Skylab::System
           map = remove_instance_variable :@mapper  # user must provide one
 
           _glob = ::File.join @startingpoint_path, ( @glob_entry || GLOB_STAR_ )
-          paths = @_FS.glob _glob
+          unsorted = @_FS.glob _glob
+          paths = Home_.services.maybe_sort_filesystem_paths unsorted
+          # #history-B.1
 
           rx = @filename_pattern
           if rx
@@ -624,4 +626,5 @@ module Skylab::System
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
 # #history-A: full rewrite to assimilate newer into older

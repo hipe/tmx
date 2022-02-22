@@ -5,6 +5,5 @@ inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specificat
 end
 
 Gem::Specification.new do |s|
-
   inf.write_all_the_common_things_and_placeholders s
 end

@@ -81,7 +81,6 @@ module Skylab::Git
       ] ; end
 
       def execute
-
         _init_stows_collection
         _ok = _resolve_versioned_directory
         _ok && __money
@@ -126,7 +125,6 @@ module Skylab::Git
       ] end
 
       def execute
-
         ok = __resolve_expressive_stow :no_color
         ok &&= _resolve_versioned_directory
         ok && __money
@@ -162,9 +160,9 @@ module Skylab::Git
       ] ; end
 
       def execute
-
         _build_expressive_stow :yes_colo
       end
+
       Actions = nil
     end
 
@@ -209,9 +207,9 @@ module Skylab::Git
       ] end
 
       def execute
-
         _new_stows_collection.to_entity_stream
       end
+
       Actions = nil
     end
 
@@ -223,7 +221,6 @@ module Skylab::Git
       end
 
       def __resolve_expressive_stow style_x
-
         es = _build_expressive_stow style_x
         if es
           @_expressive_stow = es
@@ -234,7 +231,6 @@ module Skylab::Git
       end
 
       def _build_expressive_stow style_x
-
         _ok = _resolve_stow
         _ok and __via_etc_build_ES style_x
       end
@@ -264,7 +260,6 @@ module Skylab::Git
       end
 
       def _produce_stow
-
         @_stows_collection ||= _new_stows_collection
 
         _sn = remove_instance_variable :@stow_name
@@ -274,7 +269,6 @@ module Skylab::Git
       end
 
       def _init_stows_collection & p
-
         @_stows_collection = _new_stows_collection( & p )
         NIL_
       end

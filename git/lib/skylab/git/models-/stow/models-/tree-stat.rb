@@ -9,14 +9,12 @@ module Skylab::Git
       # similar to the output of `git show --stat`
 
       def initialize s, rsc, & p
-
         @resources = rsc
         @stow_path = s
         @listener = p
       end
 
       def to_styled_line_stream
-
         _line_a = __build_line_array :in_color
         Stream_[ _line_a ]
       end
@@ -134,6 +132,12 @@ module Skylab::Git
         _, o, e, w = @resources.system_conduit.popen3(
           * ITEMS_STREAM_COMMAND___,
           chdir: @stow_path )
+
+        # == BEGIN #history-B.1
+        unordered = Common_::Stream.by{ o.gets }.to_a
+        ordered = Home_.lib_.system.maybe_sort_filesystem_paths unordered
+        o = Common_::Stream.via_nonsparse_array ordered
+        # == END
 
         p = -> do
 

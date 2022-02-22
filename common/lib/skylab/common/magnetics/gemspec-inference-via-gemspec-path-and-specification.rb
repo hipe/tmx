@@ -74,7 +74,6 @@ module Skylab::Common
     # ~ (in alphabetical order by stem)
 
     def date_via_now
-
       ::Time.now.strftime '%Y-%m-%d'
     end
 
@@ -173,14 +172,12 @@ module Skylab::Common
     ## ~~ name
 
     def gem_name_via_gemspec_path
-
       Home_::Without_extension[ ::File.basename( @gemspec_path ) ]
     end
 
     ## ~~ version
 
     def version_via_VERSION_file
-
       s = ::File.read ::File.join( @_dir, 'VERSION' )
       s.chomp!
       s

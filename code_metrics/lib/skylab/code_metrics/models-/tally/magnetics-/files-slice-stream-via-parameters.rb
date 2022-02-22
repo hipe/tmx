@@ -71,7 +71,10 @@ module Skylab::CodeMetrics
           if cache.length.zero?
             NIL_
           else
-            cache
+            # NOTE we are sorting just the chunk, just so results are
+            # consistent in tests. We are not breaking streaming (for now)
+            # so we are not sorting in respect to the whole stream of files
+            Home_.lib_.system.maybe_sort_filesystem_paths cache  # #history-B.1
           end
         end
 
@@ -103,17 +106,29 @@ module Skylab::CodeMetrics
       TYPE_SWITCH___ = '-type'
 
       def ___add_paths  # assume nonzero paths
+        # Discussion: the deep problem here is that we are not using a
+        # "find facade". The shallow problem is that #history-B.1 we are
+        # now using GNU find instead of BSD find. The deep fix for this
+        # is out of scope (use a "find facade"). The shallow fix is to
+        # follow the manpage of our "find (GNU findutils) 4.8.0":
+        #
+        #   it is generally safer to prefix wild‐cards or dubious path
+        #   names with either `./' or to use absolute path names start‐
+        #   ing with '/'
+        #
+        # See the previous code (changed at history) for the old way.
 
-        dirty_paths, clean_paths = @paths.partition do | path |
-          FUNNY_LOOKING_PATH_RX___ =~ path
+        safe_path_via = -> path do
+          first_char = path[0]
+          if ::File::SEPARATOR == first_char
+            return path
+          end
+          /[-a-zA-Z0-9]/ =~ first_char or fail "strange path: #{path}"
+          return ['.', ::File::SEPARATOR, path ].join('')
         end
 
-        dirty_paths.each do | path |
-          @_command.push SPECIFY_FILE_HIERARCHY_SWITCH___, path
-        end
-
-        clean_paths.each do | path |
-          @_command.push path
+        @paths.each do |path|
+          @_command.push safe_path_via[path]
         end
 
         NIL_
@@ -177,3 +192,4 @@ module Skylab::CodeMetrics
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X

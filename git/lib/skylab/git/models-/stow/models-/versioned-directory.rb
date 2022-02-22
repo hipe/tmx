@@ -33,6 +33,12 @@ module Skylab::Git
 
         _, o, e, w = @_sc.popen3( * cmd, chdir: __chdir_directory )
 
+        # == BEGIN #history-B.1
+        unordered = Common_::Stream.by( & o.method(:gets) ).to_a
+        ordered = Home_.lib_.system.maybe_sort_filesystem_paths unordered
+        o = Common_::Stream.via_nonsparse_array ordered
+        # == END
+
         p = -> do
 
           s = e.gets
@@ -101,3 +107,4 @@ module Skylab::Git
     end
   end
 end
+# #history-B.1: target Ubuntu not OS X
