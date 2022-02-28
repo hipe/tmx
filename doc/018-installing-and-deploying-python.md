@@ -159,7 +159,8 @@ dotfiles.
 
 ## A Terminal Nicety: xsel or xclip or pbcopy
 
-It's nice to be able to pipe text into the clipboard:
+It's nice to be able to pipe text into the clipboard from the terminal so
+you can paste it anywhere. Currently, we use `xsel` for this:
 
 ```bash
 sudo apt-get install xsel
@@ -218,8 +219,9 @@ The configuration of a `vim` consits entirely of:
 (There are more complicated ways to do config involving multiple files,
 but fortunately we don't need or use such a config architecture yet.)
 
-Since the config file configs plugin-related settings, below we cover
-the plugins first then the config file.
+Since the config file contains (among other things) plugin-related
+configuration, below we cover installation of the plugins first before
+we go over what's in the config file.
 
 Formally, these instructions document our recent experience on Ubuntu,
 but as far as we remember, these instructions "should" work for OS X as well
@@ -230,15 +232,17 @@ on our new Ubuntu machine).
 ## The `vim` plugins
 
 Because of vim's new-ish plugin architecture, the installation of most vim
-plugins involves simply doing a git checkout into a particular directory.
+plugins is relatively straightforward: it involves simply doing a git
+checkout into a particular directory.
 
 The linked-to instructions below will all be variations on this theme.
 
 Generally you will do the below installation instructions from the
-arbitrary directory we have chosen to hold our vim plugins, so go there
-now:
+arbitrary directory we have chosen to hold our vim plugins, so make that
+directory and go into it now:
 
 ```bash
+mkdir -p ~/.vim/pack/plugins/start
 cd ~/.vim/pack/plugins/start/
 ```
 
@@ -250,6 +254,7 @@ mostly meaningless):
 1. (ctrlp)[ctrlp1]: dead link there but install is straightforward. maybe not used much
 1. (fugitive)[fug1]: as directed but `plugins` not `tpope`
 1. (gitgutter)[gg1]: as directed but `plugins` not `airblade`
+1. (coc.nvim)[coc1]: as directed but `plugins` not `coc`
 
 A bit more involved is installing "ag, the silver searcher" and its
 vim plugin so that has its own section next.
@@ -267,6 +272,7 @@ sudo apt-get install silversearcher-ag
 
 
 [ag1]: https://github.com/ggreer/the_silver_searcher
+[coc1]: https://github.com/neoclide/coc.nvim/wiki/Install-coc.nvim
 [ctrlp1]: https://github.com/kien/ctrlp.vim
 [gg1]: https://github.com/airblade/vim-gitgutter
 [fug1]: https://github.com/tpope/vim-fugitive
@@ -285,7 +291,9 @@ changes up to the cloud to more easily keep our desired config synced
 across machines.
 
 To this end, you can install a `.vimrc` on to a new machine using
-the installer script at the "dotfiles" sub-project (see).
+the installer script at the "dotfiles" sub-project (see). (If you don't
+like the sound or feel of this, please note it simply makes a symlink
+to a config file that's in version control.)
 
 
 # Installing the requisite python environment
@@ -336,6 +344,9 @@ have some lines something like:
 eval $(pyenv init --path)
 eval $(pyenv init -)
 ```
+
+(At writing, the above is producing some syntax errors,
+but still appears to work.)
 
 After this and restarting your shell (`exec "$SHELL"`), you should
 be able to see that pyenv is installed with the above check.
