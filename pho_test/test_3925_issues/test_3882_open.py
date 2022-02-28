@@ -81,6 +81,10 @@ class Case3880_if_given_a_major_and_a_minor_real_hole(ProviCase):
 
 
 class Case3882_if_no_major_holes_uses_lowest_minor_hole(ProviCase):
+    # NOTE this behavior changed at #history-B.1: it used to be
+    # we would only detect holes between adjacent minor-having items.
+    # Now, we see 1-(N-1) as holes for a run whose lowest minor number
+    # is some greater-than-one N. So this used to produce "[#122.H]", now ".A"
 
     def test_050_emits_nothing(self):
         assert self.end_state
@@ -89,7 +93,7 @@ class Case3882_if_no_major_holes_uses_lowest_minor_hole(ProviCase):
         self.assertEqual(self.end_provision_type(), 'minor_hole')
 
     def test_150_correct_integer(self):
-        self.assertEqual(self.end_identifier_string(), '[#122.H]')
+        self.assertEqual(self.end_identifier_string(), '[#122.A]')
 
     def given_lines(_):
         yield '| iden |Main tag|Content|\n'
@@ -100,7 +104,7 @@ class Case3882_if_no_major_holes_uses_lowest_minor_hole(ProviCase):
         yield '|[#123.2]||\n'
         yield '|[#123]  ||\n'
         yield '|[#122.I]||\n'  # 👇 two minor holes
-        yield '|[#122.7]||\n'
+        yield '|[#122.7]||\n'  # 👇 six minor holes
         yield '|[#122]  ||\n'
         yield '|[#121]  ||\n'
 
@@ -179,10 +183,14 @@ class Case3886_money_insert(MoneyCase):
 
 
 class Case3887_directives(MoneyCase):
+    # NOTE this changed at #history-B.1: now it gives precedence to major
+    # holes over minor holes. (The fact that this didn't happen before
+    # was probably a bug.)
 
     def test_010_go(self):
         act = self.end_state.end_result.created_entity.identifier.to_string()
-        assert '[#124.C]' == act
+        # assert '[#124.C]' == act (see comment above)
+        self.assertEqual('[#125]', act)
 
     def given_lines(_):
         yield "## (hello i'm table title)\n"
@@ -259,4 +267,5 @@ def xx(*_):
 if __name__ == '__main__':
     unittest.main()
 
+# #history-B.1
 # #born

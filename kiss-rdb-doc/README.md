@@ -95,11 +95,11 @@ woah boy.
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
 |[#867.J]                   | #open | redundancy
+|[#867.I]                   | #hole |
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
-|[#867.5.2]                 | #trak | track places you have to skip example row b.c not done for you
-|[#867.5.1]                 | #prov | markdown provision: you must always employ an example row
+|[#867.E]                   | #prov | markdown provision: you must always employ an example row
 |[#867.D]                   | #open | these datetime forms not supported in python toml
 |[#867.C]                   | #open | known error cases yet to cover (not comprehensive)
 |[#867.B]                   | #watc | API for getters?

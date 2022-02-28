@@ -71,7 +71,7 @@ def build_same_collection_anew_BUT_FOR_FIELDS():
         """
         | i De nTi Fier zz | thing 1  | thing-2 | Thing_A |thing-B|
         |---|---|---|---|---
-        |eg|[#867.5.1]
+        |eg|[#867.E]
         | B9H  |     |     |  hi i'm B9H   | hey i'm B9H |
         | B8H | hi i'm B8H | hey i'm B8H
         | 2HJ
@@ -93,7 +93,7 @@ def build_same_collection_anew_BUT_FOR_IDs():
         xxxyy
         | i De nTi Fier zz | thing-1  | thing-2 |
         |---|---|---|
-        |eg|[#867.5.1]
+        |eg|[#867.E]
         | B8H
         | 2HJ|xx|yy|
         | B9G
@@ -115,7 +115,7 @@ def build_empty_collection():
 
         |aa|bb|cc|
         |---|---|---
-        |eg|[#867.5.1]
+        |eg|[#867.E]
 
         goodbye
         """)

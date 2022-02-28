@@ -116,7 +116,7 @@ class Case2516_file_has_multiple_tables(CommonCase):
             # .
             |aa|bb|cc|
             |---|---|---
-            |eg|[#867.5.1]
+            |eg|[#867.E]
             |x1|x2|x3
             |x4|x5|x6|
 

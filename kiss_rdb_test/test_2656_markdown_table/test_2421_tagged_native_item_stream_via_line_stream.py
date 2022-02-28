@@ -180,7 +180,7 @@ class Case2428_040_multi_table_not_okay_normally(CommonCase):
 
         |aa|bb|cc|
         |---|---|---
-        |eg|[#867.5.1]
+        |eg|[#867.E]
         |x1|x2|x3
         |x4|x5|x6|
 
