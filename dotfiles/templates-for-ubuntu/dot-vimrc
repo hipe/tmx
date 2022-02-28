@@ -23,6 +23,7 @@ nnoremap <c-h> :wincmd h<cr>
 nnoremap <c-l> :wincmd l<cr>
 syntax on
 colorscheme slate
+vnoremap <c-c> "+y
 nnoremap <c-v> "+p
 inoremap <c-v> <esc>"+p
 nnoremap ± 1gt

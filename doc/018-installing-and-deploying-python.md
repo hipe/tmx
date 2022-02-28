@@ -234,6 +234,14 @@ plugins involves simply doing a git checkout into a particular directory.
 
 The linked-to instructions below will all be variations on this theme.
 
+Generally you will do the below installation instructions from the
+arbitrary directory we have chosen to hold our vim plugins, so go there
+now:
+
+```bash
+cd ~/.vim/pack/plugins/start/
+```
+
 These are in order of our personal perception of their primacy (which is
 mostly meaningless):
 
@@ -243,6 +251,22 @@ mostly meaningless):
 1. (fugitive)[fug1]: as directed but `plugins` not `tpope`
 1. (gitgutter)[gg1]: as directed but `plugins` not `airblade`
 
+A bit more involved is installing "ag, the silver searcher" and its
+vim plugin so that has its own section next.
+
+
+## `vim` plugin: `ag`
+
+Per (its installation instructions)[ag1],
+
+```bash
+sudo apt-get install silversearcher-ag
+```
+
+(The rest is not documented but it was straightforward.)
+
+
+[ag1]: https://github.com/ggreer/the_silver_searcher
 [ctrlp1]: https://github.com/kien/ctrlp.vim
 [gg1]: https://github.com/airblade/vim-gitgutter
 [fug1]: https://github.com/tpope/vim-fugitive
@@ -588,6 +612,23 @@ See this [stack overflow post][pip1].
 
 
 # Other Niceties
+
+## A Development must-have: ssh keys
+
+```bash
+ssh-keygen
+```
+
+Accept the defaults (unless you want a passphrase). That's it!
+
+You'll probably want to get a copy of your public key in your clipboard
+at some point. Using `xsel` that we installed above (Ubuntu):
+
+```bash
+cat ~/.ssh/id_rsa.pub | xsel -ib
+```
+Now it's in your clipboard.
+
 
 ## A Development Nicety: GraphViz for viewing "\*.dot" files
 

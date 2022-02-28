@@ -39,4 +39,3 @@ Put `lines_via_big_string` somewhere
 Cover & integrate "create collection" for recfiles
 Document adding `recsel` and the rest (maybe with next)
 Document installing `coc` vim plugin
-Document installing silver searcher vim plugin
