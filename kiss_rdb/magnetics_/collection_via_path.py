@@ -1050,9 +1050,14 @@ class _StorageAdapter:  # move this to its own file if it gets big.
     def __init__(self, module, key):  # #testpoint
         self.module, self.key = module, key
 
-    def CREATE_COLLECTION(self, collection_path, listener, is_dry):
+    def CREATE_COLLECTION(self, collection_path, listener, is_dry, opn=None):
         # (Case4852_100)
-        return self.module.CREATE_COLLECTION(collection_path, listener, is_dry)
+        if opn:
+            kwargs = {'opn': opn}
+        else:
+            kwargs = empty_dict
+        return self.module.CREATE_COLLECTION(
+            collection_path, listener, is_dry, **kwargs)
 
 
 # == The Case Experiment (will move to [#504] soon as we want it elsewhere)
@@ -1098,7 +1103,7 @@ def _build_case_function(listener=_listener):
 
 def _emit_about_nonworking_stub(listener, sa, cstacker=None):
     def structurer():  # #not-covered, kind of crazy
-        dct = _flatten_context_stack(cstacker()) if cstacker else {}
+        dct = _flatten_context_stack(cstacker()) if cstacker else {}  # #here6
         mod = sa.module
         moniker = repr(sa.key)
         if hasattr(mod, 'STORAGE_ADAPTER_UNAVAILABLE_REASON'):
@@ -1116,7 +1121,7 @@ def _emit_about_nonworking_stub(listener, sa, cstacker=None):
 
 def _emit_about_not_directory_based(listener, sa, cstacker):
     def structurer():  # (Case1421)
-        dct = _flatten_context_stack(cstacker())
+        dct = _flatten_context_stack(cstacker()) if cstacker else {} # #here6
         dct['reason'] = ''.join(__pieces_for_not_dir_based(sa))
         return dct
     listener(*_EC_for_cannot_load,
@@ -1147,7 +1152,7 @@ def __pieces_for_not_dir_based(sa):
 
 def _emit_about_first_field_name(listener, cstacker):
     def structurer():  # (Case1418)
-        dct = _flatten_context_stack(cstacker())
+        dct = _flatten_context_stack(cstacker()) if cstacker else {}  # #here6
         dct['expecting'] = '"storage_adapter" as field name'
         return dct
     listener(*_EC_for_cannot_load,
@@ -1213,7 +1218,7 @@ def _same_splay_reason(noun_singular, wrong, key_via_what):
 
 def _emit_about_SA_key(listener, key, order, cstacker):
     def structurer():  # (Case1419)
-        dct = _flatten_context_stack(cstacker())
+        dct = _flatten_context_stack(cstacker()) if cstacker else {}  # #here6
         _these = ', '.join(repr(s) for s in order)
         dct['reason'] = (f"unknown storage adapter {repr(key)}. "
                          f"known storage adapters: ({_these})")
@@ -1313,6 +1318,7 @@ def xx(msg=None):
     raise RuntimeError(''.join(('write me', *((': ', msg) if msg else ()))))
 
 
+empty_dict = {}
 _this_shape = ('error', 'structure')
 _EC_for_cannot_load = (*_this_shape, 'cannot_load_collection')
 _EC_for_not_found = (*_this_shape, 'cannot_load_collection')

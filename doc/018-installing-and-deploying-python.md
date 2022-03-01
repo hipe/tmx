@@ -672,6 +672,25 @@ open <file.dot>
 ```
 
 
+## A General Nicety: GNU recutils
+
+In development at writing, the "kiss-rdb" sub-project has an adapter
+for reading files like this. We may use this format to hold certain
+kinds of structured notes.
+
+The [documentation][recu1] doesn't say so, but there is a package for
+Ubuntu. (We got this installed straightforwardly somehow on OS X too).
+
+```bash
+sudo apt-get install recutils
+```
+
+Now you can use the executable `recsel` (for example) on a file marked "\*.rec".
+
+
+[recu1]: https://www.gnu.org/software/recutils/
+
+
 ## A Development Nicety: patchutils
 
 We use a tool in this library only rarely, but when we need it we're glad

@@ -1,5 +1,83 @@
-from modality_agnostic.test_support.common import memoize_into, lazy
+from modality_agnostic.test_support.common import \
+        listener_and_emissions_for, memoize_into, lazy
 import os.path as os_path
+
+
+class CreateCollectionCaseMethods:
+    # (optimistically putting this high up, expecting abstraction)
+
+    def expect_only_one_emission_which_is_error_of_type(self, exp):
+        self.assertEqual(exp, self.the_only_emission.channel[2])  # ..
+
+    @property
+    def error_message(self):
+        msg, = self.the_only_emission.to_messages()
+        return msg
+
+    @property
+    def the_only_emission(self):
+        es = self.end_state
+        res = es.result
+        assert res is None  # or not
+        emis = es.emissions
+        emi, = emis
+        return emi
+
+    def build_end_state(self):
+        coll_path = self.build_collection_path()
+        listener, emis = listener_and_emissions_for(self, limit=4)
+        is_dry = self.is_dry
+        addtl_opts = self.additional_invocation_options
+        kwargs = addtl_opts or _empty_dict
+        sa = self.build_storage_adapter()
+        res = sa.CREATE_COLLECTION(coll_path, listener, is_dry=is_dry, **kwargs)
+        end_state_dict = {}
+        end_state_dict['result'] = res
+        end_state_dict['emissions'] = emis
+        if addtl_opts:
+            self.finish_end_state(end_state_dict, addtl_opts)
+        cls = self.end_state_class
+        return cls(**end_state_dict)
+
+    def build_collection_path(self):
+        from kiss_rdb_test.common_initial_state import top_test_dir
+        from os.path import join as path_join
+        return path_join(top_test_dir(), * self.coll_path_tail)
+
+    def build_storage_adapter(self):  # could be lazy
+        SA_mod = self.storage_adapter_module
+        nm = SA_mod.__name__
+        SA_module_slug = nm[nm.rindex('.')+1:]
+        from kiss_rdb.magnetics_.collection_via_path import _StorageAdapter as c
+        return c(SA_mod, SA_module_slug)
+
+    @property
+    def end_state_class(self):
+
+        # Almost tautologically, each case will use one end state schema
+        memo_key = 'end_state_class_value'
+        case_class = self.__class__
+        if hasattr(case_class, memo_key):
+            return getattr(case_class, memo_key)
+
+        # Because OCD, never make the same class twice
+        cache = _OCD_cache
+        fns = self.end_state_field_names
+        cls = cache.get(fns)
+        if cls is None:
+            from collections import namedtuple as nt
+            cls = nt(f"GeneratedEndState_{len(cache)+1}", fns)
+            cache[fns] = cls
+        setattr(case_class, memo_key, cls)
+        return cls
+
+    @property
+    def end_state_field_names(self):
+        return 'result', 'emissions'
+
+    additional_invocation_options = None
+
+_OCD_cache = {}
 
 
 class OneWriteReference:  # :[#510.5] (again)
@@ -346,6 +424,9 @@ def top_fixture_directories_directory():
 @lazy
 def top_test_dir():
     return os_path.dirname(os_path.abspath(__file__))
+
+
+_empty_dict = {}
 
 # #history-A.1
 # #born.

@@ -863,6 +863,21 @@ def _the_unindent_function():
     return unindent
 
 
+def lines_via_big_string(big_string):  # #[#610]
+    leng = len(big_string)
+    assert 2 < leng
+    assert '\n' == big_string[0]
+    assert '\n' == big_string[leng - 1]
+
+    cursor = 1
+    while True:
+        next_cursor = big_string.index('\n', cursor) + 1
+        yield big_string[cursor:next_cursor]
+        if leng == next_cursor:
+            break
+        cursor = next_cursor
+
+
 def _re():
     import re as module
     return module

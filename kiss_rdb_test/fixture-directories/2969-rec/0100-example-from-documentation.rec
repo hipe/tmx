@@ -12,6 +12,8 @@
 # We will perhaps write the case only with stub classes, so that it doesn't
 # not actually parse any of this content (a thing we shouldn't be doing
 # anyway, but we do do for code that serves (Case1403)).
+#
+# At #history-B.1 (2 1/2 years later) we started using this in other tests.
 
 
 %rec: Book
@@ -41,5 +43,6 @@ Location: unknown
 Title: Yeelong User Manual
 Location: home
 
+# #history-B.1
 # #birth.
 # End of books.rec
