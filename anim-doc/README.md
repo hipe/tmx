@@ -28,7 +28,7 @@ be something mnemonic.)
 
 |ID|main tag|content|
 |---|---|---|
-|[#900.2]| #xxx | xxx
+|[#900.2]| #xxx | elements
 
 
 
