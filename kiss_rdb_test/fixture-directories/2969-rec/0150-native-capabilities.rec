@@ -1,0 +1,31 @@
+# reminder: recsel <filename>
+
+Label: Root Thing (Don't see this label)
+ID: AA
+Child: AB
+Child: AC
+Child: AD
+
+# comment is just here to assert we don't see it in output
+
+Label: The first section
+ID: AB
+Child: BA
+Child: BB
+
+Label: The BA item
+ID: BA
+
+Label: The BB item
+ID: BB
+
+Label: the AC
+ID: AC
+
+Label: the AD
+ID: AD
+
+Label: the BB
+ID: BB
+
+# #born

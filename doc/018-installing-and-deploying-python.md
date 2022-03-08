@@ -678,6 +678,8 @@ In development at writing, the "kiss-rdb" sub-project has an adapter
 for reading files like this. We may use this format to hold certain
 kinds of structured notes.
 
+(At #history-B.2 we added a command-line script that needs it.)
+
 The [documentation][recu1] doesn't say so, but there is a package for
 Ubuntu. (We got this installed straightforwardly somehow on OS X too).
 
@@ -736,6 +738,7 @@ sudo apt install gnome-tweak-tool
 
 ## <a name='document-meta'></a>document-meta
 
+  - #history-B.2: begin cap-server which needs recutils
   - #history-B.1: pyenv virtualenv not just virtualenv
   - #history-A.4
   - #history-A.3: virtualenv & pip, not poetry

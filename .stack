@@ -23,13 +23,18 @@ Work on dance app on nights and weekends
 Get M-F hybrid dayjob
 Do Project Grow
 Do something with the idea of autobleed: its time has come (see nearby chat)
-Get photos off phone
+Have it so when you save python files it uses PEP8 or whatever
 Figure out the right way to configure vim in a per-file way
-DAY GOAL: new TMX on gitlab, photos off phone
-Do photos
-Push to gitlab
-Push to github
-Push to bitbucket
-Add ssh keys to gitlab
-Recover gitlab name/password
-Add ssh keys to github
+You could do the "analogs" project.
+(expand this section) Implement the targeted caps, at each step updating cap tree
+Create abstract capabilities tree. Commit. (more in doc)
+Determine implementation status of each capability. (more in doc)
+Populate the real capabilities tree of recfiles. Commit. (more in doc)
+See if you can clean up html/css/design by using https://penkesu.computer. Commit.
+Lua endpoint that integrates tree view and entity view. Take notes that will become "analogs". Commit. (more in doc)
+Document or script the redbean installation
+Document or script the `sqlite3` installation
+"view capability" script. Commit. (more in doc)
+Script to render dummy tree as html. Commit. (more in doc)
+Get this to output the same structure of html that recfiles docs use
+Dummy tree with just a few items. (more in doc)

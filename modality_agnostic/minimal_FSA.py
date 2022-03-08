@@ -1,5 +1,6 @@
 """The Minimal FSA Library :[#505]
 
+- Nowadays we do a simpler way
 - Mostly just keep track of what state you are in (as a name string) and
   assert that you can change into whatever other state name you set
 - Compare the more complicated [#504], which adds structural representation
