@@ -77,7 +77,13 @@ def _schema_and_entities_via_lines(lines, listener):
     return None, entities()
 
 
-def NATIVE_RECORDS_VIA_LINES(lines, listener):
+def NATIVE_RECORDS_VIA_RECSEL(recfile, recsel_args, listener):
+    with _open_recsel_process(recfile, recsel_args, listener) as lines:
+        for rec_dct in _native_records_via_lines(lines, listener):
+            yield rec_dct
+
+
+def _native_records_via_lines(lines, listener):
     # NOTE this intentionally has known holes in it, holding off until etc
 
     # from text_lib.magnetics.scanner_via import scanner_via_iterator as func
@@ -145,6 +151,10 @@ def NATIVE_RECORDS_VIA_LINES(lines, listener):
         directive, data = opcode
         assert 'yield_this' == directive
         yield data
+
+    # Not great, but meh:
+    if len(state.experimental_mutable_record_dict):
+        yield state.experimental_mutable_record_dict
 
 
 class _MinimalIdentitylessEntity:
@@ -417,13 +427,15 @@ def _line_type(line):
 
 # ==
 
-def OPEN_PROCESS(recfile, listener):
-    # (if this works, this will get abstracted so we seaparate different
-    # kind of recsel (and the rest) type calls
+def _open_recsel_process(recfile, recsel_args, listener):
+
+    if not isinstance(recfile, str):
+        from contextlib import nullcontext
+        return nullcontext(recfile)
 
     import subprocess as sp
     proc = sp.Popen(
-        args=('recsel', recfile),
+        args=('recsel', *recsel_args, recfile),
         shell=False,  # if true, the command is executed through the shell
         cwd='.',
         stdin=sp.DEVNULL,

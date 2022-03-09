@@ -6,8 +6,7 @@ class CommonCase(unittest.TestCase):
     def expect_expected_lines(self):
         subject_func = subject_module().lines_via_tree_dictionary
         arg_lines = self.given_recfile_lines()
-        from kiss_rdb.cap_server.model_ import \
-            capability_record_structures_via_lines as func
+        from kiss_rdb.cap_server.model_ import _structures_via_recsel as func
         recs_itr = func(arg_lines, listener=None)
         from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
         tree_dct = func(recs_itr, listener=None)
@@ -67,7 +66,7 @@ class Case2750_tree_lines_via_tree_typical_case(CommonCase):
         ID: AD
 
         Label: the BB
-        ID: BB
+        ID: CA
         """
 
 def unindent(big_string):

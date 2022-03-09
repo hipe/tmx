@@ -34,7 +34,3 @@ See if you can clean up html/css/design by using https://penkesu.computer. Commi
 Lua endpoint that integrates tree view and entity view. Take notes that will become "analogs". Commit. (more in doc)
 Document or script the redbean installation
 Document or script the `sqlite3` installation
-"view capability" script. Commit. (more in doc)
-Script to render dummy tree as html. Commit. (more in doc)
-Get this to output the same structure of html that recfiles docs use
-Dummy tree with just a few items. (more in doc)
