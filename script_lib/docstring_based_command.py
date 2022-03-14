@@ -96,13 +96,26 @@ class _Command:
         self._did_parse_syntax = True
         big_s = self._doc_string
         first_line = big_s[0:big_s.index('\n')]
-        assert 0 == first_line.index('usage: {prog_name} ')
-        rest = first_line[19:]
-        import re
-        if not re.match(r'^[A-Z0-9_]+(?: [A-Z0-9_]+)*\Z', rest):
-            self._has_only_positional_args = False
-            return
-        self._formal_positional_args = tuple(rest.split(' '))
+        assert 0 == first_line.index('usage: {prog_name}')
+
+        # If there is nothing after the program name, it takes no arguments
+        if 18 == len(first_line):  # (NOTE but meh)
+            self._formal_positional_args = ()
+
+        # Otherwise, it takes arguments (either positional+required or not)
+        else:
+            assert ' ' == first_line[18]
+            rest = first_line[19:]
+
+            # If it matches this strict pattern, it's all positional+required
+            # Otherwise it takes arguments but the function must parse them
+
+            import re
+            if not re.match(r'^[A-Z0-9_]+(?: [A-Z0-9_]+)*\Z', rest):
+                self._has_only_positional_args = False
+                return
+
+            self._formal_positional_args = tuple(rest.split(' '))
         self._formal_leng = len(self._formal_positional_args)
         self._has_only_positional_args = True
 

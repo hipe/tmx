@@ -1,0 +1,55 @@
+abstract_idiom: requiring_a_module_the_most_common_way
+canonical_example: require 'io'
+single_paragraph_abstract: xxyy
+
+abstract_idiom: single_line_comment
+canonical_example: -- hello
+
+abstract_idiom: calling_a_method_on_an_object
+canonical_example: fh:close()
+
+abstract_idiom: declaring_a_function_or_method_the_most_common_way
+canonical_example: function incCount (n)
++   n or 1
++   count = count + n
++ end
+
+abstract_idiom: calling_a_function_with_no_arguments
+WRITE_ME: write me
+
+abstract_idiom: the_most_common_indentation_convention
+single_line_summary: Two spaces
+
+abstract_idiom: the_most_common_literal_for_null
+canonical_example: nil
+
+abstract_idiom: the_IF_statement_or_expression
+canonical_example: if a<b then
++   return a
++ else
++   return b
++ end
+
+abstract_idiom: ELSESIF
+keyword: elseif
+
+abstract_idiom: the_most_common_string_concatenation_idiom
+operator: ..
+conventional_example: print("Hello" .. "World")
+
+abstract_idiom: the_WHILE_loop_or_closest_thing_to_it
+single_paragraph_abstract: (discussion) this is XX #todo
++ we looked this up. realized we want a component system
++ for the abstract capability tree
+
+abstract_idiom: the_SWITCH_statement_or_expression
+single_line_summary: There is none. just use an elseif chain
+
+abstract_idiom: variable_length_formal_positional_arguments_in_a_function_call
+single_paragraph_abstract: we looked this up but XX etc #todo.
++ This made us realize how essential it is to represent the language
++ *version* in this. Imagine "note this construct may not have existed
++ as-is before version 5.4 (etc). We tried `arg.n` per some documentation
++ before learning we had to do `args = {...}`
+
+# #born

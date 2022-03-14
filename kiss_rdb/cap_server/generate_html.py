@@ -66,6 +66,16 @@ command = _BND()
 _commands = command  # when we use it as a collection and not a decorator
 
 @command
+def ping(_, sout, serr):
+    """usage: {prog_name}
+
+    description: ohai hello
+    """
+    sout.write("hello from the python backend!\n")
+    return 0
+
+
+@command
 def index(_, sout, serr, recfile):
     """usage: {prog_name} RECFILE
 
@@ -197,7 +207,8 @@ def _inner_html_lines_for_index(recs_itr, listener):
 
     def leaf_node_line_for(rec):
         label_html = html_escape(rec.label)
-        link_html = label_html  # write me soon
+        url = f'/?action=view_capability&eid={rec.EID}'
+        link_html = f'<a href="{url}">{label_html}</a>'
         return f'<li>{link_html}</li>\n'
 
     from html import escape as html_escape
