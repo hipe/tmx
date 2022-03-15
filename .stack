@@ -29,5 +29,5 @@ You could do the "analogs" project.
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
+Maybe now maybe later, a dedicated commit getting rid of extraneous stylesheets
 Populate the real capabilities tree of recfiles. Commit. (more in doc)
-See if you can clean up html/css/design by using https://penkesu.computer. Commit.

@@ -76,6 +76,23 @@ def ping(_, sout, serr):
 
 
 @command
+def test_UI(_, sout, serr):
+    """usage: {prog_name}
+
+    description: static html page to test the stylesheet
+    """
+
+    def these():
+        yield "<ul><li>list item 1</li><li>List Item 2</li></ul>\n"
+
+    w = stdout.write
+    for line in _wrap_lines_commonly(these()):
+        w(line)
+
+    return 0
+
+
+@command
 def index(_, sout, serr, recfile):
     """usage: {prog_name} RECFILE
 
@@ -144,26 +161,18 @@ def _wrap_lines_commonly(lines):
 
     if not lines:  # prettier for caller
         return
-
-    yield '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n'
-    yield "<html>\n<head>\n<title>Xyzzy: Some Title</title>\n"
-
-    # Crazy hack of making these CSS lines look inline
-    yield '<style type="text/css">\n<!--\n'
-    from os.path import dirname as dn, join as jn
-    here = jn(dn(__file__), 'doc-root', 'assets', 'css', 'style.css')
-    with open(here) as css_lines:
-        itr = iter(css_lines)
-        for line in itr:
-            if "\n" == line:
-                break
-        for line in itr:
-            if "\n" == line:
-                break
-            yield line
-
-    yield '-->\n</style>\n</head>\n<body lang="en">\n'
-    yield '<div class="contents">\n'
+    yield """<!doctype html>\n<head>\n<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<title>Minimal by Steve Smith</title>
+<link rel="stylesheet" href="vendor-themes/orderedlist-minimal-cb00000/stylesheets/styles.css">
+<link rel="stylesheet" href="vendor-themes/orderedlist-minimal-cb00000/stylesheets/pygment_trac.css">
+<meta name="viewport" content="width=device-width">
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<div class="wrapper">\n"""
 
     for line in lines:
         yield line
@@ -234,4 +243,5 @@ if '__main__' == __name__:
   from sys import stdout, stderr, argv
   exit(_CLI(None, stdout, stderr, argv))
 
+# #history-C.1: change styling to "minimal" theme
 # #born

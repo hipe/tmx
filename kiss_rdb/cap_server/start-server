@@ -22,6 +22,7 @@ main() {
     do_pathnames
     ensure_recutils_is_installed
     ensure_redbean_is_installed
+    ensure_CSS_theme_is_installed
     exec_out_to_redbean
 }
 
@@ -82,6 +83,30 @@ exec_out_to_redbean() {
     echo "${do_this[*]}"
     exec bash -c "${do_this[*]}"
 }
+
+
+ensure_CSS_theme_is_installed() {
+  local target_dir="${doc_root}/vendor-themes/orderedlist-minimal-cb00000"
+  if [ -d "$target_dir" ] ; then
+    return
+  fi
+  local parent_dir=$(dirname "${target_dir}")
+  if [ ! -d "$parent_dir" ] ; then
+    mkdir "$parent_dir"
+  fi
+  local zipfile_path="${parent_dir}/tmp.zip"
+  wget https://github.com/orderedlist/minimal/zipball/master -O "$zipfile_path"
+  pushd "$parent_dir"
+  unzip tmp.zip
+  rm tmp.zip
+  popd
+  if [ -d "$target_dir" ] ; then
+    return
+  fi
+  >&2 echo "something's not right. should exist: ${target_dir}"
+  exit 3
+}
+
 
 ensure_redbean_is_installed() {
     if [ -f "$redbean_exe_path" ]; then

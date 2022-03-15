@@ -1,14 +1,18 @@
 /*
-NOTE this file is scanned for blank lines meaningfully (for now)
-so we use dots to separate paragraphs in our comments:
-.
 At #birth we copy-pasted *all* the CSS (which was all inlined)
 that the recfiles documentation used, to constitute *all* our own CSS:
 .
     https://www.gnu.org/software/recutils/manual/index.html
 .
 We anticipate not using these styles for very long.
-*/
+
+At #history-C.1 we commented out this whole thing because we're now
+using a (different) vendor theme. (In this usage, "vendor" means
+"we are not keeping it in VCS".)
+
+We're leaving this file (and its content) here for now because we
+may eventually use the file (if not some of the content) for when we
+actually customize our styling.
 
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
@@ -35,5 +39,6 @@ span.sansserif {font-family: sans-serif; font-weight: normal}
 ul.no-bullet {list-style: none}
 
 /*
+# #history-C.1
 # #birth
 */
