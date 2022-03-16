@@ -37,7 +37,7 @@ def _CLI(_, sout, serr, argv):
             e(fmt % (fname, _commands[fname].single_line_description))
         e('\n')
         e("example recfile: "
-        "kiss_rdb_test/fixture-directories/2969-rec/0150-native-capabilities.rec\n"
+        "kiss-rdb-doc/recfiles/857.12.recutils-capabilities.rec\n"
         )
         return 0
 

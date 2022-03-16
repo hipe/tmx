@@ -1,5 +1,9 @@
 # (remember that longterm we don't want to do it this way)
 
+
+_main_record_type = 'NativeCapability'
+
+
 def RETRIEVE_ENTITY(recfile, EID, listener):
 
     def use_listener(*emi):
@@ -19,7 +23,8 @@ def RETRIEVE_ENTITY(recfile, EID, listener):
         return
     del iden
 
-    itr = _structures_via_recsel(recfile, listener, '-e', f'ID="{EID}"')
+    itr = _structures_via_recsel(
+            recfile, listener, '-t', _main_record_type, '-e', f'ID="{EID}"')
     first = None
     for first in itr:
         break
@@ -51,20 +56,28 @@ def RETRIEVE_ENTITY(recfile, EID, listener):
 
 
 def TRAVERSE_COLLECTION(recfile, listener):
-    return _structures_via_recsel(recfile, listener)
+    return _structures_via_recsel(recfile, listener, '-t', _main_record_type)
 
 
 def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
     _Capability = _capability_class()
+
+    def lineser():
+        yield f"\n\nrecsel {' '.join(recfile_args)} {recfile}\n\n\n"
+    listener('info', 'expression', 'sending_recsel', lineser)
+
     from kiss_rdb.storage_adapters_.rec import NATIVE_RECORDS_VIA_RECSEL as func
     for rec in func(recfile, recfile_args, listener):
         eid, = rec.pop('ID')
         label, = rec.pop('Label')
+        native_URL, = rec.pop('NativeURL', (None,))
         children = rec.pop('Child', None)
         if children:
             children = tuple(children)
+        if len(rec):
+            xx(f"handle this/these field(s): ({' '.join(rec.keys())})")
         assert not rec
-        yield _Capability(label, eid, children)
+        yield _Capability(label, eid, native_URL, children)
 
 
 def _capability_class():
@@ -79,6 +92,13 @@ _capability_class.value = None
 
 def _build_capability_class():
     from collections import namedtuple as nt
-    return nt('Guy', ('label', 'EID', 'children'))
+    return nt('Guy', (
+            'label',
+            'EID',
+            'native_URL',
+            'children'))
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
 # #born

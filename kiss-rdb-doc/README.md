@@ -95,7 +95,7 @@ woah boy.
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
 |[#867.J]                   | #open | redundancy
-|[#867.I]                   | #hole | (document) recfiles capabilities plan
+|[#867.I]                   |       | (document) recfiles capabilities plan
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
@@ -116,6 +116,7 @@ woah boy.
 |[#860]                     |       | kube journey notes
 |[#859]                     |       | kubernetes documentation roadmap
 |[#858]                     |       | aws journal
+|[#857.12]                  |       | (recfile) recutils capabilities
 |[#857.11]                  | #prov | "delete" results in structure with entity (not dct) and diff lines
 |[#857.10]                  | #prov | "create" results in structure with entity (not dct) and diff lines
 |[#857.9]                   | #prov | whether or not the EID is an attribute is currently up in the air, up to SA

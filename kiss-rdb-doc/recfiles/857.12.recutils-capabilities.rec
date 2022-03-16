@@ -1,6 +1,558 @@
-abstract_idiom: single_line_comment
-single_paragraph_abstract: la la line 1
-+ la la line 2
+%rec: StringTemplateVariable
+
+TemplateVariableName: doc_url_head
+TemplateVariableValue: https://www.gnu.org/software/recutils/manual
+
+%rec: NativeCapability
+
+# 1-1024 is our ID space (for now)
+# width of parking lot: 1024 feet ("l")
+# number of spaces: 111 (this is the count of toplevel nodes in the doc) ("n")
+# width of each space: l/n
+# offset so each point is on center of the space: l/n/2 ("o")
+
+# $ cat tmp.py
+# > l=1024.0;n=111.0;o=l/n/2
+# > for i in range(0, int(n)):
+# >   print(int(o+(i*l/n)))
+# $ script=kiss_rdb/magnetics_/identifier_via_string.py
+# $ py tmp.py | while read line ; do py "$script" int2id 2 "$line" ; done
+
+Label: GNU Recutils - Table of Contents (THIS LABEL SHOULD NOT DISPLAY (root))
+ID: 23
+Child: 32
+Child: 5M
+Child: C9
+Child: EA
+Child: FQ
+Child: HQ
+Child: L2
+Child: LW
+Child: M7
+Child: N3
+Child: NW
+Child: Q3
+Child: R8
+Child: RT
+Child: SN
+Child: T9
+Child: WE
+Child: WP
+
+Label: 2 The Rec Format
+ID: 32
+NativeURL: {doc_url_head}/TheRecFormat.html#The-Rec-Format
+Child: 3B
+Child: 3L
+Child: 3V
+Child: 47
+
+Label: 2.1 Fields
+ID: 3B
+NativeURL: {doc_url_head}/Fields.html#Fields
+
+Label: 2.2 Records
+ID: 3L
+NativeURL: {doc_url_head}/Records.html#Records
+
+Label: 2.3 Comments
+ID: 3V
+NativeURL: {doc_url_head}/Comments.html#Comments
+
+Label: 2.4 Record Descriptors
+ID: 47
+NativeURL: {doc_url_head}/Record-Descriptors.html#Record-Descriptors
+Child: 4G
+Child: 4R
+Child: 52
+Child: 5C
+
+Label: 2.4.1 Record Sets
+ID: 4G
+NativeURL: {doc_url_head}/Record-Sets.html#Record-Sets
+
+Label: 2.4.2 Naming Record Types
+ID: 4R
+NativeURL: {doc_url_head}/Naming-Record-Types.html#Naming-Record-Types
+
+Label: 2.4.3 Documenting Records
+ID: 52
+NativeURL: {doc_url_head}/Documenting-Records.html#Documenting-Records
+
+Label: 2.4.4 Record Sets Properties
+ID: 5C
+NativeURL: {doc_url_head}/Record-Sets-Properties.html#Record-Sets-Properties
+
+Label: 3 Querying Recfiles
+ID: 5M
+NativeURL: {doc_url_head}/Querying-Recfiles.html#Querying-Recfiles
+Child: 5W
+Child: 67
+Child: 6G
+Child: 6S
+Child: 73
+Child: BP
+Child: BY
+
+Label: 3.1 Simple Selections
+ID: 5W
+NativeURL: {doc_url_head}/Simple-Selections.html#Simple-Selections
+
+Label: 3.2 Selecting by Type
+ID: 67
+NativeURL: {doc_url_head}/Selecting-by-Type.html#Selecting-by-Type
+
+Label: 3.3 Selecting by Position
+ID: 6G
+NativeURL: {doc_url_head}/Selecting-by-Position.html#Selecting-by-Position
+
+Label: 3.4 Random Records
+ID: 6S
+NativeURL: {doc_url_head}/Random-Records.html#Random-Records
+
+Label: 3.5 Selection Expressions
+ID: 73
+NativeURL: {doc_url_head}/Selection-Expressions.html#Selection-Expressions
+Child: 7C
+Child: 7M
+Child: 94
+Child: BD
+
+Label: 3.5.1 Selecting by predicate
+ID: 7C
+NativeURL: {doc_url_head}/Selecting-by-predicate.html#Selecting-by-predicate
+
+Label: 3.5.2 SEX Operands
+ID: 7M
+NativeURL: {doc_url_head}/SEX-Operands.html#SEX-Operands
+Child: 7X
+Child: 88
+Child: 8H
+Child: 8S
+
+Label: 3.5.2.1 Numeric Literals
+ID: 7X
+NativeURL: {doc_url_head}/Numeric-Literals.html#Numeric-Literals
+
+Label: 3.5.2.2 String Literals
+ID: 88
+NativeURL: {doc_url_head}/String-Literals.html#String-Literals
+
+Label: 3.5.2.3 Field Values
+ID: 8H
+NativeURL: {doc_url_head}/Field-Values.html#Field-Values
+
+Label: 3.5.2.4 Parenthesized Expressions
+ID: 8S
+NativeURL: {doc_url_head}/Parenthesized-Expressions.html#Parenthesized-Expressions
+
+Label: 3.5.3 Operators
+ID: 94
+NativeURL: {doc_url_head}/SEX-Operators.html#SEX-Operators.html
+
+Label: 3.5.3.1 Arithmetic Operators
+ID: 9D
+NativeURL: {doc_url_head}/SEX-Operators.html#Arithmetic-Operators
+
+Label: 3.5.3.2 Boolean Operators
+ID: 9N
+NativeURL: {doc_url_head}/SEX-Operators.html#Boolean-operators
+
+Label: 3.5.3.3 Comparison Operators
+ID: 9X
+NativeURL: {doc_url_head}/SEX-Operators.html#Comparison-Operators
+
+Label: 3.5.3.4 Date Comparison Operators
+ID: A8
+NativeURL: {doc_url_head}/SEX-Operators.html#Date-Comparison-Operators
+
+Label: 3.5.3.5 Field Operators
+ID: AJ
+NativeURL: {doc_url_head}/SEX-Operators.html#Field-Operators
+
+Label: 3.5.3.6 String Operators
+ID: AT
+NativeURL: {doc_url_head}/SEX-Operators.html#String-Operators
+
+Label: 3.5.3.7 Conditional Operators
+ID: B4
+NativeURL: {doc_url_head}/SEX-Operators.html#Conditional-Operators
+
+Label: 3.5.4 Evaluation of Selection Expressions
+ID: BD
+NativeURL: {doc_url_head}/SEX-Evaluation.html#SEX-Evaluation
+
+Label: 3.6 Field Expressions
+ID: BP
+NativeURL: {doc_url_head}/Field-Expressions.html#Field-Expressions
+
+Label: 3.7 Sorted Output
+ID: BY
+NativeURL: {doc_url_head}/Sorted-Output.html#Sorted-Output
+
+Label: 4 Editing Records
+ID: C9
+NativeURL: {doc_url_head}/Editing-Records.html#Editing-Records
+Child: CJ
+Child: DP
+Child: DY
+
+Label: 4.1 Inserting Records
+ID: CJ
+NativeURL: {doc_url_head}/Inserting-Records.html#Inserting-Records
+Child: CT
+Child: D5
+Child: DE
+
+Label: 4.1.1 Adding Records With recins
+ID: CT
+NativeURL: {doc_url_head}/Adding-Records-With-recins.html:#Adding-Records-With-recins
+
+Label: 4.1.2 Replacing Records With recins
+ID: D5
+NativeURL: {doc_url_head}/Replacing-Records-With-recins.html#Replacing-Records-With-recins
+
+Label: 4.1.3 Adding Anonymous Records
+ID: DE
+NativeURL: {doc_url_head}/Adding-Anonymous-Records.html#Adding-Anonymous-Records
+
+Label: 4.2 Deleting Records
+ID: DP
+NativeURL: {doc_url_head}/Deleting-Records.html
+
+Label: 4.3 Sorting Records
+ID: DY
+NativeURL: {doc_url_head}/Sorting-Records.html#Sorting-Records
+
+# BELOW confirm urls
+
+Label: 5 Editing Fields
+ID: EA
+NativeURL: {doc_url_head}/Editing-Fields.html#Editing-Fields
+Child: EK
+Child: EU
+Child: F5
+Child: FE
+
+Label: 5.1 Adding Fields
+ID: EK
+NativeURL: {doc_url_head}/Adding-Fields.html#Adding-Fields
+
+Label: 5.2 Setting Fields
+ID: EU
+NativeURL: {doc_url_head}/Setting-Fields.html#Setting-Fields
+
+Label: 5.3 Deleting Fields
+ID: F5
+NativeURL: {doc_url_head}/Deleting-Fields.html#Deleting-Fields
+
+Label: 5.4 Renaming Fields
+ID: FE
+NativeURL: {doc_url_head}/Renaming-Fields.html#Renaming-Fields
+
+Label: 6 Field Types
+ID: FQ
+NativeURL: {doc_url_head}/Field-Types.html#Field-Types
+Child: FZ
+Child: GA
+Child: GK
+Child: GV
+Child: H6
+Child: HF
+
+Label: 6.1 Declaring Types
+ID: FZ
+NativeURL: {doc_url_head}/Declaring-Types.html#Declaring-Types
+
+Label: 6.2 Types and Fields
+ID: GA
+NativeURL: {doc_url_head}/Types-and-Fields.html#Types-and-Fields
+
+Label: 6.3 Scalar Field Types
+ID: GK
+NativeURL: {doc_url_head}/Scalar-Field-Types.html#Scalar-Field-Types
+
+Label: 6.4 String Field Types
+ID: GV
+NativeURL: {doc_url_head}/String-Field-Types.html#String-Field-Types
+
+Label: 6.5 Enumerated Field Types
+ID: H6
+NativeURL: {doc_url_head}/Enumerated-Field-Types.html#Enumerated-Field-Types
+
+Label: 6.7 Other Field Types
+ID: HF
+NativeURL: {doc_url_head}/Other-Field-Types.html#Other-Field-Types
+
+Label: 7 Constraints on Record Sets
+ID: HQ
+NativeURL: {doc_url_head}/Constraints-on-Record-Sets.html#Constraints-on-Record-Sets
+Child: J2
+Child: JB
+Child: JL
+Child: JV
+Child: K6
+Child: KG
+
+Label: 7.1 Mandatory Fields
+ID: J2
+NativeURL: {doc_url_head}/Mandatory-Fields.html#Mandatory-Fields
+
+Label: 7.2 Prohibited Fields
+ID: JB
+NativeURL: {doc_url_head}/Prohibited-Fields.html#Prohibited-Fields
+
+Label: 7.3 Allowed Fields
+ID: JL
+NativeURL: {doc_url_head}/Allowed-Fields.html#Allowed-Fields
+
+Label: 7.4 Keys and Unique Fields
+ID: JV
+NativeURL: {doc_url_head}/Keys-and-Unique-Fields.html#Keys-and-Unique-Fields
+
+Label: 7.5 Size Constraints
+ID: K6
+NativeURL: {doc_url_head}/Size-Constraints.html#Size-Constraints
+
+Label: 7.6 Arbitrary Constraints
+ID: KG
+NativeURL: {doc_url_head}/Arbitrary-Constraints.html#Arbitrary-Constraints
+
+# Hole: KR
+
+Label: 8 Checking Recfiles
+ID: L2
+NativeURL: {doc_url_head}/Checking-Recfiles.html#Checking-Recfiles
+Child: LB
+Child: LM
+
+Label: 8.1 Syntactical Errors
+ID: LB
+NativeURL: {doc_url_head}/Syntactical-Errors.html#Syntactical-Errors
+
+Label: 8.2 Semantic Errors
+ID: LM
+NativeURL: {doc_url_head}/Semantic-Errors.html#Semantic-Errors
+
+Label: 9 Remote Descriptors
+ID: LW
+NativeURL: {doc_url_head}/Remote-Descriptors.html#Remote-Descriptors
+
+Label: 10 Grouping and Aggregates
+ID: M7
+NativeURL: {doc_url_head}/Grouping-and-Aggregates.html#Grouping-and-Aggregates
+Child: MG
+Child: MR
+
+Label: 10.1 Grouping Records
+ID: MG
+NativeURL: {doc_url_head}/Grouping-Records.html#Grouping-Records
+
+Label: 10.2 Aggregate Functions
+ID: MR
+NativeURL: {doc_url_head}/Aggregate-Functions.html#Aggregate-Functions
+
+Label: 11 Queries which Join Records
+ID: N3
+NativeURL: {doc_url_head}/Queries-which-Join-Records.html#Queries-which-Join-Records
+Child: NC
+Child: NM
+
+Label: 11.1 Foreign Keys
+ID: NC
+NativeURL: {doc_url_head}/Foreign-Keys.html#Foreign-Keys
+
+Label: 11.2 Joining Records
+ID: NM
+NativeURL: {doc_url_head}/Joining-Records.html#Joining-Records
+
+Label: 12 Auto-Generated Fields
+ID: NW
+NativeURL: {doc_url_head}/Auto_002dGenerated-Fields.html#Auto_002dGenerated-Fields
+Child: P8
+Child: PH
+Child: PS
+
+Label: 12.1 Counters
+ID: P8
+NativeURL: {doc_url_head}/Counters.html#Counters
+
+Label: 12.2 Unique Identifiers
+ID: PH
+NativeURL: {doc_url_head}/Unique-Identifiers.html#Unique-Identifiers
+
+Label: 12.3 Time-Stamps
+ID: PS
+NativeURL: {doc_url_head}/Time_002dStamps.html#Time_002dStamps
+
+Label: 13 Encryption
+ID: Q3
+NativeURL: {doc_url_head}/Encryption.html#Encryption
+Child: QC
+Child: QN
+Child: QX
+
+Label: 13.1 Confidential Fields
+ID: QC
+NativeURL: {doc_url_head}/Confidential-Fields.html#Confidential-Fields
+
+Label: 13.2 Encrypting Files
+ID: QN
+NativeURL: {doc_url_head}/Encrypting-Files.html#Encrypting-Files
+
+Label:13.3 Decrypting Data
+ID: QX
+NativeURL: {doc_url_head}/Decrypting-Data.html#Decrypting-Data
+
+Label: 14 Generating Reports
+ID: R8
+NativeURL: {doc_url_head}/Generating-Reports.html#Generating-Reports
+Child: RH
+
+Label: 14.1 Templates
+ID: RH
+NativeURL: {doc_url_head}/Templates.html#Templates
+
+Label: 15 Interoperability
+ID: RT
+NativeURL: {doc_url_head}/Interoperability.html#Interoperability
+Child: S4
+Child: SD
+
+Label: 15.1 CSV Files
+ID: S4
+NativeURL: {doc_url_head}/CSV-Files.html#CSV-Files.html
+
+Label: 15.2 Importing MDB Files
+ID: SD
+NativeURL: {doc_url_head}/Importing-MDB-Files.html#Importing-MDB-Files
+
+Label: 16 Bash Builtins
+ID: SN
+NativeURL: {doc_url_head}/Bash-Builtins.html#Bash-Builtins
+Child: SX
+
+Label: 16.1 readred
+ID: SX
+NativeURL: {doc_url_head}/readrec.html#readrec
+
+Label: 17 Invoking the Utilities
+ID: T9
+NativeURL: {doc_url_head}/Invoking-the-Utilities.html#Invoking-the-Utilities
+Child: TJ
+Child: TT
+Child: U4
+Child: UE
+Child: UP
+Child: UY
+Child: V9
+Child: VK
+Child: VU
+Child: W5
 
 
+Label: 17.1 Invoking recinf
+ID: TJ
+NativeURL: {doc_url_head}/Invoking-recinf.html#Invoking-recinf
+
+Label: 17.2 Invoking recsel
+ID: TT
+NativeURL: {doc_url_head}/Invoking-recsel.html#Invoking-recsel
+
+Label: 17.3 Invoking recins
+ID: U4
+NativeURL: {doc_url_head}/Invoking-recins.html#Invoking-recins
+
+Label: Invoking recdel
+ID: UE
+NativeURL: {doc_url_head}/Invoking-recdel.html#Invoking-recdel
+
+Label: 17.5 Invoking recset
+ID: UP
+NativeURL: {doc_url_head}/Invoking-recset.html#Invoking-recset
+
+Label: 17.6 Invoking recfix
+ID: UY
+NativeURL: {doc_url_head}/Invoking-recfix.html#Invoking-recfix
+
+Label: 17.7 Invoking recfmt
+ID: V9
+NativeURL: {doc_url_head}/Invoking-recfmt.html#Invoking-recfmt
+
+Label: 17.8 Invoking csv2rec
+ID: VK
+NativeURL: {doc_url_head}/Invoking-csv2rec#Invoking-csv2rec
+
+Label: 17.9 Invoking rec2csv
+ID: VU
+NativeURL: {doc_url_head}/Invoking-rec2csv.html#Invoking-rec2csv
+
+Label: 17.10 Invoking mdb2rec
+ID: W5
+NativeURL: {doc_url_head}/Invoking-mdb2rec.html#Invoking-mdb2rec
+
+Label: 18 Regular Expressions
+ID: WE
+NativeURL: {doc_url_head}/Regular-Expressions.html#Regular-Expressions
+
+Label: 19 Date input formats
+ID: WP
+NativeURL: {doc_url_head}/Date-input-formats.html#Date-input-formats
+Child: WZ
+Child: XA
+Child: XK
+Child: XU
+Child: Y6
+Child: YF
+Child: YQ
+Child: YZ
+Child: ZA
+Child: ZL
+Child: ZV
+
+Label: 19.1 General date syntax
+ID: WZ
+NativeURL: {doc_url_head}/General-date-syntax.html#General-date-syntax
+
+Label: 19.2 Calendar date items
+ID: XA
+NativeURL: {doc_url_head}/Calendar-date-items.html#Calendar-date-items
+
+Label: 19.3 Time of day items
+ID: XK
+NativeURL: {doc_url_head}/Time-of-day-items.html#Time-of-day-items
+
+Label: 19.4 Time zone items
+ID: XU
+NativeURL: {doc_url_head}/Time-zone-items.html#Time-zone-items
+
+Label: 19.5 Combined date and time of day items
+ID: Y6
+NativeURL: {doc_url_head}/Combined-date-and-time-of-day-items.html#Combined-date-and-time-of-day-items
+
+Label: 19.6 Day of the week items
+ID: YF
+NativeURL: {doc_url_head}/Day-of-the-week-items.html#Day-of-the-week-items
+
+Label: 19.7 Relative items in date strings
+ID: YQ
+NativeURL: {doc_url_head}/Relative-items-in-date-strings.html#Relative-items-in-date-strings
+
+Label: 19.8 Pure numbers in date strings
+ID: YZ
+NativeURL: {doc_url_head}/Pure-numbers-in-date-strings
+
+Label: 19.9 Seconds since the Epoch
+ID: ZA
+NativeURL: {doc_url_head}/Seconds-since-the-Epoch.html#Seconds-since-the-Epoch
+
+Label: 19.10 Specifying time zone rules
+ID: ZL
+NativeURL: {doc_url_head}/Specifying-time-zone-rules.html#Specifying-time-zone-rules
+
+Label: 19.11 Authors of parse_datetime
+ID: ZV
+NativeURL: {doc_url_head}/Authors-of-parse_005fdatetime.html#Authors-of-parse_005fdatetime
+
+# #history-C.1: initial spike of data
 # #born

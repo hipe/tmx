@@ -1,6 +1,7 @@
 require 'io'
 
-recfile_path = './kiss_rdb_test/fixture-directories/2969-rec/0150-native-capabilities.rec'
+-- recfile_path = './kiss_rdb_test/fixture-directories/2969-rec/0150-native-capabilities.rec'
+recfile_path = './kiss-rdb-doc/recfiles/857.12.recutils-capabilities.rec'
 
 if HasParam('action') then
   action_arg = GetParam('action')
