@@ -1,5 +1,8 @@
 # (remember that longterm we don't want to do it this way)
 
+from dataclasses import dataclass
+from random import random as _random_float  # for now
+
 
 _main_record_type = 'NativeCapability'
 
@@ -60,11 +63,12 @@ def TRAVERSE_COLLECTION(recfile, listener):
 
 
 def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
-    _Capability = _capability_class()
 
     def lineser():
         yield f"\n\nrecsel {' '.join(recfile_args)} {recfile}\n\n\n"
-    listener('info', 'expression', 'sending_recsel', lineser)
+
+    if listener:
+        listener('info', 'expression', 'sending_recsel', lineser)
 
     from kiss_rdb.storage_adapters_.rec import NATIVE_RECORDS_VIA_RECSEL as func
     for rec in func(recfile, recfile_args, listener):
@@ -80,25 +84,27 @@ def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
         yield _Capability(label, eid, native_URL, children)
 
 
-def _capability_class():
-    memo = _capability_class
-    if not memo.value:
-        memo.value = _build_capability_class()
-    return memo.value
+@dataclass
+class _Capability:
+    label: str
+    EID: str
+    native_URL: str
+    children: tuple
 
+    @property
+    def implementation_state(self):
+        f = _random_float()
+        if f < 0.30:
+            return
+        if f < 0.55:
+            return 'might_implement_eventually'
+        if f < 0.90:
+            return 'wont_implement_or_not_applicable'
+        return 'is_implemented'
 
-_capability_class.value = None
-
-
-def _build_capability_class():
-    from collections import namedtuple as nt
-    return nt('Guy', (
-            'label',
-            'EID',
-            'native_URL',
-            'children'))
 
 def xx(msg=None):
     raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
+# #history-C.1 changed main model class from namedtuple to dataclass
 # #born

@@ -15,7 +15,13 @@ function _ViewCapability (eid)
 end
 
 function _ShowIndex ()
-  _WriteEveryLineAndClose(_OpenCallToBackend('index', recfile_path))
+  local action_name
+  if HasParam('index_style') and 'tree' == GetParam('index_style') then
+    action_name = 'tree'
+  else
+    action_name = 'table'
+  end
+  _WriteEveryLineAndClose(_OpenCallToBackend(action_name, recfile_path))
 end
 
 function _TestUI ()

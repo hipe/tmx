@@ -12,9 +12,9 @@ class CommonCase(unittest.TestCase):
         tree_dct = func(recs_itr, listener=None)
         actual_lines = subject_func(
             tree_dct,
-            branch_node_opening_line_by=lambda rec: f"=> {rec.EID}:\n",
+            branch_node_opening_line_by=lambda rec, _: f"=> {rec.EID}:\n",
             branch_node_closing_line_string=None,
-            leaf_node_line_by=lambda rec: f"=> {rec.EID}\n")
+            leaf_node_line_by=lambda rec, _: f"=> {rec.EID}\n")
         actual_lines = tuple(actual_lines)
         expected_lines = tuple(self.expected_output_lines())
         self.assertSequenceEqual(actual_lines, expected_lines)

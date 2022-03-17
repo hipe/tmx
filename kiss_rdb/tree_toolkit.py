@@ -20,10 +20,12 @@ def lines_via_tree_dictionary(
         listener('notice', 'expression', 'empty_tree', lambda: (msg,))
         return
 
-    def lines_from_recursing_into_this_branch_node(bnode, my_indent_string):
+    def lines_from_recursing_into_this_branch_node(bnode, depth):
         some_cx_eids = bnode.children
         assert some_cx_eids
-        ch_indent_string = f"{my_indent_string}{tab_string}"  # cache but why
+        ch_depth = depth + 1
+        my_indent_string = margin_via_depth(depth)
+        ch_indent_string = margin_via_depth(ch_depth)
         if branch_node_closing_line_string:
             ch_branch_node_closing_line_string = \
                     f"{my_indent_string}{branch_node_closing_line_string}"
@@ -32,23 +34,37 @@ def lines_via_tree_dictionary(
             ch_node = dct[eid]
             child_is_leaf = not ch_node.children
             if child_is_leaf:
-                tail = leaf_node_line_by(ch_node)
+                tail = leaf_node_line_by(ch_node, ch_depth)
             else:
-                tail = branch_node_opening_line_by(ch_node)
+                tail = branch_node_opening_line_by(ch_node, ch_depth)
             yield f"{my_indent_string}{tail}"
             if child_is_leaf:
                 continue
             for line in lines_from_recursing_into_this_branch_node(
-                    ch_node, ch_indent_string):
+                    ch_node, ch_depth):
                 yield line
             if branch_node_closing_line_string:
                 yield ch_branch_node_closing_line_string
 
-    tab_string = ' ' * indent
-    return lines_from_recursing_into_this_branch_node(root_node, '')
+    if 0 == indent:
+        def margin_via_depth(depth):
+            return ''
+    else:
+        def margin_via_depth(depth):
+            s = MVD_cache.get(depth, None)
+            if s is None:
+                s = ' ' * (indent * depth)
+                MVD_cache[depth] = s
+            return s
+        MVD_cache = {}
+
+    return lines_from_recursing_into_this_branch_node(root_node, depth=0)
 
 
 def tree_dictionary_via_tree_nodes(scts, listener):
+    # (this doesn't do anything interesting except validate the refs
+    # and put it all into a dictionary.)
+
     recs = {}
     fwd_refs = {}
     for rec in scts:
@@ -58,6 +74,11 @@ def tree_dictionary_via_tree_nodes(scts, listener):
         fwd_refs.pop(eid, None)
         recs[eid] = rec
         for ch_eid in (rec.children or ()):
+            # #todo: this seems like a bug: if the original collection
+            # isn't already in pre-order, you will be incorrectly calling
+            # something a fwd ref when it is already defined and it will
+            # incorreclty trigger the below (below) exception
+
             fwd_refs[ch_eid] = None  # might be a redundant assignment
         recs[eid] = rec
 
