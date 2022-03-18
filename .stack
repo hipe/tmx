@@ -29,4 +29,7 @@ You could do the "analogs" project.
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
-Maybe now maybe later, a dedicated commit getting rid of extraneous stylesheets
+Integrate everything and write new stuff to have notes form
+Expose recutils CREATE & UPDATE
+Derive requisite formal entity from recinf
+Generate a web form from a formal entity

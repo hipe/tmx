@@ -1,52 +1,55 @@
 digraph g {
 rankdir=BT  /* Make the thing everything points to be at the top */
+DONE0200[label="Wow"]
+MODELLER->DONE0200
+VCS->DONE0200
+VCSWRITE->DONE0200
+DONE0100[label="Amazing"]
+CW->DONE0100
+HPB->DONE0100
 CW[label="Imagine being able\nto use this for\nclient work"]
-CW->UPOST
-UPRE->CW
+DONE0050->CW
 HPB[label="Be able to use this\nfor hacker's phrasebook"]
-HPB->UPOST
-UPRE->HPB
+DONE0050->HPB
+DONE0050[label="Neato"]
+EAEAA->DONE0050
+JOINNOTES->DONE0050
+ITERUSE[label="Iterate until\nthis feels actually\nusable"]
+CUSTOM->ITERUSE
+ITERUSE->ITERUSE
+JOIN->ITERUSE
+RFIOK->ITERUSE
 EAEAA[label="The ability to\nedit any entity\nat all\n(with a web form)"]
-EAEAA->UPOST
-UPRE->EAEAA
 CREATEOK[label="Turn POST form variables\ninto a successful\ndatabase write"]
-CREATEOK->UPOST
-UPRE->CREATEOK
+EXPOSEW->CREATEOK
+GWFFFE->CREATEOK
+EXPOSEW[label="Expose & cover\nrecutils (either/both)\ncreate & write"]
 GWFFFE[label="Generate a web form from\na formal entity (structure)"]
-GWFFFE->UPOST
-UPRE->GWFFFE
+EFORM->GWFFFE
+RRI->GWFFFE
 RFISE[label="Receive form input\nand show errors"]
-RFISE->UPOST
-UPRE->RFISE
+GWFFFE->RFISE
 RFIOK[label="Receive form input\nand show a successful\ncreate or update"]
-RFIOK->UPOST
-UPRE->RFIOK
-RRI[label="Read the output of recinf\nfor use in\nderiving a formal entity"]
-RRI->UPOST
-UPRE->RRI
+CREATEOK->RFIOK
+VIEW->RFIOK
+RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity"]
 JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough"]
-JOINNOTES->UPOST
-UPRE->JOINNOTES
+ITERUSE->JOINNOTES
 JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes"]
-JOIN->UPOST
-UPRE->JOIN
-UPOST[label="[Some as-yet\nundetermined\nsubsequent step(s)]"]
-UPRE[label="[Some as-yet\nundetermined\nprecondition(s)]"]
 VCS[label="timestamp (and author)\nderived from VCS woot"]
-VCS->UPOST
-UPRE->VCS
-CUSTOM[label="Eventually you will need the\nability to customize\n
+DONE0100->VCS
+VCSWRITE[label="Commit to VCS\non (for eg.)\nentity save"]
+DONE0100->VCSWRITE
+CUSTOM[label="Eventually you will need the\nability to customize
 entity EDIT & VIEW\nbeyond just what can\nbe gen'd from recinf"]
-CUSTOM->UPOST
-UPRE->CUSTOM
-VIEW[label="Entity view, purely generated from recinf"]
-VIEW->UPOST
-UPRE->VIEW
+VIEW[label="Entity view, purely\ngenerated from recinf"]
+RRI->VIEW
 MODELLER[label="create AND EDIT\nyour recutils-native\nmodel directly from GUI"]
-MODELLER->UPOST
-UPRE->MODELLER
+DONE0100->MODELLER
+EFORM[label="Investigate any\nexisting formal entity\nstructures we have"]
 }
 
 /*
+#history-C.1 Create a rough draft of dependencies from initial nodes
 #born
 */
