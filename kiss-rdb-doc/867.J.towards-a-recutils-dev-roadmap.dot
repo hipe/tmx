@@ -1,0 +1,52 @@
+digraph g {
+rankdir=BT  /* Make the thing everything points to be at the top */
+CW[label="Imagine being able\nto use this for\nclient work"]
+CW->UPOST
+UPRE->CW
+HPB[label="Be able to use this\nfor hacker's phrasebook"]
+HPB->UPOST
+UPRE->HPB
+EAEAA[label="The ability to\nedit any entity\nat all\n(with a web form)"]
+EAEAA->UPOST
+UPRE->EAEAA
+CREATEOK[label="Turn POST form variables\ninto a successful\ndatabase write"]
+CREATEOK->UPOST
+UPRE->CREATEOK
+GWFFFE[label="Generate a web form from\na formal entity (structure)"]
+GWFFFE->UPOST
+UPRE->GWFFFE
+RFISE[label="Receive form input\nand show errors"]
+RFISE->UPOST
+UPRE->RFISE
+RFIOK[label="Receive form input\nand show a successful\ncreate or update"]
+RFIOK->UPOST
+UPRE->RFIOK
+RRI[label="Read the output of recinf\nfor use in\nderiving a formal entity"]
+RRI->UPOST
+UPRE->RRI
+JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough"]
+JOINNOTES->UPOST
+UPRE->JOINNOTES
+JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes"]
+JOIN->UPOST
+UPRE->JOIN
+UPOST[label="[Some as-yet\nundetermined\nsubsequent step(s)]"]
+UPRE[label="[Some as-yet\nundetermined\nprecondition(s)]"]
+VCS[label="timestamp (and author)\nderived from VCS woot"]
+VCS->UPOST
+UPRE->VCS
+CUSTOM[label="Eventually you will need the\nability to customize\n
+entity EDIT & VIEW\nbeyond just what can\nbe gen'd from recinf"]
+CUSTOM->UPOST
+UPRE->CUSTOM
+VIEW[label="Entity view, purely generated from recinf"]
+VIEW->UPOST
+UPRE->VIEW
+MODELLER[label="create AND EDIT\nyour recutils-native\nmodel directly from GUI"]
+MODELLER->UPOST
+UPRE->MODELLER
+}
+
+/*
+#born
+*/

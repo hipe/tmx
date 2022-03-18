@@ -660,7 +660,6 @@ def build_end_state_expecting_failure_via(tc, additionally=None):
     sct = emi.payloader()  # make it not hot
     return {'result_value': x, 'channel': emi.channel,
             'payloader': lambda: sct}
-    # eventually #open [#867.J] re-redund this
 
 
 def _end_state_plus(tc, run, coll, eid, expecting_OK):

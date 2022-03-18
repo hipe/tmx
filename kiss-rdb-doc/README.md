@@ -94,7 +94,7 @@ woah boy.
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
-|[#867.J]                   | #open | redundancy
+|[#867.J]                   |       | (document) digraph for recutils dev roadmap
 |[#867.I]                   |       | (document) recfiles capabilities plan
 |[#867.H]                   | #open | blank lines during update move weirdly.
 |[#867.G]                   | #wish | empty files would tell you they're empty
