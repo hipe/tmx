@@ -46,7 +46,7 @@ VIEW[label="Entity view, purely\ngenerated from recinf"]
 RRI->VIEW
 MODELLER[label="create AND EDIT\nyour recutils-native\nmodel directly from GUI"]
 DONE0100->MODELLER
-EFORM[label="Investigate any\nexisting formal entity\nstructures we have"]
+EFORM[label="Investigate any\nexisting formal entity\nstructures we have" style=filled]
 }
 
 /*

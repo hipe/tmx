@@ -373,11 +373,21 @@ class _AbstractSchema:
             for line in table.to_description_lines():
                 yield line
 
+    def to_sexp_lines(self):
+        yield '("abstract_schema" ("properties")\n'
+        for table in self.to_tables():
+            for line in table.to_sexp_lines('  ', '  '):
+                yield line
+        yield ')\n'
+
     def to_tables(self):
         return self._tables.values()
 
     def schema_diff_to(self, otr):
         return _schema_diff(self._tables, otr._tables)
+
+
+abstract_schema_via_dictionary = _AbstractSchema
 
 
 # == Table
@@ -537,6 +547,16 @@ class _AbstractTable:
             for line in col.to_description_lines():
                 yield line
 
+    def to_sexp_lines(self, margin, indent_for_children):
+        tn = self.table_name
+        assert '"' not in tn  # can't use repr, need double-quotes
+        yield f'{margin}("abstract_entity" "{tn}"\n'
+        ch_margin = f"{margin}{indent_for_children}"
+        for abs_attr in self.to_columns():
+            for line in abs_attr.to_sexp_lines(ch_margin, indent_for_children):
+                yield line
+        yield f'{margin})\n'
+
     def to_columns(self):
         return self._columns.values()
 
@@ -637,6 +657,30 @@ class _AbstractColumn:
             pcs.append(''.join(('(', self.referenced_column_name, ')')))
         yield f"{ch_m}Foreign key: {' '.join(pcs)!r}\n"
 
+    def to_sexp_lines(self, margin, indent_for_children):
+        from kiss_rdb.magnetics_.abstract_schema_via_sexp import \
+                pretty_print_sexp_ as func
+        return func(self._to_sexp_pieces(), indent_for_children, margin)
+
+    def _to_sexp_pieces(self):
+        yield 'abstract_attribute'
+        yield self.column_name
+        yield self.column_type_storage_class
+        if self.null_is_OK:
+            yield 'optional'
+        if self.is_primary_key:
+            yield 'key'
+        elif self.is_unique:
+            yield 'unique'
+        if self.is_foreign_key_reference:
+            yield tuple(self._foreign_key_sexp_pieces())
+
+    def _foreign_key_sexp_pieces(self):
+        yield 'foreign_key'
+        yield self.referenced_table_name
+        if self.referenced_column_name:
+            xx("can we please deprecate foreign key column name (see..)?")
+            # recutils seems fine without them
     _fields = (
         'column_type_storage_class', 'null_is_OK',
         'is_foreign_key_reference',
