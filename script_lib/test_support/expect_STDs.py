@@ -34,7 +34,7 @@ details:
 possible issues:
 
   - life is easier on our end if every `write` to the IO's ends in a
-    newline. (were this no the case, we would have to design whether
+    newline. (were this not the case, we would have to design whether
     we model expected *writes* or expected *lines*. the truth may be that
     we model neither; that in fact we model the expectation of one *or more*
     lines per write.. #[#605.2]
@@ -145,6 +145,10 @@ def _stdin_for(tc):
     sin = tc.given_stdin()
     if sin is None:
         return
+    return pretend_STDIN_via_mixed(sin)
+
+
+def pretend_STDIN_via_mixed(sin):
     if isinstance(sin, str):
         return _pretend_STDIN_via_key(sin)
     if hasattr(sin, '__next__'):
@@ -670,6 +674,7 @@ class _Fake_Stub_or_Mock_STDIN:
 
     def __init__(self, isatty):
         self._isatty = isatty
+        self._is_open = True
 
     def _replace(self, **kwargs):
         otr = self.__class__(self._isatty)
@@ -678,10 +683,21 @@ class _Fake_Stub_or_Mock_STDIN:
             recv_via_k[k](v)
         return otr
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self._is_open = False
+
+    def read(self):
+        lines = tuple(iter(self))
+        return ''.join(lines)
+
     def __iter__(self):
         return self  # (Case1068DP)
 
     def __next__(self):
+        self._assert_is_open()
         return self._produce_next_item()
 
     def isatty(self):
@@ -695,6 +711,11 @@ class _Fake_Stub_or_Mock_STDIN:
 
     def readable(_):
         return True
+
+    def _assert_is_open(self):
+        if self._is_open:
+            return
+        raise ValueError("I/O operation on closed file.")
 
     name = '<stdin>'
     mode = 'r'

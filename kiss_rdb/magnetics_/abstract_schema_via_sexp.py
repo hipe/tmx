@@ -1,4 +1,4 @@
-# Actually this is XX not XX but we're hiding that fact
+# (see the help screen to the embedded CLI of this module.)
 
 import re
 
@@ -80,7 +80,7 @@ def _CLI(sin, sout, serr, argv):
 
     if fh:
         with fh:
-            abs_sch = abstract_schema_via_sexp_lines_(serr, fh)
+            abs_sch = abstract_schema_via_sexp_lines_(fh, listener=None)
 
     if abs_sch is None:
         return 3
@@ -92,8 +92,55 @@ def _CLI(sin, sout, serr, argv):
 
 
 def _help_lines(prog_namer):
-    yield "It's too hard to explain this syntax formally (for now).\n"
-    yield "Example: XX\n\n"
+    yield f"usage: {prog_namer()} [lots of primaries defining the model]\n"
+    yield f"       {prog_namer()} -file FILE_WITH_SEXP_LINES\n"
+    yield f"       echo \"[sexp lines]\" | {prog_namer()} -file -\n"
+    yield '\n'
+    yield "description: Make an abstract schema from a definition\n"
+    yield '\n'
+    yield "discussion:\n"
+    yield '\n'
+    yield "Normally this script parses ARGV for a schema definition to consume,\n"
+    yield "and it produces an S-expression representation of that schema suitable\n"
+    yield "to be consumed by other scripts that might consume such a format\n"
+    yield "to do something interesting with it, like generate SQL or HTML forms.\n"
+    yield '\n'
+    yield "An abstract schema is simply a list of *one* or more formal entities.\n"
+    yield "Each formal entity has a name and a list of *one* or more formal attributes.\n"
+    yield "Each formal attribute has a name and maybe some properties.\n"
+    yield '\n'
+    yield "You can use this module/script to produce such a schema in two ways:\n"
+    yield "from command line arguments (ARGV) and from S-expression strings\n"
+    yield "(either in a file or from STDIN).\n"
+    yield '\n'
+    yield "An abstract schema can be defined on the command line by using\n"
+    yield "certain keywords we call 'primaries' (in deference to BSD `find`),\n"
+    yield "and sometimes through the use of POSITIONAL_ARGUMENTS as determined\n"
+    yield "by the preceding primary.\n"
+    yield '\n'
+    yield "primaries and POSITIONAL_ARGUMENTS:\n"
+    yield '\n'
+    yield "-formal-entity  Starts a formal entity definition:\n"
+    yield "                -formal-entity NAME <attr-def> [<attr-def> [..]]\n"
+    yield "-attr           Starts a formal attribute definition:\n"
+    yield "                -attr NAME [TYPE_MACRO] [<attr-prop> [<attr-prop> [..]]\n"
+    yield "-key            An <attr-prop> flag indicating that this is the primary\n"
+    yield "                key of the abstract entity. There can be max one.\n"
+    yield "-optional       By default, formal attributes model required fields.\n"
+    yield "                This flag makes the attribute optional.\n"
+    yield "TYPE_MACRO      int|text|line|paragraph XX THIS IS WIP XX, not implemented yet.\n"
+    yield '\n'
+    yield "An example using the above:\n"
+    yield '\n'
+    yield f"  {prog_namer()} -formal-entity AA -attr BB -key -attr CC -optional\n"
+    yield '\n'
+    yield "The formal schema defined by your input is written as an S-expression\n"
+    yield "to STDOUT. You can also use such an S-expression as *input* to the\n"
+    yield "script, through the '-file' option. (Read from STDIN with '-file -'.)\n"
+    yield "\n"
+    yield "In such cases (if everything's working correctly), the same S-expression\n"
+    yield "will be written to STDOUT as was read from input. This execution path\n"
+    yield "exists merely to visually test that the round-trip works losslessly.\n"
 
 
 def _CLI_state_machine(serr, sout, stack):
@@ -346,11 +393,14 @@ def _human_via_fname(fname):
 
 # ==
 
-def abstract_schema_via_sexp_lines_(serr, sin):
+def abstract_schema_via_sexp_lines_(fh, listener=None):
     # #todo needs a context stack too
 
     # (it's painful for us to do this but the alternative is absurd:)
-    big_string = sin.read()
+    if hasattr(fh, 'read'):
+        big_string = fh.read()
+    else:
+        big_string = ''.join(fh)  # ..
 
     def main():
         avoid_common_errors_from_vendor_lib()

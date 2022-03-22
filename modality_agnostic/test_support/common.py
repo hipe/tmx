@@ -257,12 +257,17 @@ def dangerous_memoize(orig_f):  # #decorator
 
     def use_f(self_maybe_ignored):
         if state.is_first_call:
+            if state.call_in_progress:
+                raise RuntimeError("circular reference: memo'd value called inside builder")
             state.is_first_call = False
+            state.call_in_progress = True
             state.memoized_value = orig_f(self_maybe_ignored)
+            state.call_in_progress = False
         return state.memoized_value
 
     class state:  # #class-as-namespace
         is_first_call = True
+        call_in_progress = False
 
     return property(use_f)  # wrapped as property because of how it's used
 
