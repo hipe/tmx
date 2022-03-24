@@ -44,7 +44,7 @@ def _abstract_column_via_my_column(mcd):
     is_fk = (mcd.is_foreign_key_ref or None)
     return abstract_column_via(
         column_name=mcd.col_name,
-        column_type_storage_class=mcd.col_abs_typ,
+        type_macro=mcd.col_abs_typ,
         is_foreign_key_reference=(is_fk or False),
         referenced_table_name=(is_fk and mcd.parent_table_name),
         referenced_column_name=(is_fk and mcd.parent_column_name),
@@ -383,6 +383,8 @@ class _AbstractSchema:
     def to_tables(self):
         return self._tables.values()
 
+    to_formal_entities = to_tables  # experimenting with namechange
+
     def schema_diff_to(self, otr):
         return _schema_diff(self._tables, otr._tables)
 
@@ -537,9 +539,9 @@ class _AbstractTable:
 
     def __init__(self, name, pkfn, dct, fks):
         self.table_name = name
-        self._primary_key_field_name = pkfn
+        self.primary_key_field_name = pkfn
         self._columns = dct
-        self._FOREIGN_KEYS = tuple(fks) if fks else None
+        self.foreign_keys = tuple(fks) if fks else None
 
     def to_description_lines(self):
         yield f"Abstract table: {self.table_name!r}\n"
@@ -559,6 +561,8 @@ class _AbstractTable:
 
     def to_columns(self):
         return self._columns.values()
+
+    to_formal_attributes = to_columns
 
 
 # == Column
@@ -620,18 +624,18 @@ class _ColumnDiff:
         yield final
 
 
-def abstract_column_via(
-        column_name, column_type_storage_class, listener=None, **kw):
-
-    if column_type_storage_class not in _abstract_types:
-        xx(f"keeping this painfully minimal for now. bad type: {column_type_storage_class!r}")   # noqa: E501
-    return _AbstractColumn(column_name, column_type_storage_class, **kw)
+def abstract_column_via(column_name, type_macro='text', listener=None, **kw):
+    if isinstance(type_macro, str):
+        type_macro = type_macro_(type_macro, listener)
+    if type_macro is None:
+        return
+    return _AbstractColumn(column_name, type_macro, **kw)
 
 
 @_dataclass
 class _AbstractColumn:
     column_name: str
-    column_type_storage_class: str
+    type_macro: object
     is_primary_key: bool = False  # mutex with `is_unique` per #here2
     null_is_OK: bool = False  # API provis: NOT NULL is default at #history-B.4
     is_unique: bool = False  # mutex with `is_primary_key` per #here2
@@ -642,7 +646,7 @@ class _AbstractColumn:
     def to_description_lines(self):
         mm = '  '
         ch_m = '    '
-        typ = self.column_type_storage_class
+        typ = self.type_macro_string
         yield f"{mm}Abstract column: {self.column_name!r} {typ}\n"
         if self.null_is_OK:
             yield f"{ch_m}NULL is OK\n"
@@ -665,7 +669,7 @@ class _AbstractColumn:
     def _to_sexp_pieces(self):
         yield 'abstract_attribute'
         yield self.column_name
-        yield self.column_type_storage_class
+        yield self.type_macro.string
         if self.null_is_OK:
             yield 'optional'
         if self.is_primary_key:
@@ -681,14 +685,79 @@ class _AbstractColumn:
         if self.referenced_column_name:
             xx("can we please deprecate foreign key column name (see..)?")
             # recutils seems fine without them
+
+    @property
+    def type_macro_string(self):
+        return self.type_macro.string
+
     _fields = (
-        'column_type_storage_class', 'null_is_OK',
+        'type_macro_string', 'null_is_OK',
         'is_foreign_key_reference',
         'is_primary_key', 'is_unique',  # mutex
         'referenced_table_name', 'referenced_column_name')
 
 
-_abstract_types = {k: None for k in 'int text'.split()}
+def _define_type_macro_function():
+
+    def type_macro_via_string(type_macro_string, listener=None):
+        if (o := cache.get(type_macro_string, None)):
+            return o
+
+        type_strings = [type_macro_string]
+        current_type = type_macro_string
+        while True:
+            next_type = parent_of.get(current_type, False)
+            if next_type is False:
+                when_bad_type(listener, current_type)
+                return
+            if next_type is None:
+                break
+            type_strings.append(next_type)
+            current_type = next_type
+
+        o = _TypeMacro(tuple(reversed(type_strings)))
+        cache[type_macro_string] = o
+        return o
+    cache = {}
+
+    parent_of = {}
+    parent_of['paragraph'] = 'text'
+    parent_of['line'] = 'text'
+    parent_of['text'] = None
+    parent_of['int'] = None
+
+    class _TypeMacro:
+        def __init__(self, ancestors):
+            self._ancestors = ancestors
+
+        def kind_of(self, type_string):
+            yes = type_string in self._ancestors
+            if yes:
+                return yes
+            if type_string in parent_of:
+                return False
+            xx(f"oops: not a type in the type macro tree: {type_string!r}")
+
+        @property
+        def string(self):
+            return self._ancestors[-1]
+
+    def when_bad_type(listener, bad_type):
+        def lines():
+            yield f"Unrecognized abstract type {bad_type!r}"
+            yield f"Available: ({', '.join(parent_of.keys())})"
+        if listener:
+            listener('error', 'expression', 'bad_type', lines)
+        else:
+            raise RuntimeError(next(lines()))
+
+        def all_symbols(_):
+            return parent_of.keys()
+
+    return type_macro_via_string
+
+
+type_macro_ = _define_type_macro_function()
 
 
 def _build_throwing_listener(listener, stop):
@@ -712,6 +781,7 @@ class _Stop(RuntimeError):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #history-C.1: enter type macro
 # #history-B.5
 # #history-B.4 spike "via graph viz lines"
 # #born

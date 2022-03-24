@@ -302,7 +302,7 @@ class Case4860_440_when_a_single_column_attrib(BigCase):
         yield 'database: /pretend/db.sqlite3'
         yield 'dotfile: /pretend/my-schema.dot'
         yield "Table 'track' is out of sync in the 'track_title' column:\n"
-        yield "For column 'track_title', 'column_type_storage_class' is 'text' but should be 'int'.\n"  # noqa: E501
+        yield "For column 'track_title', 'type_macro_string' is 'text' but should be 'int'.\n"  # noqa: E501
 
     def given_graph_viz_indented_big_string(_):
         return """

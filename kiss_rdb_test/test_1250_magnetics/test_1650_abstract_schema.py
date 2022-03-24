@@ -8,7 +8,7 @@ class CommonCase(unittest_TestCase):
     @shared_subject
     def abstract_schema_one(self):
         lines = self.sexp_lines_one
-        return subject_module().abstract_schema_via_sexp_lines_(lines)
+        return subject_module()._abstract_schema_via_sexp_lines(lines)
 
     @shared_subject
     def sexp_lines_one(self):
@@ -131,10 +131,6 @@ def lines_via_big_string(big_s):
     assert '\n' == lines[0]
     assert '        ' == lines[-1]
     return tuple(lines[1:-1])
-
-
-def xx(msg=None):
-    raise RuntimeError(''.join(('ohai', *((': ', msg) if msg else ()))))
 
 
 def subject_module():

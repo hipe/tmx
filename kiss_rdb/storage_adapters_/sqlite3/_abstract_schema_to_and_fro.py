@@ -73,7 +73,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
 
     def on_type_name_thats_also_valid_storage_class():
         assert 'from_expecting_type_name' == stack.pop().__name__
-        store['column_type_storage_class'] = abstract_type_via[token_value]
+        store['type_macro'] = abstract_type_via[token_value]
         push_to(from_expecting_column_constraint_or_get_out)
 
     def from_expecting_column_constraint_or_get_out():
@@ -145,7 +145,7 @@ def _abstract_table_defs_via_sqlite_lines(lines):
         assert 'from_expecting_column_def' == k
         kw = {}
         kw['column_name'] = store.pop('column_name')
-        kw['column_type_storage_class'] = store.pop('column_type_storage_class')  # noqa: E501
+        kw['type_macro'] = store.pop('type_macro')
 
         """In our practice, 'NOT NULL' is the norm by some significant margin.
         So that it takes up less visual/cognitive space by not needing to state
@@ -487,7 +487,7 @@ def _column_words(col):
     _sanity_check_column_name(s)
     yield (s,)
 
-    abs_typ = col.column_type_storage_class
+    abs_typ = col.type_macro_string
 
     if col.is_primary_key:
         assert 'int' == abs_typ

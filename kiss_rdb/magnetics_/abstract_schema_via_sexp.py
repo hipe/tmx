@@ -2,85 +2,79 @@
 
 import re
 
+def common_CLI(sin, sout, serr, argv, receive_abstract_schema):
+    stack = list(reversed(argv))
+    prog_name_long = stack.pop()
+
+    def prog_namer():
+        return _prog_name_via_long_prog_name(prog_name_long)
+
+    w = serr.write
+    if _help_was_passed_at_head_or_tail(stack):
+        for line in _common_CLI_help_lines(receive_abstract_schema, prog_namer):
+            w(line)
+        return 0
+
+    err, fh = _resolve_upstream(sin, stack)
+    if err is None and fh is None:
+        err = "Expecting schema sexp (either '-file' arg or STDIN)\n"
+    if err:
+        w(err)
+        return 3
+
+    with fh:  # #here1
+        abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
+
+    if abs_sch is None:
+        return 3
+
+    w = sout.write
+    for line in receive_abstract_schema(abs_sch):
+        w(line)
+    return 0
+
+
+def _common_CLI_help_lines(func, prog_namer):
+    if (s := func.__doc__):
+        doc_lines = re.split('(?<=\n)    ', s)
+        assert 0 == len(doc_lines[-1])
+        doc_lines.pop()
+    else:
+        doc_lines = (f'(no __doc__ for {func.__name__}',)
+
+    yield f"usage: <command-to-generate-sexp-lines> | {prog_namer()} [-file -]\n"
+    yield f"       {prog_namer()} -file SEXP_FILE\n"
+    yield '\n'
+    itr = iter(doc_lines)
+    first_line_tail = next(itr)  # ..
+    yield f"description: {first_line_tail}"
+
+    for line in itr:
+        yield line
+
 
 def _CLI(sin, sout, serr, argv):
     prog_name_long = argv[0]
-    stack = [None, * reversed(argv[1:])]  # 'None' signals end of stream
+    stack = [None, * reversed(argv[1:])]  # 'None' signals end of stream #here3
 
     def prog_name():
-        from os.path import basename
-        return basename(prog_name_long)
+        return _prog_name_via_long_prog_name(prog_name_long)
 
-    def help_was_passed_as_far_as_we_care_to_check():
-        leng = stack_len()
-        if 0 == leng:
-            return False
-        rx = re.compile('^--?h(?:e(?:lp?)?)?$')
-        if rx.match(stack[-1]):
-            return True
-        if 1 == leng:
-            return False
-        return rx.match(stack[1])
-
-    def stack_len():
-        return len(stack) - 1  # because of special token 'None'
-
-    if help_was_passed_as_far_as_we_care_to_check():
+    if _help_was_passed_at_head_or_tail(stack):
         for line in _help_lines(prog_name):
             serr.write(line)
         return 0
 
-    # Normalize this not-necessary arg so subsequent validation is simpler
-    if 0 == stack_len() and not sin.isatty():  # (#here2)
-        stack.push('-')
-        stack.push('-file')
-
-    # Resolve any file arg
-    file_arg = None
-    if stack_len() and '-file' == stack[-1]:
-        stack.pop()
-        assert( file_arg  := stack.pop() )  # arg is required. UX meh
-        # Assert that file arg (if present) was the only arg
-        if stack_len():
-            _ = repr(stack[-1])
-            serr.write(f"'-file' primary must occur alone. Unexpected: {_}\n")
-            return 3
-
-    # A rule table that permutes {[no] STDIN}x{no_file_arg|file_arg_is[p|d]}
-
-    stdin_case = 'no_STDIN' if sin.isatty() else 'STDIN'
-    if file_arg is None:
-        file_arg_case = 'no_file_arg'
-    elif '-' == file_arg:
-        file_arg_case = 'file_arg_is_dash'
-    else:
-        file_arg_case = 'file_arg_is_path'
-
-
-    case = (stdin_case, file_arg_case)
-    fh = err = None
-    if ('no_STDIN', 'no_file_arg') == case:
-        abs_sch = _CLI_state_machine(serr, sout, stack)
-    elif ('no_STDIN', 'file_arg_is_path') == case:
-        fh = open(file_arg)  # #here1
-    elif ('no_STDIN', 'file_arg_is_dash') == case:
-        err = "with '-file -', expecting STDIN but term is interactive\n"
-    elif ('STDIN', 'no_file_arg') == case:
-        assert stack_len()  # because #here2
-        err = f"can't use STDIN *and* ARGV. unexpected: {stack[-1]!r}\n"
-    elif ('STDIN', 'file_arg_is_path') == case:
-        err = f"can't use STDIN *and* '-file PATH'. Use '-file -'.\n"
-    else:
-        assert ('STDIN', 'file_arg_is_dash') == case
-        fh = sin
-
+    err, fh = _resolve_upstream(sin, stack)
     if err:
         serr.write(err)
         return 3
 
     if fh:
-        with fh:
-            abs_sch = abstract_schema_via_sexp_lines_(fh, listener=None)
+        with fh:  # file will close at exit #here1
+            abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
+    else:  # #here5
+        abs_sch = _CLI_state_machine(serr, sout, stack)
 
     if abs_sch is None:
         return 3
@@ -143,6 +137,63 @@ def _help_lines(prog_namer):
     yield "exists merely to visually test that the round-trip works losslessly.\n"
 
 
+def _help_was_passed_at_head_or_tail(stack):
+    leng = _stack_length(stack)
+    if 0 == leng:
+        return False
+    rx = re.compile('^--?h(?:e(?:lp?)?)?$')
+    if rx.match(stack[-1]):
+        return True
+    if 1 == leng:
+        return False
+    return rx.match(stack[1])
+
+
+def _resolve_upstream(sin, stack):
+    # very similar to script_lib.RESOLVE_UPSTREAM
+    # A rule table that permutes {[no] STDIN}x{no_file_arg|file_arg_is[p|d]}
+
+    if _stack_length(stack) and '-file' == stack[-1]:
+        stack.pop()
+        if 0 == _stack_length(stack):
+            return "Missing required argument after '-file'\n", None
+        file_arg = stack.pop()
+    else:
+        file_arg = None
+
+    if sin.isatty():
+
+        # If interactive and no file arg is passed, pass the buck
+        if file_arg is None:
+            return None, None
+
+        # If interactive and '-' was passed, user error
+        if '-' == file_arg:
+            return "With '-file -', expecting STDIN but term is interactive.\n", None
+
+        # If interactive, normal file arg was passed, but more args
+        if _stack_length(stack):
+            return f"'-file' primary must occur alone. Unexpected: {stack[-1]!r}\n", None
+
+        # Interactive and filename was passed
+        return None, open(file_arg)  # #here1
+
+    # If noninteractive and file arg looks right
+    if '-' == file_arg or file_arg is None:
+
+        if _stack_length(stack):
+            return f"Can't use STDIN *and* ARGV. unexpected: {stack[-1]!r}\n", None
+
+        return None, sin  # #here1
+
+    return  "Can't use STDIN *and* '-file PATH'. Use one or the other.\n", None
+
+
+def _prog_name_via_long_prog_name(long_prog_name):
+    from os.path import basename
+    return basename(long_prog_name)
+
+
 def _CLI_state_machine(serr, sout, stack):
 
     def can_stop_here(f):
@@ -167,12 +218,26 @@ def _CLI_state_machine(serr, sout, stack):
 
     @can_stop_here
     def from_after_attribute_name():
+        yield if_ZINGBUT, handle_ZINGBUT
+        for k, f in from_after_type_macro():
+            yield k, f
+
+    @can_stop_here
+    def from_after_type_macro():
         yield if_ATTR_keyword, roll_over_attr_because_next_attr
         yield if_OPTIONAL_keyword, handle_optional
         yield if_KEY_keyword, handle_key
         yield if_end_of_input, FINISH_SOMEHOW
 
     # ==
+
+    def if_ZINGBUT():
+        s = stack[-1]
+        if s is None:
+            return
+        if '-' == s[0]:
+            return
+        return True  # validate #here2
 
     def if_common_name():
         if stack[-1] is None:
@@ -208,6 +273,14 @@ def _CLI_state_machine(serr, sout, stack):
         state.formal_attr_params = {'formal_attribute_name': stack_pop()}
         return move_to(from_after_attribute_name)
 
+    def handle_ZINGBUT():
+        arg = stack_pop()
+        tm = type_macro_(arg, listener)
+        if tm is None:
+            return
+        state.formal_attr_params['type_macro'] = tm
+        return move_to(from_after_type_macro)
+
     def handle_optional():
         stack_pop()
         state.formal_attr_params['null_is_OK'] = True
@@ -239,10 +312,10 @@ def _CLI_state_machine(serr, sout, stack):
         dct = state.formal_attr_params
         state.formal_attr_params = None
         k = dct.pop('formal_attribute_name')
+        abstract_type = dct.pop('type_macro', 'text')  # ..
         coll_dct = state.formal_entity_args['formal_attrs_dct']
         if k in coll_dct:
             xx(f"more than one definition for attribute '{k}'")
-        abstract_type = 'text'  # ..
         abs_attr = abstract_column_via(k, abstract_type, None, **dct)
         coll_dct[k] = abs_attr
         return True
@@ -302,6 +375,12 @@ def _CLI_state_machine(serr, sout, stack):
         for line in _two_context_lines(state.tokens_did, stack):
             serr.write(line)
 
+    def listener(*emi):
+        *chan, lineser = emi
+        assert 'expression' == chan[1]
+        for line in lineser():
+            serr.write(f"{line}\n")
+
     # ==
 
     state = write_lines_about_expected_from_current_state  # #watch-the-world-burn
@@ -312,7 +391,8 @@ def _CLI_state_machine(serr, sout, stack):
     from kiss_rdb.magnetics_.abstract_schema_via_definition import \
             abstract_schema_via_dictionary, \
             abstract_table_via_name_and_abstract_columns as formal_ent_via, \
-            abstract_column_via
+            abstract_column_via, \
+            type_macro_
 
     while True:
         action = find_next_action()
@@ -391,21 +471,62 @@ def _human_via_fname(fname):
     return ' '.join(reversed(stack))
 
 
+def _stack_length(stack):
+    leng = len(stack)
+    if 0 == leng:
+        return 0
+    if stack[0] is None:  # #here3
+        return leng - 1
+    return leng
+
 # ==
 
-def abstract_schema_via_sexp_lines_(fh, listener=None):
-    # #todo needs a context stack too
-
-    # (it's painful for us to do this but the alternative is absurd:)
-    if hasattr(fh, 'read'):
-        big_string = fh.read()
-    else:
-        big_string = ''.join(fh)  # ..
+def _abstract_schema_via_sexp_lines(fh):  # #testpoint
 
     def main():
+        read_file_into_big_string()
         avoid_common_errors_from_vendor_lib()
         from sexpdata import loads as sexpdata_loads
-        state.stack_stack = [list(reversed(sexpdata_loads(big_string)))]
+        sx = sexpdata_loads(state.big_string)
+        return _abstract_schema_via_sexp(sx)
+
+    state = main  # #watch-the-world-burn
+
+    def avoid_common_errors_from_vendor_lib():
+
+        # Avoid this one FIXME error from vendor
+        if 0 == len(state.big_string):
+            stop("Input is empty string")
+
+        # Avoid common issues with the parse
+        if '(' != state.big_string[0]:
+            stop(f"Expecting '(' had {big_string[0]!r} for first character")
+
+    def read_file_into_big_string():
+        state.big_string = big_string_somehow()
+
+    def big_string_somehow():
+        # (it's painful for us to do this but the alternative is absurd:)
+        if hasattr(fh, 'read'):
+            return fh.read()
+        return ''.join(fh)  # ..
+
+    stop = _stop
+
+    try:
+        return main()
+    except _Stop as _:
+        e = _
+    msgs = [''.join(("Error: ", str(e), '\n'))]
+    if hasattr(fh, 'name'):
+        msgs.append("(in {fh.name})\n")
+    xx(''.join(msgs))
+
+
+def _abstract_schema_via_sexp(sx):  # #testpoint
+    # #todo needs a context stack too
+
+    def main():
         expect_and_consume_name('abstract_schema')
         expect_and_push('properties')
         expect_end_and_pop()
@@ -419,6 +540,8 @@ def abstract_schema_via_sexp_lines_(fh, listener=None):
 
     state = main  # #watch-the-world-burn
     state.out_stack = []
+    state.stack_stack = [list(reversed(sx))]
+    del sx
 
     def use_stack(f):
         def use_f(*args):
@@ -533,32 +656,27 @@ def abstract_schema_via_sexp_lines_(fh, listener=None):
     def stack():
         return state.stack_stack[-1]
 
-    def avoid_common_errors_from_vendor_lib():
-        # Avoid this one FIXME error from vendor
-        if 0 == len(big_string):
-            stop("Input is empty string")
-
-        # Avoid common issues with the parse
-        if '(' != big_string[0]:
-            stop(f"Expecting '(' had {big_string[0]!r} for first character")
-
     from kiss_rdb.magnetics_.abstract_schema_via_definition import \
             abstract_schema_via_abstract_tables as abs_sch_via, \
             abstract_table_via_name_and_abstract_columns as abs_ent_via, \
             abstract_column_via
 
-    def stop(err):
-        raise _Stop(err)
-
-    class _Stop(RuntimeError):
-        pass
+    stop = _stop
 
     try:
         return main()
-    except _Stop as e:
-        serr.write(''.join(("Error: ", str(e), '\n')))
-        serr.write(f"(in {sin.name})\n")
+    except _Stop as _:
+        e = _
+    msgs = [''.join(("Error: ", str(e), '\n'))]
+    xx(''.join(msgs))
 
+
+def _stop(err):
+    raise _Stop(err)
+
+
+class _Stop(RuntimeError):
+    pass
 
 # ==
 

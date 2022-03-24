@@ -32,4 +32,3 @@ Determine implementation status of each capability. (more in doc)
 Integrate everything and write new stuff to have notes form
 Expose recutils CREATE & UPDATE
 Derive requisite formal entity from recinf
-Generate a web form from a formal entity
