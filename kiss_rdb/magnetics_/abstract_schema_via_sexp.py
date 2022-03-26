@@ -569,7 +569,13 @@ def _abstract_schema_via_sexp(sx):  # #testpoint
         # expect_and_consume_zero_or_more()
         while len(stack):
             if head_token_is_branch_node():
-                xx()
+                pop_push()
+                expect_and_consume_name('foreign_key')
+                table_name = expect_and_consume_any_string()
+                expect_end_and_pop()  # ..
+                kw['is_foreign_key_reference'] = True
+                kw['referenced_table_name'] = table_name
+                continue
             s = stack.pop()
             if 'optional' == s:
                 kw['null_is_OK'] = True
@@ -717,11 +723,22 @@ def pretty_print_sexp_(mixed_branch_sexp, indent_for_children, margin):
 
         while len(stack):
             x = stack.pop()
+
+            is_string = is_none = False
             if isinstance(x, str):
+                is_string = True
+            elif x is None:
+                is_none = True
+
+            if is_string:
 
                 # (we can't use 'repr' because single-quoted strings not ok)
                 inner = escape_these_rx.sub(lambda md: f'\\{md[0]}', x)
                 surface_s = ''.join(('"', inner, '"'))
+            elif is_none:
+                surface_s = '()'  # I DONT KNOW
+
+            if is_string or is_none:
 
                 token_len = len(surface_s)
                 would_be_width = state.w + token_len
@@ -755,6 +772,9 @@ def pretty_print_sexp_(mixed_branch_sexp, indent_for_children, margin):
 
                 for line in recurse_into_branch(ch_margin, x):
                     yield line
+
+        if 0 == len(galley):
+            galley.append(my_margin)
 
         galley.append(')')
         yield flush_line()

@@ -13,6 +13,112 @@ Error conditions exist for:
 import re as _re
 
 
+def _CLI(sin, sout, serr, argv):
+    prog_name, stack = _CLI_common_start(argv)
+    serr.write(f"IMPLEMENT ME: '{prog_name()}'\n")
+    return 3
+
+
+def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):
+    # this is here and not in the other file because we want it out of the
+    # main flow - this will only be used in development, whereas the other
+    # file will "run hot"
+    prog_name, stack = _CLI_common_start(argv)
+
+    def help_lines():
+        yield f"usage: {prog_name()} FILE\n"
+        yield f"       <produce-sexp> | {prog_name()} -\n"
+        yield '\n'
+        yield "description: derive abstract schema from recinfo lines\n"
+
+    if _CLI_common_help_check(stack):
+        w = sout.write
+        for line in help_lines():
+            w(line)
+        return 0
+
+    rc, fh = _CLI_resolve_upstream(sin, serr, stack, help_lines)
+    if rc is not None:
+        return rc
+
+    listener = _CLI_listener(serr)
+    from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
+            abstract_schema_via_recinf_lines as func
+    with fh:
+        abs_sch = func(fh, listener)
+
+    if abs_sch is None:
+        return 3
+    w = sout.write
+    for line in abs_sch.to_sexp_lines():
+        w(line)
+    return 0
+
+
+def _CLI_resolve_upstream(sin, serr, stack, help_lineser):
+    w = serr.write
+    if len(stack):
+        first_arg = stack.pop()
+        if len(stack):
+            w(f"Unexpected: {stack[-1]!r}\n")
+            return 3, None
+        elif '-' == first_arg:
+            if sin.isatty():
+                w("Expecting STDIN when FILE is \"-\"\n")
+                return 3, None
+            fh = sin
+        elif '-' == first_arg[0]:
+            w(f"Unrecognized option {first_arg!r}\n")
+            return 3, None
+        elif not sin.isatty():
+            w(f"Can't have STDIN and FILE argument\n")
+            return 3, None
+        else:
+            fh = open(first_arg)
+    elif sin.isatty():
+        w("Expecting input from STDIN or FILE argument\n")
+        return 3, None
+    else:
+        fh = sin
+    return None, fh
+
+
+def _CLI_common_help_check(stack):
+    leng = len(stack)
+    if 0 == leng:
+        return False
+    if _CLI_looks_like_help(stack[-1]):
+        return True
+    if 1 == leng:
+        return False
+    return _CLI_looks_like_help(stack[0])
+
+
+def _CLI_looks_like_help(arg):
+    return _re.match('--?h(?:e(?:lp?)?)?$', arg)
+
+
+def _CLI_common_start(argv):
+    stack = list(reversed(argv))
+    prog_name_long = stack.pop()
+
+    def prog_name():
+        from os.path import basename
+        return basename(prog_name_long)
+
+    return prog_name, stack
+
+
+def _CLI_listener(serr):
+    def listener(*emi):
+        *chan, lineser = emi
+        assert 'expression' == chan[1]
+        w = serr.write
+        for line in lineser():
+            w(line)
+    return listener
+
+
 def create_collection(coll_path, listener, is_dry_run, opn=None):
 
     if not _re.search(r'\.rec\Z', coll_path):
@@ -117,4 +223,11 @@ P sources: 2, 3
 P # #born
 """
 
+
+if '__main__' == __name__:
+    import sys
+    exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
+
+# #pending-rename: maybe to "recinf_via_abstract_schema" to mirror the other
+# #history-C.1: spike CLI for sibling concern
 # #born

@@ -9,7 +9,7 @@ At writing (#history-B.7) we are making Phase 2. We don't want to break
 the Phase 1 work: parsing the subset grammar by hand just to get schema.rec
 to parse.
 
-Ultimately we are interesting in pursuing Phase 3, but that is out of scope
+Ultimately we are interested in pursuing Phase 3, but that is out of scope
 for now.
 
 In transition from Phase 1 to Phase 2, we won't know exactly what to expect

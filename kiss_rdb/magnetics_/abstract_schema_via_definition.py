@@ -697,6 +697,8 @@ class _AbstractColumn:
         'referenced_table_name', 'referenced_column_name')
 
 
+# == Type Macros
+
 def _define_type_macro_function():
 
     def type_macro_via_string(type_macro_string, listener=None):
@@ -759,6 +761,8 @@ def _define_type_macro_function():
 
 type_macro_ = _define_type_macro_function()
 
+
+# ==
 
 def _build_throwing_listener(listener, stop):
     def tlistener(sev, *rest):

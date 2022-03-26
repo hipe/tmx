@@ -1,4 +1,5 @@
 digraph g {
+label="867.J) recutils dev roadmap"
 rankdir=BT  /* Make the thing everything points to be at the top */
 DONE0200[label="Wow"]
 MODELLER->DONE0200
@@ -24,7 +25,7 @@ CREATEOK[label="Turn POST form variables\ninto a successful\ndatabase write"]
 EXPOSEW->CREATEOK
 GWFFFE->CREATEOK
 EXPOSEW[label="Expose & cover\nrecutils (either/both)\ncreate & write"]
-GWFFFE[label="Generate a web form from\na formal entity (structure)"]
+GWFFFE[label="Generate a web form from\na formal entity (structure)" style=filled]
 EFORM->GWFFFE
 RRI->GWFFFE
 RFISE[label="Receive form input\nand show errors"]
@@ -32,7 +33,7 @@ GWFFFE->RFISE
 RFIOK[label="Receive form input\nand show a successful\ncreate or update"]
 CREATEOK->RFIOK
 VIEW->RFIOK
-RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity"]
+RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity" style=filled]
 JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough"]
 ITERUSE->JOINNOTES
 JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes"]

@@ -1,0 +1,53 @@
+# NOTE at writing this is not used in tests, here for reference
+
+%rec: Person
+%type: Dob date
+%type: Abode rec Residence
+
+
+Name: Alfred Nebel
+Dob: 20 April 2010
+Email: alf@example.com
+Abode: 42AbbeterWay
+
+Name: Mandy Nebel
+Dob: 21 February 1972
+Email: mandy@example.com
+Mobile: 0555 342123
+Abode: 42AbbeterWay
+
+Name: Bertram Nebel
+Dob: 3 January 1966
+Email: bert@example.com
+Abode: 42AbbeterWay
+
+Name: Charles Spencer
+Dob: 4 July 1997
+Email: charlie@example.com
+Abode: 2SerpeRise
+
+Name: Dirk Spencer
+Dob: 29 June 1945
+Email: dirk@example.com
+Mobile: 0555 342123
+Abode: 2SerpeRise
+
+Name: Ernest Wright
+Dob: 26 April 1978
+Abode: ChezGrampa
+
+%rec: Residence
+%key: Id
+
+Address: 42 Abbeter Way, Inprooving, WORCS
+Telephone: 01234 5676789
+Id: 42AbbeterWay 
+
+Address: 2 Serpe Rise, Little Worning, SURREY
+Telephone: 09876 5432109
+Id: 2SerpeRise
+
+Address: 1 Wanter Rise, Greater Inncombe, BUCKS
+Id: ChezGrampa
+
+# #born

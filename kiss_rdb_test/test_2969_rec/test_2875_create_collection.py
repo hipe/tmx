@@ -19,7 +19,7 @@ class CommonCase(CreateCollectionCaseMethods, unittest_TestCase):
     is_dry = False
 
 
-class Case296X_wrong_extension(CommonCase):
+class Case2871_wrong_extension(CommonCase):
 
     def test_100_error_type(self):
         self.expect_only_one_emission_which_is_error_of_type(
@@ -33,7 +33,7 @@ class Case296X_wrong_extension(CommonCase):
     coll_path_tail = 'fixture-directories', 'imaginary.fooz'
 
 
-class Case296X_already_exists(CommonCase):
+class Case2875_already_exists(CommonCase):
 
     def test_100_error_type(self):
         self.expect_only_one_emission_which_is_error_of_type(
@@ -50,7 +50,7 @@ class Case296X_already_exists(CommonCase):
       '0100-example-from-documentation.rec')
 
 
-class Case296X_lets_party(CommonCase):
+class Case2879_lets_party(CommonCase):
 
     def test_010_success_channel(self):
         act = self.the_focus_emission.channel
