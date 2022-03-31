@@ -67,7 +67,7 @@ def __infer_formals(mixed_command):
 
     from modality_agnostic.magnetics.formal_parameter_via_definition import (
             define)
-    from inspect import signature, _empty as signature_nothing
+    from inspect import signature, _empty as signature_nothing  # [#008.12]
 
     assert callable(mixed_command)  # for class, will be similar
 

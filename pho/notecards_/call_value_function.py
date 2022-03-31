@@ -109,7 +109,7 @@ def _load_function_once(func_name, memo, bcoll, listener):
 
 
 def _validate_signature(func, locator):
-    act_stack = list(_inspect_signature(func).parameters.values())
+    act_stack = list(_inspect_signature(func).parameters.values())  # [#008.12]
     exp_stack = list(_formals)
 
     while True:

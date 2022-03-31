@@ -619,7 +619,7 @@ class _FlatListOfAssociations:
         # == BEGIN experiment
         locs = locals()
         from inspect import signature
-        sig = signature(_FlatListOfAssociations.__init__)
+        sig = signature(_FlatListOfAssociations.__init__)  # [#008.12]
         for attr in (set(locs) - set(sig.parameters)):
             setattr(self, attr, locs[attr])
         # == END

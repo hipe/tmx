@@ -177,7 +177,7 @@ def _lines_of_description(param):
     def o(line):
         arr.append(line)
     arr = []
-    import inspect
+    import inspect  # [#008.12]
     if 2 == len(inspect.signature(f).parameters):
         f(o, _STYLER)
     else:

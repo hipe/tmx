@@ -55,7 +55,7 @@ def _build_string_receiver(response_dict_via_request_dict, config=None):
 
 
 def _API_endpoint_function(orig_f):
-    args, *rest = _getfullargspec(orig_f)
+    args, *rest = _getfullargspec(orig_f)  # [#008.12]
 
     # Assert none of these: varargs, varkw, defaults, kwonlyargs, kwod, annot
     assert not any(rest)

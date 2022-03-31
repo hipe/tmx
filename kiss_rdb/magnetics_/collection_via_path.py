@@ -226,7 +226,7 @@ def _build_collection(which, cci, sa, kw, crazy_listener):
 
         opener = _build_opener(idi, ssm, x, opn)  # redundant with #here5
 
-        import inspect as ins
+        import inspect as ins  # [#008.12]
         attrs = (tup[0] for tup in ins.getmembers(cfuncs, ins.isfunction))
         customs = tuple(tuple_via_attr(attr) for attr in attrs)
         has_custom_functions = len(customs)
@@ -1295,7 +1295,7 @@ def _case_lib():
 
 
 def _stack_function():
-    from inspect import stack as func
+    from inspect import stack as func  # [#008.12]
     return func
 
 

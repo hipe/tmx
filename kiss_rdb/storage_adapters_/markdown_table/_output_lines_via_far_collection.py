@@ -322,7 +322,7 @@ def _build_args_via_dict_via_func():
     cache = {}
 
     def do_args_via_dict_via_func(func):
-        spec = getfullargspec(func)
+        spec = getfullargspec(func)  # [#008.12]
         spec.defaults  # sometimes None, sometimes (None,)
         assert spec.varargs is None
         assert spec.varkw is None

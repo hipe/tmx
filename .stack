@@ -31,3 +31,11 @@ Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
 Integrate everything and write new stuff to have notes form
 Expose recutils CREATE & UPDATE
+Maybe refactor the engine to be streaming/lazy
+Refactor tons of guys to use this not roll-your-own CLI
+The main frontend
+Help
+Bang the subcommands
+Maybe input events shouldn't look at token shape, maybe that's engine's job
+Bang the hell out of interactive & "-file '-'"
+Commit the beginnings of "Engines of Creation" as-is

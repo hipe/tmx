@@ -126,7 +126,7 @@ class parameter_index_via_mixed:
 
         fparam_args_via = _formal_parameter_argumentser()
 
-        from inspect import signature
+        from inspect import signature  # [#008.12]
         _items = signature(function_or_method).parameters.items()
         for name, param in _items:
 
@@ -221,7 +221,7 @@ def normal_lines_via_docstring(doc):
 
 
 def _formal_parameter_argumentser():
-    from inspect import Parameter as o
+    from inspect import Parameter as o  # [#008.12]
     POSITIONAL_OR_KEYWORD = o.POSITIONAL_OR_KEYWORD
     KEYWORD_ONLY, POSITIONAL_ONLY = o.KEYWORD_ONLY, o.POSITIONAL_ONLY
     VAR_KEYWORD, VAR_POSITIONAL = o.VAR_KEYWORD, o.VAR_POSITIONAL

@@ -43,6 +43,437 @@ def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
     return main()
 
 
+def THE_ENGINES_OF_CREATION(
+        nonpositionals=None, for_interactive=None,
+        positionals=None, subcommands=None):
+
+    # States and Transitions
+
+    def from_beginning_state():
+        yield if_interactivity_event, respond_to_interactivity
+
+    def from_required_positional_state():
+        yield if_non_option_looking_token, try_to_satisfy_positional
+        yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_end_of_tokens, will_complain_about_expecting_required_positional
+
+    def from_optional_positional_state():
+        yield if_non_option_looking_token, try_to_satisfy_positional
+        yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_end_of_tokens, close_because_satisfied
+
+    def from_optional_nonpositional_in_progress_state():
+        yield if_non_option_looking_token, accept_option_value_and_pop
+        yield if_option_looking_token, will_complain_about_expecting_option_value
+        yield if_end_of_tokens, will_complain_about_expecting_option_value
+
+    def from_no_more_positionals_state():
+        yield if_end_of_tokens, close_because_satisfied
+        yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_non_option_looking_token, will_complain_about_unexpected_term
+
+    # Actions (interesting ones)
+
+    def maybe_accept_optional_nonpositional():  # return any explainer
+        input_event = state.input_event
+        assert 'head_token' == input_event[0]
+        assert 'looks_like_option' == input_event[1]
+        token = input_event[2]
+
+        # Break a large ball of {option [option [..]] [value]} into steps
+        while True:
+            expl, formal_nonpositional, replace_with_token = \
+                    floating_cloud.against(token)
+
+            # Maybe the token failed to match exactly one formal
+            if not formal_nonpositional:
+                assert expl
+                return expl
+            assert expl is None
+
+            # When the formal is a flag, we handle it now
+            if formal_nonpositional.is_flag:
+                expl = formal_nonpositional.handle_flag(state.parse_tree)
+                if expl:
+                    return expl  # this is frequently --help
+
+                # A ball of flags put together, or maybe a short o.n. and value
+                if replace_with_token:
+                    token = replace_with_token
+                    continue
+
+                # You processed the last of a ball of 1 or more flags.
+                # Stay in the state you are in. You are done
+                return
+            break
+
+        # You have found an optional nonpositional (it takes a value)
+        assert formal_nonpositional.is_optional_nonpositional
+
+        # If a value was provided in the same token "in a ball"..
+        if replace_with_token:
+            # Stay in the same state. result is any explanation
+            return formal_nonpositional.handle_value_of_nonpositional(\
+                    state.parse_tree, replace_with_token)
+
+        # We cannot process the value in this step, we have to wait for the
+        # next event (token) (if any)
+        state.stack_frame_below = state.state_function
+        state.formal_nonpositional_in_progress = formal_nonpositional
+        return move_to(from_optional_nonpositional_in_progress_state)
+
+    def try_to_satisfy_positional():  # return any explainer
+        formal_node = formal_stack[-1]
+        stack = list(reversed(formal_node))  # #here2
+        typ = stack.pop()
+        assert typ in ('required_positional', 'optional_positional')
+        formal_surface = stack.pop()
+        snake = stack.pop()
+        if len(stack):
+            handler = stack.pop()
+            assert not stack
+        else:
+            def handler(parse_tree, tok):
+                assert snake not in parse_tree.values
+                parse_tree.values[snake] = tok
+        expl = handler(state.parse_tree, state.input_event[-1])  # #here2
+        if expl:
+            return expl
+        if False and formal_node.is_glob:  # #feature:glob-positionals
+            return
+        formal_stack.pop()
+        return find_new_state_per_positionals()
+
+    def respond_to_interactivity():
+        is_interactive = state.input_event[1]
+        formal_frame = formal_stack[-1]
+        assert 'for_interactive' == formal_frame[0]
+        formal_yes = formal_frame[1]
+        ok = False
+        if formal_yes is None:
+            ok = True
+        elif formal_yes and is_interactive:
+            ok = True
+        elif (not formal_yes) and (not is_interactive):
+            ok = True
+        if not ok:
+            return explain_wrong_interactivity
+        formal_stack.pop()
+        return find_new_state_per_positionals()
+
+    # Support for actions
+
+    def find_new_state_per_positionals():
+        if 0 == len(formal_stack):
+            return move_to(from_no_more_positionals_state)
+        formal_node = formal_stack[-1]
+        typ = formal_node[0]  # #here2
+        if 'required_positional' == typ:
+            return move_to(from_required_positional_state)  # maybe redundant
+        assert 'optional_positional' == typ
+        return move_to(from_optional_positional_state)
+
+    def close_because_satisfied():
+        res = state.parse_tree
+        state.parse_tree = None
+        return None, res
+
+    # Non-interesting actions
+
+    def will_complain_about_expecting_required_positional():
+        def explain():
+            shout = formal_stack[-1][1]  # #here2
+            yield 'stop_early_reason', 'expecting_required_positional', shout
+            yield 'returncode', 72
+        return explain, None  # SADLY
+
+    def will_complain_about_unexpected_term():
+        def explain():
+            yield 'stop_early_reason', 'unexpected_extra_argument'
+            yield 'returncode', 66  # #here1
+        return explain
+
+    def will_complain_about_expecting_option_value():
+        xx()
+
+    # Matchers
+
+    def if_non_option_looking_token():
+        if 'head_token' != state.input_event_type:
+            return
+        return 'looks_like_non_option' == state.input_event[1]
+
+    def if_option_looking_token():
+        if 'head_token' != state.input_event_type:
+            return
+        return 'looks_like_option' == state.input_event[1]
+
+    def if_end_of_tokens():
+        return 'end_of_tokens' == state.input_event_type
+
+    def if_interactivity_event():
+        return 'is_interactive' == state.input_event_type
+
+    # State machine mechanics
+
+    def receive_input_event(*tup):
+        state.input_event = tup
+        state.input_event_type = tup[0]  # quick sketch
+        found = False
+        for matcher, action in state.state_function():
+            found = matcher()
+            if found:
+                break
+        if not found:
+            xx("probably we will not encounter this normally")
+        return action()
+
+    def move_to(state_func):
+        state.state_function = state_func
+
+    state = from_beginning_state  # #watch-the-world-burn
+    state.state_function = from_beginning_state
+    state.parse_tree = _data_classes().parse_tree()
+
+    # == BEGIN
+
+    if positionals:  # #feature:lazy
+        formal_stack = list(reversed(positionals))
+    else:
+        formal_stack = []
+
+    if subcommands:  # #feature:lazy
+        def f(literal_value):
+            def handle(parse_tree, token):
+
+                if literal_value == token:
+                    parse_tree.subcommands.append(literal_value)
+                    return
+
+                if len(token) < len(literal_value) and \
+                        literal_value[0:len(token)] == token:
+                    # #feature:fuzzy
+                    xx("not yet implemented: fuzzy match subcommand")
+
+                def explain():
+                    yield 'stop_early_reason', 'expecting_subcommand', literal_value
+                    yield 'returncode', 71  # #here1
+                return explain
+            return handle
+
+        for s in reversed(subcommands):
+            formal_stack.append(('required_positional', f'"{s}"', None, f(s)))
+
+    formal_stack.append(('for_interactive', for_interactive))
+
+    floating_cloud = _floating_cloud_via_nonpositionals(nonpositionals)
+
+    # = END
+
+    class facade:  # #class-as-namespace
+        pass
+
+    setattr(facade, 'receive_input_event', receive_input_event)
+
+    return facade
+
+
+class _floating_cloud_via_nonpositionals:
+
+    def __init__(self, tup):
+        def add(long_token, handler):
+            assert long_token not in these
+            these[long_token] = handler
+
+        these = {}
+
+        def build_handler_for_flag(snake):
+            def handle(parse_tree):
+                parse_tree.values[snake] = True  # don't care if clobber (cov'd)
+            return handle
+
+        def build_handler_for_opt_nonpos(snake):
+            def handle(parse_tree, token):
+                parse_tree.values[snake] = token
+            return handle
+
+        seen_one_BSD_style = False
+
+        for sx in (tup or ()):
+            stack = list(reversed(sx))
+            typ = stack.pop()
+            surface = stack.pop()
+            snake = stack.pop()
+            has_not_has = stack.pop()
+            if 'has_second_dash' == has_not_has:
+                pass
+            else:
+                assert 'no_second_dash' == has_not_has
+                seen_one_BSD_style = True
+            if len(stack):
+                arg_name, = stack
+                assert 'optional_nonpositional' == typ
+                handler = build_handler_for_opt_nonpos(snake)
+            else:
+                assert 'flag' == typ
+                handler = build_handler_for_flag(snake)
+            add(surface, handler)
+
+        if True:
+            def handle_help(parse_tree):
+                def stop_early():
+                    yield 'stop_early_reason', 'display_help'
+                    yield 'returncode', 0
+                return stop_early
+
+            add('--help', handle_help)
+
+        self.against, = _build_floating_cloud_functions(these, seen_one_BSD_style)
+
+
+def _build_floating_cloud_functions(these, seen_one_BSD_style):
+
+    def against(token):  # return (expl, formal, replace_with_token)
+        md = re.match(r'^-(?P<is_long>-)?(?P<slug_fragment>.*)$', token)
+
+        # If it looks long
+        if md['is_long'] or seen_one_BSD_style:
+            return against_long_token(md)
+        return against_short_token(md)
+
+    def against_short_token(md):  # return (expl, formal, replace_with_token)
+        slug_frag = md['slug_fragment']
+
+        # First, match all nerks with this derk
+        if '--' in these:
+            xx()
+        else:
+            use_keys = these.keys()
+        needle = slug_frag[0]
+        founds = tuple(k for k in use_keys if needle == k[2])
+
+        leng = len(founds)
+        if 0 == leng:
+            def explanation():
+                yield 'stop_early_reason', 'unrecognized_short', f"-{needle}"
+                yield 'returncode', 69  # #here1
+            return explanation, None, None
+        if 1 < leng:
+            def explanation():
+                yield 'stop_early_reason', 'ambiguous_short', f"-{needle}"
+                yield 'did_you_mean', founds
+                yield 'returncode', 70  # #here1
+            return explanation, None, None
+        longg, = founds
+        formal = _FormalNonpositional(longg, these[longg])
+        if 1 < len(slug_frag):
+            the_rest = slug_frag[1:]
+            if formal.is_flag:
+                replace_with_token = ''.join(('-', the_rest))
+            else:
+                assert formal.is_optional_nonpositional
+                replace_with_token = the_rest
+        else:
+            replace_with_token = None
+
+        return None, formal, replace_with_token
+
+    def against_long_token(md):
+        token = md[0]
+
+        # First, just see if we match against the long token as-is
+        handler = these.get(token)
+        if handler:
+            return None, _FormalNonpositional(token, handler), None
+
+        # (Check this for now, we're guaranteed to type it by accident one day)
+        if '=' in md['slug_fragment']:
+            def explanation():
+                line = f"Don't use equals for now: {token!r}\n"
+                yield 'stderr_line', line
+                yield 'returncode', 67  # #here1
+            return explanation
+
+        # It looks long but it didn't match verbatim
+
+        # Fuzzy let's go (might become option one day)
+        if True:
+            rx = re.compile(''.join(('^', re.escape(token))))
+            founds = tuple(k for k in these.keys() if rx.match(k))
+            leng = len(founds)
+
+        if 1 < leng:
+            def explanation():
+                yield 'ambiguous_long', founds
+                yield 'returncode', 72  # #here1
+        elif 1 == leng:
+            use_tok, = founds
+            return None, _FormalNonpositional(use_tok, these[use_tok]), None
+        else:
+            assert 0 == leng
+            def explanation():
+                yield 'stop_early_reason', 'unrecognized_option'
+                yield 'returncode', 68  # #here1
+
+        return explanation, None, None
+
+    return (against,)
+
+
+"""
+- .#here1: the author proposes the range 65-113
+  http://www.bic.mni.mcgill.ca/~dale/helppages/BashGuide/advshell/exitcodes.html
+"""
+
+class _FormalNonpositional:
+    def __init__(self, token, handler):
+        from inspect import signature
+        params = signature(handler).parameters
+        these = tuple(params.keys())
+        leng = len(these)
+        assert 0 < leng
+        if 'parse_tree' != these[0]:
+            xx(f"oops: {these[0]!r}")
+        if 1 == leng:
+            self.handle_flag = handler
+            self.is_flag = True
+            return
+        self.is_optional_nonpositional = True
+        self.handle_value_of_nonpositional = handler
+
+    is_flag = False
+    is_optional_nonpositional = False
+
+
+def _data_classes():
+    memo = _data_classes
+    if memo.value is None:
+        memo.value = _build_data_classes()
+    return memo.value
+
+
+_data_classes.value = None
+
+
+def _build_data_classes():
+
+    # == BEGIN
+    def dataclass(cls):  # #decorator
+        these[cls.__name__] = cls
+        return orig_dataclass(cls)
+    these = {}
+    from dataclasses import dataclass as orig_dataclass, field
+    # == END
+
+    @dataclass
+    class parse_tree:
+        subcommands:list[str] = field(default_factory=list)
+        values:dict = field(default_factory=dict)
+
+    from collections import namedtuple
+    return namedtuple('result', tuple(these.keys()))(**these)
+
+
 def build_path_relativizer():
     def relativize_path(path):
         if head != path[0:leng]:
@@ -151,7 +582,7 @@ def _strings_via_big_string(big_string):
 # (buried `filesystem_functions` and justification documentation #history-B.4)
 
 
-def xx(s):
+def xx(s='here'):
     raise _exe('cover me: {}'.format(s))
 
 
@@ -171,6 +602,7 @@ SUCCESS = 0
 _eol = '\n'
 
 
+# #history-C.1: begin "engines of creation" CLI
 # #history-B.4
 # #history-A.5
 # #history-A.4
