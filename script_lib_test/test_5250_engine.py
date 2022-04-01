@@ -93,6 +93,8 @@ The New Theory (and some old stuff):
   FSA's in THE RUNNING. For now, we keep the response API simple: the FSA
   indicates whether it ACCEPTs or FAIL_TO_ACCEPTs the event with a simple
   True or False response from its RECEIVE_INPUT_EVENT method.
+  (XX In fact it's a litle more complicated: it returns None for ACCEPT,
+  and an explanation function for FAIL_TO_ACCEPT.)
   More below about what we do based on various patterns of the FSAs
   in the THE_RUNNING accepting or failing to accept each next input event.
 - The "at least two events" are the IS_INTERACTIVE of the terminal,
@@ -115,6 +117,7 @@ The New Theory (and some old stuff):
   the input event (either IS_INTERACTIVE, HEAD_TOKEN or END_OF_TOKENS) and
   they must return some sort of structured representation of what they were
   expecting.
+  (XX in fact..)
   - When failing against the IS_INTERACTIVE event, the failure to accept
     must be because they expected (required) the inverse of the boolean value.
     (They required interactive but it was not, or the opposite).
@@ -155,52 +158,73 @@ import unittest
 class CommonCase(unittest.TestCase):
 
     def expect_success(self):
-        expl, ast = self.execute()
-        if expl:
+        resp = self.execute()
+        assert resp
+        typ, pay = resp
+        if 'early_stop' == typ:
             if self.do_debug:
-                eek = tuple(expl())
+                eek = tuple(pay())
                 print(f"\n\nDEBUG: wasn't expecting: {eek!r}\n\n")
                 print(f"(token was: {self.last_token!r})")
             assert False
-        return ast
+        return pay
 
-    def expect_stop_early(self, *reason_tail):
-        expl, ast = self.execute()
-        assert ast is None
+    def expect_early_stop(self, *reason_tail):
+        resp = self.execute()
+        assert resp
+        typ, expl = resp
+        assert 'early_stop' == typ
         kwargs = {}
         set_item = kwargs.__setitem__
         handle = {
             'returncode': set_item,
             'stderr_line': lambda k, line: stderr_lines.append(line),
-            'stop_early_reason': lambda k, *rest: set_item(k, rest),
+            'early_stop_reason': lambda k, *rest: set_item(k, rest),
         }
         stderr_lines = []
         for k, *rest in expl():
             handle[k](k, *rest)
         kwargs['stderr_lines'] = (tuple(stderr_lines) if stderr_lines else None)
         res = early_stop_class()(**kwargs)
-        self.assertSequenceEqual(reason_tail, res.stop_early_reason)
+        self.assertSequenceEqual(reason_tail, res.early_stop_reason)
         return res
 
-    def execute(self):
+    def build_first_sequence(self):  # (up here for historic reasons only)
         # stderr, lines = self.build_stderr_spy()
         use_positionals = tuple(self.expand_positionals())
         use_nonpositionals = tuple(self.expand_nonpositionals())
-        engine = subject_function()(
+        return build_sequence(
             for_interactive=self.formal_is_for_interactive,
             positionals=use_positionals,
             nonpositionals=use_nonpositionals,
             subcommands=self.subcommands)
-        expl = engine.receive_input_event('is_interactive', self.terminal_is_interactive)
-        assert expl is None
+
+    def execute(self):
+        seqs = tuple(self.build_sequences())
+        engine = subject_module().ALTERNATION_VIA_SEQUENCES(seqs)
+
+        # Keep going until engine gives any response or you reach the end event
+        resp = engine.receive_input_event('is_interactive', self.terminal_is_interactive)
+        if resp:
+          return resp
         for token in self.argv_tail:
             yes = len(token) and '-' == token[0]
             typ = 'looks_like_option' if yes else 'looks_like_non_option'
-            expl = engine.receive_input_event('head_token', typ, token)
-            if expl:
+            resp = engine.receive_input_event('head_token', typ, token)
+            if resp:
                 self.last_token = typ, token
-                return expl, None
+                return resp
         return engine.receive_input_event('end_of_tokens')
+
+    def build_sequences(self):
+        seq1 = self.build_first_sequence()
+        assert seq1
+        yield seq1
+        seq2 = self.build_second_sequence()
+        if not seq2:
+            return
+        yield seq2
+        # ..
 
     def expand_positionals(self):
         if not (shorthands := self.positionals):
@@ -256,6 +280,9 @@ class CommonCase(unittest.TestCase):
                 spy_on_write_and_lines_for as spy_for
         return spy_for(self, 'DBG SERR: ')
 
+    def build_second_sequence(self):
+        pass
+
     terminal_is_interactive = True
     formal_is_for_interactive = None
     nonpositionals = None
@@ -275,7 +302,7 @@ class Case5230_empty_grammar_against_no_tokens(CommonCase):
 class Case5234_empty_grammar_against_one_non_option_looking_token(CommonCase):
 
     def test_010_ohai(self):
-        self.expect_stop_early('unexpected_extra_argument')
+        self.expect_early_stop('unexpected_extra_argument')
 
     argv_tail = ('foo',)
 
@@ -283,7 +310,7 @@ class Case5234_empty_grammar_against_one_non_option_looking_token(CommonCase):
 class Case5238_empty_grammar_against_one_option_looking_token(CommonCase):
 
     def test_010_ohai(self):
-        self.expect_stop_early('unrecognized_option')
+        self.expect_early_stop('unrecognized_option')
 
     argv_tail = ('--strange',)
 
@@ -291,7 +318,7 @@ class Case5238_empty_grammar_against_one_option_looking_token(CommonCase):
 class Case5242_strange_short(CommonCase):
 
     def test_010_ohai(self):
-        self.expect_stop_early('unrecognized_short', '-x')
+        self.expect_early_stop('unrecognized_short', '-x')
 
     argv_tail = ('-xfoobie',)
 
@@ -299,7 +326,7 @@ class Case5242_strange_short(CommonCase):
 class Case5246_long_help(CommonCase):
 
     def test_010_ohai(self):
-        self.expect_stop_early('display_help')
+        self.expect_early_stop('display_help')
 
     argv_tail = ('--help',)
 
@@ -307,7 +334,7 @@ class Case5246_long_help(CommonCase):
 class Case5250_short_help(CommonCase):
 
     def test_010_ohai(self):
-        self.expect_stop_early('display_help')
+        self.expect_early_stop('display_help')
 
     argv_tail = ('-h',)
 
@@ -316,19 +343,19 @@ class Case5254_impatient(CommonCase):
 
     def test_010_fail_to_get_first_subcommand(self):
         self.argv_tail = 'aa', 'bb', 'cc'
-        self.expect_stop_early('expecting_subcommand', 'wing')
+        self.expect_early_stop('expecting_subcommand', 'wing')
 
     def test_020_fail_to_get_second_subcommand(self):
         self.argv_tail = 'wing', 'bb', 'cc'
-        self.expect_stop_early('expecting_subcommand', 'chun')
+        self.expect_early_stop('expecting_subcommand', 'chun')
 
     def test_030_fail_to_get_required_positional(self):
         self.argv_tail = 'wing', 'chun'
-        self.expect_stop_early('expecting_required_positional', 'ARG1')
+        self.expect_early_stop('expecting_required_positional', 'ARG1')
 
     def test_040_too_many_actual_positionals(self):
         self.argv_tail = 'wing', 'chun', 'arg1_x', 'arg2_y', 'arg3_z', 'arg4_no'
-        self.expect_stop_early('unexpected_extra_argument')
+        self.expect_early_stop('unexpected_extra_argument')
 
     def test_050_big_ball_candy_crush(self):
         self.argv_tail = 'wing', 'chun', '--verbo', 'a1', '-vfzig.txt', 'a2'
@@ -344,7 +371,7 @@ class Case5254_impatient(CommonCase):
 
     def test_060_but_ruin_it_at_end(self):
         self.argv_tail = 'wing', 'chun', '--verbo', 'a1', '-vfz.txt', 'a2', '-x'
-        self.expect_stop_early('unrecognized_short', '-x')
+        self.expect_early_stop('unrecognized_short', '-x')
 
     nonpositionals = '--verbose', '--file=FILE'
     positionals = 'ARG1', '[ARG2]', '[ARG3]'
@@ -353,21 +380,34 @@ class Case5254_impatient(CommonCase):
     formal_is_for_interactive = False
 
 
-def subject_function():
-    from script_lib import THE_ENGINES_OF_CREATION as func
-    return func
-
-
 def early_stop_class():
     memo = early_stop_class
     if memo.value is None:
         from collections import namedtuple
         memo.value = namedtuple(
-                'EarlyStop', 'stop_early_reason stderr_lines returncode')
+                'EarlyStop', 'early_stop_reason stderr_lines returncode')
     return memo.value
 
 
 early_stop_class.value = None
+
+
+def build_sequence(
+        for_interactive=None,
+        positionals=None,
+        nonpositionals=None,
+        subcommands=None):
+
+    return subject_module().SEQUENCE_VIA(
+            for_interactive=for_interactive,
+            positionals=positionals,
+            nonpositionals=nonpositionals,
+            subcommands=subcommands)
+
+
+def subject_module():
+    import script_lib as mod
+    return mod
 
 
 if '__main__' ==  __name__:

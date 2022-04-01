@@ -43,7 +43,104 @@ def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
     return main()
 
 
-def THE_ENGINES_OF_CREATION(
+def ALTERNATION_VIA_SEQUENCES(seqs):
+    """going to try to hew really close to the doc pseudocode in the
+    introductory test file
+    """
+
+    leng = len(seqs)
+    assert leng
+    if 1 == leng:
+        print("\n\n(one day etc)\n\n")
+
+    in_the_running = {k: None for k in range(0, leng)}
+
+    def receive_input_event_tuple(tup):
+        early_stops = parse_trees = None
+
+        # Feed the input event out to all the nerks "in parallel"
+        for i in in_the_running.keys():
+            resp = seqs[i].receive_input_event_tuple(tup)
+            if resp is None:
+                continue
+            typ, pay = resp  # #FSA-action-response
+            if 'early_stop' == typ:
+                if early_stops is None:
+                    early_stops = {}
+                dct = early_stops
+            else:
+                assert 'parse_tree' == typ
+                if parse_trees is None:
+                    parse_trees = {}
+                dct = parse_trees
+            dct[i] = pay
+
+        num_stops = len(early_stops) if early_stops else 0
+        num_trees = len(parse_trees) if parse_trees else 0
+        num_still_running = len(in_the_running) - (num_stops + num_trees)
+        func = which(num_stops, num_trees, num_still_running)
+        args = []
+        if num_stops:
+            args.append(early_stops)
+        if num_trees:
+            args.append(parse_trees)
+        return func(*args)
+
+    def which(num_stops, num_trees, num_still_running):  # (we could just but..)
+        if num_stops:
+            if num_trees:
+                if num_still_running:
+                    return when_some_stops_and_some_trees_and_some_still_running
+                return when_some_stops_and_some_trees_and_none_still_running
+            if num_still_running:
+                return when_some_stops_and_no_trees_and_some_still_running
+            return when_some_stops_and_no_trees_and_none_still_running
+        elif num_trees:
+            if num_still_running:
+                return when_no_stops_and_some_trees_and_some_still_running
+            return when_no_stops_and_some_trees_and_none_still_running
+        elif num_still_running:
+            return when_no_stops_and_no_trees_and_some_still_running
+        return when_no_stops_and_no_trees_and_none_still_running
+
+    def when_some_stops_and_some_trees_and_some_still_running(stops, trees):
+        xx("the behavior for this case has yet to be designed")
+
+    def when_some_stops_and_some_trees_and_none_still_running(stops, trees):
+        xx("take the trees not the stops")
+
+    def when_some_stops_and_no_trees_and_some_still_running(stops):
+        xx("common case - discard the stops")
+        # When some issued early stop while others still run, we simply discard
+        # the playload from these early stops and take them out of the running.
+        # Note this could steam-roll over a response for help; so be sure the
+        # would-be still-running sequences(s) know what they're doing. No resp.
+        for k in stops.keys():
+            in_the_running.pop(k)
+
+    def when_some_stops_and_no_trees_and_none_still_running(stops):
+        if 1 < len(stops):
+            xx("have fun merging `early_stop_reason`s")
+        return 'early_stop', next(iter(stops.values()))
+
+    def when_no_stops_and_some_trees_and_some_still_running(parse_trees):
+        xx("the behavior for this case has yet to be designed")
+
+    def when_no_stops_and_some_trees_and_none_still_running(parse_trees):
+        if 1 < len(parse_trees):
+            xx("behavior for this case not yet designed - grammar matches ambiguity")
+        return 'parse_tree', next(iter(parse_trees.values()))
+
+    def when_no_stops_and_no_trees_and_some_still_running():
+        pass  # the most common case - just keep going
+
+    def when_no_stops_and_no_trees_and_none_still_running():
+        xx("how did you get to none in the running?")
+
+    return _Facade(receive_input_event_tuple)
+
+
+def SEQUENCE_VIA(
         nonpositionals=None, for_interactive=None,
         positionals=None, subcommands=None):
 
@@ -74,7 +171,7 @@ def THE_ENGINES_OF_CREATION(
 
     # Actions (interesting ones)
 
-    def maybe_accept_optional_nonpositional():  # return any explainer
+    def maybe_accept_optional_nonpositional():  # #FSA-action-response
         input_event = state.input_event
         assert 'head_token' == input_event[0]
         assert 'looks_like_option' == input_event[1]
@@ -88,14 +185,14 @@ def THE_ENGINES_OF_CREATION(
             # Maybe the token failed to match exactly one formal
             if not formal_nonpositional:
                 assert expl
-                return expl
+                return 'early_stop', expl
             assert expl is None
 
             # When the formal is a flag, we handle it now
             if formal_nonpositional.is_flag:
                 expl = formal_nonpositional.handle_flag(state.parse_tree)
                 if expl:
-                    return expl  # this is frequently --help
+                    return 'early_stop', expl  # this is frequently --help
 
                 # A ball of flags put together, or maybe a short o.n. and value
                 if replace_with_token:
@@ -122,7 +219,7 @@ def THE_ENGINES_OF_CREATION(
         state.formal_nonpositional_in_progress = formal_nonpositional
         return move_to(from_optional_nonpositional_in_progress_state)
 
-    def try_to_satisfy_positional():  # return any explainer
+    def try_to_satisfy_positional():  # #FSA-action-response
         formal_node = formal_stack[-1]
         stack = list(reversed(formal_node))  # #here2
         typ = stack.pop()
@@ -138,13 +235,13 @@ def THE_ENGINES_OF_CREATION(
                 parse_tree.values[snake] = tok
         expl = handler(state.parse_tree, state.input_event[-1])  # #here2
         if expl:
-            return expl
+            return 'early_stop', expl
         if False and formal_node.is_glob:  # #feature:glob-positionals
             return
         formal_stack.pop()
         return find_new_state_per_positionals()
 
-    def respond_to_interactivity():
+    def respond_to_interactivity():  # #FSA-action-response
         is_interactive = state.input_event[1]
         formal_frame = formal_stack[-1]
         assert 'for_interactive' == formal_frame[0]
@@ -163,7 +260,7 @@ def THE_ENGINES_OF_CREATION(
 
     # Support for actions
 
-    def find_new_state_per_positionals():
+    def find_new_state_per_positionals():  # #FSA-action-response
         if 0 == len(formal_stack):
             return move_to(from_no_more_positionals_state)
         formal_node = formal_stack[-1]
@@ -173,27 +270,27 @@ def THE_ENGINES_OF_CREATION(
         assert 'optional_positional' == typ
         return move_to(from_optional_positional_state)
 
-    def close_because_satisfied():
+    def close_because_satisfied():  # #FSA-action-response
         res = state.parse_tree
         state.parse_tree = None
-        return None, res
+        return 'parse_tree', res
 
     # Non-interesting actions
 
-    def will_complain_about_expecting_required_positional():
+    def will_complain_about_expecting_required_positional():  # #FSA-action-response
         def explain():
             shout = formal_stack[-1][1]  # #here2
-            yield 'stop_early_reason', 'expecting_required_positional', shout
+            yield 'early_stop_reason', 'expecting_required_positional', shout
             yield 'returncode', 72
-        return explain, None  # SADLY
+        return 'early_stop', explain
 
-    def will_complain_about_unexpected_term():
+    def will_complain_about_unexpected_term():  # #FSA-action-response
         def explain():
-            yield 'stop_early_reason', 'unexpected_extra_argument'
+            yield 'early_stop_reason', 'unexpected_extra_argument'
             yield 'returncode', 66  # #here1
-        return explain
+        return 'early_stop', explain
 
-    def will_complain_about_expecting_option_value():
+    def will_complain_about_expecting_option_value(): # #FSA-action-response
         xx()
 
     # Matchers
@@ -216,7 +313,7 @@ def THE_ENGINES_OF_CREATION(
 
     # State machine mechanics
 
-    def receive_input_event(*tup):
+    def receive_input_event_tuple(tup):
         state.input_event = tup
         state.input_event_type = tup[0]  # quick sketch
         found = False
@@ -228,7 +325,7 @@ def THE_ENGINES_OF_CREATION(
             xx("probably we will not encounter this normally")
         return action()
 
-    def move_to(state_func):
+    def move_to(state_func):  # #FSA-action-response
         state.state_function = state_func
 
     state = from_beginning_state  # #watch-the-world-burn
@@ -256,7 +353,7 @@ def THE_ENGINES_OF_CREATION(
                     xx("not yet implemented: fuzzy match subcommand")
 
                 def explain():
-                    yield 'stop_early_reason', 'expecting_subcommand', literal_value
+                    yield 'early_stop_reason', 'expecting_subcommand', literal_value
                     yield 'returncode', 71  # #here1
                 return explain
             return handle
@@ -270,12 +367,16 @@ def THE_ENGINES_OF_CREATION(
 
     # = END
 
-    class facade:  # #class-as-namespace
-        pass
+    return _Facade(receive_input_event_tuple)
 
-    setattr(facade, 'receive_input_event', receive_input_event)
 
-    return facade
+class _Facade:
+
+    def __init__(self, f):
+        self.receive_input_event_tuple = f
+
+    def receive_input_event(self, *tup):
+        return self.receive_input_event_tuple(tup)
 
 
 class _floating_cloud_via_nonpositionals:
@@ -321,10 +422,10 @@ class _floating_cloud_via_nonpositionals:
 
         if True:
             def handle_help(parse_tree):
-                def stop_early():
-                    yield 'stop_early_reason', 'display_help'
+                def early_stop():
+                    yield 'early_stop_reason', 'display_help'
                     yield 'returncode', 0
-                return stop_early
+                return early_stop
 
             add('--help', handle_help)
 
@@ -355,12 +456,12 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
         leng = len(founds)
         if 0 == leng:
             def explanation():
-                yield 'stop_early_reason', 'unrecognized_short', f"-{needle}"
+                yield 'early_stop_reason', 'unrecognized_short', f"-{needle}"
                 yield 'returncode', 69  # #here1
             return explanation, None, None
         if 1 < leng:
             def explanation():
-                yield 'stop_early_reason', 'ambiguous_short', f"-{needle}"
+                yield 'early_stop_reason', 'ambiguous_short', f"-{needle}"
                 yield 'did_you_mean', founds
                 yield 'returncode', 70  # #here1
             return explanation, None, None
@@ -412,7 +513,7 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
         else:
             assert 0 == leng
             def explanation():
-                yield 'stop_early_reason', 'unrecognized_option'
+                yield 'early_stop_reason', 'unrecognized_option'
                 yield 'returncode', 68  # #here1
 
         return explanation, None, None
