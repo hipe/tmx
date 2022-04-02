@@ -152,143 +152,12 @@ The New Theory (and some old stuff):
 """
 
 
+from script_lib_test import engine_support
 import unittest
 
 
-class CommonCase(unittest.TestCase):
-
-    def expect_success(self):
-        resp = self.execute()
-        assert resp
-        typ, pay = resp
-        if 'early_stop' == typ:
-            if self.do_debug:
-                eek = tuple(pay())
-                print(f"\n\nDEBUG: wasn't expecting: {eek!r}\n\n")
-                print(f"(token was: {self.last_token!r})")
-            assert False
-        return pay
-
-    def expect_early_stop(self, *reason_tail):
-        resp = self.execute()
-        assert resp
-        typ, expl = resp
-        assert 'early_stop' == typ
-        kwargs = {}
-        set_item = kwargs.__setitem__
-        handle = {
-            'returncode': set_item,
-            'stderr_line': lambda k, line: stderr_lines.append(line),
-            'early_stop_reason': lambda k, *rest: set_item(k, rest),
-        }
-        stderr_lines = []
-        for k, *rest in expl():
-            handle[k](k, *rest)
-        kwargs['stderr_lines'] = (tuple(stderr_lines) if stderr_lines else None)
-        res = early_stop_class()(**kwargs)
-        self.assertSequenceEqual(reason_tail, res.early_stop_reason)
-        return res
-
-    def build_first_sequence(self):  # (up here for historic reasons only)
-        # stderr, lines = self.build_stderr_spy()
-        use_positionals = tuple(self.expand_positionals())
-        use_nonpositionals = tuple(self.expand_nonpositionals())
-        return build_sequence(
-            for_interactive=self.formal_is_for_interactive,
-            positionals=use_positionals,
-            nonpositionals=use_nonpositionals,
-            subcommands=self.subcommands)
-
-    def execute(self):
-        seqs = tuple(self.build_sequences())
-        engine = subject_module().ALTERNATION_VIA_SEQUENCES(seqs)
-
-        # Keep going until engine gives any response or you reach the end event
-        resp = engine.receive_input_event('is_interactive', self.terminal_is_interactive)
-        if resp:
-          return resp
-        for token in self.argv_tail:
-            yes = len(token) and '-' == token[0]
-            typ = 'looks_like_option' if yes else 'looks_like_non_option'
-            resp = engine.receive_input_event('head_token', typ, token)
-            if resp:
-                self.last_token = typ, token
-                return resp
-        return engine.receive_input_event('end_of_tokens')
-
-    def build_sequences(self):
-        seq1 = self.build_first_sequence()
-        assert seq1
-        yield seq1
-        seq2 = self.build_second_sequence()
-        if not seq2:
-            return
-        yield seq2
-        # ..
-
-    def expand_positionals(self):
-        if not (shorthands := self.positionals):
-            return
-        import re
-        rx = re.compile(
-            r'^(?P<open_square>\[)?(?P<shout>[A-Z0-9_]+)(?P<close_sq>\])?$')
-        use_pos = []
-        seen_optional_positional = False
-        for shorthand in shorthands:
-            md = rx.match(shorthand)
-            assert md
-            if md['open_square']:
-                assert md['close_sq']
-                seen_optional_positional = True
-                which = 'optional_positional'
-            else:
-                assert not seen_optional_positional  # out of scope
-                which = 'required_positional'
-            yield which, md['shout'], md['shout'].lower()
-
-    def expand_nonpositionals(self):
-        if not (shorthands := self.nonpositionals):
-            return
-        import re
-        rx = re.compile(
-            '^(?P<surface_name>--'
-            '(?P<slug>[a-z]+(?:-[a-z]+)*))'
-            '(?:=(?P<arg_name>[A-Z0-9_]+)'
-            ')?'
-            '$')
-        pcs = []
-        for shorthand in shorthands:
-            md = rx.match(shorthand)
-            assert md
-
-            if (arg_name := md['arg_name']):
-                _1st_term = 'optional_nonpositional'
-            else:
-                _1st_term = 'flag'
-
-            pcs.append(_1st_term)
-            pcs.append(md['surface_name'])
-            pcs.append(md['slug'].replace('-', '_'))
-            pcs.append('has_second_dash')
-            if arg_name:
-                pcs.append(arg_name)
-            yield tuple(pcs)
-            pcs.clear()
-
-    def build_stderr_spy(self):
-        from script_lib.test_support.expect_STDs import \
-                spy_on_write_and_lines_for as spy_for
-        return spy_for(self, 'DBG SERR: ')
-
-    def build_second_sequence(self):
-        pass
-
-    terminal_is_interactive = True
-    formal_is_for_interactive = None
-    nonpositionals = None
-    positionals = None
-    subcommands = None
-    do_debug = True
+class CommonCase(engine_support.CommonCase, unittest.TestCase):
+    pass
 
 
 class Case5230_empty_grammar_against_no_tokens(CommonCase):
@@ -380,34 +249,45 @@ class Case5254_impatient(CommonCase):
     formal_is_for_interactive = False
 
 
-def early_stop_class():
-    memo = early_stop_class
-    if memo.value is None:
-        from collections import namedtuple
-        memo.value = namedtuple(
-                'EarlyStop', 'early_stop_reason stderr_lines returncode')
-    return memo.value
+class Case5258_introduce_subcommands(CommonCase):
+
+    def test_010_tell_me_expecting(self):
+        self.argv_tail = ()
+        self.expect_early_stop('expecting_required_positional', '"zingbar"')
+
+    def test_020_tell_me_wrong(self):
+        self.argv_tail = ('zongbar',)
+        self.expect_early_stop('expecting_subcommand', 'zingbar')
+
+    def test_030_tell_me_expecting_second_MULTIPLE(self):
+        self.argv_tail = ('zingbar',)
+        self.expect_early_stop('expecting_required_positional', ('"tazo"', '"wazo"'))
+
+    def test_040_tell_me_wrong_second_MULTIPLE(self):
+        self.argv_tail = ('zingbar', 'fizo')
+        self.expect_early_stop('expecting_subcommand', ('tazo', 'wazo'))
+
+    def test_050_tell_me_RIGHT(self):
+        self.argv_tail = ('zingbar', 'tazo')
+        pt = self.expect_success()
+        self.assertSequenceEqual(('zingbar', 'tazo'), pt.subcommands)
+
+    def build_first_sequence(self):  # (up here for historic reasons only)
+        return build_sequence(
+            for_interactive=True,
+            subcommands=('zingbar', 'tazo'),
+            nonpositionals=None,
+            positionals=None)
+
+    def build_second_sequence(self):
+        return build_sequence(
+            for_interactive=True,
+            subcommands=('zingbar', 'wazo'),
+            nonpositionals=None,
+            positionals=None)
 
 
-early_stop_class.value = None
-
-
-def build_sequence(
-        for_interactive=None,
-        positionals=None,
-        nonpositionals=None,
-        subcommands=None):
-
-    return subject_module().SEQUENCE_VIA(
-            for_interactive=for_interactive,
-            positionals=positionals,
-            nonpositionals=nonpositionals,
-            subcommands=subcommands)
-
-
-def subject_module():
-    import script_lib as mod
-    return mod
+build_sequence = engine_support.build_sequence
 
 
 if '__main__' ==  __name__:

@@ -51,7 +51,7 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
     leng = len(seqs)
     assert leng
     if 1 == leng:
-        print("\n\n(one day etc)\n\n")
+        raise RuntimeError("with only once sequence, use sequence itself")
 
     in_the_running = {k: None for k in range(0, leng)}
 
@@ -110,7 +110,6 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
         xx("take the trees not the stops")
 
     def when_some_stops_and_no_trees_and_some_still_running(stops):
-        xx("common case - discard the stops")
         # When some issued early stop while others still run, we simply discard
         # the playload from these early stops and take them out of the running.
         # Note this could steam-roll over a response for help; so be sure the
@@ -120,7 +119,7 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
 
     def when_some_stops_and_no_trees_and_none_still_running(stops):
         if 1 < len(stops):
-            xx("have fun merging `early_stop_reason`s")
+            return 'early_stop', _merge_early_stop_reasons(stops.values())
         return 'early_stop', next(iter(stops.values()))
 
     def when_no_stops_and_some_trees_and_some_still_running(parse_trees):
@@ -138,6 +137,44 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
         xx("how did you get to none in the running?")
 
     return _Facade(receive_input_event_tuple)
+
+
+def _merge_early_stop_reasons(expls):
+    expecting_surfaces = {}
+    highest_returncode = None
+    seen_subtype = None
+
+    for expl in expls:
+        for component in expl():
+            typ, *pay = component
+            if 'returncode' == typ:
+                rc, = pay
+                if highest_returncode is None or highest_returncode < rc:
+                    highest_returncode = rc
+            elif 'early_stop_reason' == typ:
+                subtype = pay[0]
+                if seen_subtype is None:
+                    seen_subtype = subtype
+                elif seen_subtype != subtype:
+                    xx('ugh')
+                if 'expecting_required_positional' == subtype:
+                    expecting_surfaces[pay[1]] = None
+                elif 'expecting_subcommand' == subtype:
+                    expecting_surfaces[pay[1]] = None
+                else:
+                    xx()
+            else:
+                xx()
+
+    def explain():
+        if highest_returncode is not None:
+            yield 'returncode', highest_returncode
+
+        these = tuple(expecting_surfaces.keys())
+        use = these[0] if 1 == len(these) else these
+        yield 'early_stop_reason', seen_subtype, use  # ..
+
+    return explain
 
 
 def SEQUENCE_VIA(
