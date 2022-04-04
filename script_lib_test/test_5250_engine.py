@@ -76,6 +76,40 @@ The New Theory (and some old stuff):
 - Hot-swappable, live-loading of grammar components XX
 """
 
+"""Details (EXPERIMENTAL):
+Experimentally, we want the "lingua franca" of our engine to be "sexps"
+(XX near that description of dependency injections)
+
+The below pseudocode is an attempt to (comprehensively) XX
+
+    "?" means zero or one. These ones provided in pairs. any order
+    "D" means it's a property derived from others (hard-coded for now)
+
+    { required_positional | optional_positional }  # either
+    { <familiar_name str> | <familiar_name_function callable>
+    ? <value_constraint>
+    ? <value_normalizer>
+    ? 'glob'  # a tuple of one element, the string 'glob'
+    D parse_tree_key
+
+    optional_nonpositional  # and required_nonpositional if we ever do that
+    <familiar_name>  # must start with one or two dashes
+    <parameter_familiar_name>  # SHOUTCASE or <these>
+    ? <value_constraint>
+    ? <value_normalizer>
+    D parse_tree_key
+
+    flag
+    <familiar_name>
+    ? <value_normalizer>
+    D parse_tree_key
+
+"flag" is the only formal parameter type that doesn't take a value. As such,
+it doesn't model a `value_constraint` optional function like the others do.
+However, it does allow for a `value_normalizer`, which can change how the
+values are written to the parse tree.
+"""
+
 """Implementation:
 
 - Every grammar is an ALTERNATION of {AT LEAST ONE} SEQUENCE.

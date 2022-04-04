@@ -136,7 +136,7 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
     def when_no_stops_and_no_trees_and_none_still_running():
         xx("how did you get to none in the running?")
 
-    return _Facade(receive_input_event_tuple)
+    return _InputReceiverFacade(receive_input_event_tuple)
 
 
 def _merge_early_stop_reasons(expls):
@@ -226,10 +226,10 @@ def SEQUENCE_VIA(
             assert expl is None
 
             # When the formal is a flag, we handle it now
-            if formal_nonpositional.is_flag:
-                expl = formal_nonpositional.handle_flag(state.parse_tree)
-                if expl:
-                    return 'early_stop', expl  # this is frequently --help
+            if 'flag' == formal_nonpositional.formal_type:
+                two = formal_nonpositional.handle_flag(state.parse_tree)
+                if two:
+                    return two  # frequently --help
 
                 # A ball of flags put together, or maybe a short o.n. and value
                 if replace_with_token:
@@ -242,7 +242,7 @@ def SEQUENCE_VIA(
             break
 
         # You have found an optional nonpositional (it takes a value)
-        assert formal_nonpositional.is_optional_nonpositional
+        assert 'optional_nonpositional' == formal_nonpositional.formal_type
 
         # If a value was provided in the same token "in a ball"..
         if replace_with_token:
@@ -258,21 +258,12 @@ def SEQUENCE_VIA(
 
     def try_to_satisfy_positional():  # #FSA-action-response
         formal_node = formal_stack[-1]
-        stack = list(reversed(formal_node))  # #here2
-        typ = stack.pop()
+        typ = formal_node.formal_type
         assert typ in ('required_positional', 'optional_positional')
-        formal_surface = stack.pop()
-        snake = stack.pop()
-        if len(stack):
-            handler = stack.pop()
-            assert not stack
-        else:
-            def handler(parse_tree, tok):
-                assert snake not in parse_tree.values
-                parse_tree.values[snake] = tok
-        expl = handler(state.parse_tree, state.input_event[-1])  # #here2
-        if expl:
-            return 'early_stop', expl
+        two = formal_node.handle_positional(state.parse_tree, state.input_event[-1])
+        if two is not None:
+            assert two[0] in ('early_stop',)
+            return two
         if False and formal_node.is_glob:  # #feature:glob-positionals
             return
         formal_stack.pop()
@@ -301,7 +292,8 @@ def SEQUENCE_VIA(
         if 0 == len(formal_stack):
             return move_to(from_no_more_positionals_state)
         formal_node = formal_stack[-1]
-        typ = formal_node[0]  # #here2
+        assert formal_node.is_positional
+        typ = formal_node.formal_type
         if 'required_positional' == typ:
             return move_to(from_required_positional_state)  # maybe redundant
         assert 'optional_positional' == typ
@@ -316,7 +308,7 @@ def SEQUENCE_VIA(
 
     def will_complain_about_expecting_required_positional():  # #FSA-action-response
         def explain():
-            shout = formal_stack[-1][1]  # #here2
+            shout = formal_stack[-1].familiar_name
             yield 'early_stop_reason', 'expecting_required_positional', shout
             yield 'returncode', 72
         return 'early_stop', explain
@@ -369,45 +361,14 @@ def SEQUENCE_VIA(
     state.state_function = from_beginning_state
     state.parse_tree = _data_classes().parse_tree()
 
-    # == BEGIN
-
-    if positionals:  # #feature:lazy
-        formal_stack = list(reversed(positionals))
-    else:
-        formal_stack = []
-
-    if subcommands:  # #feature:lazy
-        def f(literal_value):
-            def handle(parse_tree, token):
-
-                if literal_value == token:
-                    parse_tree.subcommands.append(literal_value)
-                    return
-
-                if len(token) < len(literal_value) and \
-                        literal_value[0:len(token)] == token:
-                    # #feature:fuzzy
-                    xx("not yet implemented: fuzzy match subcommand")
-
-                def explain():
-                    yield 'early_stop_reason', 'expecting_subcommand', literal_value
-                    yield 'returncode', 71  # #here1
-                return explain
-            return handle
-
-        for s in reversed(subcommands):
-            formal_stack.append(('required_positional', f'"{s}"', None, f(s)))
-
-    formal_stack.append(('for_interactive', for_interactive))
-
     floating_cloud = _floating_cloud_via_nonpositionals(nonpositionals)
+    formal_stack = _lazy_formal_stack(
+            state.parse_tree, positionals, subcommands, for_interactive)
 
-    # = END
-
-    return _Facade(receive_input_event_tuple)
+    return _InputReceiverFacade(receive_input_event_tuple)
 
 
-class _Facade:
+class _InputReceiverFacade:
 
     def __init__(self, f):
         self.receive_input_event_tuple = f
@@ -416,60 +377,54 @@ class _Facade:
         return self.receive_input_event_tuple(tup)
 
 
-class _floating_cloud_via_nonpositionals:
+def _floating_cloud_via_nonpositionals(tup):
+    # The "floating cloud" is an API-private collection of the formal
+    # optional_nonpositional's tailor-made for our parsing algorithm. It does:
+    #
+    #  - ensure uniqueness of each long form (`familiar_name`)
+    #  - note if any "BSD-style" seen
+    #  - don't "expand" each formal parameter into an object until needed
+    #  - add "--help" by default
 
-    def __init__(self, tup):
-        def add(long_token, handler):
-            assert long_token not in these
-            these[long_token] = handler
-
-        these = {}
-
-        def build_handler_for_flag(snake):
-            def handle(parse_tree):
-                parse_tree.values[snake] = True  # don't care if clobber (cov'd)
-            return handle
-
-        def build_handler_for_opt_nonpos(snake):
-            def handle(parse_tree, token):
-                parse_tree.values[snake] = token
-            return handle
-
-        seen_one_BSD_style = False
-
+    def keys_and_raw_values():
         for sx in (tup or ()):
-            stack = list(reversed(sx))
-            typ = stack.pop()
-            surface = stack.pop()
-            snake = stack.pop()
-            has_not_has = stack.pop()
-            if 'has_second_dash' == has_not_has:
-                pass
-            else:
-                assert 'no_second_dash' == has_not_has
-                seen_one_BSD_style = True
-            if len(stack):
-                arg_name, = stack
-                assert 'optional_nonpositional' == typ
-                handler = build_handler_for_opt_nonpos(snake)
-            else:
-                assert 'flag' == typ
-                handler = build_handler_for_flag(snake)
-            add(surface, handler)
+            assert sx[0] in ('optional_nonpositional', 'flag')
+            yield sx[1], sx
+        if True:  # (one day, maybe help option will be opt-in)
+            yield '--help', ('flag', '--help', ('value_normalizer', _on_help))
 
-        if True:
-            def handle_help(parse_tree):
-                def early_stop():
-                    yield 'early_stop_reason', 'display_help'
-                    yield 'returncode', 0
-                return early_stop
+    def see_key(k):
+        assert k not in seen
+        seen.add(k)
+        if rx.match(k):
+            state.seen_one_BSD_style = True
+        return k
 
-            add('--help', handle_help)
+    state = see_key  # #watch-the-world-burn
+    state.seen_one_BSD_style = False
+    rx = re.compile('^-[a-zA-Z]')
+    seen = set()
 
-        self.against, = _build_floating_cloud_functions(these, seen_one_BSD_style)
+    use_itr = ((see_key(k), v) for k, v in keys_and_raw_values())
+    dict_like = _dictionary_like_cache(use_itr, _expand_nonpositional)
+
+    class FloatingCloud:
+        pass
+
+    fc = FloatingCloud()
+    for m, f in _floating_cloud_methods(dict_like, state.seen_one_BSD_style):
+        setattr(fc, m, f)
+    return fc
 
 
-def _build_floating_cloud_functions(these, seen_one_BSD_style):
+def _on_help(_existing_value):  # value normalizer #here3
+    def early_stop():
+        yield 'early_stop_reason', 'display_help'
+        yield 'returncode', 0
+    return 'early_stop', early_stop
+
+
+def _floating_cloud_methods(these, seen_one_BSD_style):
 
     def against(token):  # return (expl, formal, replace_with_token)
         md = re.match(r'^-(?P<is_long>-)?(?P<slug_fragment>.*)$', token)
@@ -478,6 +433,8 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
         if md['is_long'] or seen_one_BSD_style:
             return against_long_token(md)
         return against_short_token(md)
+
+    yield 'against', against
 
     def against_short_token(md):  # return (expl, formal, replace_with_token)
         slug_frag = md['slug_fragment']
@@ -503,26 +460,26 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
                 yield 'returncode', 70  # #here1
             return explanation, None, None
         longg, = founds
-        formal = _FormalNonpositional(longg, these[longg])
+        formal = these[longg]
         if 1 < len(slug_frag):
             the_rest = slug_frag[1:]
-            if formal.is_flag:
+            if 'flag' == formal.formal_type:
                 replace_with_token = ''.join(('-', the_rest))
             else:
-                assert formal.is_optional_nonpositional
+                assert 'optional_nonpositional' == formal.formal_type
                 replace_with_token = the_rest
         else:
             replace_with_token = None
 
         return None, formal, replace_with_token
 
-    def against_long_token(md):
+    def against_long_token(md):  # return (expl, formal, replace_with_token)
         token = md[0]
 
         # First, just see if we match against the long token as-is
-        handler = these.get(token)
-        if handler:
-            return None, _FormalNonpositional(token, handler), None
+        formal = these.get(token)
+        if formal:
+            return None, formal, None
 
         # (Check this for now, we're guaranteed to type it by accident one day)
         if '=' in md['slug_fragment']:
@@ -546,7 +503,7 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
                 yield 'returncode', 72  # #here1
         elif 1 == leng:
             use_tok, = founds
-            return None, _FormalNonpositional(use_tok, these[use_tok]), None
+            return None, these[use_tok], None
         else:
             assert 0 == leng
             def explanation():
@@ -563,24 +520,273 @@ def _build_floating_cloud_functions(these, seen_one_BSD_style):
   http://www.bic.mni.mcgill.ca/~dale/helppages/BashGuide/advshell/exitcodes.html
 """
 
-class _FormalNonpositional:
-    def __init__(self, token, handler):
-        from inspect import signature
-        params = signature(handler).parameters
-        these = tuple(params.keys())
-        leng = len(these)
-        assert 0 < leng
-        if 'parse_tree' != these[0]:
-            xx(f"oops: {these[0]!r}")
-        if 1 == leng:
-            self.handle_flag = handler
-            self.is_flag = True
-            return
-        self.is_optional_nonpositional = True
-        self.handle_value_of_nonpositional = handler
 
-    is_flag = False
-    is_optional_nonpositional = False
+def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
+    # The typical real-world command won't have "many" of these pieces so..
+    # This is similar to #here4 where we build the structures only lazily
+
+    stack = []
+
+    # Add the positionals first because they'll be the last to be parsed
+    for sx in reversed(positionals or ()):
+        stack.append([True, sx, _Positional])  # "_expand_positional"
+
+    # Add the subcommands next, they are parsed before positionals
+    if subcommands:
+        def expand_subcommand(s):
+            return _expand_subcommand(parse_tree, s)
+        for s in reversed(subcommands):
+            stack.append([True, s, expand_subcommand])
+
+    # Finally, append this
+    stack.append([False, ('for_interactive', for_interactive)])
+
+    class LazyFormalStack:
+
+        def pop(self):
+            if not len(stack):
+                raise IndexError('pop from empty list')
+            res = self[-1]
+            stack.pop()
+            return res
+
+        def __getitem__(self, i):  # the workhorse, the main thing
+            assert -1 == i
+            record = stack[-1]
+            if record[0]:
+                record[1] = record.pop()(record[1])
+                record[0] = False
+            return record[1]
+
+        def __len__(self):
+            return len(stack)
+
+    return LazyFormalStack()
+
+
+# == Support for the foundational formal parameter classes
+
+def _generic_registry(deep_copy_this_dict=None):
+    """Result is a decorator that is typically used to decorate a class by
+    associating a simple key with it. Subsequently access the class by the key
+    through the decorator itself, which is also the store.
+    """
+
+    class DecoratorAndStore:
+        def __call__(_, k):
+            def use(c_or_f):
+                dct[k] = c_or_f
+                return c_or_f
+            return use
+        def __getitem__(_, k):
+            return dct[k]
+        @property
+        def internal_dictionary(_):
+            return dct
+    if deep_copy_this_dict:
+        xx()
+        dct = {k: v for k, v in deep_copy_this_dict.items()}
+    else:
+        dct = {}
+    return DecoratorAndStore()
+
+
+def _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, formal):
+
+    # If there's a value constraint, apply that. Maybe stop early
+    resp = None
+    f = formal.value_constraint
+    if f:
+        resp = f(token)  # #here8
+        if resp:
+            if 'early_stop' == resp[0]:
+                return resp
+            assert 'value_constraint_memo' == resp[0]  # #here7
+
+    # If there's a value normalizer, apply that.
+    k = formal._snake_name
+    f = formal.value_normalizer
+    if f:
+        # (The only occasion we expect to have an existing value for a
+        # nonpositional is #feature:glob-positionals)
+        kwargs = {}
+        if k:  # subcommand (as formal positional) won't have storage key
+            kwargs['existing_value'] = parse_tree.values.get(k)
+        if resp:
+            kwargs['value_constraint_memo'] = resp[1]  # #here7
+        resp = f(**kwargs)  # #here9
+
+        # A value normalizer that results in None is saying "i handled it
+        # all. Don't do anything further on this formal parameter."
+        if resp is None:
+            return
+
+        # The value normalizer can certainly stop the parse
+        if 'early_stop' == resp[0]:
+            return resp
+
+        assert 'use_value' == resp[0]
+        use_this_value = resp[1]
+    else:
+        use_this_value = token
+
+    assert k  # some don't have storage names, e.g. subcommand
+    parse_tree.values[k] = use_this_value
+
+
+def _monadic_writer(k):
+    def write(formal, x):
+        setattr(formal, k, x)
+    return write
+
+
+_write_value_constraint = _monadic_writer('value_constraint')
+_write_value_normalizer = _monadic_writer('value_normalizer')
+
+
+@property
+def _snake_name_for_nonpositional(self):
+    md = re.match('^--?(?P<snake>[a-zA-Z][-a-zA-Z0-9]+)$', self.familiar_name)
+    return md['snake'].replace('-', '_')
+
+
+# == Positionals (required and optional)
+
+def _expand_subcommand(parse_tree, literal_value):
+
+    def familiar_name():
+        return '"' + literal_value + '"'
+
+    def constrain(token):  # #here8
+        if literal_value == token:
+            return  # you passed normalization
+        if len(token) < len(literal_value) and \
+                literal_value[0:len(token)] == token:
+            # #feature:fuzzy
+            xx("not yet implemented: fuzzy match subcommand")
+        def explain():
+            yield 'early_stop_reason', 'expecting_subcommand', literal_value
+            yield 'returncode', 71  # #here1
+        return 'early_stop', explain
+
+    def normalize_and_store():  # #here9
+        parse_tree.subcommands.append(literal_value)
+
+    return _Positional(('required_positional', None,
+            ('value_constraint', constrain),
+            ('value_normalizer', normalize_and_store),
+            ('familiar_name_function', familiar_name)))
+
+
+class _Positional:  # #here5
+    def __init__(self, sx):
+        stack = list(reversed(sx))
+        assert stack[-1] in ('required_positional', 'optional_positional')  # ..
+        self.formal_type = stack.pop()
+        self._familiar_name_value = stack.pop()
+        while len(stack):
+            k, *rest = stack.pop()
+            _write_positional_property[k](self, *rest)
+
+    def handle_positional(self, parse_tree, token):
+        return _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, self)
+
+    value_constraint = None
+    value_normalizer = None
+
+    @property
+    def familiar_name(self):
+        return (self._familiar_name_value or self.familiar_name_function())
+
+    @property
+    def _snake_name(self):
+        s = self._familiar_name_value
+        if s is None:
+            return  # subcommands don't have familar names
+        assert re.match('^[A-Z][A-Z0-9_]+$', s)
+        return s.lower()
+
+    is_positional = True
+
+
+_write_positional_property = _generic_registry()  # #here6
+_write_positional_property('value_constraint')(_write_value_constraint)
+_write_positional_property('value_normalizer')(_write_value_normalizer)
+_write_positional_property('familiar_name_function')(_monadic_writer('familiar_name_function'))
+
+
+# == Nonpositionals (required, optional and flag)
+
+def _expand_nonpositional(sx):
+    return _nonpositional_class_for[sx[0]](sx)
+
+
+_nonpositional_class_for = _generic_registry()
+
+
+@_nonpositional_class_for('optional_nonpositional')
+class _OptionalNonpositional:
+    def __init__(self, sx):
+        stack = list(reversed(sx))
+        assert 'optional_nonpositional' == stack.pop()
+        self.familiar_name = stack.pop()
+        self.parameter_familiar_name = stack.pop()
+        while len(stack):
+            k, *rest = stack.pop()
+            _write_nonpos_property[k](self, *rest)
+
+    def handle_value_of_nonpositional(self, parse_tree, token):
+        return _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, self)
+
+    value_constraint = None
+    value_normalizer = None
+    _snake_name = _snake_name_for_nonpositional
+    formal_type = 'optional_nonpositional'
+
+
+_write_nonpos_property = _generic_registry()
+_write_nonpos_property('value_constraint')(_write_value_constraint)
+_write_nonpos_property('value_normalizer')(_write_value_normalizer)
+
+
+@_nonpositional_class_for('flag')
+class _Flag:  # #here5
+    def __init__(self, sx):
+        stack = list(reversed(sx))
+        assert 'flag' == stack.pop()
+        self.familiar_name = stack.pop()
+        while len(stack):
+            k, *rest = stack.pop()
+            _write_flag_property[k](self, *rest)
+
+    def handle_flag(self, parse_tree):
+        k = self._snake_name
+        f = self.value_normalizer
+
+        # If there is no value normalizer, just set the value to true and done
+        if f is None:
+            parse_tree.values[k] = True  # might be clobber (covered)
+            return
+        existing_value = parse_tree.values.get(k)
+        two = f(existing_value)
+        if two is None:
+            return
+        # #here3:
+        if 'use_value' == two[0]:
+            xx('written but cover')
+            parse_tree.values[k] = two[1]
+            return
+        assert 'early_stop' == two[0]
+        return two
+
+    value_normalizer = None
+    _snake_name = _snake_name_for_nonpositional
+    formal_type = 'flag'
+    is_positional = False
+
+
+_write_flag_property = _generic_registry()  # #here6
+_write_flag_property('value_normalizer')(_write_value_normalizer)
 
 
 def _data_classes():
@@ -610,6 +816,69 @@ def _build_data_classes():
 
     from collections import namedtuple
     return namedtuple('result', tuple(these.keys()))(**these)
+
+
+""" :#here6: this is the centerpiece of XX but XX
+"""
+
+
+def _dictionary_like_cache(keys_and_raw_values, expander):
+    """
+    Dictionary-like lazy-loading cache: construct it with {an iterator of keys
+    and values}, and an "expander". The interface is similar to a dictionary,
+    but rather than resulting in the "raw" values, the result values are the
+    result of the raw value being passed through the "expander" (which is
+    cached). The iterator is traversed fully at construction time. :#here4
+    """
+
+    class DictionaryLikeCache:
+        pass
+
+    dict_like = DictionaryLikeCache()
+    for m, f in _dictionary_like_cache_methods(keys_and_raw_values, expander):
+        if '_' == m[0]:
+            setattr(DictionaryLikeCache, m, f)
+        else:
+            setattr(dict_like, m, f)
+    return dict_like
+
+
+def _dictionary_like_cache_methods(keys_and_raw_values, expander):
+
+    def contains(_, k):
+        return k in records
+
+    yield '__contains__', contains
+
+    def getitem(_, k):
+        res = get(k)
+        if res is None:
+            raise KeyError(k)
+        return res
+
+    yield '__getitem__', getitem
+
+    def get(k):
+        record = records.get(k)
+        if record is None:
+            return
+        do_expand, val = record
+        if do_expand:
+            val = expander(val)
+            record[0] = False
+            record[1] = val
+        return val
+
+    yield 'get', get
+
+    def keys():
+        return records.keys()
+
+    yield 'keys', keys
+
+    records = {k: [True, raw] for k, raw in keys_and_raw_values}
+
+# ==
 
 
 def build_path_relativizer():

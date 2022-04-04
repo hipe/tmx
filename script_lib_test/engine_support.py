@@ -37,12 +37,10 @@ class CommonCase:
 
     def build_first_sequence(self):  # (up here for historic reasons only)
         # stderr, lines = self.build_stderr_spy()
-        use_positionals = _expand_positionals(self.positionals)
-        use_nonpositionals = _expand_nonpositionals(self.nonpositionals)
         return build_sequence(
             for_interactive=self.formal_is_for_interactive,
-            positionals=use_positionals,
-            nonpositionals=use_nonpositionals,
+            positionals=self.positionals,
+            nonpositionals=self.nonpositionals,
             subcommands=self.subcommands)
 
     def execute(self):
@@ -99,6 +97,9 @@ def build_sequence(
         nonpositionals=None,
         subcommands=None):
 
+    nonpositionals = _expand_nonpositionals(nonpositionals)
+    positionals = _expand_positionals(positionals)
+
     return subject_module().SEQUENCE_VIA(
             for_interactive=for_interactive,
             positionals=positionals,
@@ -130,19 +131,19 @@ def _build_nonpositional_builder():
         return tuple(components_via(md))
 
     def components_via(md):
-        if (arg_name := md['arg_name']):
-            yield 'optional_nonpositional'
-        else:
+        arg_name = md['arg_name']
+        is_flag = arg_name is None
+        if is_flag:
             yield 'flag'
-        yield md['surface_name']
-        yield md['slug'].replace('-', '_')
-        yield 'has_second_dash'
+        else:
+            yield 'optional_nonpositional'
+        yield md['surface_name']  # familiar_name
         if arg_name:
-            yield arg_name
+            yield arg_name  # parameter_familiar_name
 
     import re
     rx = re.compile(
-        '^(?P<surface_name>--'
+        '^(?P<surface_name>-(?P<two_dashes>-)?'
         '(?P<slug>[a-z]+(?:-[a-z]+)*))'
         '(?:=(?P<arg_name>[A-Z0-9_]+)'
         ')?'
@@ -171,8 +172,7 @@ def _build_positional_builder_once_per_grammar():
         else:
             assert not state.seen_optional_positional  # out of scope
             yield 'required_positional'
-        yield md['shout']
-        yield md['shout'].lower()
+        yield md['shout']  # familiar_name
 
     import re
     rx = re.compile(
