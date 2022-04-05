@@ -321,6 +321,49 @@ class Case5258_introduce_subcommands(CommonCase):
             positionals=None)
 
 
+class Case5262_introduce_interactive_vs_not(CommonCase):
+
+    def test_010_term_is_interactive_and_argv_is_nothing(self):
+        self.terminal_is_interactive = True
+        self.argv_tail = ()
+        self.expect_success()
+
+    def test_020_term_is_noninteractive_and_argv_is_nothing(self):
+        self.terminal_is_interactive = False
+        self.argv_tail = ()
+        self.expect_success()
+
+    def test_030_term_is_interactive_and_file_is_dash_DO_NOT_LIKE(self):
+        self.terminal_is_interactive = True
+        self.argv_tail = '-file', '-'
+        self.expect_success()
+
+    def test_040_term_is_interactive_and_file_is_not_dash(self):
+        self.terminal_is_interactive = True
+        self.argv_tail = '-file', 'foo.txt'
+        self.expect_success()
+
+    def test_050_term_is_noninteractive_and_file_is_dash(self):
+        self.terminal_is_interactive = False
+        self.argv_tail = '-file', '-'
+        self.expect_success()
+
+    def test_060_term_is_noniteractive_and_file_is_not_dash(self):
+        self.terminal_is_interactive = False
+        self.argv_tail = '-file', 'foo.txt'
+        self.expect_early_stop('must_be_dash')
+
+    def build_first_sequence(self):  # (up here for historic reasons only)
+        return build_sequence(
+            for_interactive=True,
+            nonpositionals=('-file FILE',))
+
+    def build_second_sequence(self):
+        return build_sequence(
+            for_interactive=False,
+            nonpositionals=('-file -',))
+
+
 build_sequence = engine_support.build_sequence
 
 

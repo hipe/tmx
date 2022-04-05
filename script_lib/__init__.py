@@ -197,7 +197,7 @@ def SEQUENCE_VIA(
         yield if_end_of_tokens, close_because_satisfied
 
     def from_optional_nonpositional_in_progress_state():
-        yield if_non_option_looking_token, accept_option_value_and_pop
+        yield if_non_option_looking_token, maybe_accept_nonpos_in_progress_value
         yield if_option_looking_token, will_complain_about_expecting_option_value
         yield if_end_of_tokens, will_complain_about_expecting_option_value
 
@@ -252,7 +252,7 @@ def SEQUENCE_VIA(
 
         # We cannot process the value in this step, we have to wait for the
         # next event (token) (if any)
-        state.stack_frame_below = state.state_function
+        state.state_function_on_hold = state.state_function
         state.formal_nonpositional_in_progress = formal_nonpositional
         return move_to(from_optional_nonpositional_in_progress_state)
 
@@ -269,11 +269,22 @@ def SEQUENCE_VIA(
         formal_stack.pop()
         return find_new_state_per_positionals()
 
+    def maybe_accept_nonpos_in_progress_value():
+        formal_node = state.formal_nonpositional_in_progress
+        state.formal_nonpositional_in_progress = None
+        typ = formal_node.formal_type
+        assert typ in ('optional_nonpositional',)  # ..
+        two = formal_node.handle_value_of_nonpositional(
+                state.parse_tree, state.input_event[-1])
+        if two is not None:
+            assert two[0] in ('early_stop',)
+            return two
+        state.state_function = state.state_function_on_hold
+        state.state_function_on_hold = None
+        return find_new_state_per_positionals()
+
     def respond_to_interactivity():  # #FSA-action-response
-        is_interactive = state.input_event[1]
-        formal_frame = formal_stack[-1]
-        assert 'for_interactive' == formal_frame[0]
-        formal_yes = formal_frame[1]
+        formal_yes, is_interactive = is_interactive_expected_actual()
         ok = False
         if formal_yes is None:
             ok = True
@@ -282,9 +293,12 @@ def SEQUENCE_VIA(
         elif (not formal_yes) and (not is_interactive):
             ok = True
         if not ok:
-            return explain_wrong_interactivity
+            return will_complain_about_wrong_interactivity()
         formal_stack.pop()
         return find_new_state_per_positionals()
+
+    def accept_option_value_and_pop():
+        xx()
 
     # Support for actions
 
@@ -310,7 +324,7 @@ def SEQUENCE_VIA(
         def explain():
             shout = formal_stack[-1].familiar_name
             yield 'early_stop_reason', 'expecting_required_positional', shout
-            yield 'returncode', 72
+            yield 'returncode', 73  # #here1
         return 'early_stop', explain
 
     def will_complain_about_unexpected_term():  # #FSA-action-response
@@ -321,6 +335,27 @@ def SEQUENCE_VIA(
 
     def will_complain_about_expecting_option_value(): # #FSA-action-response
         xx()
+
+    def will_complain_about_wrong_interactivity():
+        def explain():
+            yield 'early_stop_reason', 'wrong_interactivity'
+            formal_yes, is_interactive = is_interactive_expected_actual()
+            assert bool(formal_yes) != bool(is_interactive)
+            if formal_yes:
+                xx('cover me, looks ok')
+                token = state.input_event[-1]
+                line = "when STDIN is interactive, expected '-' not {token!r}\n"
+            else:
+                xx('cover me, looks ok')
+                line = "in interactive mode, expecting file, not '-'\n"
+            yield 'stderr_line', line
+            yield 'returncode', 74  # #here1
+        return 'early_stop', explain
+
+    def is_interactive_expected_actual():
+        formal_frame = formal_stack[-1]
+        assert 'for_interactive' == formal_frame[0]
+        return formal_frame[1], state.input_event[1]
 
     # Matchers
 
@@ -560,6 +595,8 @@ def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
 
         def __len__(self):
             return len(stack)
+
+        REAL_STACK = stack
 
     return LazyFormalStack()
 

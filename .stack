@@ -36,4 +36,3 @@ Refactor tons of guys to use this not roll-your-own CLI
 The main frontend
 Help
 Maybe input events shouldn't look at token shape, maybe that's engine's job
-Bang the hell out of interactive & "-file '-'"

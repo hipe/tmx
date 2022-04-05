@@ -18,7 +18,8 @@ class CommonCase:
         resp = self.execute()
         assert resp
         typ, expl = resp
-        assert 'early_stop' == typ
+        if 'early_stop' != typ:
+            self.fail(f"expected 'early_stop' had {typ!r}")
         kwargs = {}
         set_item = kwargs.__setitem__
         handle = {
@@ -55,7 +56,7 @@ class CommonCase:
         if resp:
           return resp
         for token in self.argv_tail:
-            yes = len(token) and '-' == token[0]
+            yes = 1 < len(token) and '-' == token[0]
             typ = 'looks_like_option' if yes else 'looks_like_non_option'
             resp = engine.receive_input_event('head_token', typ, token)
             if resp:
@@ -138,15 +139,18 @@ def _build_nonpositional_builder():
         else:
             yield 'optional_nonpositional'
         yield md['surface_name']  # familiar_name
-        if arg_name:
-            yield arg_name  # parameter_familiar_name
+        if is_flag:
+            return
+        yield arg_name  # parameter_familiar_name
+        if '-' != arg_name:
+            return
+        yield 'value_constraint', _arg_must_be_dash
 
     import re
     rx = re.compile(
         '^(?P<surface_name>-(?P<two_dashes>-)?'
         '(?P<slug>[a-z]+(?:-[a-z]+)*))'
-        '(?:=(?P<arg_name>[A-Z0-9_]+)'
-        ')?'
+        '(?:[= ](?P<arg_name>-|[A-Z0-9_]+))?'
         '$')
     return nonpositional_via
 
@@ -181,6 +185,15 @@ def _build_positional_builder_once_per_grammar():
     state = components_via  # #watch-the-world-burn
     state.seen_optional_positional = False
     return positional_via
+
+
+def _arg_must_be_dash(token):
+    if '-' == token:
+        return
+    def explain():
+        yield 'early_stop_reason', 'must_be_dash'
+        yield 'returncode', 99
+    return 'early_stop', explain
 
 
 def _early_stop_class():
