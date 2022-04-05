@@ -56,11 +56,9 @@ class CommonCase:
         if resp:
           return resp
         for token in self.argv_tail:
-            yes = 1 < len(token) and '-' == token[0]
-            typ = 'looks_like_option' if yes else 'looks_like_non_option'
-            resp = engine.receive_input_event('head_token', typ, token)
+            resp = engine.receive_input_event('head_token', token)
             if resp:
-                self.last_token = typ, token
+                self.last_token = token
                 return resp
         return engine.receive_input_event('end_of_tokens')
 
@@ -144,6 +142,7 @@ def _build_nonpositional_builder():
         yield arg_name  # parameter_familiar_name
         if '-' != arg_name:
             return
+        yield ('can_accept_dash_as_value',)
         yield 'value_constraint', _arg_must_be_dash
 
     import re

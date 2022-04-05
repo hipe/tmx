@@ -189,30 +189,34 @@ def SEQUENCE_VIA(
     def from_required_positional_state():
         yield if_non_option_looking_token, try_to_satisfy_positional
         yield if_option_looking_token, maybe_accept_optional_nonpositional
-        yield if_end_of_tokens, will_complain_about_expecting_required_positional
+        yield if_end_or_special, will_complain_about_expecting_required_positional
 
     def from_optional_positional_state():
         yield if_non_option_looking_token, try_to_satisfy_positional
         yield if_option_looking_token, maybe_accept_optional_nonpositional
         yield if_end_of_tokens, close_because_satisfied
+        yield if_double_dash_token, react_to_double_dash
+        yield if_single_dash_token, will_complain_about_single_dash
 
     def from_optional_nonpositional_in_progress_state():
         yield if_non_option_looking_token, maybe_accept_nonpos_in_progress_value
+        yield if_single_dash_token, maybe_accept_dash_token
         yield if_option_looking_token, will_complain_about_expecting_option_value
-        yield if_end_of_tokens, will_complain_about_expecting_option_value
+        yield if_end_or_special, will_complain_about_expecting_option_value
 
     def from_no_more_positionals_state():
         yield if_end_of_tokens, close_because_satisfied
         yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_double_dash_token, react_to_double_dash
         yield if_non_option_looking_token, will_complain_about_unexpected_term
+        yield if_single_dash_token, will_complain_about_single_dash
 
     # Actions (interesting ones)
 
     def maybe_accept_optional_nonpositional():  # #FSA-action-response
-        input_event = state.input_event
-        assert 'head_token' == input_event[0]
-        assert 'looks_like_option' == input_event[1]
-        token = input_event[2]
+        assert 'head_token' == state.input_event_type
+        assert 'looks_like_option' == state.token_category
+        token = state.head_token
 
         # Break a large ball of {option [option [..]] [value]} into steps
         while True:
@@ -260,7 +264,7 @@ def SEQUENCE_VIA(
         formal_node = formal_stack[-1]
         typ = formal_node.formal_type
         assert typ in ('required_positional', 'optional_positional')
-        two = formal_node.handle_positional(state.parse_tree, state.input_event[-1])
+        two = formal_node.handle_positional(state.parse_tree, state.head_token)
         if two is not None:
             assert two[0] in ('early_stop',)
             return two
@@ -269,19 +273,31 @@ def SEQUENCE_VIA(
         formal_stack.pop()
         return find_new_state_per_positionals()
 
+    def maybe_accept_dash_token():
+        if state.formal_nonpositional_in_progress.can_accept_dash_as_value:
+            return maybe_accept_nonpos_in_progress_value()
+        def explanation():
+            yield 'early_stop_reason', 'cannot_be_dash'  # #here10
+            yield 'stderr_line', "can't use '-' as value\n"
+            yield 'returncode', 75
+        return 'early_stop', explanation
+
     def maybe_accept_nonpos_in_progress_value():
         formal_node = state.formal_nonpositional_in_progress
         state.formal_nonpositional_in_progress = None
         typ = formal_node.formal_type
         assert typ in ('optional_nonpositional',)  # ..
         two = formal_node.handle_value_of_nonpositional(
-                state.parse_tree, state.input_event[-1])
+                state.parse_tree, state.head_token)
         if two is not None:
             assert two[0] in ('early_stop',)
             return two
         state.state_function = state.state_function_on_hold
         state.state_function_on_hold = None
         return find_new_state_per_positionals()
+
+    def react_to_double_dash():
+        xx('double dash behavior needs to be spec\'d')
 
     def respond_to_interactivity():  # #FSA-action-response
         formal_yes, is_interactive = is_interactive_expected_actual()
@@ -334,7 +350,7 @@ def SEQUENCE_VIA(
         return 'early_stop', explain
 
     def will_complain_about_expecting_option_value(): # #FSA-action-response
-        xx()
+        xx()  # #here10
 
     def will_complain_about_wrong_interactivity():
         def explain():
@@ -343,7 +359,7 @@ def SEQUENCE_VIA(
             assert bool(formal_yes) != bool(is_interactive)
             if formal_yes:
                 xx('cover me, looks ok')
-                token = state.input_event[-1]
+                token = state.head_token
                 line = "when STDIN is interactive, expected '-' not {token!r}\n"
             else:
                 xx('cover me, looks ok')
@@ -360,14 +376,21 @@ def SEQUENCE_VIA(
     # Matchers
 
     def if_non_option_looking_token():
-        if 'head_token' != state.input_event_type:
-            return
-        return 'looks_like_non_option' == state.input_event[1]
+        return 'looks_like_non_option' == state.token_category  # mighte be None
 
     def if_option_looking_token():
-        if 'head_token' != state.input_event_type:
-            return
-        return 'looks_like_option' == state.input_event[1]
+        return 'looks_like_option' == state.token_category  # might be None
+
+    def if_end_or_special():
+        if if_end_of_tokens():
+            return True
+        return 'special_token' == state.token_category
+
+    def if_double_dash_token():
+        return '--' == state.head_token
+
+    def if_single_dash_token():
+        return '-' == state.head_token
 
     def if_end_of_tokens():
         return 'end_of_tokens' == state.input_event_type
@@ -379,7 +402,14 @@ def SEQUENCE_VIA(
 
     def receive_input_event_tuple(tup):
         state.input_event = tup
-        state.input_event_type = tup[0]  # quick sketch
+        state.input_event_type = tup[0]
+        if 'head_token' == state.input_event_type:
+            state.head_token = tup[1]
+            state.token_category = _categorize_token(state.head_token)
+        else:
+            state.head_token = None
+            state.token_category = None
+
         found = False
         for matcher, action in state.state_function():
             found = matcher()
@@ -403,6 +433,22 @@ def SEQUENCE_VIA(
     return _InputReceiverFacade(receive_input_event_tuple)
 
 
+def _categorize_token(token):
+    leng = len(token);
+    if 0 == leng:
+        xx('handling the empty string should be ok but should be covered')
+        return 'looks_like_non_option'
+    starts_with_dash = '-' == token[0]
+    if 1 == leng:
+        if starts_with_dash:
+            return 'special_token'  # 'the_single_dash_token'
+        return 'looks_like_non_option'
+    if not starts_with_dash:
+        return 'looks_like_non_option'
+    if 2 == leng and '-' == token[1]:
+        xx('have fun -- it will be fine')
+        return 'special_token'  # 'DOUBLE_DASH'
+    return 'looks_like_option'
 class _InputReceiverFacade:
 
     def __init__(self, f):
@@ -777,6 +823,7 @@ class _OptionalNonpositional:
 
     value_constraint = None
     value_normalizer = None
+    can_accept_dash_as_value = False
     _snake_name = _snake_name_for_nonpositional
     formal_type = 'optional_nonpositional'
 
@@ -784,6 +831,11 @@ class _OptionalNonpositional:
 _write_nonpos_property = _generic_registry()
 _write_nonpos_property('value_constraint')(_write_value_constraint)
 _write_nonpos_property('value_normalizer')(_write_value_normalizer)
+
+
+@_write_nonpos_property('can_accept_dash_as_value')
+def _write_nonpos_dash_etc(formal):
+    formal.can_accept_dash_as_value = True
 
 
 @_nonpositional_class_for('flag')

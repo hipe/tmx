@@ -333,10 +333,10 @@ class Case5262_introduce_interactive_vs_not(CommonCase):
         self.argv_tail = ()
         self.expect_success()
 
-    def test_030_term_is_interactive_and_file_is_dash_DO_NOT_LIKE(self):
+    def test_030_term_is_interactive_and_file_is_dash(self):
         self.terminal_is_interactive = True
         self.argv_tail = '-file', '-'
-        self.expect_success()
+        self.expect_early_stop('cannot_be_dash')
 
     def test_040_term_is_interactive_and_file_is_not_dash(self):
         self.terminal_is_interactive = True
