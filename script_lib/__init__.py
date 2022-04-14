@@ -279,7 +279,7 @@ def SEQUENCE_VIA(
         def explanation():
             yield 'early_stop_reason', 'cannot_be_dash'  # #here10
             yield 'stderr_line', "can't use '-' as value\n"
-            yield 'returncode', 75
+            yield 'returncode', 75  # #here1
         return 'early_stop', explanation
 
     def maybe_accept_nonpos_in_progress_value():
@@ -459,13 +459,15 @@ class _InputReceiverFacade:
 
 
 def _floating_cloud_via_nonpositionals(tup):
-    # The "floating cloud" is an API-private collection of the formal
+    # The "floating cloud" is an API-private collection of the formal flags and
     # optional_nonpositional's tailor-made for our parsing algorithm. It does:
     #
     #  - ensure uniqueness of each long form (`familiar_name`)
-    #  - note if any "BSD-style" seen
+    #  - note if any [#608.18] '"BSD-style" nonpositionals'
     #  - don't "expand" each formal parameter into an object until needed
     #  - add "--help" by default
+    #
+    # See [#608.10] "How we parse the nonpositionals with a floating cloud".
 
     def keys_and_raw_values():
         for sx in (tup or ()):
@@ -605,6 +607,8 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
 def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
     # The typical real-world command won't have "many" of these pieces so..
     # This is similar to #here4 where we build the structures only lazily
+    # See [#608.18] "How we use stacks to parse positional parameters"
+    # and "The order in which term types are processed"
 
     stack = []
 

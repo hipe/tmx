@@ -23,6 +23,8 @@ the related API that preceded this one.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
+|[#608.18]                  |       | document about new CLI theory & "engine"
+|[#608.17]                  |       | FSA about parsing usage lines
 |[#608.P]                   |       | curses yikes: a point about focus
 |[#608.15]                  | #prov | #provision: mock STDIN, STDOUT, STDERR must ..
 |[#608.M]                   | #prov | curses yikes: #provision: topmost interactable starts as selected

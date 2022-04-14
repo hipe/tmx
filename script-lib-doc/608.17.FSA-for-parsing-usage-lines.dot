@@ -1,0 +1,63 @@
+digraph g {
+label="\n\nfig 608.17) FSA for parsing usage lines.\n
+
+The above grap presents a confusing tangle of possible states and
+transitions. Here is a simpler representation of *the same* FSA:
+
+usage_literal pipey_thing? prog_name opt* arg* opt-arg* glob?
+
+The implementation will attempt a hybrid of
+a classic FSA and something likewise simpler."
+
+from_beginning[label="from\nbeginning"]
+from_beginning->after_usage_literal[label="usage\nliteral"]
+
+after_usage_literal[label="after\nusage\nliteral"]
+after_usage_literal->after_program_name_literal[label="program\nname\nliteral"]
+after_usage_literal->after_pipey_thing[label="pipey\nthing"]
+
+after_pipey_thing[label="after\npipey\nthing"]
+after_pipey_thing->after_program_name_literal[label="program\nname\nliteral"]
+
+after_program_name_literal[label="after program\nname literal"]
+after_program_name_literal->subcommands[label="subcommand"]
+after_program_name_literal->options[label="option-like"]
+after_program_name_literal->required_positionals[label="r. positional"]
+after_program_name_literal->optional_positionals[label="o. positional"]
+after_program_name_literal->glob[label="glob"]
+after_program_name_literal->end_of_usage_line
+
+subcommands[label="subcommands"]
+subcommands->subcommands[label="subcommand"]
+subcommands->options[label="option-like"]
+subcommands->required_positionals[label="positional"]
+subcommands->optional_positionals[label="o. positional"]
+subcommands->glob[label="glob"]
+subcommands->end_of_usage_line
+
+options[label="options"]
+options->options[label="option-like"]
+options->required_positionals[label="r. positional"]
+options->optional_positionals[label="o. positional"]
+options->glob[label="glob"]
+options->end_of_usage_line
+
+required_positionals[label="required\npositionals"]
+required_positionals->required_positionals[label="r. positional"]
+required_positionals->optional_positionals
+required_positionals->glob
+required_positionals->end_of_usage_line
+
+optional_positionals[label="optional\npositionals"]
+optional_positionals->optional_positionals[label="o. positional"]
+optional_positionals->glob
+optional_positionals->end_of_usage_line
+
+glob[label="glob"]
+glob->end_of_usage_line
+
+end_of_usage_line[label="end of\nusage line"]
+}
+/*
+#born
+*/
