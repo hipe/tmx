@@ -6,10 +6,14 @@
 import re as _regex
 
 
-def parse_help_screen(lines):
+def parse_help_screen(lines, do_it_the_new_way=False):
     lines = _dont_trust_lines(lines)
-    func = _treelib().sections_via_lines_allow_align_right__
+    if do_it_the_new_way:
+        func = _section_blocks_via_lines_the_new_way
+    else:
+        func = _treelib().sections_via_lines_allow_align_right__
     sections = func(lines)
+    sections = tuple(sections)
     sect_via_lines = _build_section_parser()
     sections = tuple(sect_via_lines(lines) for lines in sections)
     return _help_screen(sections)
@@ -30,6 +34,11 @@ def _help_screen(sects):
 
         def section_via_key(_, k):
             return sects[offset_via_key[k]]
+
+        @property
+        def SECTIONS(_):  # for interactive debugging
+            return sects
+
     return help_screen()
 
 
@@ -238,6 +247,77 @@ def _build_section_key_parser():
     return parse
 
 
+def _section_blocks_via_lines_the_new_way(lines):
+    # parsing sections with the tree-like lib won't cut it for "engine" CLIs
+    # but we don't want to break the old way
+
+    def from_beginning_state():
+        yield if_content_line, add_line_to_cache_and_move_to_after_content_line
+
+    def from_after_content_line():
+        yield if_content_line, add_line_to_cache
+        yield if_newline, flush_and_move_to_after_blank_line
+        yield if_end_of_lines, flush_and_close
+
+    def from_after_blank_line():
+        yield if_content_line, add_line_to_cache_and_move_to_after_content_line
+
+    # Actions
+
+    def flush_and_move_to_after_blank_line():
+        state.state_function = from_after_blank_line
+        return flush()
+
+    def flush_and_close():
+        state.state_function = None
+        return flush()
+
+    def flush():
+        assert len(cache)
+        result = tuple(cache)
+        cache.clear()
+        return result
+
+    def add_line_to_cache_and_move_to_after_content_line():
+        add_line_to_cache()
+        state.state_function = from_after_content_line
+
+    def add_line_to_cache():
+        cache.append(line)
+
+    # Matchers
+
+    def if_end_of_lines():
+        return line is None
+
+    def if_content_line():
+        return line is not None and not if_newline()
+
+    def if_newline():
+        return '\n' == line
+
+    state = from_beginning_state  # #watch-the-world-burn
+    state.state_function = from_beginning_state
+    cache = []
+
+    def find_action():
+        for condition, action in state.state_function():
+            yes = condition()
+            if yes:
+                return action
+        raise RuntimeError(f"Can't match {state.state_function.__name__}"
+                           f" for line {line!r}")
+
+    for line in lines:
+        res = find_action()()
+        if res is not None:
+            yield res
+    line = None
+    res = find_action()()
+    if res is not None:
+        yield res
+
+
 def _dont_trust_lines(lines):
 
     # in the past we used a vendor library (click) to generate help
@@ -265,5 +345,6 @@ def _treelib():
     return module
 
 
+# #history-C.1 treelike won't work for "engine"
 # #history-B.2 full rewrite to simplify
 # #born.

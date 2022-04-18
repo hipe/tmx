@@ -144,98 +144,48 @@ our current specification is optimized for these design objectives:
 """
 
 
-class CLI_:
-    """quick and dirty aid in re-generating index files FOR NOW..
+def CLI_(sin, sout, serr, argv):
+    """
+    description: output to STDOUT the should-be lines of an index file
+
+    Quick and dirty aid in re-generating index files FOR NOW..
 
     at #history-A-1 this works for our 32x32x32 collection but it borks
     with an assertion failure for our 32^2 collection perhaps because single
     file schemas have no index..
     """
 
-    def __init__(self, sin, sout, serr, argv):
-        self._arg_stack = list(reversed(argv))
-        self._long_program_name = self._arg_stack.pop()
-        self._pn = None
-        self.stdout, self.stderr = sout, serr
-        from os import path as os_path
-        self.os_path = os_path
+    usage = "usage: {{prog_name}} generate [-i] [--preview] COLLECTION_PATH\n"
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv,
+            usage_lines=(usage,),
+            docstring_for_help_description=CLI_.__doc__)
 
-    def execute(self):
-        command_name, errno = self.parse_command_name()
-        if errno is not None:
-            return errno
-        return getattr(self, f"execute__{command_name}__")()
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
 
-    def execute__generate__(self):  # also called by client at #history-B.4
+    assert ('generate',) == pt.subcommands
+    dct = pt.values
+    coll_path = dct.pop('collection_path')
+    do_preview = dct.pop('preview', None)
+    do_edit_in_place = dct.pop('-i', None)
+    assert not dct
 
-        stack = self._arg_stack
-        do_usage, do_help, do_invite, returncode = False, False, False, None
-
-        flag_formals_and_actuals = {
-            '-i': False,
-            '--preview': False,
-        }
-
-        formal_positionals_stack = ['COLLECTION_PATH']
-        actual_positionals = []
-
-        while len(stack):
-            arg = stack.pop()
-            if '-' == arg[0]:
-                if _looks_like_help_flag(arg):
-                    do_help, returncode = True, 0
-                    break
-                if arg in flag_formals_and_actuals:
-                    flag_formals_and_actuals[arg] = True
-                    continue
-                self.stderr.write(f"unrecognized option {repr(arg)}\n")
-                do_usage, do_invite, returncode = True, True, 124
-                break
-            if len(formal_positionals_stack):
-                formal_positionals_stack.pop()
-                actual_positionals.append(arg)
-                continue
-            self.stderr.write(f"unexpected argument: {arg!r}\n")
-            do_usage, do_invite, returncode = True, True, 125
-            break
-
-        if returncode is None and len(formal_positionals_stack):
-            which = formal_positionals_stack[-1]
-            self.stderr.write(f"expecting {which}\n")
-            do_invite, returncode = True, 126
-
-        if returncode is None:
-            do_preview = flag_formals_and_actuals.pop('--preview')
-            do_edit_in_place = flag_formals_and_actuals.pop('-i')
-            assert not flag_formals_and_actuals
-            coll_path, = actual_positionals
+    def check_mutex():  # also called by client at #history-B.4
 
         if do_edit_in_place:
             if do_preview:
-                self.stderr.write("'-i' and '--preview' are mutually exclusive\n")  # noqa: E501
-                do_invite, returncode = True, 127
+                w("'-i' and '--preview' are mutually exclusive\n")
+                return xx()
+
         elif not do_preview:
-            self.stderr.write("Must have one of '-i' or '--preview'\n")
-            do_invite, returncode = True, 128
+            w("Must have one of '-i' or '--preview'\n")
+            return 128
 
-        def say_pn():
-            return f"{self.program_name} generate"
-
-        if do_usage:
-            self.stderr.write(f"usage: {say_pn()} {{COLLECTION_PATH}}\n")
-
-        if do_help:
-            self.stderr.write("description: output to STDOUT the should-be lines of an index file\n")  # noqa: E501
-
-        if do_invite:
-            self.stderr.write(f"use '{say_pn()} -h' for help\n")
-
-        if returncode is not None:
-            return returncode
-
-        # having done all the above, cheap_arg_parse might be in order
-
-        listener = self.build_listener()
+    def main():
+        listener = build_listener()
 
         # coll_path = self.os_path.abspath(coll_path)
 
@@ -252,9 +202,9 @@ class CLI_:
 
             assert do_preview
             from contextlib import nullcontext as func
-            return f"«stdout» (not {wpath})", func(self.stdout)
+            return f"«stdout» (not {wpath})", func(sout)
 
-        from .identifiers_via_index import \
+        from kiss_rdb.magnetics_.identifiers_via_index import \
             index_file_path_via_collection_path_ as func
         wpath = func(coll_path)
 
@@ -273,47 +223,23 @@ class CLI_:
                 for line in lines:
                     bytes_tot += write(line)
 
-                out_filehandle.truncate()  # #here1
                 # (if the new file size is smaller than previous. ok on stdout)
+                # (WAS ok on stdout before #history-C.1)
+                if not out_filehandle.isatty():
+                    out_filehandle.truncate()  # #here1
 
-        self.stderr.write(f"(wrote {bytes_tot} bytes to {desc})\n")
+
+        serr.write(f"(wrote {bytes_tot} bytes to {desc})\n")
         return 0
 
-    def parse_command_name(self):
-        command_names = ('generate',)
-
-        def say_exp():
-            return ''.join(('Expecting {',  '|'.join(command_names), '}'))
-
-        stack = self._arg_stack
-        if not len(stack):
-            self.stderr.write(say_exp())
-            self.stderr.write('\n')
-            return None, self.express_usage_and_invite()
-
-        arg = stack.pop()
-        if '-' == arg[0]:
-            if _looks_like_help_flag(arg):
-                self.stderr.write(f'description: {(CLI_.__doc__)}\n\n')
-                return None, self.express_usage()
-
-            self.stderr.write(f'unrecognized option: {arg}\n')
-            return None, self.express_usage_and_invite()
-
-        if arg in command_names:
-            return arg, None
-
-        self.stderr.write(f"unrecognized command {repr(arg)}. {say_exp()}\n")
-        return None, self.express_invite()
-
-    def build_listener(self):
+    def build_listener():
         # build a "error case expressor" (listener) that is similar in spirit
         # to our real CLI but worse in several observed ways. We don't want to
         # depend on the CLI because that defeats the purpose of a quarantined
         # one-off, but #trak #[#008.11] is to abstract it to be more accessible
 
         def listener(*args):
-            write = self.stderr.write
+            write = serr.write
             mood, shape, typ, *rest, payloader = args
             if 'expression' == shape:
                 for line in payloader():
@@ -329,31 +255,7 @@ class CLI_:
                 if '\n' != line[-1]:
                     write('\n')
         return listener
-
-    def express_usage_and_invite(self):
-        self.express_usage()
-        return self.express_invite()
-
-    def express_invite(self):
-        self.stderr.write(f"see '{self.program_name} -h'\n")
-        return 400  # generic "application error"
-
-    def express_usage(self):
-        self.stderr.write(f'usage: {self.program_name} {{generate}} [..]\n')
-        return 0
-
-    @property
-    def program_name(self):
-        if self._pn is None:
-            s = self._long_program_name
-            self._pn = self.os_path.basename(s)
-        return self._pn
-
-
-def _looks_like_help_flag(arg):
-    import re
-    return re.match('^--?h(?:e(?:lp?)?)?$', arg)
-
+    return main()
 
 # ==
 
@@ -610,10 +512,11 @@ _num_digits = 32  # copy paste! from sibling
 
 
 if __name__ == '__main__':
-    from sys import argv, stdout, stderr
-    exit(CLI_(None, stdout, stderr, argv).execute())
+    from sys import stdin, stdout, stderr, argv
+    exit(CLI_(stdin, stdout, stderr, argv))
 
 
+# #history-C.1 as was referenced
 # #history-B.4 mounted by legacy CLI
 # #history-A-1: add CLI
 # #history: received transplant

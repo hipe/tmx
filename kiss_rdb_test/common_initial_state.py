@@ -223,13 +223,13 @@ when mocking STDIN).)
 """
 
 
-def spy_on_write_and_lines_for(tc, debug_prefix):
+def spy_on_write_and_lines_for(tc, debug_prefix, isatty=None):
     # (this pretend resource for capturing output is at top.
     # the rest in this sections are for mocking input)
 
     from script_lib.test_support.expect_STDs import \
         spy_on_write_and_lines_for as func
-    return func(tc, debug_prefix, isatty=None)
+    return func(tc, debug_prefix, isatty=isatty)
 
 
 def pretend_resource_and_controller_via_KV_pairs(itr):

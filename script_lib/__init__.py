@@ -181,6 +181,10 @@ def SEQUENCE_VIA(
         nonpositionals=None, for_interactive=None,
         positionals=None, subcommands=None):
 
+    if subcommands and isinstance(subcommands[0], str):
+        # until #just-in-time-parse-parsing
+        xx(f"oops change these to sexps: {subcommands!r}")
+
     # States and Transitions
 
     def from_beginning_state():
@@ -332,7 +336,7 @@ def SEQUENCE_VIA(
     def close_because_satisfied():  # #FSA-action-response
         res = state.parse_tree
         state.parse_tree = None
-        return 'parse_tree', res
+        return 'parse_tree', _finish_parse_tree(res)
 
     # Non-interesting actions
 
@@ -449,6 +453,8 @@ def _categorize_token(token):
         xx('have fun -- it will be fine')
         return 'special_token'  # 'DOUBLE_DASH'
     return 'looks_like_option'
+
+
 class _InputReceiverFacade:
 
     def __init__(self, f):
@@ -513,7 +519,17 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
         md = re.match(r'^-(?P<is_long>-)?(?P<slug_fragment>.*)$', token)
 
         # If it looks long
-        if md['is_long'] or seen_one_BSD_style:
+        if md['is_long']:
+            return against_long_token(md)
+
+        # It looks short..
+        if seen_one_BSD_style:
+            # Under BSD-style parsing, normally we treat every short-looking
+            # token as "long" and don't do our fuzzy lookup (right?). But if
+            # we do this we don't handle "-h" the idiomatic way. So, special:
+
+            if '-h' == token and '--help' in these:
+                return against_short_token(md)
             return against_long_token(md)
         return against_short_token(md)
 
@@ -528,7 +544,9 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
         else:
             use_keys = these.keys()
         needle = slug_frag[0]
-        founds = tuple(k for k in use_keys if needle == k[2])
+        assert re.match('^[a-zA-Z]$', needle)  # until..
+        needle_rx = re.compile(f'^--?{needle}')
+        founds = tuple(k for k in use_keys if needle_rx.match(k))
 
         leng = len(founds)
         if 0 == leng:
@@ -734,12 +752,16 @@ _write_value_normalizer = _monadic_writer('value_normalizer')
 @property
 def _snake_name_for_nonpositional(self):
     md = re.match('^--?(?P<snake>[a-zA-Z][-a-zA-Z0-9]+)$', self.familiar_name)
+    if not md:
+        assert re.match('^-[a-zA-Z]$', self.familiar_name)  # meh
+        return self.familiar_name  # meh
     return md['snake'].replace('-', '_')
 
 
 # == Positionals (required and optional)
 
-def _expand_subcommand(parse_tree, literal_value):
+def _expand_subcommand(parse_tree, sx):
+    literal_value, = sx[1:]
 
     def familiar_name():
         return '"' + literal_value + '"'
@@ -767,8 +789,11 @@ def _expand_subcommand(parse_tree, literal_value):
 
 class _Positional:  # #here5
     def __init__(self, sx):
+        typ = sx[0]
+        if typ not in ('required_positional', 'optional_positional'):
+            xx(f"is this a positional? not covered yet: {typ!r}")
+
         stack = list(reversed(sx))
-        assert stack[-1] in ('required_positional', 'optional_positional')  # ..
         self.formal_type = stack.pop()
         self._familiar_name_value = stack.pop()
         while len(stack):
@@ -911,6 +936,12 @@ def _build_data_classes():
     return namedtuple('result', tuple(these.keys()))(**these)
 
 
+def _finish_parse_tree(pt):
+    if pt.subcommands:
+        pt.subcommands = tuple(pt.subcommands)
+    return pt
+
+
 """ :#here6: this is the centerpiece of XX but XX
 """
 
@@ -1001,7 +1032,12 @@ def deindented_strings_via_big_string_(big_string):
 
 
 def _deindent(item_itr, empty_item):
+    # TODO XX see help_lines_via_invocation. merge this with that.
     # (this should be in text_lib now, but we're leaving it here for now.)
+    # (we desparately wanted to write this anew with a state machine
+    # before rediscovering it here. we forced ourself not to do so,
+    # to focus on the important despite the urgent. But it's our belief
+    # that a state machine would perhaps be easier code to follow.)
 
     def peek():
         item = next(item_itr)  # ..

@@ -35,5 +35,3 @@ Expose recutils CREATE & UPDATE
 Maybe refactor the engine to be streaming/lazy
 Refactor tons of guys to use this not roll-your-own CLI
 (in the next item, update [#608.18] to show where you had hand-written positional parsers)
-The main frontend
-Help

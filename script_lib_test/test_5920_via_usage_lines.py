@@ -168,6 +168,18 @@ class Case5940_enter_noninteractive(UsageLineCase):
         return 'optional_nonpositional', '-file', '-'
 
 
+class Case5948_subcommand_and_nonpos_and_pos(UsageLineCase):
+
+    def test_010_work(self):
+        self.parse_parse()
+
+    def given_usage_line(_):
+        return "usage: {{prog_name}} generate [-i] [--preview] COLLECTION_PATH\n"
+
+    def expected_heads_tail(_):
+        return 'subcommand', 'flag', 'flag', 'required_positional'
+
+
 def parse_this_one_term(string, cursor):
     memo = parse_this_one_term
     if memo.value is None:

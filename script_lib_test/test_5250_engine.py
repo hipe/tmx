@@ -278,7 +278,7 @@ class Case5254_impatient(CommonCase):
 
     nonpositionals = '--verbose', '--file=FILE'
     positionals = 'ARG1', '[ARG2]', '[ARG3]'
-    subcommands = 'wing', 'chun'
+    subcommands = ('subcommand', 'wing'), ('subcommand', 'chun')
     terminal_is_interactive = False
     formal_is_for_interactive = False
 
@@ -309,14 +309,14 @@ class Case5258_introduce_subcommands(CommonCase):
     def build_first_sequence(self):  # (up here for historic reasons only)
         return build_sequence(
             for_interactive=True,
-            subcommands=('zingbar', 'tazo'),
+            subcommands=(('subcommand','zingbar'), ('subcommand', 'tazo')),
             nonpositionals=None,
             positionals=None)
 
     def build_second_sequence(self):
         return build_sequence(
             for_interactive=True,
-            subcommands=('zingbar', 'wazo'),
+            subcommands=(('subcommand', 'zingbar'), ('subcommand','wazo')),
             nonpositionals=None,
             positionals=None)
 

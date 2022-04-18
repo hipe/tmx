@@ -262,14 +262,21 @@ class Case1476_CLI_tool(CommonCase):
 
     @shared_subject
     def end_state(self):
-        sout, sout_lines = spy_on_write_and_lines_for(self, 'SOUT DBG: ')
-        serr, serr_lines = spy_on_write_and_lines_for(self, 'SERR DBG: ')
+        sout, sout_lines = spy_on_write_and_lines_for(
+                self, 'SOUT DBG: ', isatty=True)
+        serr, serr_lines = spy_on_write_and_lines_for(
+                self, 'SERR DBG: ', isatty=True)
 
         yikes = 'kiss_rdb_test/fixture-directories/4844-eno/050-canon-main'
         argv = '[me]', 'generate', yikes, '--preview'
 
         cli = subject_module().CLI_
-        rc = cli(None, sout, serr, argv).execute()
+
+        from script_lib.test_support.expect_STDs import \
+            pretend_STDIN_via_mixed as func
+        sin = func('FAKE_STDIN_INTERACTIVE')
+
+        rc = cli(sin, sout, serr, argv)
         return tuple(sout_lines), tuple(serr_lines), rc
 
 

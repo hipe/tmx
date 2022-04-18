@@ -150,7 +150,7 @@ class _EarlyStopExpresser:
         yield f"unrecognized option {short!r}\n"
 
     def expecting_subcommand(self, literal_value):
-        xx('easy')
+        yield f"expecting subcommand {literal_value!r}\n"
 
     def expecting_required_positional(self, shout):
         yield f"expecting {shout}\n"
@@ -172,21 +172,53 @@ def _sequence_via_usage_line(usage_line):
 
 
 def _four_pieces_via_usage_line(usage_line):
+    """Translate the stream of term sexps to the four name-value pairs.
 
-    def required_positional(sx):
-        positionals.append(sx)
+    When we refactor to #just-in-time-parse-parsing, this function goes away.
+    """
 
-    funcs = {k:v for k, v in locals().items()}
-    funcs.pop('usage_line')
+    def stack():
+        yield 'optional_glob', lambda sx: positionals.append(sx), 1
+        yield 'required_glob', lambda sx: positionals.append(sx), 2
+        yield 'optional_positional', lambda sx: positionals.append(sx), 0
+        yield 'required_positional', lambda sx: positionals.append(sx), 0
+        yield 'nonpositional', lambda sx: nonpositionals.append(sx), 0
+        yield 'subcommand', lambda sx: subcommands.append(sx), 0
+        yield 'for_interactive', lambda sx: on_for_interactive(*sx[1:]), 1
 
+    stack = list(stack())
+
+    def on_for_interactive(yn):
+        if yn is not None:
+            return 'for_interactive', yn
+
+    subcommands = []
+    nonpositionals = []
     positionals = []
 
     for sx in _parse_usage_line(usage_line):
-        # ==
-        if sx[0] not in funcs:
-            xx(f"no problem you are good at this: '{sx[0]}'")
-        # ==
-        funcs[sx[0]](sx)
+        typ = sx[0]
+        if 'flag' == typ:
+            typ = 'nonpositional'
+        while True:
+            if not len(stack):
+                xx(f"oops, unexpected or in wrong position: {typ!r}")
+            if typ == stack[-1][0]:
+                break
+            stack.pop()
+        func, num_pops = stack[-1][1:]
+        pair = func(sx)
+        if pair:
+            yield pair
+        if num_pops:
+            for _ in range(0, num_pops):
+                stack.pop()
+
+    if subcommands:
+        yield 'subcommands', tuple(subcommands)
+
+    if nonpositionals:
+        yield 'nonpositionals', tuple(nonpositionals)
 
     if positionals:
         yield 'positionals', tuple(positionals)
@@ -240,14 +272,14 @@ def _parse_usage_line(usage_line):
             this_category = term_category_present_or_future_stack[-1][0]
             if this_category == cat:
 
-                # Put this category in both pasts (may be redundant)
-                actual_term_categories_in_the_past[cat] = None
-                formal_term_categories_in_the_past[cat] = None
-
                 # Maybe pop this off the stack
                 arity, = term_category_present_or_future_stack[-1][1:]
                 is_max_one = ('zero_or_more', 'max_one').index(arity)
                 if is_max_one:
+                    # Put this category in both pasts (may be redundant)
+                    actual_term_categories_in_the_past[cat] = None
+                    formal_term_categories_in_the_past[cat] = None
+
                     term_category_present_or_future_stack.pop()
                 break
 
@@ -295,7 +327,7 @@ def _parse_usage_line(usage_line):
         return (('for_interactive', None),)  # #here1
 
     def flush_any_final_thing():
-        print("\n\nIGNORING FINAL THING FOR NOW\n\n")
+        pass  # nothing to do, ever, for now
 
     # == Matchers
 
