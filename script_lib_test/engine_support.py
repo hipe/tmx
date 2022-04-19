@@ -55,6 +55,7 @@ class CommonCase:
         resp = engine.receive_input_event('is_interactive', self.terminal_is_interactive)
         if resp:
           return resp
+        self.last_token = None
         for token in self.argv_tail:
             resp = engine.receive_input_event('head_token', token)
             if resp:
@@ -163,26 +164,35 @@ def _expand_positionals(shorthands):
 
 def _build_positional_builder_once_per_grammar():
     def positional_via(shorthand):
-        md = rx.match(shorthand)
-        assert md
-        return tuple(components_via(md))
+        # This is an ersatz form of what a frontend probably does
+        # (at #history-C.1 got rid of regex-based all-in-one parsing)
 
-    def components_via(md):
-        if md['open_square']:
-            assert md['close_sq']
-            state.seen_optional_positional = True
-            yield 'optional_positional'
-        else:
-            assert not state.seen_optional_positional  # out of scope
-            yield 'required_positional'
-        yield md['shout']  # familiar_name
+        assert 2 < len(shorthand)
+        if '[' == shorthand[0]:
+            assert ']' == shorthand[-1]
+            inside = shorthand[1:-1]
+            if re.match('^[A-Z0-9_]+$', inside):
+                state.seen_optional_positional = True
+                return 'optional_positional', inside
+            md = re.match(r'^(?P<shout>[A-Z0-9_]+) \[\1 \[\.\.\]\]$', inside)
+            assert md
+            assert not state.seen_glob
+            state.seen_glob = True
+            return 'optional_glob', md['shout']
+        if '[' in shorthand:
+            md = re.match(r'^(?P<shout>[A-Z0-9_]+) \[\1 \[\.\.\]\]$', shorthand)
+            assert md
+            assert not state.seen_glob
+            state.seen_glob = True
+            return 'required_glob', md['shout']
+        assert re.match('^[A-Z0-9_]+$', shorthand)
+        assert not state.seen_optional_positional  # out of scope
+        return 'required_positional', shorthand
 
     import re
-    rx = re.compile(
-        r'^(?P<open_square>\[)?(?P<shout>[A-Z0-9_]+)(?P<close_sq>\])?$')
-
-    state = components_via  # #watch-the-world-burn
+    state = positional_via  # #watch-the-world-burn
     state.seen_optional_positional = False
+    state.seen_glob = False
     return positional_via
 
 
@@ -213,4 +223,5 @@ def subject_module():
     import script_lib as mod
     return mod
 
+# #history-C.1 (as referenced)
 # #abstracted

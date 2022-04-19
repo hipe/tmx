@@ -191,7 +191,14 @@ import unittest
 
 
 class CommonCase(engine_support.CommonCase, unittest.TestCase):
-    pass
+
+    def expect_value_sequence(self, these):
+        pt = self.expect_success()
+        act = pt.values.get(self.parse_tree_focus_value)
+        if these is None:
+            assert act is None
+            return
+        self.assertSequenceEqual(act, these)
 
 
 class Case5230_empty_grammar_against_no_tokens(CommonCase):
@@ -363,6 +370,55 @@ class Case5262_introduce_interactive_vs_not(CommonCase):
             for_interactive=False,
             nonpositionals=('-file -',))
 
+
+class Case6266_introduce_optional_glob(CommonCase):
+
+    def test_005_none(self):
+        self.argv_tail = ()
+        self.expect_value_sequence(None)
+
+    def test_010_one(self):
+        same = ('val1',)
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    def test_020_two(self):
+        same = 'val1', 'val2'
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    def test_030_three(self):
+        same = 'val1 val2 val3'.split()
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    positionals = ('[TING [TING [..]]]',)
+    parse_tree_focus_value = 'ting'
+
+
+class Case6270_introduce_required_glob(CommonCase):
+
+    def test_005_none(self):
+        self.argv_tail = ()
+        self.expect_early_stop('expecting_required_positional', 'TING')
+
+    def test_010_one(self):
+        same = ('val1',)
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    def test_020_two(self):
+        same = 'val1', 'val2'
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    def test_030_three(self):
+        same = 'val1 val2 val3'.split()
+        self.argv_tail = same
+        self.expect_value_sequence(same)
+
+    positionals = ('TING [TING [..]]',)
+    parse_tree_focus_value = 'ting'
 
 build_sequence = engine_support.build_sequence
 

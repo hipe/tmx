@@ -195,6 +195,11 @@ def SEQUENCE_VIA(
         yield if_option_looking_token, maybe_accept_optional_nonpositional
         yield if_end_or_special, will_complain_about_expecting_required_positional
 
+    def from_required_glob_initial_state():  # like above except one thing
+        yield if_non_option_looking_token, try_to_satisfy_1st_reqglob_positional
+        yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_end_or_special, will_complain_about_expecting_required_positional
+
     def from_optional_positional_state():
         yield if_non_option_looking_token, try_to_satisfy_positional
         yield if_option_looking_token, maybe_accept_optional_nonpositional
@@ -264,16 +269,25 @@ def SEQUENCE_VIA(
         state.formal_nonpositional_in_progress = formal_nonpositional
         return move_to(from_optional_nonpositional_in_progress_state)
 
-    def try_to_satisfy_positional():  # #FSA-action-response
+    def try_to_satisfy_1st_reqglob_positional():  # #FSA-action-response
+        return try_to_satisfy_positional(was_reqglob=True)
+
+    def try_to_satisfy_positional(was_reqglob=False):  # #FSA-action-response
         formal_node = formal_stack[-1]
         typ = formal_node.formal_type
-        assert typ in ('required_positional', 'optional_positional')
+        if formal_node.is_glob:
+            assert typ in ('optional_glob', 'required_glob')
+        else:
+            assert typ in ('required_positional', 'optional_positional')
         two = formal_node.handle_positional(state.parse_tree, state.head_token)
         if two is not None:
             assert two[0] in ('early_stop',)
             return two
-        if False and formal_node.is_glob:  # #feature:glob-positionals
-            return
+        if formal_node.is_glob:
+            if was_reqglob:
+                # The state after a required glob formal consumed its token is:
+                move_to(from_optional_positional_state)
+            return  # Don't pop the formal stack, leave glob on there forever
         formal_stack.pop()
         return find_new_state_per_positionals()
 
@@ -328,10 +342,17 @@ def SEQUENCE_VIA(
         formal_node = formal_stack[-1]
         assert formal_node.is_positional
         typ = formal_node.formal_type
+        if formal_node.is_glob:
+            if 'required_glob' == typ:
+                return move_to(from_required_glob_initial_state)
+            if 'optional_glob' == typ:
+                return move_to(from_optional_positional_state)
+            xx(f"? {typ!r}")
         if 'required_positional' == typ:
             return move_to(from_required_positional_state)  # maybe redundant
-        assert 'optional_positional' == typ
-        return move_to(from_optional_positional_state)
+        if 'optional_positional' == typ:
+            return move_to(from_optional_positional_state)
+        xx(f"? {typ!r}")
 
     def close_because_satisfied():  # #FSA-action-response
         res = state.parse_tree
@@ -714,7 +735,7 @@ def _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, formal):
     if f:
         # (The only occasion we expect to have an existing value for a
         # nonpositional is #feature:glob-positionals)
-        kwargs = {}
+        kwargs = {'token': token}
         if k:  # subcommand (as formal positional) won't have storage key
             kwargs['existing_value'] = parse_tree.values.get(k)
         if resp:
@@ -722,7 +743,7 @@ def _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, formal):
         resp = f(**kwargs)  # #here9
 
         # A value normalizer that results in None is saying "i handled it
-        # all. Don't do anything further on this formal parameter."
+        # all. Don't do anything further on this formal parameter." :#here11
         if resp is None:
             return
 
@@ -731,7 +752,7 @@ def _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, formal):
             return resp
 
         assert 'use_value' == resp[0]
-        use_this_value = resp[1]
+        use_this_value, = resp[1:]
     else:
         use_this_value = token
 
@@ -778,7 +799,8 @@ def _expand_subcommand(parse_tree, sx):
             yield 'returncode', 71  # #here1
         return 'early_stop', explain
 
-    def normalize_and_store():  # #here9
+    def normalize_and_store(token):  # #here9
+        assert literal_value == token
         parse_tree.subcommands.append(literal_value)
 
     return _Positional(('required_positional', None,
@@ -789,16 +811,23 @@ def _expand_subcommand(parse_tree, sx):
 
 class _Positional:  # #here5
     def __init__(self, sx):
-        typ = sx[0]
-        if typ not in ('required_positional', 'optional_positional'):
-            xx(f"is this a positional? not covered yet: {typ!r}")
-
         stack = list(reversed(sx))
-        self.formal_type = stack.pop()
+        typ = stack.pop()
+        if typ in ('required_positional', 'optional_positional'):
+            pass
+        elif typ in ('optional_glob', 'required_glob'):
+            self.is_glob = True
+        else:
+            xx(f"is this a positional? not covered yet: {typ!r}")
+        self.formal_type = typ
         self._familiar_name_value = stack.pop()
         while len(stack):
             k, *rest = stack.pop()
             _write_positional_property[k](self, *rest)
+        if self.is_glob:
+            if self.value_normalizer:
+                xx("you need normalizer chains")
+            self.value_normalizer = _add_glob_val
 
     def handle_positional(self, parse_tree, token):
         return _HANDLE_AGAINST_VALUED_FORMAL(parse_tree, token, self)
@@ -818,6 +847,7 @@ class _Positional:  # #here5
         assert re.match('^[A-Z][A-Z0-9_]+$', s)
         return s.lower()
 
+    is_glob = False
     is_positional = True
 
 
@@ -825,6 +855,13 @@ _write_positional_property = _generic_registry()  # #here6
 _write_positional_property('value_constraint')(_write_value_constraint)
 _write_positional_property('value_normalizer')(_write_value_normalizer)
 _write_positional_property('familiar_name_function')(_monadic_writer('familiar_name_function'))
+
+
+def _add_glob_val(existing_value, token):
+    if existing_value:
+        existing_value.append(token)
+        return  # #here11
+    return 'use_value', [token]
 
 
 # == Nonpositionals (required, optional and flag)

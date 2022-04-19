@@ -46,7 +46,7 @@ def _CLI(sin, sout, serr, argv):
     from script_lib.via_usage_line import build_invocation
     invo = build_invocation(
             sin, sout, serr, argv,
-            usage_lines=("usage: {{prog_name}} INDEX_PATH\n",),
+            usage_lines=("usage: {{prog_name}} INDEX_PATH\n",),  # #[#857.13]
             docstring_for_help_description=_CLI.__doc__)
 
     rc, pt = invo.returncode_or_parse_tree()

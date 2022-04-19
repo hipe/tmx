@@ -155,7 +155,7 @@ def CLI_(sin, sout, serr, argv):
     file schemas have no index..
     """
 
-    usage = "usage: {{prog_name}} generate [-i] [--preview] COLLECTION_PATH\n"
+    usage = "usage: {{prog_name}} generate [-i] [--preview] COLLECTION_PATH\n"  # #[#857.13]
     from script_lib.via_usage_line import build_invocation
     invo = build_invocation(
             sin, sout, serr, argv,
