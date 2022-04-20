@@ -182,7 +182,7 @@ def SEQUENCE_VIA(
         positionals=None, subcommands=None):
 
     if subcommands and isinstance(subcommands[0], str):
-        # until #just-in-time-parse-parsing
+        # until #feat:just-in-time-parse-parsing
         xx(f"oops change these to sexps: {subcommands!r}")
 
     # States and Transitions
@@ -273,22 +273,40 @@ def SEQUENCE_VIA(
         return try_to_satisfy_positional(was_reqglob=True)
 
     def try_to_satisfy_positional(was_reqglob=False):  # #FSA-action-response
+        # Sanity-check the properties of the formal
         formal_node = formal_stack[-1]
         typ = formal_node.formal_type
         if formal_node.is_glob:
             assert typ in ('optional_glob', 'required_glob')
         else:
             assert typ in ('required_positional', 'optional_positional')
+
+        # Handle the token and return if it failed
         two = formal_node.handle_positional(state.parse_tree, state.head_token)
         if two is not None:
             assert two[0] in ('early_stop',)
             return two
+
+        # Peek ahead to determine if there's a #feat:passive-parsing stop
+        def do_stop_parsing():
+            if len(formal_stack) < 2:
+                return
+            o = formal_stack[-2]  # o = next formal node
+            return o.is_positional and hasattr(o, 'stop_parsing')
+        do_stop_parsing = do_stop_parsing()
+
+        # If it's a glob, leave the formal on the stack to be used over and over
         if formal_node.is_glob:
+            assert not do_stop_parsing
             if was_reqglob:
                 # The state after a required glob formal consumed its token is:
                 move_to(from_optional_positional_state)
             return  # Don't pop the formal stack, leave glob on there forever
+
+        # Normally, pop the stack and find the new state based on new stack
         formal_stack.pop()
+        if do_stop_parsing:
+            return 'stop_parsing', close_parse_tree()
         return find_new_state_per_positionals()
 
     def maybe_accept_dash_token():
@@ -355,9 +373,13 @@ def SEQUENCE_VIA(
         xx(f"? {typ!r}")
 
     def close_because_satisfied():  # #FSA-action-response
+        return 'parse_tree', close_parse_tree()
+
+    def close_parse_tree():
         res = state.parse_tree
+        assert res
         state.parse_tree = None
-        return 'parse_tree', _finish_parse_tree(res)
+        return _finish_parse_tree(res)
 
     # Non-interesting actions
 
@@ -675,8 +697,8 @@ def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
             return res
 
         def __getitem__(self, i):  # the workhorse, the main thing
-            assert -1 == i
-            record = stack[-1]
+            assert -1 == i or -2 == i  # #feat:passive-parsing
+            record = stack[i]
             if record[0]:
                 record[1] = record.pop()(record[1])
                 record[0] = False
@@ -817,6 +839,8 @@ class _Positional:  # #here5
             pass
         elif typ in ('optional_glob', 'required_glob'):
             self.is_glob = True
+        elif 'stop_parsing' == typ:
+            self.stop_parsing = True
         else:
             xx(f"is this a positional? not covered yet: {typ!r}")
         self.formal_type = typ

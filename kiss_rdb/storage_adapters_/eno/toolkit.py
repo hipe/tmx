@@ -23,15 +23,23 @@ def _cli_for_production():
 
 def _CLI_for_crazy_visual_test(sin, sout, serr, argv):
     try:
-        return _do_toolkit_CLI(sout, serr, argv, _external_functions)
+        return _do_toolkit_CLI(sin, sout, serr, argv, _external_functions)
     except _Stop_On_CLI_Error as e:
         return e.exitstatus
 
 
-def _do_toolkit_CLI(sout, serr, argv, efx):
+def _do_toolkit_CLI(sin, sout, serr, argv, efx):
+    """description: Developmental tooling for eno-based collections"""
 
-    bash_argv = list(reversed(argv))
-    long_prog_name = bash_argv.pop()
+    def description_lines(_):
+        s = _do_toolkit_CLI.__doc__
+        yield f"{s}\n"
+        yield '\n'
+        yield "available commands (tests):\n"
+        for k in tests.keys():
+            yield f"  {k}\n"
+
+    u = "usage: {{prog_name}} COLL_PATH TEST_NAME [test-specific args..]\n"  # #[#857.13]
 
     def bash_argv_pop(moniker):
         if len(bash_argv):
@@ -39,16 +47,17 @@ def _do_toolkit_CLI(sout, serr, argv, efx):
         serr.write(f"expecting {moniker}\n")
         raise _Stop_On_CLI_Error(usage())
 
+    def no_more_argv():
+        if 0 == len(bash_argv):
+            return
+        raise _Stop_On_CLI_Error(unexpected())
+
     def unexpected():
-        serr.write("unexpected argument(s)\n")
+        serr.write(f"unexpected argument: {bash_argv[-1]!r}\n")
         return usage()
 
     def usage():
-        from os.path import basename
-        prog_name = basename(long_prog_name)
-        serr.write(f"usage: {prog_name}")
-        _ = test_names_alternation()
-        serr.write(f' <collection-path> {_} [test-specific args..]\n')
+        serr.write(invo.first_usage_line)
         return 44
 
     def test_names_alternation():
@@ -64,6 +73,7 @@ def _do_toolkit_CLI(sout, serr, argv, efx):
     @command
     def BIG_AUDIT_TRAIL():
         eid = bash_argv_pop('<entity-id>')
+        no_more_argv()
         mon = efx.monitor_via_stderr(serr)
         return _big_audit_trail(sout, eid, coll, mon)
 
@@ -74,6 +84,7 @@ def _do_toolkit_CLI(sout, serr, argv, efx):
     @command
     def RETRIEVE_ENTITY():
         entity_id = bash_argv_pop('<entity-id>')
+        no_more_argv()
         ent = _retrieve(entity_id, coll, listener)
         if not ent:
             return 3
@@ -83,6 +94,7 @@ def _do_toolkit_CLI(sout, serr, argv, efx):
     @command
     def ENTITY_RETRIEVAL():
         entity_id = bash_argv_pop('<entity-id>')
+        no_more_argv()
         retr = _retrieval(entity_id, coll, listener)
         assert retr.entity
         assert retr.entity_section
@@ -94,17 +106,31 @@ def _do_toolkit_CLI(sout, serr, argv, efx):
 
     @command
     def TRAVERSE_IDENTIFIERS():
-        if len(bash_argv):
-            return unexpected()
+        no_more_argv()
         with _open_traverse_idens(coll) as idens:
             for iden in idens:
                 serr.write(f'NEATO: {iden.to_string()}\n')
         return 0
 
-    if 0 == len(bash_argv) or '-' == (coll_path := bash_argv.pop())[0]:
-        return usage()
+    # == FROM at #history-C.1
 
-    test_name = bash_argv_pop('<test-name>')
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv,
+            usage_lines=(u,),
+            docstring_for_help_description=description_lines)
+
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    dct = pt.values
+    test_name = dct.pop('test_name')
+    coll_path = dct.pop('coll_path')
+    assert not dct
+    bash_argv = invo.argv_stack
+
+    # == TO
+
     f = tests.get(test_name)
     if f is None:
         serr.write(f'{test_name!r} is not a test\n')
@@ -349,6 +375,7 @@ HELLO_I_AM_ENO_TOOLKIT_ = True  # #tespoint (only)
 if '__main__' == __name__:
     _cli_for_production()
 
+# #history-C.1 retrofit to use "engine" (partially)
 # #history-B.4
 # #history-A.1
 # #born.

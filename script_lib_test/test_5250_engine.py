@@ -420,6 +420,23 @@ class Case6270_introduce_required_glob(CommonCase):
     positionals = ('TING [TING [..]]',)
     parse_tree_focus_value = 'ting'
 
+
+class Case6274_introduce_stops(CommonCase):
+
+    def test_010_what(self):
+        self.argv_tail = 'val1', 'no-parse-1', 'no-parse-2'
+        pt = self.expect_success()
+        assert 'val1' == pt.values.pop('arg1')
+        assert not pt.values
+        stack = self.argv_stack
+        assert 'val1' == stack.pop()  # not so in frontend integration
+        assert 'no-parse-1' == stack.pop()
+        assert 'no-parse-2' == stack.pop()
+        assert not stack
+
+    positionals = ('ARG1', '[stop ..]')
+
+
 build_sequence = engine_support.build_sequence
 
 

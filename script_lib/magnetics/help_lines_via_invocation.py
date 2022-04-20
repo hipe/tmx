@@ -20,7 +20,7 @@ def help_lines_via_components_EXPERIMENTAL_(
         raw_usage_lines, program_name, docstring_for_help_description):
 
     # Usage lines
-    f = _build_fake_template_thing(program_name)
+    f = build_fake_template_thing_(program_name)
     itr = iter(f(s) for s in raw_usage_lines)
     first_line = next(itr)
     yield first_line
@@ -35,8 +35,16 @@ def help_lines_via_components_EXPERIMENTAL_(
     if not docstring_for_help_description:
         return
 
+    if callable(docstring_for_help_description):
+        docstring_for_help_description = docstring_for_help_description()
+
+    if isinstance(docstring_for_help_description, str):
+        itr = _one_or_more_lines_via_docstring(docstring_for_help_description)
+    else:
+        assert hasattr(docstring_for_help_description, '__next__')
+        itr = docstring_for_help_description
+
     yield '\n'
-    itr = _one_or_more_lines_via_docstring(docstring_for_help_description)
     first_line = next(itr)
 
     if not re.compile('^description:', re.IGNORECASE).match(first_line):
@@ -48,7 +56,7 @@ def help_lines_via_components_EXPERIMENTAL_(
         yield line
 
 
-def _build_fake_template_thing(program_name):
+def build_fake_template_thing_(program_name):
     def apply(raw_usage_line):
         md = re.search('(?P<outer>{{(?P<snake>(?:(?!=>}}).)*)}})', raw_usage_line)
         if not md or 'prog_name' != md['snake']:

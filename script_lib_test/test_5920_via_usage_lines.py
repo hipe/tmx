@@ -34,7 +34,7 @@ class ParseTermCase(unittest.TestCase):
         self.assertEqual(act_sx[0], self.expected_nonterminal)
         # assert act_sx[0] == self.expected_nonterminal
         assert act_end == exp_end
-        print(f"\n\nfor now IGNORING: {act_sx[1:]!r}\n\n")
+        # print(f"\n\nfor now IGNORING: {act_sx[1:]!r}\n\n")
 
 
 class Case5911_RP(ParseTermCase):  # required positional
@@ -115,6 +115,14 @@ class Case5920_nested_optional_positionals(ParseTermCase):  # optional position
 
     given_string = 'xxx [BARG [FARG [HARG]]] yyy'
     expected_nonterminal = 'nested_optional_positionals'
+
+
+class Case5922_stop_parsing(ParseTermCase):  # optional position
+    def test_010_ok(self):
+        self.expect_parses()
+
+    given_string = 'xxx [any-thing you want ..] yyy'
+    expected_nonterminal = 'stop_parsing'
 
 
 class Case5928_no_parameters(UsageLineCase):

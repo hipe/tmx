@@ -46,6 +46,12 @@ def build_invocation(
         def head_token(self):
             return self.argv_stack[-1]  # ..
 
+        @property
+        def first_usage_line(self):
+            from script_lib.magnetics.help_lines_via_invocation import \
+                    build_fake_template_thing_ as func
+            return func(self.program_name)(usage_lines[0])
+
         _raw_usage_lines = usage_lines
         _docstring = docstring_for_help_description
 
@@ -64,6 +70,8 @@ def _response_via_engine(sin, argv_stack, engine):
     while len(argv_stack):
         resp = engine.receive_input_event('head_token', argv_stack[-1])
         if resp:
+            if 'stop_parsing' == resp[0]:
+                argv_stack.pop()  # indicate we processed it
             return resp
         argv_stack.pop()
     return engine.receive_input_event('end_of_tokens')
@@ -79,6 +87,10 @@ def _returncode_or_parse_tree_via_response(serr, resp, invo):
 
     @handler
     def parse_tree(pt):
+        return None, pt
+
+    @handler
+    def stop_parsing(pt):
         return None, pt
 
     return handler[resp[0]](*resp[1:])
@@ -174,12 +186,13 @@ def _sequence_via_usage_line(usage_line):
 def _four_pieces_via_usage_line(usage_line):
     """Translate the stream of term sexps to the four name-value pairs.
 
-    When we refactor to #just-in-time-parse-parsing, this function goes away.
+    When we refactor to #feat:just-in-time-parse-parsing, away this function.
     """
 
     def stack():
-        yield 'optional_glob', lambda sx: positionals.append(sx), 1
-        yield 'required_glob', lambda sx: positionals.append(sx), 2
+        yield 'stop_parsing', lambda sx: positionals.append(sx), 1
+        yield 'optional_glob', lambda sx: positionals.append(sx), 2
+        yield 'required_glob', lambda sx: positionals.append(sx), 3
         yield 'optional_positional', lambda sx: positionals.append(sx), 0
         yield 'required_positional', lambda sx: positionals.append(sx), 0
         yield 'nonpositional', lambda sx: nonpositionals.append(sx), 0
@@ -252,47 +265,64 @@ def _parse_usage_line(usage_line):
     # == Actions
 
     def match_next_term_and_process_customly():
+        # (We avoid the noisiness of the spaghetti FSA [#608.17] by this:)
+
         sx, state.cursor = _term_matcher()(usage_line, state.cursor)
         typ = sx[0]
-        cat = _term_category_via_term_type[typ]
+        rec = _term_types[typ]
+        cat = rec[0]
+        if 1 < len(rec):  # #here4
+            stack = list(reversed(rec[1:]))
+            special_syntax_check = stack.pop()
+            expand = stack.pop() if len(stack) else None
+            assert not stack
+        else:
+            special_syntax_check = expand = None
 
-        # (The density below is what avoids the noisiness of [#608.17])
+        # If there was a last category that is not this category, put it in past
+        if state.last_category:
+            if cat != state.last_category:
+                put_this_in_the_actual_and_formal_past(state.last_category)
+            state.last_category = None
 
         # If this category is already in the formal past, stop
         if cat in formal_term_categories_in_the_past:
             raise match_failure(explain_bad_category_position(cat))
 
-        # Special handling for this one thing
-        if 'required_glob' == cat and \
-                'optpos_category' in actual_term_categories_in_the_past:
-            raise match_failure("required glob can't follow optional positional")
+        # If there's a special syntax check for this term, do that
+        if special_syntax_check:
+            special_syntax_check(state)
+
+        # With the placement-based syntax checks done,
 
         # Since it's not in the formal past, it must be somewhere in the stack
         while True:
             this_category = term_category_present_or_future_stack[-1][0]
             if this_category == cat:
-
-                # Maybe pop this off the stack
-                arity, = term_category_present_or_future_stack[-1][1:]
-                is_max_one = ('zero_or_more', 'max_one').index(arity)
-                if is_max_one:
-                    # Put this category in both pasts (may be redundant)
-                    actual_term_categories_in_the_past[cat] = None
-                    formal_term_categories_in_the_past[cat] = None
-
-                    term_category_present_or_future_stack.pop()
                 break
-
-            # This category is not in formal past nor matches the arg category.
-            # Put it in the formal past so we know its time is passed
-            formal_term_categories_in_the_past[this_category] = None
+            # We're popping this category off the stack. The time for it has
+            # passed. Put it in the formal past (maybe redundantly meh)
+            put_this_in_the_formal_past(this_category)
             term_category_present_or_future_stack.pop()
 
-        # There's only one kind of term that needs to be flattened
-        if 'nested_optional_positionals' == typ:
-            shouts, = sx[1:]
-            return tuple(('optional_positional', s) for s in shouts)  # #here1
+        # The top of the stack is now the relevant category
+
+        # If the term category has a max one arity, pop it off now
+        arity, = term_category_present_or_future_stack[-1][1:]
+        if 'max_one' == arity:
+            put_this_in_the_actual_and_formal_past(cat)
+            term_category_present_or_future_stack.pop()
+
+        # Otherwise, make a note of this category for the future past (sic)
+        else:
+            assert 'zero_or_more' == arity
+            state.last_category = cat
+
+        if expand:
+            return expand(sx)
         return (sx,)  # #here1
+
+    state = from_beginning_state  # #watch-the-world-burn
 
     def explain_bad_category_position(cat):
         last_cat = list(actual_term_categories_in_the_past.keys()).pop()
@@ -303,14 +333,26 @@ def _parse_usage_line(usage_line):
         return f"Can't have {cat_short} after {last_cat_short}"
 
     term_category_present_or_future_stack = [
+        ('stop_parsing_category', 'max_one'),
         ('glob_category', 'max_one'),
         ('optpos_category', 'max_one'),
         ('reqpos_category', 'zero_or_more'),
         ('nonpositional_category', 'zero_or_more'),
         ('subcommand_category', 'zero_or_more')
     ]
+
+    def put_this_in_the_actual_and_formal_past(cat):
+        actual_term_categories_in_the_past[cat] = None
+        put_this_in_the_formal_past(cat)
+
+    def put_this_in_the_formal_past(cat):
+        formal_term_categories_in_the_past[cat] = None
+
     formal_term_categories_in_the_past = {}
     actual_term_categories_in_the_past = {}
+
+    state.actual_term_categories_in_the_past = \
+            actual_term_categories_in_the_past  # #here5
 
     def process_pipey_thing():
         md = rx_pipey_thing.assert_match(usage_line, state.cursor)
@@ -351,7 +393,7 @@ def _parse_usage_line(usage_line):
     def if_more_input():
         return leng != state.cursor
 
-    state = from_beginning_state  # #watch-the-world-burn
+    state.last_category = None
     state.cursor = 0
     assert '\n' == usage_line[-1]
     leng = len(usage_line) - 1
@@ -391,6 +433,8 @@ def _parse_usage_line(usage_line):
 
     def match_failure(reason):
         return _MatchFailure(reason, string=usage_line, cursor=state.cursor)
+
+    state.match_failure = match_failure  # #here5
 
     while if_more_input():
         if (flush_these := find_and_call_action()):
@@ -456,17 +500,19 @@ def _build_term_matcher():  # #testpoint
         which = _which_one_match(md)
         if 'dash' == which:
             sx, next_cursor = match_dash_term(string, cursor)
-        else:
-            assert 'A_to_Z' == which
+        elif 'A_to_Z' == which:
             sx, next_cursor = match_bracketed_shouty_term(string, cursor)
+        else:
+            assert 'a_to_z'
+            sx, next_cursor = match_stop_term(string, cursor)
         md = rx_close_bracket.assert_match(string, next_cursor)
         return sx, md.end()  # #here3
 
     shout_rxs = '[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
 
     rx_first_char_after_open_bracket = o(
-            '(?:(?P<dash>-)|(?P<A_to_Z>[A-Z]))',
-            expecting="dash or x or y or z")
+            '(?:(?P<dash>-)|(?P<A_to_Z>[A-Z])|(?P<a_to_z>[a-z]))',
+            expecting="dash or A-Z or a-z")
 
     def match_bracketed_shouty_term(string, cursor):
         # match "[ARG [ARG [..]]]" or "[ARG [FARG [PARG]]]"
@@ -553,6 +599,34 @@ def _build_term_matcher():  # #testpoint
             expecting="close bracket or space and open bracket")
     rx_close_bracket = o(']', expecting='close square bracket ("]")')
 
+    def match_stop_term(string, cursor):
+        # (writing it "by hand" for #here2 and because backwards)
+        open_bracket_pos = cursor-1  # LOOK
+
+        # Find the close bracket
+        close_bracket_pos = string.find(']', cursor)
+        if -1 == close_bracket_pos:
+            raise _MatchFailure("closing ']' not found", string, cursor)
+
+        # Assert that it ends with '..'
+        inside = string[cursor:close_bracket_pos]
+        if len(inside) < 3 or '..' != inside[-2:]:
+            here = open_bracket_pos + len(inside) - 2
+            raise _MatchFailure("expecting '..'", string, here)
+        inside = inside[0:-2]
+
+        # Make sure the content part matches these peevish rules
+        md = re.search('[^-A-Za-z0-9 ]', inside)  # find first char that isn't
+        if md:
+            raise _MatchFailure(
+                    "inside must be A-Z a-z 0-9 or dash or space",
+                    string, (cursor+md.start()))
+        if ' ' not in inside:
+            raise _MatchFailure("must contain at least one space", string, cursor)
+
+        familiar = string[open_bracket_pos:(close_bracket_pos+1)]
+        return ('stop_parsing',  familiar), close_bracket_pos
+
     def match_reqpos_or_reqglob(string, cursor):
         """Assume string[cursor] is [A-Z].
         "ARG [ARG [..]]" looks a lot like "[ARG [ARG [..]]]", so at first
@@ -607,14 +681,40 @@ def _build_term_matcher():  # #testpoint
     return match_term
 
 
-_term_category_via_term_type = {
-    'optional_glob': 'glob_category',
-    'required_glob': 'glob_category',
-    'nested_optional_positionals': 'optpos_category',
-    'required_positional': 'reqpos_category',
-    'optional_nonpositional': 'nonpositional_category',
-    'flag': 'nonpositional_category',
-    'subcommand': 'subcommand_category',
+# Special placement-based (meta-positional) syntax checks and result expanders
+
+def _expand_nested_OPs(sx):
+    # There's only one term type that gets expanded into multiple AST components
+    shouts, = sx[1:]
+    return tuple(('optional_positional', s) for s in shouts)  # #here1
+
+
+def _check_required_glob_placement(state):  # :#here5
+    if 'optpos_category' not in state.actual_term_categories_in_the_past:
+        return
+    raise state.match_failure("required glob can't follow optional positional")
+
+
+def _check_stop_parsing_placement(state):
+    order = tuple(state.actual_term_categories_in_the_past.keys())
+    if order and 'reqpos_category' == order[-1]:
+        return
+    raise state.match_failure("for now, stop must come after required positional")
+
+
+""":#here4: each below "record" is CATEGORY [SPECIAL_SYNTAX_CHECK [EXPAND]]
+"""
+
+
+_term_types = {
+    'stop_parsing': ('stop_parsing_category', _check_stop_parsing_placement),
+    'optional_glob': ('glob_category',),
+    'required_glob': ('glob_category', _check_required_glob_placement),
+    'nested_optional_positionals': ('optpos_category', None, _expand_nested_OPs),
+    'required_positional': ('reqpos_category',),
+    'optional_nonpositional': ('nonpositional_category',),
+    'flag': ('nonpositional_category',),
+    'subcommand': ('subcommand_category',),
 }
 
 
@@ -701,4 +801,5 @@ def _home():
 def xx(msg=None):
     raise RuntimeError(''.join(('to do', *((': ', msg) if msg else ()))))
 
+# #history-C.1 (as referenced)
 # #birth

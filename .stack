@@ -36,6 +36,3 @@ Re-house documentation content from the test file to the document
 Maybe refactor the engine to be streaming/lazy
 Refactor tons of guys to use this not roll-your-own CLI
 (in the next item, update [#608.18] to show where you had hand-written positional parsers)
-Integrate parse stopping with eno toolkit
-Implement parse stopping in the engine
-Come up with and parse the stop term

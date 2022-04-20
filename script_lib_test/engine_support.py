@@ -12,7 +12,11 @@ class CommonCase:
                 print(f"\n\nDEBUG: wasn't expecting: {eek!r}\n\n")
                 print(f"(token was: {self.last_token!r})")
             assert False
-        return pay
+        if 'stop_parsing' == typ:
+            return pay
+        if 'parse_tree' == typ:
+            return pay
+        raise RuntimeError(f"? {typ!r}")
 
     def expect_early_stop(self, *reason_tail):
         resp = self.execute()
@@ -56,11 +60,15 @@ class CommonCase:
         if resp:
           return resp
         self.last_token = None
-        for token in self.argv_tail:
+        stack = list(reversed(self.argv_tail))
+        self.argv_stack = stack
+        while len(stack):
+            token = stack[-1]
             resp = engine.receive_input_event('head_token', token)
             if resp:
                 self.last_token = token
                 return resp
+            stack.pop()
         return engine.receive_input_event('end_of_tokens')
 
     def build_sequences(self):
@@ -175,6 +183,9 @@ def _build_positional_builder_once_per_grammar():
                 state.seen_optional_positional = True
                 return 'optional_positional', inside
             md = re.match(r'^(?P<shout>[A-Z0-9_]+) \[\1 \[\.\.\]\]$', inside)
+            if not md:
+                assert '[stop ..]' == shorthand
+                return 'stop_parsing', shorthand
             assert md
             assert not state.seen_glob
             state.seen_glob = True
