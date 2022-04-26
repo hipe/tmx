@@ -27,10 +27,17 @@ def build_invocation(
         docstring_for_help_description):
 
     seqs = tuple(_sequence_via_usage_line(s) for s in usage_lines)
+    return _build_invocation(
+            sin, serr, argv, seqs, usage_lines, docstring_for_help_description)
+
+
+def _build_invocation(
+        sin, serr, argv, seqs, usage_lines, docstring_for_help_description):
+    # #testpoint
+
     if 1 == len(seqs):
         engine, = seqs
     else:
-        xx('never been kissed, probably fine')
         engine = _home().ALTERNATION_VIA_SEQUENCES(seqs)
 
     class Invocation:
@@ -71,7 +78,9 @@ def _response_via_engine(sin, argv_stack, engine):
         resp = engine.receive_input_event('head_token', argv_stack[-1])
         if resp:
             if 'stop_parsing' == resp[0]:
-                argv_stack.pop()  # indicate we processed it
+                pt, = resp[1:]
+                if pt.do_consume_head_token:
+                    argv_stack.pop()  # indicate we processed it
             return resp
         argv_stack.pop()
     return engine.receive_input_event('end_of_tokens')
@@ -147,7 +156,13 @@ class _EarlyStopExpresser:
         return func(invo._raw_usage_lines, invo.program_name, invo._docstring)
 
     def cannot_be_dash(self):
-        xx("has stderr line. should add context. say \"in <token>\"")
+        yield "value cannot be dash\n"
+
+    def must_be_dash(self):
+        yield f"must be dash: {self._head_token!r}\n"
+
+    def failed_value_constraint(self, desc):
+        yield f"expecting {desc}\n"
 
     def ambiguous_long(self, founds):
         xx("show token and be like \"did you mean\"")
@@ -178,7 +193,7 @@ class _EarlyStopExpresser:
         return self._invocation.head_token
 
 
-def _sequence_via_usage_line(usage_line):
+def _sequence_via_usage_line(usage_line):  # #testpoint
     kwargs = {k:v for k, v in _four_pieces_via_usage_line(usage_line)}
     return _home().SEQUENCE_VIA(**kwargs)
 
@@ -466,6 +481,7 @@ def _build_term_matcher():  # #testpoint
     [--flag]              flag
     [-file=DING]          optional_nonpositional
     [--file=DING]         optional_nonpositional
+    -file               required_positional (nonpositional-looking literal)
     ARG                 required_positional
     [ARG [FARG [PARG]]] nested_optional_positionals
     ARG [ARG [..]]      required_glob
@@ -480,16 +496,27 @@ def _build_term_matcher():  # #testpoint
         md = rx1.assert_match(string, cursor)
         cursor += 1  # LOOK skip over the space that was matched
         which = _which_one_match(md)
-        if 'sq' == which:
+        if 'open_square_bracket' == which:
             return match_bracketed_expression(string, cursor)
-        if 'UC' == which:
+        if 'uppercase' == which:
             return match_reqpos_or_reqglob(string, cursor)
-        assert 'LC' == which
-        return match_subcommand(string, cursor)
+        if 'lowercase' == which:
+            return match_subcommand(string, cursor)
+        if 'single_dash' == which:
+            return _build_single_dash_sexp(), cursor+1  # #here3
+        assert 'nonpositional_looking_literal' == which
+        if True:
+            return match_nonpos_looking_literal(string, cursor)
 
     o = _AssertivePattern
-    rx1 = o(r'[ ](?:(?P<sq>\[)|(?P<UC>[A-Z])|(?P<LC>[a-z]))',
-            expecting="open bracket or [A-Z] or [a-z]")
+    rx1 = o('[ ](?:'
+                '(?P<open_square_bracket>\\[)|'
+                '(?P<uppercase>[A-Z])|'
+                '(?P<lowercase>[a-z])|'
+                '(?P<nonpositional_looking_literal>-[a-zA-Z]{2,})|'
+                '(?P<single_dash>-(?=(?:$| )))'
+            ')',
+            expecting="open bracket or [A-Z] or [a-z] or single dash")
 
     def match_bracketed_expression(string, cursor):
         # Assume string at cursor is an open bracket
@@ -670,6 +697,15 @@ def _build_term_matcher():  # #testpoint
             f'(?:[= ](?P<nonpositional_variable_name>{shout_rxs}|-))?',
             expecting="--foo-bar[=DING]")
 
+    def match_nonpos_looking_literal(string, cursor):
+        md = rx_nonpos_looking_literal.assert_match(string, cursor)
+        sx = _build_nonpos_looking_literal_sexp(md['literal'])
+        return sx, md.end()
+
+    rx_nonpos_looking_literal = o(
+            '(?P<literal>-[-a-zA-Z]+)(?!==)',
+            expecting='"-foo-bar" or "-FOO-BAR" (not followed by "=")')
+
     def match_subcommand(string, cursor):
         md = rx_subcommand.assert_match(string, cursor)
         return ('subcommand', md['familiar_name']), md.end()  # #here3
@@ -679,6 +715,54 @@ def _build_term_matcher():  # #testpoint
             expecting="sub-command-name")
 
     return match_term
+
+
+def _build_single_dash_sexp():
+    """Experimental implementation of the "single dash" as positional literal..
+    Could be memoized but why.
+    """
+
+    def properties():
+        yield ('can_accept_dash_as_value',)
+        yield 'value_constraint', constrain
+        yield 'value_normalizer', do_not_store
+        yield 'familiar_name_function', lambda: '-'
+
+    def constrain(token):
+        if '-' == token:
+            return
+        def details():
+            yield 'early_stop_reason', 'must_be_dash'
+            yield 'returncode', 99
+        return 'early_stop', details
+
+    def do_not_store(token):
+        assert '-' == token
+        return
+    return 'required_positional', None, *properties()
+
+
+def _build_nonpos_looking_literal_sexp(target_token):
+    """Experimental implementation of something like "-file X" w/o using =
+    """
+
+    def properties():
+        yield 'value_constraint', constrain
+        yield 'value_normalizer', do_not_store
+        yield 'familiar_name_function', lambda: target_token
+
+    def constrain(token):
+        if target_token == token:
+            return
+        def details():
+            yield 'early_stop_reason', 'failed_value_constraint', repr(target_token)
+            yield 'returncode', 99
+        return 'early_stop', details
+
+    def do_not_store(token):
+        assert target_token == token
+        return
+    return 'required_positional', None, *properties()
 
 
 # Special placement-based (meta-positional) syntax checks and result expanders
@@ -699,7 +783,9 @@ def _check_stop_parsing_placement(state):
     order = tuple(state.actual_term_categories_in_the_past.keys())
     if order and 'reqpos_category' == order[-1]:
         return
-    raise state.match_failure("for now, stop must come after required positional")
+    if 0 == len(order):
+        return  # Case5950: a stop at the beginning with match anything
+    raise state.match_failure("stop must be at beginning or after reqpos")
 
 
 """:#here4: each below "record" is CATEGORY [SPECIAL_SYNTAX_CHECK [EXPAND]]

@@ -56,6 +56,15 @@ def help_lines_via_components_EXPERIMENTAL_(
         yield line
 
 
+def _build_header_replacer_thing(usage_line_1):
+    def replace(usage_line_2):
+        return rx.sub(replacement, usage_line_2)
+    md = re.match('^[a-zA-Z ]+:', usage_line_1)
+    rx = re.compile(''.join(('^', re.escape(md[0]))))
+    replacement = ' ' * md.end()
+    return replace
+
+
 def build_fake_template_thing_(program_name):
     def apply(raw_usage_line):
         md = re.search('(?P<outer>{{(?P<snake>(?:(?!=>}}).)*)}})', raw_usage_line)

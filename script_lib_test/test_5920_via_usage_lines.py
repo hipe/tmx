@@ -24,6 +24,8 @@ class UsageLineCase(unittest.TestCase):
         if expected_last_term is not None:
             self.assertSequenceEqual(syntax_sexp[-1], expected_last_term)
 
+        return syntax_sexp
+
     expected_first_term = expected_last_term = expected_heads_tail = None
 
 
@@ -35,6 +37,7 @@ class ParseTermCase(unittest.TestCase):
         # assert act_sx[0] == self.expected_nonterminal
         assert act_end == exp_end
         # print(f"\n\nfor now IGNORING: {act_sx[1:]!r}\n\n")
+        return act_sx
 
 
 class Case5911_RP(ParseTermCase):  # required positional
@@ -93,6 +96,26 @@ class Case5917_ONPS(ParseTermCase):  # optional nonpositional (single dash)
     expected_nonterminal = 'optional_nonpositional'
 
 
+class Case5917_02_NonpositionalLookingLiteral(ParseTermCase):
+    def test_010_ok(self):
+        sx = self.expect_parses()
+
+        dct = {sx[i][0]: sx[i][1] for i in range(3, len(sx))}
+        assert 2 == len(dct)
+
+        # No storage name but name function
+        assert sx[1] is None
+        surface = dct.pop('familiar_name_function')()
+        assert '-file' == surface
+
+        # value normalizer says do not store
+        assert dct.pop('value_normalizer')('-file') is None
+        assert not dct
+
+    given_string = 'xxx -file yyy'
+    expected_nonterminal = 'required_positional'
+
+
 class Case5918_OG(ParseTermCase):  # optional glob
     def test_010_ok(self):
         self.expect_parses()
@@ -117,7 +140,7 @@ class Case5920_nested_optional_positionals(ParseTermCase):  # optional position
     expected_nonterminal = 'nested_optional_positionals'
 
 
-class Case5922_stop_parsing(ParseTermCase):  # optional position
+class Case5922_stop_parsing(ParseTermCase):
     def test_010_ok(self):
         self.expect_parses()
 
@@ -176,6 +199,7 @@ class Case5940_enter_noninteractive(UsageLineCase):
         return 'optional_nonpositional', '-file', '-'
 
 
+
 class Case5948_subcommand_and_nonpos_and_pos(UsageLineCase):
 
     def test_010_work(self):
@@ -186,6 +210,79 @@ class Case5948_subcommand_and_nonpos_and_pos(UsageLineCase):
 
     def expected_heads_tail(_):
         return 'subcommand', 'flag', 'flag', 'required_positional'
+
+
+class Case5940_enter_noninteractive(UsageLineCase):
+
+    def test_010_work(self):
+        self.parse_parse()
+
+    def given_usage_line(self):
+        return "usage: <anything-like-this> | {{prog_name}} [-file -]\n"
+
+    def expected_first_term(_):
+        return 'for_interactive', False
+
+    def expected_last_term(_):
+        return 'optional_nonpositional', '-file', '-'
+
+
+class Case5942_noninteractive_this_way(UsageLineCase):  # sister: Case5278
+
+    def test_010_work(self):
+        syntax_sx = self.parse_parse()
+        term_sx = syntax_sx[-1]
+        assert 'required_positional' == term_sx[0]
+
+        # This term has no "familiar name" to assert "do not store"
+        assert term_sx[1] is None  # the familiar name (no storage)
+
+        # But it has many properties..
+        props = {}
+        for i in range(2, len(term_sx)):
+            prop = term_sx[i]
+            if 1 == len(prop):
+                props[prop[0]] = True
+            else:
+                k, v = prop
+                props[k] = v
+
+        # It turns on this special meta-flag to tell the parser single dash ok
+        yn = props.pop('can_accept_dash_as_value')
+        assert yn is True
+
+        # It has a value constraint to assert that it only matches '-'
+        func = props.pop('value_constraint')
+        assert func('-') is None
+        assert func('x') is not None
+
+        # It has a value normalizer to override storing
+        func = props.pop('value_normalizer')
+        res = func(token='-')
+        assert res is None
+
+        # It has a name function so it can describe the formal in messages
+        func = props.pop('familiar_name_function')
+        assert '-' == func()
+
+        assert not props
+
+    def given_usage_line(self):
+        return "usage: <produce-sexp> | {{prog_name}} -\n"
+
+    def expected_first_term(_):
+        return 'for_interactive', False
+
+
+class Case5950_stop_at_beginning(UsageLineCase):
+
+    def test_010_work(self):
+        syntax_sx = self.parse_parse()
+        assert 2 == len(syntax_sx)
+        assert syntax_sx[1][0] == 'stop_parsing'
+
+    def given_usage_line(self):
+        return "usage: {{prog_name}} [this matches anything..]\n"
 
 
 def parse_this_one_term(string, cursor):

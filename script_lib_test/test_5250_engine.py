@@ -371,7 +371,7 @@ class Case5262_introduce_interactive_vs_not(CommonCase):
             nonpositionals=('-file -',))
 
 
-class Case6266_introduce_optional_glob(CommonCase):
+class Case5266_introduce_optional_glob(CommonCase):
 
     def test_005_none(self):
         self.argv_tail = ()
@@ -396,7 +396,7 @@ class Case6266_introduce_optional_glob(CommonCase):
     parse_tree_focus_value = 'ting'
 
 
-class Case6270_introduce_required_glob(CommonCase):
+class Case5270_introduce_required_glob(CommonCase):
 
     def test_005_none(self):
         self.argv_tail = ()
@@ -421,7 +421,7 @@ class Case6270_introduce_required_glob(CommonCase):
     parse_tree_focus_value = 'ting'
 
 
-class Case6274_introduce_stops(CommonCase):
+class Case5274_introduce_stops(CommonCase):
 
     def test_010_what(self):
         self.argv_tail = 'val1', 'no-parse-1', 'no-parse-2'
@@ -435,6 +435,22 @@ class Case6274_introduce_stops(CommonCase):
         assert not stack
 
     positionals = ('ARG1', '[stop ..]')
+
+
+class Case5278_literal_dash_as_positional(CommonCase):  # sister: Case5952
+
+    def test_010_stores_nothing(self):
+        """ it must be so because we can't derive a name from the term """
+        self.argv_tail = ('-',)
+        pt = self.expect_success()
+        assert 0 == len(pt.values)
+
+    def test_020_whines_about_expecting(self):
+        self.argv_tail = ()
+        wat = self.expect_early_stop('expecting_required_positional', '-')
+
+    positionals = ('-',)
+    formal_is_for_interactive = True
 
 
 build_sequence = engine_support.build_sequence

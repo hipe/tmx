@@ -53,38 +53,110 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
     if 1 == leng:
         raise RuntimeError("with only once sequence, use sequence itself")
 
+    match_any = _rewrite_interactivity_designations(seqs)
     in_the_running = {k: None for k in range(0, leng)}
 
     def receive_input_event_tuple(tup):
-        early_stops = parse_trees = None
+
+        stats = _Stats(in_the_running)
+
+        if conditional_stuff_before:
+            conditional_stuff_before.pop()(tup)
 
         # Feed the input event out to all the nerks "in parallel"
         for i in in_the_running.keys():
             resp = seqs[i].receive_input_event_tuple(tup)
             if resp is None:
                 continue
-            typ, pay = resp  # #FSA-action-response
-            if 'early_stop' == typ:
-                if early_stops is None:
-                    early_stops = {}
-                dct = early_stops
-            else:
-                assert 'parse_tree' == typ
-                if parse_trees is None:
-                    parse_trees = {}
-                dct = parse_trees
-            dct[i] = pay
+            stats.add_response(i, resp)
 
-        num_stops = len(early_stops) if early_stops else 0
-        num_trees = len(parse_trees) if parse_trees else 0
-        num_still_running = len(in_the_running) - (num_stops + num_trees)
-        func = which(num_stops, num_trees, num_still_running)
-        args = []
-        if num_stops:
-            args.append(early_stops)
-        if num_trees:
-            args.append(parse_trees)
-        return func(*args)
+        if conditional_stuff_after:
+            res = conditional_stuff_after.pop()(stats, tup)
+            if res:
+                assert res[0] in ('early_stop', 'stop_parsing')
+                return res
+
+        func = which(*stats.to_three_integers())
+        return func(*stats.to_args())
+
+    # == BEGIN experiment with jumping thru hoops to get "match any" at head
+    conditional_stuff_before = conditional_stuff_after = None
+    if match_any:
+        def conditional_stuff_before():
+            def before(tup):
+                """The second input event: If it was end of tokens, do nothing.
+                We handle it #here2. Otherwise (and it's a token), take
+                yourself out of the running because we don't actually process
+                tokens. :#here13"""
+                typ = tup[0]
+                if 'head_token' != typ:
+                    assert 'end_of_tokens' == typ
+                    # we are still in the running per #here2 and we will issue
+                    # a response about expecting at tag.
+                    return
+                for i in match_any:
+                    in_the_running.pop(i)
+            yield before
+            def before(tup):
+                # The first input event: Assert this one thing & be done
+                assert 'is_interactive' == tup[0]
+            yield before
+        def conditional_stuff_after():
+            def after(stats, tup):  # The second input event
+                typ = tup[0]
+
+                # If end of tokens, leave ourselves in the running by #here2
+                if 'head_token' != typ:
+                    assert 'end_of_tokens' == typ
+                    return  # (Case6042.test_030)
+
+                # Otherwise (and it's a token), keep in mind we are already
+                # not in the running because #here13
+
+                num_stops, num_trees, num_still_running = stats.to_three_integers()
+
+                # If anybody wanted the token and is still in progress
+                # processing it (still running), stay out and procede as normal
+                if num_still_running:
+                    return  # (Case6040.test_010) (Case6042.test_040)
+
+                # If anybody closed with a tree (strange not at end of tokens)
+                # stay out and procede as normal
+                if num_trees:
+                    xx('not covered but probably fine')
+                    return
+
+                # There are early stops
+                func = which(num_stops, num_trees, num_still_running)
+
+                # We've gotta peek into the early stop to see the reason
+                res = func(*stats.to_args())
+                assert 'early_stop' == res[0]
+                rsn = next(res[1]())
+                assert 'early_stop_reason' == rsn[0]  # conventioal (not guar.)
+
+                # If the early stop reason was for help, procede as normal
+                if 'display_help' == rsn[1]:
+                    return res  # (Case6042.test_050)
+
+                # Everyone is out of the running. Assume the early stop
+                # reason(s) were parse failure. It is in this case that we,
+                # the "match any", are activated: match any token but don't
+                # consume it #here14
+
+                res = seqs[match_any[0]].receive_input_event('stop_parsing')
+                # if empty parse tree, they should all be the same let's hope
+                assert 'stop_parsing' == res[0]
+                return res  # (Case6042.test_020)
+
+            yield after
+            def after(stats, tup):
+                # The first input event: Assert (again) this one thing
+                assert 'is_interactive' == tup[0]
+            yield after
+        conditional_stuff_before = list(conditional_stuff_before())
+        conditional_stuff_after = list(conditional_stuff_after())
+    # == END
 
     def which(num_stops, num_trees, num_still_running):  # (we could just but..)
         if num_stops:
@@ -140,41 +212,171 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
 
 
 def _merge_early_stop_reasons(expls):
+    # see "Merging responses" in [#608.18]
+
+    semantic_taxonomy = {
+        'display_help': (),
+        'expecting_required_positional': (),
+        'expecting_subcommand': ('expecting_required_positional',),
+        'failed_value_constraint': ('expecting_required_positional',)
+    }
+
+    def merge_in_early_stop_reason(reason_tail):
+        reason_key = reason_tail[0]
+        channel = (*semantic_taxonomy[reason_key], reason_key)
+        shorten_longest_common_channel(channel)
+        if 'expecting_required_positional' == channel[0]:
+            assert 1 < len(reason_tail)
+            surface = reason_tail[-1]
+            expecting_surfaces[surface] = None
+
+    def shorten_longest_common_channel(channel):
+        if state.longest_common_channel is None:
+            state.longest_common_channel = channel
+            return
+        min_leng = min(len(channel), len(state.longest_common_channel))
+        do_shorten = False
+        for i in range(0, min_leng):
+            memo_one = state.longest_common_channel[i]
+            this_one = channel[i]
+            if memo_one == this_one:
+                continue
+            do_shorten = True
+            break
+        if not do_shorten:
+            return
+        if 0 == i:
+            xx(f"bad alternation grammar: conflict in early stop shapes")
+        xx("shorten, easy")
+
+    state = shorten_longest_common_channel  # #watch-the-world-burn
+    state.longest_common_channel = None
     expecting_surfaces = {}
-    highest_returncode = None
-    seen_subtype = None
+
+    def merge_in_returncode(rc):
+        x = state.highest_returncode
+        if x is None or x < rc:
+            state.highest_returncode = rc
+
+    state.highest_returncode = None
 
     for expl in expls:
         for component in expl():
             typ, *pay = component
             if 'returncode' == typ:
-                rc, = pay
-                if highest_returncode is None or highest_returncode < rc:
-                    highest_returncode = rc
+                merge_in_returncode(*pay)
             elif 'early_stop_reason' == typ:
-                subtype = pay[0]
-                if seen_subtype is None:
-                    seen_subtype = subtype
-                elif seen_subtype != subtype:
-                    xx('ugh')
-                if 'expecting_required_positional' == subtype:
-                    expecting_surfaces[pay[1]] = None
-                elif 'expecting_subcommand' == subtype:
-                    expecting_surfaces[pay[1]] = None
-                else:
-                    xx()
+                merge_in_early_stop_reason(pay)
             else:
                 xx()
 
     def explain():
+        use_subtype = state.longest_common_channel[-1]
+        pcs = ['early_stop_reason', use_subtype]
+        these = tuple(expecting_surfaces.keys())
+        if these:
+            use = these[0] if 1 == len(these) else these
+            pcs.append(use)
+        yield tuple(pcs)
+
+        highest_returncode = state.highest_returncode
         if highest_returncode is not None:
             yield 'returncode', highest_returncode
 
-        these = tuple(expecting_surfaces.keys())
-        use = these[0] if 1 == len(these) else these
-        yield 'early_stop_reason', seen_subtype, use  # ..
-
     return explain
+
+
+def _rewrite_interactivity_designations(seqs):
+    """At the engine level, the engine wants to tend towards being agnostic
+    about interactivity designation: If the sexp sequence (usage line) doesn't
+    state explicity that it's *for* interactivity or *not* for interactivity,
+    the engine wants to take a neutral stance and allow the usage line to match
+    for both interaction modes.
+
+    However in practice this becomes annoying vis-a-vis our one frontend:
+    Although there is a type of term for indicating that that the usage line is
+    *for* STDIN, there is no corresponding idiom for expressing that the usage
+    line is for *not* STDIN (that is, it *is* for interactive mode (only)).
+    (We could introduce such meta-syntax, but this would make it noisy and
+    unnatural.)
+
+    As such, (currently at the engine level) we awkwardly mutate those usage
+    lines that didn't state explicitly they are *for* interactive IFF there
+    is one or more that indicated it is *for* STDIN. This makes the parsing
+    of ARGVs go more smoothly because we can disqualify non-matching usage
+    lines earlier. The "diamond" use cases cover this XX.
+
+    Against the "diamond" canonic compound syntax, if the client pipes in STDIN
+    *and* passes a filename, the desired behavior is to complain about the
+    filename argument not being a "-". In absense of the idiomatic mutation
+    here, it will be undefined/unexpected/silently unclear which usage line
+    would match this input.
+
+    (While making the full traversal, we also gather against one more dimension.)
+
+    Experimental and we might rather push this up somehow.
+    """
+
+    yeses = [] ; nos = [] ; not_specifieds = [] ; match_any = []
+    for i in range(0, len(seqs)):
+        seq = seqs[i]
+        if seq.matches_anything:
+            match_any.append(i)
+        ynm = seq.for_interactiver()
+        if ynm is None:
+            not_specifieds.append(i)
+        elif ynm is True:
+            yeses.append(i)
+        else:
+            assert ynm is False
+            nos.append(i)
+
+    if nos and not yeses:
+        # (some tests specify "yes" explicitly but this is unnatural)
+        # Only if some said they are not for interactive
+        # Make the ones that say None say True so they get eliminated in parsing
+        for i in not_specifieds:
+            seqs[i]._become_for_interactive()
+
+    return match_any
+
+
+class _Stats:
+
+    def __init__(self, in_the_running):
+        self.early_stops = {}
+        self.parse_trees = {}
+        self._in_the_running = in_the_running
+
+    def add_response(self, i, resp):  # #FSA-action-response
+        typ, pay = resp
+        if 'early_stop' == typ:
+            dct = self.early_stops
+        else:
+            assert 'parse_tree' == typ
+            dct = self.parse_trees
+        dct[i] = pay
+
+    def to_args(self):
+        if self.early_stops:
+            yield self.early_stops
+        if self.parse_trees:
+            yield self.parse_trees
+
+    def to_three_integers(self):
+        return self._num_stops, self._num_trees, self._num_still_running
+
+    @property
+    def _num_still_running(self):
+        return len(self._in_the_running) - (self._num_stops + self._num_trees)
+
+    @property
+    def _num_stops(self):
+        return len(self.early_stops)
+
+    @property
+    def _num_trees(self):
+        return len(self.parse_trees)
 
 
 def SEQUENCE_VIA(
@@ -190,9 +392,14 @@ def SEQUENCE_VIA(
     def from_beginning_state():
         yield if_interactivity_event, respond_to_interactivity
 
+    def from_stopped_parsing_state():
+        yield if_end_of_tokens, will_complain_about_expecting_any  # #here2
+        yield if_stop_parsing, stop_parsing_with_empty_parse_tree
+
     def from_required_positional_state():
         yield if_non_option_looking_token, try_to_satisfy_positional
         yield if_option_looking_token, maybe_accept_optional_nonpositional
+        yield if_single_dash_token, maybe_accept_single_dash_for_reqpos
         yield if_end_or_special, will_complain_about_expecting_required_positional
 
     def from_required_glob_initial_state():  # like above except one thing
@@ -209,7 +416,7 @@ def SEQUENCE_VIA(
 
     def from_optional_nonpositional_in_progress_state():
         yield if_non_option_looking_token, maybe_accept_nonpos_in_progress_value
-        yield if_single_dash_token, maybe_accept_dash_token
+        yield if_single_dash_token, maybe_accept_single_dash_for_nonpos
         yield if_option_looking_token, will_complain_about_expecting_option_value
         yield if_end_or_special, will_complain_about_expecting_option_value
 
@@ -223,6 +430,21 @@ def SEQUENCE_VIA(
     # Actions (interesting ones)
 
     def maybe_accept_optional_nonpositional():  # #FSA-action-response
+        """Special hack EXPERIMENTAL: give positionals a chance to intercept
+        an option-looking token under these conditions, by peeking against
+        the constraint. if the positional has a constraint to accept the
+        leading dash, we assume etc. (we could move this to lower precedence
+        than options too) :#here12
+        """
+
+        special_failure = None
+        if len(formal_stack) and (posi := formal_stack[-1]).value_constraint:
+            special_failure = posi.value_constraint(state.head_token)
+            if not special_failure:
+                return try_to_satisfy_positional()
+        return try_to_satisfy_options_cloud(special_failure)
+
+    def try_to_satisfy_options_cloud(special_failure=None):
         assert 'head_token' == state.input_event_type
         assert 'looks_like_option' == state.token_category
         token = state.head_token
@@ -235,6 +457,13 @@ def SEQUENCE_VIA(
             # Maybe the token failed to match exactly one formal
             if not formal_nonpositional:
                 assert expl
+
+                # ugh if doing this experimental hack w/ positionals, we want
+                # the more specific failure over the more general #here12
+                if special_failure:
+                    assert 'early_stop' == special_failure[0]
+                    return special_failure
+
                 return 'early_stop', expl
             assert expl is None
 
@@ -269,10 +498,14 @@ def SEQUENCE_VIA(
         state.formal_nonpositional_in_progress = formal_nonpositional
         return move_to(from_optional_nonpositional_in_progress_state)
 
+    def maybe_accept_single_dash_for_reqpos():  # #FSA-action-return
+        return try_to_satisfy_positional(is_dash=True)
+
     def try_to_satisfy_1st_reqglob_positional():  # #FSA-action-response
         return try_to_satisfy_positional(was_reqglob=True)
 
-    def try_to_satisfy_positional(was_reqglob=False):  # #FSA-action-response
+    def try_to_satisfy_positional(was_reqglob=False, is_dash=False):
+        # #FSA-action-response
         # Sanity-check the properties of the formal
         formal_node = formal_stack[-1]
         typ = formal_node.formal_type
@@ -282,6 +515,11 @@ def SEQUENCE_VIA(
             assert typ in ('required_positional', 'optional_positional')
 
         # Handle the token and return if it failed
+        if is_dash and not formal_node.can_accept_dash_as_value:
+            # formals that *do* accept dash *do* have value constraint,
+            # but formals that *don't* do *not* themselves protect themselves
+            return 'early_stop', _explain_dash_noaccept_nopos_or_pos
+
         two = formal_node.handle_positional(state.parse_tree, state.head_token)
         if two is not None:
             assert two[0] in ('early_stop',)
@@ -309,14 +547,10 @@ def SEQUENCE_VIA(
             return 'stop_parsing', close_parse_tree()
         return find_new_state_per_positionals()
 
-    def maybe_accept_dash_token():
+    def maybe_accept_single_dash_for_nonpos():
         if state.formal_nonpositional_in_progress.can_accept_dash_as_value:
             return maybe_accept_nonpos_in_progress_value()
-        def explanation():
-            yield 'early_stop_reason', 'cannot_be_dash'  # #here10
-            yield 'stderr_line', "can't use '-' as value\n"
-            yield 'returncode', 75  # #here1
-        return 'early_stop', explanation
+        return 'early_stop', _explain_dash_noaccept_nopos_or_pos
 
     def maybe_accept_nonpos_in_progress_value():
         formal_node = state.formal_nonpositional_in_progress
@@ -370,18 +604,26 @@ def SEQUENCE_VIA(
             return move_to(from_required_positional_state)  # maybe redundant
         if 'optional_positional' == typ:
             return move_to(from_optional_positional_state)
+        if 'stop_parsing' == typ:
+            return move_to(from_stopped_parsing_state)
         xx(f"? {typ!r}")
+
+    def stop_parsing_with_empty_parse_tree():
+        return 'stop_parsing', close_parse_tree(do_consume_head_token=False)
 
     def close_because_satisfied():  # #FSA-action-response
         return 'parse_tree', close_parse_tree()
 
-    def close_parse_tree():
+    def close_parse_tree(do_consume_head_token=True):
         res = state.parse_tree
         assert res
         state.parse_tree = None
-        return _finish_parse_tree(res)
+        return _finish_parse_tree(res, do_consume_head_token)
 
     # Non-interesting actions
+
+    def will_complain_about_expecting_any():  # #FSA-action-value, #here2
+        return _early_stop_for_match_any(formal_stack[-1].familiar_name)
 
     def will_complain_about_expecting_required_positional():  # #FSA-action-response
         def explain():
@@ -417,8 +659,9 @@ def SEQUENCE_VIA(
 
     def is_interactive_expected_actual():
         formal_frame = formal_stack[-1]
-        assert 'for_interactive' == formal_frame[0]
-        return formal_frame[1], state.input_event[1]
+        assert 'for_interactiver' == formal_frame[0]
+        boolean_value_reader, = formal_frame[1:]
+        return boolean_value_reader(), state.input_event[1]
 
     # Matchers
 
@@ -439,11 +682,15 @@ def SEQUENCE_VIA(
     def if_single_dash_token():
         return '-' == state.head_token
 
+    def if_stop_parsing():
+        return 'stop_parsing' == state.input_event_type
+
     def if_end_of_tokens():
         return 'end_of_tokens' == state.input_event_type
 
     def if_interactivity_event():
         return 'is_interactive' == state.input_event_type
+
 
     # State machine mechanics
 
@@ -457,14 +704,16 @@ def SEQUENCE_VIA(
             state.head_token = None
             state.token_category = None
 
-        found = False
         for matcher, action in state.state_function():
             found = matcher()
             if found:
-                break
-        if not found:
-            xx("probably we will not encounter this normally")
-        return action()
+                return action()
+
+        def message():
+            yield "found no transtion"
+            yield state.state_function.__name__.replace('_', ' ')
+            yield f"with input event {tup!r}"
+        xx(' '.join(message()))
 
     def move_to(state_func):  # #FSA-action-response
         state.state_function = state_func
@@ -474,10 +723,31 @@ def SEQUENCE_VIA(
     state.parse_tree = _data_classes().parse_tree()
 
     floating_cloud = _floating_cloud_via_nonpositionals(nonpositionals)
-    formal_stack = _lazy_formal_stack(
-            state.parse_tree, positionals, subcommands, for_interactive)
 
-    return _InputReceiverFacade(receive_input_event_tuple)
+    # Peek ahead to the any first positional to see if this matches anything
+    if positionals and 'stop_parsing' == positionals[0][0]:
+        mat = positionals[0]
+    else:
+        mat = None
+
+    facade = _SequenceFacade(receive_input_event_tuple, for_interactive, mat)
+
+    formal_stack = _lazy_formal_stack(
+            state.parse_tree, positionals, subcommands, facade.for_interactiver)
+
+    return facade
+
+
+def _early_stop_for_match_any(familiar):
+    def explain():
+        yield 'early_stop_reason', 'expecting_required_positional', familiar
+        yield 'returncode', 73  # #here1
+    return 'early_stop', explain
+
+
+def _explain_dash_noaccept_nopos_or_pos():
+    yield 'early_stop_reason', 'cannot_be_dash'  # #here10
+    yield 'returncode', 75  # #here1
 
 
 def _categorize_token(token):
@@ -505,6 +775,25 @@ class _InputReceiverFacade:
 
     def receive_input_event(self, *tup):
         return self.receive_input_event_tuple(tup)
+
+
+class _SequenceFacade(_InputReceiverFacade):
+
+    def __init__(self, recv_input, for_interactive_yes_no_none, mat):
+        super().__init__(recv_input)
+        if mat:
+            self.matches_anything = True
+            self.term_at_head_for_matches_anything = mat
+        else:
+            self.matches_anything = False
+        self._is_for_interactive = for_interactive_yes_no_none
+
+    def _become_for_interactive(self):
+        assert self._is_for_interactive is None
+        self._is_for_interactive = True
+
+    def for_interactiver(self):
+        return self._is_for_interactive
 
 
 def _floating_cloud_via_nonpositionals(tup):
@@ -665,7 +954,7 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
 """
 
 
-def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
+def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactiver):
     # The typical real-world command won't have "many" of these pieces so..
     # This is similar to #here4 where we build the structures only lazily
     # See [#608.18] "How we use stacks to parse positional parameters"
@@ -685,7 +974,7 @@ def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactive):
             stack.append([True, s, expand_subcommand])
 
     # Finally, append this
-    stack.append([False, ('for_interactive', for_interactive)])
+    stack.append([False, ('for_interactiver', for_interactiver)])
 
     class LazyFormalStack:
 
@@ -873,12 +1162,18 @@ class _Positional:  # #here5
 
     is_glob = False
     is_positional = True
+    can_accept_dash_as_value = False
 
 
 _write_positional_property = _generic_registry()  # #here6
 _write_positional_property('value_constraint')(_write_value_constraint)
 _write_positional_property('value_normalizer')(_write_value_normalizer)
 _write_positional_property('familiar_name_function')(_monadic_writer('familiar_name_function'))
+
+
+@_write_positional_property('can_accept_dash_as_value')
+def _become_dash_accepting(formal):
+    formal.can_accept_dash_as_value = True
 
 
 def _add_glob_val(existing_value, token):
@@ -921,11 +1216,8 @@ class _OptionalNonpositional:
 _write_nonpos_property = _generic_registry()
 _write_nonpos_property('value_constraint')(_write_value_constraint)
 _write_nonpos_property('value_normalizer')(_write_value_normalizer)
+_write_nonpos_property('can_accept_dash_as_value')(_become_dash_accepting)
 
-
-@_write_nonpos_property('can_accept_dash_as_value')
-def _write_nonpos_dash_etc(formal):
-    formal.can_accept_dash_as_value = True
 
 
 @_nonpositional_class_for('flag')
@@ -992,14 +1284,16 @@ def _build_data_classes():
     class parse_tree:
         subcommands:list[str] = field(default_factory=list)
         values:dict = field(default_factory=dict)
+        do_consume_head_token:bool = True
 
     from collections import namedtuple
     return namedtuple('result', tuple(these.keys()))(**these)
 
 
-def _finish_parse_tree(pt):
+def _finish_parse_tree(pt, do_consume_head_token):
     if pt.subcommands:
         pt.subcommands = tuple(pt.subcommands)
+    pt.do_consume_head_token = do_consume_head_token
     return pt
 
 

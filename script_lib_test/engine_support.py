@@ -151,8 +151,8 @@ def _build_nonpositional_builder():
         yield arg_name  # parameter_familiar_name
         if '-' != arg_name:
             return
-        yield ('can_accept_dash_as_value',)
-        yield 'value_constraint', _arg_must_be_dash
+        yield ('can_accept_dash_as_value',)  # see also #here1
+        yield 'value_constraint', _arg_must_be_single_dash
 
     import re
     rx = re.compile(
@@ -175,7 +175,11 @@ def _build_positional_builder_once_per_grammar():
         # This is an ersatz form of what a frontend probably does
         # (at #history-C.1 got rid of regex-based all-in-one parsing)
 
-        assert 2 < len(shorthand)
+        if len(shorthand) < 3:
+            if '-' != shorthand:
+                raise RuntimeError(f"nothing for this yet: {shorthand!r}")
+            return _term_sexp_for_single_dash_reqpos()
+
         if '[' == shorthand[0]:
             assert ']' == shorthand[-1]
             inside = shorthand[1:-1]
@@ -207,13 +211,28 @@ def _build_positional_builder_once_per_grammar():
     return positional_via
 
 
-def _arg_must_be_dash(token):
+def _term_sexp_for_single_dash_reqpos():
+    def these():
+        yield ('can_accept_dash_as_value',)  # see also #here1
+        yield 'value_constraint', _arg_must_be_single_dash
+        yield 'value_normalizer', _do_nothing_to_store_single_dash
+        yield 'familiar_name_function', lambda: '-'
+    return 'required_positional', None, *these()
+
+
+def _arg_must_be_single_dash(token):
     if '-' == token:
         return
     def explain():
         yield 'early_stop_reason', 'must_be_dash'
         yield 'returncode', 99
     return 'early_stop', explain
+
+
+def _do_nothing_to_store_single_dash(token):
+    # we must do nothing, can't derive a good store name from term
+    assert '-' == token
+    return None
 
 
 def _early_stop_class():
