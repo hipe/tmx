@@ -1,48 +1,6 @@
 import re
 
 
-def OPEN_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
-    # At #history-A.4 this shurnk to tiny,  re-written for API change.
-    # At this same time, we sunsetted a whole redundant module (file).
-    # Using stderr instead of listener is an experimental simplification..
-    # Result value is experimental.
-
-    typ = RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin)
-    if typ is None:
-        return
-
-    if 'stdin_as_argument' == typ:
-        from contextlib import nullcontext
-        return nullcontext(stdin)
-
-    assert('path_as_argument' == typ)
-    return open(arg_value)
-
-
-def RESOLVE_UPSTREAM(stderr, arg_moniker, arg_value, stdin):
-    # (see note at above function)
-
-    def main():
-        if stdin.isatty():
-            if '-' == arg_value:
-                return when_neither()
-            return 'path_as_argument'
-        if '-' == arg_value:
-            return 'stdin_as_argument'
-        return when_both()
-
-    def when_both():
-        whine(f'when piping from STDIN, {arg_moniker} must be "-"')
-
-    def when_neither():
-        whine(f'when {arg_moniker} is "-", STDIN must be pipe')
-
-    def whine(msg):
-        stderr.write(f'parameter error: {msg}\n')  # [#605.2] _eol
-
-    return main()
-
-
 def ALTERNATION_VIA_SEQUENCES(seqs):
     """going to try to hew really close to the doc pseudocode in the
     introductory test file
@@ -95,7 +53,7 @@ def ALTERNATION_VIA_SEQUENCES(seqs):
                     # a response about expecting at tag.
                     return
                 for i in match_any:
-                    in_the_running.pop(i)
+                    in_the_running.pop(i, None)  # might already be out
             yield before
             def before(tup):
                 # The first input event: Assert this one thing & be done
@@ -555,8 +513,7 @@ def SEQUENCE_VIA(
     def maybe_accept_nonpos_in_progress_value():
         formal_node = state.formal_nonpositional_in_progress
         state.formal_nonpositional_in_progress = None
-        typ = formal_node.formal_type
-        assert typ in ('optional_nonpositional',)  # ..
+        assert 'optional_nonpositional' == formal_node.formal_type
         two = formal_node.handle_value_of_nonpositional(
                 state.parse_tree, state.head_token)
         if two is not None:
@@ -643,15 +600,14 @@ def SEQUENCE_VIA(
 
     def will_complain_about_wrong_interactivity():
         def explain():
-            yield 'early_stop_reason', 'wrong_interactivity'
             formal_yes, is_interactive = is_interactive_expected_actual()
             assert bool(formal_yes) != bool(is_interactive)
+            yield 'early_stop_reason', 'wrong_interactivity', formal_yes, is_interactive
             if formal_yes:
                 xx('cover me, looks ok')
                 token = state.head_token
                 line = "when STDIN is interactive, expected '-' not {token!r}\n"
             else:
-                xx('cover me, looks ok')
                 line = "in interactive mode, expecting file, not '-'\n"
             yield 'stderr_line', line
             yield 'returncode', 74  # #here1
@@ -1492,6 +1448,9 @@ SUCCESS = 0
 
 _eol = '\n'
 
+"""#history-A.4 description (moved in file): the now gone OPEN_UPSTREAM shrunk
+to tiny, re-written for API change. Also sunsetted a whole redundant module.
+"""
 
 # #history-C.1: begin "engines of creation" CLI
 # #history-B.4

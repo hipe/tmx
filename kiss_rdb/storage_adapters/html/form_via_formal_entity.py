@@ -417,8 +417,9 @@ _empty_dict = {}
 
 
 if '__main__' == __name__:
-    from kiss_rdb.magnetics_.abstract_schema_via_sexp import common_CLI as func
-    import sys
-    exit(func(sys.stdin, sys.stdout, sys.stderr, sys.argv, html_form_via_abstract_schema))
+    from kiss_rdb.magnetics_.abstract_schema_via_sexp import \
+            abstract_schema_based_CLI_ as func
+    from sys import stdin, stdout, stderr, argv
+    exit(func(stdin, stdout, stderr, argv, html_form_via_abstract_schema))
 
 # #born

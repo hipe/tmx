@@ -34,6 +34,4 @@ Integrate everything and write new stuff to have notes form
 Expose recutils CREATE & UPDATE
 Re-house documentation content from the test file to the document
 Maybe refactor the engine to be streaming/lazy
-Refactor tons of guys to use this not roll-your-own CLI
-(in the next item, update [#608.18] to show where you had hand-written positional parsers)
-Make sure to get the new function called '*_resolve_upstream_*'
+get invite line to come after stderr lines

@@ -59,6 +59,11 @@ def _build_invocation(
                     build_fake_template_thing_ as func
             return func(self.program_name)(usage_lines[0])
 
+        def description_lines_via_docstring(_, s):  # 1x
+            from script_lib.magnetics.help_lines_via_invocation import \
+                description_lines_via_mixed_ as func
+            return func(s)
+
         _raw_usage_lines = usage_lines
         _docstring = docstring_for_help_description
 
@@ -158,9 +163,6 @@ class _EarlyStopExpresser:
     def cannot_be_dash(self):
         yield "value cannot be dash\n"
 
-    def must_be_dash(self):
-        yield f"must be dash: {self._head_token!r}\n"
-
     def failed_value_constraint(self, desc):
         yield f"expecting {desc}\n"
 
@@ -185,8 +187,13 @@ class _EarlyStopExpresser:
     def unexpected_extra_argument(self):
         yield f"unexpected extra argument {self._head_token!r}\n"
 
-    def wrong_interactivity(self):
-        xx("has stderr line. maybe skip context for now")
+    def wrong_interactivity(self, formal_for_interactive, is_interactive):
+        if formal_for_interactive:
+            assert not is_interactive
+            yield "Cannot handle pipe thru STDIN (must be interactive)\n"
+            return
+        assert is_interactive
+        yield "Must have pipe from STDIN (can't be interactive)\n"
 
     @property
     def _head_token(self):
@@ -226,7 +233,7 @@ def _four_pieces_via_usage_line(usage_line):
 
     for sx in _parse_usage_line(usage_line):
         typ = sx[0]
-        if 'flag' == typ:
+        if typ in ('flag', 'optional_nonpositional'):
             typ = 'nonpositional'
         while True:
             if not len(stack):
@@ -687,9 +694,13 @@ def _build_term_matcher():  # #testpoint
         if -1 == beg:
             sx = 'flag', familiar_name
         else:
-            sx = ('optional_nonpositional',
-                    familiar_name, md['nonpositional_variable_name'])
-        return sx, md.span()[1]  # #here3
+            metavar = md['nonpositional_variable_name']
+            sx = ['optional_nonpositional', familiar_name, metavar]
+            if '-' == metavar:
+                sx.append(('value_constraint', _must_be_dash_value_constraint))
+                sx.append(('can_accept_dash_as_value',))
+            sx = tuple(sx)
+        return sx, md.end()  # #here3
 
     rx_dash_term = o(
             '-(?P<_2nd_dash>-)?'
@@ -724,17 +735,9 @@ def _build_single_dash_sexp():
 
     def properties():
         yield ('can_accept_dash_as_value',)
-        yield 'value_constraint', constrain
+        yield 'value_constraint', _must_be_dash_value_constraint
         yield 'value_normalizer', do_not_store
         yield 'familiar_name_function', lambda: '-'
-
-    def constrain(token):
-        if '-' == token:
-            return
-        def details():
-            yield 'early_stop_reason', 'must_be_dash'
-            yield 'returncode', 99
-        return 'early_stop', details
 
     def do_not_store(token):
         assert '-' == token
@@ -747,22 +750,30 @@ def _build_nonpos_looking_literal_sexp(target_token):
     """
 
     def properties():
+        constrain = _build_literal_value_constraint(target_token)
         yield 'value_constraint', constrain
         yield 'value_normalizer', do_not_store
         yield 'familiar_name_function', lambda: target_token
-
-    def constrain(token):
-        if target_token == token:
-            return
-        def details():
-            yield 'early_stop_reason', 'failed_value_constraint', repr(target_token)
-            yield 'returncode', 99
-        return 'early_stop', details
 
     def do_not_store(token):
         assert target_token == token
         return
     return 'required_positional', None, *properties()
+
+
+def _must_be_dash_value_constraint(token):
+    return _build_literal_value_constraint('-')(token)
+
+
+def _build_literal_value_constraint(target_token):
+    def constrain(token):
+        if target_token == token:
+            return
+        def details():
+            yield 'early_stop_reason', 'failed_value_constraint', repr(target_token)
+            yield 'returncode', 101
+        return 'early_stop', details
+    return constrain
 
 
 # Special placement-based (meta-positional) syntax checks and result expanders
@@ -857,7 +868,7 @@ def _reason_pieces_via_state_function(state_function):
     head = state_function.__name__.replace('_', ' ')
     yield head[0].upper() + head[1:]
     yield "can't find a transition. Expecting"
-    itr = iter(re.sub('^if_', '', pair[0].__name__).sub('_', ' ')
+    itr = iter(re.sub('^if_', '', pair[0].__name__).replace('_', ' ')
             for pair in state_function())
     yield next(itr)
     for noun_phrase in itr:

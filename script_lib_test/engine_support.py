@@ -224,7 +224,7 @@ def _arg_must_be_single_dash(token):
     if '-' == token:
         return
     def explain():
-        yield 'early_stop_reason', 'must_be_dash'
+        yield 'early_stop_reason', 'must_be_dash_FOR_EXAMPLE'
         yield 'returncode', 99
     return 'early_stop', explain
 

@@ -7,11 +7,11 @@ class CommonCase(unittest_TestCase):
 
     @shared_subject
     def abstract_schema_one(self):
-        lines = self.sexp_lines_one
+        lines = self.expected_sexp_lines_one
         return subject_module()._abstract_schema_via_sexp_lines(lines)
 
     @shared_subject
-    def sexp_lines_one(self):
+    def expected_sexp_lines_one(self):
         return lines_via_big_string("""
             ("abstract_schema" ("properties")
               ("abstract_entity" "AA"
@@ -54,7 +54,7 @@ class Case1644_sexp_lines_via_abstract_schema__round_trip__(CommonCase):
     def test_010_sexp_lines_look_right(self):
         abs_sch = self.abstract_schema_one
         act_lines = tuple(abs_sch.to_sexp_lines())
-        exp_lines = self.sexp_lines_one
+        exp_lines = self.expected_sexp_lines_one
         self.assertSequenceEqual(act_lines, exp_lines)
 
 
@@ -67,7 +67,7 @@ class Case1648_CLI_model_abstract_schema_from_command_line(CommonCase):
 
     def test_020_wrote_thing(self):
         _, out_lines, err_lines = self.end_state_for_CLI
-        self.assertSequenceEqual(out_lines, self.sexp_lines_one)
+        self.assertSequenceEqual(out_lines, self.expected_sexp_lines_one)
         assert not err_lines
 
     @shared_subject
@@ -91,7 +91,7 @@ class Case1652_CLI_read_sexp_lines_from_file_works(CommonCase):
     def test_020_wrote_thing(self):
         _, out_lines, err_lines = self.end_state_for_CLI
         assert 0 == len(err_lines)
-        self.assertSequenceEqual(out_lines, self.sexp_lines_one)
+        self.assertSequenceEqual(out_lines, self.expected_sexp_lines_one)
 
     @shared_subject
     def end_state_for_CLI(self):
@@ -101,7 +101,7 @@ class Case1652_CLI_read_sexp_lines_from_file_works(CommonCase):
         return '-file', '-'
 
     def given_stdin(self):
-        return self.sexp_lines_one
+        return self.expected_sexp_lines_one
 
 
 class Case1656_help_screen(CommonCase):

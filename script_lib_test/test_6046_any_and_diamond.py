@@ -12,7 +12,7 @@ class CommonCase(unittest.TestCase):
         assert re.search(rxs, self.first_stderr_line)
 
     def expect_parse_tree_keys(self, *keys):
-        act = self.end_state['parse_tree_keys']
+        act = tuple(self.end_state['parse_tree_values'].keys())
         self.assertSequenceEqual(act, keys)
 
     def expect_no_remaining_ARGV(self):
@@ -43,7 +43,8 @@ class CommonCase(unittest.TestCase):
     def build_end_state(self):
         seqs, lines = self.build_sequence_sexps()
         argv = ('wahoo', * self.given_argv)
-        sin = interactive_terminal
+
+        sin = interactive_terminal if self.is_interactive else noninteractive_terminal
 
         from script_lib.test_support.expect_STDs import \
                 spy_on_write_and_lines_for as spy
@@ -57,7 +58,7 @@ class CommonCase(unittest.TestCase):
         rc, pt = invo.returncode_or_parse_tree()
         if rc is None:
             assert not serr_lines
-            yield 'parse_tree_keys', tuple(pt.values.keys())
+            yield 'parse_tree_values', pt.values
             # ..
         else:
             assert pt is None
@@ -71,7 +72,49 @@ class CommonCase(unittest.TestCase):
         func = subject_module()._sequence_via_usage_line
         return tuple(func(s) for s in lines), lines
 
+    is_interactive = True
     do_debug = False
+
+
+class Case6038_nonpositional_with_must_be_dash_constraint(CommonCase):
+
+    def test_010_when_not_dash(self):
+        self.is_interactive = False
+        self.given_argv = '-file', 'some-file'
+        self.expect_in_first_stderr_line("expecting '-'")
+        self.expect_remaining_ARGV_head("some-file")
+
+    def test_020_when_dash(self):
+        self.is_interactive = False
+        self.given_argv = '-file', 'some-file'
+        self.given_argv = '-file', '-'
+        dct = self.end_state['parse_tree_values']
+        # this one DOES store the value
+        assert '-' == dct['file']
+
+    def test_030_when_interactive(self):
+        self.is_interactive = True
+        self.given_argv = '-file', 'some-file'
+        self.expect_in_first_stderr_line("can't be interactive")
+
+    def given_usage_lines(_):
+        yield "usage: <some-ting> | {{prog_name}} [-file -]\n"
+
+
+"""At #history-C.1 we deleted these cases from the client file
+and the now gone OPEN_UPSTREAM/RESOLVE_UPSTREAM
+
+If you run in to trouble or want better coverage, create cases that cover
+the below expressions and and take them off the below list.
+
+  - Missing required argument after '-file'
+  - "With '-file -', expecting STDIN but term is interactive"
+        - (alt:) whine(f'when {arg_moniker} is "-", STDIN must be pipe')
+  - "'-file' primary must occur alone. Unexpected: "
+  - "Can't use STDIN *and* ARGV. Unexpected: "
+  - "Can't use STDIN *and* '-file PATH'. Use one or the other.\n"
+        - (alt:) whine(f'when piping from STDIN, {arg_moniker} must be "-"')
+"""
 
 
 class Case6042_introduce_match_any(CommonCase):
@@ -108,6 +151,11 @@ class Case6042_introduce_match_any(CommonCase):
         yield "usage: {{prog_name}} -file THE_FILE\n"
 
 
+class noninteractive_terminal:  # #class-as-namespace
+    def isatty():
+        return False
+
+
 class interactive_terminal:  # #class-as-namespace
     def isatty():
         return True
@@ -121,4 +169,5 @@ def subject_module():
 if '__main__' ==  __name__:
     unittest.main()
 
+# #history-C.1
 # #born

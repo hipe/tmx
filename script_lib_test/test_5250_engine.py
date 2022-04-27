@@ -358,7 +358,7 @@ class Case5262_introduce_interactive_vs_not(CommonCase):
     def test_060_term_is_noniteractive_and_file_is_not_dash(self):
         self.terminal_is_interactive = False
         self.argv_tail = '-file', 'foo.txt'
-        self.expect_early_stop('must_be_dash')
+        self.expect_early_stop('must_be_dash_FOR_EXAMPLE')
 
     def build_first_sequence(self):  # (up here for historic reasons only)
         return build_sequence(

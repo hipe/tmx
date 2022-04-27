@@ -32,11 +32,20 @@ def help_lines_via_components_EXPERIMENTAL_(
             yield f(line)
 
     # Description lines
+    if callable(docstring_for_help_description):
+        lines = docstring_for_help_description()
+        # (we don't run it through the normalizer function. client can)
+    else:
+        lines = description_lines_via_mixed_(docstring_for_help_description)
+
+    for line in lines:
+        yield line
+
+
+def description_lines_via_mixed_(docstring_for_help_description):
+
     if not docstring_for_help_description:
         return
-
-    if callable(docstring_for_help_description):
-        docstring_for_help_description = docstring_for_help_description()
 
     if isinstance(docstring_for_help_description, str):
         itr = _one_or_more_lines_via_docstring(docstring_for_help_description)
@@ -107,13 +116,16 @@ def _one_or_more_lines_via_docstring(big_string):  # #testpoint
 
     def deindent():
         md = release_line_classification()[1]
-        if state.expected_margin != md['margin']:
-            xx(f"probably we want to allow deeper indentation {line!r}")
-        return md['content_line']
+        over_by = len(md['margin'] or '') - len(state.expected_margin)
+        if 0 == over_by:
+            return md['content_line']
+        if 0 < over_by:
+            return (' ' * over_by) + md['content_line']
+        xx(f"shallower indentation? {md['line']!r}")
 
     def handle_determiner():
         md = release_line_classification()[1]
-        state.expected_margin = md['margin']
+        state.expected_margin = md['margin'] or ''
         return md['content_line']
 
     def passthru():

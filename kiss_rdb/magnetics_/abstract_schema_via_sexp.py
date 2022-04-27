@@ -2,25 +2,32 @@
 
 import re
 
-def common_CLI(sin, sout, serr, argv, receive_abstract_schema):
-    stack = list(reversed(argv))
-    prog_name_long = stack.pop()
+def abstract_schema_based_CLI_(sin, sout, serr, argv, receive_abstract_schema):
 
-    def prog_namer():
-        return _prog_name_via_long_prog_name(prog_name_long)
+    # == FROM #history-C.1
+    def usage_lines():
+        yield "usage: <command-to-generate-sexp-lines> | {{prog_name}} [-file -]\n"
+        yield "usage: {{prog_name}} -file SEXP_FILE\n"  # #[#857.13]
 
-    w = serr.write
-    if _help_was_passed_at_head_or_tail(stack):
-        for line in _common_CLI_help_lines(receive_abstract_schema, prog_namer):
-            w(line)
-        return 0
-
-    err, fh = _resolve_upstream(sin, stack)
-    if err is None and fh is None:
-        err = "Expecting schema sexp (either '-file' arg or STDIN)\n"
-    if err:
-        w(err)
-        return 3
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+        sin, sout, serr, argv,
+        usage_lines=tuple(usage_lines()),
+        docstring_for_help_description=receive_abstract_schema.__doc__)
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    dct = pt.values
+    del pt
+    path = dct.pop('file', None)
+    assert not dct
+    if path:
+        assert sin.isatty()
+        fh = open(path)
+    else:
+        assert not sin.isatty()
+        fh = sin
+    # == TO HERE
 
     with fh:  # #here1
         abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
@@ -34,46 +41,44 @@ def common_CLI(sin, sout, serr, argv, receive_abstract_schema):
     return 0
 
 
-def _common_CLI_help_lines(func, prog_namer):
-    if (s := func.__doc__):
-        doc_lines = re.split('(?<=\n)    ', s)
-        assert 0 == len(doc_lines[-1])
-        doc_lines.pop()
-    else:
-        doc_lines = (f'(no __doc__ for {func.__name__}',)
-
-    yield f"usage: <command-to-generate-sexp-lines> | {prog_namer()} [-file -]\n"
-    yield f"       {prog_namer()} -file SEXP_FILE\n"
-    yield '\n'
-    itr = iter(doc_lines)
-    first_line_tail = next(itr)  # ..
-    yield f"description: {first_line_tail}"
-
-    for line in itr:
-        yield line
-
-
 def _CLI(sin, sout, serr, argv):
-    prog_name_long = argv[0]
-    stack = [None, * reversed(argv[1:])]  # 'None' signals end of stream #here3
+    # see _help_lines
 
-    def prog_name():
-        return _prog_name_via_long_prog_name(prog_name_long)
+    # == BEGIN  # #history-C.1
+    def usage_lines():
+        yield "usage: {{prog_name}} [lots of primaries defining the model..]\n"  # [#857.13]
+        yield "usage: {{prog_name}} -file FILE_WITH_SEXP_LINES\n"
+        yield "usage: <output-sexp-lines> | {{prog_name}} -file -\n"
 
-    if _help_was_passed_at_head_or_tail(stack):
-        for line in _help_lines(prog_name):
-            serr.write(line)
-        return 0
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv, usage_lines=tuple(usage_lines()),
+            docstring_for_help_description=_help_lines)
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    stack = invo.argv_stack
+    dct = pt.values
+    del pt
+    # == END
 
-    err, fh = _resolve_upstream(sin, stack)
-    if err:
-        serr.write(err)
-        return 3
-
-    if fh:
+    # If there's no remaining ARGV to parse (historical placement)
+    if not stack:
+        # If a filename was passed
+        if dct:
+            assert sin.isatty()
+            path = dct.pop('file_with_sexp_lines')
+            assert not dct
+            fh = open(path)
+        # Otherwise, read from STDIN
+        else:
+            assert not sin.isatty()
+            fh = sin
         with fh:  # file will close at exit #here1
             abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
     else:  # #here5
+        assert sin.isatty()
+        assert not dct
         abs_sch = _CLI_state_machine(serr, sout, stack)
 
     if abs_sch is None:
@@ -85,10 +90,8 @@ def _CLI(sin, sout, serr, argv):
     return 0
 
 
-def _help_lines(prog_namer):
-    yield f"usage: {prog_namer()} [lots of primaries defining the model]\n"
-    yield f"       {prog_namer()} -file FILE_WITH_SEXP_LINES\n"
-    yield f"       echo \"[sexp lines]\" | {prog_namer()} -file -\n"
+def _help_lines(invocation):
+    prog_namer = lambda: invocation.program_name
     yield '\n'
     yield "description: Make an abstract schema from a definition\n"
     yield '\n'
@@ -137,62 +140,6 @@ def _help_lines(prog_namer):
     yield "exists merely to visually test that the round-trip works losslessly.\n"
 
 
-def _help_was_passed_at_head_or_tail(stack):
-    leng = _stack_length(stack)
-    if 0 == leng:
-        return False
-    rx = re.compile('^--?h(?:e(?:lp?)?)?$')
-    if rx.match(stack[-1]):
-        return True
-    if 1 == leng:
-        return False
-    return rx.match(stack[1])
-
-
-def _resolve_upstream(sin, stack):
-    # very similar to script_lib.RESOLVE_UPSTREAM
-    # A rule table that permutes {[no] STDIN}x{no_file_arg|file_arg_is[p|d]}
-
-    if _stack_length(stack) and '-file' == stack[-1]:
-        stack.pop()
-        if 0 == _stack_length(stack):
-            return "Missing required argument after '-file'\n", None
-        file_arg = stack.pop()
-    else:
-        file_arg = None
-
-    if sin.isatty():
-
-        # If interactive and no file arg is passed, pass the buck
-        if file_arg is None:
-            return None, None
-
-        # If interactive and '-' was passed, user error
-        if '-' == file_arg:
-            return "With '-file -', expecting STDIN but term is interactive.\n", None
-
-        # If interactive, normal file arg was passed, but more args
-        if _stack_length(stack):
-            return f"'-file' primary must occur alone. Unexpected: {stack[-1]!r}\n", None
-
-        # Interactive and filename was passed
-        return None, open(file_arg)  # #here1
-
-    # If noninteractive and file arg looks right
-    if '-' == file_arg or file_arg is None:
-
-        if _stack_length(stack):
-            return f"Can't use STDIN *and* ARGV. unexpected: {stack[-1]!r}\n", None
-
-        return None, sin  # #here1
-
-    return  "Can't use STDIN *and* '-file PATH'. Use one or the other.\n", None
-
-
-def _prog_name_via_long_prog_name(long_prog_name):
-    from os.path import basename
-    return basename(long_prog_name)
-
 
 def _CLI_state_machine(serr, sout, stack):
 
@@ -218,7 +165,7 @@ def _CLI_state_machine(serr, sout, stack):
 
     @can_stop_here
     def from_after_attribute_name():
-        yield if_ZINGBUT, handle_ZINGBUT
+        yield if_probably_type_macro, handle_type_macro
         for k, f in from_after_type_macro():
             yield k, f
 
@@ -227,14 +174,12 @@ def _CLI_state_machine(serr, sout, stack):
         yield if_ATTR_keyword, roll_over_attr_because_next_attr
         yield if_OPTIONAL_keyword, handle_optional
         yield if_KEY_keyword, handle_key
-        yield if_end_of_input, FINISH_SOMEHOW
 
     # ==
 
-    def if_ZINGBUT():
+    def if_probably_type_macro():
         s = stack[-1]
-        if s is None:
-            return
+        assert s  # (new at #history-C.1)
         if '-' == s[0]:
             return
         return True  # validate #here2
@@ -256,12 +201,6 @@ def _CLI_state_machine(serr, sout, stack):
     def if_KEY_keyword():
         return '-key' == stack[-1]
 
-    def if_end_of_input():
-        one_way = 1 == len(stack)
-        other_way = stack[-1] is None
-        assert one_way == other_way
-        return one_way
-
     # ==
 
     def handle_entity_name():
@@ -273,7 +212,7 @@ def _CLI_state_machine(serr, sout, stack):
         state.formal_attr_params = {'formal_attribute_name': stack_pop()}
         return move_to(from_after_attribute_name)
 
-    def handle_ZINGBUT():
+    def handle_type_macro():
         arg = stack_pop()
         tm = type_macro_(arg, listener)
         if tm is None:
@@ -302,11 +241,12 @@ def _CLI_state_machine(serr, sout, stack):
         stack_pop()
         return move_to(from_after_attribute_keyword)
 
-    def FINISH_SOMEHOW():
-        if state.formal_attr_params:
-            close_current_formal_attribute()
-        stack_pop()
-        return True
+    def close_because_end_of_input():
+        assert 0 == len(stack)
+        if not state.formal_attr_params:
+            return
+        ok = close_current_formal_attribute()
+        assert ok  # raise don't check return value it's too
 
     def close_current_formal_attribute():
         dct = state.formal_attr_params
@@ -408,6 +348,7 @@ def _CLI_state_machine(serr, sout, stack):
         write_lines_about_expected_from_current_state()
         return
 
+    close_because_end_of_input()
     close_current_formal_entity()  # SOON expand grammar for multiple ents
     dct = state.abstract_schema_dct
     state.abstract_schema_dct = None
@@ -471,14 +412,6 @@ def _human_via_fname(fname):
     return ' '.join(reversed(stack))
 
 
-def _stack_length(stack):
-    leng = len(stack)
-    if 0 == leng:
-        return 0
-    if stack[0] is None:  # #here3
-        return leng - 1
-    return leng
-
 # ==
 
 def _abstract_schema_via_sexp_lines(fh):  # #testpoint
@@ -500,7 +433,7 @@ def _abstract_schema_via_sexp_lines(fh):  # #testpoint
 
         # Avoid common issues with the parse
         if '(' != state.big_string[0]:
-            stop(f"Expecting '(' had {big_string[0]!r} for first character")
+            stop(f"Expecting '(' had {state.big_string[0]!r} for first character")
 
     def read_file_into_big_string():
         state.big_string = big_string_somehow()
@@ -801,4 +734,5 @@ if '__main__' == __name__:
     import sys
     exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
 
+# #history-C.1 "engine" not hand-written CLI
 # #born

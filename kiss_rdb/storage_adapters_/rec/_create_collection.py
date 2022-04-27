@@ -13,33 +13,62 @@ Error conditions exist for:
 import re as _re
 
 
+_doc = __doc__
+
+
 def _CLI(sin, sout, serr, argv):
-    prog_name, stack = _CLI_common_start(argv)
-    serr.write(f"IMPLEMENT ME: '{prog_name()}'\n")
-    return 3
+    # made for the first time at #history-C.1
+    def usage_lines():
+        yield "usage: {{prog_name}} [-n] COLLECTION_PATH\n"  # [#857.13]
+
+    def docstring_for_help(invo):
+        for line in invo.description_lines_via_docstring(_doc):
+            yield line
+        yield '\n'
+        yield "Option:\n"
+        yield "  -n    dry run\n"
+
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv, usage_lines=tuple(usage_lines()),
+            docstring_for_help_description=docstring_for_help)
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    dct = pt.values
+    is_dry = dct.get('-n', False)
+    listener = _CLI_listener(serr)
+    create_collection(dct['collection_path'], listener, is_dry)
+    return 33 if listener.did_error else 0
 
 
 def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):
+    """description: derive abstract schema from recinfo lines"""
+
     # this is here and not in the other file because we want it out of the
     # main flow - this will only be used in development, whereas the other
     # file will "run hot"
-    prog_name, stack = _CLI_common_start(argv)
 
-    def help_lines():
-        yield f"usage: {prog_name()} FILE\n"
-        yield f"       <produce-sexp> | {prog_name()} -\n"
-        yield '\n'
-        yield "description: derive abstract schema from recinfo lines\n"
+    # == BEGIN #history-C.1
+    def usage_lines():
+        yield "usage: {{prog_name}} FILE\n"
+        yield "usage: <produce-sexp> | {{prog_name}} -\n"  # [#857.13]
 
-    if _CLI_common_help_check(stack):
-        w = sout.write
-        for line in help_lines():
-            w(line)
-        return 0
-
-    rc, fh = _CLI_resolve_upstream(sin, serr, stack, help_lines)
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv, usage_lines=tuple(usage_lines()),
+            docstring_for_help_description=\
+            CLI_for_abstract_schema_via_recinf_.__doc__)
+    rc, pt = invo.returncode_or_parse_tree()
     if rc is not None:
         return rc
+
+    if pt.values:
+        filename, = pt.values.values()
+        fh = open(filename)
+    else:
+        fh = sin
+    # == END
 
     listener = _CLI_listener(serr)
     from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
@@ -55,67 +84,18 @@ def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):
     return 0
 
 
-def _CLI_resolve_upstream(sin, serr, stack, help_lineser):
-    w = serr.write
-    if len(stack):
-        first_arg = stack.pop()
-        if len(stack):
-            w(f"Unexpected: {stack[-1]!r}\n")
-            return 3, None
-        elif '-' == first_arg:
-            if sin.isatty():
-                w("Expecting STDIN when FILE is \"-\"\n")
-                return 3, None
-            fh = sin
-        elif '-' == first_arg[0]:
-            w(f"Unrecognized option {first_arg!r}\n")
-            return 3, None
-        elif not sin.isatty():
-            w(f"Can't have STDIN and FILE argument\n")
-            return 3, None
-        else:
-            fh = open(first_arg)
-    elif sin.isatty():
-        w("Expecting input from STDIN or FILE argument\n")
-        return 3, None
-    else:
-        fh = sin
-    return None, fh
-
-
-def _CLI_common_help_check(stack):
-    leng = len(stack)
-    if 0 == leng:
-        return False
-    if _CLI_looks_like_help(stack[-1]):
-        return True
-    if 1 == leng:
-        return False
-    return _CLI_looks_like_help(stack[0])
-
-
-def _CLI_looks_like_help(arg):
-    return _re.match('--?h(?:e(?:lp?)?)?$', arg)
-
-
-def _CLI_common_start(argv):
-    stack = list(reversed(argv))
-    prog_name_long = stack.pop()
-
-    def prog_name():
-        from os.path import basename
-        return basename(prog_name_long)
-
-    return prog_name, stack
-
-
 def _CLI_listener(serr):
     def listener(*emi):
-        *chan, lineser = emi
-        assert 'expression' == chan[1]
+        severity, shape, *ignored, lineser = emi
+        assert 'expression' == shape
+        if 'error' == severity:
+            listener.did_error = True
         w = serr.write
         for line in lineser():
             w(line)
+            if '\n' not in line:
+                w('\n')
+    listener.did_error = False
     return listener
 
 
@@ -228,6 +208,7 @@ if '__main__' == __name__:
     import sys
     exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
 
+# #history-C.2: "engine" not hand-written
 # #pending-rename: maybe to "recinf_via_abstract_schema" to mirror the other
 # #history-C.1: spike CLI for sibling concern
 # #born

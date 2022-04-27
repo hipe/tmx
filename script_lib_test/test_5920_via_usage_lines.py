@@ -7,22 +7,28 @@ class UsageLineCase(unittest.TestCase):
         itr = subject_module()._parse_usage_line(self.given_usage_line())
         syntax_sexp = tuple(itr)
 
-        def same(f):
-            return f and f()
-
-        expected_first_term = same(self.expected_first_term)
-        expected_last_term = same(self.expected_last_term)
-        expected_heads_tail = same(self.expected_heads_tail)
-
+        expected_heads_tail = (f := self.expected_heads_tail) and f()
         if expected_heads_tail is not None:
             act = tuple(term[0] for term in syntax_sexp[1:])
             self.assertSequenceEqual(act, expected_heads_tail)
 
-        if expected_first_term is not None:
-            self.assertSequenceEqual(syntax_sexp[0], expected_first_term)
+        def test_first_or_last_term(f, offset):
+            if not f:
+                return
+            actual_sequence = syntax_sexp[offset]
 
-        if expected_last_term is not None:
-            self.assertSequenceEqual(syntax_sexp[-1], expected_last_term)
+            # If it takes arguments, assume it does its own testing
+            from inspect import signature
+            params = signature(f).parameters
+            if len(params):
+                return f(actual_sequence)
+
+            # Since it takes no arguments, assume it produces the target seq
+            expected_sequence = f()
+            self.assertSequenceEqual(actual_sequence, expected_sequence)
+
+        test_first_or_last_term(self.expected_first_term, 0)
+        test_first_or_last_term(self.expected_last_term, -1)
 
         return syntax_sexp
 
@@ -223,8 +229,15 @@ class Case5940_enter_noninteractive(UsageLineCase):
     def expected_first_term(_):
         return 'for_interactive', False
 
-    def expected_last_term(_):
-        return 'optional_nonpositional', '-file', '-'
+    def expected_last_term(self, sx):
+        exp = 'optional_nonpositional', '-file', '-'
+        self.assertSequenceEqual(exp, sx[:3])
+        dct = {sx[i][0]: sx[i][1:] for i in range(3, len(sx))}
+        f, = dct.pop('value_constraint')
+        assert f('-') is None
+        assert f('') is not None
+        assert 0 == len(dct.pop('can_accept_dash_as_value'))
+        assert not dct
 
 
 class Case5942_noninteractive_this_way(UsageLineCase):  # sister: Case5278

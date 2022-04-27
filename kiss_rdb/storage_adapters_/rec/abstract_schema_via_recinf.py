@@ -408,7 +408,7 @@ def xx(msg=None):
 if '__main__' == __name__:
     from kiss_rdb.storage_adapters_.rec._create_collection import \
             CLI_for_abstract_schema_via_recinf_ as _CLI
-    import sys
-    exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
+    from sys import stdin, stdout, stderr, argv
+    exit(_CLI(stdin, stdout, stderr, argv))
 
 # #born

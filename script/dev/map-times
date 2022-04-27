@@ -1,15 +1,6 @@
 #!/usr/bin/env python3 -W default::Warning::0
 
-
 def _CLI(sin, sout, serr, argv):
-    formals = (('-h', '--help', 'this screen'),
-               ('<file>', 'The input file to look for timestamps in.',
-                          "Use '-' to read from STDIN."))
-    from script_lib.cheap_arg_parse import cheap_arg_parse as func
-    return func(_do_CLI, sin, sout, serr, argv, formals)
-
-
-def _do_CLI(sin, sout, serr, path, _rscr):
     """
     A one-off script (possibly re-usable) meant to format streams of lines
 
@@ -26,12 +17,36 @@ def _do_CLI(sin, sout, serr, path, _rscr):
 
     (It's a major UX issue having the duration of the previous "item" occur
     on each next line, but this is just a sketch for now.)
+
+    Arguments:
+      FILE    The input file to look for timestams in
     """
 
-    from script_lib import OPEN_UPSTREAM
-    opened = OPEN_UPSTREAM(serr, '<file>', path, sin)
-    if opened is None:
-        return 567
+    # At #history-C.1, changed from cheap_arg_parse to engine so we can
+    #   DRY away OPEN_UPSTREAM and RESOLVE_UPSTREAM. this entailed some
+    #   superficial changes in the interface ("FILE" not "<file>"), engine
+    #   has no support for parameter-level annotations yet)
+
+    # == FROM
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+        sin, sout, serr, argv,
+        usage_lines=(
+            "usage: {{prog_name}} FILE\n",  # [#857.13]
+            "usage: <output-lines> | {{prog_name}} -\n" ),
+        docstring_for_help_description=_CLI.__doc__)
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    dct = pt.values
+    del pt
+    if (path := dct.pop('file', None)):
+        assert sin.isatty()
+        opened = open(path)
+    else:
+        assert not sin.isatty()
+        opened = sin
+    # == TO
 
     w = serr.write
 
@@ -146,4 +161,5 @@ if '__main__' == __name__:
     import sys as o
     exit(_CLI(o.stdin, o.stdout, o.stderr, o.argv))
 
+# #history-C.1 "engine" not cheap arg parse
 # #born.

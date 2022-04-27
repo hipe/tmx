@@ -31,9 +31,10 @@ def _CLI_for_crazy_visual_test(sin, sout, serr, argv):
 def _do_toolkit_CLI(sin, sout, serr, argv, efx):
     """description: Developmental tooling for eno-based collections"""
 
-    def description_lines(_):
-        s = _do_toolkit_CLI.__doc__
-        yield f"{s}\n"
+    def description_lines(invo):
+        big_string = _do_toolkit_CLI.__doc__
+        for line in invo.description_lines_via_docstring(big_string):
+            yield line
         yield '\n'
         yield "available commands (tests):\n"
         for k in tests.keys():
