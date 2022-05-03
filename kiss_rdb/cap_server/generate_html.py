@@ -3,29 +3,29 @@
 from script_lib.docstring_based_command import build_new_decorator as _BND
 
 
-def _CLI(_, sout, serr, argv):
+def _CLI(sin, sout, serr, argv):
+    """backend endpoints for our capability server,
 
-    def show_usage():
-        serr.write(f"usage: {prog_name()} COMMAND [args..]\n")
+    exposed (here) as CLI commands. Pass "-h" to the specific commands.
+    """
 
-    def prog_name():
-        from os.path import basename
-        return basename(raw_prog_name)
+    # == BEGIN #history-C.2
 
-    stack = list(reversed(argv))
-    raw_prog_name = stack.pop()
+    def usage_lines():
+        yield "usage: {{prog_name}} COMMAND [command args..]\n"  # #[#857.13]
 
-    e = serr.write
+    def docstring_for_help_description(invo):
+        for line in invo.description_lines_via_docstring(_CLI.__doc__):
+            yield line
+        for line in lines_for_description_of_commands():
+            yield line
 
-    if 0 == (leng := len(stack)):
-        e("expecting COMMAND\n")
-        return 3
-
-    # Maybe show toplevel help
     import re
     help_rx = re.compile(r'^--?h(?:e(?:lp?)?)?\Z')
-    if help_rx.match(stack[-1]):
-        show_usage()
+
+    def lines_for_description_of_commands():
+        lines = []
+        e = lines.append
         e('\n')
         e('commands:\n')
         maxwidth = 0
@@ -40,10 +40,28 @@ def _CLI(_, sout, serr, argv):
         e("example recfile: "
         "kiss-rdb-doc/recfiles/857.12.recutils-capabilities.rec\n"
         )
-        return 0
+        return lines
 
-    # Resolve the command by name
-    command_arg = stack.pop()
+    from script_lib.via_usage_line import build_invocation
+    invo = build_invocation(
+            sin, sout, serr, argv,
+            usage_lines=usage_lines(),
+            docstring_for_help_description=docstring_for_help_description)
+
+    rc, pt = invo.returncode_or_parse_tree()
+    if rc is not None:
+        return rc
+    dct = pt.values
+    stack = invo.argv_stack
+    prog_name = lambda: invo.program_name
+    del pt
+    command_arg = dct.pop('command')
+    assert not dct
+
+    # ==
+
+    e = serr.write
+
     cmd = _commands.get(command_arg)
     if not cmd:
         e(f"not a command: {command_arg!r}\n")
@@ -56,6 +74,7 @@ def _CLI(_, sout, serr, argv):
         return 0
 
     # Validate & send the parameters to the command func
+    _ = None  # (historic value of stderr)
     if cmd.has_only_positional_args:
         if (rc := cmd.validate_positionals(stderr, stack, prog_name)):
             return rc
@@ -134,6 +153,7 @@ def _tree_or_table(sout, serr, inner_lineser, recfile):
 def view_capability(_, sout, serr, recfile, EID):
     """usage: {prog_name} RECFILE EID
 
+    Description: (unnecessary line until next line is sorted out)
     This includes things like XX and XX.
     """
 
@@ -208,23 +228,27 @@ def _wrap_lines_commonly(lines):
     yield '</div>\n</body>\n</html>\n'
 
 
-def _inner_html_lines_for_view(sct, listener):
+def _inner_html_lines_for_view(ent, listener):
     from html import escape as h
     yield "<table>\n"
-    yield f"<tr><th>Label</th><td>{h(sct.label)}</td></tr>\n"
-    yield f"<tr><th>ID</th><td>{h(sct.EID)}</td></tr>\n"
+    yield f"<tr><th>Label</th><td>{h(ent.label)}</td></tr>\n"
+    yield f"<tr><th>ID</th><td>{h(ent.EID)}</td></tr>\n"
     pcs = []
-    itr = iter(sct.children or ())
-    first = None
-    for first in itr:
+    itr = iter(ent.children or ())
+    first = next(itr, None)
+    if first:
         pcs.append(h(first))
-        break
     for nonfirst in itr:
         pcs.append('&nbsp;')
         pcs.append(h(nonfirst))
     if pcs:
         val = ''.join(pcs)
         yield f"<tr><th>children</th><td>{val}</td></tr>\n"
+
+    itr = ent.RETRIEVE_NOTES(listener)
+    if itr:
+        for note in itr:
+            yield f"<tr><th>note</th><td>{_html_escape(note.body)}</td></tr>\n"
     yield "</table>\n"
 
 
@@ -362,8 +386,9 @@ _html_escape.sanity = True
 
 
 if '__main__' == __name__:
-  from sys import stdout, stderr, argv
-  exit(_CLI(None, stdout, stderr, argv))
+  from sys import stdin, stdout, stderr, argv
+  exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.2: "engine" not hand-written CLI
 # #history-C.1: change styling to "minimal" theme
 # #born

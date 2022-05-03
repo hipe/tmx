@@ -16,7 +16,6 @@ backend to consume. This is just one of several theoretical frontends.
 
 [#608.18] has tons and tons of documentation explaining almost every
 aspect of this module.
-- Introducing the distinction between positionals and nonpositionals
 """
 
 
@@ -24,9 +23,13 @@ import re
 
 def build_invocation(
         sin, sout, serr, argv, usage_lines,
-        docstring_for_help_description):
+        docstring_for_help_description,
+        parameter_refinements=None):
 
-    seqs = tuple(_sequence_via_usage_line(s) for s in usage_lines)
+    usage_lines = tuple(usage_lines)  # clients like functions & generators
+    def seq_via_usage_line(s):
+        return _sequence_via_usage_line(s, parameter_refinements)
+    seqs = tuple(seq_via_usage_line(s) for s in usage_lines)
     return _build_invocation(
             sin, serr, argv, seqs, usage_lines, docstring_for_help_description)
 
@@ -115,18 +118,15 @@ def _returncode_and_behave_via_early_stop(serr, explain, invo):
 
     @handler
     def early_stop_reason(*neato):
-        expresser = _EarlyStopExpresser(invo)
-        func = getattr(expresser, neato[0])
-        w = serr.write
-        for line in func(*neato[1:]):
-            w(line)
-        if not expresser._do_invite:
-            return
-        w(f"see '{invo.program_name} -h' for help\n")
+        early_stop_reason.tuple = neato
+
+    early_stop_reason.tuple = None
 
     @handler
     def stderr_line(line):
-        serr.write(line)
+        stderr_line.lines.append(line)
+
+    stderr_line.lines = []
 
     @handler
     def returncode(rc):
@@ -134,10 +134,35 @@ def _returncode_and_behave_via_early_stop(serr, explain, invo):
 
     returncode.value = None
 
+    other = {}
     for sx in explain():
-        handler[sx[0]](*sx[1:])
+        k = sx[0]
+        if k in handler:
+            handler[k](*sx[1:])
+        elif k in other:
+            xx(f'oops: {k!r}')
+        elif 2 == (leng := len(sx)):
+            other[k] = sx[1]
+        elif 0 == leng:
+            other[k] = True
+        else:
+            other[k] = sx[1:]
 
     assert returncode.value is not None
+
+    expresser = _EarlyStopExpresser(invo)
+    tup = early_stop_reason.tuple
+    func = getattr(expresser, tup[0])
+    w = serr.write
+    for line in func(*tup[1:], **other):
+        w(line)
+
+    for line in stderr_line.lines:
+        w(line)
+
+    if expresser._do_invite:
+        w(f"see '{invo.program_name} -h' for help\n")
+
     return returncode.value
 
 
@@ -169,13 +194,15 @@ class _EarlyStopExpresser:
     def ambiguous_long(self, founds):
         xx("show token and be like \"did you mean\"")
 
-    def ambiguous_short(self, token, did_you_mean):
-        xx("also has did_you_mean (founds[str])")
+    def ambiguous_short(self, did_you_mean):
+        yield f"ambiguous short-looking token {self._head_token!r}\n"
+        yield f"did you mean {did_you_mean!r}?\n"
 
     def unrecognized_option(self):
         yield f"unrecognized option {self._head_token!r}\n"
 
-    def unrecognized_short(self, short):
+    def unrecognized_short(self):
+        short = self._head_token
         yield f"unrecognized option {short!r}\n"
 
     def expecting_subcommand(self, literal_value):
@@ -200,8 +227,9 @@ class _EarlyStopExpresser:
         return self._invocation.head_token
 
 
-def _sequence_via_usage_line(usage_line):  # #testpoint
+def _sequence_via_usage_line(usage_line, parameter_refinements=None):  # #testpoint
     kwargs = {k:v for k, v in _four_pieces_via_usage_line(usage_line)}
+    kwargs['parameter_refinements'] = parameter_refinements
     return _home().SEQUENCE_VIA(**kwargs)
 
 
@@ -889,6 +917,9 @@ class _function_registry:
     def __getitem__(self, k):
         return self._dict[k]
 
+    def __contains__(self, k):
+        return k in self._dict
+
 
 def _home():
     import script_lib as mod
@@ -898,5 +929,6 @@ def _home():
 def xx(msg=None):
     raise RuntimeError(''.join(('to do', *((': ', msg) if msg else ()))))
 
+# #history-C.2 (as referenced)
 # #history-C.1 (as referenced)
 # #birth

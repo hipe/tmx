@@ -8,7 +8,7 @@ class CommonCase(unittest_TestCase):
     @shared_subject
     def abstract_schema_one(self):
         lines = self.expected_sexp_lines_one
-        return subject_module()._abstract_schema_via_sexp_lines(lines)
+        return subject_module().abstract_schema_via_sexp_lines_(lines)
 
     @shared_subject
     def expected_sexp_lines_one(self):

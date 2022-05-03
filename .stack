@@ -30,8 +30,5 @@ You could do the "analogs" project.
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
 Integrate everything and write new stuff to have notes form
-(in the next item, update [#608.18] to show where you chose to use BSD-style nonpositionals)
 Expose recutils CREATE & UPDATE
-Re-house documentation content from the test file to the document
 Maybe refactor the engine to be streaming/lazy
-get invite line to come after stderr lines

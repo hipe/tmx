@@ -70,6 +70,8 @@ def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
     if listener:
         listener('info', 'expression', 'sending_recsel', lineser)
 
+    Capability = _build_EXPERIMENTAL_capability_class(recfile)
+
     from kiss_rdb.storage_adapters_.rec import NATIVE_RECORDS_VIA_RECSEL as func
     for rec in func(recfile, recfile_args, listener):
         eid, = rec.pop('ID')
@@ -81,7 +83,21 @@ def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
         if len(rec):
             xx(f"handle this/these field(s): ({' '.join(rec.keys())})")
         assert not rec
-        yield _Capability(label, eid, native_URL, children)
+        yield Capability(label, eid, native_URL, children)
+
+
+def _build_EXPERIMENTAL_capability_class(recfile):
+
+    class Capability(_Capability):
+        def __init__(self, *rest):
+            super().__init__(*rest)
+
+        def RETRIEVE_NOTES(self, listener):
+            recfile
+            yield _Note("I am Note One")
+            yield _Note("I am Note Two")
+
+    return Capability
 
 
 @dataclass
@@ -101,6 +117,11 @@ class _Capability:
         if f < 0.90:
             return 'wont_implement_or_not_applicable'
         return 'is_implemented'
+
+
+class _Note:
+    def __init__(self, body):
+        self.body = body
 
 
 def xx(msg=None):

@@ -1,6 +1,8 @@
 # An experimental, even lighter-weight, more DIY alternative
 # to "cheap_arg_parse" (abstracted early from a one-off CLI),
 #
+# (This predated "engine" but only by a little bit)
+#
 # - More geared towards helping with positional-parameter APIs, not CLI's
 # - roll your own arg-parsing at the top level for readability
 # - The Command structure is evaluated lazily, only as needed
@@ -55,6 +57,8 @@ class _Command:
         scn.advance()
         line = scn.current_line
         md = re.match('^[dD]escription:[ ](?P<the_rest>.+)', line)
+        if not md:
+            xx(f"line must say 'description:' - {line!r}")
         return md['the_rest']
 
     def build_doc_lines(self, prog_name):
@@ -201,5 +205,9 @@ def _docstring_iterator(big_s):
         yield True
         pos = end
     yield False
+
+
+def xx(msg=None):
+    raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
 # #born

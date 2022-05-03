@@ -19,7 +19,7 @@ _doc = __doc__
 def _CLI(sin, sout, serr, argv):
     # made for the first time at #history-C.1
     def usage_lines():
-        yield "usage: {{prog_name}} [-n] COLLECTION_PATH\n"  # [#857.13]
+        yield "usage: {{prog_name}} [-n] COLLECTION_PATH\n"  # [#857.13] [#608.20]
 
     def docstring_for_help(invo):
         for line in invo.description_lines_via_docstring(_doc):
@@ -52,7 +52,7 @@ def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):
     # == BEGIN #history-C.1
     def usage_lines():
         yield "usage: {{prog_name}} FILE\n"
-        yield "usage: <produce-sexp> | {{prog_name}} -\n"  # [#857.13]
+        yield "usage: <produce-recinf-lines> | {{prog_name}} -\n"  # [#857.13]
 
     from script_lib.via_usage_line import build_invocation
     invo = build_invocation(

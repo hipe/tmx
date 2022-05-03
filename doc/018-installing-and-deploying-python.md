@@ -254,10 +254,30 @@ mostly meaningless):
 1. (ctrlp)[ctrlp1]: dead link there but install is straightforward. maybe not used much
 1. (fugitive)[fug1]: as directed but `plugins` not `tpope`
 1. (gitgutter)[gg1]: as directed but `plugins` not `airblade`
-1. (coc.nvim)[coc1]: as directed but `plugins` not `coc`
 
-A bit more involved is installing "ag, the silver searcher" and its
-vim plugin so that has its own section next.
+A bit more involved is installing the vim plugins for `coc.nvim` and
+"ag, the silver searcher" (and their dependencies) so those have their
+own sections next.
+
+
+## `vim` plugin: `coc.nvim`
+
+To get autocomplete, we chose this plugin as a workaround for whataver plugin
+we used to use (we don't remember). This one requires node:
+
+```bash
+sudo apt-get install nodejs
+```
+
+which gave us:
+
+```bash
+$ nodejs --version
+v12.22.9
+```
+
+Then follow the (coc.nvim)[coc1] instructions as directed but use
+`plugins` not `coc`
 
 
 ## `vim` plugin: `ag`

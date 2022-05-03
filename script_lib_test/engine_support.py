@@ -42,11 +42,18 @@ class CommonCase:
 
     def build_first_sequence(self):  # (up here for historic reasons only)
         # stderr, lines = self.build_stderr_spy()
+
+        parameter_refinements = self.parameter_refinements
+        if parameter_refinements:
+            raise RuntimeError("no longer covered but worked once")
+            parameter_refinements = parameter_refinements()
+
         return build_sequence(
             for_interactive=self.formal_is_for_interactive,
             positionals=self.positionals,
             nonpositionals=self.nonpositionals,
-            subcommands=self.subcommands)
+            subcommands=self.subcommands,
+            parameter_refinements=parameter_refinements)
 
     def execute(self):
         seqs = tuple(self.build_sequences())
@@ -94,6 +101,7 @@ class CommonCase:
     nonpositionals = None
     positionals = None
     subcommands = None
+    parameter_refinements = None
     do_debug = True
 
 
@@ -103,7 +111,8 @@ def build_sequence(
         for_interactive=None,
         positionals=None,
         nonpositionals=None,
-        subcommands=None):
+        subcommands=None,
+        parameter_refinements=None):
 
     nonpositionals = _expand_nonpositionals(nonpositionals)
     positionals = _expand_positionals(positionals)
@@ -112,7 +121,8 @@ def build_sequence(
             for_interactive=for_interactive,
             positionals=positionals,
             nonpositionals=nonpositionals,
-            subcommands=subcommands)
+            subcommands=subcommands,
+            parameter_refinements=parameter_refinements)
 
 
 def _expand_nonpositionals(shorthands):

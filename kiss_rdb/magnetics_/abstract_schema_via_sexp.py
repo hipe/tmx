@@ -2,44 +2,6 @@
 
 import re
 
-def abstract_schema_based_CLI_(sin, sout, serr, argv, receive_abstract_schema):
-
-    # == FROM #history-C.1
-    def usage_lines():
-        yield "usage: <command-to-generate-sexp-lines> | {{prog_name}} [-file -]\n"
-        yield "usage: {{prog_name}} -file SEXP_FILE\n"  # #[#857.13]
-
-    from script_lib.via_usage_line import build_invocation
-    invo = build_invocation(
-        sin, sout, serr, argv,
-        usage_lines=tuple(usage_lines()),
-        docstring_for_help_description=receive_abstract_schema.__doc__)
-    rc, pt = invo.returncode_or_parse_tree()
-    if rc is not None:
-        return rc
-    dct = pt.values
-    del pt
-    path = dct.pop('file', None)
-    assert not dct
-    if path:
-        assert sin.isatty()
-        fh = open(path)
-    else:
-        assert not sin.isatty()
-        fh = sin
-    # == TO HERE
-
-    with fh:  # #here1
-        abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
-
-    if abs_sch is None:
-        return 3
-
-    w = sout.write
-    for line in receive_abstract_schema(abs_sch):
-        w(line)
-    return 0
-
 
 def _CLI(sin, sout, serr, argv):
     # see _help_lines
@@ -47,8 +9,8 @@ def _CLI(sin, sout, serr, argv):
     # == BEGIN  # #history-C.1
     def usage_lines():
         yield "usage: {{prog_name}} [lots of primaries defining the model..]\n"  # [#857.13]
-        yield "usage: {{prog_name}} -file FILE_WITH_SEXP_LINES\n"
-        yield "usage: <output-sexp-lines> | {{prog_name}} -file -\n"
+        yield "usage: {{prog_name}} -file FILE_WITH_SEXP_LINES\n"  # [#608.20]
+        yield "usage: <output-sexp-lines> | {{prog_name}} -file -\n"  # [#608.20]
 
     from script_lib.via_usage_line import build_invocation
     invo = build_invocation(
@@ -75,7 +37,7 @@ def _CLI(sin, sout, serr, argv):
             assert not sin.isatty()
             fh = sin
         with fh:  # file will close at exit #here1
-            abs_sch = _abstract_schema_via_sexp_lines(fh)  # listener one day
+            abs_sch = abstract_schema_via_sexp_lines_(fh)  # listener one day
     else:  # #here5
         assert sin.isatty()
         assert not dct
@@ -414,7 +376,7 @@ def _human_via_fname(fname):
 
 # ==
 
-def _abstract_schema_via_sexp_lines(fh):  # #testpoint
+def abstract_schema_via_sexp_lines_(fh):  # #testpoint
 
     def main():
         read_file_into_big_string()
@@ -734,5 +696,6 @@ if '__main__' == __name__:
     import sys
     exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
 
+# #history-C.2 lose a CLI support function (abstracted too early) to a neighbor
 # #history-C.1 "engine" not hand-written CLI
 # #born

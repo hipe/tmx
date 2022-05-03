@@ -3,6 +3,45 @@
 import unittest
 
 class UsageLineCase(unittest.TestCase):
+
+    def expect_failure(self):
+        serr_lines, rc, pt = self.execute()
+        assert rc is not None
+        assert not pt
+        return serr_lines, rc
+
+    def expect_success(self):
+        # patterned after a function of the same name in the engine test module
+        # but here, a high-level integration for this frontend
+
+        serr_lines, rc, pt = self.execute()
+        assert rc is None
+        assert not serr_lines
+        return pt
+
+    def execute(self):
+        from script_lib.test_support.expect_STDs import \
+                spy_on_write_and_lines_for as spy_for, \
+                pretend_STDIN_via_mixed
+
+        sin = pretend_STDIN_via_mixed('FAKE_STDIN_INTERACTIVE')
+        sout = None  # meh
+        serr, stderr_lines = spy_for(self, 'DBG SERR: ')
+        argv = ('wazoo', *self.given_argv_tail)
+
+        if (f := self.given_parameter_refinements):
+            parameter_refinements = {k: v for k, v in f()}
+        else:
+            parameter_refinements = None
+
+        subject_function = subject_module().build_invocation
+        invo = subject_function(
+                sin, sout, serr, argv, self.given_usage_lines(),
+                docstring_for_help_description="not covered\nnot covered 2\n",
+                parameter_refinements=parameter_refinements)
+        rc, pt = invo.returncode_or_parse_tree()
+        return tuple(stderr_lines), rc, pt
+
     def parse_parse(self):
         itr = subject_module()._parse_usage_line(self.given_usage_line())
         syntax_sexp = tuple(itr)
@@ -32,7 +71,12 @@ class UsageLineCase(unittest.TestCase):
 
         return syntax_sexp
 
+    def given_usage_lines(self):
+        yield self.given_usage_line()
+
+    given_parameter_refinements = None
     expected_first_term = expected_last_term = expected_heads_tail = None
+    do_debug = False
 
 
 class ParseTermCase(unittest.TestCase):
@@ -296,6 +340,49 @@ class Case5950_stop_at_beginning(UsageLineCase):
 
     def given_usage_line(self):
         return "usage: {{prog_name}} [this matches anything..]\n"
+
+
+class Case5954_example_of_refinement(UsageLineCase):
+
+    def test_010_no(self):
+        self.given_argv_tail = '-IP', '1.2.3.four'
+        serr_lines, rc = self.expect_failure()
+        assert 123 == rc
+        stack = list(reversed(serr_lines))
+        assert "expecting IP addy\n" == stack.pop()
+        assert "custom line 1\n" == stack.pop()
+        assert "custom line 2\n" == stack.pop()
+        assert '-h' in stack.pop()  # avoid too much content assertion on invite line
+        assert not stack
+
+    def test_020_go(self):
+        self.given_argv_tail = '-IP', '1.2.3.4', '-IP', '5.6.7.888'
+        pt = self.expect_success()
+        dct = pt.values
+        self.assertSequenceEqual(dct['IP_addr'], ((1, 2, 3, 4), (5, 6, 7, 888)))
+
+    def given_usage_line(self):
+        return "usage: {{prog_name}} [-IP-addr=IP_ADDRESS]\n"
+
+    def given_parameter_refinements(_):
+        def constrain(token):
+            import re
+            md = re.match(r'^(?P<ting_ting>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$', token)
+            if md:
+                return 'value_constraint_memo', md
+            def reason():
+                yield 'early_stop_reason', 'failed_value_constraint', "IP addy"
+                yield 'stderr_line', "custom line 1\n"
+                yield 'stderr_line', "custom line 2\n"
+                yield 'returncode', 123
+            return 'early_stop', reason
+        def normalize(existing_value, value_constraint_memo, token):
+            _ = value_constraint_memo['ting_ting'].split('.')
+            add_me = tuple(int(s) for s in _)
+            if existing_value:
+                return 'use_value', (*existing_value, add_me)
+            return 'use_value', (add_me,)
+        yield '-IP-addr', (('value_constraint', constrain), ('value_normalizer', normalize))
 
 
 def parse_this_one_term(string, cursor):

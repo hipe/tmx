@@ -311,7 +311,7 @@ class _Stats:
         if 'early_stop' == typ:
             dct = self.early_stops
         else:
-            assert 'parse_tree' == typ
+            assert typ in ('parse_tree', 'stop_parsing')
             dct = self.parse_trees
         dct[i] = pay
 
@@ -339,7 +339,8 @@ class _Stats:
 
 def SEQUENCE_VIA(
         nonpositionals=None, for_interactive=None,
-        positionals=None, subcommands=None):
+        positionals=None, subcommands=None,
+        parameter_refinements=None):
 
     if subcommands and isinstance(subcommands[0], str):
         # until #feat:just-in-time-parse-parsing
@@ -678,7 +679,8 @@ def SEQUENCE_VIA(
     state.state_function = from_beginning_state
     state.parse_tree = _data_classes().parse_tree()
 
-    floating_cloud = _floating_cloud_via_nonpositionals(nonpositionals)
+    floating_cloud = _floating_cloud_via_nonpositionals(
+            nonpositionals, parameter_refinements)
 
     # Peek ahead to the any first positional to see if this matches anything
     if positionals and 'stop_parsing' == positionals[0][0]:
@@ -752,7 +754,7 @@ class _SequenceFacade(_InputReceiverFacade):
         return self._is_for_interactive
 
 
-def _floating_cloud_via_nonpositionals(tup):
+def _floating_cloud_via_nonpositionals(tup, parameter_refinements):
     # The "floating cloud" is an API-private collection of the formal flags and
     # optional_nonpositional's tailor-made for our parsing algorithm. It does:
     #
@@ -764,8 +766,14 @@ def _floating_cloud_via_nonpositionals(tup):
     # See [#608.10] "How we parse the nonpositionals with a floating cloud".
 
     def keys_and_raw_values():
+        if parameter_refinements:
+            assert hasattr(parameter_refinements, '__getitem__')
+            # (for now, assert look like dictionary)
         for sx in (tup or ()):
             assert sx[0] in ('optional_nonpositional', 'flag')
+            if parameter_refinements and sx[1] in parameter_refinements:
+                add_these = parameter_refinements[sx[1]]
+                sx = (*sx, *add_these)
             yield sx[1], sx
         if True:  # (one day, maybe help option will be opt-in)
             yield '--help', ('flag', '--help', ('value_normalizer', _on_help))
@@ -839,12 +847,12 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
         leng = len(founds)
         if 0 == leng:
             def explanation():
-                yield 'early_stop_reason', 'unrecognized_short', f"-{needle}"
+                yield 'early_stop_reason', 'unrecognized_short'
                 yield 'returncode', 69  # #here1
             return explanation, None, None
         if 1 < leng:
             def explanation():
-                yield 'early_stop_reason', 'ambiguous_short', f"-{needle}"
+                yield 'early_stop_reason', 'ambiguous_short'
                 yield 'did_you_mean', founds
                 yield 'returncode', 70  # #here1
             return explanation, None, None
@@ -876,7 +884,7 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
                 line = f"Don't use equals for now: {token!r}\n"
                 yield 'stderr_line', line
                 yield 'returncode', 67  # #here1
-            return explanation
+            return explanation, None, None
 
         # It looks long but it didn't match verbatim
 
