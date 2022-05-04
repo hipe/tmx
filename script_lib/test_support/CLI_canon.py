@@ -86,7 +86,7 @@ def THESE_TWO_CHILDREN_CLI_METHODS():
 
 
 def xx():
-    raise Exception('write me')
+    raise RuntimeError('write me')
 
 
 _eol = '\n'

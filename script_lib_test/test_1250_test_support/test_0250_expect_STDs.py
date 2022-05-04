@@ -416,7 +416,7 @@ class _SingleFailExpecter:  # :#here2
 
     def finish(self):
         if not self.did:
-            raise Exception('did not fail')
+            raise RuntimeError('did not fail')
         return self
 
     do_debug = False  # look like a test case

@@ -42,8 +42,14 @@ def _CLI(sin, sout, serr, argv):
     return 33 if listener.did_error else 0
 
 
-def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):
-    """description: derive abstract schema from recinfo lines"""
+def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):  # 1x
+    """description: derive abstract schema from recinfo lines
+
+    example file: kiss_rdb_test/fixture-directories/2969-rec/0176-recinf-of-previous.lines
+    """
+
+    # only client at writing:
+    #     kiss_rdb/storage_adapters_/rec/abstract_schema_via_recinf.py
 
     # this is here and not in the other file because we want it out of the
     # main flow - this will only be used in development, whereas the other

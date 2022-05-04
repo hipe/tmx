@@ -23,6 +23,7 @@ the related API that preceded this one.)
 
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|---|
+|[#608.21]                  | #open | track CLIs that have known bugs
 |[#608.20]                  |       | track CLIs in the world that use BSD-style options
 |[#608.S]                   | #wish | #feature:just-in-time-parse-parsing
 |[#608.18]                  |       | document about new CLI theory & "engine"

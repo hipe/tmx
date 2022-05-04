@@ -10,7 +10,7 @@ def _CLI(sin, sout, serr, argv):
     def usage_lines():
         yield "usage: {{prog_name}} [lots of primaries defining the model..]\n"  # [#857.13]
         yield "usage: {{prog_name}} -file FILE_WITH_SEXP_LINES\n"  # [#608.20]
-        yield "usage: <output-sexp-lines> | {{prog_name}} -file -\n"  # [#608.20]
+        yield "usage: <output-sexp-lines> | {{prog_name}} -file -\n"  # [#608.20] [#608.21]
 
     from script_lib.via_usage_line import build_invocation
     invo = build_invocation(

@@ -277,7 +277,7 @@ class _ScannedLine:
     def __init__(self, line_s):
         match = self.__class__._THIS_ONE_RE.search(line_s)
         if match is None:
-            raise Exception('assumption failed: was not newline terminated')
+            assert False, f"not newline terminated: {line_s!r}"
         self._match = match
 
         margin_s = self.margin_string
@@ -365,8 +365,11 @@ class _scanner_via_iterator:  # #testpoint
 
 
 def _my_exception(msg):  # #copy-pasted
-    from script_lib import Exception as MyException
-    return MyException(msg)
+    return ExpectTreelikeScreenException(msg)
+
+
+class ExpectTreelikeScreenException(RuntimeError):
+    pass
 
 
 def xx(msg='write me'):

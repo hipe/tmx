@@ -114,22 +114,21 @@ def build_sequence(
         subcommands=None,
         parameter_refinements=None):
 
-    nonpositionals = _expand_nonpositionals(nonpositionals)
-    positionals = _expand_positionals(positionals)
+    def order():
+        yield 'for_interactive', for_interactive
+        if subcommands:
+            for sx in subcommands:
+                yield sx
+        if nonpositionals:
+            for x in nonpositionals:
+                yield _nonpositional_builder()(x)
+        if positionals:
+            f = _build_positional_builder_once_per_grammar()
+            for x in positionals:
+                yield f(x)
 
-    return subject_module().SEQUENCE_VIA(
-            for_interactive=for_interactive,
-            positionals=positionals,
-            nonpositionals=nonpositionals,
-            subcommands=subcommands,
-            parameter_refinements=parameter_refinements)
-
-
-def _expand_nonpositionals(shorthands):
-    if not shorthands:
-        return
-    build_nonpositional = _nonpositional_builder()
-    return tuple(build_nonpositional(s) for s in shorthands)
+    return subject_module().SEQUENCE_VIA_TERM_SEXPS(
+            order(), parameter_refinements)
 
 
 def _nonpositional_builder():
@@ -171,13 +170,6 @@ def _build_nonpositional_builder():
         '(?:[= ](?P<arg_name>-|[A-Z0-9_]+))?'
         '$')
     return nonpositional_via
-
-
-def _expand_positionals(shorthands):
-    if not shorthands:
-        return
-    build_positional = _build_positional_builder_once_per_grammar()
-    return tuple(build_positional(s) for s in shorthands)
 
 
 def _build_positional_builder_once_per_grammar():

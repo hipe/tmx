@@ -3,7 +3,6 @@
 this is #meta-testing
 """
 
-from script_lib import Exception as MyException
 from modality_agnostic.test_support.common import \
         dangerous_memoize as shared_subject, lazy
 import unittest
@@ -162,6 +161,8 @@ class Case0455_these_errors(CommonCase):
             "\tohai\n")
 
     def _expect_this_one_error_from_this_one_line(self, exp_s, input_s):
+        from script_lib.test_support.expect_treelike_screen import \
+                ExpectTreelikeScreenException as MyException
         e = None
         try:
             _tree_via_lines(iter([input_s]))

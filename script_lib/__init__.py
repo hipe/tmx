@@ -1,3 +1,6 @@
+# everything is explained in [#608.18]
+
+
 import re
 
 
@@ -280,7 +283,7 @@ def _rewrite_interactivity_designations(seqs):
         seq = seqs[i]
         if seq.matches_anything:
             match_any.append(i)
-        ynm = seq.for_interactiver()
+        ynm = seq.is_for_interactive
         if ynm is None:
             not_specifieds.append(i)
         elif ynm is True:
@@ -337,14 +340,7 @@ class _Stats:
         return len(self.parse_trees)
 
 
-def SEQUENCE_VIA(
-        nonpositionals=None, for_interactive=None,
-        positionals=None, subcommands=None,
-        parameter_refinements=None):
-
-    if subcommands and isinstance(subcommands[0], str):
-        # until #feat:just-in-time-parse-parsing
-        xx(f"oops change these to sexps: {subcommands!r}")
+def SEQUENCE_VIA_TERM_SEXPS(sexps, parameter_refinements=None):
 
     # States and Transitions
 
@@ -489,7 +485,7 @@ def SEQUENCE_VIA(
             if len(formal_stack) < 2:
                 return
             o = formal_stack[-2]  # o = next formal node
-            return o.is_positional and hasattr(o, 'stop_parsing')
+            return o.is_positional and 'stop_parsing' == o.formal_type  # #here16
         do_stop_parsing = do_stop_parsing()
 
         # If it's a glob, leave the formal on the stack to be used over and over
@@ -538,7 +534,7 @@ def SEQUENCE_VIA(
             ok = True
         if not ok:
             return will_complain_about_wrong_interactivity()
-        formal_stack.pop()
+        # (we used to pop the formal stack here before #history-C.2)
         return find_new_state_per_positionals()
 
     def accept_option_value_and_pop():
@@ -615,10 +611,8 @@ def SEQUENCE_VIA(
         return 'early_stop', explain
 
     def is_interactive_expected_actual():
-        formal_frame = formal_stack[-1]
-        assert 'for_interactiver' == formal_frame[0]
-        boolean_value_reader, = formal_frame[1:]
-        return boolean_value_reader(), state.input_event[1]
+        actual_value, = state.input_event[1:]
+        return facade.is_for_interactive, actual_value
 
     # Matchers
 
@@ -647,7 +641,6 @@ def SEQUENCE_VIA(
 
     def if_interactivity_event():
         return 'is_interactive' == state.input_event_type
-
 
     # State machine mechanics
 
@@ -679,20 +672,32 @@ def SEQUENCE_VIA(
     state.state_function = from_beginning_state
     state.parse_tree = _data_classes().parse_tree()
 
-    floating_cloud = _floating_cloud_via_nonpositionals(
-            nonpositionals, parameter_refinements)
+    add_nonpos_to_cloud, floating_cloud = \
+            _begin_floating_cloud(parameter_refinements)
+
+    if True:  # (one day maybe opt-in)
+        add_nonpos_to_cloud(('flag', '--help', ('value_normalizer', _on_help)))
+
+    itr = _each_next_formal(add_nonpos_to_cloud, state.parse_tree, sexps)
+    formal_stack = _lazy_formal_stack_via_formals(itr)
+
+    # Pop the first formal off the stack now because we need it below
+    def ynm():  # ynm = yes no maybe
+        sx = formal_stack.pop()
+        assert 'for_interactive' == sx[0]
+        ynm, = sx[1:]
+        return ynm
+    ynm = ynm()
 
     # Peek ahead to the any first positional to see if this matches anything
-    if positionals and 'stop_parsing' == positionals[0][0]:
-        mat = positionals[0]
-    else:
-        mat = None
+    def mat():  # mat = match any token
+        if not len(formal_stack):
+            return
+        top = formal_stack[-1]
+        return 'stop_parsing' == top.formal_type and top
+    mat = mat()
 
-    facade = _SequenceFacade(receive_input_event_tuple, for_interactive, mat)
-
-    formal_stack = _lazy_formal_stack(
-            state.parse_tree, positionals, subcommands, facade.for_interactiver)
-
+    facade = _SequenceFacade(receive_input_event_tuple, ynm, mat)
     return facade
 
 
@@ -744,17 +749,14 @@ class _SequenceFacade(_InputReceiverFacade):
             self.term_at_head_for_matches_anything = mat
         else:
             self.matches_anything = False
-        self._is_for_interactive = for_interactive_yes_no_none
+        self.is_for_interactive = for_interactive_yes_no_none
 
     def _become_for_interactive(self):
-        assert self._is_for_interactive is None
-        self._is_for_interactive = True
-
-    def for_interactiver(self):
-        return self._is_for_interactive
+        assert self.is_for_interactive is None
+        self.is_for_interactive = True
 
 
-def _floating_cloud_via_nonpositionals(tup, parameter_refinements):
+def _begin_floating_cloud(parameter_refinements):
     # The "floating cloud" is an API-private collection of the formal flags and
     # optional_nonpositional's tailor-made for our parsing algorithm. It does:
     #
@@ -765,41 +767,61 @@ def _floating_cloud_via_nonpositionals(tup, parameter_refinements):
     #
     # See [#608.10] "How we parse the nonpositionals with a floating cloud".
 
-    def keys_and_raw_values():
-        if parameter_refinements:
-            assert hasattr(parameter_refinements, '__getitem__')
-            # (for now, assert look like dictionary)
-        for sx in (tup or ()):
-            assert sx[0] in ('optional_nonpositional', 'flag')
-            if parameter_refinements and sx[1] in parameter_refinements:
-                add_these = parameter_refinements[sx[1]]
-                sx = (*sx, *add_these)
-            yield sx[1], sx
-        if True:  # (one day, maybe help option will be opt-in)
-            yield '--help', ('flag', '--help', ('value_normalizer', _on_help))
+    if parameter_refinements:
+        assert hasattr(parameter_refinements, '__getitem__')
 
-    def see_key(k):
-        assert k not in seen
-        seen.add(k)
-        if rx.match(k):
-            state.seen_one_BSD_style = True
-        return k
+    def add_nonpos_to_cloud(sx):  # how the client adds to the collection
+        familiar_name = sx[1]
+        if rx_BSD_style.match(familiar_name):
+            fc.seen_one_BSD_style = True
+        if familiar_name in records:
+            xx(f"won't clobber existing nonpositional: {familiar_name!r}")
+        records[familiar_name] = [True, sx]
 
-    state = see_key  # #watch-the-world-burn
-    state.seen_one_BSD_style = False
-    rx = re.compile('^-[a-zA-Z]')
-    seen = set()
+    rx_BSD_style = re.compile('^-[a-zA-Z]')
 
-    use_itr = ((see_key(k), v) for k, v in keys_and_raw_values())
-    dict_like = _dictionary_like_cache(use_itr, _expand_nonpositional)
+    class these:  # used to be dedicated class before #history-C.2
+        def __contains__(_, k):
+            return k in records
 
-    class FloatingCloud:
-        pass
+        def __getitem__(self, k):
+            res = self.get(k)
+            if res is None:
+                raise KeyError(k)
+            return res
 
-    fc = FloatingCloud()
-    for m, f in _floating_cloud_methods(dict_like, state.seen_one_BSD_style):
+        def get(_, k):
+            record = records.get(k)
+            if record is None:
+                return
+            do_expand, nonpos = record
+            if do_expand:
+                nonpos = expand_nonpos(nonpos)
+                record[0] = False
+                record[1] = nonpos
+            return nonpos
+
+        def keys(_):
+            return records.keys()
+
+    these = these()
+
+    def expand_nonpos(sx):  # the formal is only expanded when it's retrieved
+        typ, familiar_name = sx[:2]
+        assert typ in ('optional_nonpositional', 'flag')
+        if parameter_refinements and familiar_name in parameter_refinements:
+            sx = (*sx, *parameter_refinements[familiar_name])
+        return _expand_nonpositional(sx)  # #here4
+
+    class fc:  # fc = floating cloud
+        def __init__(self):
+            self.seen_one_BSD_style = False
+
+    fc = fc()
+    for m, f in _floating_cloud_methods(these, lambda: fc.seen_one_BSD_style):
         setattr(fc, m, f)
-    return fc
+    records = {}
+    return add_nonpos_to_cloud, fc
 
 
 def _on_help(_existing_value):  # value normalizer #here3
@@ -809,7 +831,7 @@ def _on_help(_existing_value):  # value normalizer #here3
     return 'early_stop', early_stop
 
 
-def _floating_cloud_methods(these, seen_one_BSD_style):
+def _floating_cloud_methods(these, seen_one_BSD_styler):
 
     def against(token):  # return (expl, formal, replace_with_token)
         md = re.match(r'^-(?P<is_long>-)?(?P<slug_fragment>.*)$', token)
@@ -819,7 +841,7 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
             return against_long_token(md)
 
         # It looks short..
-        if seen_one_BSD_style:
+        if seen_one_BSD_styler():
             # Under BSD-style parsing, normally we treat every short-looking
             # token as "long" and don't do our fuzzy lookup (right?). But if
             # we do this we don't handle "-h" the idiomatic way. So, special:
@@ -896,7 +918,7 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
 
         if 1 < leng:
             def explanation():
-                yield 'ambiguous_long', founds
+                yield 'early_stop_reason', 'ambiguous_long', founds
                 yield 'returncode', 72  # #here1
         elif 1 == leng:
             use_tok, = founds
@@ -918,51 +940,230 @@ def _floating_cloud_methods(these, seen_one_BSD_style):
 """
 
 
-def _lazy_formal_stack(parse_tree, positionals, subcommands, for_interactiver):
-    # The typical real-world command won't have "many" of these pieces so..
-    # This is similar to #here4 where we build the structures only lazily
-    # See [#608.18] "How we use stacks to parse positional parameters"
-    # and "The order in which term types are processed"
-
-    stack = []
-
-    # Add the positionals first because they'll be the last to be parsed
-    for sx in reversed(positionals or ()):
-        stack.append([True, sx, _Positional])  # "_expand_positional"
-
-    # Add the subcommands next, they are parsed before positionals
-    if subcommands:
-        def expand_subcommand(s):
-            return _expand_subcommand(parse_tree, s)
-        for s in reversed(subcommands):
-            stack.append([True, s, expand_subcommand])
-
-    # Finally, append this
-    stack.append([False, ('for_interactiver', for_interactiver)])
+def _lazy_formal_stack_via_formals(formals):
+    """See [#608.18] "How we use stacks to parse positional parameters"
+    The engine reads the formal positionals list through the "stack" idiom.
+    - Originally the "formal stack" *was* a straightforward stack of formals.
+    - In python we typically use lists in a stack-like way to accomplish stacks.
+    - Now it's streaming and lazy.
+    - To make it "fail fast" just `return list(reversed(formals))` instead
+    """
 
     class LazyFormalStack:
 
         def pop(self):
-            if not len(stack):
+            if buffer_empty():
                 raise IndexError('pop from empty list')
-            res = self[-1]
-            stack.pop()
-            return res
+            return buffer_next()
 
         def __getitem__(self, i):  # the workhorse, the main thing
-            assert -1 == i or -2 == i  # #feat:passive-parsing
-            record = stack[i]
-            if record[0]:
-                record[1] = record.pop()(record[1])
-                record[0] = False
-            return record[1]
+            if buffer_empty():
+                raise IndexError('list index out of range')
+            if -1 == i:
+                return buffer[0]
+            # #feat:passive-parsing requires one more lookahead
+            assert -2 == i
+            return buffer[1]
 
         def __len__(self):
-            return len(stack)
+            return len(buffer)  # USE CAUTION
 
-        REAL_STACK = stack
+    def buffer_next():  # maintain two components of lookahead except when empty
+        res = buffer[0]  # assume buffer not empty
+        leng = len(buffer)
+        if 2 == leng:
+            buffer[0] = buffer[1]
+            formal = next_formal()
+            if formal:
+                buffer[1] = formal
+            else:
+                buffer.pop()
+        else:
+            assert 1 == leng
+            buffer.pop()
+        return res
 
+    def buffer_empty():
+        return 0 == len(buffer)
+
+    def next_formal():
+        return next(formals, None)
+
+    def buffer():
+        if not (formal := next_formal()):
+            return
+        yield formal
+        if not (formal := next_formal()):
+            return
+        yield formal
+    buffer = list(buffer())
     return LazyFormalStack()
+
+
+def _each_next_formal(add_nonpos_to_cloud, parse_tree, sexps):
+    """See [#608.18] "The order in which term types are processed".
+    The FSA below started life as a [#608.17] design in GraphViz. At that
+    time, it seemed like a superfluous amount of code would be required to
+    manage all the noisiness of boring and numerous transitions; so instead
+    we proscribed the required order of term types "by hand" with a
+    "formal formal" stack. Then at #history-C.2 we opted to go with the
+    classic state machine you see here; mainly because of how familiar it is
+    """
+
+    # States & transitions
+
+    def from_beginning_state():
+        yield if_for_interactive, passthru, from_after_for_interactive
+
+    def from_after_for_interactive():
+        yield if_subcommand, expand_subcommand, from_after_subcommand
+        yield if_nonpositional, do_add_nonpos_to_cloud, from_after_nonpos  # #here15
+        yield if_positional, expand_positional, from_after_positional
+        yield if_end, ok_you_ended, None
+
+    def from_after_subcommand():
+        yield if_subcommand, expand_subcommand
+        yield if_nonpositional, do_add_nonpos_to_cloud, from_after_nonpos
+        yield if_positional, expand_positional, from_after_positional
+        yield if_end, ok_you_ended, None
+
+    def from_after_nonpos():
+        yield if_nonpositional, do_add_nonpos_to_cloud
+        yield if_positional, expand_positional, from_after_positional
+        yield if_end, ok_you_ended, None
+
+    def from_after_positional():
+        yield if_positional, expand_positional
+        yield if_end, ok_you_ended, None
+
+    # Actions
+
+    def ok_you_ended():
+        None
+
+    def expand_positional():
+        formal = _Positional(sx)
+        if formal.is_glob:
+            check_positioning_of_glob(formal)
+            state.seen_glob = True
+        elif 'required_positional' == (typ := formal.formal_type):
+            check_positioning_of_reqpos()
+        elif 'optional_positional' == typ:
+            state.seen_optpos = True
+        elif 'stop_parsing' == typ:
+            check_positioning_of_stop()
+            state.seen_stop = True
+        else:
+            xx(typ)
+        state.last_positional = formal
+        return (formal,)
+
+    def check_positioning_of_stop():
+        # The stop can be at the very beginning (Case5950)
+        if from_after_for_interactive == state.state_function:
+            return
+        # If not at beginning, it must be after a positional
+        if from_after_positional != state.state_function:
+            raise ParseParseError_("stop must be at beginning or after positional")
+        if state.last_positional.is_glob:
+            raise ParseParseError_("stop cannot come after glob")
+        if 'required_positional' != state.last_positional.formal_type:
+            raise ParseParseError_("stop must come after `required_positional`")
+        # (below it is asserted that no terms come after a stop)
+
+    def check_positioning_of_glob(formal):
+        if 'optional_glob' == formal.formal_type:
+            return
+        if not state.seen_optpos:
+            return
+        raise ParseParseError_("required glob can't follow optional positional")
+
+    def check_positioning_of_reqpos():
+        if not state.seen_optpos:
+            return
+        raise ParseParseError_("required positional after optional positional")
+
+    def do_add_nonpos_to_cloud():
+        add_nonpos_to_cloud(sx)  # add raw sexp here. expanded at #here4
+        # (because return None, immediately procede to each next nonpos)
+
+    def expand_subcommand():
+        return (_expand_subcommand(parse_tree, sx),)
+
+    def passthru():
+        return (sx,)
+
+    # Matchers
+
+    def if_end():
+        return not sx
+
+    def if_positional():
+        if not sx:
+            return False
+        typ = sx[0]
+        if 'required_positional' == typ:
+            return True
+        if 'optional_positional' == typ:
+            return True
+        if 'required_glob' == typ:
+            return True
+        if 'optional_glob' == typ:
+            return True
+        if 'stop_parsing' == typ:
+            return True  # #EXPERIMENTAL
+
+    def if_nonpositional():
+        if not sx:
+            return False
+        return sx[0] in ('flag', 'optional_nonpositional')
+
+    def if_subcommand():
+        if not sx:
+            return False
+        return 'subcommand' == sx[0]
+
+    def if_for_interactive():
+        return 'for_interactive' == sx[0]
+
+    state = from_beginning_state  # #watch-the-world-burn
+    state.seen_stop = state.seen_glob = state.seen_optpos = False
+    state.last_positional = None
+    state.state_function = from_beginning_state
+
+    sx = True
+    while sx:
+        sx = next(sexps, None)
+        if state.seen_glob and sx:
+            raise ParseParseError_("cannot have terms after glob")
+        if state.seen_stop and sx:
+            raise ParseParseError_("cannot have terms after stop")
+        yes = False
+        for two_or_three in state.state_function():
+            yes = two_or_three[0]()
+            if yes:
+                break
+        if not yes:
+            raise ParseParseError_(_explain_no_transition(sx, state))
+        stack = list(reversed(two_or_three[1:]))
+        action = stack.pop()
+        yield_these = action()
+        if yield_these:
+            for formal in yield_these:
+                yield formal
+        if len(stack):
+            next_state_func, = stack
+            state.state_function = next_state_func
+
+
+def _explain_no_transition(sx, state):
+    what = sx[0] if sx else "end of syntax"
+    from_where = state.state_function.__name__.replace('_', ' ')
+    return f"Can't process {what} {from_where}"
+
+
+
+""":#here15: if it just stayed in state it would be amazing & weird"""
 
 
 # == Support for the foundational formal parameter classes
@@ -1074,13 +1275,13 @@ def _expand_subcommand(parse_tree, sx):
             yield 'returncode', 71  # #here1
         return 'early_stop', explain
 
-    def normalize_and_store(token):  # #here9
+    def normalize(token):  # #here9
         assert literal_value == token
         parse_tree.subcommands.append(literal_value)
 
     return _Positional(('required_positional', None,
             ('value_constraint', constrain),
-            ('value_normalizer', normalize_and_store),
+            ('value_normalizer', normalize),
             ('familiar_name_function', familiar_name)))
 
 
@@ -1093,7 +1294,7 @@ class _Positional:  # #here5
         elif typ in ('optional_glob', 'required_glob'):
             self.is_glob = True
         elif 'stop_parsing' == typ:
-            self.stop_parsing = True
+            pass  # #here16
         else:
             xx(f"is this a positional? not covered yet: {typ!r}")
         self.formal_type = typ
@@ -1265,62 +1466,6 @@ def _finish_parse_tree(pt, do_consume_head_token):
 """
 
 
-def _dictionary_like_cache(keys_and_raw_values, expander):
-    """
-    Dictionary-like lazy-loading cache: construct it with {an iterator of keys
-    and values}, and an "expander". The interface is similar to a dictionary,
-    but rather than resulting in the "raw" values, the result values are the
-    result of the raw value being passed through the "expander" (which is
-    cached). The iterator is traversed fully at construction time. :#here4
-    """
-
-    class DictionaryLikeCache:
-        pass
-
-    dict_like = DictionaryLikeCache()
-    for m, f in _dictionary_like_cache_methods(keys_and_raw_values, expander):
-        if '_' == m[0]:
-            setattr(DictionaryLikeCache, m, f)
-        else:
-            setattr(dict_like, m, f)
-    return dict_like
-
-
-def _dictionary_like_cache_methods(keys_and_raw_values, expander):
-
-    def contains(_, k):
-        return k in records
-
-    yield '__contains__', contains
-
-    def getitem(_, k):
-        res = get(k)
-        if res is None:
-            raise KeyError(k)
-        return res
-
-    yield '__getitem__', getitem
-
-    def get(k):
-        record = records.get(k)
-        if record is None:
-            return
-        do_expand, val = record
-        if do_expand:
-            val = expander(val)
-            record[0] = False
-            record[1] = val
-        return val
-
-    yield 'get', get
-
-    def keys():
-        return records.keys()
-
-    yield 'keys', keys
-
-    records = {k: [True, raw] for k, raw in keys_and_raw_values}
-
 # ==
 
 
@@ -1437,15 +1582,15 @@ def _strings_via_big_string(big_string):
 # (buried `filesystem_functions` and justification documentation #history-B.4)
 
 
+class ParseParseError_(RuntimeError):
+    pass
+
+
 def xx(s='here'):
     raise _exe('cover me: {}'.format(s))
 
 
-_exe = Exception
-
-
-class Exception(Exception):
-    pass
+_exe = RuntimeError
 
 
 # -- CONSTANTS
@@ -1460,6 +1605,7 @@ _eol = '\n'
 to tiny, re-written for API change. Also sunsetted a whole redundant module.
 """
 
+# #history-C.2: refactor to just-in-time parse-parsing
 # #history-C.1: begin "engines of creation" CLI
 # #history-B.4
 # #history-A.5
