@@ -1,0 +1,22 @@
+# Experimental
+
+%rec: Note
+
+Parent: AA
+Ordinal: 1
+Body: N2 (own file) Line 1
++ N2 Line 2
++ N2 Line 3
+
+Parent: AA
+Ordinal: 0
+Body: (own file) Line 1
++ Line 2
++ Line 3
+
+Parent: BB
+Ordinal: 77
+Body: BB Line 1
++ BB Line 2
+
+# #born

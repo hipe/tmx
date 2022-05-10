@@ -77,44 +77,369 @@ def _schema_and_entities_via_lines(lines, listener):
     return None, entities()
 
 
-def NATIVE_RECORDS_VIA_RECSEL(recfile, recsel_args, listener):
+def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
+
+    def retrieve_collection(_, k):
+        if k not in cache:
+            cache[k] = build_collection(k)
+        return cache[k]
+
+    cache = {}
+
+    def build_collection(fent_name):
+        cls = dataclasser()(fent_name)
+        assert cls  # for now (but one day not)
+        recfile = determine_recfile(fent_name)
+
+        @lazy
+        def name_converterer():
+            maybe_two = (renames and renames(fent_name))
+            return _build_name_converter(fent_name, maybe_two)
+
+        return _build_collection(cls, recfile, name_converterer)
+
+    @lazy
+    def dataclasser():
+        return dataclasserer(colz)
+
+    def determine_recfile(fent_name):
+        if main_fent_name == fent_name:
+            return main_recfile
+        return ''.join(derive_recfile_pieces(fent_name))
+
+    def derive_recfile_pieces(fent_name):
+        from os.path import splitext
+        head, ext = splitext(main_recfile)
+        yield head
+        atoms = list(_nccs().atoms_via_camel(fent_name))
+        atoms[-1] = f"{atoms[-1]}s"  # LOOK PLURALIZE
+        for atom in atoms:
+            yield '-'
+            yield atom
+        yield ext
+
+    class Collections:
+        __getitem__ = retrieve_collection
+    colz = Collections()
+    import re
+    return colz
+
+
+def lazy(func):
+    def use():
+        if use.value is None:
+            use.value = func()
+        return use.value
+    use.value = None
+    return use
+
+
+def _build_collection(dataclass, recfile, name_converterer):
+
+    def retrieve_entity(eid, listener=None):
+        if not _identifier_via_string(eid, listener):
+            return
+        return select({'EID': eid}, formal_arity=1, listener=listener)
+
+    def select(kvs=None, formal_arity=None, order_by=None, listener=None):
+        itr = do_select(kvs, order_by, listener)
+        if formal_arity is None:
+            return itr  # LOOK return multiple here
+        assert 1 == formal_arity  # would be fun otherwise
+        ent = next(itr, None)
+        if not ent:
+            _ = repr(kvs)
+            reason = f"expecting one had none from {dataclass.__name__} {_}"
+            return _integrity_error(listener, reason)
+        ent_2 = next(itr, None)
+        if ent_2:
+            xx(f"expecting one had multiple from {dataclass.__name__} {_}")
+        return ent  # LOOK return one here
+
+    def do_select(kvs, order_by, listener):
+        denativizer = denativizerer()
+        _ = recfile_args_via(kvs, order_by)
+        recfile_args = tuple(s for row in _ for s in row)
+        for raw in _native_records_via_recsel(recfile, recfile_args, listener):
+            dct = denativizer(raw)  # ..
+            yield dataclass(**dct)
+
+    def recfile_args_via(kvs, order_by):
+        yield (f'-t{name_converterer().store_record_type}',)
+        if kvs:
+            yield '-e', expression_token_via(kvs)
+        if order_by:
+            store_k = name_converterer().store_key_via_use_key(order_by)
+            yield (f"-S{store_k}",)  # we yield tuples. One token because cute
+
+    def expression_token_via(kvs):
+        return ','.join(expression_token_components(kvs))
+
+    def expression_token_components(kvs):
+        for k, v in kvs.items():
+            store_k = name_converterer().store_key_via_use_key(k)
+            if not re.match(r'^[A-Za-z_]+$', store_k):
+                xx(repr(store_k))
+            if not re.match(r'[A-Za-z0-9_ ]+$', v):
+                xx(f"ugh you need an escape function {v!r}")
+            yield f'{store_k}="{v}"'
+
+    @lazy
+    def denativizerer():
+        return _denativizer_via_dataclass(dataclass, name_converterer)
+
+    import re
+
+    class Collection:
+        def where(_, *args, **kwargs):
+            return select(*args, **kwargs)
+    coll = Collection()
+    coll.retrieve_entity = retrieve_entity
+    return coll
+
+
+"""Introducing "denativizers"
+    "native" records (in functions below) come from storage with:
+    - Each value is an array of the line right-hand-sides
+    - Each component of the array is newline terminated
+    - There's no assurance that your optionality is followed (required fields)
+    The "denativized" record:
+    - "atomic" values are not arrays but single string values (maybe one day etc)
+    - values that should be newline-terminated strings stay that way, else not
+    - assert optionaity (make sure required fields are there)
+    - maybe something about calling the factories that dataclasses have
+    """
+
+
+def _denativizer_via_dataclass(dataclass, name_converterer):
+    from kiss_rdb.magnetics_.abstract_schema_via_definition import \
+            abstract_entity_via_dataclass as func
+    absent = func(dataclass)
+    return _denativizer_via_abstract_entity(absent, name_converterer)
+
+
+def _denativizer_via_abstract_entity(absent, name_converterer):
+
+    def denativize(dct):
+        return {k: v for k, v in do_nativize(dct)}
+
+    def do_nativize(dct):
+        not_seen = {k: None for k in required_use_keys}
+        for native_k, native_v in dct.items():
+            use_k = use_attr_via_native_attr.get(native_k)
+            if not use_k:
+                raise IntegrityError(explain_strange_key(native_k))
+            use_v = attribute_denativizers[use_k](native_v)
+            if use_v is None:
+                continue
+            not_seen.pop(use_k, None)
+            yield use_k, use_v
+        if not not_seen:
+            return
+        xx(f"missing required key(s): {tuple(not_seen.keys())!r}")
+
+    def attribute_denativizers():
+        for fattr in absent.to_formal_attributes():
+            yield fattr.column_name, denativizer_for(fattr)
+
+    def denativizer_for(fattr):
+        def denativize(line_tail_list):
+            if early_factory:
+                return early_factory(line_tail_list)
+            if do_chop:
+                strings = tuple(chop(line) for line in line_tail_list)
+            else:
+                strings = tuple(line_tail_list)
+            if is_plural:
+                return strings
+            one_string, = strings  # assertion
+            if late_factory:
+                return late_factory(one_string)
+            return one_string
+
+        early_factory = None  # placeholder for the idea for now
+        late_factory = None
+        is_plural = False
+        do_chop = True
+        tm = fattr.type_macro
+        use_k = fattr.column_name
+
+        # Derive requiredness from "can be null"
+        if not fattr.null_is_OK:
+            required_use_keys.append(use_k)  # LOOK
+
+        # Derive pluralness (and some normalizers) from type macro
+        if tm.kind_of('text'):
+            pass
+        elif tm.kind_of('tuple'):
+            is_plural = True
+            # EXPERIMENTAL we don't love this
+            # we need to distinguish between body line strings and many atoms
+            if 'tuple' == tm.string:
+                assert do_chop
+            elif 'tuple[str]' == tm.string:
+                do_chop = False
+            else:
+                xx(f"fun: {tm.string!r}")
+        elif tm.kind_of('int'):
+            def late_factory(s):
+                if re.match(r'^\d+$', s):  # ..
+                    return int(s)
+                xx(f"have fun, should be integer: {s!r}")
+            import re
+        else:
+            xx(f"have fun, we anticipate date[time]: {tm.string!r}")
+
+        # Derive store attr key from custom setting or this formula
+        store_k = name_converterer().store_key_via_use_key(use_k)
+        use_attr_via_native_attr[store_k] = use_k  # LOOK
+        return denativize
+
+    def explain_strange_key(native_k):
+        who = name_converterer().store_record_type
+        ks = tuple(use_attr_via_native_attr.keys())
+        return f"Unrecognized store key {native_k!r} for {who}. Expecting {ks!r}"
+
+    def chop(line):
+        assert '\n' == line[-1]
+        return line[:-1]
+
+    use_attr_via_native_attr = {}  # LOOK
+    required_use_keys = []  # LOOK
+    attribute_denativizers = {k: v for k, v in attribute_denativizers()}
+    required_use_keys = tuple(required_use_keys)
+    return denativize
+
+
+def _identifier_via_string(any_string, listener):
+    def use_listener(*emi):
+        if ('error', 'structure') == emi[:2]:
+            reason = emi[-1]()['reason']
+            emi = 'error', 'expression', *emi[2:-1], lambda: (reason,)
+        listener(*emi)
+    from kiss_rdb.magnetics_.identifier_via_string import \
+            identifier_via_string_ as func
+    return func(any_string, use_listener)
+
+
+def _build_name_converter(fent_name, maybe_two):
+
+    def export(func):
+        setattr(export, func.__name__, func)  # #watch-the-world-burn
+        return func
+
+    store_record_type = store_key_via_use_key_dict = None
+    if maybe_two:
+        store_record_type, store_key_via_use_key_dict = maybe_two
+    if store_record_type is None:
+        store_record_type = fent_name
+
+    if store_key_via_use_key_dict:
+        @export
+        def store_key_via_use_key(use_k):
+            if (k := store_key_via_use_key_dict.get(use_k)):
+                return k
+            return _nccs().camel_via_snake(use_k)
+    else:
+        @export
+        def store_key_via_use_key(k):
+            return _nccs().camel_via_snake(k)
+
+    export.store_record_type = store_record_type
+    return export
+
+
+@lazy
+def _nccs():  # nccs = name convention converters
+
+    def export(func):
+        setattr(export, func.__name__, func)  # #watch-the-world-burn
+        return func
+
+    @export
+    def camel_via_snake(snake):
+        atoms = atoms_via_snake(snake)
+        return camel_via_atoms(atoms)
+
+    def snake_via_camel(camel):
+        atoms = atoms_via_camel(camel)
+        return snake_via_atoms(atoms)
+
+    def camel_via_atoms(atoms):
+        _ = ((s[0].upper(), s[1:]) for s in atoms)
+        return ''.join(s for two in _ for s in two)
+
+    @export
+    def atoms_via_camel(camel):
+        assert re.match(f'^(?:[A-Z][a-z]+)+$', camel)
+        humps = re.split('(?<=[a-z])(?=[A-Z])', camel)
+        return (s.lower() for s in humps)
+
+    def snake_via_atoms(atoms):
+        return atoms.join('_')
+
+    def atoms_via_snake(snake):
+        return snake.split('_')
+
+    import re
+    return export
+
+
+def _native_records_via_recsel(recfile, recsel_args, listener):
     with _open_recsel_process(recfile, recsel_args, listener) as lines:
         for rec_dct in _native_records_via_lines(lines, listener):
             yield rec_dct
 
 
-def _native_records_via_lines(lines, listener):
+def _native_records_via_lines(lines, listener):  # #testpoint
     # NOTE this intentionally has known holes in it, holding off until etc
 
     # from text_lib.magnetics.scanner_via import scanner_via_iterator as func
     # scn = func(lines)
 
-    def from_beginning_state():
-        yield if_field_line, move_to_main_state
+    def from_before_record():
+        yield if_field_line, process_field_line, from_inside_record
 
     def from_inside_record():
         yield if_field_line, process_field_line
-        yield if_blank_line, yield_record
+        yield if_additional_line, process_additional_line
+        yield if_blank_line, yield_record, from_before_record
 
     # == matchers
 
     def if_field_line():
-        return not '\n' == line
+        return 'field_line' == line_category
 
     def if_blank_line():
-        return '\n' == line
+        return 'blank_line' == line_category
+
+    def if_additional_line():
+        return 'string_literal_additional_line' == line_category
+
+    def categorize_line():
+        state.colon_offset = None  # meh
+        if '\n' == line:
+            return 'blank_line'
+        if '+' == line[0]:
+            return 'string_literal_additional_line'
+        state.colon_offset = line.index(':')  # also an assertion
+        if True:
+            return 'field_line'
 
     # == actions
 
-    def move_to_main_state():
-        process_field_line()
-        state.current_state = from_inside_record
+    def process_additional_line():
+        arr = state.experimental_mutable_record_dict[
+                state.last_native_field_name]
+        assert '+ ' == line[:2]
+        arr.append(line[2:])
 
     def process_field_line():
-        pos = line.index(':')
+        pos = state.colon_offset
         native_field_name = line[0:pos]
+        state.last_native_field_name = native_field_name
         assert ' ' == line[pos+1]  # ..
-        value_but = line[pos+2:-1]
+        value_but = line[pos+2:]  # LEAVE NEWLINE IN for now #here3
         dct = state.experimental_mutable_record_dict
         if native_field_name in dct:
             arr = dct[native_field_name]
@@ -125,36 +450,51 @@ def _native_records_via_lines(lines, listener):
     def yield_record():
         dct = state.experimental_mutable_record_dict
         state.experimental_mutable_record_dict = {}
-        return 'yield_this', dct
+        return 'yield_this', _finalize_native_record(dct)
 
     state = yield_record  # #watch-the-world-burn
-    state.current_state = from_beginning_state
+    state.state_function = from_before_record
     state.experimental_mutable_record_dict = {}
 
     lineno = 0
     for line in lines:
+        # Categorize line
         lineno += 1
+        line_category = categorize_line()
 
-        found = None
-        for matcher, action in state.current_state():
-            yes = matcher()
-            if not yes:
-                continue
-            found = action
-            break
+        # Find matching transition
+        found = False
+        for two_or_three in state.state_function():
+            found = two_or_three[0]()
+            if found:
+                break
         if not found:
-            nm = state.current_state.__name__
-            xx(f"{nm}, unexpected line: {line!r}")
-        opcode = found()
-        if not opcode:
-            continue
-        directive, data = opcode
-        assert 'yield_this' == directive
-        yield data
+            from_where = state.state_function.__name__.replace('_', ' ')
+            xx(f"{from_where} had unexpected line: {line!r}")
+        action, *rest = two_or_three[1:]
+        if rest:
+            next_state_function, = rest
+        else:
+            next_state_function = None
+
+        # Do the action
+        opcode = action()
+        if opcode:
+            directive, data = opcode
+            assert 'yield_this' == directive
+            yield data
+
+        # Change the state (if any)
+        if rest:  # (next state might be None):
+            state.state_function = next_state_function
 
     # Not great, but meh:
     if len(state.experimental_mutable_record_dict):
-        yield state.experimental_mutable_record_dict
+        yield _finalize_native_record(state.experimental_mutable_record_dict)
+
+
+def _finalize_native_record(dct):
+    return dct  # this is a placeholder. we came up with "denativize" here
 
 
 class _MinimalIdentitylessEntity:
@@ -433,6 +773,11 @@ def _open_recsel_process(recfile, recsel_args, listener):
         from contextlib import nullcontext
         return nullcontext(recfile)
 
+    if listener:
+        def express():
+            yield f"recsel {' '.join(recsel_args)} {recfile}"
+        listener('info', 'expression', 'sending_recsel', express)
+
     import subprocess as sp
     proc = sp.Popen(
         args=('recsel', *recsel_args, recfile),
@@ -484,7 +829,7 @@ def _open_recsel_process(recfile, recsel_args, listener):
                 if rc_is_ok:
                     return
                 yield f"(exitstatus: {rc})"
-            listener('error', 'expression', 'recsel_failure', lineser)
+            (listener or _eek)('error', 'expression', 'recsel_failure', lineser)
 
         def __exit__(self, *_):
             if self.did_terminate:
@@ -502,6 +847,22 @@ def CREATE_COLLECTION(collection_path, listener, is_dry, opn=None):
 
 
 # ==
+
+
+def _integrity_error(listener, reason):
+    if not listener:
+        raise IntegrityError(reason)
+    listener('error', 'expression', 'integrity_error', lambda: (reason,))
+
+
+def _eek(*emi):
+    assert 'expression' == emi[1]
+    raise IntegrityError(next(emi[-1]()))
+
+
+class IntegrityError(RuntimeError):
+    pass
+
 
 def _scnlib():
     from text_lib.magnetics import scanner_via as module

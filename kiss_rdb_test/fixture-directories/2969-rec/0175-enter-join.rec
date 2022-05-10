@@ -1,11 +1,19 @@
 # google "standard linux terminal size", answer: 80x24 (or 1920 characters)
 
-%rec: Cappo
+%rec: NativeCapability
 %type: Label line
 %key: ID
 
 Label: Wazoo Fazoo
 ID: AA
+Child: DD
+Child: EE
+
+Label: Dazoo Gazoo
+ID: DD
+
+Label: Egads Feegads
+ID: EE
 
 %rec: Note
 %mandatory: Parent
@@ -13,7 +21,7 @@ ID: AA
 %mandatory: Body
 %allowed: FruFru
 %mandatory: Ordinal FroFro
-%type: Parent rec Cappo
+%type: Parent rec NativeCapability
 %type: Ordinal int
 %typedef: Paragraph_t size 1920
 %type: Body Paragraph_t

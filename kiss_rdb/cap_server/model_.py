@@ -1,115 +1,77 @@
 # (remember that longterm we don't want to do it this way)
-
-from dataclasses import dataclass
-from random import random as _random_float  # for now
+"""LOOK
 
 
-_main_record_type = 'NativeCapability'
 
+"""
+
+# == Public API functions
 
 def RETRIEVE_ENTITY(recfile, EID, listener):
-
-    def use_listener(*emi):
-        if 'expression' == emi[0]:
-            return listener(*emi)
-        chan = emi[0:-1]
-        if ('error', 'structure', 'input_error') == chan:
-            dct = emi[-1]()
-            s = dct['reason']
-            return listener('error', 'expression', 'input_error', lambda: (s,))
-        return listener(*emi)  # meh
-
-    from kiss_rdb.magnetics_.identifier_via_string import \
-            identifier_via_string_ as func
-    iden = func(EID, use_listener)
-    if not iden:
-        return
-    del iden
-
-    itr = _structures_via_recsel(
-            recfile, listener, '-t', _main_record_type, '-e', f'ID="{EID}"')
-    first = None
-    for first in itr:
-        break
-
-    # Maybe it wasn't found
-    if not first:
-        def lineser():
-            yield f"not found: {EID!r}"
-        listener('error', 'expression', "entity_not_found", lineser)
-        return
-
-    # Maybe multiple were found (integrity error)
-    second = None
-    for second in itr:
-        break
-    if second:
-
-        # exhaust the traversal to close the process :/
-        count = 2
-        for _ in itr:
-            count += 1
-
-        def lineser():
-            yield f"{count} entities with same EID: {EID!r}"
-        listener('error', 'expression', 'multiple_entities_found', lineser)
-        return
-
-    return first
+    return _collection(recfile, 'Capability').retrieve_entity(EID, listener)
 
 
 def TRAVERSE_COLLECTION(recfile, listener):
-    return _structures_via_recsel(recfile, listener, '-t', _main_record_type)
+    return _collection(recfile, 'Capability').where(listener=listener)
 
 
-def _structures_via_recsel(recfile, listener, *recfile_args):  # #testpoint
-
-    def lineser():
-        yield f"\n\nrecsel {' '.join(recfile_args)} {recfile}\n\n\n"
-
-    if listener:
-        listener('info', 'expression', 'sending_recsel', lineser)
-
-    Capability = _build_EXPERIMENTAL_capability_class(recfile)
-
-    from kiss_rdb.storage_adapters_.rec import NATIVE_RECORDS_VIA_RECSEL as func
-    for rec in func(recfile, recfile_args, listener):
-        eid, = rec.pop('ID')
-        label, = rec.pop('Label')
-        native_URL, = rec.pop('NativeURL', (None,))
-        children = rec.pop('Child', None)
-        if children:
-            children = tuple(children)
-        if len(rec):
-            xx(f"handle this/these field(s): ({' '.join(rec.keys())})")
-        assert not rec
-        yield Capability(label, eid, native_URL, children)
+def _collection(main_recfile, formal_entity_name):
+    return _lazy_collection(main_recfile)[formal_entity_name]
 
 
-def _build_EXPERIMENTAL_capability_class(recfile):
+def _lazy_collection(main_recfile):
+    def dataclasserer(colz):
+        # If you ever feel that the model is "too big" to load all the model
+        # every time any dataclass is needed, we can complicate this
+        return _build_datamodel(colz).__getitem__
 
-    class Capability(_Capability):
-        def __init__(self, *rest):
-            super().__init__(*rest)
+    def renames(fent_name):
+        if 'Capability' == fent_name:
+            return ('NativeCapability', {'EID': 'ID', 'children_EIDs': 'Child'})
+        if 'Note' == fent_name:
+            return (None, {'body_lines': 'Body'})
+    from kiss_rdb.storage_adapters_.rec import LAZY_COLLECTIONS as func
+    colz = func(main_recfile, 'Capability', dataclasserer, renames)
+    return colz
+
+
+def _build_datamodel(collections):
+    export = _build_exporter()
+    from dataclasses import dataclass
+
+    @export
+    @dataclass
+    class Capability:
+        label: str
+        EID: str
+        native_URL: str = None
+        children_EIDs: tuple = ()
 
         def RETRIEVE_NOTES(self, listener):
-            recfile
-            yield _Note("I am Note One")
-            yield _Note("I am Note Two")
+            return collections['Note'].where(
+                {'parent': self.EID}, order_by='ordinal', listener=listener)
 
-    return Capability
+        @property
+        def implementation_state(_):
+            return random_implementation_state()
+
+    random_implementation_state = _build_randomer()
+
+    @export
+    @dataclass
+    class Note:
+        parent: str
+        ordinal: int
+        body: tuple[str]
+
+    return export.dictionary
 
 
-@dataclass
-class _Capability:
-    label: str
-    EID: str
-    native_URL: str
-    children: tuple
+# == Support (& Legacy - kept in position for history)
 
-    @property
-    def implementation_state(self):
-        f = _random_float()
+def _build_randomer():
+    def random_implementation_state():
+        f = random_float()
         if f < 0.30:
             return
         if f < 0.55:
@@ -118,14 +80,24 @@ class _Capability:
             return 'wont_implement_or_not_applicable'
         return 'is_implemented'
 
+    from random import random as random_float
+    return random_implementation_state
 
-class _Note:
-    def __init__(self, body):
-        self.body = body
+
+def _build_exporter():
+    def export(class_or_function):
+        k = class_or_function.__name__
+        assert k not in dct
+        dct[k] = class_or_function
+        return class_or_function
+    dct = {}
+    export.dictionary = dct
+    return export
 
 
 def xx(msg=None):
     raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
+# #history-C.2 enter "via dataclass"
 # #history-C.1 changed main model class from namedtuple to dataclass
 # #born

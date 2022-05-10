@@ -283,6 +283,80 @@ class _MyColDef:
         self.parent_column_name = parent_col_name
 
 
+# == via dataclass
+
+def abstract_entity_via_dataclass(dataclass):
+    def each_column():
+        for fie in dc.fields(dataclass):
+            yield func(fie)
+    _ = _functions_for_abstract_attribute_via_dataclass_field()
+    func = _['abstract_attribute_via_dataclass_field']
+    import dataclasses as dc
+    return abstract_table_via_name_and_abstract_columns(
+            dataclass.__name__, each_column(), listener=None)
+
+
+def _functions_for_abstract_attribute_via_dataclass_field():
+    memo = _functions_for_abstract_attribute_via_dataclass_field
+    if not memo.value:
+        memo.value = \
+            _define_functions_for_abstract_attribute_via_dataclass_field()
+    return memo.value
+
+
+_functions_for_abstract_attribute_via_dataclass_field.value = None
+
+
+def _define_functions_for_abstract_attribute_via_dataclass_field():
+    export = _build_exporter()
+
+    @export
+    def abstract_attribute_via_dataclass_field(fie):
+        kwargs = {k:v for k, v in kwargs_via_dataclass_field(fie)}
+        col_name = kwargs.pop('column_name')
+        return abstract_column_via(col_name, **kwargs)
+
+    def kwargs_via_dataclass_field(fie):
+        # The property name would make a fine field name (probably)
+        yield 'column_name', fie.name
+
+        # Requiredness is determined by the presence of default
+        # (if it has a default [factory], null is OK (hrm))
+        if none == fie.default:
+            if none == fie.default_factory:
+                yield 'null_is_OK', False
+            else:
+                yield 'null_is_OK', True
+        else:
+            yield 'null_is_OK', True
+
+        # Convert frequently (ugh) used python types to type macro types
+        yield 'type_macro', type_macro_via_python_type(fie.type)
+
+    def type_macro_via_python_type(typ):
+        if str == typ:
+            return 'text'
+        if tuple == typ:
+            return 'tuple'
+        if int == typ:
+            return 'int'
+        from types import GenericAlias
+        if not isinstance(typ, GenericAlias):
+            xx(f"have fun: {typ!r}")
+        md = re.match(r'^tuple\[(?P<which>str)\]$', str(typ))
+        if not md:
+            xx(f'huh interesting: {typ}')
+        assert 'str' == md['which']
+
+        # LOOK big experiment EXPERIMENTAL
+        tm = type_macro_('tuple')
+        return tm.__class__(ancestors=(*tm._ancestors, str(typ)))
+
+    from dataclasses import MISSING as none
+    import re
+    return export.dictionary
+
+
 # == Schema diff
 
 def _schema_diff(left_tables, right_tables):
@@ -559,6 +633,12 @@ class _AbstractTable:
                 yield line
         yield f'{margin})\n'
 
+    def __getitem__(self, k):
+        return self._columns[k]
+
+    def TO_ATTRIBUTE_KEYS(self):
+        return self._columns.keys()
+
     def to_columns(self):
         return self._columns.values()
 
@@ -723,6 +803,7 @@ def _define_type_macro_function():
     cache = {}
 
     parent_of = {}
+    parent_of['tuple'] = None
     parent_of['paragraph'] = 'text'
     parent_of['line'] = 'text'
     parent_of['text'] = None
@@ -764,6 +845,21 @@ type_macro_ = _define_type_macro_function()
 
 # ==
 
+def _build_exporter():
+    class export:
+        def __call__(_, asset):
+            k = asset.__name__
+            assert k not in dct
+            dct[k] = asset
+            return asset
+
+        @property
+        def dictionary(_):
+            return dct
+    dct = {}
+    return export()
+
+
 def _build_throwing_listener(listener, stop):
     def tlistener(sev, *rest):
         listener(sev, *rest)
@@ -785,6 +881,7 @@ class _Stop(RuntimeError):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #history-C.2: enter via dataclass
 # #history-C.1: enter type macro
 # #history-B.5
 # #history-B.4 spike "via graph viz lines"

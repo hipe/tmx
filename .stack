@@ -26,6 +26,9 @@ Do something with the idea of autobleed: its time has come (see nearby chat)
 Have it so when you save python files it uses PEP8 or whatever
 Figure out the right way to configure vim in a per-file way
 You could do the "analogs" project.
+Imagine clicking up to parent from VIEW
+Imagine clicking into children from VIEW
+Eventually you'll have to assemble that URL
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)

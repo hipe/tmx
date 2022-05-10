@@ -1,8 +1,13 @@
+def _childrener(o):
+    return o.children
+
+
 def lines_via_tree_dictionary(
         dct,
         branch_node_opening_line_by,
         leaf_node_line_by,
         branch_node_closing_line_string,
+        childrener=_childrener,
         listener=None, root_node_EID=None, indent=2):
 
     # Emit a notice if there are no nodes at all
@@ -15,13 +20,13 @@ def lines_via_tree_dictionary(
 
     # Emit a notice if the root node has no children
     root_node = dct[root_node_EID]
-    if not root_node.children:
+    if not childrener(root_node):
         msg = 'root tree has no children'
         listener('notice', 'expression', 'empty_tree', lambda: (msg,))
         return
 
     def lines_from_recursing_into_this_branch_node(bnode, depth):
-        some_cx_eids = bnode.children
+        some_cx_eids = childrener(bnode)
         assert some_cx_eids
         ch_depth = depth + 1
         my_indent_string = margin_via_depth(depth)
@@ -32,7 +37,7 @@ def lines_via_tree_dictionary(
 
         for eid in some_cx_eids:
             ch_node = dct[eid]
-            child_is_leaf = not ch_node.children
+            child_is_leaf = not childrener(ch_node)
             if child_is_leaf:
                 tail = leaf_node_line_by(ch_node, ch_depth)
             else:
@@ -61,7 +66,7 @@ def lines_via_tree_dictionary(
     return lines_from_recursing_into_this_branch_node(root_node, depth=0)
 
 
-def tree_dictionary_via_tree_nodes(scts, listener):
+def tree_dictionary_via_tree_nodes(scts, childrener=_childrener, listener=None):
     # (this doesn't do anything interesting except validate the refs
     # and put it all into a dictionary.)
 
@@ -73,7 +78,7 @@ def tree_dictionary_via_tree_nodes(scts, listener):
             xx(f"collision, redefined {eid!r}")
         fwd_refs.pop(eid, None)
         recs[eid] = rec
-        for ch_eid in (rec.children or ()):
+        for ch_eid in (childrener(rec) or ()):
             # #todo: this seems like a bug: if the original collection
             # isn't already in pre-order, you will be incorrectly calling
             # something a fwd ref when it is already defined and it will

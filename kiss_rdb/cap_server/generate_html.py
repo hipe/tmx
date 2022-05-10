@@ -234,7 +234,7 @@ def _inner_html_lines_for_view(ent, listener):
     yield f"<tr><th>Label</th><td>{h(ent.label)}</td></tr>\n"
     yield f"<tr><th>ID</th><td>{h(ent.EID)}</td></tr>\n"
     pcs = []
-    itr = iter(ent.children or ())
+    itr = iter(ent.children_EIDs or ())
     first = next(itr, None)
     if first:
         pcs.append(h(first))
@@ -248,13 +248,21 @@ def _inner_html_lines_for_view(ent, listener):
     itr = ent.RETRIEVE_NOTES(listener)
     if itr:
         for note in itr:
-            yield f"<tr><th>note</th><td>{_html_escape(note.body)}</td></tr>\n"
-    yield "</table>\n"
+            yield '<tr><th>note</th><td>\n'
+            for line in note.body:
+                # We haven't decided what the semantics are here
+                if False:
+                    yield _html_escape(line)
+                else:
+                    escaped = _html_escape(line[:-1])
+                    yield f'{escaped}</br>\n'  # super cute EXPERIMENTAL
+            yield '</td></tr>\n'
+    yield '</table>\n'
 
 
 def _inner_html_lines_for_table(recs_itr, listener):
     from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
-    tree_dct = func(recs_itr, listener)
+    tree_dct = func(recs_itr, _childrener, listener)
 
     if 0 == len(tree_dct):
         return  # ..
@@ -287,7 +295,7 @@ def _inner_html_lines_for_table(recs_itr, listener):
         branch_node_opening_line_by=table_row_for,
         branch_node_closing_line_string=None,
         leaf_node_line_by=table_row_for,
-        indent=0,
+        indent=0, childrener=_childrener,
         listener=listener)
 
     if not lines:
@@ -301,7 +309,7 @@ def _inner_html_lines_for_table(recs_itr, listener):
 
 def _inner_html_lines_for_tree(recs_itr, listener):
     from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
-    tree_dct = func(recs_itr, listener)
+    tree_dct = func(recs_itr, _childrener, listener)
     if 0 == len(tree_dct):
         return  # ..
 
@@ -332,6 +340,10 @@ def _inner_html_lines_for_tree(recs_itr, listener):
     for line in lines:
         yield line
     yield branch_node_closing_line_string
+
+
+def _childrener(node):
+    return node.children_EIDs
 
 
 def _impl_state_html(rec):

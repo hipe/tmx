@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import dataclass
 
 
 class CommonCase(unittest.TestCase):
@@ -6,8 +7,7 @@ class CommonCase(unittest.TestCase):
     def expect_expected_lines(self):
         subject_func = subject_module().lines_via_tree_dictionary
         arg_lines = self.given_recfile_lines()
-        from kiss_rdb.cap_server.model_ import _structures_via_recsel as func
-        recs_itr = func(arg_lines, listener=None)
+        recs_itr = my_records_via_lines(arg_lines)
         from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
         tree_dct = func(recs_itr, listener=None)
         actual_lines = subject_func(
@@ -80,6 +80,52 @@ def unindent(big_string):
 unindent.f = None
 
 
+# == BEGIN our own "denativizer"
+#    denativization is out of scope for this level of testing
+
+def my_records_via_lines(lines):
+    from kiss_rdb.storage_adapters_.rec import \
+            _native_records_via_lines as func1
+    native_recs = func1(lines, listener=None)
+    return (my_rec_via_native_rec(rec) for rec in native_recs)
+
+
+def my_rec_via_native_rec(dct):
+    use = {}
+    use['label'] = one(dct.pop('Label'))
+    use['EID'] = one(dct.pop('ID'))
+    use['children'] = many(dct.pop('Child', None))
+    assert not dct
+    return MyRec(**use)
+
+
+def one(lines):
+    assert 1 == len(lines)
+    res, = many(lines)
+    return res
+
+
+def many(lines):
+    if lines is None:
+        return None
+    return tuple(do_many(lines))
+
+
+def do_many(lines):
+    for line in lines:
+        assert '\n' == line[-1]
+        yield line[:-1]
+
+
+@dataclass
+class MyRec:
+    label:str
+    EID:str
+    children:tuple = None
+
+# == END
+
+
 def subject_module():
     from kiss_rdb import tree_toolkit as mod
     return mod
@@ -88,4 +134,5 @@ def subject_module():
 if __name__ == '__main__':
     unittest.main()
 
+# #history-C.1 hand-written denativization not business model
 # #born
