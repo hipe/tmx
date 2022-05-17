@@ -32,5 +32,11 @@ Eventually you'll have to assemble that URL
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
+Show summary of number of notes per capability with big custom thing in tree view
 Integrate everything and write new stuff to have notes form
+Gonna need to validate rectangle of text lol
+Rearchitect (somehow) to support redirects
+Solve the encoding problem - see if you can just escape double quotes. else file
 Expose recutils CREATE & UPDATE
+Expose recutils UPDATE
+Expose recutils CREATE

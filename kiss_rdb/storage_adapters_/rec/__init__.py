@@ -96,7 +96,7 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
             maybe_two = (renames and renames(fent_name))
             return _build_name_converter(fent_name, maybe_two)
 
-        return _build_collection(cls, recfile, name_converterer)
+        return _build_collection(recfile, cls, name_converterer, colz)
 
     @lazy
     def dataclasser():
@@ -134,7 +134,12 @@ def lazy(func):
     return use
 
 
-def _build_collection(dataclass, recfile, name_converterer):
+def _build_collection(recfile, dataclass, name_converterer, colz):
+
+    def create_entity(params, listener=None, is_dry=False):
+        from kiss_rdb.storage_adapters_.rec._create_and_update import \
+                CREATE_ENTITY_ as func
+        return func(params, coll, colz, listener, is_dry)
 
     def retrieve_entity(eid, listener=None):
         if not _identifier_via_string(eid, listener):
@@ -193,8 +198,20 @@ def _build_collection(dataclass, recfile, name_converterer):
     class Collection:
         def where(_, *args, **kwargs):
             return select(*args, **kwargs)
+
+        @property
+        def name_converter(_):
+            return name_converterer()
+
+        @property
+        def fent_name(self):
+            return dataclass.__name__
     coll = Collection()
+    coll.create_entity = create_entity
     coll.retrieve_entity = retrieve_entity
+    coll.recfile = recfile
+    coll.dataclass = dataclass
+    coll.name_converterer = name_converterer
     return coll
 
 
@@ -324,29 +341,31 @@ def _identifier_via_string(any_string, listener):
 
 def _build_name_converter(fent_name, maybe_two):
 
-    def export(func):
-        setattr(export, func.__name__, func)  # #watch-the-world-burn
-        return func
-
-    store_record_type = store_key_via_use_key_dict = None
+    typ = dct = None
     if maybe_two:
-        store_record_type, store_key_via_use_key_dict = maybe_two
-    if store_record_type is None:
-        store_record_type = fent_name
+        typ, dct = maybe_two
 
-    if store_key_via_use_key_dict:
-        @export
-        def store_key_via_use_key(use_k):
-            if (k := store_key_via_use_key_dict.get(use_k)):
+    def downwards_normally(use_k):
+        return _nccs().camel_via_snake(use_k)
+
+    if dct:
+        def downwards(use_k):
+            if (k := dct.get(use_k)):
                 return k
-            return _nccs().camel_via_snake(use_k)
+            return downwards_normally(use_k)
     else:
-        @export
-        def store_key_via_use_key(k):
-            return _nccs().camel_via_snake(k)
+        downwards = downwards_normally
 
-    export.store_record_type = store_record_type
-    return export
+    class name_converter:
+        def custom_renames_use_and_store_(_):
+            return dct.items() if dct else ()
+        @property
+        def name_convention_converters_(_):
+            return _nccs()
+    nc = name_converter()
+    nc.store_key_via_use_key = downwards
+    nc.store_record_type = fent_name if typ is None else typ
+    return nc
 
 
 @lazy
@@ -361,6 +380,7 @@ def _nccs():  # nccs = name convention converters
         atoms = atoms_via_snake(snake)
         return camel_via_atoms(atoms)
 
+    @export
     def snake_via_camel(camel):
         atoms = atoms_via_camel(camel)
         return snake_via_atoms(atoms)
@@ -376,7 +396,7 @@ def _nccs():  # nccs = name convention converters
         return (s.lower() for s in humps)
 
     def snake_via_atoms(atoms):
-        return atoms.join('_')
+        return '_'.join(atoms)
 
     def atoms_via_snake(snake):
         return snake.split('_')

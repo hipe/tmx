@@ -454,6 +454,9 @@ class _AbstractSchema:
                 yield line
         yield ')\n'
 
+    def __getitem__(self, k):
+        return self._tables[k]
+
     def to_tables(self):
         return self._tables.values()
 
@@ -820,6 +823,10 @@ def _define_type_macro_function():
             if type_string in parent_of:
                 return False
             xx(f"oops: not a type in the type macro tree: {type_string!r}")
+
+        def __eq__(self, otr):
+            assert isinstance(otr, self.__class__)
+            return self._ancestors == otr._ancestors
 
         @property
         def string(self):

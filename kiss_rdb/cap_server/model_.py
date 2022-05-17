@@ -7,6 +7,10 @@
 
 # == Public API functions
 
+def CREATE_ENTITY(recfile, fent, params, listener):
+    return _collection(recfile, fent).create_entity(params, listener)
+
+
 def RETRIEVE_ENTITY(recfile, EID, listener):
     return _collection(recfile, 'Capability').retrieve_entity(EID, listener)
 
