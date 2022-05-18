@@ -1,5 +1,4 @@
-def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
-    """ALL EXPERIMENTAL
+"""ALL EXPERIMENTAL
 
     Since we're writing this *in order to* be able to accumulate our reading
     notes on recutils, we're allowing it to be messy with this hybrid approach:
@@ -14,7 +13,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
     our ORM-ish; we found it convenient to have dataclasses, and soon we
     discovered the PRO's of dataclasses over `recinf`:
 
-    - performance: one less process to open for each operation
+    - performance: one less process to open for those operations that don't
+      need the information `recinf` can give us
     - power: we can extend our conventions arbitrarily because we own the design
     - familiarity: we (personally) know python well so it's easier to read
 
@@ -29,6 +29,172 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
     merely gathering notes.
     """
 
+
+def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
+    """UPDATE differs from CREATE in these key ways:
+
+    - Requires an EID (maybe one day an identifying expression or "compound PK")
+    - No defaulting, no VALUE_FACTORIES
+    - The parameters structure isn't simply key-value pairs, it's directives,
+      which can fail in interesting ways
+    - Dry run isn't as pretty because vendor does not simply output lines
+
+    As we write it, we discover it's made subtly, sublimely more complicated
+    by some of these vendor behaviors:
+
+    - You must correctly distinguish between changing existing value vs
+      creating a value for an attribute that wasn't already there
+    - If you don't, it fails silently
+    - With a set of arbitrary form values coming down from the client, after it
+      passes the ALLOW_LIST, the question does not intuitively answer itself
+      of what to do with the set difference: Does a form value not passed imply
+      "DELETE_EXISTING_ATTRIBUTE" or leave existing value alone? It seems like
+      we *want* meaningful empty values here to come from the form explicitly,
+      else fail. I.E. the whole ALLOW_LIST becomes REQUIREDS in its way.
+
+    Row 1: "Will it work if the attribute is NOT already set?"
+    Row 2: "Will it work if the attribute IS already set?"
+
+    | Our Directive Name            | 1 | 2 | Vendor Oper. & Other Impl. Strat
+    |-------------------------------|---|---|---------------------------------
+    | SET_ATTRIBUTE                 | Y | Y | --add or --set depending
+    | UPDATE_ATTRIBUTE              | N | Y | --set (must already be set)
+    | CREATE_ATTRIBUTE              | Y | N | --add (be careful)
+    | DELETE_ANY_EXISTING_ATTRIBUTE | Y | Y | (imagined feature) (etc)
+    | DELETE_EXISTING_ATTRIBUTE     | N | Y | --delete (must already be set)
+    (:#here8)
+    """
+
+    def main():
+        derive_ALLOW_LIST_from_three_sources()
+        determine_any_UNEXPECTEDS_and_strange_directives()
+        validate_and_prepare_directives()
+        put_the_prepared_directives_in_formal_order()
+        send_it_back_to_recset()
+        return True  # should have thrown a stop on failure
+
+    def send_it_back_to_recset():
+        _send_it_back_to_recset(
+                state.primary_key_field_name, EID,
+                state.ordered_prepared_directives, coll, tlistener, is_dry)
+
+    def put_the_prepared_directives_in_formal_order():
+        dct = {k: direc for k, direc in do_formalize_parameter_order()}
+        state.ordered_prepared_directives = dct
+
+    def do_formalize_parameter_order():
+        unordered_but_prepared = state.unordered_but_prepared
+        delattr(state, 'unordered_but_prepared')
+        for (_, use_col) in state.BOTH:
+            use_k = use_col.column_name
+            if use_k in unordered_but_prepared:
+                yield use_k, unordered_but_prepared.pop(use_k)
+        assert not unordered_but_prepared
+
+    def validate_and_prepare_directives():
+        # _sanity_check_identifier(EID)  # or etc
+        existing_entity = coll.retrieve_entity(EID, tlistener)
+        # (the above validates the identifeir string :#here7)
+        assert existing_entity  # else it would have thrown b.c. tlistener
+        itr = _prepare_directives(existing_entity, param_direcs, tlistener)
+        unexpecteds = next(itr)
+        use_direcs = {k: direc for k, direc in itr}  # populates unexpecteds
+        if unexpecteds:
+            _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
+        state.unordered_but_prepared = use_direcs
+
+    def determine_any_UNEXPECTEDS_and_strange_directives():
+        add_unexpected, unexpecteds = _build_unexpecteds()
+        ALLOW = state.ALLOW_LIST
+        for k, direc in param_direcs.items():
+            if k not in ALLOW:
+                add_unexpected('unrecognized', k)
+                continue
+            # (unlike in CREATE, we allow the setting of
+            typ = direc[0]
+            num = None  # :#here5:
+            if 'SET_ATTRIBUTE' == typ:
+                num = 2
+            elif 'UPDATE_ATTRIBUTE' == typ:
+                num = 3
+            elif 'CREATE_ATTRIBUTE' == typ:
+                num = 2
+            elif 'DELETE_EXISTING_ATTRIBUTE' == typ:
+                num = 1
+            if num is None:
+                add_unexpected(f"unrecognized directive {typ!r}", k)
+            elif num != len(direc):
+                exp_act = f"(need {num} had {len(direc)})"
+                add_unexpected(f"Wrong number for {typ!r} {exp_act}", k)
+        if unexpecteds:
+            _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
+
+    def derive_ALLOW_LIST_from_three_sources():
+        o = _build_BOTH(coll, tlistener)
+        state.ALLOW_LIST = o.ALLOW_LIST
+        # ignoring VALUE_FACTORIES for now
+        state.BOTH = o.BOTH
+        state.primary_key_field_name = o.primary_key_field_name
+
+    state = main
+    stop = _Stop
+    tlistener = _build_throwing_listener(listener, stop)
+
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def _prepare_directives(existing_entity, param_direcs, tlistener):
+    # (implementing this directly from the table #here8)
+    add_unexpected, unexpecteds = _build_unexpecteds()
+    yield unexpecteds  # #promise
+    for use_k, direc in param_direcs.items():
+        existing_value = None
+        x = getattr(existing_entity, use_k)  # wee no default
+        if _value_is_considered_to_be_set(x):
+            already_set = True
+            existing_value = x
+        else:
+            already_set = False
+            del existing_value
+        typ = direc[0]
+        if 'SET_ATTRIBUTE' == typ:
+            new_val, = direc[1:]
+            if already_set:
+                yield use_k, ('UPDATE_ATTRIBUTE', existing_value, new_val)
+            else:
+                yield use_k, ('CREATE_ATTRIBUTE', new_val)
+        elif 'UPDATE_ATTRIBUTE' == typ:
+            if already_set:
+                yield use_k, direc  # passthru
+            else:
+                add_unexpected(use_k, "must already be set but wasn't")
+        elif 'CREATE_ATTRIBUTE' == typ:
+            if already_set:
+                add_unexpected(use_k, "cannot create because already set")
+            else:
+                yield use_k, direc  # passthru
+        elif 'DELETE_ANY_EXISTING_ATTRIBUTE' == typ:
+            if already_set:
+                yield use_k, ('DELETE_EXISTING_ATTRIBUTE', existing_value)
+            else:
+                pass  # do nothing, it's already not set
+        else:
+            assert 'DELETE_EXISTING_ATTRIBUTE' == typ
+            leng = len(direc)  # we don't know if we want to require the safety
+            assert leng in range(1, 3)
+            if already_set:
+                if 2 == leng:
+                    yield use_k, direc
+                else:
+                    yield use_k, ('DELETE_EXISTING_ATTRIBUTE', existing_value)
+            else:
+                add_unexpected(use_k, "cannot delete because not currently set")
+
+
+def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
     """
     A very short way to distill the overall algorithm:
     Derive any UNEXPECTEDS by (PARAM_ATTRS - ALLOW_LIST)
@@ -43,17 +209,18 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         derive_ALLOW_LIST_from_three_sources()
         determine_any_UNEXPECTEDS_by_beginning_USE_PARAMS()
         do_the_pipeline_for_each_formal_attribute()
-        return send_it_back_with_recins()
+        return send_it_back_to_recins()
 
-    def send_it_back_with_recins():
+    def send_it_back_to_recins():
         final_params = {k: v for k, v in formalize_parameter_order()}
-        return _send_it_back_with_recins(
+        return _send_it_back_to_recins(
             final_params, coll, tlistener, is_dry)
 
     def formalize_parameter_order():
         # This makes the lines in the recfile be in the formal order
         for (_, use_col) in state.BOTH:
             use_k = use_col.column_name
+            # NOTE todo what about etc
             x = use_params.pop(use_k)
             yield use_k, x
         assert not use_params
@@ -63,6 +230,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         # There's "value-based" constraints and "existential" constraints
 
         ok = True
+        value_is_considered_to_be_set = _value_is_considered_to_be_set
         for store_col, use_col in state.BOTH:
             use_k = use_col.column_name
 
@@ -146,7 +314,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         if (vfs := state.VALUE_FACTORIES) and (vf := vfs.get(use_k)):
             def defaulter():
                 x = vf(colz, tlistener)
-                if not value_is_considered_to_be_set(x):
+                if not _value_is_considered_to_be_set(x):
                     xx(f"No policy for {use_k!r} VALUE_FACTORY result: {x!r}")
                 return (x,)  # #here1
             yield 'value factory defaulter', defaulter
@@ -176,11 +344,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
                 yield 'dataclass field default value', defaulter
 
     def determine_any_UNEXPECTEDS_by_beginning_USE_PARAMS():
-        def add_unexpected(category, attr_name):
-            if category not in unexpecteds:
-                unexpecteds[category] = []
-            unexpecteds[category].append(attr_name)
-        unexpecteds = {}
+        add_unexpected, unexpecteds = _build_unexpecteds()
         ALLOW = state.ALLOW_LIST
         for k, unsanitized_s in params.items():
             if k not in ALLOW:
@@ -204,13 +368,31 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         if unexpecteds:
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
 
-    def value_is_considered_to_be_set(x):
-        return x or (False == x)
+    def derive_ALLOW_LIST_from_three_sources():
+        o = _build_BOTH(coll, tlistener)
+        state.ALLOW_LIST = o.ALLOW_LIST
+        state.VALUE_FACTORIES = o.VALUE_FACTORIES
+        state.BOTH = o.BOTH
 
+    from dataclasses import fields as func, MISSING as dataclass_none
+    dataclass_fields = {dcf.name: dcf for dcf in func(coll.dataclass)}
+    use_params = {}
+    state = main  # #watch-the-world-burn
+    stop = _Stop
+    tlistener = _build_throwing_listener(listener, stop)
+
+    try:
+        return main()
+    except stop:
+        pass
+
+
+def _build_BOTH(coll, tlistener):
     def derive_ALLOW_LIST_from_three_sources():
         abs_ent_1 = abstract_entity_via_recinf()
         abs_ent_2 = abstract_entity_via_dataclass()
         both = _merge_fents(abs_ent_1, abs_ent_2, coll)
+
         vf = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
         ALLOW = {two[1].column_name: None for two in both}
         for k in (vf.keys() if vf else ()):
@@ -219,6 +401,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         state.ALLOW_LIST = ALLOW
         state.VALUE_FACTORIES = vf
         state.BOTH = both
+        state.primary_key_field_name = abs_ent_1.primary_key_field_name
+        # (At writing, our "dataclass" side doesn't care about pk's)
 
     def abstract_entity_via_dataclass():
         from kiss_rdb.magnetics_.abstract_schema_via_definition import \
@@ -226,32 +410,17 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         return func(coll.dataclass)
 
     def abstract_entity_via_recinf():
-        _ = coll.name_converter.store_record_type
-        lines = _recinf_lines_via_recfile(coll.recfile, _, tlistener)
+        rec_type = coll.name_converter.store_record_type
+        lines = _recinf_lines_via_recfile(coll.recfile, rec_type, tlistener)
         from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
                 abstract_schema_via_recinf_lines as func
         abs_sch = func(lines, tlistener)
         # might save the above one day
-        return abs_sch[coll.fent_name]
+        return abs_sch[rec_type]
 
-    def tlistener(*emi):
-        listener(*emi)
-        if 'error' == emi[0]:
-            raise stop()
-
-    from dataclasses import fields as dataclass_fields_of, \
-            MISSING as dataclass_none
-
-    dataclass_fields = {dcf.name: dcf for dcf in dataclass_fields_of(coll.dataclass)}
-    use_params = {}
-
-    state = main  # #watch-the-world-burn
-    stop = _Stop
-
-    try:
-        return main()
-    except stop:
-        pass
+    state = derive_ALLOW_LIST_from_three_sources  # #watch-the-world-burn
+    derive_ALLOW_LIST_from_three_sources()
+    return state
 
 
 def _merge_fents(abs_ent_1, abs_ent_2, coll):
@@ -266,6 +435,24 @@ def _merge_fents(abs_ent_1, abs_ent_2, coll):
     if use_only:
         xx(_line_via_lines(_explain_top_heavy(use_only, coll)))
     return tuple(both)
+
+
+def _build_unexpecteds():
+    def add_unexpected(category, attr_name):
+        if category not in unexpecteds:
+            unexpecteds[category] = []
+        unexpecteds[category].append(attr_name)
+    unexpecteds = {}
+    return add_unexpected, unexpecteds
+
+
+def _explain_existing_value(listener, verb, use_k, existing_value):
+    def lines():
+        if True:  # one day, don't do this for big structures
+            tail = f" ({existing_value!r})"
+        yield (f"for {use_k!r}, {verb} doesn't "
+               f"currently confirm previous value{tail}")
+    listener('warning', 'expression', 'caution_thrown_to_wind', lines)
 
 
 def _explain_inconsistent_requiredness(listener, store_col, use_col, coll):
@@ -297,7 +484,7 @@ def _explain_unexpecteds(listener, unexpecteds, coll):
     def lines():
         for cat, ks in unexpecteds.items():
             yield f"parameter(s) {cat.replace('_', ' ')}: {tuple(ks)!r}"
-    listener('error', 'expression', 'unrecognized_parameters', lines)
+    listener('error', 'expression', 'unrecognized_or_malformed_parameters', lines)
 
 
 def _explain_top_heavy(use_only, coll):
@@ -368,7 +555,75 @@ def _text_normalizer(mixed_value, use_k, listener):
     return (mixed_value,)  # #here1
 
 
-def _send_it_back_with_recins(sanitized_parameters, coll, listener, is_dry):
+def _send_it_back_to_recset(pkfn, EID, use_direcs, coll, tlistener, is_dry):
+
+    assert use_direcs  # make sure at least one
+
+    def args_args():
+        # Each attribute-directive needs its own whole command because recutils
+        # (Otherwise you get "recset: error: please specify just one action.")
+        for use_k, direc in use_direcs.items():
+            yield tuple(args_for_just_one_action(use_k, direc))
+
+    def args_for_just_one_action(use_k, direc):
+        # Express program name, record type
+        yield 'recset'
+        yield f'-t{name_converter.store_record_type}'
+
+        # Express the selection expression
+        yield f'-e{pkfn}="{EID}"'  # assume #here7 string is validated
+
+        # For just this one attribute-directive:
+        store_k = name_converter.store_key_via_use_key(use_k)
+        typ = direc[0]
+
+        # == BEGIN assume #here5
+        yield f'-f{store_k}'
+
+        if 'UPDATE_ATTRIBUTE' == typ:
+            # UPDATE_ATTRIBUTE wants to assert previous existence but 2 hard
+            existing_value, new_value = direc[1:]
+            if existing_value is not None:
+                _explain_existing_value(tlistener, typ, use_k, existing_value)
+            yield f'-s{encode(new_value)}'  # --set
+        elif 'CREATE_ATTRIBUTE' == typ:
+            add_value, = direc[1:]
+            yield f'-a{encode(add_value)}'  # --add
+        else:
+            if 'DELETE_EXISTING_ATTRIBUTE' != typ:
+                xx(f"oops, should not have {typ!r} per #here8")
+            leng = len(direc)
+            assert leng in range(1, 3)
+            if 2 == leng:
+                _explain_existing_value(tlistener, typ, use_k, direc[1])
+            yield '-d'
+            # == END
+
+        # "give a detailed report if the integrity check fails"
+        yield "--verbose"
+
+        # (unlike CREATE, you must express the recfile or blocks reading STDIN)
+        yield coll.recfile
+
+    name_converter = coll.name_converter
+    encode = _encode_for_subprocess
+
+    args_args = tuple(args_args())
+    for args in args_args:
+        _do_send_it_back_to_recset(args, is_dry, tlistener)
+
+
+def _do_send_it_back_to_recset(args, is_dry, listener):
+    def lines():
+        yield _shell_escape_FOR_DISPLAY_ONLY(args)
+    lines.COMMAND_ARGS = args
+    listener('info', 'expression', 'recutils_command', 'recins', lines)
+    if not is_dry:
+        sout_lines = _call_subprocess(args, listener)
+        assert not len(sout_lines)
+
+
+def _send_it_back_to_recins(sanitized_parameters, coll, listener, is_dry):
 
     assert sanitized_parameters  #  make sure at least one
 
@@ -376,16 +631,11 @@ def _send_it_back_with_recins(sanitized_parameters, coll, listener, is_dry):
         yield 'recins'
         name_converter = coll.name_converter
         for use_k, mixed_v in sanitized_parameters.items():
-            coll
             store_k = name_converter.store_key_via_use_key(use_k)
             yield f'-f{store_k}'
-            if isinstance(mixed_v, str):
-                use_v = mixed_v
-            elif isinstance(mixed_v, int):
-                use_v = str(mixed_v)
-            else:
-                xx(f"have fun no problem with {type(mixed_v)}: {mixed_v!r}")
+            use_v = _encode_for_subprocess(mixed_v)
             yield f"-v{use_v}"
+            # == END
 
         yield f"-t{name_converter.store_record_type}"
 
@@ -398,9 +648,9 @@ def _send_it_back_with_recins(sanitized_parameters, coll, listener, is_dry):
 
     args = tuple(args())
     def lines():
-        yield ' '.join(args)  # ..
+        yield _shell_escape_FOR_DISPLAY_ONLY(args)
     listener('info', 'expression', 'recutils_command', 'recins', lines)
-    sout_lines = _EXPERIMENTAL(args, listener)
+    sout_lines = _call_subprocess(args, listener)
 
     if is_dry:
         def lines():
@@ -412,6 +662,70 @@ def _send_it_back_with_recins(sanitized_parameters, coll, listener, is_dry):
     return sanitized_parameters
 
 
+def _shell_escape_FOR_DISPLAY_ONLY(args):
+    return ' '.join(_do_shell_escape_FOR_DISPLAY_ONLY(args))
+
+
+def _do_shell_escape_FOR_DISPLAY_ONLY(args):
+    import re
+
+    def escape_the_double_quotes():
+        return rx_double.sub(escape_double, arg)
+
+    def escape_double(md):
+        return ''.join(('\\', md['double_or_backslash']))
+
+    rx_double = re.compile(r'(?P<double_or_backslash>"|\\)')
+
+    def surround_in_double_quotes():
+        return ''.join(('"', arg, '"'))
+
+    def surround_in_single_quotes():
+        return ''.join(("'", arg, "'"))
+
+    def signature():
+        result = set()
+        for md in rx_sig.finditer(arg):
+            k = next(k for k in these if md[k])
+            result.add(k)
+            if leng == len(result):
+                return result
+        return result
+
+    rx_sig = re.compile('(?:(?P<space> )|(?P<single>\')|(?P<double>"))')
+    these = tuple(rx_sig.groupindex.keys())
+    leng = len(these)
+
+    for arg in args:
+        sig = signature()
+        has_double = 'double' in sig
+        has_single = 'single' in sig
+        has_space = 'space' in sig
+        if has_double:
+            if has_single:
+                yield escape_the_double_quotes()
+            else:
+                yield surround_in_single_quotes()
+        elif has_single:
+            yield surround_in_double_quotes()
+        elif has_space:
+            yield surround_in_single_quotes()
+        else:
+            yield arg
+
+
+def _encode_for_subprocess(mixed_value):
+    if isinstance(mixed_value, str):
+        return mixed_value
+    if isinstance(mixed_value, int):
+        return str(mixed_value)
+    xx(f"have fun no problem with {type(mixed_value)}: {mixed_value!r}")
+
+
+def _value_is_considered_to_be_set(x):
+    return x or (False == x)
+
+
 def _recinf_lines_via_recfile(recfile, store_record_type, listener):
     import re
     assert re.match('^[A-Z][a-zA-Z]+$', store_record_type)
@@ -421,10 +735,10 @@ def _recinf_lines_via_recfile(recfile, store_record_type, listener):
         '-d',  # include full record descriptors
         # '--print-sexps'  Would be neat but we didn't write it this way
         recfile)
-    return _EXPERIMENTAL(args, listener)
+    return _call_subprocess(args, listener)
 
 
-def _EXPERIMENTAL(args, listener):
+def _call_subprocess(args, listener):
     import subprocess as sp
     proc = sp.Popen(
         args=args,
@@ -457,6 +771,14 @@ def _EXPERIMENTAL(args, listener):
         xx(f"nonzero exitstatus without stderr lines? --> {rc} <--")
 
     return sout_lines
+
+
+def _build_throwing_listener(listener, stop):
+    def tlistener(*emi):
+        listener(*emi)
+        if 'error' == emi[0]:
+            raise stop()
+    return tlistener
 
 
 def _line_via_lines(lines):

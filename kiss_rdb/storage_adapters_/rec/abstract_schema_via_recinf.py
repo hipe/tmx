@@ -398,7 +398,15 @@ def _context_lines(line, lineno, column, filehandle):
 # == END
 
 def _snake_via_camel(camel):
-    return '_'.join(re.split('(?<=[a-z])(?=[A-Z])', camel)).lower()
+    memo = _snake_via_camel
+    if memo.value is None:
+        from kiss_rdb.storage_adapters_.rec import \
+                name_convention_converters_ as nccs
+        memo.value = nccs().snake_via_camel
+    return memo.value(camel)
+
+
+_snake_via_camel.value = None
 
 
 def xx(msg=None):

@@ -7,6 +7,10 @@
 
 # == Public API functions
 
+def UPDATE_ENTITY(recfile, fent, param_directives, listener):
+    return _collection(recfile, fent).create_entity(param_directives, listener)
+
+
 def CREATE_ENTITY(recfile, fent, params, listener):
     return _collection(recfile, fent).create_entity(params, listener)
 

@@ -1,4 +1,5 @@
 from modality_agnostic.test_support.common import \
+        listener_and_emissions_simplified_for as listener_and_emissions_for, \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes, \
         lazy
 from unittest import TestCase as unittest_TestCase, main as unittest_main
@@ -31,7 +32,7 @@ class CommonCase(unittest_TestCase):
     @shared_subject_in_child_classes
     def end_state(self):
         coll = collection(self.recfile, 'Note')
-        listener, emis = self.build_listener_spy()
+        listener, emis = listener_and_emissions_for(self)
         params = self.given_parameters
         if (dct := self.given_additional_options):
             use_opts = dct
@@ -41,29 +42,6 @@ class CommonCase(unittest_TestCase):
         return (res, tuple(emis))
 
     # Set-up for invocation
-
-    def build_listener_spy(self):
-        # == BEGIN you should dry this
-        def listener(*emi):
-            def lines():
-                if lines.value is None:
-                    assert 'expression' == emi[1]
-                    lines.value = tuple(emi[-1]())
-                return lines.value
-            lines.value = None
-            if self.do_debug:
-                from sys import stderr
-                w = stderr.write
-                w(repr(emi[0:-1]) + ': \n')
-                for line in lines():
-                    w(line)
-                    if 0 == len(line) or '\n' != line[-1]:
-                        w('\n')
-            emissions.append((*emi[:-1], lines()))
-
-        emissions = []
-        return listener, emissions
-        # == END
 
     @property
     def recfile(self):
@@ -82,7 +60,8 @@ class Case2920_extra(CommonCase):
         assert self.end_state_result is None
 
     def test_020_expresses_special_emission(self):
-        emi = self.first_end_state_emission_of_category('unrecognized_parameters')
+        emi = self.first_end_state_emission_of_category(
+                'unrecognized_or_malformed_parameters')
         line, = emi[-1]
         assert "parameter(s) unrecognized: ('one', 'three')" == line
 
@@ -192,10 +171,6 @@ def the_main_main_recfile():
 def subject_module():
     import kiss_rdb.storage_adapters_.rec as mod
     return mod
-
-
-def xx(msg=None):
-    raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
 
 if __name__ == '__main__':

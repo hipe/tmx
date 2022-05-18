@@ -10,6 +10,7 @@ architectural points:
 """
 
 from modality_agnostic.test_support.common import \
+        listener_and_emissions_simplified_for as listener_and_emissions_for, \
         dangerous_memoize_in_child_classes as shared_subject_in_child_classes
 from unittest import TestCase as unittest_TestCase, main as unittest_main
 
@@ -23,7 +24,7 @@ class CommonCase(unittest_TestCase):
     @property
     @shared_subject_in_child_classes
     def notes(self):
-        listener, emissions = self.build_listener_spy()
+        listener, emissions = listener_and_emissions_for(self)
         res = tuple(self.capability.retrieve_notes(listener))
         assert not next((emi for emi in emissions if 'info' != emi[0]), None)
         return res
@@ -36,7 +37,7 @@ class CommonCase(unittest_TestCase):
         return ent
 
     def do_retrieve_capability(self):
-        listener, emissions = self.build_listener_spy()
+        listener, emissions = listener_and_emissions_for(self)
         ent = self.collection.retrieve_entity(self.EID, listener)
         return ent, emissions
 
@@ -51,26 +52,6 @@ class CommonCase(unittest_TestCase):
         return join(
             top_test_dir,
             'fixture-directories', '2969-rec', '0175-enter-join.rec')
-
-    def build_listener_spy(self):
-        def listener(*emi):
-            def lines():
-                if lines.value is None:
-                    assert 'expression' == emi[1]
-                    lines.value = tuple(emi[-1]())
-                return lines.value
-            lines.value = None
-            if self.do_debug:
-                from sys import stderr
-                w = stderr.write
-                w(repr(emi[0:-1]) + ': \n')
-                for line in lines():
-                    w(line)
-                    w('\n')
-            emissions.append((*emi[:-1], lines()))
-
-        emissions = []
-        return listener, emissions
 
     fent_name = 'Capability'
     EID = 'AA'
@@ -170,9 +151,6 @@ def build_datamodel(collections):
     # behavior is undefined if you don't match the names
 
 # == END
-
-def xx(msg=None):
-    raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
 
 def subject_module():

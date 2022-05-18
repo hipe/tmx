@@ -3,6 +3,9 @@
 %rec: NativeCapability
 %type: Label line
 %key: ID
+%type: ImplementationStatus line
+%type: NativeURL line
+%type: Child line
 
 Label: Wazoo Fazoo
 ID: AA
@@ -15,12 +18,15 @@ ID: DD
 Label: Egads Feegads
 ID: EE
 
+Label: Cholula Folula
+ID: MM
+ImplementationStatus: body_is_ready
+NativeURL: existing://val
+
 %rec: Note
 %mandatory: Parent
 %allowed: Ordinal
 %mandatory: Body
-%allowed: FruFru
-%mandatory: Ordinal FroFro
 %type: Parent rec NativeCapability
 %type: Ordinal int
 %typedef: Paragraph_t size 1920

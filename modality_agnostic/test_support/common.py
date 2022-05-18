@@ -72,6 +72,27 @@ def listener_and_done_via(expected_emissions, tc=None):
     return listener, done
 
 
+def listener_and_emissions_simplified_for(tc):
+    # (at #history-C.1, needed the simpler interface this one-off provides)
+    def listener(*emi):
+        def lines():
+            if lines.value is None:
+                assert 'expression' == emi[1]
+                lines.value = tuple(emi[-1]())
+            return lines.value
+        lines.value = None
+        if tc.do_debug:
+            from sys import stderr
+            w = stderr.write
+            w(repr(emi[0:-1]) + ': \n')
+            for line in lines():
+                w(line)
+                w('\n')
+        emissions.append((*emi[:-1], lines()))
+    emissions = []
+    return listener, emissions
+
+
 def listener_and_emissions_for(tc, limit=None):
     emissions, recvrs = [], []
     if tc:
@@ -176,12 +197,12 @@ def _emission_receiver_for_debugging(tc):
 
         # BEGIN super hacky: break out of in-progress unittest txt block if nec
         if hasattr((cls := tc.__class__), '_MA_DEBUG_EMI_'):
-            nl = ''
+            is_first = False
         else:
             setattr(cls, '_MA_DEBUG_EMI_', None)
-            nl = '\n'
+            is_first = True
         # END
-        _echo_emi_for_debugging(stderr, emi, nl)
+        _echo_emi_for_debugging(stderr, emi, is_first)
     tc.do_debug  # fail early if this isn't implemented
     from sys import stderr
     return receive_emission
@@ -197,9 +218,20 @@ def debugging_listener():
     return _listener_via_receivers((receive_emission,))
 
 
-def _echo_emi_for_debugging(stderr, emi, nl='\n'):
-    pcs = (nl, 'DEBUG EMI: ', repr(emi.to_debugging_tuple_()), '\n')
-    stderr.write(''.join(pcs))
+def _echo_emi_for_debugging(stderr, emi, is_first):
+    w = stderr.write
+    for line in _debugging_lines_via_emi(emi, is_first):
+        w(line)
+
+
+def _debugging_lines_via_emi(emi, is_first):
+    head_nl = '\n' if is_first else ''
+    yield ''.join((head_nl, 'DBG EMI CHAN: ', repr(emi.to_debugging_tuple_()), '\n'))
+    if not emi.can_produce_messages_:
+        return
+    for string in emi.to_messages():
+        nl = '' if '\n' in string else '\n'
+        yield ''.join(('DBG EMI MESG: ', string, nl))
 
 
 def throwing_listener(sev, *rest):
@@ -306,6 +338,7 @@ def xx(msg=None):
     use_msg = ''.join(('cover me/write me', *((': ', msg) if msg else ())))
     raise RuntimeError(use_msg)
 
+# #history-C.1 (as mentioned)
 # #history-B.1: absorb two emission testing modules
 # #history-A.6: get rid of all nonlocal
 # #history-A.5: experimental memoizing into a class attribute

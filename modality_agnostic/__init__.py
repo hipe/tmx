@@ -56,8 +56,7 @@ class emission_via_tuple:  # moved here at #history-B.4
         self.channel = tuple(channel)
 
     def to_debugging_tuple_(self):
-        lines = self.to_messages()
-        return (*self.channel, *lines)
+        return self.channel
 
     def to_messages(self):
         if 'expression' == self.shape:
@@ -80,6 +79,8 @@ class emission_via_tuple:  # moved here at #history-B.4
     @property
     def severity(self):
         return self.channel[0]
+
+    can_produce_messages_ = True
 
 
 # ==

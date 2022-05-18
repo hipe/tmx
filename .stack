@@ -29,6 +29,8 @@ You could do the "analogs" project.
 Imagine clicking up to parent from VIEW
 Imagine clicking into children from VIEW
 Eventually you'll have to assemble that URL
+Somewhere near here, make recset atomic because integrated with VCS
+Somewhere near here, imagine integration with VCS
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
@@ -37,6 +39,3 @@ Integrate everything and write new stuff to have notes form
 Gonna need to validate rectangle of text lol
 Rearchitect (somehow) to support redirects
 Solve the encoding problem - see if you can just escape double quotes. else file
-Expose recutils CREATE & UPDATE
-Expose recutils UPDATE
-Expose recutils CREATE

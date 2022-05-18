@@ -136,6 +136,11 @@ def lazy(func):
 
 def _build_collection(recfile, dataclass, name_converterer, colz):
 
+    def update_entity(eid, param_direcs, listener=None, is_dry=False):
+        from kiss_rdb.storage_adapters_.rec._create_and_update import \
+                UPDATE_ENTITY_ as func
+        return func(eid, param_direcs, coll, colz, listener, is_dry)
+
     def create_entity(params, listener=None, is_dry=False):
         from kiss_rdb.storage_adapters_.rec._create_and_update import \
                 CREATE_ENTITY_ as func
@@ -207,6 +212,7 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
         def fent_name(self):
             return dataclass.__name__
     coll = Collection()
+    coll.update_entity = update_entity
     coll.create_entity = create_entity
     coll.retrieve_entity = retrieve_entity
     coll.recfile = recfile
@@ -369,7 +375,8 @@ def _build_name_converter(fent_name, maybe_two):
 
 
 @lazy
-def _nccs():  # nccs = name convention converters
+def name_convention_converters_():  # nccs = name convention converters
+    import re
 
     def export(func):
         setattr(export, func.__name__, func)  # #watch-the-world-burn
@@ -386,23 +393,38 @@ def _nccs():  # nccs = name convention converters
         return snake_via_atoms(atoms)
 
     def camel_via_atoms(atoms):
-        _ = ((s[0].upper(), s[1:]) for s in atoms)
-        return ''.join(s for two in _ for s in two)
+        return ''.join(do_camel_via_atoms(atoms))
+
+    def do_camel_via_atoms(atoms):
+        for atom in atoms:
+            if rx_ALL_CAPS.match(atom):  # covered (e.g 'native_URL'). gonna bite
+                yield atom
+            else:
+                yield atom[0].upper()
+                yield atom[1:]
+
+    rx_ALL_CAPS = re.compile('^[A-Z]+$')
 
     @export
     def atoms_via_camel(camel):
-        assert re.match(f'^(?:[A-Z][a-z]+)+$', camel)
+        assert re.match(f'^(?:[A-Z][a-z]*)+$', camel)
         humps = re.split('(?<=[a-z])(?=[A-Z])', camel)
-        return (s.lower() for s in humps)
+        for s in humps:
+            if re.match('^[A-Z]+$', s):
+                # Acronyms (like URL) stay
+                yield s
+            else:
+                yield s.lower()
 
     def snake_via_atoms(atoms):
         return '_'.join(atoms)
 
     def atoms_via_snake(snake):
         return snake.split('_')
-
-    import re
     return export
+
+
+_nccs = name_convention_converters_  # shorter name for local use
 
 
 def _native_records_via_recsel(recfile, recsel_args, listener):
@@ -796,7 +818,7 @@ def _open_recsel_process(recfile, recsel_args, listener):
     if listener:
         def express():
             yield f"recsel {' '.join(recsel_args)} {recfile}"
-        listener('info', 'expression', 'sending_recsel', express)
+        listener('info', 'expression', 'recutils_command', 'recsel', express)
 
     import subprocess as sp
     proc = sp.Popen(
