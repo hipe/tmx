@@ -460,6 +460,9 @@ class _AbstractSchema:
     def to_tables(self):
         return self._tables.values()
 
+    def TO_FORMAL_ENTITY_KEYS(self):
+        return self._tables.keys()
+
     to_formal_entities = to_tables  # experimenting with namechange
 
     def schema_diff_to(self, otr):

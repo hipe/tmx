@@ -73,6 +73,7 @@ woah boy.
 |[#873.B]                   | #wish | this one smell in emissions
 |[#873.A]                   | #open | modernize the CLI of this hidden exe
 |[#873]                     |       | internal tracking (extended)
+|[#872.C]                   |       | ting ting ting
 |[#872.B]                   | #edit | edit documentation
 |[#872]                     |       | multi-line strings: the document
 |[#871.1]                   | #prov | markdown provision: leftmost is identifier

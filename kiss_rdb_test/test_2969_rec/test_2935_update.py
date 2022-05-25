@@ -49,7 +49,7 @@ class CommonCase(unittest_TestCase):
         return the_main_main_recfile()
 
     given_IS_DRY = False
-    do_debug = True
+    do_debug = False
 
 
 class Case2932_not_found_AND_strange_params(CommonCase):
@@ -67,7 +67,6 @@ class Case2932_not_found_AND_strange_params(CommonCase):
         return {'onez': ('no_see',), 'threez': ('no_see',)}
 
     given_EID = 'QQ'
-    do_debug = True
 
 
 class Case2934_entity_not_found_BUT_good_params(CommonCase):
@@ -124,7 +123,7 @@ class Case2942_lets_go(CommonCase):
             if cat not in counts:
                 counts[cat] = 0
             counts[cat] += 1
-        assert counts.pop('recutils_command') == 3  # sad but necessary
+        assert counts.pop('recutils_command') == 4  # sad but necessary
         assert counts.pop('caution_thrown_to_wind') == 2  # for now
         assert not counts
 

@@ -12,7 +12,9 @@ class CommonCase(unittest_TestCase):
                 ("abstract_attribute", "BB", "text", "key"),
                 ("abstract_attribute", "CC", "text", "optional"),
             )))
-        lines = subject_module().html_form_via_abstract_schema(abs_sch)
+        mod = subject_module()
+        coll = mod._DUMMY_COLL(abs_sch['AA'])
+        lines = subject_module().html_form_via_SOMETHING_ON_THE_MOVE_(coll)
         seen = {}
         import re
         rx = re.compile('^[ ]*</?([a-z]+)')

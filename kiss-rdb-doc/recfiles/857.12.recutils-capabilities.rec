@@ -4,6 +4,11 @@ TemplateVariableName: doc_url_head
 TemplateVariableValue: https://www.gnu.org/software/recutils/manual
 
 %rec: NativeCapability
+%type: Label line
+%key: ID
+%type: ImplementationStatus line
+%type: NativeURL line
+%type: Child line
 
 # 1-1024 is our ID space (for now)
 # width of parking lot: 1024 feet ("l")

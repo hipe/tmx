@@ -196,13 +196,38 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
 
     @lazy
     def denativizerer():
-        return _denativizer_via_dataclass(dataclass, name_converterer)
+        abs_ent = abstract_entity_via_dataclass()  # ..
+        return _denativizer_via_abstract_entity(abs_ent, name_converterer)
+
+    def build_store_fent(listener):
+        store_fent_name = name_converterer().store_record_type
+        from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
+                abstract_entity_via_recfile_ as func
+        return func(recfile, store_fent_name, listener=listener)
+
+    build_store_fent.value = None
+
+    @lazy
+    def abstract_entity_via_dataclass():
+        from kiss_rdb.magnetics_.abstract_schema_via_definition import \
+                abstract_entity_via_dataclass as func
+        return func(dataclass)
 
     import re
 
     class Collection:
         def where(_, *args, **kwargs):
             return select(*args, **kwargs)
+
+        @property
+        def abstract_entity_derived_from_dataclass(_):
+            return abstract_entity_via_dataclass()
+
+        def abstract_entity_derived_from_store(_, listener=None):
+            memo = build_store_fent
+            if memo.value is None:
+                memo.value = build_store_fent(listener)
+            return memo.value
 
         @property
         def name_converter(_):
@@ -232,14 +257,6 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
     - assert optionaity (make sure required fields are there)
     - maybe something about calling the factories that dataclasses have
     """
-
-
-def _denativizer_via_dataclass(dataclass, name_converterer):
-    from kiss_rdb.magnetics_.abstract_schema_via_definition import \
-            abstract_entity_via_dataclass as func
-    absent = func(dataclass)
-    return _denativizer_via_abstract_entity(absent, name_converterer)
-
 
 def _denativizer_via_abstract_entity(absent, name_converterer):
 
@@ -351,15 +368,46 @@ def _build_name_converter(fent_name, maybe_two):
     if maybe_two:
         typ, dct = maybe_two
 
+    def upwards_normally(snake_store_k):
+        return snake_store_k
+
+    def snake_downwards_normally(use_k):
+        return use_k
+
     def downwards_normally(use_k):
         return _nccs().camel_via_snake(use_k)
 
     if dct:
+        def upwards(snake_store_k):
+            if upwards.value is None:
+                rev_dct = {k: v for k, v in build_reverse()}
+                assert len(rev_dct) == len(dct)
+                upwards.value = rev_dct
+            else:
+                rev_dct = upwards.value
+            if (k := rev_dct.get(snake_store_k)):
+                return k
+            return upwards_normally(snake_store_k)
+
+        upwards.value = None
+
+        def build_reverse():
+            f = _nccs().snake_via_camel
+            for use_k, store_k in dct.items():
+                yield f(store_k), use_k
+
+        def snake_downwards(use_k):
+            if (k := dct.get(use_k)):
+                return _nccs().snake_via_camel(k)
+            return use_k
+
         def downwards(use_k):
             if (k := dct.get(use_k)):
                 return k
             return downwards_normally(use_k)
     else:
+        upwards = upwards_normally
+        snake_downwards = snake_downwards_normally
         downwards = downwards_normally
 
     class name_converter:
@@ -369,6 +417,8 @@ def _build_name_converter(fent_name, maybe_two):
         def name_convention_converters_(_):
             return _nccs()
     nc = name_converter()
+    nc.use_key_via_snake_store_key = upwards
+    nc.snake_store_key_via_use_key = snake_downwards
     nc.store_key_via_use_key = downwards
     nc.store_record_type = fent_name if typ is None else typ
     return nc
@@ -889,6 +939,40 @@ def CREATE_COLLECTION(collection_path, listener, is_dry, opn=None):
 
 
 # ==
+
+def call_subprocess_(args, listener):
+    import subprocess as sp
+    proc = sp.Popen(
+        args=args,
+        shell=False,  # if true, the command is executed through the shell
+        cwd='.',
+        stdin=sp.DEVNULL,
+        stdout=sp.PIPE,
+        stderr=sp.PIPE,
+        text=True,  # give me lines, not binary
+    )
+
+    def sout_lines():
+        with proc.stdout as fh:
+            for line in fh:
+                yield line
+
+    def serr_lines():
+        with proc.stderr as fh:
+            for line in fh:
+                yield line
+
+    sout_lines = tuple(sout_lines())
+    serr_lines = tuple(serr_lines())
+
+    if serr_lines:
+        xx(f'write this to listener, e.g. {serr_lines[0]!r}')
+
+    rc = proc.wait()
+    if 0 != rc:
+        xx(f"nonzero exitstatus without stderr lines? --> {rc} <--")
+
+    return sout_lines
 
 
 def _integrity_error(listener, reason):

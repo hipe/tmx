@@ -16,17 +16,19 @@
     - performance: one less process to open for those operations that don't
       need the information `recinf` can give us
     - power: we can extend our conventions arbitrarily because we own the design
+    - viz: VALUE_FACTORIES (a plain old dict)
     - familiarity: we (personally) know python well so it's easier to read
 
-    We don't yet want to abandon the recinf-based approach, but we are about
-    to leverage dataclass-based schemas in yet another way that only they can
-    do: VALUE_FACTORIES
+    But also consider these perceived PRO's of recinf over dataclasses:
 
-    As such, we "touch" recinf-derived schema here (with the assumption that
-    we don't CREATE as much as we READ so the overhead of the extra process
-    hit is more negligible) so that we don't feel we are giving up on this
-    "pure" (but limited) derivational source; while still serving the end of
-    merely gathering notes.
+    - "pure" storage-layer derivation, one less home for schema
+    - foreign keys and primary keys modeled more naturally
+    - (superficially) as it works out, we like the shorter, more human attr names
+
+    As such, there is a constant pushing back-and-forth between the
+    recinf-derived and dataclass-derived schema here as we suss out whether
+    and to what extent we will go with this hybrid approach (and maybe one day
+    make a merged abstract entity).
     """
 
 
@@ -230,13 +232,12 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         # There's "value-based" constraints and "existential" constraints
 
         ok = True
-        value_is_considered_to_be_set = _value_is_considered_to_be_set
         for store_col, use_col in state.BOTH:
             use_k = use_col.column_name
 
             # Apply defaulting iff there's defaulting and value is not set
             defaulter = resolve_any_one_defaulter(store_col, use_col)
-            wv = (use_params[use_k],) if use_k in params else None
+            wv = (use_params[use_k],) if use_k in use_params else None
             is_set = value_is_considered_to_be_set(wv[0]) if wv else False
 
             if defaulter and not is_set:  # #here3
@@ -264,6 +265,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         if ok:
             return
         raise stop()  # Throw the stop only after going thru the whole "form"
+
+    value_is_considered_to_be_set = _value_is_considered_to_be_set
 
     def resolve_any_normalizer(store_col, use_col):
         store_tm = store_col.type_macro
@@ -411,12 +414,9 @@ def _build_BOTH(coll, tlistener):
 
     def abstract_entity_via_recinf():
         rec_type = coll.name_converter.store_record_type
-        lines = _recinf_lines_via_recfile(coll.recfile, rec_type, tlistener)
         from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
-                abstract_schema_via_recinf_lines as func
-        abs_sch = func(lines, tlistener)
-        # might save the above one day
-        return abs_sch[rec_type]
+                abstract_entity_via_recfile_ as func
+        return func(coll.recfile, rec_type, tlistener)
 
     state = derive_ALLOW_LIST_from_three_sources  # #watch-the-world-burn
     derive_ALLOW_LIST_from_three_sources()
@@ -726,51 +726,9 @@ def _value_is_considered_to_be_set(x):
     return x or (False == x)
 
 
-def _recinf_lines_via_recfile(recfile, store_record_type, listener):
-    import re
-    assert re.match('^[A-Z][a-zA-Z]+$', store_record_type)
-    args = (
-        'recinf',  # this should be under an abstraction layer
-        f'-t{store_record_type}',
-        '-d',  # include full record descriptors
-        # '--print-sexps'  Would be neat but we didn't write it this way
-        recfile)
-    return _call_subprocess(args, listener)
-
-
 def _call_subprocess(args, listener):
-    import subprocess as sp
-    proc = sp.Popen(
-        args=args,
-        shell=False,  # if true, the command is executed through the shell
-        cwd='.',
-        stdin=sp.DEVNULL,
-        stdout=sp.PIPE,
-        stderr=sp.PIPE,
-        text=True,  # give me lines, not binary
-    )
-
-    def sout_lines():
-        with proc.stdout as fh:
-            for line in fh:
-                yield line
-
-    def serr_lines():
-        with proc.stderr as fh:
-            for line in fh:
-                yield line
-
-    sout_lines = tuple(sout_lines())
-    serr_lines = tuple(serr_lines())
-
-    if serr_lines:
-        xx(f'write this to listener, e.g. {serr_lines[0]!r}')
-
-    rc = proc.wait()
-    if 0 != rc:
-        xx(f"nonzero exitstatus without stderr lines? --> {rc} <--")
-
-    return sout_lines
+    from kiss_rdb.storage_adapters_.rec import call_subprocess_ as func
+    return func(args, listener)
 
 
 def _build_throwing_listener(listener, stop):

@@ -148,15 +148,20 @@ def _returncode_and_behave_via_early_stop(serr, explain, invo):
         else:
             other[k] = sx[1:]
 
-    assert early_stop_reason.tuple is not None
     assert returncode.value is not None
 
-    expresser = _EarlyStopExpresser(invo)
     tup = early_stop_reason.tuple
-    func = getattr(expresser, tup[0])
     w = serr.write
-    for line in func(*tup[1:], **other):
-        w(line)
+
+    if tup:
+        # (at #history-C.4 experimentally allowing early stops with no formal
+        # reason, just stderr lines. Was already coded for but not covered (67).)
+        expresser = _EarlyStopExpresser(invo)
+        func = getattr(expresser, tup[0])
+        for line in func(*tup[1:], **other):
+            w(line)
+    else:
+        assert stderr_line.lines
 
     for line in stderr_line.lines:
         w(line)
@@ -760,6 +765,7 @@ def _home():
 def xx(msg=None):
     raise RuntimeError(''.join(('to do', *((': ', msg) if msg else ()))))
 
+# #history-C.4 (can be temporary)
 # #history-C.3 lost code to sibling when changed to just-in-time-parse-parsing
 # #history-C.2 (as referenced)
 # #history-C.1 (as referenced)

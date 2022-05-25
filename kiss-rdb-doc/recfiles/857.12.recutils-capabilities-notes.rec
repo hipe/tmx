@@ -3,6 +3,13 @@
 # to # visual-test the view of notes before we do form gen & CREATE.
 
 %rec: Note
+%mandatory: Parent
+%allowed: Ordinal
+%mandatory: Body
+%type: Parent rec NativeCapability
+%type: Ordinal int
+%typedef: Paragraph_t size 1920
+%type: Body Paragraph_t
 
 Parent: 32
 Ordinal: 77

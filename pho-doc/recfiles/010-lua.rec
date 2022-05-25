@@ -52,4 +52,19 @@ single_paragraph_abstract: we looked this up but XX etc #todo.
 + as-is before version 5.4 (etc). We tried `arg.n` per some documentation
 + before learning we had to do `args = {...}`
 
+abstract_idiom: type_reflection
+url: http://lua-users.org/wiki/LuaTypeChecking
+
+abstract_idiom: append_to_list
+url: https://stackoverflow.com/questions/27434142/how-do-i-append-to-a-table-in-lua
+
+abstract_idiom: list_length
+single_paragraph_abstract: old way is deprecated and now gone
+url: https://www.lua.org/pil/19.1.html
+url: https://stackoverflow.com/questions/31452871/table-getn-is-deprecated-how-can-i-get-the-length-of-an-array
+
+abstract_idiom: dictionary_pop
+single_paragraph_abstract: table.remove
+url: https://www.lua.org/pil/19.2.html
+
 # #born

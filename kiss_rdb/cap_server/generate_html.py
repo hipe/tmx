@@ -139,9 +139,7 @@ def _tree_or_table(sout, serr, inner_lineser, recfile):
 
     write = sout.write
     listener = _common_listener(serr)
-
-    from kiss_rdb.cap_server.model_ import TRAVERSE_COLLECTION as func
-    sct_itr = func(recfile, listener)
+    sct_itr = _collz(recfile)['Capability'].where(listener=listener)
     lines = inner_lineser(sct_itr, listener)
     for line in _wrap_lines_commonly(lines):
         write(line)
@@ -159,9 +157,8 @@ def view_capability(_, sout, serr, recfile, EID):
 
     write = sout.write
     listener = _common_listener(serr)
-
-    from kiss_rdb.cap_server.model_ import RETRIEVE_ENTITY as func
-    ent = func(recfile, EID, listener)
+    coll = _collz(recfile)['Capability']
+    ent = coll.retrieve_entity(EID, listener)
     if ent is None:
         return 3  # #error-with-no-output #FIXME
 
@@ -172,7 +169,112 @@ def view_capability(_, sout, serr, recfile, EID):
     return (3 if listener.did_error else 0)
 
 
+@command
+def process_form(_, sout, serr, stack):
+    """usage: {prog_name} RECFILE FENT *FORM_ARGS
+
+    Description: experiment
+    """
+
+    # We have to do these two positionals by hand because we parse our own
+    recfile = stack.pop()
+    fent_name = stack.pop()
+    coll = _collz(recfile)[fent_name]
+
+    # Convert params from the weird lua-friendly (bridge-friendly) encoding
+    # into a params dictionary
+    # while changing key names from "snake store key" to "use key"
+    form_values = {}
+    f = coll.name_converter.use_key_via_snake_store_key
+    while len(stack):
+        k, v = stack.pop().split(':', 1)  # ..
+        form_values[f(k)] = v  # might clobber
+
+    # Go
+    custom_listener, WHAT = _build_listener_custom_to_this_module(serr)
+    roc = coll.create_entity(form_values, custom_listener)
+    if roc:
+        sout.write("CREATE was OK. This needs writing.\n")
+        return 0
+    return _do_show_form(sout, coll, form_values, custom_listener, WHAT)
+
+
+@command
+def show_form(_, sout, serr, recfile, fent_name, parent_EID):
+    """usage: {prog_name} RECFILE FENT_NAME PARENT_EID
+
+    Description: The dream of form generation, not yet fully realized..
+    """
+
+    coll = _collz(recfile)[fent_name]
+    form_values = {'parent_EID': parent_EID}
+    listener, WHAT = _build_listener_custom_to_this_module(serr)
+    # (experimental - wiring a listener on form GENERATION for reasons)
+
+    return _do_show_form(sout, coll, form_values, listener, WHAT)
+
+
+def _do_show_form(sout, coll, form_values, listener, WHAT=None):
+    from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
+            html_form_via_SOMETHING_ON_THE_MOVE_ as func
+    lines = func(
+        coll, action='add_note', form_values=form_values,  # #here1
+        WHAT=WHAT, listener=listener)
+    w = sout.write
+    for line in _wrap_lines_commonly(lines):
+        w(line)
+    return 0
+
+
+# == Listeners
+
+def _build_listener_custom_to_this_module(serr):
+    """Create listener that stores certain emissions to a custom structure.
+    Purpose-built for form interaction.
+    """
+
+    def custom_listener(*emi):
+        if 'expression' != emi[1]:
+            line = "error-error: can't express " + repr(tuple(emi[:-1]))
+            emi = 'error', 'expression', 'error_error', lambda: (line,)
+        if 'info' == emi[0]:
+            return write_info_lines_to_my_stderr_FOR_NOW(emi)
+        if 'error' == emi[0]:
+            if 'error_about_field' == emi[2]:
+                return handle_error_about_field(emi)
+        write_info_lines_to_my_stderr_FOR_NOW(emi)
+
+    def handle_error_about_field(emi):
+        sev, shape, _, WRONG_ATTR_KEY, cat, lineser = emi
+        dct = WHAT[1]
+        k = WRONG_ATTR_KEY
+        if not (lis := dct.get(k)):
+            dct[k] = (lis := [])
+        lis.append((cat, tuple(lineser())))
+
+    def write_info_lines_to_my_stderr_FOR_NOW(emi):
+        for line in emi[-1]():
+            w(line)
+
+    w = _line_writer_via_write_function(serr.write)
+    WHAT = [], {}
+    return custom_listener, WHAT
+
+
 def _common_listener(serr):
+    write_line = _line_writer_via_write_function(serr.write)
+    return _listener_via_line_receiver(write_line)
+
+
+def _line_writer_via_write_function(w):
+    def write_line(line):
+        w(line)
+        if 0 == len(line) or '\n' != line[-1]:
+            w('\n')
+    return write_line
+
+
+def _listener_via_line_receiver(recv_line):
     def listener(*emission):
         *chan, payloader = emission
         if 'error' == chan[0]:
@@ -180,15 +282,15 @@ def _common_listener(serr):
 
         if 'expression' == chan[1]:
             for line in payloader():
-                serr.write(line)
-                if 0 == len(line) or '\n' != line[-1]:
-                    serr.write('\n')
+                recv_line(line)
         else:
-            serr.write(repr(chan))
+            recv_line(repr(chan))
 
     listener.did_error = False  # #watch-the-world-burn
     return listener
 
+
+# == HTML lol
 
 def _wrap_lines_commonly(lines):
     # Not caring about templates or frameworks for now
@@ -209,6 +311,7 @@ def _wrap_lines_commonly(lines):
 
     yield """
 <style type="text/css">
+td.the_buttons_tabledata { text-align: center; }
 .impl-state-unknown     { background-color: none; }
 .impl-state-wont        { background-color: lightgray; }
 .impl-state-maybe       { background-color: lightblue; }
@@ -229,10 +332,12 @@ def _wrap_lines_commonly(lines):
 
 
 def _inner_html_lines_for_view(ent, listener):
-    from html import escape as h
+    h = _html_escape_function()
     yield "<table>\n"
     yield f"<tr><th>Label</th><td>{h(ent.label)}</td></tr>\n"
     yield f"<tr><th>ID</th><td>{h(ent.EID)}</td></tr>\n"
+
+    # Express any children
     pcs = []
     itr = iter(ent.children_EIDs or ())
     first = next(itr, None)
@@ -245,6 +350,7 @@ def _inner_html_lines_for_view(ent, listener):
         val = ''.join(pcs)
         yield f"<tr><th>children</th><td>{val}</td></tr>\n"
 
+    # Express any notes
     itr = ent.RETRIEVE_NOTES(listener)
     if itr:
         for note in itr:
@@ -252,11 +358,20 @@ def _inner_html_lines_for_view(ent, listener):
             for line in note.body:
                 # We haven't decided what the semantics are here
                 if False:
-                    yield _html_escape(line)
+                    yield h(line)
                 else:
-                    escaped = _html_escape(line[:-1])
+                    escaped = h(line[:-1])
                     yield f'{escaped}</br>\n'  # super cute EXPERIMENTAL
             yield '</td></tr>\n'
+
+    if True:
+        yield '<tr><td colspan="2" class="the_buttons_tabledata">\n'
+        params = {'action': 'add_note', 'parent': 'QQxxQQ'}
+        url_for_add_note = f'/?action=add_note&parent=QQ'
+        htmls = _html_lines_for_buttons((('Add Note', params),))
+        for html in htmls:
+            yield html
+        yield '</td></tr>\n'
     yield '</table>\n'
 
 
@@ -379,22 +494,47 @@ def _express_implementation_state(state):
 
 def _link_and_label_of_record(rec):
     label_html = _html_escape(rec.label)
-    url = f'/?action=view_capability&eid={rec.EID}'
+    url = f'/?action=view_capability&eid={rec.EID}'  # #here1
     return f'<a href="{url}">{label_html}</a>'
+
+
+def _html_lines_for_buttons(button_pairs):
+    for label, params in button_pairs:
+        for line in _html_lines_for_button(label, params):
+            yield line
+
+
+def _html_lines_for_button(label, params):
+    yield f'<form method="GET" action="/">\n'  # #here1
+    for k, v in params.items():
+        assert '"' not in v  # one day we will understand the difference
+        yield f'<input type="hidden" name="{k}" value="{v}" />\n'
+    yield f'<input type="submit" value="{label}" />\n'
+    yield f'</form>\n'
+
+
+# :#here1: [#872.C]: how we generate (or don't generate) urls is weird for now
 
 
 def _html_escape(msg):  # (experiment in lazy loading)
     assert _html_escape.sanity
     _html_escape.sanity = False
-
-    from html import escape as f
-
     import sys
-    sys.modules[__name__]._html_escape = f
+    sys.modules[__name__]._html_escape = _html_escape_function()
     return _html_escape(msg)
 
 
 _html_escape.sanity = True
+
+
+def _html_escape_function():
+    from html import escape as func
+    return func
+
+
+def _collz(recfile):
+    from kiss_rdb.cap_server.model_ import collections_via_recfile_ as func
+    return func(recfile)
 
 
 if '__main__' == __name__:

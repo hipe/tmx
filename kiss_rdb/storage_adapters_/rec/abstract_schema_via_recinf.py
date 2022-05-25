@@ -1,5 +1,27 @@
 import re
 
+def abstract_entity_via_recfile_(recfile, store_record_type, listener):
+    import re
+    assert re.match('^[A-Z][a-zA-Z]+$', store_record_type)
+    args = (
+        'recinf',  # this should be under an abstraction layer
+        f'-t{store_record_type}',
+        '-d',  # include full record descriptors
+        # '--print-sexps'  Would be neat but we didn't write it this way
+        recfile)
+
+    if listener:
+        def express():
+            yield ' '.join(args)  # ..
+        listener('info', 'expression', 'recutils_command', 'recinf', express)
+
+    from . import call_subprocess_ as func
+    sout_lines = func(args, listener)
+    abs_sch = abstract_schema_via_recinf_lines(sout_lines, listener)
+    # ..
+    return abs_sch[store_record_type]
+
+
 def abstract_schema_via_recinf_lines(lines, listener):
 
     # == States
@@ -349,6 +371,9 @@ def abstract_schema_via_recinf_lines(lines, listener):
 
             action()
         line = None
+
+        if not hasattr(state, 'entity_scratch_space'):
+            raise line_error("no recinf lines?")
 
         if state.entity_scratch_space:
             consume_entity_scratch_space()
