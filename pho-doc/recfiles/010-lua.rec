@@ -67,4 +67,10 @@ abstract_idiom: dictionary_pop
 single_paragraph_abstract: table.remove
 url: https://www.lua.org/pil/19.2.html
 
+abstract_idiom: substring
+single_paragraph_abstract: strsub(s, i, j)  -- don't forget lua starts at 1
++ HOW ANNOYING actually it's `string.sub`. This issue is of a kind
+url: https://www.lua.org/manual/2.4/node22.html
+
+
 # #born

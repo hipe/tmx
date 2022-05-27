@@ -659,7 +659,7 @@ def _send_it_back_to_recins(sanitized_parameters, coll, listener, is_dry):
     else:
         assert 0 == len(sout_lines)
 
-    return sanitized_parameters
+    return 'recins_success', sanitized_parameters
 
 
 def _shell_escape_FOR_DISPLAY_ONLY(args):

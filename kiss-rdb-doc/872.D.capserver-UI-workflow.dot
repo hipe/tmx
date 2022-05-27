@@ -1,0 +1,14 @@
+digraph g {
+label="\n872.D) Capserver UI Workflow"
+show_index->view_capability
+view_capability->show_index[label="(linkback in nav)" color="gray"]
+view_capability->add_note
+add_note->view_capability
+add_note->add_note
+view_capability->edit_capability
+edit_capability->edit_capability
+edit_capability->view_capability
+}
+/*
+# #born
+*/

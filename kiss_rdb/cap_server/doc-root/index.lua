@@ -12,10 +12,7 @@ end
 function _ProcessCreateNote (params_list)  -- #here2
   local params = _DictionaryViaParams(params_list)
   local fh = _OpenCallToBackend('process_form', recfile_path, 'Note', params)
-  if not fh then
-    return
-  end
-  _WriteEveryLineAndClose(fh)
+  _MaybeRedirect(fh)
 end
 
 function _ShowCreateNoteForm (parent_EID)
@@ -51,8 +48,39 @@ end
 
 -- Support
 
+function _MaybeRedirect (fh)
+  if not fh then  -- (when debugging, we print stuff ourselves and return nil)
+    return
+  end
+  -- Big flex (fragile hack): If the first line "looks like" an html doc, etc
+  local line = fh:read('L')
+  local first_char = string.sub(line, 1, 1)
+  if "<" == first_char then
+    Write(line)
+    return _WriteEveryLineAndClose(fh)
+  end
+
+  local line2 = fh:read('L')
+  if line2 then
+    Write("wasn't expecting more than one line of headers for now: " .. line2)
+    return
+  end
+
+  -- Otherwise, look for one of our "custom" "headers" (probably just this one)
+  if "redirect " == string.sub(line, 1, 9) then
+    return _DoRedirect(string.sub(line, 9, -2))  -- chomp
+  end
+
+  Write("unrecognized directive: " .. first_line)  -- #todo
+end
+
+function _DoRedirect (url)
+  SetStatus(303) -- "See Other; Used to redirect after a PUT or a POST, so .."
+  SetHeader("Location", url)
+end
+
 function _WriteEveryLineAndClose (fh)
-  line = fh:read('L')
+  local line = fh:read('L')
   while line do
     Write(line)
     line = fh:read('L')

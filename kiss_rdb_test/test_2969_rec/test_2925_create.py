@@ -96,7 +96,9 @@ class Case2922_missing(CommonCase):
 class Case2924_ok(CommonCase):
 
     def test_010_result_is_sanitized_params_FOR_NOW(self):
-        dct = self.end_state_result
+        roc = self.end_state_result  # roc = "result of create"
+        assert 'recins_success' == roc[0]
+        dct = roc[1]
         act = tuple(dct.keys())
         self.assertSequenceEqual(('parent_EID', 'ordinal', 'body_lines'), act)
         assert 332211 == dct['ordinal']

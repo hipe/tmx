@@ -194,7 +194,10 @@ def process_form(_, sout, serr, stack):
     custom_listener, WHAT = _build_listener_custom_to_this_module(serr)
     roc = coll.create_entity(form_values, custom_listener)
     if roc:
-        sout.write("CREATE was OK. This needs writing.\n")
+        assert 'recins_success' == roc[0]
+        sanitized_params = roc[1]
+        eid = sanitized_params['parent_EID']
+        sout.write(f"redirect /?action=view_capability&eid={eid}\n")  # #here1
         return 0
     return _do_show_form(sout, coll, form_values, custom_listener, WHAT)
 
@@ -355,7 +358,7 @@ def _inner_html_lines_for_view(ent, listener):
     if itr:
         for note in itr:
             yield '<tr><th>note</th><td>\n'
-            for line in note.body:
+            for line in note.body_lines:
                 # We haven't decided what the semantics are here
                 if False:
                     yield h(line)
@@ -366,7 +369,7 @@ def _inner_html_lines_for_view(ent, listener):
 
     if True:
         yield '<tr><td colspan="2" class="the_buttons_tabledata">\n'
-        params = {'action': 'add_note', 'parent': 'QQxxQQ'}
+        params = {'action': 'add_note', 'parent': ent.EID}
         url_for_add_note = f'/?action=add_note&parent=QQ'
         htmls = _html_lines_for_buttons((('Add Note', params),))
         for html in htmls:

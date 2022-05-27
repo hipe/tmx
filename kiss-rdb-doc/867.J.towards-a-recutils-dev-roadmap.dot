@@ -21,16 +21,16 @@ ITERUSE->ITERUSE
 JOIN->ITERUSE
 RFIOK->ITERUSE
 EAEAA[label="The ability to\nedit any entity\nat all\n(with a web form)"]
-CREATEOK[label="Turn POST form variables\ninto a successful\ndatabase write"]
+CREATEOK[label="Turn POST form variables\ninto a successful\ndatabase write" style=filled]
 EXPOSEW->CREATEOK
 GWFFFE->CREATEOK
-EXPOSEW[label="Expose & cover\nrecutils (either/both)\ncreate & write"]
+EXPOSEW[label="Expose & cover\nrecutils (either/both)\ncreate & write" style=filled]
 GWFFFE[label="Generate a web form from\na formal entity (structure)" style=filled]
 EFORM->GWFFFE
 RRI->GWFFFE
-RFISE[label="Receive form input\nand show errors"]
+RFISE[label="Receive form input\nand show errors" style=filled]
 GWFFFE->RFISE
-RFIOK[label="Receive form input\nand show a successful\ncreate or update"]
+RFIOK[label="Receive form input\nand show a successful\ncreate or update" style=filled]
 CREATEOK->RFIOK
 VIEW->RFIOK
 RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity" style=filled]
@@ -43,7 +43,7 @@ VCSWRITE[label="Commit to VCS\non (for eg.)\nentity save"]
 DONE0100->VCSWRITE
 CUSTOM[label="Eventually you will need the\nability to customize
 entity EDIT & VIEW\nbeyond just what can\nbe gen'd from recinf"]
-VIEW[label="Entity view, purely\ngenerated from recinf"]
+VIEW[label="Entity view, purely\ngenerated from recinf" style=filled]
 RRI->VIEW
 MODELLER[label="create AND EDIT\nyour recutils-native\nmodel directly from GUI"]
 DONE0100->MODELLER
