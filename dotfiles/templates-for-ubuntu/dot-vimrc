@@ -24,8 +24,11 @@ nnoremap <c-l> :wincmd l<cr>
 syntax on
 colorscheme slate
 vnoremap <c-c> "+y
-nnoremap <c-v> "+p
-inoremap <c-v> <esc>"+p
+
+" nnoremap <c-v> "+p
+" inoremap <c-v> <esc>"+p
+" (these blocks using c-v for making special chars like '\r')
+
 nnoremap ± 1gt
 nnoremap ² 2gt
 nnoremap ³ 3gt

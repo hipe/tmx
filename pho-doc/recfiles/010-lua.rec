@@ -72,5 +72,8 @@ single_paragraph_abstract: strsub(s, i, j)  -- don't forget lua starts at 1
 + HOW ANNOYING actually it's `string.sub`. This issue is of a kind
 url: https://www.lua.org/manual/2.4/node22.html
 
+abstract_idiom: regular_expressions
+single_paragraph_abstract: You don't have regex
+url: https://www.lua.org/pil/20.1.html
 
 # #born

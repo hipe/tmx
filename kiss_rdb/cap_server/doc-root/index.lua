@@ -54,6 +54,10 @@ function _MaybeRedirect (fh)
   end
   -- Big flex (fragile hack): If the first line "looks like" an html doc, etc
   local line = fh:read('L')
+  if nil == line then
+    Write("Strange -- file was empty\n")
+    return
+  end
   local first_char = string.sub(line, 1, 1)
   if "<" == first_char then
     Write(line)
@@ -80,6 +84,10 @@ function _DoRedirect (url)
 end
 
 function _WriteEveryLineAndClose (fh)
+  if not fh then  -- #here3 and #todo
+    Write("No open filehandle to write. Debugging line turned on?\n")
+    return
+  end
   local line = fh:read('L')
   while line do
     Write(line)
@@ -111,7 +119,7 @@ function _OpenCallToBackend (sanitized_action_name, ...)
     print("\n\n\n\n\n\n")
   end
 
-  if false then
+  if false then  -- :#here3
     return
   end
 
@@ -168,31 +176,60 @@ function _DictionaryViaParams (param_list)
 end
 
 function _MyEscape (s)
-  -- The below table is a list of special characters whose existence triggers
-  -- our hand-made "shellescape"; and the second column is how we handle it
+  -- WARNING Getting this wrong has potentially catastrophic consequences!
+
+  -- At writing, we don't know of a way to open a subprocess from lua other
+  -- than doing it lua's way with `io.popen` which is ONE BIG STRING that gets
+  -- processed by a `bin/sh`. (We would prefer to pass the command as a list
+  -- of tokens and circumvent a shell.)
+
+  -- If this one string has special characters like carriage returns, newlines,
+  -- pipes, greater than/less-than characters, dollar signs, parenthesis
+  -- (others); it can lead to *arbitrary unintended execution*, for example
+  -- wiping out your hard-drive.
+
+  -- At #history-C.1 we flipped this from an optimistic approach to a paranoid
+  -- approach: Now, unless the string looks totally "ordinary", we wrap it in
+  -- quotes and escape certain special characters with a backslash.
+
+  -- (Previously, we weren't giving special handling to carriage
+  -- returns/newlines and greater-than/less-than, and we had exposed an
+  -- arbitrary execution vulnerability (!).)
+
+  -- (Experimentally) We currently chose to use double-quotes over single
+  -- quotes for the wrapping.
+  -- PRO's of single quotes:
+  -- - Can pass-thru as-isis: dollar signs, exclamation points
+  -- CON of single quotes:
+  -- - Impossible to represent a literal single quote; gotta break into more tokens
+
+  -- This table lists some characters that should have special attention,
+  -- and what we do about them. (Somewhat arbitrarily, we have attempted to
+  -- order them from "least potentially harmful" to "most")
   --
   -- | Char that triggers    | How we handle it
   -- | --------------------- | ----------------
-  -- | a single space  (" ") | leave as-is, should be okay within single quotes
-  -- | a tab character       | leave as-is, it should be okay in single quotes
-  -- | a dollar sign         | leave as-is, shells don't expand w/ single quotes
-  -- | a single quote        | escape with a backslash
-  -- | a double quote        | leave as-is, okay within single quotes
-  -- | a backslash           | escape it with another backslash
+  -- | a single space  (" ") | leave as-is; should be okay within quotes
+  -- | a tab character       | leave as-is; should be okay within quotes
+  -- | carriage return / newl| leave as-is; terrifying, should be okay in quotes
+  -- | a single quote        | leave as-is (IFF using double quotes)
+  -- | a double quote        | escape with a backslahs (IFF using DQ's)
+  -- | a dollar sign         | escape with backslash (IFF using DQ's)
+  -- | less / greater than   | leave as-is; no magic meaning in quotes
+  -- | exclamation point     | (surprisingly) do NOT escape (DQ's)
+  -- | pipe                  | leave as-is; no magic meaning in quotes
+  -- | a backslash           | VERY IMPORTANT escape it with another backslash
 
-  -- If the string doesn't have special chars, just use as-is
-
-  if not string.find(s, '[ \t$\'"\\\\]') then
+  -- Play it safe: escape the token *unless* it looks like this:
+  if string.find(s, "^[a-zA-Z0-9_]+$") then
     return s
   end
 
-  -- Escape a literal backslash and escape a single quote (not double) :#here1
-  -- (and pray that's all we need to escape - not newlines)
-
-  local inside = string.gsub(s, "[\\\\']", function (c)
+  -- Implement the "rule table" above
+  local inside = string.gsub(s, '["$\\\\]', function (c)
     return "\\" .. c
   end)
-  return "'" .. inside .. "'"
+  return '"' .. inside .. '"'
 end
 
 if 'POST' == GetMethod() then
@@ -218,4 +255,5 @@ else
   Write("unrecognized action: " .. action_arg)  -- #todo
 end
 
+-- #history-C.1
 -- #born

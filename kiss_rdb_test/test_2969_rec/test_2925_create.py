@@ -123,6 +123,10 @@ class Case2924_ok(CommonCase):
         # (but it will fail that one test)
 
 
+# == BEGIN
+# THEORY: a line ending in a backslash
+# == END
+
 # == Support
 
 def collection(main_recfile, formal_entity_name):

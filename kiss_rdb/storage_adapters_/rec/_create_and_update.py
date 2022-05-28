@@ -198,7 +198,7 @@ def _prepare_directives(existing_entity, param_direcs, tlistener):
 
 def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
     """
-    A very short way to distill the overall algorithm:
+    A very short distillation of the overall algorithm:
     Derive any UNEXPECTEDS by (PARAM_ATTRS - ALLOW_LIST)
     Derive any MISSING_REQUIREDS by (REQUIREDS - PARAM_ATTRS)
     In the first, ALLOW_LIST is {something} minus attrs of VALUE_FACTORIES
@@ -535,7 +535,12 @@ def _do_make_statistics(abs_ent_1, abs_ent_2, coll):
 
 def _normalizer_via_type_macro(tm):
     if tm.kind_of('text'):
-        return _text_normalizer
+        if 'text' == tm.string:
+            return _text_normalizer
+        if tm.kind_of('paragraph'):
+            assert 'paragraph' == tm.string  # for now
+            return _paragraph_normalizer
+        xx(f"have fun: {tm.string}")
     if tm.kind_of('int'):
         return _int_normalizer
     xx(f"Neato, make normalizer for {tm.string!r}")
@@ -547,11 +552,114 @@ def _int_normalizer(mixed_value, use_k, listener):
     xx(f"neato, convert to int from string with regex whatever: {mixed_value!r}")
 
 
+def _paragraph_normalizer(x, k, listener):
+
+    # Make sure type is string, furthermore make sure string is nonempty
+    wv = _text_normalizer(x, k, listener)
+    if not wv:
+        return
+    x, = wv
+
+    # NOTE normally we stream but we want to just make it easier
+
+    # Split on newlines, preserving them
+    import re
+    lis = re.split('(?<=\n)(?=.)', x)
+
+    # If the carriage return char is anywhere, be gone! (weird browser thing)
+    # (we do this after splitting in case we end up needing to use '\r' later)
+    if -1 != x.find('\r'):
+        lis = [s.replace('\r', '') for s in lis]
+
+    # If the last line didn't terminate (probably), termindate it
+    # (#todo: Actually we don't like it.)
+    if False and not (len(lis[-1]) and '\n' == lis[-1][-1]):
+        lis[-1] = f"{lis[-1]}\n"
+
+    # EXPERIMENTAL enforce this here, hard-codedly:
+    # "standard linux terminal size" for a paragraph (80x24)
+
+    max_w, max_h = 80, 24
+    use_max_w = max_w + 1  # don't count newline against the max
+
+    # What are the offsets of lines that are too wide lol?
+    bads = tuple(i for i in range(0, len(lis)) if use_max_w < len(lis[i]))
+
+    # How many lines are we over the max number of lines?
+    over = max(0, len(lis)-max_h)
+
+    if bads or over:
+        return _explain_rectangle(listener, bads, over, lis, max_w, max_h, k)
+
+    # == BEGIN hotfix for recins bug probably #todo
+    # Find all the line that END in a backslash (also check something)
+    def yes(line):
+        md = bad_rx.search(line)
+        if not md:
+            return
+        assert '\\' == md[1]  # because #here6
+        return True
+    bad_rx = re.compile('(.?)\\\\$')
+    bads = tuple(i for i in range(0, len(lis)) if yes(lis[i]))
+    if bads:
+        return _explain_recins_bug(listener, bads, lis, k)
+    # == END
+
+    # Since we're normalizing for storage into recins, it's a string we want
+    x = ''.join(lis)
+    return (x,)  # #here1
+
+
+def _explain_recins_bug(listener, bads, lis, k):
+    def lines():
+        s, oxford_np, are = _express_line_numbers(bads)
+        yield f"Line{s} {oxford_np} cannot end in a backslash."
+        yield "This is probably because of a recins bug."
+    listener('error', 'expression', 'error_about_field', k, 'recins_bug', lines)
+
+
+def _explain_rectangle(listener, bads, over, tup, max_w, max_h, k):
+    # If the first too-wide line is also already past the row limit, focus.
+    if not bads or (max_w <= bads[0]):
+        return _explain_rectangle_too_tall(listener, over, tup, max_h, k)
+    return _explain_rectangle_too_wide(listener, bads, tup, max_w, k)
+
+
+def _explain_rectangle_too_wide(listener, bads, tup, max_w, k):
+    def lines():
+        s, oxford_np, are = _express_line_numbers(bads)
+        yield f"Line{s} {oxford_np} {are} too long."
+        yield f"Max line width is {max_w}."
+    listener('error', 'expression', 'error_about_field', k, 'too_wide', lines)
+
+
+def _express_line_numbers(bads):
+    line_nos = [str(i+1) for i in bads]
+    if 1 < len(bads):
+        line_nos[-1] = f'{line_nos[-2]} and {line_nos.pop()}'
+        s, are = 's', 'are'
+    else:
+        s, are = '', 'is'
+    oxford_np = ', '.join(line_nos)
+    return s, oxford_np, are
+
+
+def _explain_rectangle_too_tall(listener, over, tup, max_h, k):
+    def lines():
+        yield f"has too many lines. Max is {max_h}; this has {max_h + over}."
+    listener('error', 'expression', 'error_about_field', k, 'too_tall', lines)
+
+
 def _text_normalizer(mixed_value, use_k, listener):
     if not isinstance(mixed_value, str):
         xx(f"cover strange type, expected str had {type(mixed_value)}")
     if not len(mixed_value):
         xx(f"cover let's required nonzero length strings (for {use_k!r})")
+    # == BEGIN #hotfix
+    #    somewhere along the pipeline, if we don't escape backslashes
+    #    they get swallowed
+    mixed_value = mixed_value.replace('\\', '\\\\')  # :#here6
+    # == END
     return (mixed_value,)  # #here1
 
 

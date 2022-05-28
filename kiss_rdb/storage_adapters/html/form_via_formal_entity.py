@@ -484,10 +484,15 @@ def _expression_strategy_via_type_macro(tm):
 
 def render_as_textarea(stem, m, indent):  # m = margin
     attrs = _render_form_el_attrs(stem, rows=4, cols=50)  # ..
-    yield f'{m}<textarea {attrs}>\n'
+
+    # (we must ignore margin because it is interpreted as content inside #here5)
+    # yield f'{m}<textarea {attrs}>\n'
+    yield f'<textarea {attrs}>\n'
     for line in _html_lines_via_existing_value(stem.existing_value, m):
         yield line
-    yield f'{m}</textarea>\n'
+    # yield f'{m}</textarea>\n'
+
+    yield f'</textarea>\n'
 
 
 # == BEGIN copy-pasted list from https://www.w3schools.com/html/html_form_input_types.asp
@@ -609,7 +614,11 @@ def _html_lines_via_existing_value(existing_value, margin):
 
     h = _html_escape_function()
     for line in lines:
-        pcs = [margin, h(line)]
+
+        # (no leading margin: it shows up "cosmetically" in text area) #here5
+        # pcs = [margin, h(line)]
+        pcs = [h(line)]
+
         if 0 == len(line) or '\n' != line[-1]:
             pcs.append('\n')
         yield ''.join(pcs)

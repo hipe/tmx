@@ -1,6 +1,6 @@
 # NOTE schema is EXPERIMENTAL at this time.
 # At #birth we hand-populated this with some records just
-# to # visual-test the view of notes before we do form gen & CREATE.
+# to visual-test the view of notes before we do form gen & CREATE.
 
 %rec: Note
 %mandatory: Parent
