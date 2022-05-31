@@ -722,6 +722,7 @@ def abstract_column_via(column_name, type_macro='text', listener=None, **kw):
 class _AbstractColumn:
     column_name: str
     type_macro: object
+    IDENTIFIER_FUNCTION: callable = None
     is_primary_key: bool = False  # mutex with `is_unique` per #here2
     null_is_OK: bool = False  # API provis: NOT NULL is default at #history-B.4
     is_unique: bool = False  # mutex with `is_primary_key` per #here2
@@ -772,6 +773,16 @@ class _AbstractColumn:
             xx("can we please deprecate foreign key column name (see..)?")
             # recutils seems fine without them
 
+    def IDENTIFIER_FOR_PURPOSE(self, tup):
+        if (f := self.IDENTIFIER_FUNCTION):
+            return f(tup)
+        first = tup[0]
+        if 'key' == first:
+            return self.column_name
+        if 'label' == first:
+            return self.column_name.replace('_', ' ')
+        xx(repr(first))
+
     @property
     def type_macro_string(self):
         return self.type_macro.string
@@ -781,6 +792,8 @@ class _AbstractColumn:
         'is_foreign_key_reference',
         'is_primary_key', 'is_unique',  # mutex
         'referenced_table_name', 'referenced_column_name')
+
+FormalAttribute_ = _AbstractColumn
 
 
 # == Type Macros

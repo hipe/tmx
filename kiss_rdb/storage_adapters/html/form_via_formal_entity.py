@@ -72,6 +72,7 @@ from client to server at all, and when UPDATE-ing an existing entity; the
 primary key will be passed back and forth as a hidden field.
 """
 
+from dataclasses import dataclass
 import re
 
 
@@ -174,16 +175,14 @@ def _CLI(sin, sout, serr, argv):
     for omit_k in omits:
         violation.pop(omit_k)
 
-    coll = _DUMMY_COLL(use_fent)
-
     form_values = {k: v for k, v in hiddens}  # NOTE new in this iteration
 
-    lines = html_form_via_SOMETHING_ON_THE_MOVE_(
-            coll=coll,
+    lines = asset_function(
+            FORMAL_ATTRIBUTES=violation.values(),
             action='#',
             form_values=form_values,
             listener=None,
-            WHAT=([], {}))
+            WHAT=None)
     w = sout.write
     for line in lines:
         w(line)
@@ -229,7 +228,7 @@ def _value_normalizer_on_omit_parameter(
 
 
 def html_form_via_SOMETHING_ON_THE_MOVE_(
-        coll,  # experimentally expanded from just a fent
+        FORMAL_ATTRIBUTES,  # an iterator (or tuple)
         action='#',  # a string for the FORM html element attribute value.
         form_values=None,  # use the "use" keys and values as strings
         listener=None,  # will be used to complain about missing req'd hiddens
@@ -240,6 +239,10 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     """EXPERIMENT in form generation.."""
     # (the above appears in a CLI help form)
 
+    general_message_lines = tms = None  # tms = targeted message structures
+    if WHAT:
+        general_message_lines, tms = WHAT
+
     # In a first pass, partition the hiddens from the non-hiddens
     hiddens = []
     non_hiddens = []
@@ -248,7 +251,19 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     if '#' != action:
         hiddens.append(_HiddenFormElement('action', action))
 
-    for stem in _stems(coll, form_values, listener, WHAT):
+    attr_via_fpn = {}  # (fpn = form parameter name.
+    for attr in FORMAL_ATTRIBUTES:
+
+        # Determine existing value with the form values param
+        fpn = attr.IDENTIFIER_FOR_PURPOSE(_FORM_KEY_PURPOSE)
+        attr_via_fpn[fpn] = attr  # keep these keyed to fpm for later use
+
+        ev = (form_values.get(fpn) if form_values else None)
+        # (ev = existing form value)
+
+        stem = _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener)
+        if stem is None:
+            continue
         (hiddens if stem.is_hidden_form_element else non_hiddens).append(stem)
 
     assert non_hiddens
@@ -280,15 +295,15 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     yield f'{ch_margin}<table class="SOMETHING_SPECIFIC_SOON">\n'
 
     # Put any general messages at the top (like messages from #here2)
-
     def htmls():
         # General messages intended as general messages
-        for plain_line in (WHAT or _empty_what())[0]:
+        for plain_line in (general_message_lines or ()):
             yield _html_escape(plain_line)
 
         # Attribute-specific messages that didn't get used yet :#here3 #todo
-        for k, emi_tails in (WHAT or _empty_what())[1].items():
-            for html in _htmls_via_emission_tails(emi_tails, k, coll, do_express_subject=True):
+        for fpn, emi_tails in (tms.items() if tms else ()):
+            attr = attr_via_fpn[fpn]
+            for html in _htmls_via_emission_tails(emi_tails, attr, do_express_subject=True):
                 yield html
 
     htmls = tuple(htmls())
@@ -310,7 +325,8 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
 
         if (scts := stem.message_structures):
             yield f'{ch3_margin}<tr><td class="SOMETHING_ABOUT_HANGING_INFO" colspan="2"><ul>\n'
-            for html in _htmls_via_emission_tails(scts, stem.snake_name, coll):
+            attr = attr_via_fpn[stem.form_element_name]
+            for html in _htmls_via_emission_tails(scts, attr):
                 yield f'{ch4_margin}<li>{html}</li>\n'
             yield f'{ch3_margin}</ul></td></tr>\n'
 
@@ -325,18 +341,17 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     yield f'{margin}</form>\n'
 
 
-def _htmls_via_emission_tails(emi_tails, k, coll, do_express_subject=False):
+def _htmls_via_emission_tails(emi_tails, attr, do_express_subject=False):
     for emi_tail in emi_tails:
-        for html in _htmls_via_emission_tail(emi_tail, k, coll, do_express_subject):
+        for html in _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
             yield html
 
 
-def _htmls_via_emission_tail(emi_tail, k, coll, do_express_subject):
+def _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
     category, predicate_strings = emi_tail
     del(category)  # one day we might allow selectively filtering out messages
 
-    _ = coll.name_converter.snake_store_key_via_use_key(k)
-    subject_string = _.replace('_', ' ')  # human_via ..
+    subject_string = attr.IDENTIFIER_FOR_PURPOSE(_LABEL_PURPOSE)
 
     def subject_string_is_already_at_head():
         pos = predicate_string.find(' ')  # or use regex meh idc
@@ -359,74 +374,34 @@ def _htmls_via_emission_tail(emi_tail, k, coll, do_express_subject):
         yield _html_escape(' '.join((*head_pcs, predicate_string)))
 
 
-def _stems(coll, form_values, listener, WHAT):
-    def monadic_nothing(_):
-        pass
+def _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener):
 
-    # Determine existing value with the form vlaues param
-    if form_values:
-        any_existing_value_of = form_values.get
-    else:
-        any_existing_value_of = monadic_nothing
-
-    # Determine if it has value factory with this
-    _ = getattr(coll.dataclass, 'VALUE_FACTORIES', _empty_dict)
-    has_value_factory = _.__contains__
-
-    # Determine if it's the primary key with this
-    store_fent = coll.abstract_entity_derived_from_store(listener=None)
-    # (before #history-C.2 this used to be abstract_entity_derived_from_dataclass)
-
-    pkfn = store_fent.primary_key_field_name
-    if pkfn is None:
-        is_primary_key = monadic_nothing
-    else:
-        def is_primary_key(k):
-            return pkfn == k
-
-    f = coll.name_converter.use_key_via_snake_store_key
-    for attr in store_fent.to_formal_attributes():
-        ssk = attr.column_name  # ssk = snake store key
-        k = f(ssk)  # k = use key
-
-        # If the field has a value factory, it receives no form expression
-        if has_value_factory(k):
-            continue
-        s = any_existing_value_of(k)
-
-        # Foreign key references are hidden
-        if attr.is_foreign_key_reference:
-            if s is None:
-                if not listener:
-                    xx(f"oops, provide value for hidden parameter {ssk!r}")
-                def lines():
-                    yield "is required to generate form."
-                listener('error', 'expression', 'error_about_field',
-                         k, 'missing_required_hidden', lines)
+    # Foreign key references are hidden
+    if attr.is_foreign_key_reference:
+        if ev is None:
+            _explain_FKs_must_be_provided(listener, fpn)
                 # (confusingly, above is populated but not used :#here2)
-                continue
                 # (badly, we are rendering the form but it cannot be used #todo)
-            yield _HiddenFormElement(ssk, s)
-            continue
+            return
+        return _HiddenFormElement(fpn, ev)
 
-        # Primary keys get nothing on CREATE, pass-thru on UPDATE
-        if is_primary_key(ssk):
-            if s is None:
-                continue
-            yield _HiddenFormElement(ssk, s)
-            continue
+    # Primary keys get nothing on CREATE, pass-thru on UPDATE
+    if attr.is_primary_key:
+        if ev is None:
+            return
+        return _HiddenFormElement(fpn, ev)
 
-        # All others get visual representation, probably
-        msg_scts = (WHAT or _empty_what())[1].pop(k, None)  # :#here3
-        yield _NonHiddenFormElement(attr, s, msg_scts)
+    # All others get visual representation, probably
+    msg_scts = (tms and tms.pop(fpn, None))  # :#here3
+    return _NonHiddenFormElement(fpn, attr, ev, msg_scts)
 
 
+@dataclass
 class _NonHiddenFormElement:
-
-    def __init__(self, attr, existing_value=None, message_structures=None):
-        self.message_structures = message_structures
-        self.existing_value = existing_value
-        self.formal_attribute = attr
+    _formal_name:str
+    formal_attribute:object
+    existing_value:str = None
+    message_structures:tuple = None
 
     def to_html_lines(self, margin, indent):
         strat = self._inferred_expression_strategy
@@ -436,7 +411,7 @@ class _NonHiddenFormElement:
 
     @property
     def attribute_label(self):
-        return self._formal_name.replace('_', ' ').title()
+        return self.formal_attribute.IDENTIFIER_FOR_PURPOSE(_LABEL_PURPOSE)
 
     @property
     def form_element_ID(self):
@@ -447,16 +422,8 @@ class _NonHiddenFormElement:
         return self._formal_name
 
     @property
-    def snake_name(self):
-        return self._formal_name
-
-    @property
     def _inferred_expression_strategy(self):
         return _expression_strategy_via_type_macro(self.formal_attribute.type_macro)
-
-    @property
-    def _formal_name(self):
-        return self.formal_attribute.column_name
 
     is_hidden_form_element = False
 
@@ -585,9 +552,19 @@ def render_as_input_type_url(*_, **__):
 def render_as_input_type_week(*_, **__):
     xx()
 
+# == END copy-pasted list
 
-# == END
 
+# == Explanations
+
+def _explain_FKs_must_be_provided(listener, fpn):
+    def lines():
+        yield "is required to generate form."
+    listener('error', 'expression', 'error_about_field',
+             fpn, 'missing_required_hidden', lines)
+
+
+# ==
 
 class _HiddenFormElement:  # :+#stem
 
@@ -661,35 +638,6 @@ def _html_escape_function():
     return func
 
 
-# ==
-
-class _DUMMY_COLL:
-    def __init__(self, abs_ent):
-        self._abs_ent = abs_ent
-        self._NC = None
-
-    def abstract_entity_derived_from_store(self, listener=None):
-        return self._abs_ent
-
-    @property
-    def name_converter(self):
-        if self._NC is None:
-            self._NC = _DUMMY_NAME_CONVERTER()
-        return self._NC
-
-    dataclass = None
-
-
-def _IDENTITY(x):
-    return x
-
-
-class _DUMMY_NAME_CONVERTER:
-    def __init__(self):
-        self.snake_store_key_via_use_key = _IDENTITY
-        self.use_key_via_snake_store_key = _IDENTITY
-
-
 # :#here4 :[#872.C]: #feat:namespace_for_CGI_params munging namespaces
 
 # ==
@@ -705,22 +653,13 @@ def _self_module():
 _self_module.value = None
 
 
-def _empty_what():
-    memo = _empty_what
-    if memo.value is None:
-        memo.value = ((), _empty_dict)
-    return memo.value
-
-
-_empty_what.value = None
-
-
 def xx(msg=None):
     head = "finish this/cover this"
     raise RuntimeError(''.join((head, *((': ', msg) if msg else ()))))
 
 
-_EVENTUALLY = None  # placeholder for future logic
+_LABEL_PURPOSE = 'label', 'UI_LABEL_PURPOSE'
+_FORM_KEY_PURPOSE = 'key', 'HTML_FORM_PARAMETER_NAME_PURPOSE'
 _empty_dict = {}
 
 
@@ -728,6 +667,7 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.3 enter "identifier for purpose"; formal attributes not collections
 # #history-C.2
 # #history-C.1
 # #born

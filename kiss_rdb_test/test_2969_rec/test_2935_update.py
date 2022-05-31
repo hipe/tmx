@@ -125,6 +125,8 @@ class Case2942_lets_go(CommonCase):
             counts[cat] += 1
         assert counts.pop('recutils_command') == 4  # sad but necessary
         assert counts.pop('caution_thrown_to_wind') == 2  # for now
+        assert counts.pop('type_macro_stuff') == 4
+        assert counts.pop('inconsistent_requiredness') == 3
         assert not counts
 
     @property

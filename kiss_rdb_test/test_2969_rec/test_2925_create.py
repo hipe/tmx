@@ -83,10 +83,10 @@ class Case2922_missing(CommonCase):
             fields.append(emi[3])
             lines.append(emi[-1][0])
         assert 2 == len(emis)
-        self.assertSequenceEqual(('parent_EID', 'body_lines'), fields)
+        self.assertSequenceEqual(('parent', 'body'), fields)
         # NOTE we use the names from storage because friendlier yikes
-        assert 'parent is required.' == lines[0]
-        assert 'body is required.' == lines[1]
+        assert 'parent is required.' == lines[0].lower()
+        assert 'body is required.' == lines[1].lower()
 
     @property
     def given_parameters(_):
@@ -100,7 +100,7 @@ class Case2924_ok(CommonCase):
         assert 'recins_success' == roc[0]
         dct = roc[1]
         act = tuple(dct.keys())
-        self.assertSequenceEqual(('parent_EID', 'ordinal', 'body_lines'), act)
+        self.assertSequenceEqual(('parent', 'ordinal', 'body'), act)
         assert 332211 == dct['ordinal']
 
     def test_020_because_it_was_dry_it_wrote_to_STDOUT(self):
@@ -112,8 +112,8 @@ class Case2924_ok(CommonCase):
     @property
     def given_parameters(_):
         return {
-            'body_lines': "HELLO line 1\nHELLO line 2\n",
-            'parent_EID': "Not Valid EID meh",
+            'body': "HELLO line 1\nHELLO line 2\n",
+            'parent': "Not Valid EID meh",
         }
 
     @property

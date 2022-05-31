@@ -185,10 +185,10 @@ def process_form(_, sout, serr, stack):
     # into a params dictionary
     # while changing key names from "snake store key" to "use key"
     form_values = {}
-    f = coll.name_converter.use_key_via_snake_store_key
     while len(stack):
         k, v = stack.pop().split(':', 1)  # ..
-        form_values[f(k)] = v  # might clobber
+        # (at #history-C.3, got rid of name convention conversion)
+        form_values[k] = v  # might clobber
 
     # Go
     custom_listener, WHAT = _build_listener_custom_to_this_module(serr)
@@ -196,7 +196,7 @@ def process_form(_, sout, serr, stack):
     if roc:
         assert 'recins_success' == roc[0]
         sanitized_params = roc[1]
-        eid = sanitized_params['parent_EID']
+        eid = sanitized_params['parent']
         sout.write(f"redirect /?action=view_capability&eid={eid}\n")  # #here1
         return 0
     return _do_show_form(sout, coll, form_values, custom_listener, WHAT)
@@ -210,7 +210,7 @@ def show_form(_, sout, serr, recfile, fent_name, parent_EID):
     """
 
     coll = _collz(recfile)[fent_name]
-    form_values = {'parent_EID': parent_EID}
+    form_values = {'parent': parent_EID}  # [#872.7] use HTML form name
     listener, WHAT = _build_listener_custom_to_this_module(serr)
     # (experimental - wiring a listener on form GENERATION for reasons)
 
@@ -218,15 +218,35 @@ def show_form(_, sout, serr, recfile, fent_name, parent_EID):
 
 
 def _do_show_form(sout, coll, form_values, listener, WHAT=None):
+    fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
+    fattrs = fe.to_formal_attributes()
+
+    # If it has VALUE_FACTORIES, take those attrs out
+    VF_dct = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
+    if VF_dct:
+        fattrs = _filter_out_these(fattrs, VF_dct)
     from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
             html_form_via_SOMETHING_ON_THE_MOVE_ as func
     lines = func(
-        coll, action='add_note', form_values=form_values,  # #here1
+        FORMAL_ATTRIBUTES=fattrs,
+        action='add_note', form_values=form_values,  # #here1
         WHAT=WHAT, listener=listener)
     w = sout.write
     for line in _wrap_lines_commonly(lines):
         w(line)
     return 0
+
+
+def _filter_out_these(fattrs, these):
+    pool = {k: True for k in these.keys()}
+    _DATACLASS_FIELD_NAME_PURPOSE = ('DATACLASS_FIELD_NAME_PURPOSE_',)
+    for attr in fattrs:
+        use_k = attr.IDENTIFIER_FOR_PURPOSE(_DATACLASS_FIELD_NAME_PURPOSE)
+        if pool.pop(use_k, False):
+            continue
+        yield attr
+    if pool:
+        xx(f'oops: {tuple(pool.keys())!r}')
 
 
 # == Listeners
@@ -544,6 +564,7 @@ if '__main__' == __name__:
   from sys import stdin, stdout, stderr, argv
   exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.3 (can be temporary)
 # #history-C.2: "engine" not hand-written CLI
 # #history-C.1: change styling to "minimal" theme
 # #born

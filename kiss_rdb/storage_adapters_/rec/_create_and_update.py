@@ -1,4 +1,4 @@
-"""ALL EXPERIMENTAL
+"""ALL EXPERIMENTAL (the below comment is now :[#872.E] here for posterity.)
 
     Since we're writing this *in order to* be able to accumulate our reading
     notes on recutils, we're allowing it to be messy with this hybrid approach:
@@ -29,6 +29,8 @@
     recinf-derived and dataclass-derived schema here as we suss out whether
     and to what extent we will go with this hybrid approach (and maybe one day
     make a merged abstract entity).
+
+    (At #history-C.1 the hybridized stuff moved to its own file)
     """
 
 
@@ -87,8 +89,7 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
     def do_formalize_parameter_order():
         unordered_but_prepared = state.unordered_but_prepared
         delattr(state, 'unordered_but_prepared')
-        for (_, use_col) in state.BOTH:
-            use_k = use_col.column_name
+        for use_k, use_col in state.FORMAL_PARAMETERS_DICTIONARY.items():
             if use_k in unordered_but_prepared:
                 yield use_k, unordered_but_prepared.pop(use_k)
         assert not unordered_but_prepared
@@ -132,11 +133,12 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
 
     def derive_ALLOW_LIST_from_three_sources():
-        o = _build_BOTH(coll, tlistener)
-        state.ALLOW_LIST = o.ALLOW_LIST
         # ignoring VALUE_FACTORIES for now
-        state.BOTH = o.BOTH
-        state.primary_key_field_name = o.primary_key_field_name
+        indexer = _IndexBuilder(coll, tlistener)
+        for k in ('ALLOW_LIST',
+                  'FORMAL_PARAMETERS_DICTIONARY',
+                  'primary_key_field_name'):
+            setattr(state, k, getattr(indexer, k))
 
     state = main
     stop = _Stop
@@ -220,8 +222,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
     def formalize_parameter_order():
         # This makes the lines in the recfile be in the formal order
-        for (_, use_col) in state.BOTH:
-            use_k = use_col.column_name
+        for use_k in state.FORMAL_PARAMETERS_DICTIONARY.keys():
             # NOTE todo what about etc
             x = use_params.pop(use_k)
             yield use_k, x
@@ -232,21 +233,22 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         # There's "value-based" constraints and "existential" constraints
 
         ok = True
-        for store_col, use_col in state.BOTH:
-            use_k = use_col.column_name
+        for use_k, use_col in state.FORMAL_PARAMETERS_DICTIONARY.items():
 
             # Apply defaulting iff there's defaulting and value is not set
-            defaulter = resolve_any_one_defaulter(store_col, use_col)
+            k = coll.name_converter.use_key_via_store_key(use_col.column_name)
+            value_factory = resolve_any_one_defaulter(k)
             wv = (use_params[use_k],) if use_k in use_params else None
             is_set = value_is_considered_to_be_set(wv[0]) if wv else False
 
-            if defaulter and not is_set:  # #here3
-                wv = defaulter()  # #here1
+            if value_factory and not is_set:  # #here3
+                wv = value_factory()  # #here1
                 assert value_is_considered_to_be_set(wv[0])
                 use_params[use_k] = wv[0]
 
             # Apply any normalization & validation if value is set
-            normalizer = resolve_any_normalizer(store_col, use_col)
+            normalizer = _normalizer_via_type_macro(use_col.type_macro)
+
             if wv and normalizer and value_is_considered_to_be_set(wv[0]):
                 wv = normalizer(wv[0], use_k, listener)
                 # If it failed validation, assume emitted and skip to next
@@ -256,9 +258,9 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
                 use_params[use_k], = wv
 
             # Determine requiredness and if so, assert it
-            is_reqd = determine_if_its_required(store_col, use_col)
+            is_reqd = not use_col.null_is_OK
             if is_reqd and not (wv and value_is_considered_to_be_set(wv[0])):
-                express_missing_required(store_col.column_name, use_k)
+                express_missing_required(use_k, use_col)
                 ok = False
                 continue
 
@@ -268,33 +270,15 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
     value_is_considered_to_be_set = _value_is_considered_to_be_set
 
-    def resolve_any_normalizer(store_col, use_col):
-        store_tm = store_col.type_macro
-        use_tm = use_col.type_macro
-        if store_tm != use_tm:
-            def lines():
-                yield (f"Using store type macro {store_tm.string!r} "
-                       f"over dataclass type macro {use_tm.string!r}")
-            listener('info', 'expression', 'type_macro_stuff', lines)
-            use_tm = store_tm
-        return _normalizer_via_type_macro(use_tm)
-
-    def express_missing_required(snake_store_key, use_k):
+    def express_missing_required(use_k, use_col):
         def lines():
-            yield f"{snake_store_key.replace('_', ' ')} is required."  # #here4
-        listener('error', 'expression', 'error_about_field', use_k, 'required_and_missing', lines)
+            label = use_col.IDENTIFIER_FOR_PURPOSE(('label',))
+            yield f"{label} is required."  # #here4
+        listener('error', 'expression', 'error_about_field',
+                 use_k, 'required_and_missing', lines)
 
-    def determine_if_its_required(store_col, use_col):
-        store_reqd = not store_col.null_is_OK
-        use_reqd = not use_col.null_is_OK
-
-        if bool(store_reqd) != bool(use_reqd):
-            _explain_inconsistent_requiredness(listener, store_col, use_col, coll)
-
-        return (store_reqd or use_reqd)
-
-    def resolve_any_one_defaulter(store_col, use_col):
-        these = tuple(resolve_defaulters(store_col, use_col))
+    def resolve_any_one_defaulter(field_attr_name):
+        these = tuple(resolve_defaulters(field_attr_name))
         leng = len(these)
         if 0 == leng:
             return
@@ -302,26 +286,25 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
             return these[0][1]
         both = 'both' if 2 == leng else 'all of'
         this_and_this = ' AND '.join(two[1] for two in these)
-        msg = f"For {use_col.column_name!r}, can't have {both} {this_and_this}"
+        msg = f"For {use_k!r}, can't have {both} {this_and_this}"
         xx(f"Data modeling error: {msg}")
 
-    def resolve_defaulters(store_col, use_col):
+    def resolve_defaulters(field_attr_name):
         """VALUE_FACTORIES are orthogonal to defaulting. The latter is for
         when the user doesn't provide a value. The former is an assertion that
         the value is not provided and function that's always used to populate
         it. At #here3 we asserted that. As such they are mutually exclusive.
         """
-        use_k = use_col.column_name
 
         # The any VALUE_FACTORY
-        if (vfs := state.VALUE_FACTORIES) and (vf := vfs.get(use_k)):
+        if (vfs := state.VALUE_FACTORIES) and (vf := vfs.get(field_attr_name)):
             def defaulter():
                 x = vf(colz, tlistener)
                 if not _value_is_considered_to_be_set(x):
-                    xx(f"No policy for {use_k!r} VALUE_FACTORY result: {x!r}")
+                    xx(f"No policy for {field_attr_name!r} VALUE_FACTORY result: {x!r}")
                 return (x,)  # #here1
             yield 'value factory defaulter', defaulter
-        dcf = dataclass_fields[use_k]  # dcf = dataclass field
+        dcf = dataclass_fields[field_attr_name]  # dcf = dataclass field
 
         # The any `default_factory`
         if dcf.default_factory != dataclass_none:
@@ -372,10 +355,11 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
 
     def derive_ALLOW_LIST_from_three_sources():
-        o = _build_BOTH(coll, tlistener)
-        state.ALLOW_LIST = o.ALLOW_LIST
-        state.VALUE_FACTORIES = o.VALUE_FACTORIES
-        state.BOTH = o.BOTH
+        indexer = _IndexBuilder(coll, tlistener)
+        for k in ('ALLOW_LIST',
+                  'FORMAL_PARAMETERS_DICTIONARY',
+                  'VALUE_FACTORIES'):
+            setattr(state, k, (getattr(indexer, k)))
 
     from dataclasses import fields as func, MISSING as dataclass_none
     dataclass_fields = {dcf.name: dcf for dcf in func(coll.dataclass)}
@@ -390,51 +374,75 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         pass
 
 
-def _build_BOTH(coll, tlistener):
-    def derive_ALLOW_LIST_from_three_sources():
-        abs_ent_1 = abstract_entity_via_recinf()
-        abs_ent_2 = abstract_entity_via_dataclass()
-        both = _merge_fents(abs_ent_1, abs_ent_2, coll)
+def _IndexBuilder(coll, tlistener):
+    class IndexBuilder:
+        pass
 
-        vf = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
-        ALLOW = {two[1].column_name: None for two in both}
-        for k in (vf.keys() if vf else ()):
-            assert k in ALLOW
-            ALLOW[k] = 'has_value_factory'  # #here3
-        state.ALLOW_LIST = ALLOW
-        state.VALUE_FACTORIES = vf
-        state.BOTH = both
-        state.primary_key_field_name = abs_ent_1.primary_key_field_name
-        # (At writing, our "dataclass" side doesn't care about pk's)
+    def export(func):
+        setattr(IndexBuilder, func.__name__, property(lambda _: func()))
+        return func
 
-    def abstract_entity_via_dataclass():
-        from kiss_rdb.magnetics_.abstract_schema_via_definition import \
-                abstract_entity_via_dataclass as func
-        return func(coll.dataclass)
+    def memoize(func):
+        def use_func():
+            if k not in memo:
+                memo[k] = func()
+            return memo[k]
+        k = func.__name__
+        return use_func
 
-    def abstract_entity_via_recinf():
-        rec_type = coll.name_converter.store_record_type
-        from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
-                abstract_entity_via_recfile_ as func
-        return func(coll.recfile, rec_type, tlistener)
+    memo = {}
 
-    state = derive_ALLOW_LIST_from_three_sources  # #watch-the-world-burn
-    derive_ALLOW_LIST_from_three_sources()
-    return state
+    @export
+    def ALLOW_LIST():
+        return {k: None for k in allow_list_keys()}
 
+    def allow_list_keys():
+        # The ALLOW_LIST is the (fpns of) the FATTRs list minus VALUE_FACTORIES
+        # Don't bother creating name keys if you're not looking for it (ick)
+        pool = None
+        if (dct := VALUE_FACTORIES()):
+            pool = {k: None for k in dct.keys()}
 
-def _merge_fents(abs_ent_1, abs_ent_2, coll):
-    stats = {
-        'store_only': (store_only := []),
-        'use_only': (use_only := []),
-        'both': (both := [])}
-    for k, x in _do_make_statistics(abs_ent_1, abs_ent_2, coll):
-        stats[k].append(x)
-    if store_only:
-        xx(_line_via_lines(_explain_bottom_heavy(store_only, coll)))
-    if use_only:
-        xx(_line_via_lines(_explain_top_heavy(use_only, coll)))
-    return tuple(both)
+        for attr in formal_attributes():
+            if pool:
+                k = coll.name_converter.use_key_via_store_key(attr.column_name)
+                if k in pool:
+                    pool.pop(k)
+                    continue
+            yield form_parameter_name_for(attr)
+
+        assert not pool
+
+    @export
+    def VALUE_FACTORIES():
+        return getattr(coll.dataclass, 'VALUE_FACTORIES', None)
+
+    @export
+    def primary_key_field_name():
+        return formal_entity().primary_key_field_name
+
+    @export
+    def FORMAL_PARAMETERS_DICTIONARY():
+        return {k: v for k, v in build_formal_parameters_dictionary()}
+
+    def build_formal_parameters_dictionary():
+        for attr in formal_attributes():
+            k = form_parameter_name_for(attr)
+            yield k, attr
+
+    def formal_attributes():
+        return formal_entity().to_formal_attributes()
+
+    @memoize
+    def formal_entity():
+        return coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(tlistener)
+
+    def form_parameter_name_for(attr):
+        return attr.IDENTIFIER_FOR_PURPOSE(_FORM_PARAMETER_NAME_PURPOSE)
+
+    _FORM_PARAMETER_NAME_PURPOSE = ('key',)  # near HTML_FORM_PARAMETER_NAME_PURPOSE
+
+    return IndexBuilder()
 
 
 def _build_unexpecteds():
@@ -455,82 +463,11 @@ def _explain_existing_value(listener, verb, use_k, existing_value):
     listener('warning', 'expression', 'caution_thrown_to_wind', lines)
 
 
-def _explain_inconsistent_requiredness(listener, store_col, use_col, coll):
-    def lines():
-        if store_col.null_is_OK:
-            assert not use_col.null_is_OK
-            return lines_when_use()
-        else:
-            assert use_col.null_is_OK
-            return lines_when_store()
-
-    def lines_when_use():
-        yield (f"{head}{use_col.column_name!r} is required in dataclass but "
-               f"not in store{tail()}")
-
-    def lines_when_store():
-        yield (f"{head}{store_col.column_name!r} is required in recfile but "
-               f"not in dataclass{tail()}")
-
-    def tail():
-        return f" (recfile: {coll.recfile})"
-
-    head = "Data modeling notice: "
-
-    listener('notice', 'expression', 'inconsistent_requiredness', lines)
-
-
 def _explain_unexpecteds(listener, unexpecteds, coll):
     def lines():
         for cat, ks in unexpecteds.items():
             yield f"parameter(s) {cat.replace('_', ' ')}: {tuple(ks)!r}"
     listener('error', 'expression', 'unrecognized_or_malformed_parameters', lines)
-
-
-def _explain_top_heavy(use_only, coll):
-    these = tuple(col.column_name for col in use_only)
-    yield f"{coll.fent_name!r} dataclass has this/these field(s) but recfile"
-    yield "doesn't (not sure yet if we will allow this):"
-    yield repr(these)
-    yield f"(recfile: {coll.recfile})"
-
-
-def _explain_bottom_heavy(store_only, coll):
-    these = tuple(col.column_name for col in store_only)
-    yield f"{coll.fent_name!r} has these fields in recfile but not dataclass"
-    yield "(not sure yet if we will allow this):"
-    yield repr(these)
-    yield f"(in {coll.recfile})"
-
-
-def _do_make_statistics(abs_ent_1, abs_ent_2, coll):
-
-    # Place the "store" side in a pool, under "use" keys (not "store" keys)
-
-    nc = coll.name_converter
-    ncc = nc.name_convention_converters_
-    f = ncc.snake_via_camel
-    uvs = {f(s_k): u_k for u_k, s_k in nc.custom_renames_use_and_store_()}
-
-    def store_pool():
-        for col in abs_ent_1.to_columns():
-            snake_store_k = col.column_name
-            yield uvs.get(snake_store_k, snake_store_k), col
-
-    store_pool = {k: v for k, v in store_pool()}
-
-    # Traverse the "use" side, linking it up with any "store" counterparts
-    for col in abs_ent_2.to_columns():
-        use_k = col.column_name
-        store_col = store_pool.pop(use_k, None)
-        if store_col:
-            yield 'both', (store_col, col)
-        else:
-            yield 'use_only', col
-
-    # Any parts left from store that aren't in use
-    for col in store_pool.values():
-        yield 'store_only', col
 
 
 def _normalizer_via_type_macro(tm):
@@ -725,7 +662,7 @@ def _do_send_it_back_to_recset(args, is_dry, listener):
     def lines():
         yield _shell_escape_FOR_DISPLAY_ONLY(args)
     lines.COMMAND_ARGS = args
-    listener('info', 'expression', 'recutils_command', 'recins', lines)
+    listener('info', 'expression', 'recutils_command', 'recset', lines)
     if not is_dry:
         sout_lines = _call_subprocess(args, listener)
         assert not len(sout_lines)
@@ -847,10 +784,6 @@ def _build_throwing_listener(listener, stop):
     return tlistener
 
 
-def _line_via_lines(lines):
-    return ' '.join(lines)
-
-
 class _Stop(RuntimeError):
     pass
 
@@ -858,4 +791,5 @@ class _Stop(RuntimeError):
 def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
+# #history-C.1
 # #born

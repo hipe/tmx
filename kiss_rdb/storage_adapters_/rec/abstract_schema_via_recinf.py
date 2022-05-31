@@ -239,8 +239,9 @@ def abstract_schema_via_recinf_lines(lines, listener):
                 kw['referenced_table_name'] = foreign_table_name
                 kw['referenced_column_name'] = None  # assume PK of remote table
 
-            snake = _snake_via_camel(native_attr_name)
-            formal_attrs.append(formal_attribute_via(snake, **kw))
+            # (changed to use native (camel) name for column_name at #history-C.1)
+            assert re.match('^[A-Z]', native_attr_name)
+            formal_attrs.append(formal_attribute_via(native_attr_name, **kw))
 
         fe = formal_entity_via(
             formal_entity_camel_name, formal_attrs, line_stopping_listener)
@@ -444,4 +445,5 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.1: use native (camel) name (not snake) as column name
 # #born

@@ -219,6 +219,11 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
         def where(_, *args, **kwargs):
             return select(*args, **kwargs)
 
+        def EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(self, listener):
+            from kiss_rdb.storage_adapters_.rec._hybrid_abstract_schema \
+                    import EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_VIA_ as func
+            return func(coll, listener)
+
         @property
         def abstract_entity_derived_from_dataclass(_):
             return abstract_entity_via_dataclass()
@@ -368,58 +373,101 @@ def _build_name_converter(fent_name, maybe_two):
     if maybe_two:
         typ, dct = maybe_two
 
-    def upwards_normally(snake_store_k):
-        return snake_store_k
+    def snake_via_camel(store_k):
+        return _nccs().snake_via_camel(store_k)
 
-    def snake_downwards_normally(use_k):
-        return use_k
-
-    def downwards_normally(use_k):
+    def camel_via_snake(use_k):
         return _nccs().camel_via_snake(use_k)
 
+    def identity(same_k):
+        return same_k
+
+    # ==
+
+    use_key_via_snake_store_key_normally = identity
+
+    use_key_via_store_key_normally = snake_via_camel
+
+    snake_store_key_via_use_key_normally = identity
+
+    snake_store_key_via_store_key = snake_via_camel
+
+    store_key_via_use_key_normally = camel_via_snake
+
     if dct:
-        def upwards(snake_store_k):
-            if upwards.value is None:
-                rev_dct = {k: v for k, v in build_reverse()}
-                assert len(rev_dct) == len(dct)
-                upwards.value = rev_dct
-            else:
-                rev_dct = upwards.value
+
+        def use_key_via_snake_store_key(snake_store_k):
+            rev_dct = memoized_use_key_via_snake_store_key()
             if (k := rev_dct.get(snake_store_k)):
                 return k
-            return upwards_normally(snake_store_k)
+            return use_key_via_snake_store_key_normally(snake_store_k)
 
-        upwards.value = None
+        def use_key_via_store_key(store_k):
+            rev_dct = memoized_use_key_via_store_key()
+            if (k := rev_dct.get(store_k)):
+                return k
+            return use_key_via_store_key_normally(store_k)
 
-        def build_reverse():
+        def memoized_use_key_via_snake_store_key():
+            memo = memoized_use_key_via_snake_store_key
+            if memo.value is None:
+                memo.value = {k:v for k, v in build_use_key_via_snake_store_key()}
+                assert len(memo.value) == len(dct)
+            return memo.value
+
+        def memoized_use_key_via_store_key():
+            memo = memoized_use_key_via_store_key
+            if memo.value is None:
+                memo.value = {k: v for k, v in build_use_key_via_store_key()}
+                assert len(memo.value) == len(dct)
+            return memo.value
+
+        memoized_use_key_via_snake_store_key.value = None
+        memoized_use_key_via_store_key.value = None
+
+        def build_use_key_via_snake_store_key():
             f = _nccs().snake_via_camel
             for use_k, store_k in dct.items():
                 yield f(store_k), use_k
 
-        def snake_downwards(use_k):
+        def build_use_key_via_store_key():
+            return ((v, k) for k, v in dct.items())
+
+        def snake_store_key_via_use_key(use_k):
             if (k := dct.get(use_k)):
                 return _nccs().snake_via_camel(k)
             return use_k
 
-        def downwards(use_k):
+        def store_key_via_use_key(use_k):
             if (k := dct.get(use_k)):
                 return k
-            return downwards_normally(use_k)
+            return store_key_via_use_key_normally(use_k)
     else:
-        upwards = upwards_normally
-        snake_downwards = snake_downwards_normally
-        downwards = downwards_normally
+        use_key_via_snake_store_key = use_key_via_snake_store_key_normally
+        use_key_via_store_key = use_key_via_store_key_normally
+        snake_store_key_via_use_key = snake_store_key_via_use_key_normally
+        store_key_via_use_key = store_key_via_use_key_normally
 
     class name_converter:
-        def custom_renames_use_and_store_(_):
-            return dct.items() if dct else ()
         @property
         def name_convention_converters_(_):
             return _nccs()
+
+    """
+           UK
+                v ^
+         v ^      SSK
+                v ^
+           SK
+    """
+
     nc = name_converter()
-    nc.use_key_via_snake_store_key = upwards
-    nc.snake_store_key_via_use_key = snake_downwards
-    nc.store_key_via_use_key = downwards
+    nc.use_key_via_snake_store_key = use_key_via_snake_store_key
+    nc.use_key_via_store_key = use_key_via_store_key
+    nc.snake_store_key_via_use_key = snake_store_key_via_use_key
+    nc.snake_store_key_via_store_key = snake_store_key_via_store_key
+    nc.store_key_via_use_key = store_key_via_use_key
+    nc.store_key_via_snake_store_key = store_key_via_use_key_normally
     nc.store_record_type = fent_name if typ is None else typ
     return nc
 
@@ -457,14 +505,18 @@ def name_convention_converters_():  # nccs = name convention converters
 
     @export
     def atoms_via_camel(camel):
-        assert re.match(f'^(?:[A-Z][a-z]*)+$', camel)
-        humps = re.split('(?<=[a-z])(?=[A-Z])', camel)
+        humps = humps_via_camel(camel)
         for s in humps:
             if re.match('^[A-Z]+$', s):
                 # Acronyms (like URL) stay
                 yield s
             else:
                 yield s.lower()
+
+    @export
+    def humps_via_camel(camel):  # ..
+        assert re.match(f'^(?:[A-Z][a-z]*)+$', camel)
+        return re.split('(?<=[a-z])(?=[A-Z])', camel)
 
     def snake_via_atoms(atoms):
         return '_'.join(atoms)
