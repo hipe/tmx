@@ -33,16 +33,19 @@ def _build_datamodel(collections):
     class Capability:
         label: str
         EID: str
+        implementation_status: str = None
         native_URL: str = None
-        children_EIDs: tuple = ()
+        children_EIDs: tuple['Capability'] = ()
 
         def RETRIEVE_NOTES(self, listener):
             return collections['Note'].where(
                 {'parent': self.EID}, order_by='ordinal', listener=listener)
 
         @property
-        def implementation_state(_):
+        def FAKE_RANDOM_implementation_status(self):
             return random_implementation_state()
+
+        FORM_ACTION_EXPERIMENTAL = 'edit_capability'  # no
 
     random_implementation_state = _build_randomer()
 
@@ -57,6 +60,7 @@ def _build_datamodel(collections):
         body_lines: tuple[str]
 
         VALUE_FACTORIES = {'ordinal': generate_next_ordinal}
+        FORM_ACTION_EXPERIMENTAL = 'add_note'
 
     return export.dictionary
 

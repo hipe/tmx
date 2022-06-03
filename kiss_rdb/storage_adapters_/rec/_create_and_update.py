@@ -478,6 +478,11 @@ def _normalizer_via_type_macro(tm):
             assert 'paragraph' == tm.string  # for now
             return _paragraph_normalizer
         xx(f"have fun: {tm.string}")
+    if tm.kind_of('tuple'):
+        arg, = tm.generic_alias_args_  # ..
+        if str == arg:
+            return _paragraph_normalizer
+        xx(f"Neato, make normalizer for {tm.string!r}")
     if tm.kind_of('int'):
         return _int_normalizer
     xx(f"Neato, make normalizer for {tm.string!r}")

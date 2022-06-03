@@ -16,7 +16,14 @@ function _ProcessCreateNote (params_list)  -- #here2
 end
 
 function _ShowCreateNoteForm (parent_EID)
-  local fh = _OpenCallToBackend('show_form', recfile_path, 'Note', parent_EID)
+  local qid = "parent_EID:" .. parent_EID
+  local fh = _OpenCallToBackend('show_form', recfile_path, 'Note', qid)
+  _WriteEveryLineAndClose(fh)
+end
+
+function _ShowEditCapabilityForm (EID)
+  local qid = "EID:" .. EID
+  local fh = _OpenCallToBackend('show_form', recfile_path, 'Capability', qid)
   _WriteEveryLineAndClose(fh)
 end
 
@@ -243,6 +250,8 @@ elseif 'view_capability' == action_arg then
   _ViewCapability(eid)
 elseif 'show_index' == action_arg then
   _ShowIndex()
+elseif 'edit_capability' == action_arg then
+  _ShowEditCapabilityForm(GetParam('entity_EID'))  -- ..
 elseif 'add_note' == action_arg then
   local parent_EID = GetParam('parent')
   _ShowCreateNoteForm(parent_EID)

@@ -51,8 +51,19 @@ def _fattrs_via(coll, listener):
     def resolve_one_type_macro():
         store_TM = store_FA.type_macro
         use_TM = use_FA.type_macro
-        if store_TM != use_TM:
-            _explain_which_type_macro(listener, store_TM, use_TM)
+
+        # It is unlikely that the two type macros are the same (for reasons)
+        if store_TM == use_TM:
+            return store_TM
+
+        # (store is better than dataclass for "singluar" types (maybe),
+        # but for "plural" types, this is an area of experimentation)
+        if use_TM.kind_of('tuple'):
+            _explain_use_over_store_TM(listener, store_TM, use_TM)
+            return use_TM
+
+        # We'll use store over dataclass for singular types, for now
+        _explain_store_over_use_TM(listener, store_TM, use_TM)
         return store_TM
 
     def resolve_one_NULL_IS_OK_for_the_existential_constraint():
@@ -125,7 +136,14 @@ def _fattrs_via(coll, listener):
 
 # == Explanations
 
-def _explain_which_type_macro(listener, store_TM, use_TM):
+def _explain_use_over_store_TM(listener, store_TM, use_TM):
+    def lines():
+        yield (f"Using dataclass type macro {use_TM.string!r} "
+               f"over store type macro {store_TM.string!r}")
+    listener('info', 'expression', 'type_macro_stuff', lines)
+
+
+def _explain_store_over_use_TM(listener, store_TM, use_TM):
     def lines():
         yield (f"Using store type macro {store_TM.string!r} "
                f"over dataclass type macro {use_TM.string!r}")

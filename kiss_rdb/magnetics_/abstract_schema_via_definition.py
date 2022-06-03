@@ -287,7 +287,7 @@ class _MyColDef:
 
 def abstract_entity_via_dataclass(dataclass):
     def each_column():
-        for fie in dc.fields(dataclass):
+        for fie in dc.fields(dataclass):  # fie = field
             yield func(fie)
     _ = _functions_for_abstract_attribute_via_dataclass_field()
     func = _['abstract_attribute_via_dataclass_field']
@@ -330,29 +330,29 @@ def _define_functions_for_abstract_attribute_via_dataclass_field():
         else:
             yield 'null_is_OK', True
 
-        # Convert frequently (ugh) used python types to type macro types
-        yield 'type_macro', type_macro_via_python_type(fie.type)
+        # Convert the parametized type to a type macro
+        yield 'type_macro', type_macro_argument_via_python_type(fie.type)
 
-    def type_macro_via_python_type(typ):
-        if str == typ:
-            return 'text'
-        if tuple == typ:
-            return 'tuple'
-        if int == typ:
-            return 'int'
-        from types import GenericAlias
-        if not isinstance(typ, GenericAlias):
-            xx(f"have fun: {typ!r}")
-        md = re.match(r'^tuple\[(?P<which>str)\]$', str(typ))
-        if not md:
-            xx(f'huh interesting: {typ}')
-        assert 'str' == md['which']
+    def type_macro_argument_via_python_type(typ):
+        if isinstance(typ, type):
+            s = type_macro_string_via_primitive_type.get(typ)
+            if s:
+                return s  # Let the TM factory turn this into a cached object
 
-        # LOOK big experiment EXPERIMENTAL
-        tm = type_macro_('tuple')
-        return tm.__class__(ancestors=(*tm._ancestors, str(typ)))
+            if isinstance(typ, python_GenericAlias):
+                return type_macro_.NEW_FUN_EXPERIMENT_via_GA_(typ)
+
+            xx(f"Fun! first time seeing this type in an annotation: {typ!r}")
+        xx(f"For now, expecting type in annotation to be of type `type`: {typ!r}")
+
+    type_macro_string_via_primitive_type = {
+        str: 'text',
+        tuple: 'tuple',
+        int: 'int',
+    }
 
     from dataclasses import MISSING as none
+    from types import GenericAlias as python_GenericAlias
     import re
     return export.dictionary
 
@@ -629,7 +629,7 @@ class _AbstractTable:
             for line in col.to_description_lines():
                 yield line
 
-    def to_sexp_lines(self, margin, indent_for_children):
+    def to_sexp_lines(self, margin='', indent_for_children='  '):
         tn = self.table_name
         assert '"' not in tn  # can't use repr, need double-quotes
         yield f'{margin}("abstract_entity" "{tn}"\n'
@@ -796,9 +796,56 @@ class _AbstractColumn:
 FormalAttribute_ = _AbstractColumn
 
 
-# == Type Macros
+"""Type Macros
+
+A "type macro" expression is typically as simple as a string, like "paragraph".
+The idea is that behind such a short expression of type, we may draw from an
+agreed-upon set of "opinionated" associations: In this example, "paragraph" is
+one node in our "static, universal taxonomy", a "standard, abstract typology
+lexicon" that essentially associates a bunch of words together into a
+straightforward hierarchy. In this hierarchy, "paragraph" is a child node
+of "text". (It is in this sense that we consider it a "macro" because it starts
+as a simple word but "expands" into this richer structure through its
+implications.)
+
+Knowing where this node fits within a hierarchy allows different "operational
+contexts" to zoom-in or zoom-out to whatever level of detail is appropriate
+for their on "typology" systems:
+
+Different operational contexts can make different inferences from this
+expression of type: For example, a sqlite3 database would be able to know that
+expression of type "paragraph" (as a type macro) is a `kind_of("text")` and
+so it would know that it can use its own storage class "TEXT" to store a
+paragraph.
+
+Elsewhere, a validation/normalization layer might know that it can assume
+the constraints for a paragraph is that it be a tuple of lines that is
+maximum 24 lines long and each line maximum 80 characters wide; or perhaps
+it limits the whole paragraph to 1920 characters; etc. For the known type macro
+"int", validation/normalization layers can make the unsurprising validations/
+normalizations there.
+
+Internally, every type macro for a "known type" will have as its only member
+data a tuple of strings, where the tuple is ordered from general to specific
+as a path on the taxonomy, for example `('text', 'paragraph')` or `('int',)`.
+Because every known type will always expand into the same `ancestor_strings`
+(and the object is immutable), we cache these type macros lazily.
+
+Beyond just this "specification" above, we are now experimenting with type
+macros that can ~ leverage ~ the ~ power ~ of type annoations in python.
+:#[#872.H]
+"""
 
 def _define_type_macro_function():
+
+    def type_macro_via_generic_alias(ga):  # ga = GA = types.GenericAlias
+        from typing import get_origin, get_args
+        GA_origin = get_origin(ga)
+        GA_args = get_args(ga)
+        if GA_origin is not tuple:
+            xx("proceding cautiously for now. Not tuple? {GA_origin!r}")
+        ancestor_strings = 'tuple', str(ga)  # always tuple for now
+        return _TypeMacro(ancestor_strings, (GA_origin, GA_args))
 
     def type_macro_via_string(type_macro_string, listener=None):
         if (o := cache.get(type_macro_string, None)):
@@ -829,7 +876,12 @@ def _define_type_macro_function():
     parent_of['int'] = None
 
     class _TypeMacro:
-        def __init__(self, ancestors):
+        def __init__(self, ancestors, GA_components=None):
+            assert isinstance(ancestors, tuple)
+            if GA_components:
+                self.generic_alias_origin_, self.generic_alias_args_ = GA_components
+            else:
+                self.generic_alias_origin_ = None
             self._ancestors = ancestors
 
         def kind_of(self, type_string):
@@ -860,6 +912,7 @@ def _define_type_macro_function():
         def all_symbols(_):
             return parent_of.keys()
 
+    type_macro_via_string.NEW_FUN_EXPERIMENT_via_GA_ = type_macro_via_generic_alias
     return type_macro_via_string
 
 

@@ -303,9 +303,7 @@ def _denativizer_via_abstract_entity(absent, name_converterer):
             return one_string
 
         early_factory = None  # placeholder for the idea for now
-        late_factory = None
-        is_plural = False
-        do_chop = True
+
         tm = fattr.type_macro
         use_k = fattr.column_name
 
@@ -314,26 +312,10 @@ def _denativizer_via_abstract_entity(absent, name_converterer):
             required_use_keys.append(use_k)  # LOOK
 
         # Derive pluralness (and some normalizers) from type macro
-        if tm.kind_of('text'):
-            pass
-        elif tm.kind_of('tuple'):
-            is_plural = True
-            # EXPERIMENTAL we don't love this
-            # we need to distinguish between body line strings and many atoms
-            if 'tuple' == tm.string:
-                assert do_chop
-            elif 'tuple[str]' == tm.string:
-                do_chop = False
-            else:
-                xx(f"fun: {tm.string!r}")
-        elif tm.kind_of('int'):
-            def late_factory(s):
-                if re.match(r'^\d+$', s):  # ..
-                    return int(s)
-                xx(f"have fun, should be integer: {s!r}")
-            import re
-        else:
-            xx(f"have fun, we anticipate date[time]: {tm.string!r}")
+        these = _IS_PLURAL_and_DO_CHOP_via_type_macro(tm)
+        is_plural = these.is_plural
+        do_chop = these.do_chop
+        late_factory = these.late_factory
 
         # Derive store attr key from custom setting or this formula
         store_k = name_converterer().store_key_via_use_key(use_k)
@@ -354,6 +336,66 @@ def _denativizer_via_abstract_entity(absent, name_converterer):
     attribute_denativizers = {k: v for k, v in attribute_denativizers()}
     required_use_keys = tuple(required_use_keys)
     return denativize
+
+
+class _IS_PLURAL_and_DO_CHOP_via_type_macro:
+
+    def __init__(self, tm):
+        self.is_plural = False
+        self.do_chop = True
+        self.late_factory = None
+        for attr, v in _do_IS_PLURAL_and_DO_CHOP(tm):
+            setattr(self, attr, v)
+
+
+def _do_IS_PLURAL_and_DO_CHOP(tm):
+    if tm.kind_of('text'):
+        return ()  # accept the defaults: is singular, do chop
+
+    if tm.kind_of('tuple'):
+        return _do_IS_PLURAL_and_DO_CHOP_when_tuple(tm)
+
+    if tm.kind_of('int'):
+        return _do_IS_PLURAL_and_DO_CHOP_when_int(tm)
+
+    xx(f"have fun, we anticipate date[time]: {tm.string!r}. Also see here.")
+    # If it's a different type of generic that's not tuple, then why?
+
+
+def _do_IS_PLURAL_and_DO_CHOP_when_tuple(tm):
+    # For now, we allow plural in the store IFF the dataclass uses tuple
+    yield 'is_plural', True
+
+    orig = tm.generic_alias_origin_
+    if not orig:
+        # (might be tests only) when this did't come from a dataclass, defaults)
+        return
+
+    assert tuple == orig  # (until it isn't..)
+
+    arg, = tm.generic_alias_args_  # ..
+
+    if isinstance(arg, str):
+        # When the generic alias arg is a literal string, [#872.H] it's an EID
+        # do chop which is the default.
+        return
+
+    if str == arg:
+        # this is a tuple of strings which is how we represent paragraph
+        yield 'do_chop', False
+        return
+
+    xx("interesting, new shape of generic alias ({tm.string!r)}")
+    return
+
+
+def _do_IS_PLURAL_and_DO_CHOP_when_int(tm):
+    def late_factory(s):
+        if re.match(r'^\d+$', s):  # ..
+            return int(s)
+        xx(f"have fun, should be integer: {s!r}")
+    import re
+    yield 'late_factory', late_factory
 
 
 def _identifier_via_string(any_string, listener):

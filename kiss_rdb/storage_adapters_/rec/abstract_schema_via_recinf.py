@@ -122,6 +122,8 @@ def abstract_schema_via_recinf_lines(lines, listener):
 
         We _enforce_ native naming conventions that were suggested (but not
         proscribed) in the native documentation.
+
+        (This is now part of "type macros" [#872.H])
         """
 
         expect_minmax_number_of_terms(2, None)

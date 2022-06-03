@@ -155,18 +155,81 @@ def view_capability(_, sout, serr, recfile, EID):
     This includes things like XX and XX.
     """
 
+    # == TODO imagine if this was a generic function, not specific to capability
+
     write = sout.write
     listener = _common_listener(serr)
-    coll = _collz(recfile)['Capability']
+    collz = _collz(recfile)
+    coll = collz['Capability']
     ent = coll.retrieve_entity(EID, listener)
     if ent is None:
         return 3  # #error-with-no-output #FIXME
+    fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
 
-    lines = _inner_html_lines_for_view(ent, listener)
+    ar = {}  # ar = additional renderers
+
+    # Build a custom renderer to render all the notes
+    def render_notes(same_ent, margin):
+        itr = ent.RETRIEVE_NOTES(listener)
+        for note in (itr or ()):
+            for line in render_note(note, margin=margin):
+                yield line
+
+    render_note = _build_note_renderer(collz, listener)
+
+    _add_safely(ar, '_n', render_notes)
+
+    # Build a custom renderer for the buttons
+    def render_buttons(same_ent, margin):
+        buttons = _buttons_for_capability(ent)
+        assert buttons  # one day maybe dynamically off
+        # == BEGIN will move
+        yield f'{margin}<tr><td colspan="2" class="the_buttons_tabledata">\n'
+        for html in _html_lines_for_buttons(buttons):
+            yield html
+        yield f'{margin}</td></tr>\n'
+        # == END
+
+    _add_safely(ar, '_b', render_buttons)
+
+    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+            create_entity_renderer as func
+    lines = func(fe, additional_renderers=ar)(ent)
     for line in _wrap_lines_commonly(lines):
         write(line)
 
     return (3 if listener.did_error else 0)
+
+
+def _build_note_renderer(collz, listener):
+
+    coll = collz['Note']
+    fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
+
+    # Do a complicated way of saying "render all attrs but these"
+    pool = {k: None for k in ('Parent', 'Ordinal')}
+
+    def fattrs():
+        for fa in fe.to_formal_attributes():
+            k = fa.column_name
+            if k in pool:
+                pool.pop(k)
+                continue
+            yield fa
+        assert not pool
+    fattrs = tuple(fattrs())
+
+    # Let's try this
+    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+            component_renderer_via_formal_attribute as func
+    component_renderers = tuple(func(fa, label='Note') for fa in fattrs)
+    def render_note(ent, margin):
+        yield "<!-- WOW BEGIN A NOTE -->\n"
+        for cr in component_renderers:
+            for line in cr(ent, margin=margin):
+                yield line
+        yield "<!-- WOW END A NOTE -->\n"
+    return render_note
 
 
 @command
@@ -203,18 +266,22 @@ def process_form(_, sout, serr, stack):
 
 
 @command
-def show_form(_, sout, serr, recfile, fent_name, parent_EID):
-    """usage: {prog_name} RECFILE FENT_NAME PARENT_EID
+def show_form(_, sout, serr, recfile, fent_name, qid):
+    """usage: {prog_name} RECFILE FENT_NAME QUALIFIED_EID
 
     Description: The dream of form generation, not yet fully realized..
     """
 
     coll = _collz(recfile)[fent_name]
-    form_values = {'parent': parent_EID}  # [#872.7] use HTML form name
+    # form_values = {'parent': parent_EID}  # [#872.7] use HTML form name
+
+    form_values = {k: v for k, v in _EXPERIMENT(qid)}
+
     listener, WHAT = _build_listener_custom_to_this_module(serr)
     # (experimental - wiring a listener on form GENERATION for reasons)
 
     return _do_show_form(sout, coll, form_values, listener, WHAT)
+
 
 
 def _do_show_form(sout, coll, form_values, listener, WHAT=None):
@@ -225,11 +292,13 @@ def _do_show_form(sout, coll, form_values, listener, WHAT=None):
     VF_dct = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
     if VF_dct:
         fattrs = _filter_out_these(fattrs, VF_dct)
+
+    form_action = coll.dataclass.FORM_ACTION_EXPERIMENTAL
     from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
             html_form_via_SOMETHING_ON_THE_MOVE_ as func
     lines = func(
         FORMAL_ATTRIBUTES=fattrs,
-        action='add_note', form_values=form_values,  # #here1
+        action=form_action, form_values=form_values,  # #here1
         WHAT=WHAT, listener=listener)
     w = sout.write
     for line in _wrap_lines_commonly(lines):
@@ -247,6 +316,21 @@ def _filter_out_these(fattrs, these):
         yield attr
     if pool:
         xx(f'oops: {tuple(pool.keys())!r}')
+
+
+def _EXPERIMENT(qid):
+    if ':' in qid:
+        typ, rest = qid.split(':', 1)
+        if 'EID' == typ:
+            yield 'EID', rest
+        elif 'parent_EID' == typ:
+            yield 'parent', rest
+        else:
+            xx(f"sad, we cannot fail: {typ!r}")
+    elif 'none' == qid:
+        xx("just an idea")
+    else:
+        xx(f"failed to parse QID: {qid!r}")
 
 
 # == Listeners
@@ -335,6 +419,7 @@ def _wrap_lines_commonly(lines):
     yield """
 <style type="text/css">
 td.the_buttons_tabledata { text-align: center; }
+.the_buttons_tabledata > form { display: inline; }
 .impl-state-unknown     { background-color: none; }
 .impl-state-wont        { background-color: lightgray; }
 .impl-state-maybe       { background-color: lightblue; }
@@ -352,50 +437,6 @@ td.the_buttons_tabledata { text-align: center; }
         yield line
 
     yield '</div>\n</body>\n</html>\n'
-
-
-def _inner_html_lines_for_view(ent, listener):
-    h = _html_escape_function()
-    yield "<table>\n"
-    yield f"<tr><th>Label</th><td>{h(ent.label)}</td></tr>\n"
-    yield f"<tr><th>ID</th><td>{h(ent.EID)}</td></tr>\n"
-
-    # Express any children
-    pcs = []
-    itr = iter(ent.children_EIDs or ())
-    first = next(itr, None)
-    if first:
-        pcs.append(h(first))
-    for nonfirst in itr:
-        pcs.append('&nbsp;')
-        pcs.append(h(nonfirst))
-    if pcs:
-        val = ''.join(pcs)
-        yield f"<tr><th>children</th><td>{val}</td></tr>\n"
-
-    # Express any notes
-    itr = ent.RETRIEVE_NOTES(listener)
-    if itr:
-        for note in itr:
-            yield '<tr><th>note</th><td>\n'
-            for line in note.body_lines:
-                # We haven't decided what the semantics are here
-                if False:
-                    yield h(line)
-                else:
-                    escaped = h(line[:-1])
-                    yield f'{escaped}</br>\n'  # super cute EXPERIMENTAL
-            yield '</td></tr>\n'
-
-    if True:
-        yield '<tr><td colspan="2" class="the_buttons_tabledata">\n'
-        params = {'action': 'add_note', 'parent': ent.EID}
-        url_for_add_note = f'/?action=add_note&parent=QQ'
-        htmls = _html_lines_for_buttons((('Add Note', params),))
-        for html in htmls:
-            yield html
-        yield '</td></tr>\n'
-    yield '</table>\n'
 
 
 def _inner_html_lines_for_table(recs_itr, listener):
@@ -486,7 +527,7 @@ def _childrener(node):
 
 def _impl_state_html(rec):
     cache = _impl_state_html.cache
-    state = rec.implementation_state
+    state = rec.FAKE_RANDOM_implementation_status
     h = cache.get(state)
     if h is not None:
         return h
@@ -521,19 +562,31 @@ def _link_and_label_of_record(rec):
     return f'<a href="{url}">{label_html}</a>'
 
 
-def _html_lines_for_buttons(button_pairs):
+def _buttons_for_capability(ent):
+    params = {'action': 'edit_capability', 'entity_EID': ent.EID}
+    # yield 'Edit', params
+    params = {'action': 'add_note', 'parent': ent.EID}
+    yield 'Add Note', params
+
+
+def _html_lines_for_buttons(button_pairs, margin=''):
     for label, params in button_pairs:
-        for line in _html_lines_for_button(label, params):
+        for line in _html_lines_for_button(label, params, margin):
             yield line
 
 
-def _html_lines_for_button(label, params):
-    yield f'<form method="GET" action="/">\n'  # #here1
+def _html_lines_for_button(label, params, margin):
+    yield f'{margin}<form method="GET" action="/">\n'  # #here1
     for k, v in params.items():
         assert '"' not in v  # one day we will understand the difference
-        yield f'<input type="hidden" name="{k}" value="{v}" />\n'
-    yield f'<input type="submit" value="{label}" />\n'
-    yield f'</form>\n'
+        yield f'{margin}  <input type="hidden" name="{k}" value="{v}" />\n'
+    yield f'{margin}<input type="submit" value="{label}" />\n'
+    yield f'{margin}</form>\n'
+
+
+def _add_safely(dct, k, val):
+    assert k not in dct
+    dct[k] = val
 
 
 # :#here1: [#872.C]: how we generate (or don't generate) urls is weird for now
