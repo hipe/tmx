@@ -9,6 +9,12 @@ else
   action_arg = 'show_index'
 end
 
+function _ProcessEditCapability (params_list)  -- #here2
+  local params = _DictionaryViaParams(params_list)
+  local fh = _OpenCallToBackend('process_form', recfile_path, 'Capability', params)
+  _MaybeRedirect(fh)
+end
+
 function _ProcessCreateNote (params_list)  -- #here2
   local params = _DictionaryViaParams(params_list)
   local fh = _OpenCallToBackend('process_form', recfile_path, 'Note', params)
@@ -240,7 +246,9 @@ function _MyEscape (s)
 end
 
 if 'POST' == GetMethod() then
-  if 'add_note' == action_arg then
+  if 'edit_capability' == action_arg then
+    _ProcessEditCapability(GetParams())
+  elseif 'add_note' == action_arg then
     _ProcessCreateNote(GetParams())
   else
     Write("unrecognized POST action: " .. action_arg)  -- #todo

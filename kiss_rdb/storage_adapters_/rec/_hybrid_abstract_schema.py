@@ -31,13 +31,11 @@ def _fattrs_via(coll, listener):
 
     def main():
         def identifier_for_purpose(purpose):
-            return identifier_function_via_core_purpose[purpose[0]](store_k)
-
-        store_k = store_FA.column_name
+            return identifier_function_via_core_purpose[purpose[0]](fa)
         combined_TM = resolve_one_type_macro()
         combined_NIO = resolve_one_NULL_IS_OK_for_the_existential_constraint()
 
-        return formal_attribute_factory(
+        fa = formal_attribute_factory(
             column_name=store_FA.column_name,
             type_macro=combined_TM,
             IDENTIFIER_FUNCTION=identifier_for_purpose,
@@ -47,6 +45,7 @@ def _fattrs_via(coll, listener):
             is_foreign_key_reference=store_FA.is_foreign_key_reference,
             referenced_table_name=store_FA.referenced_table_name,
             referenced_column_name=store_FA.referenced_column_name)
+        return fa
 
     def resolve_one_type_macro():
         store_TM = store_FA.type_macro
@@ -88,16 +87,22 @@ def _fattrs_via(coll, listener):
     identifier_function_via_core_purpose = {}
 
     @for_purpose('label')
-    def _(store_k):
+    def _(fa):
+        tm = fa.type_macro
+        if tuple == tm.generic_alias_origin_ and isinstance(tm.generic_alias_arg_, str):
+            return _disgusting_hotfix_for_tuple(fa)
+        store_k = fa.column_name
         humps = nc.name_convention_converters_.humps_via_camel(store_k)
         return ' '.join(humps)
 
     @for_purpose('key')
-    def _(store_k):
+    def _(fa):
+        store_k = fa.column_name
         return nc.snake_store_key_via_store_key(store_k)
 
     @for_purpose('DATACLASS_FIELD_NAME_PURPOSE_')
-    def _(store_k):
+    def _(fa):
+        store_k = fa.column_name
         return nc.use_key_via_store_key(store_k)
 
     nc = coll.name_converter
@@ -134,20 +139,37 @@ def _fattrs_via(coll, listener):
         xx(' '.join(_explain_top_heavy(keys_only_in_use, coll)))
 
 
+def _disgusting_hotfix_for_tuple(fa):
+    """Don't use 'Child' as label, use 'Children'
+
+    Per [#872.7] we generally derive label names from store names;
+    but for the current store vendor this doesn't work for those (common) cases
+    where you exploit recutil's field plurality.
+    """
+
+    attr = fa.identifier_for_purpose(('DATACLASS_FIELD_NAME_PURPOSE_',))
+    eek = attr.split('_')
+    import re
+    if 1 < len(eek) and re.match('^[A-Z]{2}', eek[-1]):
+        eek.pop()
+    eek[0] = eek[0][0].upper() + eek[0][1:]
+    return ' '.join(eek)
+
+
 # == Explanations
 
 def _explain_use_over_store_TM(listener, store_TM, use_TM):
     def lines():
         yield (f"Using dataclass type macro {use_TM.string!r} "
                f"over store type macro {store_TM.string!r}")
-    listener('info', 'expression', 'type_macro_stuff', lines)
+    listener('info', 'expression', 'hybridization', 'type_macro_stuff', lines)
 
 
 def _explain_store_over_use_TM(listener, store_TM, use_TM):
     def lines():
         yield (f"Using store type macro {store_TM.string!r} "
                f"over dataclass type macro {use_TM.string!r}")
-    listener('info', 'expression', 'type_macro_stuff', lines)
+    listener('info', 'expression', 'hybridization', 'type_macro_stuff', lines)
 
 
 def _explain_inconsistent_requiredness(listener, store_FA, use_FA, coll):
@@ -172,7 +194,7 @@ def _explain_inconsistent_requiredness(listener, store_FA, use_FA, coll):
 
     head = "Data modeling notice: "
 
-    listener('notice', 'expression', 'inconsistent_requiredness', lines)
+    listener('notice', 'expression', 'hybridization', 'inconsistent_requiredness', lines)
 
 
 def _explain_top_heavy(keys_only_in_use, coll):

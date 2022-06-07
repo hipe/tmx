@@ -164,31 +164,35 @@ def view_capability(_, sout, serr, recfile, EID):
     ent = coll.retrieve_entity(EID, listener)
     if ent is None:
         return 3  # #error-with-no-output #FIXME
+    # (fe = formal entity)
     fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
 
     ar = {}  # ar = additional renderers
 
     # Build a custom renderer to render all the notes
-    def render_notes(same_ent, margin):
+    def render_notes(same_ent, margin, indent):
         itr = ent.RETRIEVE_NOTES(listener)
         for note in (itr or ()):
-            for line in render_note(note, margin=margin):
+            for line in render_note(note, margin, indent):
                 yield line
+
+    render_notes.component_label = 'Notes'
 
     render_note = _build_note_renderer(collz, listener)
 
     _add_safely(ar, '_n', render_notes)
 
     # Build a custom renderer for the buttons
-    def render_buttons(same_ent, margin):
+    def render_buttons(same_ent, margin, indent):
         buttons = _buttons_for_capability(ent)
         assert buttons  # one day maybe dynamically off
         # == BEGIN will move
-        yield f'{margin}<tr><td colspan="2" class="the_buttons_tabledata">\n'
-        for html in _html_lines_for_buttons(buttons):
+        for html in _html_lines_for_buttons(buttons, margin, indent):
             yield html
-        yield f'{margin}</td></tr>\n'
         # == END
+
+    render_buttons.component_label = None
+    render_buttons.component_TD_element_class = 'the_buttons_tabledata'
 
     _add_safely(ar, '_b', render_buttons)
 
@@ -222,11 +226,17 @@ def _build_note_renderer(collz, listener):
     # Let's try this
     from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
             component_renderer_via_formal_attribute as func
-    component_renderers = tuple(func(fa, label='Note') for fa in fattrs)
-    def render_note(ent, margin):
+    component_renderers = tuple(func(fa) for fa in fattrs)
+    def render_note(ent, margin, indent):
         yield "<!-- WOW BEGIN A NOTE -->\n"
+        m2 = f'{margin}{indent}'
+        first = True
         for cr in component_renderers:
-            for line in cr(ent, margin=margin):
+            if first:
+                first = False
+            else:
+                yield f'{margin}<br>\n'  # EEK. probably never see
+            for line in cr(ent, m2, indent):
                 yield line
         yield "<!-- WOW END A NOTE -->\n"
     return render_note
@@ -237,6 +247,7 @@ def process_form(_, sout, serr, stack):
     """usage: {prog_name} RECFILE FENT *FORM_ARGS
 
     Description: experiment
+    For CREATE *and* UPDATE wow!
     """
 
     # We have to do these two positionals by hand because we parse our own
@@ -251,18 +262,77 @@ def process_form(_, sout, serr, stack):
     while len(stack):
         k, v = stack.pop().split(':', 1)  # ..
         # (at #history-C.3, got rid of name convention conversion)
+        v = v.strip()  # (Maybe supposed to happen at layer above but why trust)
         form_values[k] = v  # might clobber
 
     # Go
     custom_listener, WHAT = _build_listener_custom_to_this_module(serr)
-    roc = coll.create_entity(form_values, custom_listener)
-    if roc:
-        assert 'recins_success' == roc[0]
-        sanitized_params = roc[1]
-        eid = sanitized_params['parent']
-        sout.write(f"redirect /?action=view_capability&eid={eid}\n")  # #here1
-        return 0
-    return _do_show_form(sout, coll, form_values, custom_listener, WHAT)
+
+    # == BEGIN break this up when the dust settles
+
+    is_UPDATE_not_CREATE = 'ID' in form_values
+    # (:#here2 experiment: determine this from this)
+
+    if is_UPDATE_not_CREATE:
+        eid = form_values.pop('ID')
+
+        def param_direcs():
+            # Assume `strip` happened above. See [#867.I] about below semantics
+            for k, v in form_values.items():
+                if len(v):
+                    yield k, ('SET_ATTRIBUTE', v)
+                else:
+                    yield k, ('DELETE_ANY_EXISTING_ATTRIBUTE',)
+        param_direcs = {k: v for k, v in param_direcs()}
+
+        # (roo = result of operation)
+        roo = coll.update_entity(eid, param_direcs, custom_listener)
+
+        if roo:
+            assert 'result_of_CREATE_or_UPDATE' == roo[0]
+            assert 'result_of_UPDATE' == roo[1]
+
+        # For now, high-level UI choice: for this one type of case,
+        # turn a success into a failure (sort of):
+        if roo and 'UPDATE_was_no_op' == roo[2]:
+            WHAT[0].append("Everthing was unchanged. No values need updating.")
+            roo = None
+
+        if roo:
+            assert 'UPDATE_succeeded' == roo[2]
+            these_args = 'UPDATE', eid
+            # (disregarding ordered prepared direcs. not nec to make redirect)
+    else:
+        roo = coll.create_entity(form_values, custom_listener)
+        if roo:
+            assert 'result_of_CREATE_or_UPDATE' == roo[0]
+            assert 'result_of_CREATE' == roo[1]
+            assert 'CREATE_succeeded' == roo[2]
+            these_args = 'CREATE', roo[3]  # just realized this will need the new ID eventually
+
+    if not roo:
+        # If it failed, assume messages were written to WHAT and re-show form
+        fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(custom_listener)
+        return _do_show_form(sout, form_values, fe, coll, custom_listener, WHAT)
+
+    # An attempt is made to handle successes of *both* CREATE and UPDATE
+    # here in one place but..
+
+    # VERY EXPERIMENTAL complicated API for deciding where to redirect to
+    action_name, use_params = coll.dataclass.AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(*these_args)
+
+    def url():
+        yield '/?action=', action_name
+        if not use_params:
+            return
+        import re
+        for k, v in use_params.items():
+            assert re.match('^[a-zA-Z0-9]+$', v)  # or urlencode whatever
+            yield '&', k, '=', v
+    url = ''.join(s for row in url() for s in row)
+    # == END
+    sout.write(f"redirect {url}\n")  # #here1
+    return 0
 
 
 @command
@@ -273,19 +343,21 @@ def show_form(_, sout, serr, recfile, fent_name, qid):
     """
 
     coll = _collz(recfile)[fent_name]
-    # form_values = {'parent': parent_EID}  # [#872.7] use HTML form name
-
-    form_values = {k: v for k, v in _EXPERIMENT(qid)}
 
     listener, WHAT = _build_listener_custom_to_this_module(serr)
+
+    fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
+
+    kvs = _EXPERIMENTAL_form_values_via_QID(qid, fe, coll, listener)
+    form_values = {k: v for k, v in kvs}
+
     # (experimental - wiring a listener on form GENERATION for reasons)
 
-    return _do_show_form(sout, coll, form_values, listener, WHAT)
+    return _do_show_form(sout, form_values, fe, coll, listener, WHAT)
 
 
+def _do_show_form(sout, form_values, fe, coll, listener, WHAT=None):
 
-def _do_show_form(sout, coll, form_values, listener, WHAT=None):
-    fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
     fattrs = fe.to_formal_attributes()
 
     # If it has VALUE_FACTORIES, take those attrs out
@@ -310,7 +382,7 @@ def _filter_out_these(fattrs, these):
     pool = {k: True for k in these.keys()}
     _DATACLASS_FIELD_NAME_PURPOSE = ('DATACLASS_FIELD_NAME_PURPOSE_',)
     for attr in fattrs:
-        use_k = attr.IDENTIFIER_FOR_PURPOSE(_DATACLASS_FIELD_NAME_PURPOSE)
+        use_k = attr.identifier_for_purpose(_DATACLASS_FIELD_NAME_PURPOSE)
         if pool.pop(use_k, False):
             continue
         yield attr
@@ -318,11 +390,16 @@ def _filter_out_these(fattrs, these):
         xx(f'oops: {tuple(pool.keys())!r}')
 
 
-def _EXPERIMENT(qid):
+def _EXPERIMENTAL_form_values_via_QID(qid, fe, coll, listener):
     if ':' in qid:
         typ, rest = qid.split(':', 1)
         if 'EID' == typ:
-            yield 'EID', rest
+            ent = coll.retrieve_entity(rest, listener)
+            assert ent  # for now
+            from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
+                    EXPERIMENTAL_populate_form_values_ as func
+            for k, v in func(ent, fe, listener):
+                yield k, v
         elif 'parent_EID' == typ:
             yield 'parent', rest
         else:
@@ -338,20 +415,45 @@ def _EXPERIMENT(qid):
 def _build_listener_custom_to_this_module(serr):
     """Create listener that stores certain emissions to a custom structure.
     Purpose-built for form interaction.
+
+    Discussion: An essential piece of this module, routing emissions either
+    to the UI (essential for UX) or to the terminal (critical part of
+    developing tooling, seeing the sub-process commands etc.)
+
+    There's a wide variety of emissions across the spectrum from high-level
+    to low of every variety of severity. Some may need refinement of how
+    they're routed.
     """
 
     def custom_listener(*emi):
-        if 'expression' != emi[1]:
-            line = "error-error: can't express " + repr(tuple(emi[:-1]))
-            emi = 'error', 'expression', 'error_error', lambda: (line,)
-        if 'info' == emi[0]:
-            return write_info_lines_to_my_stderr_FOR_NOW(emi)
+        return handle_emission(emi)
+
+    def handle_emission(emi):
         if 'error' == emi[0]:
-            if 'error_about_field' == emi[2]:
-                return handle_error_about_field(emi)
+            custom_listener.did_error = True
+        if 'expression' == emi[1]:
+            return handle_expression(emi)
+        return handle_strange_emission_shape(emi)
+
+    def handle_strange_emission_shape(emi):
+        line = "error-error: can't express " + repr(tuple(emi[:-1]))
+        use_emi = 'error', 'expression', 'error_error', lambda: (line,)
+        return handle_emission(use_emi)
+
+    def handle_expression(emi):
+        # (for now) All expressions targeting a specific field, show to user in UI
+        if 'about_field' == emi[2]:
+            return handle_expression_about_field(emi)
+
+        # (for now) All errors, show to user in UI
+        # (this will be ugly for e.g. the "error_error" above, but UI design is later or never)
+        if 'error' == emi[0]:
+            return show_this_non_targeted_error_to_user(emi)
+
+        # (for now) All other emissions, just write to terminal or /dev/null
         write_info_lines_to_my_stderr_FOR_NOW(emi)
 
-    def handle_error_about_field(emi):
+    def handle_expression_about_field(emi):
         sev, shape, _, WRONG_ATTR_KEY, cat, lineser = emi
         dct = WHAT[1]
         k = WRONG_ATTR_KEY
@@ -359,12 +461,17 @@ def _build_listener_custom_to_this_module(serr):
             dct[k] = (lis := [])
         lis.append((cat, tuple(lineser())))
 
+    def show_this_non_targeted_error_to_user(emi):
+        for line in emi[-1]():
+            WHAT[0].append(line)
+
     def write_info_lines_to_my_stderr_FOR_NOW(emi):
         for line in emi[-1]():
             w(line)
 
     w = _line_writer_via_write_function(serr.write)
     WHAT = [], {}
+    custom_listener.did_error = False
     return custom_listener, WHAT
 
 
@@ -564,23 +671,24 @@ def _link_and_label_of_record(rec):
 
 def _buttons_for_capability(ent):
     params = {'action': 'edit_capability', 'entity_EID': ent.EID}
-    # yield 'Edit', params
+    yield 'Edit', params
     params = {'action': 'add_note', 'parent': ent.EID}
     yield 'Add Note', params
 
 
-def _html_lines_for_buttons(button_pairs, margin=''):
+def _html_lines_for_buttons(button_pairs, margin, indent):
     for label, params in button_pairs:
-        for line in _html_lines_for_button(label, params, margin):
+        for line in _html_lines_for_button(label, params, margin, indent):
             yield line
 
 
-def _html_lines_for_button(label, params, margin):
+def _html_lines_for_button(label, params, margin, indent):
+    m2 = f'{margin}{indent}'
     yield f'{margin}<form method="GET" action="/">\n'  # #here1
     for k, v in params.items():
         assert '"' not in v  # one day we will understand the difference
-        yield f'{margin}  <input type="hidden" name="{k}" value="{v}" />\n'
-    yield f'{margin}<input type="submit" value="{label}" />\n'
+        yield f'{m2}<input type="hidden" name="{k}" value="{v}" />\n'
+    yield f'{m2}<input type="submit" value="{label}" />\n'
     yield f'{margin}</form>\n'
 
 
@@ -595,8 +703,7 @@ def _add_safely(dct, k, val):
 def _html_escape(msg):  # (experiment in lazy loading)
     assert _html_escape.sanity
     _html_escape.sanity = False
-    import sys
-    sys.modules[__name__]._html_escape = _html_escape_function()
+    _this_module()._html_escape = _html_escape_function()
     return _html_escape(msg)
 
 
@@ -611,6 +718,11 @@ def _html_escape_function():
 def _collz(recfile):
     from kiss_rdb.cap_server.model_ import collections_via_recfile_ as func
     return func(recfile)
+
+
+def _this_module():
+    import sys
+    return sys.modules[__name__]
 
 
 if '__main__' == __name__:

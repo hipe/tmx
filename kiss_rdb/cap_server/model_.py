@@ -41,6 +41,11 @@ def _build_datamodel(collections):
             return collections['Note'].where(
                 {'parent': self.EID}, order_by='ordinal', listener=listener)
 
+        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(which, eid):
+            assert 'UPDATE' == which  # ..
+            # (at writing, Capability's are never CREATE'd, BUT THIS WILL CHANGE)
+            return 'view_capability', {'eid': eid}
+
         @property
         def FAKE_RANDOM_implementation_status(self):
             return random_implementation_state()
@@ -61,6 +66,11 @@ def _build_datamodel(collections):
 
         VALUE_FACTORIES = {'ordinal': generate_next_ordinal}
         FORM_ACTION_EXPERIMENTAL = 'add_note'
+
+        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(which, sanitized_params):
+            assert 'CREATE' == which
+            # (notes only ever get created, never updated)
+            return 'view_capability', {'eid': sanitized_params['parent']}
 
     return export.dictionary
 

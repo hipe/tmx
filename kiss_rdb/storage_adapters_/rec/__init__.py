@@ -220,9 +220,10 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
             return select(*args, **kwargs)
 
         def EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(self, listener):
-            from kiss_rdb.storage_adapters_.rec._hybrid_abstract_schema \
-                    import EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_VIA_ as func
-            return func(coll, listener)
+            if not self._cached_hybrid_fent:
+                # (we cache it, would otherwise be built 2x in UPDATE who fails)
+                self._cached_hybrid_fent = _build_hybrid_fent(listener)
+            return self._cached_hybrid_fent
 
         @property
         def abstract_entity_derived_from_dataclass(_):
@@ -241,6 +242,15 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
         @property
         def fent_name(self):
             return dataclass.__name__
+
+        _cached_hybrid_fent = None
+
+
+    def _build_hybrid_fent(listener):
+        from kiss_rdb.storage_adapters_.rec._hybrid_abstract_schema \
+                import EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_VIA_ as func
+        return func(coll, listener)
+
     coll = Collection()
     coll.update_entity = update_entity
     coll.create_entity = create_entity

@@ -76,7 +76,7 @@ class Case2922_missing(CommonCase):
         assert self.end_state_result is None
 
     def test_020_errors_about_fields_have_field_name_in_channel(self):
-        emis = tuple(self.all_end_state_emissions_of_category('error_about_field'))
+        emis = tuple(self.all_end_state_emissions_of_category('about_field'))
         fields = []
         lines = []
         for emi in emis:
@@ -96,9 +96,10 @@ class Case2922_missing(CommonCase):
 class Case2924_ok(CommonCase):
 
     def test_010_result_is_sanitized_params_FOR_NOW(self):
-        roc = self.end_state_result  # roc = "result of create"
-        assert 'recins_success' == roc[0]
-        dct = roc[1]
+        sx = self.end_state_result  # sx = S-expression
+        exp = 'result_of_CREATE_or_UPDATE', 'result_of_CREATE', 'CREATE_succeeded'
+        self.assertSequenceEqual(exp, sx[:-1])
+        dct = sx[-1]
         act = tuple(dct.keys())
         self.assertSequenceEqual(('parent', 'ordinal', 'body'), act)
         assert 332211 == dct['ordinal']

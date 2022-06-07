@@ -251,14 +251,16 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     if '#' != action:
         hiddens.append(_HiddenFormElement('action', action))
 
+    form_values_pool = form_values.copy() if form_values else _empty_dict
+
     attr_via_fpn = {}  # (fpn = form parameter name.
     for attr in FORMAL_ATTRIBUTES:
 
         # Determine existing value with the form values param
-        fpn = attr.IDENTIFIER_FOR_PURPOSE(_FORM_KEY_PURPOSE)
+        fpn = attr.identifier_for_purpose(_FORM_KEY_PURPOSE)
         attr_via_fpn[fpn] = attr  # keep these keyed to fpm for later use
 
-        ev = (form_values.get(fpn) if form_values else None)
+        ev = form_values_pool.pop(fpn, None)
         # (ev = existing form value)
 
         stem = _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener)
@@ -267,6 +269,8 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         (hiddens if stem.is_hidden_form_element else non_hiddens).append(stem)
 
     assert non_hiddens
+    if form_values_pool:
+        xx(f"oops: non-used form values: {tuple(form_values_pool.keys())!r}")
 
     # Precompute some things used in loops before outputting any html
     def do(i):
@@ -317,10 +321,8 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         yield f'{ch2_margin}<tr>\n'
         _ = h(stem.attribute_label)
         yield f'{ch3_margin}<th><label for="{stem.form_element_ID}">{_}</label></th>\n'
-        yield f'{ch3_margin}<td>\n'
-        for line in stem.to_html_lines(ch4_margin, indent):
+        for line in _TD_lines(stem, ch3_margin, ch4_margin, indent):
             yield line
-        yield f'{ch3_margin}</td>\n'
         yield f'{ch2_margin}</tr>\n'
 
         if (scts := stem.message_structures):
@@ -332,13 +334,35 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
 
     if True:
         yield f'{ch2_margin}<tr>\n'
-        yield f'{ch3_margin}<td colspan="2">\n'
+        yield f'{ch3_margin}<td colspan="2" class="the_buttons_tabledata">\n'
         yield f'{ch4_margin}<input type="submit" value="Submit">\n'
         yield f'{ch3_margin}</td>\n'
         yield f'{ch2_margin}</tr>\n'
 
     yield f'{ch_margin}</table>\n'
     yield f'{margin}</form>\n'
+
+
+def _TD_lines(stem, ch3_margin, ch4_margin, indent):
+    """(be super cute with when you break '<td></td>' into multiple lines)"""
+
+    pcs = [ch3_margin, '<td>']
+    itr = stem.to_html_lines(ch4_margin, indent)
+    line = next(itr, None)
+    if line:
+        if '\n' == line[-1]:  #..
+            pcs.append('\n')
+            yield ''.join(pcs)
+            pcs.clear()
+            pcs.append(ch3_margin)
+            while line:
+                yield line
+                line = next(itr, None)
+        else:
+            assert not next(itr, None)
+            pcs.append(line)
+    pcs.append('</td>\n')
+    yield ''.join(pcs)
 
 
 def _htmls_via_emission_tails(emi_tails, attr, do_express_subject=False):
@@ -351,7 +375,7 @@ def _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
     category, predicate_strings = emi_tail
     del(category)  # one day we might allow selectively filtering out messages
 
-    subject_string = attr.IDENTIFIER_FOR_PURPOSE(_LABEL_PURPOSE)
+    subject_string = attr.identifier_for_purpose(_LABEL_PURPOSE)
 
     def subject_string_is_already_at_head():
         pos = predicate_string.find(' ')  # or use regex meh idc
@@ -400,18 +424,18 @@ def _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener):
 class _NonHiddenFormElement:
     _formal_name:str
     formal_attribute:object
-    existing_value:str = None
+    existing_value:object = None
     message_structures:tuple = None
 
     def to_html_lines(self, margin, indent):
-        strat = self._inferred_expression_strategy
-        mod = _self_module()
-        func = getattr(mod, strat)
-        return func(self, margin, indent)
+        cr = _component_renderer_via_formal_attribute(self.formal_attribute)
+        if isinstance(cr, str):  # for legacy
+            cr = getattr(_self_module(), cr)
+        return cr(self, margin, indent)
 
     @property
     def attribute_label(self):
-        return self.formal_attribute.IDENTIFIER_FOR_PURPOSE(_LABEL_PURPOSE)
+        return self.formal_attribute.identifier_for_purpose(_LABEL_PURPOSE)
 
     @property
     def form_element_ID(self):
@@ -421,14 +445,37 @@ class _NonHiddenFormElement:
     def form_element_name(self):
         return self._formal_name
 
-    @property
-    def _inferred_expression_strategy(self):
-        return _expression_strategy_via_type_macro(self.formal_attribute.type_macro)
-
     is_hidden_form_element = False
 
 
-def _expression_strategy_via_type_macro(tm):
+# == BEGIN XXX
+
+def EXPERIMENTAL_populate_form_values_(ent, fe, listener):
+    # NOTE we're really not sure we want to "know" about entities.
+    # wouldn't it be better to just take dicts?
+    # NOTE keeping this close to render-related derivations (below) for now
+
+    for fa in fe.to_formal_attributes():
+        attr = fa.identifier_for_purpose(_DATACLASS_FIELD_NAME_PURPOSE)
+        mixed = getattr(ent, attr)
+        if mixed is None:
+            continue
+        fpn = fa.identifier_for_purpose(_FORM_KEY_PURPOSE)
+        # we endcode it XXX elsewhere
+        yield fpn, mixed
+
+# == END XXX
+
+
+def _component_renderer_via_formal_attribute(fa):
+    """(at #history-C.4 we changed the name of this idea from the more generic
+    "expression strategy" to the more concrete "component renderer" so A)
+    it parallels its view-only sibling module and B) we can return arbitrary
+    functions from here, not just strings that are names of functions already
+    defined in this module.)
+    """
+
+    tm = fa.type_macro
     if tm.kind_of('text'):
         if tm.kind_of('paragraph'):
             return 'render_as_textarea'
@@ -442,24 +489,72 @@ def _expression_strategy_via_type_macro(tm):
         return 'render_as_input_type_text'  # ..
 
     if tm.kind_of('tuple'):
-        if tm.kind_of('tuple[str]'):
+        orig = tm.generic_alias_origin_
+
+        if not orig:
+            xx("does this ever happen?")
+
+        assert tuple == orig  # because of something in [#872.H]
+        arg, = tm.generic_alias_args_  # ..
+        if str == arg:
             # like "paragraph" but by dataclass not recinf (experimental)
             return 'render_as_textarea'
+        if isinstance(arg, str):
+            # Assume this is a "fent" name [#872.H]
+            return _fall_back_to_view_only_component_renderer(fa)
+
+        xx(f"unhandled tuple parameterization {tm.string!r}")
 
     xx(f"unhandled type {tm.string!r}")
 
 
-def render_as_textarea(stem, m, indent):  # m = margin
+def _fall_back_to_view_only_component_renderer(fa):
+    """If for whatever reason we want to render a component of the
+    entity as view-only, here we fall-back to the generated entity
+    VIEW facilities. (Our founding reason was because making a
+    one-to-many UI component was too hard/out of scope.)
+    """
+
+    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+            component_renderer_via_formal_attribute as func
+
+    vendor_component_renderer = func(fa, attr='existing_value')
+
+    def my_component_renderer(stem, margin, indent):
+        return vendor_component_renderer(stem, margin, indent)
+    return my_component_renderer
+
+
+def render_as_textarea(stem, margin, indent):
     attrs = _render_form_el_attrs(stem, rows=4, cols=50)  # ..
 
-    # (we must ignore margin because it is interpreted as content inside #here5)
-    # yield f'{m}<textarea {attrs}>\n'
-    yield f'<textarea {attrs}>\n'
-    for line in _html_lines_via_existing_value(stem.existing_value, m):
-        yield line
-    # yield f'{m}</textarea>\n'
+    # XXX see:
+    """Note: spaces between these two: "<textarea></textarea>" will show up
+    as the text value of the input element. We are fine-tuning to what
+    extent this is true for the whitespace before and/or after existing non-ws
+    content. :#here5
+    Since we will be avoiding putting leading margin ahead of "</textarea>"
+    for the above reason, we will also do so for the opening tag, so that
+    they line up vertically.
+    """
 
-    yield f'</textarea>\n'
+    pcs = []
+    itr = _html_lines_via_existing_value(stem.existing_value, margin)
+    line = next(itr, None)
+    if not line:
+        pcs.append(margin)
+    pcs.append(f'<textarea {attrs}>')
+    if line:
+        pcs.append('\n')
+        yield ''.join(pcs)
+        pcs.clear()
+        while line:
+            assert '\n' == line[-1]
+            yield line
+            line = next(itr, None)
+
+    pcs.append('</textarea>\n')
+    yield ''.join(pcs)
 
 
 # == BEGIN copy-pasted list from https://www.w3schools.com/html/html_form_input_types.asp
@@ -555,12 +650,16 @@ def render_as_input_type_week(*_, **__):
 # == END copy-pasted list
 
 
+def render_as_placeholder_or_IDK(stem, margin, indent):
+    yield "<p>WAT DO</p>\n"
+
+
 # == Explanations
 
 def _explain_FKs_must_be_provided(listener, fpn):
     def lines():
         yield "is required to generate form."
-    listener('error', 'expression', 'error_about_field',
+    listener('error', 'expression', 'about_field',
              fpn, 'missing_required_hidden', lines)
 
 
@@ -577,8 +676,9 @@ class _HiddenFormElement:  # :+#stem
         self.attribute_name = attribute_name
 
     def to_html_lines(self, indent, margin):
+        use_value = _encode_primitive_value(self.existing_value)
         yield (f'{margin}<input type="hidden" name="{self.attribute_name}" '
-               f'value="{self.existing_value}">\n')
+               f'value="{use_value}">\n')
 
     is_hidden_form_element = True
 
@@ -604,10 +704,12 @@ def _html_lines_via_existing_value(existing_value, margin):
 # ==
 
 def _render_as_input_type(typ, stem, margin, ind):
-    if stem.existing_value:
-        kw = {value: _html_escape(stem.existing_value)}
-    else:
-        kw = _empty_dict
+    def kw():
+        ev = stem.existing_value
+        if ev is None:
+            return
+        yield 'value', _encode_primitive_value(ev)
+    kw = {k: v for k, v in kw()}
     attrs = _render_form_el_attrs(stem, type='text', **kw)
     yield f'{margin}<input {attrs}>\n'
 
@@ -627,6 +729,12 @@ def _form_el_attr_NV_pairs(stem, kw):
 
 def _attr(k, v):
     return f'{k}="{v}"'
+
+
+def _encode_primitive_value(mixed):
+    if isinstance(mixed, str):
+        return _html_escape(mixed)
+    xx("this is straightforward (probably) but not covered - {type(mixed)}")
 
 
 def _html_escape(s):
@@ -660,6 +768,7 @@ def xx(msg=None):
 
 _LABEL_PURPOSE = 'label', 'UI_LABEL_PURPOSE'
 _FORM_KEY_PURPOSE = 'key', 'HTML_FORM_PARAMETER_NAME_PURPOSE'
+_DATACLASS_FIELD_NAME_PURPOSE = ('DATACLASS_FIELD_NAME_PURPOSE_',)
 _empty_dict = {}
 
 
@@ -667,6 +776,7 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.4
 # #history-C.3 enter "identifier for purpose"; formal attributes not collections
 # #history-C.2
 # #history-C.1

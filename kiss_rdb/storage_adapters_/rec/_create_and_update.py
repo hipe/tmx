@@ -64,7 +64,7 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
     | SET_ATTRIBUTE                 | Y | Y | --add or --set depending
     | UPDATE_ATTRIBUTE              | N | Y | --set (must already be set)
     | CREATE_ATTRIBUTE              | Y | N | --add (be careful)
-    | DELETE_ANY_EXISTING_ATTRIBUTE | Y | Y | (imagined feature) (etc)
+    | DELETE_ANY_EXISTING_ATTRIBUTE | Y | Y | --delete IFF already set else noop
     | DELETE_EXISTING_ATTRIBUTE     | N | Y | --delete (must already be set)
     (:#here8)
     """
@@ -75,7 +75,14 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
         validate_and_prepare_directives()
         put_the_prepared_directives_in_formal_order()
         send_it_back_to_recset()
-        return True  # should have thrown a stop on failure
+
+        # Should have raised a stop on no-op or failure.
+        # Ergo if we got this far, we should be OK
+        return ('result_of_CREATE_or_UPDATE', 'result_of_UPDATE',
+                'UPDATE_succeeded', state.ordered_prepared_directives)
+        # (this is a bit of encapsulation violation to result in an internal
+        # structure but we wanted to give some kind of structured detail of
+        # the work that was actually performed)
 
     def send_it_back_to_recset():
         _send_it_back_to_recset(
@@ -97,33 +104,31 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
     def validate_and_prepare_directives():
         # _sanity_check_identifier(EID)  # or etc
         existing_entity = coll.retrieve_entity(EID, tlistener)
-        # (the above validates the identifeir string :#here7)
+        # (the above validates the identifier string :#here7)
         assert existing_entity  # else it would have thrown b.c. tlistener
         itr = _prepare_directives(existing_entity, param_direcs, tlistener)
-        unexpecteds = next(itr)
+        unexpecteds = next(itr)  # #here9 "promise"
         use_direcs = {k: direc for k, direc in itr}  # populates unexpecteds
         if unexpecteds:
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
+        if 0 == len(use_direcs):
+            raise stop('result_of_CREATE_or_UPDATE', 'result_of_UPDATE',
+                       'UPDATE_was_no_op', 'nothing_to_do')
         state.unordered_but_prepared = use_direcs
 
     def determine_any_UNEXPECTEDS_and_strange_directives():
         add_unexpected, unexpecteds = _build_unexpecteds()
         ALLOW = state.ALLOW_LIST
+
         for k, direc in param_direcs.items():
+            # Validate each attribute name in the parameter directives
             if k not in ALLOW:
                 add_unexpected('unrecognized', k)
                 continue
-            # (unlike in CREATE, we allow the setting of
+
+            # Validate each directive name (and its length) :#here5
             typ = direc[0]
-            num = None  # :#here5:
-            if 'SET_ATTRIBUTE' == typ:
-                num = 2
-            elif 'UPDATE_ATTRIBUTE' == typ:
-                num = 3
-            elif 'CREATE_ATTRIBUTE' == typ:
-                num = 2
-            elif 'DELETE_EXISTING_ATTRIBUTE' == typ:
-                num = 1
+            num = directive_length_via_directive_type.get(typ)
             if num is None:
                 add_unexpected(f"unrecognized directive {typ!r}", k)
             elif num != len(direc):
@@ -131,6 +136,14 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
                 add_unexpected(f"Wrong number for {typ!r} {exp_act}", k)
         if unexpecteds:
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
+
+    directive_length_via_directive_type = {
+        'SET_ATTRIBUTE': 2,
+        'UPDATE_ATTRIBUTE': 3,
+        'CREATE_ATTRIBUTE': 2,
+        'DELETE_ANY_EXISTING_ATTRIBUTE': 1,
+        'DELETE_EXISTING_ATTRIBUTE': 1,
+    }
 
     def derive_ALLOW_LIST_from_three_sources():
         # ignoring VALUE_FACTORIES for now
@@ -146,14 +159,15 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
 
     try:
         return main()
-    except stop:
-        pass
+    except stop as the_stop:
+        return the_stop.result_sexp
 
 
 def _prepare_directives(existing_entity, param_direcs, tlistener):
     # (implementing this directly from the table #here8)
+
     add_unexpected, unexpecteds = _build_unexpecteds()
-    yield unexpecteds  # #promise
+    yield unexpecteds  # #promise #here9
     for use_k, direc in param_direcs.items():
         existing_value = None
         x = getattr(existing_entity, use_k)  # wee no default
@@ -167,6 +181,10 @@ def _prepare_directives(existing_entity, param_direcs, tlistener):
         if 'SET_ATTRIBUTE' == typ:
             new_val, = direc[1:]
             if already_set:
+                assert type(existing_value) == type(new_val)
+                if existing_value == new_val:
+                    _explain_no_change(tlistener, use_k, existing_value)
+                    continue
                 yield use_k, ('UPDATE_ATTRIBUTE', existing_value, new_val)
             else:
                 yield use_k, ('CREATE_ATTRIBUTE', new_val)
@@ -213,7 +231,13 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         derive_ALLOW_LIST_from_three_sources()
         determine_any_UNEXPECTEDS_by_beginning_USE_PARAMS()
         do_the_pipeline_for_each_formal_attribute()
-        return send_it_back_to_recins()
+        sx = send_it_back_to_recins()
+        if sx is None:
+            return
+        assert 'recins_success' == sx[0]
+        final_params, = sx[1:]
+        return ('result_of_CREATE_or_UPDATE', 'result_of_CREATE',
+                'CREATE_succeeded', final_params)
 
     def send_it_back_to_recins():
         final_params = {k: v for k, v in formalize_parameter_order()}
@@ -272,9 +296,9 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
     def express_missing_required(use_k, use_col):
         def lines():
-            label = use_col.IDENTIFIER_FOR_PURPOSE(('label',))
+            label = use_col.identifier_for_purpose(('label',))
             yield f"{label} is required."  # #here4
-        listener('error', 'expression', 'error_about_field',
+        listener('error', 'expression', 'about_field',
                  use_k, 'required_and_missing', lines)
 
     def resolve_any_one_defaulter(field_attr_name):
@@ -323,7 +347,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
                 required attributes. :#here2 stipulates that we don't actually
                 set values to None in the param dict (rather, don't set it).
                 """
-                assert not dcf.default_factory
+                assert dataclass_none == dcf.default_factory
             else:
                 def defaulter():
                     return (dcf.default,)  # #here1
@@ -370,8 +394,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
     try:
         return main()
-    except stop:
-        pass
+    except stop as the_stop:
+        return the_stop.result_sexp  # at writing, always None BUT MAYBE NOT NOW
 
 
 def _IndexBuilder(coll, tlistener):
@@ -438,7 +462,7 @@ def _IndexBuilder(coll, tlistener):
         return coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(tlistener)
 
     def form_parameter_name_for(attr):
-        return attr.IDENTIFIER_FOR_PURPOSE(_FORM_PARAMETER_NAME_PURPOSE)
+        return attr.identifier_for_purpose(_FORM_PARAMETER_NAME_PURPOSE)
 
     _FORM_PARAMETER_NAME_PURPOSE = ('key',)  # near HTML_FORM_PARAMETER_NAME_PURPOSE
 
@@ -454,13 +478,21 @@ def _build_unexpecteds():
     return add_unexpected, unexpecteds
 
 
+def _explain_no_change(listener, use_k, same_value):
+    def lines():
+        yield f"{use_k!r} is already set to this value"
+    listener('info', 'expression', 'about_field', use_k,
+             'attribute_is_already_this_value', lines)
+
+
 def _explain_existing_value(listener, verb, use_k, existing_value):
     def lines():
         if True:  # one day, don't do this for big structures
             tail = f" ({existing_value!r})"
         yield (f"for {use_k!r}, {verb} doesn't "
                f"currently confirm previous value{tail}")
-    listener('warning', 'expression', 'caution_thrown_to_wind', lines)
+    listener('warning', 'expression', 'about_field', use_k,
+             'caution_thrown_to_wind', lines)
 
 
 def _explain_unexpecteds(listener, unexpecteds, coll):
@@ -474,14 +506,18 @@ def _normalizer_via_type_macro(tm):
     if tm.kind_of('text'):
         if 'text' == tm.string:
             return _text_normalizer
+        if tm.kind_of('line'):
+            return _text_normalizer
         if tm.kind_of('paragraph'):
             assert 'paragraph' == tm.string  # for now
             return _paragraph_normalizer
         xx(f"have fun: {tm.string}")
     if tm.kind_of('tuple'):
-        arg, = tm.generic_alias_args_  # ..
+        arg = tm.generic_alias_arg_  # ..
         if str == arg:
             return _paragraph_normalizer
+        if isinstance(arg, str):  # [#872.H] assume fent name
+            return _dont_allow_this_to_be_set_normalizer
         xx(f"Neato, make normalizer for {tm.string!r}")
     if tm.kind_of('int'):
         return _int_normalizer
@@ -552,12 +588,18 @@ def _paragraph_normalizer(x, k, listener):
     return (x,)  # #here1
 
 
+def _dont_allow_this_to_be_set_normalizer(x, k, listener):
+    xx(f"this is an assertion that {k!r} is never set")
+
+
+# == Explain things
+
 def _explain_recins_bug(listener, bads, lis, k):
     def lines():
         s, oxford_np, are = _express_line_numbers(bads)
         yield f"Line{s} {oxford_np} cannot end in a backslash."
         yield "This is probably because of a recins bug."
-    listener('error', 'expression', 'error_about_field', k, 'recins_bug', lines)
+    listener('error', 'expression', 'about_field', k, 'recins_bug', lines)
 
 
 def _explain_rectangle(listener, bads, over, tup, max_w, max_h, k):
@@ -572,7 +614,7 @@ def _explain_rectangle_too_wide(listener, bads, tup, max_w, k):
         s, oxford_np, are = _express_line_numbers(bads)
         yield f"Line{s} {oxford_np} {are} too long."
         yield f"Max line width is {max_w}."
-    listener('error', 'expression', 'error_about_field', k, 'too_wide', lines)
+    listener('error', 'expression', 'about_field', k, 'too_wide', lines)
 
 
 def _express_line_numbers(bads):
@@ -589,7 +631,7 @@ def _express_line_numbers(bads):
 def _explain_rectangle_too_tall(listener, over, tup, max_h, k):
     def lines():
         yield f"has too many lines. Max is {max_h}; this has {max_h + over}."
-    listener('error', 'expression', 'error_about_field', k, 'too_tall', lines)
+    listener('error', 'expression', 'about_field', k, 'too_tall', lines)
 
 
 def _text_normalizer(mixed_value, use_k, listener):
@@ -647,7 +689,7 @@ def _send_it_back_to_recset(pkfn, EID, use_direcs, coll, tlistener, is_dry):
             if 2 == leng:
                 _explain_existing_value(tlistener, typ, use_k, direc[1])
             yield '-d'
-            # == END
+        # == END
 
         # "give a detailed report if the integrity check fails"
         yield "--verbose"
@@ -685,7 +727,6 @@ def _send_it_back_to_recins(sanitized_parameters, coll, listener, is_dry):
             yield f'-f{store_k}'
             use_v = _encode_for_subprocess(mixed_v)
             yield f"-v{use_v}"
-            # == END
 
         yield f"-t{name_converter.store_record_type}"
 
@@ -766,14 +807,62 @@ def _do_shell_escape_FOR_DISPLAY_ONLY(args):
 
 def _encode_for_subprocess(mixed_value):
     if isinstance(mixed_value, str):
-        return mixed_value
+        # (at #history-C.2 we discovered this bug during visual testing
+        #  but sadly it's not covered LOL)
+        if len(mixed_value):
+            return mixed_value
+        xx("Storing the empty string is never allowed - see here")
+        """At BOTH points where this function is called, if we were to return
+        the empty string, it would break the semantics of the command tuple
+        as constructed: An empty string concatted after "-s" or "-a" is still
+        that same token, so the command line interpreter consumes the
+        *subsequent* token for its argument; erroneously setting values meant
+        to be blank to the value "--verbose" (the token that just *happens* to
+        come after this part of the expression yikes!).
+        This could be fixed by using *two* tokens instead of one for for "--set"
+        and "--add" parts, HOWEVER per [#872.I], we should never be storing
+        a blank string as an attribute value anyway. It's convenient using this
+        function as a last-line of defense sanity check against that (currently)
+        """
     if isinstance(mixed_value, int):
         return str(mixed_value)
     xx(f"have fun no problem with {type(mixed_value)}: {mixed_value!r}")
 
 
 def _value_is_considered_to_be_set(x):
-    return x or (False == x)
+    """This used to be a one-liner, but at #history-C.2 we needed to complicate
+    this: if a defaulter (factory or value) sets the default to `()` (empty
+    tuple), we want to allow this. But (for now) if a defaulter results in
+    either `None` or the empty string, we want to consider these not set and
+    raise an exception; because (except for some fantastical imaginings we have
+    yet to need) there should never be any reason to result in either of these
+    two values from a defaulter. (Just don't have a defaulter)
+
+    In a further experimentation, we munge the above use-case in with the
+    others, namely: determining if the existing value of an entity (its member
+    data) it to be considered as "set" or ot not.
+
+    As yet a further concern, Whether or not this semantic taxonomy should be
+    the same for the above two use cases of this function (and whatever other
+    call-points); this is a related but seperate question and still open XX
+    """
+
+    # If the value is true-ish, it's definitely considered set
+    if x:
+        return True
+
+    # The value is false-ish: something like: None, False, 0, "", [], (), {}
+    if x is None:
+        return False  # `None` is the quintessece of the "not set" value
+
+    typ = type(x)
+    if str == typ:
+        return False  # We consider the empty string to be not set for XX reason
+
+    if typ in (tuple, int, bool, float):
+        return True  # the value False and the empty tuple *are* meaningful values
+
+    xx(f"new or unexpected value type: {typ!r}")
 
 
 def _call_subprocess(args, listener):
@@ -790,11 +879,13 @@ def _build_throwing_listener(listener, stop):
 
 
 class _Stop(RuntimeError):
-    pass
+    def __init__(self, *sx):
+        self.result_sexp = sx if len(sx) else None
 
 
 def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
+# #history-C.2
 # #history-C.1
 # #born

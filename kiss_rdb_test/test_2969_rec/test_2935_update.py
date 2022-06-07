@@ -113,8 +113,13 @@ class Case2942_lets_go(CommonCase):
     """(we tested this visually then set it to dry. es muss sein)"""
 
     def test_010_succeeds(self):
-        res = self.end_state_result
-        assert res is True
+        sx = self.end_state_result  # sx = S-expression
+        assert sx
+        act = sx[:-1]
+        exp = 'result_of_CREATE_or_UPDATE', 'result_of_UPDATE', 'UPDATE_succeeded'
+        self.assertSequenceEqual(act, exp)
+        # Not gonna cover the rest of it for now, except to say:
+        assert isinstance(sx[-1], dict)
 
     def test_020_these_kinds_of_emissions(self):
         counts = {}
@@ -124,9 +129,8 @@ class Case2942_lets_go(CommonCase):
                 counts[cat] = 0
             counts[cat] += 1
         assert counts.pop('recutils_command') == 4  # sad but necessary
-        assert counts.pop('caution_thrown_to_wind') == 2  # for now
-        assert counts.pop('type_macro_stuff') == 4
-        assert counts.pop('inconsistent_requiredness') == 3
+        assert counts.pop('hybridization') == 7
+        assert counts.pop('about_field') == 2
         assert not counts
 
     @property

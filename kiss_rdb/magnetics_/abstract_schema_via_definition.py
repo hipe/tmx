@@ -773,7 +773,7 @@ class _AbstractColumn:
             xx("can we please deprecate foreign key column name (see..)?")
             # recutils seems fine without them
 
-    def IDENTIFIER_FOR_PURPOSE(self, tup):
+    def identifier_for_purpose(self, tup):
         if (f := self.IDENTIFIER_FUNCTION):
             return f(tup)
         first = tup[0]
@@ -880,6 +880,8 @@ def _define_type_macro_function():
             assert isinstance(ancestors, tuple)
             if GA_components:
                 self.generic_alias_origin_, self.generic_alias_args_ = GA_components
+                if 1 == len(self.generic_alias_args_):
+                    self.generic_alias_arg_, = self.generic_alias_args_
             else:
                 self.generic_alias_origin_ = None
             self._ancestors = ancestors
