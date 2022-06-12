@@ -83,14 +83,20 @@ def abstract_schema_via_recinf_lines(lines, listener):
         dct = state.entity_scratch_space['is_optional']
         for term in right_hand_side_terms():
             # we could parse each term, but why
+            if term in dct:
+                xx(f"we didn't cover overwriting existential the constraint ({term!r})")
             see_native_field_name(term)
-            dct[term] = False  # overwriting possibly previous values
+            dct[term] = False
 
     @thing
     def allowed():
         # #todo we don't understand exactly how this manifests practically natively
+        dct = state.entity_scratch_space['is_optional']
         for term in right_hand_side_terms():
+            if term in dct:
+                xx(f"we didn't cover overwriting existential the constraint ({term!r})")
             see_native_field_name(term)
+            dct[term] = True
 
     @thing
     def key():

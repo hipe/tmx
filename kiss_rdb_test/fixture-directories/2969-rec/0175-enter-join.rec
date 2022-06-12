@@ -3,6 +3,7 @@
 %rec: NativeCapability
 %type: Label line
 %key: ID
+%allowed: ImplementationStatus
 %type: ImplementationStatus line
 %type: NativeURL line
 %type: Child line

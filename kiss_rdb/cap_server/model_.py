@@ -33,7 +33,7 @@ def _build_datamodel(collections):
     class Capability:
         label: str
         EID: str
-        implementation_status: str = None
+        implementation_status: 'ImplementationStatus' = None
         native_URL: str = None
         children_EIDs: tuple['Capability'] = ()
 
@@ -51,6 +51,16 @@ def _build_datamodel(collections):
             return random_implementation_state()
 
         FORM_ACTION_EXPERIMENTAL = 'edit_capability'  # no
+
+    # == BEGIN
+    from enum import Enum, unique as unique_enum
+    @export
+    @unique_enum
+    class ImplementationStatus(Enum):
+        WONT_IMPLEMENT = 'wont_implement_or_not_applicable'
+        MIGHT_IMPLEMENT = 'might_implement_eventually'
+        IS_IMPLEMENTED = 'is_implemented'
+    # == END
 
     random_implementation_state = _build_randomer()
 

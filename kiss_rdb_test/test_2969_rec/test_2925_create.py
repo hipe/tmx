@@ -85,8 +85,8 @@ class Case2922_missing(CommonCase):
         assert 2 == len(emis)
         self.assertSequenceEqual(('parent', 'body'), fields)
         # NOTE we use the names from storage because friendlier yikes
-        assert 'parent is required.' == lines[0].lower()
-        assert 'body is required.' == lines[1].lower()
+        assert 'parent is required' in lines[0].lower()
+        assert 'body is required' in lines[1].lower()
 
     @property
     def given_parameters(_):

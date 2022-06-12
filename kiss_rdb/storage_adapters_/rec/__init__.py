@@ -258,6 +258,7 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
     coll.recfile = recfile
     coll.dataclass = dataclass
     coll.name_converterer = name_converterer
+    coll.collectioner = colz
     return coll
 
 
@@ -359,13 +360,17 @@ class _IS_PLURAL_and_DO_CHOP_via_type_macro:
 
 
 def _do_IS_PLURAL_and_DO_CHOP(tm):
-    if tm.kind_of('text'):
+    typ = tm.LEFTMOST_TYPE
+    if 'text' == typ:
         return ()  # accept the defaults: is singular, do chop
 
-    if tm.kind_of('tuple'):
+    if 'instance_of_class' == typ:
+        return ()  # accept the defaults: is singular, do chop
+
+    if 'tuple' == typ:
         return _do_IS_PLURAL_and_DO_CHOP_when_tuple(tm)
 
-    if tm.kind_of('int'):
+    if tm.kind_of('int'):  # anticipating that this won't always be a base type
         return _do_IS_PLURAL_and_DO_CHOP_when_int(tm)
 
     xx(f"have fun, we anticipate date[time]: {tm.string!r}. Also see here.")

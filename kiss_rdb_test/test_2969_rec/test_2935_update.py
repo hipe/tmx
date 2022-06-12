@@ -129,7 +129,7 @@ class Case2942_lets_go(CommonCase):
                 counts[cat] = 0
             counts[cat] += 1
         assert counts.pop('recutils_command') == 4  # sad but necessary
-        assert counts.pop('hybridization') == 7
+        assert counts.pop('hybridization') == 6
         assert counts.pop('about_field') == 2
         assert not counts
 

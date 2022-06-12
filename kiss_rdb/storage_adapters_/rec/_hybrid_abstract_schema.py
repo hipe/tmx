@@ -57,7 +57,9 @@ def _fattrs_via(coll, listener):
 
         # (store is better than dataclass for "singluar" types (maybe),
         # but for "plural" types, this is an area of experimentation)
-        if use_TM.kind_of('tuple'):
+        # also 'instance_of_class' probably has more info than store side
+        lmt = use_TM.LEFTMOST_TYPE
+        if lmt in ('tuple', 'instance_of_class'):
             _explain_use_over_store_TM(listener, store_TM, use_TM)
             return use_TM
 

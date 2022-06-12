@@ -270,11 +270,12 @@ def process_form(_, sout, serr, stack):
 
     # == BEGIN break this up when the dust settles
 
-    is_UPDATE_not_CREATE = 'ID' in form_values
+    EID_form_key = 'ID'
+    is_UPDATE_not_CREATE = EID_form_key in form_values
     # (:#here2 experiment: determine this from this)
 
     if is_UPDATE_not_CREATE:
-        eid = form_values.pop('ID')
+        eid = form_values.pop(EID_form_key)
 
         def param_direcs():
             # Assume `strip` happened above. See [#867.I] about below semantics
@@ -285,8 +286,19 @@ def process_form(_, sout, serr, stack):
                     yield k, ('DELETE_ANY_EXISTING_ATTRIBUTE',)
         param_direcs = {k: v for k, v in param_direcs()}
 
+        """Filter out these notices when the value is unchanged.
+        (If we were a CLI we would want the notice, but, the nature of
+        forms is such that the whole "comb" is submitted even if your
+        intention is only to change certain attributes)
+        """
+        def use_listener(*emi):
+            if ( 'about_field' == emi[2] and
+                 'attribute_is_already_this_value' == emi[4] ):
+               return
+            custom_listener(*emi)
+
         # (roo = result of operation)
-        roo = coll.update_entity(eid, param_direcs, custom_listener)
+        roo = coll.update_entity(eid, param_direcs, use_listener)
 
         if roo:
             assert 'result_of_CREATE_or_UPDATE' == roo[0]
@@ -302,6 +314,10 @@ def process_form(_, sout, serr, stack):
             assert 'UPDATE_succeeded' == roo[2]
             these_args = 'UPDATE', eid
             # (disregarding ordered prepared direcs. not nec to make redirect)
+        else:
+            # Yuck -we're going to re-show the UPDATE form. needs this hidden
+            form_values[EID_form_key] = eid
+
     else:
         roo = coll.create_entity(form_values, custom_listener)
         if roo:
@@ -358,9 +374,9 @@ def show_form(_, sout, serr, recfile, fent_name, qid):
 
 def _do_show_form(sout, form_values, fe, coll, listener, WHAT=None):
 
-    fattrs = fe.to_formal_attributes()
-
     # If it has VALUE_FACTORIES, take those attrs out
+    # (we could put this knowledge in the downstream function, but why)
+    fattrs = fe.to_formal_attributes()
     VF_dct = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
     if VF_dct:
         fattrs = _filter_out_these(fattrs, VF_dct)

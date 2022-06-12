@@ -4,7 +4,6 @@
 
 %rec: Note
 %mandatory: Parent
-%allowed: Ordinal
 %mandatory: Body
 %allowed: FruFru
 %mandatory: Ordinal FroFro

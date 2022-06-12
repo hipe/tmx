@@ -343,7 +343,11 @@ def _define_functions_for_abstract_attribute_via_dataclass_field():
                 return type_macro_.NEW_FUN_EXPERIMENT_via_GA_(typ)
 
             xx(f"Fun! first time seeing this type in an annotation: {typ!r}")
-        xx(f"For now, expecting type in annotation to be of type `type`: {typ!r}")
+        if isinstance(typ, str):
+            assert re.match(r'^[A-Z][a-zA-Z0-9]+$', typ)
+            return type_macro_.via_model_class_name_(typ)
+
+        xx(f"For now, type in annotation must be `str` or of type `type`. (Had {typ!r})")
 
     type_macro_string_via_primitive_type = {
         str: 'text',
@@ -774,6 +778,13 @@ class _AbstractColumn:
             # recutils seems fine without them
 
     def identifier_for_purpose(self, tup):
+        if self._identifier_cache is None:
+            self._identifier_cache = {}
+        if tup not in self._identifier_cache:
+            self._identifier_cache[tup] = self._build_identifier_for_purpose(tup)
+        return self._identifier_cache[tup]
+
+    def _build_identifier_for_purpose(self, tup):
         if (f := self.IDENTIFIER_FUNCTION):
             return f(tup)
         first = tup[0]
@@ -792,6 +803,8 @@ class _AbstractColumn:
         'is_foreign_key_reference',
         'is_primary_key', 'is_unique',  # mutex
         'referenced_table_name', 'referenced_column_name')
+
+    _identifier_cache = None
 
 FormalAttribute_ = _AbstractColumn
 
@@ -847,6 +860,10 @@ def _define_type_macro_function():
         ancestor_strings = 'tuple', str(ga)  # always tuple for now
         return _TypeMacro(ancestor_strings, (GA_origin, GA_args))
 
+    def type_macro_via_model_class_name(s):
+        # assume has been validated to sort of look like a class name
+        return _TypeMacro(('instance_of_class', s))
+
     def type_macro_via_string(type_macro_string, listener=None):
         if (o := cache.get(type_macro_string, None)):
             return o
@@ -870,6 +887,7 @@ def _define_type_macro_function():
 
     parent_of = {}
     parent_of['tuple'] = None
+    parent_of['instance_of_class'] = None
     parent_of['paragraph'] = 'text'
     parent_of['line'] = 'text'
     parent_of['text'] = None
@@ -902,6 +920,14 @@ def _define_type_macro_function():
         def string(self):
             return self._ancestors[-1]
 
+        @property
+        def LEFTMOST_TYPE(self):
+            return self._ancestors[0]
+
+        @property
+        def type_macro_ancestors_(self):
+            return self._ancestors
+
     def when_bad_type(listener, bad_type):
         def lines():
             yield f"Unrecognized abstract type {bad_type!r}"
@@ -915,6 +941,7 @@ def _define_type_macro_function():
             return parent_of.keys()
 
     type_macro_via_string.NEW_FUN_EXPERIMENT_via_GA_ = type_macro_via_generic_alias
+    type_macro_via_string.via_model_class_name_ = type_macro_via_model_class_name
     return type_macro_via_string
 
 

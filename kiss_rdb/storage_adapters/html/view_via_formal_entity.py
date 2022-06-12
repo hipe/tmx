@@ -104,15 +104,19 @@ def _begin_component_renderer_via_formal_attribute(fa, attr):
         attr = fa.identifier_for_purpose(_DK_FN_PURPOSE)
 
     tm = fa.type_macro
+    base_type = tm.LEFTMOST_TYPE
 
-    if tm.kind_of('text'):  # 'line' or 'text' ('paragraph' doesn't happen now)
+    if 'text' == base_type:  # 'line' or 'text' ('paragraph' doesn't happen now)
         return _build_the_most_common_component_renderer(attr)
 
-    if tm.kind_of('tuple'):
+    if 'tuple' == base_type:
         return _build_tuple_component_renderer(attr, tm)
 
-    if tm.kind_of('int'):
+    if 'int' == base_type:  # ..
         return _build_int_component_renderer(attr)
+
+    if 'instance_of_class' == base_type:
+        return _build_the_most_common_component_renderer(attr)  # ..
 
     xx(f"have fun: {tm.string!r}")
 
@@ -144,7 +148,12 @@ def _build_list_of_ents_component_renderer(attr):
                 yield h(nonfirst)
 
         use_val = ''.join(pieces())
-        # (you could return here on no children. we used to before #abstration)
+        """(before #abstraction we used to return no lines on no children.
+        Then before #history-C.1 we changed it to yield one empty line,
+        then (at that history) we changed it back)
+        """
+        if 0 == len(use_val):
+            return
         yield use_val  # #here2 no newline at end
     h = _html_escape_function()
     return html_lines_for_component_via_entity
@@ -199,4 +208,5 @@ def xx(msg=None):
     head = "finish this/cover this/oops"
     raise RuntimeError(''.join((head, *((': ', msg) if msg else ()))))
 
+# #history-C.1
 # #abstraction

@@ -253,6 +253,8 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
 
     form_values_pool = form_values.copy() if form_values else _empty_dict
 
+    form_componenter = _build_form_componenter(tms, listener)
+
     attr_via_fpn = {}  # (fpn = form parameter name.
     for attr in FORMAL_ATTRIBUTES:
 
@@ -263,10 +265,10 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         ev = form_values_pool.pop(fpn, None)
         # (ev = existing form value)
 
-        stem = _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener)
-        if stem is None:
+        fc = form_componenter(ev, attr)
+        if fc is None:
             continue
-        (hiddens if stem.is_hidden_form_element else non_hiddens).append(stem)
+        (hiddens if fc.is_hidden_form_element else non_hiddens).append(fc)
 
     assert non_hiddens
     if form_values_pool:
@@ -398,40 +400,54 @@ def _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
         yield _html_escape(' '.join((*head_pcs, predicate_string)))
 
 
-def _form_stem_via_formal_attribute(ev, fpn, attr, tms, listener):
+def _build_form_componenter(tms, listener):
+    # mcvn = model class via name
 
-    # Foreign key references are hidden
-    if attr.is_foreign_key_reference:
+    def form_componenter(ev, fa):
+
+        # Foreign key references are hidden (for now)
+        if fa.is_foreign_key_reference:
+            return form_component_for_foreign_key(ev, fa)
+
+        # Primary keys get nothing on CREATE, pass-thru on UPDATE
+        if fa.is_primary_key:
+            if ev is None:
+                return
+            return hidden_form_component(ev, fa)
+
+        # Now that you know it's not hidden, we have to resolve a rendering strat
+        # (before #history-C.5 we used to do this lazily at render time)
+        cr = resolve_component_renderer(fa)
+        msg_scts = (tms and tms.pop(form_key(fa), None))  # :#here3
+        return _NonHiddenFormElement(fa, cr, ev, msg_scts)
+
+    def form_component_for_foreign_key(ev, fa):
         if ev is None:
-            _explain_FKs_must_be_provided(listener, fpn)
-                # (confusingly, above is populated but not used :#here2)
-                # (badly, we are rendering the form but it cannot be used #todo)
-            return
-        return _HiddenFormElement(fpn, ev)
+            return _explain_FKs_must_be_provided(listener, fpn())
+            # (confusingly, render a form that cannot be used :#here2)
+        return hidden_form_component(ev, fa)
 
-    # Primary keys get nothing on CREATE, pass-thru on UPDATE
-    if attr.is_primary_key:
-        if ev is None:
-            return
-        return _HiddenFormElement(fpn, ev)
+    def hidden_form_component(ev, fa):
+        return _HiddenFormElement(form_key(fa), ev)
 
-    # All others get visual representation, probably
-    msg_scts = (tms and tms.pop(fpn, None))  # :#here3
-    return _NonHiddenFormElement(fpn, attr, ev, msg_scts)
+    def form_key(fa):
+        return fa.identifier_for_purpose(_FORM_KEY_PURPOSE)
+
+    resolve_component_renderer = _build_component_rendererer(
+            tms, listener)
+
+    return form_componenter
 
 
 @dataclass
 class _NonHiddenFormElement:
-    _formal_name:str
     formal_attribute:object
+    component_renderer:callable
     existing_value:object = None
     message_structures:tuple = None
 
     def to_html_lines(self, margin, indent):
-        cr = _component_renderer_via_formal_attribute(self.formal_attribute)
-        if isinstance(cr, str):  # for legacy
-            cr = getattr(_self_module(), cr)
-        return cr(self, margin, indent)
+        return self.component_renderer(self, margin, indent)
 
     @property
     def attribute_label(self):
@@ -444,6 +460,10 @@ class _NonHiddenFormElement:
     @property
     def form_element_name(self):
         return self._formal_name
+
+    @property
+    def _formal_name(self):  # legacy name
+        return self.formal_attribute.identifier_for_purpose(_FORM_KEY_PURPOSE)
 
     is_hidden_form_element = False
 
@@ -467,16 +487,23 @@ def EXPERIMENTAL_populate_form_values_(ent, fe, listener):
 # == END XXX
 
 
-def _component_renderer_via_formal_attribute(fa):
-    """(at #history-C.4 we changed the name of this idea from the more generic
-    "expression strategy" to the more concrete "component renderer" so A)
-    it parallels its view-only sibling module and B) we can return arbitrary
-    functions from here, not just strings that are names of functions already
-    defined in this module.)
-    """
+def _build_component_rendererer(tms, listener):
+    # at #history-C.4 "component renderer" not "expression strategy" (reasons)
 
-    tm = fa.type_macro
-    if tm.kind_of('text'):
+    def resolve_component_renderer(fa):
+        base_type = fa.type_macro.LEFTMOST_TYPE
+        base_func = renderer_via_base_type[base_type]  # ..
+        mixed = base_func(fa)
+        if isinstance(mixed, str):
+            return getattr(_self_module(), mixed)
+        assert callable(mixed)
+        return mixed
+
+    renderer_for, renderer_via_base_type = _build_keyed_decorator()
+
+    @renderer_for('text')
+    def _(fa):
+        tm = fa.type_macro
         if tm.kind_of('paragraph'):
             return 'render_as_textarea'
 
@@ -485,10 +512,13 @@ def _component_renderer_via_formal_attribute(fa):
 
         return 'render_as_input_type_text'  # ..
 
-    if tm.kind_of('int'):
+    @renderer_for('int')
+    def _(_):
         return 'render_as_input_type_text'  # ..
 
-    if tm.kind_of('tuple'):
+    @renderer_for('tuple')
+    def _(fa):
+        tm = fa.type_macro
         orig = tm.generic_alias_origin_
 
         if not orig:
@@ -505,7 +535,11 @@ def _component_renderer_via_formal_attribute(fa):
 
         xx(f"unhandled tuple parameterization {tm.string!r}")
 
-    xx(f"unhandled type {tm.string!r}")
+    @renderer_for('instance_of_class')
+    def _(fa):
+        return 'render_as_input_type_text'  # away soon
+
+    return resolve_component_renderer
 
 
 def _fall_back_to_view_only_component_renderer(fa):
@@ -523,6 +557,7 @@ def _fall_back_to_view_only_component_renderer(fa):
     def my_component_renderer(stem, margin, indent):
         return vendor_component_renderer(stem, margin, indent)
     return my_component_renderer
+
 
 
 def render_as_textarea(stem, margin, indent):
@@ -748,6 +783,15 @@ def _html_escape_function():
 
 # :#here4 :[#872.C]: #feat:namespace_for_CGI_params munging namespaces
 
+def _build_keyed_decorator():
+    def for_which(key):
+        def decorator(func):
+            dct[key] = func
+        return decorator
+    dct = {}
+    return for_which, dct
+
+
 # ==
 
 def _self_module():
@@ -776,6 +820,7 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.5
 # #history-C.4
 # #history-C.3 enter "identifier for purpose"; formal attributes not collections
 # #history-C.2

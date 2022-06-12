@@ -109,12 +109,81 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
         itr = _prepare_directives(existing_entity, param_direcs, tlistener)
         unexpecteds = next(itr)  # #here9 "promise"
         use_direcs = {k: direc for k, direc in itr}  # populates unexpecteds
+
+        # First, if there were strange attribute keys, complain and stop
         if unexpecteds:
             _explain_unexpecteds(tlistener, unexpecteds, coll)  # throws stop
+
+        # Then, if eliminating redundants made a no-op; explain and stop
         if 0 == len(use_direcs):
             raise stop('result_of_CREATE_or_UPDATE', 'result_of_UPDATE',
                        'UPDATE_was_no_op', 'nothing_to_do')
+
+        # Finally, run any attribute-specific normalization & validation
+        use_direcs = {k: v for k, v in normalize_attribute_values(use_direcs)}
         state.unordered_but_prepared = use_direcs
+
+    def normalize_attribute_values(direcs):
+        """UPDATE normalization differs from that of CREATE in these ways:
+        - UPDATE has deletion. Prevent the deletion of required attributes.
+        - UPDATE does no defaulting nor VALUE_FACTORIES
+        But UPDATE and CREATE do share this:
+        - Attribute-level validation & normalization
+        - Accumulate errors "horizontally", don't just stop at the first one
+
+        Here's possible issues:
+        - If there's a required attribute and the form submission doesn't
+          pass a name-value pair for that attribute, it may look like it's okay
+        """
+
+        normalizer_via_formal_attribute = _build_normalizerer(colz)  # #here14
+
+        did_fail_at_least_once = False
+        for form_k, direc in direcs.items():
+            fa = state.FORMAL_PARAMETERS_DICTIONARY[form_k]
+            typ = direc[0]
+            if 'DELETE_EXISTING_ATTRIBUTE' == typ:
+                if fa.null_is_OK:
+                    yield form_k, direc  # passthru
+                else:
+                    _explain_missing_required(listener, fa)
+                    did_fail_at_least_once = True
+                continue
+
+            if 'UPDATE_ATTRIBUTE' == typ:
+                new_value = direc[-1]
+            else:
+                assert 'CREATE_ATTRIBUTE' == typ
+                new_value = direc[-1]
+
+            # == BEGIN compare and contrast to the CREATE pipeline #here10
+
+            # Assert this unwritten assumption until we know what our spec is
+            assert isinstance(new_value, str)  # #here13
+            normalize = normalizer_via_formal_attribute(fa)
+
+            # If there is no normalizer derived from this field, it passes
+            if normalize is None:
+                yield form_k, direc  # #passthru
+                continue
+
+            # If the normalization failed, assume expression emitted & continue
+            wv = normalize(new_value, listener)
+            if wv is None:
+                did_fail_at_least_once = True
+                continue
+
+            # Create a new directive that uses the normalized value
+            if len(wv):
+                use_value, = wv
+            else:
+                use_value = new_value
+            use_direc = (*direc[:-1], use_value)
+            yield form_k, use_direc
+
+            # == END
+        if did_fail_at_least_once:
+            raise stop()
 
     def determine_any_UNEXPECTEDS_and_strange_directives():
         add_unexpected, unexpecteds = _build_unexpecteds()
@@ -150,7 +219,9 @@ def UPDATE_ENTITY_(EID, param_direcs, coll, colz, listener, is_dry):
         indexer = _IndexBuilder(coll, tlistener)
         for k in ('ALLOW_LIST',
                   'FORMAL_PARAMETERS_DICTIONARY',
-                  'primary_key_field_name'):
+                  'primary_key_field_name',
+                  'formal_entity'
+                  ):
             setattr(state, k, getattr(indexer, k))
 
     state = main
@@ -256,8 +327,10 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         # We want more specific failures before more general ones
         # There's "value-based" constraints and "existential" constraints
 
+        normalizer_via_formal_attribute = _build_normalizerer(colz)
         ok = True
         for use_k, use_col in state.FORMAL_PARAMETERS_DICTIONARY.items():
+            # == BEGIN #here10
 
             # Apply defaulting iff there's defaulting and value is not set
             k = coll.name_converter.use_key_via_store_key(use_col.column_name)
@@ -267,39 +340,41 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
             if value_factory and not is_set:  # #here3
                 wv = value_factory()  # #here1
-                assert value_is_considered_to_be_set(wv[0])
-                use_params[use_k] = wv[0]
+                x, = wv
+                assert value_is_considered_to_be_set(x)
+                use_params[use_k] = x
 
             # Apply any normalization & validation if value is set
-            normalizer = _normalizer_via_type_macro(use_col.type_macro)
+            normalize = normalizer_via_formal_attribute(use_col)
 
-            if wv and normalizer and value_is_considered_to_be_set(wv[0]):
-                wv = normalizer(wv[0], use_k, listener)
+            if wv and normalize and value_is_considered_to_be_set(wv[0]):
+                unsanitized_value = wv[0]
+                wv = normalize(unsanitized_value, listener)  # #here10
                 # If it failed validation, assume emitted and skip to next
-                if not wv:
+                if wv is None:
                     ok = False
                     continue
-                use_params[use_k], = wv
+                if 0 == len(wv):
+                    use_value = unsanitized_value
+                    wv = (use_value,)
+                else:
+                    use_value, = wv
+                use_params[use_k] = use_value
 
             # Determine requiredness and if so, assert it
             is_reqd = not use_col.null_is_OK
             if is_reqd and not (wv and value_is_considered_to_be_set(wv[0])):
-                express_missing_required(use_k, use_col)
+                _explain_missing_required(listener, use_col)
                 ok = False
                 continue
+
+            # == END
 
         if ok:
             return
         raise stop()  # Throw the stop only after going thru the whole "form"
 
     value_is_considered_to_be_set = _value_is_considered_to_be_set
-
-    def express_missing_required(use_k, use_col):
-        def lines():
-            label = use_col.identifier_for_purpose(('label',))
-            yield f"{label} is required."  # #here4
-        listener('error', 'expression', 'about_field',
-                 use_k, 'required_and_missing', lines)
 
     def resolve_any_one_defaulter(field_attr_name):
         these = tuple(resolve_defaulters(field_attr_name))
@@ -382,7 +457,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
         indexer = _IndexBuilder(coll, tlistener)
         for k in ('ALLOW_LIST',
                   'FORMAL_PARAMETERS_DICTIONARY',
-                  'VALUE_FACTORIES'):
+                  'VALUE_FACTORIES',
+                  ):
             setattr(state, k, (getattr(indexer, k)))
 
     from dataclasses import fields as func, MISSING as dataclass_none
@@ -412,6 +488,7 @@ def _IndexBuilder(coll, tlistener):
                 memo[k] = func()
             return memo[k]
         k = func.__name__
+        use_func.__name__ = k
         return use_func
 
     memo = {}
@@ -457,14 +534,13 @@ def _IndexBuilder(coll, tlistener):
     def formal_attributes():
         return formal_entity().to_formal_attributes()
 
+    @export
     @memoize
     def formal_entity():
         return coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(tlistener)
 
     def form_parameter_name_for(attr):
         return attr.identifier_for_purpose(_FORM_PARAMETER_NAME_PURPOSE)
-
-    _FORM_PARAMETER_NAME_PURPOSE = ('key',)  # near HTML_FORM_PARAMETER_NAME_PURPOSE
 
     return IndexBuilder()
 
@@ -495,6 +571,13 @@ def _explain_existing_value(listener, verb, use_k, existing_value):
              'caution_thrown_to_wind', lines)
 
 
+def _explain_missing_required(listener, fa):
+    def lines():
+        label = _label(fa)
+        yield f"{label} is required"  # #here4
+    listener('error', 'expression', 'about_field', _form_key(fa), 'missing_required', lines)
+
+
 def _explain_unexpecteds(listener, unexpecteds, coll):
     def lines():
         for cat, ks in unexpecteds.items():
@@ -502,8 +585,38 @@ def _explain_unexpecteds(listener, unexpecteds, coll):
     listener('error', 'expression', 'unrecognized_or_malformed_parameters', lines)
 
 
-def _normalizer_via_type_macro(tm):
-    if tm.kind_of('text'):
+def _build_normalizerer(colz):
+    """build a function that builds a #here12-style normalizer"""
+    # (this is sort of a glue-function (dispatching) retrofitting to older code)
+
+    def normalizer_via_formal_attribute(fa):
+        implementing_function = implementing_function_via_formal_attribute(fa)
+        if implementing_function is None:
+            return
+
+        def normalize(unsanitized_s, listener):
+            # assert isinstance(unsanitized_s, str)  # #here13 for now
+            # no - let int thru - needs design
+            return implementing_function(unsanitized_s, fa, listener)
+        return normalize
+
+    def implementing_function_via_formal_attribute(fa):
+        base_type = fa.type_macro.LEFTMOST_TYPE
+        func = func_via_base_type.get(base_type)
+        if func:
+            return func(fa)
+        xx(f"have fun: {tm.string!r}")
+
+    def for_base_type(typ):
+        def decorator(func):
+            func_via_base_type[typ] = func
+        return decorator
+
+    func_via_base_type = {}
+
+    @for_base_type('text')
+    def _(fa):
+        tm = fa.type_macro
         if 'text' == tm.string:
             return _text_normalizer
         if tm.kind_of('line'):
@@ -512,31 +625,95 @@ def _normalizer_via_type_macro(tm):
             assert 'paragraph' == tm.string  # for now
             return _paragraph_normalizer
         xx(f"have fun: {tm.string}")
-    if tm.kind_of('tuple'):
+
+    @for_base_type('tuple')
+    def _(fa):
+        tm = fa.type_macro
         arg = tm.generic_alias_arg_  # ..
         if str == arg:
             return _paragraph_normalizer
         if isinstance(arg, str):  # [#872.H] assume fent name
             return _dont_allow_this_to_be_set_normalizer
         xx(f"Neato, make normalizer for {tm.string!r}")
-    if tm.kind_of('int'):
+
+    @for_base_type('instance_of_class')
+    def _(fa):
+        return _build_class_based_normalizerer(fa, colz)
+
+    @for_base_type('int')  # won't be a base type forever, probably
+    def _(_):
         return _int_normalizer
-    xx(f"Neato, make normalizer for {tm.string!r}")
+
+    return normalizer_via_formal_attribute
 
 
-def _int_normalizer(mixed_value, use_k, listener):
+def _build_class_based_normalizerer(fa, colz):  # #here14
+    fent_name = fa.type_macro.type_macro_ancestors_[1]
+    coll = colz[fent_name]  # this is a HUGE amount of surface area for one thing
+    dc = coll.dataclass
+    if hasattr(dc, '__members__'):
+        return _build_enum_normalizer(fa, dc)
+    xx(f"We like the idea of this, but not covered: {fa.column_name}:{fent_name}")
+
+
+def _build_enum_normalizer(fa, enum_class):
+    def normalize(unsanitized_s, same_fa, listener):
+        """(We would rather use `(<strange-str> in <enum-class>)` but doing
+        so currently raises a DeprecationWarning about an upcoming behavior
+        change (at writing, can't confirm it's the change we want) so we're
+        just avoiding it altogether for now; instead using an exception as
+        a conditional ick/meh):"""
+
+        try:
+            enum_class(unsanitized_s)  # throws if not valid value
+            return ()  # #here12: empty tuple means accept value as-is
+        except ValueError:
+            pass
+        explain(listener, unsanitized_s)
+
+    def explain(listener, unsanitized_s):
+        def lines():
+            yield ''.join(reversed(tuple(reversed_pieces())))
+
+        def reversed_pieces():
+            label = fa.identifier_for_purpose(_LABEL_PURPOSE)
+            stack = list(reversed(tuple(repr(item.value) for item in iter(enum_class))))
+            if not stack:
+                yield f"(empty enum for {label})"
+                return
+            yield stack.pop()
+            if stack:
+                yield " or "
+                yield stack.pop()
+                while stack:
+                    yield ", "
+                    yield stack.pop()
+            yield f"{label} must be "
+
+        listener('error', 'expression', 'about_field', form_k, 'failed_validation', lines)
+
+    form_k = _form_key(fa)
+    return normalize
+
+
+def _int_normalizer(mixed_value, fa, listener):
+    """(this was written before precondition #here13)"""
+
     if isinstance(mixed_value, int):
         return (mixed_value,)  # #here1
     xx(f"neato, convert to int from string with regex whatever: {mixed_value!r}")
 
 
-def _paragraph_normalizer(x, k, listener):
+def _paragraph_normalizer(x, fa, listener):
+    k = fa.identifier_for_purpose(_FORM_PARAMETER_NAME_PURPOSE)  # retrofit
 
     # Make sure type is string, furthermore make sure string is nonempty
-    wv = _text_normalizer(x, k, listener)
-    if not wv:
+    wv = _text_normalizer(x, fa, listener)
+    if wv is None:
         return
-    x, = wv
+
+    if 0 < len(wv):
+        x, = wv
 
     # NOTE normally we stream but we want to just make it easier
 
@@ -588,7 +765,8 @@ def _paragraph_normalizer(x, k, listener):
     return (x,)  # #here1
 
 
-def _dont_allow_this_to_be_set_normalizer(x, k, listener):
+def _dont_allow_this_to_be_set_normalizer(x, fa, listener):
+    k = fa.identifier_for_purpose(_LABEL_PURPOSE)
     xx(f"this is an assertion that {k!r} is never set")
 
 
@@ -634,7 +812,8 @@ def _explain_rectangle_too_tall(listener, over, tup, max_h, k):
     listener('error', 'expression', 'about_field', k, 'too_tall', lines)
 
 
-def _text_normalizer(mixed_value, use_k, listener):
+def _text_normalizer(mixed_value, fa, listener):
+    use_k = fa.identifier_for_purpose(_FORM_PARAMETER_NAME_PURPOSE)
     if not isinstance(mixed_value, str):
         xx(f"cover strange type, expected str had {type(mixed_value)}")
     if not len(mixed_value):
@@ -883,8 +1062,20 @@ class _Stop(RuntimeError):
         self.result_sexp = sx if len(sx) else None
 
 
+def _label(fa):
+    return fa.identifier_for_purpose(_LABEL_PURPOSE)
+
+
+def _form_key(fa):
+    return fa.identifier_for_purpose(_FORM_PARAMETER_NAME_PURPOSE)
+
+
 def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
+
+
+_LABEL_PURPOSE = ('label',)
+_FORM_PARAMETER_NAME_PURPOSE = ('key',)  # near HTML_FORM_PARAMETER_NAME_PURPOSE
 
 # #history-C.2
 # #history-C.1
