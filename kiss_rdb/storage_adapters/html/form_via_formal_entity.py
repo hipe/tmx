@@ -233,11 +233,18 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         form_values=None,  # use the "use" keys and values as strings
         listener=None,  # will be used to complain about missing req'd hiddens
         WHAT=None,  # experimental mutable structure that holds UI messages
+        model_class_via_name=None, # experiment for enums
         margin='',
         indent='  '):
 
     """EXPERIMENT in form generation.."""
     # (the above appears in a CLI help form)
+
+    """(We really don't want the form generator to have to take on the
+    knowledge of the vast, granulated, ever-moving "whole schema" API
+    so instead EXPERIMENTALLY we're just passing this one function, so that
+    (at present) enums can be rendered:)
+    """
 
     general_message_lines = tms = None  # tms = targeted message structures
     if WHAT:
@@ -253,13 +260,14 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
 
     form_values_pool = form_values.copy() if form_values else _empty_dict
 
-    form_componenter = _build_form_componenter(tms, listener)
+    form_componenter = _build_form_componenter(
+            model_class_via_name, tms, listener)
 
     attr_via_fpn = {}  # (fpn = form parameter name.
     for attr in FORMAL_ATTRIBUTES:
 
         # Determine existing value with the form values param
-        fpn = attr.identifier_for_purpose(_FORM_KEY_PURPOSE)
+        fpn = _form_key(attr)
         attr_via_fpn[fpn] = attr  # keep these keyed to fpm for later use
 
         ev = form_values_pool.pop(fpn, None)
@@ -345,11 +353,11 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     yield f'{margin}</form>\n'
 
 
-def _TD_lines(stem, ch3_margin, ch4_margin, indent):
+def _TD_lines(form_component, ch3_margin, ch4_margin, indent):
     """(be super cute with when you break '<td></td>' into multiple lines)"""
 
     pcs = [ch3_margin, '<td>']
-    itr = stem.to_html_lines(ch4_margin, indent)
+    itr = form_component.to_html_lines(ch4_margin, indent)
     line = next(itr, None)
     if line:
         if '\n' == line[-1]:  #..
@@ -400,7 +408,7 @@ def _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
         yield _html_escape(' '.join((*head_pcs, predicate_string)))
 
 
-def _build_form_componenter(tms, listener):
+def _build_form_componenter(mcvn, tms, listener):
     # mcvn = model class via name
 
     def form_componenter(ev, fa):
@@ -430,11 +438,10 @@ def _build_form_componenter(tms, listener):
     def hidden_form_component(ev, fa):
         return _HiddenFormElement(form_key(fa), ev)
 
-    def form_key(fa):
-        return fa.identifier_for_purpose(_FORM_KEY_PURPOSE)
+    form_key = _form_key
 
     resolve_component_renderer = _build_component_rendererer(
-            tms, listener)
+            mcvn, tms, listener)
 
     return form_componenter
 
@@ -463,7 +470,7 @@ class _NonHiddenFormElement:
 
     @property
     def _formal_name(self):  # legacy name
-        return self.formal_attribute.identifier_for_purpose(_FORM_KEY_PURPOSE)
+        return _form_key(self.formal_attribute)
 
     is_hidden_form_element = False
 
@@ -480,14 +487,14 @@ def EXPERIMENTAL_populate_form_values_(ent, fe, listener):
         mixed = getattr(ent, attr)
         if mixed is None:
             continue
-        fpn = fa.identifier_for_purpose(_FORM_KEY_PURPOSE)
+        fpn = _form_key(fa)
         # we endcode it XXX elsewhere
         yield fpn, mixed
 
 # == END XXX
 
 
-def _build_component_rendererer(tms, listener):
+def _build_component_rendererer(model_class_via_name, tms, listener):
     # at #history-C.4 "component renderer" not "expression strategy" (reasons)
 
     def resolve_component_renderer(fa):
@@ -537,9 +544,75 @@ def _build_component_rendererer(tms, listener):
 
     @renderer_for('instance_of_class')
     def _(fa):
-        return 'render_as_input_type_text'  # away soon
+        fent_name = fa.type_macro.type_macro_ancestors_[1]
+        mc = model_class_via_name(fent_name)
+        items = tuple(iter(mc))  # the way python Enums work
+        if len(items) < 6:  # #aesthetic-heuristic
+            return _build_radio_button_renderer(items)
+        return _build_select_renderer_via_enum(items)
 
     return resolve_component_renderer
+
+
+def _build_select_renderer_via_enum(items):
+    def render_as_select(form_component, margin, indent):
+        mel = _Mutable_HTML_Element('<select>')
+        mel.add_attributes(_attributes_via_form_component(form_component))
+        yield mel.to_html_line(margin)
+        ch_margin = f'{margin}{indent}'
+        ev = form_component.existing_value
+        for item_value, label in _values_and_labels_via_enum_items(items):
+            mel = _Mutable_HTML_Element('<option>', value=item_value)
+            mel.set_body_string(label)
+            if ev == item_value:
+                mel.add_attribute('selected', 'selected')
+            yield mel.to_html_line(ch_margin)
+        yield f'{margin}</select>\n'
+    return render_as_select
+
+
+def _build_radio_button_renderer(items):
+    def render_as_radio_buttons(form_component, margin, indent):
+        ev = form_component.existing_value
+        same_name = form_component.form_element_name
+
+        for item_value, label in _values_and_labels_via_enum_items(items):
+            for_what = item_value or '_none_'
+            mel = _Mutable_HTML_Element(
+                    '<input>', type='radio', id=for_what,
+                    name=same_name, value=item_value)
+            if ev == item_value:
+                mel.add_attribute('checked', 'checked')
+            yield mel.to_html_line(margin)
+            mel = _Mutable_HTML_Element('<label>', **{'for':for_what})
+            mel.set_body_string(label)
+            def pieces():
+                for pc in mel.to_open_and_close_pieces_no_newlines(margin):
+                    yield pc
+                yield '<br>\n'
+            yield ''.join(pieces())
+    return render_as_radio_buttons
+
+
+def _values_and_labels_via_enum_items(items):
+    yield '', '(none)'
+    for item in items:
+        item_value = item.value
+        yield item_value, _clever_label_via_enum_value_thing(item_value)
+
+
+def _clever_label_via_enum_value_thing(enum_item_value):
+    # `wont_do_this` => "Won't do this"
+
+    def words():
+        for word in enum_item_value.split('_'):
+            yield _clever_label_thing.get(word, word)
+    words = list(words())
+    words[0] = words[0][0].upper() + words[0][1:]  # not title(): "Won'T"
+    return ' '.join(words)
+
+
+_clever_label_thing = {'wont': "won't"}
 
 
 def _fall_back_to_view_only_component_renderer(fa):
@@ -559,37 +632,12 @@ def _fall_back_to_view_only_component_renderer(fa):
     return my_component_renderer
 
 
-
-def render_as_textarea(stem, margin, indent):
-    attrs = _render_form_el_attrs(stem, rows=4, cols=50)  # ..
-
-    # XXX see:
-    """Note: spaces between these two: "<textarea></textarea>" will show up
-    as the text value of the input element. We are fine-tuning to what
-    extent this is true for the whitespace before and/or after existing non-ws
-    content. :#here5
-    Since we will be avoiding putting leading margin ahead of "</textarea>"
-    for the above reason, we will also do so for the opening tag, so that
-    they line up vertically.
-    """
-
-    pcs = []
-    itr = _html_lines_via_existing_value(stem.existing_value, margin)
-    line = next(itr, None)
-    if not line:
-        pcs.append(margin)
-    pcs.append(f'<textarea {attrs}>')
-    if line:
-        pcs.append('\n')
-        yield ''.join(pcs)
-        pcs.clear()
-        while line:
-            assert '\n' == line[-1]
-            yield line
-            line = next(itr, None)
-
-    pcs.append('</textarea>\n')
-    yield ''.join(pcs)
+def render_as_textarea(form_component, margin, indent):
+    mel = _Mutable_HTML_Element('<textarea>', rows='4', cols='50')
+    mel.add_attributes(_attributes_via_form_component(form_component))
+    mel.set_body_string(form_component.existing_value or '')  # very important
+    # (deleting long comment as part of #history-C.6)
+    return mel.to_html_lines(margin, indent)
 
 
 # == BEGIN copy-pasted list from https://www.w3schools.com/html/html_form_input_types.asp
@@ -623,8 +671,7 @@ def render_as_input_type_file(*_, **__):
     xx()
 
 
-def render_as_input_type_hidden(*_, **__):
-    xx()
+# `render_as_input_type_hidden` was done "by hand"
 
 
 def render_as_input_type_image(*_, **__):
@@ -643,8 +690,7 @@ def render_as_input_type_password(*_, **__):
     xx()
 
 
-def render_as_input_type_radio(*_, **__):
-    xx()
+# `render_as_input_type_radio` moved to custom function builder #history-C.6
 
 
 def render_as_input_type_range(*_, **__):
@@ -659,16 +705,15 @@ def render_as_input_type_search(*_, **__):
     xx()
 
 
-def render_as_input_type_submit(*_, **__):
-    xx()
+# `render_as_input_type_submit`  # done "by hand"
 
 
 def render_as_input_type_tel(*_, **__):
     xx()
 
 
-def render_as_input_type_text(stem, *a, **kw):
-    return _render_as_input_type('text', stem, *a, **kw)
+def render_as_input_type_text(form_component, indent, margin):
+    return _render_as_input_type('text', form_component, indent, margin)
 
 
 def render_as_input_type_time(*_, **__):
@@ -711,16 +756,137 @@ class _HiddenFormElement:  # :+#stem
         self.attribute_name = attribute_name
 
     def to_html_lines(self, indent, margin):
-        use_value = _encode_primitive_value(self.existing_value)
-        yield (f'{margin}<input type="hidden" name="{self.attribute_name}" '
-               f'value="{use_value}">\n')
+        mel = _Mutable_HTML_Element(
+            '<input>', type='hidden',
+            name=self.attribute_name, value=self.existing_value)
+        return mel.to_html_lines(indent, margin)
 
     is_hidden_form_element = True
 
 
+def _render_as_input_type(typ, form_component, margin, indent):
+    mel = _Mutable_HTML_Element('<input>', type=typ)
+    mel.add_attributes(_attributes_via_form_component(form_component))
+    ev = form_component.existing_value
+    if ev is not None:
+        mel.add_attribute('value', ev)
+    return mel.to_html_lines(margin, indent)
+
+
+class _Mutable_HTML_Element:
+
+    def __init__(self, _el_name, **attrs):  # avoid name collision w/ attr name
+        assert '<' == _el_name[0] and _el_name[-1] == '>'
+        self._HTML_element_name = _el_name[1:-1]
+        self._HTML_element_attributes = {}
+        if attrs:
+            self.add_attributes(attrs.items())
+        self._body_string = None
+
+    def add_attributes(self, keys_and_values):
+        for k, v in keys_and_values:
+            self.add_attribute(k, v)
+
+    def add_attribute(self, k, v):
+        assert v is not None
+        if not isinstance(v, str):  # until not
+            xx(f'hmm: {v!r}')
+        assert k not in self._HTML_element_attributes
+        self._HTML_element_attributes[k] = v
+
+    def set_body_string(self, s):
+        assert self._body_string is None
+        self._body_string = s
+
+    # == View
+
+    def to_html_lines(self, margin, indent):
+        # Hackishly we use the none-ness of body string to determine etc.
+        # #history-C.6 deletes a long explanation of the pretty-print rationale
+
+        # IFF body string is None; margin, opening tag, newline ONLY. one line
+        if self._body_string is None:
+            yield ''.join(self._to_opening_tag_line_pieces(margin))
+            return
+
+        # IFF body string not none and no newlines, render on one line w/ close
+        if '\n' not in self._body_string:
+            yield ''.join(self._to_open_and_close_on_one_line_pieces(margin))
+            return
+
+        # Opening tag on one line (no leading margin)
+        yield ''.join(self._to_opening_tag_line_pieces(margin=''))
+
+        # One line for each line in the business value
+        for line in _html_lines_via_existing_value(self._body_string, margin=''):
+            yield line
+
+        # Closing tag on one line (no leading margin)
+        yield ''.join(self._to_closing_tag_line_pieces_no_margin())
+
+    def to_html_line(self, margin):
+        if self._body_string is None:
+            return ''.join(self._to_opening_tag_line_pieces(margin))
+        assert '\n' not in self._body_string
+        return ''.join(self._to_open_and_close_on_one_line_pieces(margin))
+
+    # == Pieces with newlines
+
+    def lineify_pieces(pcs_func_name):
+        def decorator(ignore_func):
+            def use_func(self, *a):
+                for pc in getattr(self, pcs_func_name)(*a):
+                    yield pc
+                yield '\n'
+            return use_func
+        return decorator
+
+    @lineify_pieces('to_open_and_close_pieces_no_newlines')
+    def _to_open_and_close_on_one_line_pieces(self, margin):
+        pass
+
+    @lineify_pieces('_to_opening_tag_pieces')
+    def _to_opening_tag_line_pieces(self, margin):
+        pass
+
+    @lineify_pieces('_to_closing_tag_pieces_no_margin')
+    def _to_closing_tag_line_pieces_no_margin(self, margin):
+        pass
+
+    # == Pieces
+
+    def to_open_and_close_pieces_no_newlines(self, margin):
+        assert '\n' not in self._body_string
+        for pc in self._to_opening_tag_pieces(margin):
+            yield pc
+        yield _html_escape(self._body_string)
+        for pc in self._to_closing_tag_pieces_no_margin():
+            yield pc
+
+    def _to_opening_tag_pieces(self, margin):
+        yield margin
+        yield '<'
+        yield self._HTML_element_name
+        h = _html_escape_function()
+        for k, v in self._HTML_element_attributes.items():
+            assert isinstance(v, str)  # until it isn't ..
+            yield ' '
+            yield k
+            yield '='
+            yield '"'
+            yield h(v)
+            yield '"'
+        yield '>'
+
+    def _to_closing_tag_pieces_no_margin(self):
+        yield '</'
+        yield self._HTML_element_name
+        yield '>'
+
+
 def _html_lines_via_existing_value(existing_value, margin):
-    if existing_value is None:
-        return
+    assert existing_value is not None
+    assert issinstance(existing_value, str)  # for now
 
     lines = re.split('(?<=\n)(?=.)', existing_value)
 
@@ -736,40 +902,9 @@ def _html_lines_via_existing_value(existing_value, margin):
         yield ''.join(pcs)
 
 
-# ==
-
-def _render_as_input_type(typ, stem, margin, ind):
-    def kw():
-        ev = stem.existing_value
-        if ev is None:
-            return
-        yield 'value', _encode_primitive_value(ev)
-    kw = {k: v for k, v in kw()}
-    attrs = _render_form_el_attrs(stem, type='text', **kw)
-    yield f'{margin}<input {attrs}>\n'
-
-
-def _render_form_el_attrs(stem, **kw):
-    return ' '.join(_attr(k, v) for (k, v) in _form_el_attr_NV_pairs(stem, kw))
-
-
-def _form_el_attr_NV_pairs(stem, kw):
-    if (typ := kw.pop('type', None)):
-        yield 'type', typ
+def _attributes_via_form_component(stem):
     yield 'id', stem.form_element_ID
     yield 'name', stem.form_element_name
-    for k, v in kw.items():
-        yield k, v
-
-
-def _attr(k, v):
-    return f'{k}="{v}"'
-
-
-def _encode_primitive_value(mixed):
-    if isinstance(mixed, str):
-        return _html_escape(mixed)
-    xx("this is straightforward (probably) but not covered - {type(mixed)}")
 
 
 def _html_escape(s):
@@ -790,6 +925,12 @@ def _build_keyed_decorator():
         return decorator
     dct = {}
     return for_which, dct
+
+
+# ==
+
+def _form_key(formal_attribute):
+    return formal_attribute.identifier_for_purpose(_FORM_KEY_PURPOSE)
 
 
 # ==
@@ -820,6 +961,7 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.6
 # #history-C.5
 # #history-C.4
 # #history-C.3 enter "identifier for purpose"; formal attributes not collections

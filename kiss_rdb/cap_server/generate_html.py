@@ -381,12 +381,17 @@ def _do_show_form(sout, form_values, fe, coll, listener, WHAT=None):
     if VF_dct:
         fattrs = _filter_out_these(fattrs, VF_dct)
 
+    def model_class_via_name(fent_name):
+        _ = coll.collectioner[fent_name]  # key error okay
+        return _.dataclass
+
     form_action = coll.dataclass.FORM_ACTION_EXPERIMENTAL
     from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
             html_form_via_SOMETHING_ON_THE_MOVE_ as func
     lines = func(
         FORMAL_ATTRIBUTES=fattrs,
         action=form_action, form_values=form_values,  # #here1
+        model_class_via_name=model_class_via_name,
         WHAT=WHAT, listener=listener)
     w = sout.write
     for line in _wrap_lines_commonly(lines):

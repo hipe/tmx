@@ -4,10 +4,14 @@ TemplateVariableName: doc_url_head
 TemplateVariableValue: https://www.gnu.org/software/recutils/manual
 
 %rec: NativeCapability
+%mandatory: Label
 %type: Label line
 %key: ID
+%allowed: ImplementationStatus
 %type: ImplementationStatus line
+%allowed: NativeURL
 %type: NativeURL line
+%allowed: Child
 %type: Child line
 
 # 1-1024 is our ID space (for now)
