@@ -69,13 +69,7 @@ def _(collections):
             # (cr = component renderer; fa = formal attribute)
         }
 
-        @property
-        def FAKE_RANDOM_implementation_status(self):
-            return random_implementation_state()
-
         FORM_ACTION_EXPERIMENTAL = 'edit_capability'  # no
-
-    random_implementation_state = _build_randomer()
 
     return Capability
 
@@ -103,7 +97,7 @@ def _(colz):
         get to deleting notes, etc. Also, would be nice to #lock-the-file
         """
         num = colz['Note'].where(
-                {'parent': params['parent']}, count=True, listener=listener)
+                {'parent': params['parent']}, format='count', listener=listener)
         return num + 1
 
     @_dataclass()
@@ -119,6 +113,21 @@ def _(colz):
             assert 'CREATE' == which
             # (notes only ever get created, never updated)
             return 'view_capability', {'eid': sanitized_params['parent']}
+
+        def SPECIAL_REPORT():
+            # Make a tally, count the notes per item, keyed to item identifier
+            # Execution time should scale linearly with the increase in notes
+            idens = colz['Note'].where(
+                    {}, format='strings',
+                    additional_recsel_options=(
+                            ('--collapse',), ('--print-values', 'Parent')))
+            stats = {}
+            for iden_s in idens:
+                if iden_s in stats:
+                    stats[iden_s] += 1
+                else:
+                    stats[iden_s] = 1
+            return stats
 
     return Note
 
@@ -170,21 +179,6 @@ def _view_pipeline_for_this_one_url(cr, fa, colz):
     use_cr.component_label = cr.component_label  # ick/meh
     use_cr.sanity_once = True
     return use_cr
-
-
-def _build_randomer():
-    def random_implementation_state():
-        f = random_float()
-        if f < 0.30:
-            return
-        if f < 0.55:
-            return 'might_implement_eventually'
-        if f < 0.90:
-            return 'wont_implement_or_not_applicable'
-        return 'is_implemented'
-
-    from random import random as random_float
-    return random_implementation_state
 
 
 def _dataclass():

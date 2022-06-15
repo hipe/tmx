@@ -64,6 +64,16 @@ def _(sin, sout, serr, fent_name, func_name, model=None, recfile=None):
     coll = colz[fent_name]  # raises KeyError
     func = getattr(coll.dataclass, func_name)
     res = func()  # used to pass listener before #history-C.1
+    w = sout.write
+
+    if not hasattr(res, '__next__'):  # meh w/e, modify as needed
+        if hasattr(res, '__getitem__'):
+            w(repr(res))
+        else:
+            w(type(res))
+        w('\n')
+        return 3
+
     first = next(res, None)
     if first is None:
         serr.write('(none.)\n')
@@ -88,7 +98,6 @@ def _(sin, sout, serr, fent_name, func_name, model=None, recfile=None):
         return func
 
     baked = tuple(bake(k) for k in first.__class__.__dataclass_fields__.keys())
-    w = sout.write
     count = 1
     while True:
         if 1 < count:

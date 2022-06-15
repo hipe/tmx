@@ -159,12 +159,18 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
 
     def select(
             kvs=None, formal_arity=None, order_by=None,
-            count=False, additional_recsel_options=None, listener=None):
+            format=None, additional_recsel_options=None, listener=None):
 
-        itr = do_select(kvs, order_by, count, additional_recsel_options, listener)
-        if count:
-            assert formal_arity is None
-            formal_arity = 1
+        itr = do_select(kvs, order_by, format, additional_recsel_options, listener)
+
+        if format:
+            if 'count' == format:
+                assert formal_arity is None
+                formal_arity = 1
+            elif 'strings' == format:
+                pass
+            else:
+                xx(f"no: {format!r}")
         if formal_arity is None:
             return itr  # LOOK return multiple here
         assert 1 == formal_arity  # would be fun otherwise
@@ -178,28 +184,46 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
             xx(f"expecting one had multiple from {dataclass.__name__} {_}")
         return ent  # LOOK return one here
 
-    def do_select(kvs, order_by, count, additional_recsel_options, listener):
-        _ = recsel_args_via(kvs, order_by, count, additional_recsel_options)
+    def do_select(kvs, order_by, format, additional_recsel_options, listener):
+        _ = recsel_args_via(kvs, order_by, format, additional_recsel_options)
         recsel_args = tuple(s for row in _ for s in row)
-        if count:
-            with _open_recsel_process(recfile, recsel_args, listener) as lines:
-                lines = tuple(lines)
-            line, = lines  # ..
-            yield int(re.match(r'^(\d+)\n\Z', line)[1])
-            return
+        if format:
+            if 'count' == format:
+                return results_when_count(recsel_args, listener)
+            if 'strings' == format:
+                return results_when_strings(recsel_args, listener)
+            xx(f"no: {format!r}")
+
+        return results_normally(recsel_args, listener)
+
+    def results_normally(recsel_args, listener):
         denativizer = denativizerer()
-        for raw in native_records_via_recsel_(recfile, recsel_args, listener):
+        raws = native_records_via_recsel_(recfile, recsel_args, listener)
+        for raw in raws:
             dct = denativizer(raw)  # ..
             yield dataclass(**dct)
 
-    def recsel_args_via(kvs, order_by, count, additional_recsel_options):
+    def results_when_count(recsel_args, listener):
+        with _open_recsel_process(recfile, recsel_args, listener) as lines:
+            lines = tuple(lines)
+        line, = lines  # ..
+        count = int(re.match(r'^(\d+)\n\Z', line)[1])
+        return iter((count,))
+
+    def results_when_strings(recsel_args, listener):
+        with _open_recsel_process(recfile, recsel_args, listener) as lines:
+            for line in lines:
+                assert '\n' == line[-1]
+                yield line[:-1]
+
+    def recsel_args_via(kvs, order_by, format, additional_recsel_options):
         yield (f'-t{name_converterer().store_record_type}',)
         if kvs:
             yield '-e', expression_token_via(kvs)
         if order_by:
             store_k = name_converterer().store_key_via_use_key(order_by)
             yield (f"-S{store_k}",)  # we yield tuples. One token because cute
-        if count:
+        if 'count' == format:
             assert not order_by
             yield ('--count',)
         if additional_recsel_options:

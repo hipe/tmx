@@ -139,8 +139,9 @@ def _tree_or_table(sout, serr, inner_lineser, recfile):
 
     write = sout.write
     listener = _common_listener(serr)
-    sct_itr = _collz(recfile)['Capability'].where(listener=listener)
-    lines = inner_lineser(sct_itr, listener)
+    colz = _collz(recfile)
+    sct_itr = colz['Capability'].where(listener=listener)
+    lines = inner_lineser(sct_itr, colz, listener)
     for line in _wrap_lines_commonly(lines):
         write(line)
 
@@ -571,12 +572,14 @@ td.the_buttons_tabledata { text-align: center; }
     yield '</div>\n</body>\n</html>\n'
 
 
-def _inner_html_lines_for_table(recs_itr, listener):
+def _inner_html_lines_for_table(recs_itr, colz, listener):
     from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
     tree_dct = func(recs_itr, _childrener, listener)
 
     if 0 == len(tree_dct):
         return  # ..
+
+    pool = colz['Note'].dataclass.SPECIAL_REPORT()
 
     def table_row_for(rec, depth):
         # Discussion about this current hack for indenting the tree nodes:
@@ -591,7 +594,14 @@ def _inner_html_lines_for_table(recs_itr, listener):
         margin = ''.join('&#12288;' for _ in range(0, depth-1))
         label = f'{margin} {_link_and_label_of_record(rec)}'
         impl_state = _impl_state_html(rec)
-        other = '(notes here eventually..)'
+
+        num = pool.pop(rec.EID, None)
+        if num is None:
+            other = ''
+        elif 1 == num:
+            other = '1 note'
+        else:
+            other = f'{num} notes'
 
         return ('<tr>'
             f'<td>{rec.EID}</td>'
@@ -612,13 +622,18 @@ def _inner_html_lines_for_table(recs_itr, listener):
     if not lines:
         return
 
-    yield '<table>\n<tr><th>ID</th><th>Label</th><th>State</th><th>xx yy zz</th></tr>\n'
+    yield '<table>\n<tr><th>ID</th><th>Label</th><th>State</th><th>&#35; notes</th></tr>\n'
     for line in lines:
         yield line
+
+    if pool:
+        def lines():
+            yield f"warning: orphan note(s): {tuple(pool.keys())!r}"
+        listener('warning', 'expression', 'orphan_notes', lines)
     yield '</table>\n'
 
 
-def _inner_html_lines_for_tree(recs_itr, listener):
+def _inner_html_lines_for_tree(recs_itr, _colz_NOT_USED, listener):
     from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
     tree_dct = func(recs_itr, _childrener, listener)
     if 0 == len(tree_dct):
@@ -659,7 +674,7 @@ def _childrener(node):
 
 def _impl_state_html(rec):
     cache = _impl_state_html.cache
-    state = rec.FAKE_RANDOM_implementation_status
+    state = rec.implementation_status
     h = cache.get(state)
     if h is not None:
         return h
@@ -685,6 +700,7 @@ def _express_implementation_state(state):
 
     if 'is_implemented' == state:
         return 'impl-state-implemented', 'done'
+
     xx(f"unknown implmentation state: {state!r}")
 
 

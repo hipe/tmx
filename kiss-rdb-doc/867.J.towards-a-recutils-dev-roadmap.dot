@@ -36,13 +36,13 @@ VIEW->RFIOK
 RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity" style=filled]
 JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough"]
 ITERUSE->JOINNOTES
-JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes"]
+JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes" style=filled]
 VCS[label="timestamp (and author)\nderived from VCS woot"]
 DONE0100->VCS
 VCSWRITE[label="Commit to VCS\non (for eg.)\nentity save"]
 DONE0100->VCSWRITE
 CUSTOM[label="Eventually you will need the\nability to customize
-entity EDIT & VIEW\nbeyond just what can\nbe gen'd from recinf"]
+entity EDIT & VIEW\nbeyond just what can\nbe gen'd from recinf" style=filled]
 VIEW[label="Entity view, purely\ngenerated from recinf" style=filled]
 RRI->VIEW
 MODELLER[label="create AND EDIT\nyour recutils-native\nmodel directly from GUI"]
