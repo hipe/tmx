@@ -58,7 +58,8 @@ def _(collections):
             return collections['Note'].where(
                 {'parent': self.EID}, order_by='ordinal', listener=listener)
 
-        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(which, eid):
+        @classmethod
+        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(_, which, eid):
             assert 'UPDATE' == which  # ..
             # (at writing, Capability's are never CREATE'd, BUT THIS WILL CHANGE)
             return 'view_capability', {'eid': eid}
@@ -107,6 +108,25 @@ def _(colz):
             return 'view_capability', {'eid': sanitized_params['parent']}
 
     return Note
+
+
+@model_class('StringTemplateVariable')
+def _(colz):
+    @_dataclass()
+    class StringTemplateVariable:
+        template_variable_name: str
+        template_variable_value: str
+
+        @classmethod
+        def RETRIEVE_EXTENT(_, listener):
+            # Optimization: don't read the whole file just to get one record.
+            # This will bite us eventually XX..
+            return colz['StringTemplateVariable'].where(
+                    additional_recsel_options=(('--number', '0'),))
+
+        IS_IN_MAIN_RECFILE = True
+
+    return StringTemplateVariable
 
 
 # == Support (& Legacy - kept in position for history)

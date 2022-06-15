@@ -62,7 +62,45 @@ def _(sin, sout, serr, fent_name, func_name, model=None, recfile=None):
         ('-recfile', recfile, 'required')), listener)
     colz = _collectioner_via(model, recfile, listener)
     coll = colz[fent_name]  # raises KeyError
-    xx()
+    func = getattr(coll.dataclass, func_name)
+    res = func(listener)
+    first = next(res, None)
+    if first is None:
+        serr.write('(none.)\n')
+        return 0
+    curr = first
+    def lines_via_entity(ent):
+        for func in baked:
+            for line in func(ent):
+                yield line
+    def bake(k):
+        def func(ent):
+            rhs = val_func(getattr(ent, k))
+            yield f"{k}: {rhs}\n"
+
+        def val_func(x):
+            if x is None:
+                return '(none.)'
+            if isinstance(x, str):
+                return x
+            return repr(x)
+
+        return func
+
+    baked = tuple(bake(k) for k in first.__class__.__dataclass_fields__.keys())
+    w = sout.write
+    count = 1
+    while True:
+        if 1 < count:
+            w('\n')
+        for line in lines_via_entity(curr):
+            w(line)
+        curr = next(res, None)
+        if not curr:
+            break
+        count += 1
+    serr.write(f"({count} total)\n")
+    return 0
 
 
 @subcommand('model')
@@ -113,9 +151,9 @@ def _list_model_class_names(sout, serr, colz):
         count += 1
         sout.write(f"{fent_name}\n")
     if 0 == count:
-        serr.write("# (none.)\n")
+        serr.write("# (none)\n")
     else:
-        serr.write(f"# ({count} total.)\n")
+        serr.write(f"# ({count} total)\n")
     return 0
 
 

@@ -89,7 +89,7 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, bridger, renames=None):
     def build_collection(fent_name):
         cls = bridge()[fent_name]
         assert cls  # for now (but one day not)
-        recfile = determine_recfile(fent_name)
+        recfile = determine_recfile(cls, fent_name)
 
         @lazy
         def name_converterer():
@@ -102,8 +102,10 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, bridger, renames=None):
     def bridge():
         return bridger(colz)
 
-    def determine_recfile(fent_name):
+    def determine_recfile(dc, fent_name):  # dc = dataclass
         if main_fent_name == fent_name:
+            return main_recfile
+        if getattr(dc, 'IS_IN_MAIN_RECFILE', False):
             return main_recfile
         return ''.join(derive_recfile_pieces(fent_name))
 
@@ -155,8 +157,11 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
             return
         return select({'EID': eid}, formal_arity=1, listener=listener)
 
-    def select(kvs=None, formal_arity=None, order_by=None, listener=None):
-        itr = do_select(kvs, order_by, listener)
+    def select(
+            kvs=None, formal_arity=None, order_by=None,
+            additional_recsel_options=None, listener=None):
+
+        itr = do_select(kvs, order_by, additional_recsel_options, listener)
         if formal_arity is None:
             return itr  # LOOK return multiple here
         assert 1 == formal_arity  # would be fun otherwise
@@ -170,21 +175,30 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
             xx(f"expecting one had multiple from {dataclass.__name__} {_}")
         return ent  # LOOK return one here
 
-    def do_select(kvs, order_by, listener):
+    def do_select(kvs, order_by, additional_recsel_options, listener):
         denativizer = denativizerer()
-        _ = recfile_args_via(kvs, order_by)
+        _ = recfile_args_via(kvs, order_by, additional_recsel_options)
         recfile_args = tuple(s for row in _ for s in row)
         for raw in native_records_via_recsel_(recfile, recfile_args, listener):
             dct = denativizer(raw)  # ..
             yield dataclass(**dct)
 
-    def recfile_args_via(kvs, order_by):
+    def recfile_args_via(kvs, order_by, additional_recsel_options):
         yield (f'-t{name_converterer().store_record_type}',)
         if kvs:
             yield '-e', expression_token_via(kvs)
         if order_by:
             store_k = name_converterer().store_key_via_use_key(order_by)
             yield (f"-S{store_k}",)  # we yield tuples. One token because cute
+        if additional_recsel_options:
+            # exercise extreme CAUTION because this is a big injection vuln
+            for row in additional_recsel_options:
+                flag, *right_hand_side = row
+                assert re.match('^--?[-a-z]+$', flag)
+                if right_hand_side:
+                    val, = right_hand_side  # ..
+                    assert re.match('^[a-zA-Z_0-9]+$', val)  # ..
+                yield row
 
     def expression_token_via(kvs):
         return ','.join(expression_token_components(kvs))
