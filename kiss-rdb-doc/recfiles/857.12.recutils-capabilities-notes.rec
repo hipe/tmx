@@ -11,21 +11,18 @@
 %typedef: Paragraph_t size 1920
 %type: Body Paragraph_t
 
-Parent: 32
-Ordinal: 77
-Body: The Rec Format note 2 line 1
-+ note 2 line 2
-+ note 2 line 3
+Parent: WP
+Ordinal: 1
+Body: Time zone stuff is far out of scope for now.
++ 
++ We have generalized this to all date/time concerns
++ for now.
++ 
++ We don't want to invest in the vendor too much
++ for problems like this. We would rather solve
++ them in a generic way vendor-agnostically first.
++ 
++ This could be used as a reference to that end.
 
-Parent: 32
-Ordinal: 22
-Body: The Rec Format note 1 line 1
-+ note 1 line 2 this should get <em>ESCAPED</em>
-+ note 1 line 3
-
-Parent: 99
-Ordinal: 50
-Body: This isn't attached to anyone
-+ floating line 2
-
+# #history-C.1: begin self-support
 # #birth: 3 hand-written records just to get started

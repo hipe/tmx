@@ -409,7 +409,7 @@ Label: 13.2 Encrypting Files
 ID: QN
 NativeURL: {doc_url_head}/Encrypting-Files.html#Encrypting-Files
 
-Label:13.3 Decrypting Data
+Label: 13.3 Decrypting Data
 ID: QX
 NativeURL: {doc_url_head}/Decrypting-Data.html#Decrypting-Data
 
@@ -458,7 +458,6 @@ Child: V9
 Child: VK
 Child: VU
 Child: W5
-
 
 Label: 17.1 Invoking recinf
 ID: TJ
@@ -518,50 +517,63 @@ Child: YZ
 Child: ZA
 Child: ZL
 Child: ZV
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.1 General date syntax
 ID: WZ
 NativeURL: {doc_url_head}/General-date-syntax.html#General-date-syntax
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.2 Calendar date items
 ID: XA
 NativeURL: {doc_url_head}/Calendar-date-items.html#Calendar-date-items
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.3 Time of day items
 ID: XK
 NativeURL: {doc_url_head}/Time-of-day-items.html#Time-of-day-items
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.4 Time zone items
 ID: XU
 NativeURL: {doc_url_head}/Time-zone-items.html#Time-zone-items
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.5 Combined date and time of day items
 ID: Y6
 NativeURL: {doc_url_head}/Combined-date-and-time-of-day-items.html#Combined-date-and-time-of-day-items
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.6 Day of the week items
 ID: YF
 NativeURL: {doc_url_head}/Day-of-the-week-items.html#Day-of-the-week-items
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.7 Relative items in date strings
 ID: YQ
 NativeURL: {doc_url_head}/Relative-items-in-date-strings.html#Relative-items-in-date-strings
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.8 Pure numbers in date strings
 ID: YZ
 NativeURL: {doc_url_head}/Pure-numbers-in-date-strings
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.9 Seconds since the Epoch
 ID: ZA
 NativeURL: {doc_url_head}/Seconds-since-the-Epoch.html#Seconds-since-the-Epoch
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.10 Specifying time zone rules
 ID: ZL
 NativeURL: {doc_url_head}/Specifying-time-zone-rules.html#Specifying-time-zone-rules
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 19.11 Authors of parse_datetime
 ID: ZV
 NativeURL: {doc_url_head}/Authors-of-parse_005fdatetime.html#Authors-of-parse_005fdatetime
+ImplementationStatus: wont_implement_or_not_applicable
 
+# #history-C.2: begin self-support
 # #history-C.1: initial spike of data
 # #born
