@@ -159,37 +159,49 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
 
     def select(
             kvs=None, formal_arity=None, order_by=None,
-            additional_recsel_options=None, listener=None):
+            count=False, additional_recsel_options=None, listener=None):
 
-        itr = do_select(kvs, order_by, additional_recsel_options, listener)
+        itr = do_select(kvs, order_by, count, additional_recsel_options, listener)
+        if count:
+            assert formal_arity is None
+            formal_arity = 1
         if formal_arity is None:
             return itr  # LOOK return multiple here
         assert 1 == formal_arity  # would be fun otherwise
         ent = next(itr, None)
-        if not ent:
+        if ent is None:
             _ = repr(kvs)
             reason = f"expecting one had none from {dataclass.__name__} {_}"
             return _integrity_error(listener, reason)
         ent_2 = next(itr, None)
-        if ent_2:
+        if ent_2 is not None:
             xx(f"expecting one had multiple from {dataclass.__name__} {_}")
         return ent  # LOOK return one here
 
-    def do_select(kvs, order_by, additional_recsel_options, listener):
+    def do_select(kvs, order_by, count, additional_recsel_options, listener):
+        _ = recsel_args_via(kvs, order_by, count, additional_recsel_options)
+        recsel_args = tuple(s for row in _ for s in row)
+        if count:
+            with _open_recsel_process(recfile, recsel_args, listener) as lines:
+                lines = tuple(lines)
+            line, = lines  # ..
+            yield int(re.match(r'^(\d+)\n\Z', line)[1])
+            return
         denativizer = denativizerer()
-        _ = recfile_args_via(kvs, order_by, additional_recsel_options)
-        recfile_args = tuple(s for row in _ for s in row)
-        for raw in native_records_via_recsel_(recfile, recfile_args, listener):
+        for raw in native_records_via_recsel_(recfile, recsel_args, listener):
             dct = denativizer(raw)  # ..
             yield dataclass(**dct)
 
-    def recfile_args_via(kvs, order_by, additional_recsel_options):
+    def recsel_args_via(kvs, order_by, count, additional_recsel_options):
         yield (f'-t{name_converterer().store_record_type}',)
         if kvs:
             yield '-e', expression_token_via(kvs)
         if order_by:
             store_k = name_converterer().store_key_via_use_key(order_by)
             yield (f"-S{store_k}",)  # we yield tuples. One token because cute
+        if count:
+            assert not order_by
+            yield ('--count',)
         if additional_recsel_options:
             # exercise extreme CAUTION because this is a big injection vuln
             for row in additional_recsel_options:

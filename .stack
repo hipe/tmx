@@ -39,4 +39,3 @@ Maybe nav (either a complicated way or a simple way)
 It will soon be time to formalize the 'WHAT' (the UI messaging mechanic)
 Show summary of number of notes per capability with big custom thing in tree view
 Integrate everything and write new stuff to have notes form
-Implement actual ordinal derivation, cover somehow, imagine soft failure somehow

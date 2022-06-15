@@ -63,7 +63,7 @@ def _(sin, sout, serr, fent_name, func_name, model=None, recfile=None):
     colz = _collectioner_via(model, recfile, listener)
     coll = colz[fent_name]  # raises KeyError
     func = getattr(coll.dataclass, func_name)
-    res = func(listener)
+    res = func()  # used to pass listener before #history-C.1
     first = next(res, None)
     if first is None:
         serr.write('(none.)\n')
@@ -317,4 +317,5 @@ if True:  # ..
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.1
 # #born

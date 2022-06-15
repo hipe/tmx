@@ -95,8 +95,16 @@ def _(colz):
 @model_class('Note')
 def _(colz):
 
-    def generate_next_ordinal(colz, listener):
-      return 7654321
+    def generate_next_ordinal(params, listener):
+        """The next ordinal is the number of notes under this item plus one.
+        So if it has zero notes, the next ordinal is '1' and so on.
+        We chose this definition because it is semi-sane and relatiely easy
+        to implement (with the vendor's --count option); however if we ever
+        get to deleting notes, etc. Also, would be nice to #lock-the-file
+        """
+        num = colz['Note'].where(
+                {'parent': params['parent']}, count=True, listener=listener)
+        return num + 1
 
     @_dataclass()
     class Note:

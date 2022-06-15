@@ -339,7 +339,7 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
             is_set = value_is_considered_to_be_set(wv[0]) if wv else False
 
             if value_factory and not is_set:  # #here3
-                wv = value_factory()  # #here1
+                wv = value_factory(params)  # #here1 #here15
                 x, = wv
                 assert value_is_considered_to_be_set(x)
                 use_params[use_k] = x
@@ -397,8 +397,8 @@ def CREATE_ENTITY_(params, coll, colz, listener, is_dry):
 
         # The any VALUE_FACTORY
         if (vfs := state.VALUE_FACTORIES) and (vf := vfs.get(field_attr_name)):
-            def defaulter():
-                x = vf(colz, tlistener)
+            def defaulter(arg):  # #here15
+                x = vf(arg, tlistener)
                 if not _value_is_considered_to_be_set(x):
                     xx(f"No policy for {field_attr_name!r} VALUE_FACTORY result: {x!r}")
                 return (x,)  # #here1
@@ -725,6 +725,17 @@ def _paragraph_normalizer(x, fa, listener):
     # (we do this after splitting in case we end up needing to use '\r' later)
     if -1 != x.find('\r'):
         lis = [s.replace('\r', '') for s in lis]
+
+    # Strip trailing whitespace (spaces, tabs) from lines (preserve newline)
+    # (we added this when we didn't understand that recins always adds a single
+    # space after the '+' on multiline strings, but no matter.)
+    def f(s):
+        md = re.match(r'^(.*[^ \t]|)[ \t]+\n\Z', s)
+        if not md:
+            return s
+        return md[1] + '\n'
+
+    lis = [f(s) for s in lis]
 
     # If the last line didn't terminate (probably), termindate it
     # (#todo: Actually we don't like it.)
