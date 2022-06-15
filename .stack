@@ -43,4 +43,3 @@ Implement actual ordinal derivation, cover somehow, imagine soft failure somehow
 Make view capability show URL
 url rendering pipeline: one thing is custom, one thing is straightforward
 Use tooling CLI to devleop the special query for templating thing, new model class
-Consider breaking out model into its own parts
