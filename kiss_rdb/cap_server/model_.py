@@ -9,10 +9,10 @@
 #    (shrunk down to one function at #history-C.3)
 
 def collections_via_recfile_(main_recfile):
-    def dataclasserer(colz):
+    def bridger(colz):
         # If you ever feel that the model is "too big" to load all the model
         # every time any dataclass is needed, we can complicate this
-        return _build_datamodel(colz).__getitem__
+        return _build_datamodel_bridge(colz)
 
     def renames(fent_name):
         if 'Capability' == fent_name:
@@ -20,11 +20,11 @@ def collections_via_recfile_(main_recfile):
         if 'Note' == fent_name:
             return (None, {'parent_EID': 'Parent', 'body_lines': 'Body'})
     from kiss_rdb.storage_adapters_.rec import LAZY_COLLECTIONS as func
-    colz = func(main_recfile, 'Capability', dataclasserer, renames)
+    colz = func(main_recfile, 'Capability', bridger, renames)
     return colz
 
 
-def _build_datamodel(collections):
+def _build_datamodel_bridge(collections):
     export = _build_exporter()
     from dataclasses import dataclass
 

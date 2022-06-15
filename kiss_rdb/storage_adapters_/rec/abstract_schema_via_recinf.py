@@ -18,8 +18,7 @@ def abstract_entity_via_recfile_(recfile, store_record_type, listener):
     from . import call_subprocess_ as func
     sout_lines = func(args, listener)
     abs_sch = abstract_schema_via_recinf_lines(sout_lines, listener)
-    # ..
-    return abs_sch[store_record_type]
+    return abs_sch and abs_sch[store_record_type]
 
 
 def abstract_schema_via_recinf_lines(lines, listener):
@@ -351,6 +350,7 @@ def abstract_schema_via_recinf_lines(lines, listener):
         state.state_function = state_function
 
     state = from_first_state  # #watch-the-world-burn
+    state.column = None
     state.several_formal_entities = []
     move_to(from_first_state)
 
@@ -421,7 +421,8 @@ def _noun_phrase_via_matcher(matcher):
 
 def _context_lines(line, lineno, column, filehandle):
     left_piece = f"  {lineno}: "
-    yield ''.join((left_piece, line[:-1], '\n'))
+    if line:
+        yield ''.join((left_piece, line[:-1], '\n'))
     if column is None:
         return
     yield ''.join((' '*len(left_piece), '-'*column, '^\n'))

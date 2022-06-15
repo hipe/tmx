@@ -77,7 +77,7 @@ def _schema_and_entities_via_lines(lines, listener):
     return None, entities()
 
 
-def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
+def LAZY_COLLECTIONS(main_recfile, main_fent_name, bridger, renames=None):
 
     def retrieve_collection(_, k):
         if k not in cache:
@@ -87,7 +87,7 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
     cache = {}
 
     def build_collection(fent_name):
-        cls = dataclasser()(fent_name)
+        cls = bridge()[fent_name]
         assert cls  # for now (but one day not)
         recfile = determine_recfile(fent_name)
 
@@ -99,8 +99,8 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
         return _build_collection(recfile, cls, name_converterer, colz)
 
     @lazy
-    def dataclasser():
-        return dataclasserer(colz)
+    def bridge():
+        return bridger(colz)
 
     def determine_recfile(fent_name):
         if main_fent_name == fent_name:
@@ -120,6 +120,10 @@ def LAZY_COLLECTIONS(main_recfile, main_fent_name, dataclasserer, renames=None):
 
     class Collections:
         __getitem__ = retrieve_collection
+
+        def model_class_names(_):
+            return bridge().keys()
+
     colz = Collections()
     import re
     return colz
@@ -170,7 +174,7 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
         denativizer = denativizerer()
         _ = recfile_args_via(kvs, order_by)
         recfile_args = tuple(s for row in _ for s in row)
-        for raw in _native_records_via_recsel(recfile, recfile_args, listener):
+        for raw in native_records_via_recsel_(recfile, recfile_args, listener):
             dct = denativizer(raw)  # ..
             yield dataclass(**dct)
 
@@ -586,7 +590,7 @@ def name_convention_converters_():  # nccs = name convention converters
 _nccs = name_convention_converters_  # shorter name for local use
 
 
-def _native_records_via_recsel(recfile, recsel_args, listener):
+def native_records_via_recsel_(recfile, recsel_args, listener):
     with _open_recsel_process(recfile, recsel_args, listener) as lines:
         for rec_dct in _native_records_via_lines(lines, listener):
             yield rec_dct
@@ -1079,6 +1083,13 @@ def call_subprocess_(args, listener):
 
     rc = proc.wait()
     if 0 != rc:
+        # client likes to write to stdout errors
+        if sout_lines:
+            def lines():
+                for line in sout_lines:
+                    yield f"(from vendor) {line}"
+            listener('error', 'expression', 'vendor_subprocess_error', lines)
+            return ()
         xx(f"nonzero exitstatus without stderr lines? --> {rc} <--")
 
     return sout_lines

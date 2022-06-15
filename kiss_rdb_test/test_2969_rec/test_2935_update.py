@@ -151,18 +151,18 @@ def collection(main_recfile, formal_entity_name):
 
 
 def lazy_collections(main_recfile):
-    def dataclasserer(collections):
-        return build_datamodel(collections).__getitem__  # EXPERIMENTAL
+    def bridger(collections):
+        return build_datamodel_bridge(collections)  # EXPERIMENTAL
 
     def renames(fent_name):
         if 'Capability' == fent_name:
             return ('NativeCapability', {'EID': 'ID', 'children_EIDs': 'Child'})
 
     func = subject_module().LAZY_COLLECTIONS
-    return func(main_recfile, 'Capability', dataclasserer, renames)
+    return func(main_recfile, 'Capability', bridger, renames)
 
 
-def build_datamodel(collections):
+def build_datamodel_bridge(collections):
     from dataclasses import dataclass
 
     @dataclass

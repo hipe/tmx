@@ -26,10 +26,10 @@ def help_lines_via_components_EXPERIMENTAL_(
     yield first_line
     second_line = next(itr, None)
     if second_line:
-        f = _build_header_replacer_thing(first_line)
-        yield f(second_line)
+        g = _build_header_replacer_thing(first_line)
+        yield g(second_line)
         for line in itr:
-            yield f(line)
+            yield g(line)
 
     # Description lines
     if callable(docstring_for_help_description):

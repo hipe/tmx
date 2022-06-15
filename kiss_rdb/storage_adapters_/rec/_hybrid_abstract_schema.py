@@ -23,6 +23,9 @@ because of how experimental and in-development all this still is.
 
 def EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_VIA_(coll, listener):
     fattrs = _fattrs_via(coll, listener)
+    fattrs = tuple(fattrs)
+    if not fattrs:
+        return
     return _this_module().abstract_table_via_name_and_abstract_columns(
         coll.fent_name, fattrs, listener)
 
@@ -77,6 +80,8 @@ def _fattrs_via(coll, listener):
 
     def produce_pool_from_store_keyed_to_dataclass_keys():
         store_ae = coll.abstract_entity_derived_from_store(listener)
+        if not store_ae:
+            return
         for fa in store_ae.to_formal_attributes():
             yield nc.use_key_via_store_key(fa.column_name), fa
 
@@ -119,6 +124,8 @@ def _fattrs_via(coll, listener):
     """
 
     pool = {k: fa for k, fa in produce_pool_from_store_keyed_to_dataclass_keys()}
+    if 0 == len(pool):
+        return  # assume errors if no store model
     use_FE = coll.abstract_entity_derived_from_dataclass
     keys_only_in_store = keys_only_in_use = None
 
