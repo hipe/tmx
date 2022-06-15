@@ -53,16 +53,23 @@ def _fattrs_via(coll, listener):
     def resolve_one_type_macro():
         store_TM = store_FA.type_macro
         use_TM = use_FA.type_macro
+        store_tup = store_TM.type_macro_ancestors_
+        use_tup = use_TM.type_macro_ancestors_
 
         # It is unlikely that the two type macros are the same (for reasons)
-        if store_TM == use_TM:
+        if store_tup == use_tup:
             return store_TM
 
         # (store is better than dataclass for "singluar" types (maybe),
         # but for "plural" types, this is an area of experimentation)
         # also 'instance_of_class' probably has more info than store side
-        lmt = use_TM.LEFTMOST_TYPE
+        lmt = use_tup[0]
         if lmt in ('tuple', 'instance_of_class'):
+            _explain_use_over_store_TM(listener, store_TM, use_TM)
+            return use_TM
+
+        # Let dataclass take precedence over store if it's longer lol
+        if len(store_tup) < len(use_tup):
             _explain_use_over_store_TM(listener, store_TM, use_TM)
             return use_TM
 

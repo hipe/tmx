@@ -343,9 +343,13 @@ def _define_functions_for_abstract_attribute_via_dataclass_field():
                 return type_macro_.NEW_FUN_EXPERIMENT_via_GA_(typ)
 
             xx(f"Fun! first time seeing this type in an annotation: {typ!r}")
+
         if isinstance(typ, str):
-            assert re.match(r'^[A-Z][a-zA-Z0-9]+$', typ)
-            return type_macro_.via_model_class_name_(typ)
+            if re.match(r'^[A-Z][a-zA-Z0-9]+$', typ):
+                return type_macro_.via_model_class_name_(typ)
+
+            assert re.match(r'[a-z_]+$', typ)
+            return type_macro_(typ, listener=None)
 
         xx(f"For now, type in annotation must be `str` or of type `type`. (Had {typ!r})")
 
@@ -888,6 +892,7 @@ def _define_type_macro_function():
     parent_of = {}
     parent_of['tuple'] = None
     parent_of['instance_of_class'] = None
+    parent_of['url'] = 'line'  # not sure .. what a bold move
     parent_of['paragraph'] = 'text'
     parent_of['line'] = 'text'
     parent_of['text'] = None

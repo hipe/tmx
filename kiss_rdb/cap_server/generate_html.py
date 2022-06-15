@@ -196,9 +196,13 @@ def view_capability(_, sout, serr, recfile, EID):
 
     _add_safely(ar, '_b', render_buttons)
 
+    # Experimental pipeline thing
+    vp = coll.dataclass.VIEW_PIPELINES
+
     from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
-            create_entity_renderer as func
-    lines = func(fe, additional_renderers=ar)(ent)
+            create_entity_renderer__ as func
+    _ = func(fe, additional_renderers=ar, view_pipelines=vp)
+    lines = _(ent)
     for line in _wrap_lines_commonly(lines):
         write(line)
 

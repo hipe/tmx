@@ -51,7 +51,7 @@ def _(collections):
         label: str
         EID: str
         implementation_status: 'ImplementationStatus' = None
-        native_URL: str = None
+        native_URL: 'url' = None
         children_EIDs: tuple['Capability'] = ()
 
         def RETRIEVE_NOTES(self, listener):
@@ -63,6 +63,11 @@ def _(collections):
             assert 'UPDATE' == which  # ..
             # (at writing, Capability's are never CREATE'd, BUT THIS WILL CHANGE)
             return 'view_capability', {'eid': eid}
+
+        VIEW_PIPELINES = {
+            'native_URL': lambda cr, fa: _view_pipeline_for_this_one_url(cr, fa, collections)
+            # (cr = component renderer; fa = formal attribute)
+        }
 
         @property
         def FAKE_RANDOM_implementation_status(self):
@@ -118,7 +123,7 @@ def _(colz):
         template_variable_value: str
 
         @classmethod
-        def RETRIEVE_EXTENT(_, listener):
+        def RETRIEVE_EXTENT(_):
             # Optimization: don't read the whole file just to get one record.
             # This will bite us eventually XX..
             return colz['StringTemplateVariable'].where(
@@ -130,6 +135,34 @@ def _(colz):
 
 
 # == Support (& Legacy - kept in position for history)
+
+def _view_pipeline_for_this_one_url(cr, fa, colz):
+    """Change the URL string by expanding the template variables.
+    This is all EXPERIMENTAL to see how it feels using the database itself
+    for templating like this.
+    Also EXPERIMENTAL around *the idea* of a "view pipeline".
+    Proof of concept, but a little nasty as written
+    """
+
+    def use_cr(ent, margin, indent):
+        orig_url = ent.native_URL
+        if orig_url is None:
+            return cr(ent, margin, indent)
+        assert use_cr.sanity_once
+        use_cr.sanity_once = False
+        _ = tuple(colz['StringTemplateVariable'].dataclass.RETRIEVE_EXTENT())
+        tv, = _  # assume one for now
+        needle = ''.join(('{', tv.template_variable_name, '}'))
+        use_url = orig_url.replace(needle, tv.template_variable_value)
+        use_ent = ReplacementEntity(use_url)
+        return cr(use_ent, margin, indent)
+    class ReplacementEntity:
+        def __init__(self, x):
+            self.native_URL = x
+    use_cr.component_label = cr.component_label  # ick/meh
+    use_cr.sanity_once = True
+    return use_cr
+
 
 def _build_randomer():
     def random_implementation_state():

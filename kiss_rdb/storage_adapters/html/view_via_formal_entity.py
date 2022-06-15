@@ -9,6 +9,9 @@ This module,
 - abstracted from a not-over-abstracted hard-coded thing
 ..became the de-facto *and* de-jure home of the concept of "component renderer"
 - Then retroactively this concept back-pollinated the UPDATE sibling
+- Throughout this is the concept of "baking" (preparing a function that will
+  then be called successively, for example across several entities or
+  the several values in a "column" (field))
 
 A Component renderer:
 - is basically a function that produces lines (but see the rest)
@@ -17,12 +20,17 @@ A Component renderer:
 """
 
 
-def create_entity_renderer(fe, additional_renderers=None):
+def create_entity_renderer__(fe, view_pipelines=None, additional_renderers=None):
+    assert(view_pipelines is None or isinstance(view_pipelines, dict))
     assert(additional_renderers is None or isinstance(additional_renderers, dict))
+
     def component_renderers():
         for fa in fe.to_formal_attributes():
             cr = component_renderer_via_formal_attribute(fa)
+            if view_pipelines and (vpl := view_pipelines.get(_attr(fa))):
+                cr = vpl(cr, fa)
             yield fa.column_name, cr
+
         for k, cr in (additional_renderers.items() if additional_renderers else ()):
             if not hasattr(cr, 'component_label'):
                 xx(f"oops, you forgot to add `component_label` to {k!r}")
@@ -101,12 +109,14 @@ def component_renderer_via_formal_attribute(fa, attr=None):
 def _begin_component_renderer_via_formal_attribute(fa, attr):
 
     if attr is None:  # experimental, only an option for hacks
-        attr = fa.identifier_for_purpose(_DK_FN_PURPOSE)
+        attr = _attr(fa)
 
     tm = fa.type_macro
     base_type = tm.LEFTMOST_TYPE
 
     if 'text' == base_type:  # 'line' or 'text' ('paragraph' doesn't happen now)
+        if 'url' == tm.string:
+            return _build_URL_renderer(attr)
         return _build_the_most_common_component_renderer(attr)
 
     if 'tuple' == base_type:
@@ -159,6 +169,16 @@ def _build_list_of_ents_component_renderer(attr):
     return html_lines_for_component_via_entity
 
 
+def _build_URL_renderer(attr):
+    def html_lines_for(ent, margin, indent):
+        url = getattr(ent, attr)
+        if not url:
+            return
+        yield f'{margin}<a href="{url}">{h(url)}</a>\n'
+    h = _html_escape_function()
+    return html_lines_for
+
+
 def _build_paragraph_renderer(attr):
     def html_lines_for_component_via_entity(ent, margin, indent):  # #here1
         for line in getattr(ent, attr):  # ..
@@ -194,6 +214,10 @@ def _build_int_component_renderer(attr):
 
 
 # == Support
+
+def _attr(fa):
+    return fa.identifier_for_purpose(_DK_FN_PURPOSE)
+
 
 def _html_escape_function():
     from html import escape as func
