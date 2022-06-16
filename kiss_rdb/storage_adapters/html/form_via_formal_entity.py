@@ -182,7 +182,7 @@ def _CLI(sin, sout, serr, argv):
             action='#',
             form_values=form_values,
             listener=None,
-            WHAT=None)
+            ui_msgs=None)
     w = sout.write
     for line in lines:
         w(line)
@@ -232,7 +232,7 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         action='#',  # a string for the FORM html element attribute value.
         form_values=None,  # use the "use" keys and values as strings
         listener=None,  # will be used to complain about missing req'd hiddens
-        WHAT=None,  # experimental mutable structure that holds UI messages
+        ui_msgs=None,  # experimental mutable structure that holds UI messages
         model_class_via_name=None, # experiment for enums
         margin='',
         indent='  '):
@@ -247,8 +247,8 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     """
 
     general_message_lines = tms = None  # tms = targeted message structures
-    if WHAT:
-        general_message_lines, tms = WHAT
+    if ui_msgs:
+        general_message_lines, tms = ui_msgs
 
     # In a first pass, partition the hiddens from the non-hiddens
     hiddens = []

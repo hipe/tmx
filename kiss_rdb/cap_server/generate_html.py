@@ -271,7 +271,7 @@ def process_form(_, sout, serr, stack):
         form_values[k] = v  # might clobber
 
     # Go
-    custom_listener, WHAT = _build_listener_custom_to_this_module(serr)
+    custom_listener, ui_msgs = _build_listener_custom_to_this_module(serr)
 
     # == BEGIN break this up when the dust settles
 
@@ -312,7 +312,8 @@ def process_form(_, sout, serr, stack):
         # For now, high-level UI choice: for this one type of case,
         # turn a success into a failure (sort of):
         if roo and 'UPDATE_was_no_op' == roo[2]:
-            WHAT[0].append("Everthing was unchanged. No values need updating.")
+            ui_msgs.general.append(
+                    "Everything was unchanged. No values need updating.")
             roo = None
 
         if roo:
@@ -332,9 +333,9 @@ def process_form(_, sout, serr, stack):
             these_args = 'CREATE', roo[3]  # just realized this will need the new ID eventually
 
     if not roo:
-        # If it failed, assume messages were written to WHAT and re-show form
+        # If it failed, assume messages were written to ui_msgs and re-show form
         fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(custom_listener)
-        return _do_show_form(sout, form_values, fe, coll, custom_listener, WHAT)
+        return _do_show_form(sout, form_values, fe, coll, custom_listener, ui_msgs)
 
     # An attempt is made to handle successes of *both* CREATE and UPDATE
     # here in one place but..
@@ -365,7 +366,7 @@ def show_form(_, sout, serr, recfile, fent_name, qid):
 
     coll = _collz(recfile)[fent_name]
 
-    listener, WHAT = _build_listener_custom_to_this_module(serr)
+    listener, ui_msgs = _build_listener_custom_to_this_module(serr)
 
     fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
 
@@ -374,10 +375,10 @@ def show_form(_, sout, serr, recfile, fent_name, qid):
 
     # (experimental - wiring a listener on form GENERATION for reasons)
 
-    return _do_show_form(sout, form_values, fe, coll, listener, WHAT)
+    return _do_show_form(sout, form_values, fe, coll, listener, ui_msgs)
 
 
-def _do_show_form(sout, form_values, fe, coll, listener, WHAT=None):
+def _do_show_form(sout, form_values, fe, coll, listener, ui_msgs=None):
 
     # If it has VALUE_FACTORIES, take those attrs out
     # (we could put this knowledge in the downstream function, but why)
@@ -397,7 +398,7 @@ def _do_show_form(sout, form_values, fe, coll, listener, WHAT=None):
         FORMAL_ATTRIBUTES=fattrs,
         action=form_action, form_values=form_values,  # #here1
         model_class_via_name=model_class_via_name,
-        WHAT=WHAT, listener=listener)
+        ui_msgs=ui_msgs, listener=listener)
     w = sout.write
     for line in _wrap_lines_commonly(lines):
         w(line)
@@ -481,7 +482,7 @@ def _build_listener_custom_to_this_module(serr):
 
     def handle_expression_about_field(emi):
         sev, shape, _, WRONG_ATTR_KEY, cat, lineser = emi
-        dct = WHAT[1]
+        dct = ui_msgs.specific
         k = WRONG_ATTR_KEY
         if not (lis := dct.get(k)):
             dct[k] = (lis := [])
@@ -489,16 +490,16 @@ def _build_listener_custom_to_this_module(serr):
 
     def show_this_non_targeted_error_to_user(emi):
         for line in emi[-1]():
-            WHAT[0].append(line)
+            ui_msgs.general.append(line)
 
     def write_info_lines_to_my_stderr_FOR_NOW(emi):
         for line in emi[-1]():
             w(line)
 
     w = _line_writer_via_write_function(serr.write)
-    WHAT = [], {}
+    ui_msgs = _UI_Messages()
     custom_listener.did_error = False
-    return custom_listener, WHAT
+    return custom_listener, ui_msgs
 
 
 def _common_listener(serr):
@@ -733,6 +734,16 @@ def _html_lines_for_button(label, params, margin, indent):
     yield f'{margin}</form>\n'
 
 
+class _UI_Messages:
+    # might either become named tuple or go back to before #history-C.4
+
+    def __init__(self):
+        self.general, self.specific = [], {}
+
+    def __iter__(self):
+        return iter((self.general, self.specific))
+
+
 def _add_safely(dct, k, val):
     assert k not in dct
     dct[k] = val
@@ -770,6 +781,7 @@ if '__main__' == __name__:
   from sys import stdin, stdout, stderr, argv
   exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.4 (as referenced)
 # #history-C.3 (can be temporary)
 # #history-C.2: "engine" not hand-written CLI
 # #history-C.1: change styling to "minimal" theme
