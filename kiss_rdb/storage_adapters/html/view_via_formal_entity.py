@@ -22,19 +22,36 @@ A Component renderer:
 
 def create_entity_renderer__(fe, view_pipelines=None, additional_renderers=None):
     assert(view_pipelines is None or isinstance(view_pipelines, dict))
-    assert(additional_renderers is None or isinstance(additional_renderers, dict))
+
+    upper_addtl_renderers = lower_addtl_renderers = None
+    if additional_renderers:
+        # #open [#872.J] the below needs DRYing. we're just feeling it out for now
+        ks = tuple(additional_renderers.keys())
+        assert additional_renderers['_THE_MIDDLE_'] is None  # KeyError
+        where = ks.index('_THE_MIDDLE_')  # ValueError
+        upper_addtl_renderers = \
+                {k: additional_renderers[k] for k in ks[:where]}
+        lower_addtl_renderers = \
+                {k: additional_renderers[k] for k in ks[(where+1):]}
 
     def component_renderers():
+
+        def check(k, cr):
+            if not hasattr(cr, 'component_label'):
+                xx(f"oops, you forgot to add `component_label` to {k!r}")
+            return k, cr
+
+        for k, cr in (upper_addtl_renderers.items() if upper_addtl_renderers else ()):
+            yield check(k, cr)
+
         for fa in fe.to_formal_attributes():
             cr = component_renderer_via_formal_attribute(fa)
             if view_pipelines and (vpl := view_pipelines.get(_attr(fa))):
                 cr = vpl(cr, fa)
             yield fa.column_name, cr
 
-        for k, cr in (additional_renderers.items() if additional_renderers else ()):
-            if not hasattr(cr, 'component_label'):
-                xx(f"oops, you forgot to add `component_label` to {k!r}")
-            yield k, cr
+        for k, cr in (lower_addtl_renderers.items() if lower_addtl_renderers else ()):
+            yield check(k, cr)
 
     component_renderers = {k: v for k, v in component_renderers()}
     return entity_renderer_via_component_renderers(component_renderers)

@@ -170,6 +170,10 @@ def view_capability(_, sout, serr, recfile, EID):
 
     ar = {}  # ar = additional renderers
 
+    _add_safely(ar, '_top_nav', _build_top_nav(_top_nav_from_view_cap()))
+
+    _add_safely(ar, '_THE_MIDDLE_', None)  # divide top and bottom lol
+
     # Build a custom renderer to render all the notes
     def render_notes(same_ent, margin, indent):
         itr = ent.RETRIEVE_NOTES(listener)
@@ -321,9 +325,10 @@ def process_form(_, sout, serr, stack):
             these_args = 'UPDATE', eid
             # (disregarding ordered prepared direcs. not nec to make redirect)
         else:
+            top_nav_links = _nav_links_from_UPDATE_XX(form_values)
+
             # Yuck -we're going to re-show the UPDATE form. needs this hidden
             form_values[EID_form_key] = eid
-
     else:
         roo = coll.create_entity(form_values, custom_listener)
         if roo:
@@ -331,11 +336,22 @@ def process_form(_, sout, serr, stack):
             assert 'result_of_CREATE' == roo[1]
             assert 'CREATE_succeeded' == roo[2]
             these_args = 'CREATE', roo[3]  # just realized this will need the new ID eventually
+        else:
+            top_nav_links = _nav_links_from_CREATE_XX(form_values)
 
     if not roo:
         # If it failed, assume messages were written to ui_msgs and re-show form
+
+        assert top_nav_links
+        additional_renderers = {}
+        assert top_nav_links
+        additional_renderers['_top_nav'] = _build_top_nav(top_nav_links)
+        additional_renderers['_THE_MIDDLE_'] = None
+
         fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(custom_listener)
-        return _do_show_form(sout, form_values, fe, coll, custom_listener, ui_msgs)
+        return _do_show_form(
+                sout, form_values, fe, coll, custom_listener,
+                additional_renderers, ui_msgs)
 
     # An attempt is made to handle successes of *both* CREATE and UPDATE
     # here in one place but..
@@ -375,10 +391,23 @@ def show_form(_, sout, serr, recfile, fent_name, qid):
 
     # (experimental - wiring a listener on form GENERATION for reasons)
 
-    return _do_show_form(sout, form_values, fe, coll, listener, ui_msgs)
+    if 'parent' in form_values:  # this is so bad. #open [#872.J] (adjacent)
+        use_form_values = form_values
+    else:
+        use_form_values = {'parent': form_values['ID']}  # ..
+    additional_renderers = {
+        '_top_nav': _build_top_nav(_nav_links_from_CREATE_XX(use_form_values)),
+        '_THE_MIDDLE_': None,
+    }
+
+    return _do_show_form(
+            sout, form_values, fe, coll, listener,
+            additional_renderers, ui_msgs)
 
 
-def _do_show_form(sout, form_values, fe, coll, listener, ui_msgs=None):
+def _do_show_form(
+        sout, form_values, fe, coll, listener,
+        additional_renderers=None, ui_msgs=None):
 
     # If it has VALUE_FACTORIES, take those attrs out
     # (we could put this knowledge in the downstream function, but why)
@@ -398,6 +427,7 @@ def _do_show_form(sout, form_values, fe, coll, listener, ui_msgs=None):
         FORMAL_ATTRIBUTES=fattrs,
         action=form_action, form_values=form_values,  # #here1
         model_class_via_name=model_class_via_name,
+        additional_renderers=additional_renderers,
         ui_msgs=ui_msgs, listener=listener)
     w = sout.write
     for line in _wrap_lines_commonly(lines):
@@ -705,11 +735,31 @@ def _express_implementation_state(state):
     xx(f"unknown implmentation state: {state!r}")
 
 
+# == Nav links
+
 def _link_and_label_of_record(rec):
     label_html = _html_escape(rec.label)
     url = f'/?action=view_capability&eid={rec.EID}'  # #here1
     return f'<a href="{url}">{label_html}</a>'
 
+
+def _nav_links_from_UPDATE_XX(values):
+    return _same_nav_links(values)
+
+
+def _nav_links_from_CREATE_XX(values):
+    return _same_nav_links(values)
+
+
+def _same_nav_links(values):
+    yield '⬅️  Cancel', {'action': 'view_capability', 'eid': values['parent']}
+
+
+def _top_nav_from_view_cap():
+    yield '⬅️  Index', None
+
+
+# == Buttons
 
 def _buttons_for_capability(ent):
     params = {'action': 'edit_capability', 'entity_EID': ent.EID}
@@ -717,11 +767,36 @@ def _buttons_for_capability(ent):
     params = {'action': 'add_note', 'parent': ent.EID}
     yield 'Add Note', params
 
+# --
+
+def _build_top_nav(links):
+    def render_top_nav(_, margin, indent):
+        return _html_lines_for_nav_links(links, margin, indent)
+    render_top_nav.component_label = None
+    return render_top_nav
+
+
+def _html_lines_for_nav_links(link_pairs, margin, indent):
+    for label, params in link_pairs:
+        for line in _html_lines_for_nav_link(label, params, margin, indent):
+            yield line
+
 
 def _html_lines_for_buttons(button_pairs, margin, indent):
     for label, params in button_pairs:
         for line in _html_lines_for_button(label, params, margin, indent):
             yield line
+
+
+def _html_lines_for_nav_link(label, params, margin, indent):
+    if params is None:
+        url_tail = ''
+    else:
+        assert params
+        from urllib.parse import urlencode
+        url_tail = ''.join(('?', urlencode(params)))
+    use_label = _html_escape(label)  # this isn't giving &nbsp; to each space
+    yield f'{margin}<a href="/{url_tail}">{use_label}</a>\n'
 
 
 def _html_lines_for_button(label, params, margin, indent):

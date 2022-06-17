@@ -70,6 +70,13 @@ and semantic).)
 As such, when CREATE-ing the typical entity, no primary key value is passed
 from client to server at all, and when UPDATE-ing an existing entity; the
 primary key will be passed back and forth as a hidden field.
+
+
+ISSUES:
+- #open :[#872.J]: the "additional component" system is not DRY between its
+  two clients of it as a pattern. They should both assign the same CSS class
+  to the resulting <td>'s or whatever.
+
 """
 
 from dataclasses import dataclass
@@ -231,11 +238,13 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
         FORMAL_ATTRIBUTES,  # an iterator (or tuple)
         action='#',  # a string for the FORM html element attribute value.
         form_values=None,  # use the "use" keys and values as strings
-        listener=None,  # will be used to complain about missing req'd hiddens
         ui_msgs=None,  # experimental mutable structure that holds UI messages
+        additional_renderers=None,  # experimental, be like VIEW sibling
         model_class_via_name=None, # experiment for enums
         margin='',
-        indent='  '):
+        indent='  ',
+        listener=None,  # will be used to complain about missing req'd hiddens
+        ):
 
     """EXPERIMENT in form generation.."""
     # (the above appears in a CLI help form)
@@ -327,6 +336,29 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
             yield f'{ch3_margin}<li>{html}</li>\n'
         yield f'{ch2_margin}</ul></td></tr>\n'
 
+    # == BEGIN DRY would be nice
+
+    upper_addtls = lower_addtls = None
+    if additional_renderers:
+        # #open [#872.J] the below needs DRYing
+        mid = (ks := tuple(additional_renderers.keys())).index('_THE_MIDDLE_')
+        upper_addtls = tuple(additional_renderers[k] for k in ks[:mid])
+        lower_addtls = tuple(additional_renderers[k] for k in ks[(mid+1):])
+
+        def table_row_for_additional_renderer(cr):
+            # (cr = component renderer)
+            assert cr.component_label is None  # laziness. needs DRY
+            yield f'{ch2_margin}<tr><td colspan="2">\n'
+            for line in cr(form_values, ch3_margin, indent):
+                yield line
+            yield f'{ch2_margin}</td></tr>\n'
+
+    for cr in (upper_addtls or ()):
+        for line in table_row_for_additional_renderer(cr):
+            yield line
+
+    # == END
+
     for stem in non_hiddens:
         yield f'{ch2_margin}<tr>\n'
         _ = h(stem.attribute_label)
@@ -341,6 +373,10 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
             for html in _htmls_via_emission_tails(scts, attr):
                 yield f'{ch4_margin}<li>{html}</li>\n'
             yield f'{ch3_margin}</ul></td></tr>\n'
+
+    for cr in (lower_addtls or ()):
+        for line in table_row_for_additional_renderer(cr):
+            yield line
 
     if True:
         yield f'{ch2_margin}<tr>\n'

@@ -35,4 +35,3 @@ Somewhere near here, imagine integration with VCS
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
-Maybe nav (either a complicated way or a simple way)
