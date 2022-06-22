@@ -36,3 +36,5 @@ Somewhere near here, imagine integration with VCS
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
 Refactor: Get business logic out of index.lua as much as possible
+DON'T FORGET -k MESSES IT UP. TRY THE REST FROM THE TOP. INSECURE
+BREAK OUT THE OPTIONS INTO SPECIFIC THINGS

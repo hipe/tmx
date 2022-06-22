@@ -79,7 +79,17 @@ show_help() {
 
 
 exec_out_to_redbean() {
-    local do_this=("$redbean_exe_path" -vvzukmbag -p "$port" -D "$doc_root")
+    local opts="-vv"  # increase verbosity
+    opts+=" -VV" # increase SSL verbosity
+    opts+=" -z"  # print port
+    opts+=" -u"  # uniprocess
+    opts+=" -k"  # disable ssl fetch verify
+    opts+=" -m"  # log messages
+    opts+=" -b"  # log message bodies
+    opts+=" -a"  # log resource usage
+    opts+=" -g"  # log handler latency
+
+    local do_this=("$redbean_exe_path" "$opts" -p "$port" -D "$doc_root")
     echo "${do_this[*]}"
     exec bash -c "${do_this[*]}"
 }
