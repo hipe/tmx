@@ -24,5 +24,107 @@ Body: Time zone stuff is far out of scope for now.
 + 
 + This could be used as a reference to that end.
 
+Parent: WE
+Ordinal: 1
+Body: As written, this documentation of the available
++ regex subsystem doesn't contextualize it - are
++ we to use these in --expression expressions for
++ recel commands? We will see..
++ 
++ If that is the case, then we might indeed want to
++ use these for pattern-based searching. But at
++ present, we can't think of an immediate use-case;
++ and also this brings up the problem of vendor-
++ specificity.
+
+Parent: S4
+Ordinal: 1
+Body: Although this looks potentially interesting for
++ use-cases of CSV's in the world of "kiss-rdb";
++ it's out of scope for now. Also it introduces
++ the problem of "node-hopping"; which might be
++ an interesting, hackish workaround for us
++ implementing collection migration...
+
+Parent: R8
+Ordinal: 1
+Body: This templating facility is potentially
++ interesting; but probably won't be a perfect
++ fit for our needs (because for one thing, we
++ want to be able to attempt a "pure-model"-based
++ UI, so we wouldn't be writing each field "by hand")
++ 
++ But it bears enough similarity to a general
++ templating solution that it might be
++ worth looking in to later.
++ 
++ It's worth noting that we could use this facility
++ for templating from data sources other than just
++ recutils; they would just have to output data in
++ the rec format
+
+Parent: Q3
+Ordinal: 1
+Body: Encryption is something we may want in the future
++ (if for example we have a passwords table) but
++ for now this is "won't implement" for the usual
++ reason of breaking vendor agnosticity
+
+Parent: PS
+Ordinal: 1
+Body: We would probably prefer to do time-stamping in
++ one of these ways:
++ 
++ - where possible, use the VCS
++ - use bespoke code (develop an internal API) to
++   generate dates
++ 
++ avoid reliance on the storage vendor.
++ leverage the VCS because we can.
+
+Parent: NW
+Ordinal: 1
+Body: use our internal identifier system instead
++ 
++   - vendor agnosticity
++   - future-proof for sharding
+
+Parent: N3
+Ordinal: 1
+Body: In our frontier use-case (many Notes to one
++ Capability), we didn't need to do a proper join
++ because it was enough just to select from Notes
++ with the parent qualifier.
++ 
++ However we want to keep a dog-ear in this for now,
++ because it seems like something we will probably
++ want eventually.
++ 
++ unless our above-described solution becomes
++ a reliable, reusable pattern
+
+Parent: M7
+Ordinal: 1
+Body: This seems potentially useful down the road,
++ but we must be wary of the usual pitfall of
++ avoiding vendor-specific solutions when we
++ could write it in a vendor-agnostic way
+
+Parent: LW
+Ordinal: 1
+Body: This idea of being able to re-use a record
++ descriptor from a different file, this may
++ come in handing down the road for #sharding
+
+Parent: L2
+Ordinal: 1
+Body: We were sure we were going to want something
++ like this to do integrity checks after strange
++ operations where we mutate the storage files.
++ 
++ However, in thinking about this we realize that
++ we may never need this if we always stick to
++ `recset` and `recdel` for mutating data
+
 # #history-C.1: begin self-support
 # #birth: 3 hand-written records just to get started

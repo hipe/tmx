@@ -74,6 +74,7 @@ woah boy.
 |[#873.A]                   | #open | modernize the CLI of this hidden exe
 |[#873]                     |       | internal tracking (extended)
 |[#872.X]                   | #hole | (easier to find this part)
+|[#872.K]                   | #open | lua open subprocess with tokens not expanded string
 |[#872.J]                   | #open | component renderers system needs to bye DRY'ed (see)
 |[#872.I]                   |       | isomorphing between web and store (in [#867.I])
 |[#872.H]                   |       | type macros, generics, annotations & form generation

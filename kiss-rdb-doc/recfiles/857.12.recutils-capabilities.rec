@@ -334,6 +334,7 @@ ID: L2
 NativeURL: {doc_url_head}/Checking-Recfiles.html#Checking-Recfiles
 Child: LB
 Child: LM
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 8.1 Syntactical Errors
 ID: LB
@@ -346,12 +347,14 @@ NativeURL: {doc_url_head}/Semantic-Errors.html#Semantic-Errors
 Label: 9 Remote Descriptors
 ID: LW
 NativeURL: {doc_url_head}/Remote-Descriptors.html#Remote-Descriptors
+ImplementationStatus: might_implement_eventually
 
 Label: 10 Grouping and Aggregates
 ID: M7
 NativeURL: {doc_url_head}/Grouping-and-Aggregates.html#Grouping-and-Aggregates
 Child: MG
 Child: MR
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 10.1 Grouping Records
 ID: MG
@@ -366,6 +369,7 @@ ID: N3
 NativeURL: {doc_url_head}/Queries-which-Join-Records.html#Queries-which-Join-Records
 Child: NC
 Child: NM
+ImplementationStatus: might_implement_eventually
 
 Label: 11.1 Foreign Keys
 ID: NC
@@ -381,6 +385,7 @@ NativeURL: {doc_url_head}/Auto_002dGenerated-Fields.html#Auto_002dGenerated-Fiel
 Child: P8
 Child: PH
 Child: PS
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 12.1 Counters
 ID: P8
@@ -393,6 +398,7 @@ NativeURL: {doc_url_head}/Unique-Identifiers.html#Unique-Identifiers
 Label: 12.3 Time-Stamps
 ID: PS
 NativeURL: {doc_url_head}/Time_002dStamps.html#Time_002dStamps
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 13 Encryption
 ID: Q3
@@ -400,6 +406,7 @@ NativeURL: {doc_url_head}/Encryption.html#Encryption
 Child: QC
 Child: QN
 Child: QX
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 13.1 Confidential Fields
 ID: QC
@@ -417,33 +424,40 @@ Label: 14 Generating Reports
 ID: R8
 NativeURL: {doc_url_head}/Generating-Reports.html#Generating-Reports
 Child: RH
+ImplementationStatus: might_implement_eventually
 
 Label: 14.1 Templates
 ID: RH
 NativeURL: {doc_url_head}/Templates.html#Templates
+ImplementationStatus: might_implement_eventually
 
 Label: 15 Interoperability
 ID: RT
 NativeURL: {doc_url_head}/Interoperability.html#Interoperability
 Child: S4
 Child: SD
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 15.1 CSV Files
 ID: S4
 NativeURL: {doc_url_head}/CSV-Files.html#CSV-Files.html
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 15.2 Importing MDB Files
 ID: SD
 NativeURL: {doc_url_head}/Importing-MDB-Files.html#Importing-MDB-Files
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 16 Bash Builtins
 ID: SN
 NativeURL: {doc_url_head}/Bash-Builtins.html#Bash-Builtins
 Child: SX
+ImplementationStatus: wont_implement_or_not_applicable
 
-Label: 16.1 readred
+Label: 16.1 readrec
 ID: SX
 NativeURL: {doc_url_head}/readrec.html#readrec
+ImplementationStatus: wont_implement_or_not_applicable
 
 Label: 17 Invoking the Utilities
 ID: T9
@@ -471,7 +485,7 @@ Label: 17.3 Invoking recins
 ID: U4
 NativeURL: {doc_url_head}/Invoking-recins.html#Invoking-recins
 
-Label: Invoking recdel
+Label: 17.4 Invoking recdel
 ID: UE
 NativeURL: {doc_url_head}/Invoking-recdel.html#Invoking-recdel
 
@@ -502,6 +516,7 @@ NativeURL: {doc_url_head}/Invoking-mdb2rec.html#Invoking-mdb2rec
 Label: 18 Regular Expressions
 ID: WE
 NativeURL: {doc_url_head}/Regular-Expressions.html#Regular-Expressions
+ImplementationStatus: might_implement_eventually
 
 Label: 19 Date input formats
 ID: WP

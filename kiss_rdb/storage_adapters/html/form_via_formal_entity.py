@@ -669,7 +669,7 @@ def _fall_back_to_view_only_component_renderer(fa):
 
 
 def render_as_textarea(form_component, margin, indent):
-    mel = _Mutable_HTML_Element('<textarea>', rows='4', cols='50')
+    mel = _Mutable_HTML_Element('<textarea>', rows='12', cols='50')
     mel.add_attributes(_attributes_via_form_component(form_component))
     mel.set_body_string(form_component.existing_value or '')  # very important
     # (deleting long comment as part of #history-C.6)
@@ -870,8 +870,8 @@ class _Mutable_HTML_Element:
 
     def lineify_pieces(pcs_func_name):
         def decorator(ignore_func):
-            def use_func(self, *a):
-                for pc in getattr(self, pcs_func_name)(*a):
+            def use_func(self, *a, **kw):
+                for pc in getattr(self, pcs_func_name)(*a, **kw):
                     yield pc
                 yield '\n'
             return use_func
@@ -922,7 +922,7 @@ class _Mutable_HTML_Element:
 
 def _html_lines_via_existing_value(existing_value, margin):
     assert existing_value is not None
-    assert issinstance(existing_value, str)  # for now
+    assert isinstance(existing_value, str)  # for now
 
     lines = re.split('(?<=\n)(?=.)', existing_value)
 

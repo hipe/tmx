@@ -35,3 +35,6 @@ Somewhere near here, imagine integration with VCS
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
+Refactor: Get business logic out of index.lua as much as possible
+Refactor (2 parts): Move a lot of index.lua .init.lua
+Commit: apply fix for the one big bug

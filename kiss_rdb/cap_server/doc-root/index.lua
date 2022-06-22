@@ -193,45 +193,67 @@ function _MyEscape (s)
 
   -- At writing, we don't know of a way to open a subprocess from lua other
   -- than doing it lua's way with `io.popen` which is ONE BIG STRING that gets
-  -- processed by a `bin/sh`. (We would prefer to pass the command as a list
-  -- of tokens and circumvent a shell.)
+  -- processed by a `bin/sh`.
 
-  -- If this one string has special characters like carriage returns, newlines,
-  -- pipes, greater than/less-than characters, dollar signs, parenthesis
-  -- (others); it can lead to *arbitrary unintended execution*, for example
-  -- wiping out your hard-drive.
+  -- Passing user input over such a string is dire: characters like carriage
+  -- returns, newlines, pipes, greater than/less than characters, dollar signs,
+  -- parenthesis, BACKTICKS; in shell they all have special meaning. (And there
+  -- are probably others we forgot!)
+  --
+  -- If they occur in user data and are not given special handling, they could
+  -- lead to any number of disgusting mishaps; including the glaring
+  -- vulnerability of *arbitrary command execution* on the system, for example
+  -- wiping out the entire hard drive.
+
+  -- We would prefer lua's API function for this to accept an *array of string
+  -- tokens* that do *not* get expanded by a shell (as other platforms do), but
+  -- it does not. (There is -- talk of a 3rd party module that that does this.
+  -- .#open [#872.K] is to schlurp-in the relevant part of their implementation.)
+
+  -- At #history-C.2 we flipped from using double-quotes to single-quotes:
+  -- with single quotes there are less characters that need escaping, and
+  -- thanks to help from Rob Normal and Gertlex we now know a way within a
+  -- single-quoted string to escape single-quotes.
 
   -- At #history-C.1 we flipped this from an optimistic approach to a paranoid
   -- approach: Now, unless the string looks totally "ordinary", we wrap it in
   -- quotes and escape certain special characters with a backslash.
 
-  -- (Previously, we weren't giving special handling to carriage
-  -- returns/newlines and greater-than/less-than, and we had exposed an
-  -- arbitrary execution vulnerability (!).)
-
-  -- (Experimentally) We currently chose to use double-quotes over single
-  -- quotes for the wrapping.
-  -- PRO's of single quotes:
-  -- - Can pass-thru as-isis: dollar signs, exclamation points
-  -- CON of single quotes:
-  -- - Impossible to represent a literal single quote; gotta break into more tokens
-
   -- This table lists some characters that should have special attention,
-  -- and what we do about them. (Somewhat arbitrarily, we have attempted to
-  -- order them from "least potentially harmful" to "most")
+  -- and what we do about them within different kinds of string literals.
+  --   - Do *not* assume this list is exhaustive.
+  --   - Somewhat arbitrarily we attempt to order this list from
+  --     "least potentially harmful" to "most"
+  --   - "SQ" = in a Single-Quoted string   "DQ" = in a Double-Quoted string
+  --   - "DSSQ" = "in a Dollar-Sign Single-Quoted string"
+  --     (as https://stackoverflow.com/questions/8254120/)
+  --   - Not pictured is all the semantic effects these chars can have if
+  --     you're *not* within a quoted string.
   --
-  -- | Char that triggers    | How we handle it
-  -- | --------------------- | ----------------
-  -- | a single space  (" ") | leave as-is; should be okay within quotes
-  -- | a tab character       | leave as-is; should be okay within quotes
-  -- | carriage return / newl| leave as-is; terrifying, should be okay in quotes
-  -- | a single quote        | leave as-is (IFF using double quotes)
-  -- | a double quote        | escape with a backslahs (IFF using DQ's)
-  -- | a dollar sign         | escape with backslash (IFF using DQ's)
-  -- | less / greater than   | leave as-is; no magic meaning in quotes
-  -- | exclamation point     | (surprisingly) do NOT escape (DQ's)
-  -- | pipe                  | leave as-is; no magic meaning in quotes
-  -- | a backslash           | VERY IMPORTANT escape it with another backslash
+  -- | Char that triggers    |       SQ       |      DQ       |     DSSQ[3]
+  -- | --------------------- | ------------------------------------------------
+  -- | a single space  (" ") |   leave as-is  |  leave as-is  | leave as-is
+  -- | a tab character       |   leave as-is  |  leave as-is  | leave as-is
+  -- | carriage return / newl|   leave as-is  |  leave as-is  | leave as-is
+  -- | a single quote        |  see [1] below |  leave as-is  | backslash it
+  -- | a double quote        |   leave as-is  | backslash it  | leave as-is
+  -- | a dollar sign         |   leave as-is  | backslash it  | leave as-is
+  -- | less / greater than   |   leave as-is  |  leave as-is  | leave as-is
+  -- | exclamation point [2] |   leave as-is  |  leave as-is  | leave as-is
+  -- | pipe                  |   leave as-is  |  leave as-is  | leave as-is
+  -- | a backslash           |   backslash it | backslash it  | backslash it
+  -- | a backtick            |   leave as-is  | backslash it  | leave as-is
+  --
+  --
+  -- [1]: The shells appear to consider this an escape sequence: ('"'"')
+  --      although (by design) it looks like the closing of a single string
+  --      and etc.
+  -- [2]: If you're trying these out from zsh as we do, zsh may give special
+  --      meaning to the exclamation point. zsh is not relevant here.
+  -- [3]: We were excited about the dollar-sign-single-quoted-string at first
+  --      but it appears to be a bash shell thing, and we are stuck with a
+  --      Bourne shell under lua. The column is left intact for reference and
+  --      novelty.
 
   -- Play it safe: escape the token *unless* it looks like this:
   if string.find(s, "^[a-zA-Z0-9_]+$") then
@@ -239,10 +261,14 @@ function _MyEscape (s)
   end
 
   -- Implement the "rule table" above
-  local inside = string.gsub(s, '["$\\\\]', function (c)
-    return "\\" .. c
+  local inside = string.gsub(s, '[\'\\\\]', function (c)
+    if "'" == c then
+      return "'\"'\"'"
+    end
+    assert('`' == c)
+    return "\\`"
   end)
-  return '"' .. inside .. '"'
+  return "'" .. inside .. "'"
 end
 
 if 'POST' == GetMethod() then
@@ -272,5 +298,6 @@ else
   Write("unrecognized action: " .. action_arg)  -- #todo
 end
 
+-- #history-C.2
 -- #history-C.1
 -- #born
