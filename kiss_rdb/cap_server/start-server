@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
-redbean_version='1.5'
+redbean_version='2.0.4'
 redbean_build_stem='unsecure'
-redbean_exe_file="redbean-${redbean_build_stem}-${redbean_version}.com.dbg"
+redbean_exe_file="redbean-${redbean_build_stem}-${redbean_version}.com"
+# (since #history-C.1 there's no more *.dbg version)
 
 recutils_exe_name='recsel'
 
 tmpdir_entry='z'
 # (NOTE in development we use the above (under the mono-repo root dir)
-# to be a "semi-permanent tempdir"; basically to hold files that are 
+# to be a "semi-permanent tempdir"; basically to hold files that are
 # necessary for the runtime but not versioned. We don't expect this
 # arrangement to stay this way into "production" (or remove this comment))
 
@@ -80,10 +81,10 @@ show_help() {
 
 exec_out_to_redbean() {
     local opts="-vv"  # increase verbosity
-    opts+=" -VV" # increase SSL verbosity
+    # opts+=" -VV" # increase SSL verbosity  # #history-C.1
     opts+=" -z"  # print port
     opts+=" -u"  # uniprocess
-    opts+=" -k"  # disable ssl fetch verify
+    # opts+=" -k"  # disable ssl fetch verify  # #history-C.1
     opts+=" -m"  # log messages
     opts+=" -b"  # log message bodies
     opts+=" -a"  # log resource usage
@@ -91,7 +92,8 @@ exec_out_to_redbean() {
 
     local do_this=("$redbean_exe_path" "$opts" -p "$port" -D "$doc_root")
     echo "${do_this[*]}"
-    exec bash -c "${do_this[*]}"
+    eval "${do_this[*]}"
+    # (we used to exec before #history-C.1 but it is no longer nec. w/ --assimilate)
 }
 
 
@@ -127,8 +129,9 @@ ensure_redbean_is_installed() {
     >&2 echo "(we could script this but it's out of scope for now:)"
     >&2 echo "Try this to install the requisite build of redbean:"
     >&2 echo ""
-    >&2 echo "    curl https://redbean.dev/${redbean_exe_file} > ${redbean_exe_path}"
+    >&2 echo "    curl https://redbean.dev/${redbean_exe_file} -o ${redbean_exe_path}"
     >&2 echo "    chmod ug+x ${redbean_exe_path}"
+    >&2 echo "    bash -c \"${redbean_exe_path} --assimilate\""
     >&2 echo ""
     >&2 echo "(And then run this script again.)"
     exit 3
@@ -170,4 +173,5 @@ ensure_correct_getopt_version_is_installed() {
 
 main
 
+# #history-C.1
 # #born
