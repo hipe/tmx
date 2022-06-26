@@ -119,7 +119,7 @@ def lazy_collections(main_recfile):
         if 'Note' == fent_name:
             return (None, {'body_lines': 'Body'})
 
-    func = subject_module().LAZY_COLLECTIONS
+    func = subject_module().collections_via_main_recfile
     return func(main_recfile, 'Capability', bridger, renames)
 
 

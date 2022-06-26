@@ -1,0 +1,14 @@
+%rec: PageNode
+%type: NaturalKey line
+
+NaturalKey: good_lordt_mamma_one
+
+NaturalKey: good_lordt_mamma_two
+
+%rec: UI_Transition
+
+InitialState: good_lordt_mamma_one
+ResultState: good_lordt_mamma_two
+TransitionType: ting_ting_one
+
+# #born written by hand

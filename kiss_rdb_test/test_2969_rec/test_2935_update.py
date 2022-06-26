@@ -158,7 +158,7 @@ def lazy_collections(main_recfile):
         if 'Capability' == fent_name:
             return ('NativeCapability', {'EID': 'ID', 'children_EIDs': 'Child'})
 
-    func = subject_module().LAZY_COLLECTIONS
+    func = subject_module().collections_via_main_recfile
     return func(main_recfile, 'Capability', bridger, renames)
 
 

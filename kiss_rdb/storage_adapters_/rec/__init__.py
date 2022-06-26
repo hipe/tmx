@@ -77,7 +77,8 @@ def _schema_and_entities_via_lines(lines, listener):
     return None, entities()
 
 
-def LAZY_COLLECTIONS(main_recfile, main_fent_name, bridger, renames=None):
+def collections_via_main_recfile(
+        main_recfile, main_fent_name, bridger, renames=None):
 
     def retrieve_collection(_, k):
         if k not in cache:
@@ -1169,6 +1170,7 @@ def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
 
+# #pending-rename: publicize "rec"
 # #history-B.7
 # #history-B.6
 # #history-B.5

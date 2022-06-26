@@ -23,34 +23,12 @@ install this with:
 |pho_test                | pelican
 
 
+Current status (#history-C.1): Many endpoints are here.
 
-Current status (#history-A.6):
+(At #history-C.1 we deleted lengthy history explaining legacy historical points)
+(At #history-A.7 we schlurped all endpoints into this one egg)
 
-The objective is only to get the pho endpoint installed (which we achieve).
-
-Some time between now and before the changeover to poetry, things changed such
-this setupfile "broke" because it specifies multiple egg (names). This might
-be a blessing in disguise because it fortells the need for one of these files
-fore each sub-project.
-
-We would like to know how to make uninstallers, if that's a thing.
-
-
-
-Historical notes:
-
-At #birth this file was created only to facilitate the creation of the
-CLI entrypoint file for "kiss rdb"
-
-At #history-A.2 we added an entry for the CLI for `pho`
-
-At #history-A.3 we added a couple more
-
-At #history-A.4 this stopped working, probably coinciding with the change
-to "poetry", but the workaround was to invoke the CLI scripts by name;
-which is fine for now. Part of #open [#008.13]
-
-At #history-A.5 we reinstated pip/virtualenv over poetry
+Issues/wishes:
 
 Ideally we will eventually know how we can have this file live in the
 sub-project directory if possible
@@ -71,6 +49,7 @@ setup(
         ],
         entry_points='''
             [console_scripts]
+            tmx-app-flow=app_flow.cli:cli_for_production
             pho=pho.cli:cli_for_production
             tmx-dot2cytoscape=pho.cli.dot2cytoscape:cli_for_production
             tmx-timestamp=pho.cli.timestamp:cli_for_production
@@ -81,6 +60,7 @@ setup(
             dp=data_pipes.cli:cli_for_production
         ''')
 
+# #history-C.1
 # #history-A.7: schlurped all old endpoints into one egg
 # #history-A.6
 # #history-A.5
