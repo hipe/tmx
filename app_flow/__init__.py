@@ -10,7 +10,7 @@ def app_design_via_recfile(main_recfile, listener):
 
     @export
     def to_graph_viz_lines_(listener):
-        return _to_graph_viz_lines(colz, listener)
+        return _to_graph_viz_lines(colz, listener, ad.app_label)
 
     @export
     def check_app_design(listener):
@@ -22,6 +22,8 @@ def app_design_via_recfile(main_recfile, listener):
     ad = AppDesign()
     for func in exports:
         setattr(ad, func.__name__, func)
+
+    ad.app_label = _hackishly_derive_app_label(main_recfile)
 
     return ad
 
@@ -39,12 +41,12 @@ def something_or_stop(func):
 
 # ==
 
-def _to_graph_viz_lines(colz, listener):
+def _to_graph_viz_lines(colz, listener, app_label=None):
     from app_flow._graph_viz_lines_via_big_index \
             import graph_viz_lines_via_big_index_ as func
     try:
         bi = _build_big_index(colz, listener)
-        return func(bi, listener)
+        return func(bi, listener, app_label=app_label)
     except _Stop:
         return ()
 
@@ -152,6 +154,15 @@ def _these_four(colz, listener):
         return _when_none(listener, coll)
 
     return node_itr, first_node, trans_itr, first_trans
+
+
+def _hackishly_derive_app_label(main_recfile):
+    if not isinstance(main_recfile, str):
+        return
+    from os.path import basename, splitext
+    bn = basename(main_recfile)
+    stem, ext = splitext(bn)
+    return stem  # whatever
 
 
 def _when_strange_transition_boundary(listener, nat_key):

@@ -56,7 +56,7 @@ class Case1255_everything(CommonCase):
         lines = self.end_state_stdout_lines
         assert 'digraph g {\n' == lines[0]
         assert '}\n' == lines[-1]
-        assert '/* Nodes */' in lines[1]
+        assert '/* Nodes */' in lines[2]
         assert len(lines) >= 7
 
     def test_040_errput_lines_look_good(self):

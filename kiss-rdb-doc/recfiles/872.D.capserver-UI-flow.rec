@@ -1,14 +1,50 @@
-digraph g {
-label="\n872.D) Capserver UI Workflow"
-show_index->view_capability
-view_capability->show_index[label="(linkback in nav)" color="gray"]
-view_capability->add_note
-add_note->view_capability
-add_note->add_note
-view_capability->edit_capability
-edit_capability->edit_capability
-edit_capability->view_capability
-}
-/*
+
+%rec: PageNode
+%type: NaturalKey line
+
+# == BEGIN EXAMPLE
+
+NaturalKey: show_index
+
+NaturalKey: view_capability
+
+NaturalKey: edit_capability
+
+NaturalKey: add_note
+
+%rec: UI_Transition
+
+InitialState: show_index
+ResultState: view_capability
+TransitionType: item_link
+
+InitialState: view_capability
+ResultState: show_index
+TransitionType: nav_link
+
+InitialState: view_capability
+ResultState: add_note
+TransitionType: button_like
+
+InitialState: add_note
+ResultState: view_capability
+TransitionType: success_or_cancel
+
+InitialState: add_note
+ResultState: add_note
+TransitionType: redraw
+
+InitialState: view_capability
+ResultState: edit_capability
+TransitionType: button_like
+
+InitialState: edit_capability
+ResultState: edit_capability
+TransitionType: redraw
+
+InitialState: edit_capability
+ResultState: view_capability
+TransitionType: success_or_cancel
+
+# #history-C.1: changed format from dotfile to rec
 # #born
-*/
