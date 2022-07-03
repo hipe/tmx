@@ -102,45 +102,51 @@ def _request_url_scanner(url_tail, http_method, GET_params=None):
     advance()
 
 
-class _route_string_scanner:
+def _route_string_scanner(string, rav):
+    """(at #history-C.1 we rewrote this to be in our "weird" way, despite
+    initially having attempted to write it the normal, class-based way.
+    See commit message for justification.)
+    """
 
-    def __init__(self, string):
-        self._len = len(string)
-        assert self._len
-        assert '/' == string[0]
-        if 1 == self._len:
-            self.more = False
+    length = len(string)
+    assert length
+    assert '/' == string[0]
+
+    def advance():
+        if state.end_has_been_peeked:
+            scn.empty = True
+            del scn.peek
             return
-        self.more = True
-        self._pos = 1
-        self._string = string
-        self._end_has_been_peeked = False
-        self._advance()
-
-    def next(self):
-        res = self.peek
-        self._advance()
-        return res
-
-    def _advance(self):
-        if self._end_has_been_peeked:
-            del self.peek
-            del self._end_has_been_peeked
-            del self._pos
-            del self._len
-            del self._string
-            self.more = False
-            return
-        md = _rx_one_or_more_not_slash_then_slash.match(self._string, self._pos)
+        md = _rx_one_or_more_not_slash_then_slash.match(string, state.pos)
         if not md:
-            xx()
-        end = md.end()
-        if end == self._len:
-            self._end_has_been_peeked = True
-        self.peek = md[1]
+            tail = string[state.pos:]
+            raise DefinitionError(f'need non-slashes followed by slash: {tail!r}')
+        scn.peek = md[1]
+        state.pos = md.end()
+        if state.pos == length:
+            state.end_has_been_peeked = True
+
+    class RouteScanner:
+
+        def next(self):
+            res = self.peek
+            advance()
+            return res
+
+        ROUTE_ASSOCIATED_VALUE = None
+
+    scn = RouteScanner()
+    scn.empty = False
+    scn.peek = None  # be careful
+    state = advance  # #watch-the-world-burn
+    state.pos = 1
+    state.end_has_been_peeked = state.pos == length
+    advance()
+    return scn
 
 
 _rx_one_or_more_not_slash_then_slash  = re.compile(r'([^/]+)/')
 
 
+# #history-C.1
 # #born

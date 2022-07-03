@@ -28,7 +28,7 @@ class RouteCase(unittest_TestCase):
 
     def do_go(self):
         scn = subject_module()._route_string_scanner(self.given_route_string)
-        while scn.more:
+        while not scn.empty:
             yield scn.next()
 
 
