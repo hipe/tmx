@@ -66,40 +66,174 @@ import re
 class matcher_via_routes:
 
     def __init__(self, route_definitions):
-        self._root_node = None
+        self._root_node_for_parameterless_GET_request = None
         self._route_definitions = route_definitions
 
     def match(self, url_tail, http_method, GET_params):
-        if self._root_node is None:
-            rd = self._route_definitions
-            del self._route_definitions
-            self._root_node = _build_lazy_root_node(rd)
-        pass
+        if self._root_node_for_parameterless_GET_request is None:
+            self._construct_index()
+        if 'GET' != http_method:
+            xx()
+        if GET_params is not None:
+            xx()
+        return _match_url(url_tail, self._root_node_for_parameterless_GET_request)
+
+    def _construct_index(self):
+        """As soon as it's time to parse an input url (which it should be by
+        now), we must at least begin to parse *every* route
+        """
+
+        ordinarys = []
+
+        defs = self._route_definitions
+        del self._route_definitions
+        for tup in defs:
+            if 2 == len(tup):
+                string, rav = tup  # rav = route associated value
+                ordinarys.append(_route_string_scanner(string, rav))
+                continue
+            xx()
+
+        self._root_node_for_parameterless_GET_request = _RoutesNode(ordinarys)
 
 
-def _build_lazy_root_node(route_definitions):
-    """As soon as it's time to parse an input url (which it should be by now),
-    we're gonna want *every* route to be under a scanner (because we won't
-    know if we need the route for the current url unless we at least ²
-    """
+def _match_url(url_tail, root_node):
 
-    xx()
+    # The request url (tail) cannot be the empty string
+    scn = _unsanitized_request_url_scanner(url_tail)
+    if scn.empty:
+        return _routing_failure("API argument error: url was empty string")
 
+    # The request url (tail) must start with a slash (as an API requirement)
+    if not scn.skip_any_slash():
+        return _routing_failure("API argument error: url must start with '/'")
+    had_trailing_slash = True
+
+    # the core algorithm: Start at the root node
+    current_node = root_node
+    while True:
+        # If you reached the end of the input url, break out to go match end
+        if scn.empty:
+            break
+
+        # Read the next token (might be "") off input stream. & any slash
+        entry_string = scn.next_entry()
+        had_trailing_slash = scn.skip_any_slash()
+        # (advance the scanner past the any next slash now so that subsequently
+        # if we generate expressions of the url, it will include the slash if
+        # it was provided, to look more "normal" #here3)
+
+        if not had_trailing_slash:
+            # (sanity check: the only way there could be no slash is at the end)
+            assert scn.empty
+
+        # Attempt to match the current token against the node matchers
+        next_node = current_node.match_request_url_entry(entry_string)
+
+        # If you found one, keep partying
+        if next_node:
+            current_node = next_node
+            continue
+
+        # Stop because you didn't find one this step
+        url_head = url_tail[:scn.position]
+        return _routing_failure(f"404 - not found: {url_tail!r}")
+
+    wv = current_node.match_end_of_url()
+    if wv:
+        return _routing_success(wv[0], had_trailing_slash)  # #here2
+    return _routing_failure(f"404 - not an endpoint: {url_tail!r}")
+
+
+class _routing_failure:
+
+    def __init__(self, msg):
+        self.message = msg
+
+    OK = False
+
+
+class _routing_success:
+
+    def __init__(self, route_associated_value, had_trailing_slash):
+        self.route_associated_value = route_associated_value
+        self.had_trailing_slash = had_trailing_slash
+
+    OK = True
+
+
+# ==
 
 class _RoutesNode:
 
+    def __init__(self, hot_route_scanners_TEMP):
+        rename_me = {}
+        self._can_match_the_end = False
+        for scn in hot_route_scanners_TEMP:
+            # If the route scanner is at the end, this node can match the end
+            if scn.empty:
+                if self._can_match_the_end:
+                    xx("ambiguous grammar: more than one identical route path")
+                self._can_match_the_end = True
+                self._route_value_for_matching_end = scn.ROUTE_ASSOCIATED_VALUE
+                continue
+            # Otherwise, in our contract, EVERY scanner in our "collar" must
+            # advance by one
+            literal = scn.next()
+            if '{' in literal:
+                xx()
+
+            rec = rename_me.get(literal)
+            if not rec:
+                rec = (False, [])  # #here1
+                rename_me[literal] = rec
+            rec[1].append(scn)
+        self._mixed_via_literal = rename_me
+
     def match_request_url_entry(self, entry):
-        xx()
+        rec = self._mixed_via_literal.get(entry)
+        if not rec:
+            return
+        is_cold, node_or_routes = rec
+        if is_cold:
+            return node_or_routes
+        node = _RoutesNode(node_or_routes)
+        self._mixed_via_literal[entry] = (True, node)  # #here1
+        return node
 
     def match_end_of_url(self):
-        xx()
+        if self._can_match_the_end:
+            return (self._route_value_for_matching_end,)  # #here2
 
 
-def _request_url_scanner(url_tail, http_method, GET_params=None):
-    xx()
-    more
-    peek
-    advance()
+def _unsanitized_request_url_scanner(string):
+
+    class Request_URL_Scanner:
+        def __init__(self):
+            self.position = 0
+
+        def next_entry(self):
+            md = _rx_zero_or_more_not_slashes.match(string, self.position)
+            self.position = md.end()
+            return md[1]
+
+        def skip_any_slash(self):
+            md = _rx_slash.match(string, self.position)
+            if not md:
+                return
+            self.position = md.end()
+            return True
+
+        @property
+        def more(self):
+            return self.position != length
+
+        @property
+        def empty(self):
+            return self.position == length
+
+    length = len(string)
+    return Request_URL_Scanner()
 
 
 def _route_string_scanner(string, rav):
@@ -133,7 +267,7 @@ def _route_string_scanner(string, rav):
             advance()
             return res
 
-        ROUTE_ASSOCIATED_VALUE = None
+        ROUTE_ASSOCIATED_VALUE = rav
 
     scn = RouteScanner()
     scn.empty = False
@@ -145,7 +279,13 @@ def _route_string_scanner(string, rav):
     return scn
 
 
-_rx_one_or_more_not_slash_then_slash  = re.compile(r'([^/]+)/')
+_rx_one_or_more_not_slash_then_slash  = re.compile('([^/]+)/')
+_rx_zero_or_more_not_slashes = re.compile('([^/]*)')
+_rx_slash = re.compile('/')
+
+
+class DefinitionError(RuntimeError):
+    pass
 
 
 # #history-C.1
