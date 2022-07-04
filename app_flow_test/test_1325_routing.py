@@ -8,12 +8,30 @@ class CommonCase(unittest_TestCase):
     def go(self):
         self.end_state = self.url_matcher.match(
             self.given_url, self.given_http_method, self.given_GET_params)
+        if not self.do_debug:
+            return
+        from sys import stderr
+        w = stderr.write
+        if self.end_state.OK:
+            def these():
+                es = self.end_state
+                yield f"RAV: {es.route_associated_value!r}"
+                if es.parse_tree:
+                    yield f"PT: {es.parse_tree!r}"
+            these = ' '.join(these())
+            w(f"_routing_success ({self.given_url!r} begets {these})\n")
+        else:
+            w(f"_routing_failure: {self.given_url!r}\n")
 
     def expect_failure(self, msg):
+        if self.end_state.OK:
+            self.fail("expected a route not to match but one did")
         err = self.end_state
         self.assertEqual(msg, err.message)
 
-    def expect_success(self, rav):
+    def expect_success(self, rav):  # rav = route-associated value
+        if not self.end_state.OK:
+            self.fail("expected a route to match but it did not")
         actual_value = self.end_state.route_associated_value
         self.assertEqual(rav, actual_value)
 
@@ -23,11 +41,23 @@ class CommonCase(unittest_TestCase):
         """NOTE XXX this is intentionaly wild: strap in. subject is lazy
         """
 
-        these = ((s, ('xx_RAV_xx', s)) for s in self.given_routes)
-        return subject_module().matcher_via_routes(these)
+        def these():
+            for mixed in self.given_routes:
+                if isinstance(mixed, str):
+                    yield mixed, ('xx_RAV_xx', mixed)  # RAV = route-associated value
+                    continue
+                assert isinstance(mixed, tuple)
+                assert 2 == len(mixed)
+                yield mixed
+
+        these = these()
+        return subject_module().matcher_via_routes(
+                these, self.given_pattern_definitions)
 
     given_http_method = 'GET'
     given_GET_params = None
+    given_pattern_definitions = None
+    do_debug = False
 
 
 class RouteCase(unittest_TestCase):
@@ -114,6 +144,26 @@ class Case1327_intro(CommonCase):
         yield '/lower/pelvis/'
         yield '/torso/heart/'
         yield '/torso/shoulders/'
+
+
+class Case1331_introduce_patterns(CommonCase):
+
+    def test_010_against_good(self):
+        self.given_url = '/beanieman/ABC_123/discogs'
+        self.go()
+        self.expect_success('the_way_1')
+        self.assertEqual('ABC_123', self.end_state.parse_tree['USER_ID'])
+
+    @property
+    def given_routes(self):
+        yield '/beanieman/{USER_ID}/discogs/', 'the_way_1'
+
+    @property
+    def given_pattern_definitions(self):
+        def these(pattern_identifier):
+            if 'USER_ID' == pattern_identifier:
+                return '^[A-Z0-9_]+$'
+        return these
 
 
 def subject_module():

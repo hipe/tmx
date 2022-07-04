@@ -65,9 +65,10 @@ import re
 
 class matcher_via_routes:
 
-    def __init__(self, route_definitions):
+    def __init__(self, route_definitions, PATTERN_DEFINITIONS=None):
         self._root_node_for_parameterless_GET_request = None
         self._route_definitions = route_definitions
+        self._PATTERN_DEFINITIONS = PATTERN_DEFINITIONS
 
     def match(self, url_tail, http_method, GET_params):
         if self._root_node_for_parameterless_GET_request is None:
@@ -94,7 +95,13 @@ class matcher_via_routes:
                 continue
             xx()
 
-        self._root_node_for_parameterless_GET_request = _RoutesNode(ordinarys)
+        if self._PATTERN_DEFINITIONS:
+            gpf = _general_pattern_factory(self._PATTERN_DEFINITIONS)
+        else:
+            gpf = None
+
+        self._root_node_for_parameterless_GET_request = \
+                _RoutesNode(ordinarys, gpf)
 
 
 def _match_url(url_tail, root_node):
@@ -108,6 +115,7 @@ def _match_url(url_tail, root_node):
     if not scn.skip_any_slash():
         return _routing_failure("API argument error: url must start with '/'")
     had_trailing_slash = True
+    matchdatas = None
 
     # the core algorithm: Start at the root node
     current_node = root_node
@@ -128,10 +136,16 @@ def _match_url(url_tail, root_node):
             assert scn.empty
 
         # Attempt to match the current token against the node matchers
-        next_node = current_node.match_request_url_entry(entry_string)
+        pair = current_node.match_request_url_entry(entry_string)  # #here4
 
         # If you found one, keep partying
-        if next_node:
+        if pair:
+            next_node, md_kv = pair  # md_kv = matchdata key-value pair
+            if md_kv:
+                assert 2 == len(md_kv)
+                if matchdatas is None:
+                    matchdatas = []
+                matchdatas.append(md_kv)
             current_node = next_node
             continue
 
@@ -141,7 +155,7 @@ def _match_url(url_tail, root_node):
 
     wv = current_node.match_end_of_url()
     if wv:
-        return _routing_success(wv[0], had_trailing_slash)  # #here2
+        return _routing_success(wv[0], had_trailing_slash, matchdatas)  # #here2
     return _routing_failure(f"404 - not an endpoint: {url_tail!r}")
 
 
@@ -153,23 +167,103 @@ class _routing_failure:
     OK = False
 
 
-class _routing_success:
+class _routing_success:  # dataclass
 
-    def __init__(self, route_associated_value, had_trailing_slash):
+    def __init__(self, route_associated_value, had_trailing_slash, matchdatas):
         self.route_associated_value = route_associated_value
         self.had_trailing_slash = had_trailing_slash
+        if matchdatas is None:
+            self.parse_tree = None
+            return
+        self.parse_tree = _matchdatas_dict_via_pairs(matchdatas)
 
     OK = True
 
+
+def _matchdatas_dict_via_pairs(matchdatas):
+    """Planning for contingencies we probably won't ever encounter, given that
+    our routing pattern language doesn't have "kleeny"-style operators (like
+    regexes do), we know that every url that matches a given route will have
+    exactly the same number of components (entries) the route has.
+
+    For example, given this route:
+
+        /foo/{BAR}/baz/
+
+    all urls that match it will have exactly three components. And they will
+    all have exactly one entry that corresponds to the one pattern placeholder.
+
+    (We cannot write a pattern that "globs" multiple entires; not only is this
+    a design choice, it's also a by-product of how we implemented route
+    processing: forward slashes are parsed with a higher precedence than
+    user-provided patterns; user-provided pattern "matchers" are only ever
+    passed single entries at a time.)
+
+    As such, we can leverage this fixed behavior to affect how we create
+    "parse trees":
+
+    Consider the contrived example:
+
+        /member/{MEMBER_IDENTIFIER}/view-relationship-with/{MEMBER_IDENTIFIER}/
+
+    Notice same pattern identifier (and so pattern) repeats once.
+    As a sort of corollary to the axiom offered above, all urls that match
+    this route will have exactly two components (entries) that correspond with
+    those two placeholders in the route.
+
+    Following the principle of least surprise, it's natural for the user
+    to expect that those patterns whose placeholder only occurs once
+    (the commonmost case by far) should have a component in the parse tree
+    that is an ordinary, straighforward value (and not, for example, a list
+    or tuple (unless the custom matcher function creates such a value for
+    whatever reason)).
+
+    Conversely, the user will expect (probably) that patterns with multiple
+    occurrences in the route have a corresponding list-like component in the
+    parse tree.
+
+    As it works out, we can implement this complex-sounding "spec" here
+    relatively straightforwardly, and do so lazily (at "match-time"), rather
+    than needing to have some complicated pass when we parse the route.
+
+    We need to take care that the user-provided function can result in any
+    true-ish value for a matchata, and we should not assume that result is
+    not list-like, so we maintain our own memory of what pattern names we've
+    seen.
+    """
+
+    matchdatas_dct = {}
+    field_state = {}
+    for k, v in matchdatas:
+        num = field_state.get(k, 1)
+
+        # If this is the first time you've seen it, set it as a single
+        # value and remember that you've seen it
+        if 1 == num:
+            matchdatas_dct[k] = v
+            field_state[k] = 2
+
+        # If this is the second time you've seen this, upgrade the
+        # component to be a list, do the switcheroo, and remember etc
+        elif 2 == num:
+            matchdatas_dct[k] = [matchdatas_dct[k], v]
+            field_state[k] = 3
+
+        # If this is the third or more time you've seen this, LG
+        else:
+            assert 3 == num
+            matchdatas_dct[k].append(v)
+    return matchdatas_dct
 
 # ==
 
 class _RoutesNode:
 
-    def __init__(self, hot_route_scanners_TEMP):
-        rename_me = {}
+    def __init__(self, hot_route_scanners, gpf):
+        literals = {}
+        matchers = None
         self._can_match_the_end = False
-        for scn in hot_route_scanners_TEMP:
+        for scn in hot_route_scanners:
             # If the route scanner is at the end, this node can match the end
             if scn.empty:
                 if self._can_match_the_end:
@@ -179,27 +273,57 @@ class _RoutesNode:
                 continue
             # Otherwise, in our contract, EVERY scanner in our "collar" must
             # advance by one
-            literal = scn.next()
-            if '{' in literal:
-                xx()
+            token = scn.next()
 
-            rec = rename_me.get(literal)
+            # Determine which dictionary the scanners go in to
+            if '{' in token:
+                if matchers is None:
+                    matchers = {}
+                    self._SPECIFIC_PATTERN_FACTORY = gpf()
+                dct = matchers
+            else:
+                dct = literals
+
+            rec = dct.get(token)
             if not rec:
-                rec = (False, [])  # #here1
-                rename_me[literal] = rec
+                rec = [True, []]  # #here1
+                dct[token] = rec
             rec[1].append(scn)
-        self._mixed_via_literal = rename_me
+
+        self._hot_or_cold_via_literal = literals
+        self._hot_or_cold_via_matcher_placeholder = matchers
+        self._general_pattern_factory = gpf
 
     def match_request_url_entry(self, entry):
-        rec = self._mixed_via_literal.get(entry)
-        if not rec:
+        rec = self._hot_or_cold_via_literal.get(entry)
+        if rec:
+            md_kv = None
+        else:
+            # (we considered making a separate class but probably not worth it)
+            pair = self._match_using_patterns(entry)
+            if not pair:
+                return
+            rec, md_kv = pair
+        assert 2 == len(rec)
+        if rec[0]:  # if it's hot, "collapse" the "superposition". all #here1
+            rec[0] = None
+
+            rec[1] = _RoutesNode(rec[1], self._general_pattern_factory)
+            # recurse (pass scanners)
+
+            rec[0] = False  # False means "is cold"
+        return rec[1], md_kv  # #here4
+
+    def _match_using_patterns(self, entry):
+        if not self._hot_or_cold_via_matcher_placeholder:
             return
-        is_cold, node_or_routes = rec
-        if is_cold:
-            return node_or_routes
-        node = _RoutesNode(node_or_routes)
-        self._mixed_via_literal[entry] = (True, node)  # #here1
-        return node
+
+        for placeholder, rec in self._hot_or_cold_via_matcher_placeholder.items():
+            matcher = self._SPECIFIC_PATTERN_FACTORY(placeholder)  # ..
+            trueish = matcher(entry)
+            if not trueish:
+                continue
+            return rec, (matcher.parse_tree_component_name, trueish)  # #here5
 
     def match_end_of_url(self):
         if self._can_match_the_end:
@@ -283,6 +407,61 @@ _rx_one_or_more_not_slash_then_slash  = re.compile('([^/]+)/')
 _rx_zero_or_more_not_slashes = re.compile('([^/]*)')
 _rx_slash = re.compile('/')
 
+
+# ==
+
+def _general_pattern_factory(pattern_definitions):
+    """In our frontier imagined practical use case, there will probably
+    be only one pattern, and we will re-use it within several routes.
+
+    The distinction seen here between "general" and "specific" pattern
+    factories is that the specific pattern factory is built for a single
+    branch node. As we write, we're discovering it may an unnecessary
+    accomodation, and one that we don't utilize, but one we'll leave in
+    (for now) nonetheless.
+
+    We don't want the client to worry about caching and re-using the same
+    matcher for multiple instances of the same placeholder; we do that.
+    """
+
+    def build_specific_pattern_factory():
+        def build_matcher_for(placeholder):
+            if placeholder not in matcher_cache:
+                matcher_cache[placeholder] = _resolve_matcher(placeholder, pattern_definitions)
+            return matcher_cache[placeholder]
+        return build_matcher_for
+    matcher_cache = {}
+    return build_specific_pattern_factory
+
+
+def _resolve_matcher(placeholder, pattern_definitions):
+    pattern_identifier = _validate_and_strip_surface_placeholder(placeholder)
+    matcher_func = pattern_definitions(pattern_identifier)
+    if not matcher_func:
+        raise DefinitionError(f'no: {pattern_identifier!r}')
+
+    if isinstance(matcher_func, str):
+        matcher_func = re.compile(matcher_func)
+
+    if hasattr(matcher_func, 'match'):
+        rx = matcher_func
+        def matcher_func(entry):
+            md = rx.match(entry)
+            if not md:
+                return
+            return md[0]  # EXPERIMENTAL #here5
+    matcher_func.parse_tree_component_name = pattern_identifier  # ick/meh
+    return matcher_func
+
+
+def _validate_and_strip_surface_placeholder(placeholder):
+    md = re.match(r'^\{([^{}]+)\}$', placeholder)
+    if not md:
+        raise DefinitionError(f"Placeholder must look like '{{FOO_BAR_123}}' - {placeholder!r}")
+    return md[1]
+
+
+# ==
 
 class DefinitionError(RuntimeError):
     pass
