@@ -73,9 +73,15 @@ class matcher_via_routes:
     def match(self, url_tail, http_method, GET_params):
         if self._root_node_for_parameterless_GET_request is None:
             self._construct_index()
+
         if 'GET' != http_method:
             assert 'POST' == http_method
-            xx()
+            rn = self._root_node_for_POST_request
+            if not rn:
+                xx()
+                return _routing_failure(f"404 - no POSTs at all: {url_tail!r}")
+            return _match_url(url_tail, rn)
+
         if GET_params:
             return _crazy_GET_params_thing(
                 url_tail, GET_params,
@@ -91,15 +97,36 @@ class matcher_via_routes:
 
         ordinarys = []
         extraordinaries = None
+        posts = None
 
         defs = self._route_definitions
         del self._route_definitions
         for tup in defs:
-            if 2 == len(tup):
-                string, rav = tup  # rav = route associated value
+            stack = list(reversed(tup))
+            string = stack.pop()
+            rav = stack.pop()  # rav = route-associated value (anything from user)
+            GET_params_query = stack.pop() if stack else None
+            method = stack.pop() if stack else None
+
+            # If it's POST, do this
+            if method:
+                if 'POST' != method:
+                    raise DefinitionError("method must be POST (default is "
+                                          f"GET). Had: {method!r}")
+                if GET_params_query:
+                    raise DefinitionError("can't have both GET_params_query "
+                                          "and POST method")
+                if posts is None:
+                    posts = []
+                posts.append(_route_string_scanner(string, rav))
+                continue
+
+            # If it's "ordinary", do this:
+            if not GET_params_query:
                 ordinarys.append(_route_string_scanner(string, rav))
                 continue
-            string, rav, GET_params_query = tup
+
+            # Since it's associated with a GET params query, do this:
             if extraordinaries is None:
                 extraordinaries = []
                 extraordinary_offset_via_GET_param_key = {}
@@ -119,6 +146,11 @@ class matcher_via_routes:
 
         self._root_node_for_parameterless_GET_request = \
                 _RoutesNode(ordinarys, gpf)
+
+        this = None
+        if posts:
+            this = _RoutesNode(posts, gpf)
+        self._root_node_for_POST_request = this
 
         these = None
         if extraordinaries:  # see #here6

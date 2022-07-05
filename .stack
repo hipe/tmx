@@ -37,4 +37,3 @@ Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
 Refactor: Get business logic out of index.lua as much as possible
 Overhaul the lua "frontend" and the "middleware" (CLI) to have sane url's
-The POST thing for routing

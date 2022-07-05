@@ -199,6 +199,25 @@ class Case1335_introduce_GET_params(CommonCase):
         yield '/chim/churry/', 'version_3'
 
 
+class Case1339_introduce_POST_method(CommonCase):
+
+    def test_010_GET_not_POST(self):
+        self.go()
+        self.expect_success('version_1')
+
+    def test_020_POST_not_GET(self):
+        self.given_http_method = 'POST'
+        self.go()
+        self.expect_success('version_2')
+
+    given_url = '/zap/daddy/'
+
+    @property
+    def given_routes(self):
+        yield '/zap/daddy/', 'version_1'
+        yield '/zap/daddy/', 'version_2', None, 'POST'
+
+
 def subject_module():
     # XXX not sure if will come in thru CLI
     import app_flow.routing as mod
