@@ -74,9 +74,14 @@ class matcher_via_routes:
         if self._root_node_for_parameterless_GET_request is None:
             self._construct_index()
         if 'GET' != http_method:
+            assert 'POST' == http_method
             xx()
-        if GET_params is not None:
-            xx()
+        if GET_params:
+            return _crazy_GET_params_thing(
+                url_tail, GET_params,
+                self._extraordinary_offsets_via_GET_parameter_name,
+                self._root_nodes_with_associated_GET_signatures,
+                self._root_node_for_parameterless_GET_request)
         return _match_url(url_tail, self._root_node_for_parameterless_GET_request)
 
     def _construct_index(self):
@@ -85,6 +90,7 @@ class matcher_via_routes:
         """
 
         ordinarys = []
+        extraordinaries = None
 
         defs = self._route_definitions
         del self._route_definitions
@@ -93,7 +99,18 @@ class matcher_via_routes:
                 string, rav = tup  # rav = route associated value
                 ordinarys.append(_route_string_scanner(string, rav))
                 continue
-            xx()
+            string, rav, GET_params_query = tup
+            if extraordinaries is None:
+                extraordinaries = []
+                extraordinary_offset_via_GET_param_key = {}
+            offset = len(extraordinaries)
+            scn = _route_string_scanner(string, rav)
+            extraordinaries.append((scn, GET_params_query))
+            # (this will get expensive for CLI's lol)
+            for k in GET_params_query.keys():
+                if k not in extraordinary_offset_via_GET_param_key:
+                    extraordinary_offset_via_GET_param_key[k] = []
+                extraordinary_offset_via_GET_param_key[k].append(offset)
 
         if self._PATTERN_DEFINITIONS:
             gpf = _general_pattern_factory(self._PATTERN_DEFINITIONS)
@@ -103,6 +120,76 @@ class matcher_via_routes:
         self._root_node_for_parameterless_GET_request = \
                 _RoutesNode(ordinarys, gpf)
 
+        these = None
+        if extraordinaries:  # see #here6
+            def these():
+                for scn, params_query in extraordinaries:
+                    yield _RoutesNode((scn,), gpf, params_query)
+            these = tuple(these())
+            self._extraordinary_offsets_via_GET_parameter_name = \
+                    extraordinary_offset_via_GET_param_key
+        self._root_nodes_with_associated_GET_signatures = these
+
+
+def _crazy_GET_params_thing(
+        url_tail, GET_params, offset_via_GET_key, extraordinaries, ordinary):
+
+    """TRICKY: when working with routes associated with specific GET
+    parameter keys-and-values, as a practical heuristic simplification,
+    to resolve a matching url we employ a culling pass and a straight
+    selection pass; rather than walking along our usual one giant hash-table-
+    based tree. Nonetheless we employ the same "routes node" class and eat
+    the cost of have one tall, 1-width tree for each participating route.
+
+    We may change this is ever we find ourselves having many routes associated
+    with the same GET params signature
+    """  # :#here6
+
+    # Find all the root nodes that have parameter keys intersecting with arg
+    def offsets():
+        for k in GET_params.keys():
+            for i in offset_via_GET_key.get(k, ()):
+                yield i
+
+    offsets = sorted({k: None for k in offsets()}.keys())
+    if 3 < len(offsets):
+        xx('sanity: this is getting a little crazy. profile this, see how it degrades')
+
+    # Of those, find ones whose GET params signature matches the actual params
+    def offsets_matching_GET_params():
+        for i in offsets:
+            yn = does_match_GET_params(extraordinaries[i])
+            if yn:
+                yield i
+
+    def does_match_GET_params(root_node):
+        for formal_key, formal_value in root_node.GET_parameters_signature.items():
+            yn = formal_value == GET_params.get(formal_key)  # formal None is meaningless
+            if not yn:
+                return False
+        return True
+
+    offsets_matching_GET_params = tuple(offsets_matching_GET_params())
+
+    # Of those routes that match the GET params, do the routing EXPENSIVELY
+    OKs = []
+    not_OKs = []
+    for i in offsets_matching_GET_params:
+        resp = _match_url(url_tail, extraordinaries[i])
+        (OKs if resp.OK else not_OKs).append(resp)
+
+    if OKs:
+        if 1 < len(OKs):
+            xx("ambiguous routes grammar. never been covered")
+        return OKs[0]
+
+    if not_OKs:
+        xx()
+
+    return _routing_failure(f'404 - not found: {url_tail!r} (with GET params)')
+
+
+# ==
 
 def _match_url(url_tail, root_node):
 
@@ -259,7 +346,7 @@ def _matchdatas_dict_via_pairs(matchdatas):
 
 class _RoutesNode:
 
-    def __init__(self, hot_route_scanners, gpf):
+    def __init__(self, hot_route_scanners, gpf, GET_params_signature=None):
         literals = {}
         matchers = None
         self._can_match_the_end = False
@@ -293,6 +380,7 @@ class _RoutesNode:
         self._hot_or_cold_via_literal = literals
         self._hot_or_cold_via_matcher_placeholder = matchers
         self._general_pattern_factory = gpf
+        self.GET_parameters_signature = GET_params_signature
 
     def match_request_url_entry(self, entry):
         rec = self._hot_or_cold_via_literal.get(entry)

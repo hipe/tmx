@@ -47,7 +47,7 @@ class CommonCase(unittest_TestCase):
                     yield mixed, ('xx_RAV_xx', mixed)  # RAV = route-associated value
                     continue
                 assert isinstance(mixed, tuple)
-                assert 2 == len(mixed)
+                assert 2 <= len(mixed)
                 yield mixed
 
         these = these()
@@ -164,6 +164,39 @@ class Case1331_introduce_patterns(CommonCase):
             if 'USER_ID' == pattern_identifier:
                 return '^[A-Z0-9_]+$'
         return these
+
+
+class Case1335_introduce_GET_params(CommonCase):
+
+    def test_010_exact_match(self):
+        self.given_GET_params = {'seymore': 'butts'}
+        self.go()
+        self.expect_success('version_1')
+
+    def test_020_partial_match(self):
+        self.given_GET_params = {
+            'feeky': 'beeky', 'seymore': 'beets', 'does_not': 'matter'}
+        self.go()
+        self.expect_success('version_2')
+
+    def test_030_a_default_version(self):
+        self.given_GET_params = {}  # _empty_dict
+        self.go()
+        self.expect_success('version_3')
+
+    def test_040_try_this(self):
+        """LITERALLY EXPERIMENTAL"""
+        self.given_GET_params = {'zippo': 'zaffo'}
+        self.go()
+        self.expect_failure("404 - not found: '/chim/churry' (with GET params)")
+
+    given_url = '/chim/churry'
+
+    @property
+    def given_routes(self):
+        yield '/chim/churry/', 'version_1', {'seymore': 'butts'}
+        yield '/chim/churry/', 'version_2', {'seymore': 'beets', 'feeky':'beeky'}
+        yield '/chim/churry/', 'version_3'
 
 
 def subject_module():
