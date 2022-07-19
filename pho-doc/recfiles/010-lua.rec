@@ -63,6 +63,13 @@ single_paragraph_abstract: old way is deprecated and now gone
 url: https://www.lua.org/pil/19.1.html
 url: https://stackoverflow.com/questions/31452871/table-getn-is-deprecated-how-can-i-get-the-length-of-an-array
 
+abstract_idiom: iterate_over_an_array
+url: https://stackoverflow.com/questions/39991717/looping-over-array-values-in-lua
+single_paragraph_abstract:
++ for _, item in ipairs(arr) do  -- use ipairs over pairs with an array
++   ..
++ end
+
 abstract_idiom: dictionary_pop
 single_paragraph_abstract: table.remove
 url: https://www.lua.org/pil/19.2.html

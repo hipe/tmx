@@ -58,18 +58,12 @@ def _(collections):
             return collections['Note'].where(
                 {'parent': self.EID}, order_by='ordinal', listener=listener)
 
-        @classmethod
-        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(_, which, eid):
-            assert 'UPDATE' == which  # ..
-            # (at writing, Capability's are never CREATE'd, BUT THIS WILL CHANGE)
-            return 'view_capability', {'eid': eid}
+        AFTER_CREATE_OR_UPDATE_EXPERIMENTAL = None  # gone at #history-C.5
 
         VIEW_PIPELINES = {
             'native_URL': lambda cr, fa: _view_pipeline_for_this_one_url(cr, fa, collections)
             # (cr = component renderer; fa = formal attribute)
         }
-
-        FORM_ACTION_EXPERIMENTAL = 'edit_capability'  # no
 
     return Capability
 
@@ -107,12 +101,8 @@ def _(colz):
         body_lines: tuple[str]
 
         VALUE_FACTORIES = {'ordinal': generate_next_ordinal}
-        FORM_ACTION_EXPERIMENTAL = 'add_note'
 
-        def AFTER_CREATE_OR_UPDATE_EXPERIMENTAL(which, sanitized_params):
-            assert 'CREATE' == which
-            # (notes only ever get created, never updated)
-            return 'view_capability', {'eid': sanitized_params['parent']}
+        AFTER_CREATE_OR_UPDATE_EXPERIMENTAL = None  # gone at #history-C.5
 
         def SPECIAL_REPORT():
             # Make a tally, count the notes per item, keyed to item identifier
@@ -189,6 +179,7 @@ def _dataclass():
 def xx(msg=None):
     raise RuntimeError(''.join(('oops', *((': ', msg) if msg else ()))))
 
+# #history-C.5 url routing introduced some hard-coded assumptions
 # #history-C.4 broke model out into individual functions, one for each class
 # #history-C.3 (as noted)
 # #history-C.2 enter "via dataclass"

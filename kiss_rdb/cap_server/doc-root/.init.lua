@@ -1,67 +1,104 @@
+-- BEGIN right from the get-go, ensure what we need from environ/args or exit
+--
+-- (it's a bit arbitrary that we do the "file exists?" check here and
+-- not in the server start script. This could change.)
+--
+-- (it's cruel to punish endpoints that don't use the RECFILE in this way,
+-- but meh for now.)
+
+
+len = #arg
+if 0 == len then
+  print("missing required argument RECFILE. exiting.")
+  -- (the bash script also checks for this arg and suggests an existing file)
+  unix.exit(3)
+end
+
+if 1 < len then
+  print("unexpected argument: " .. arg[2])
+  unix.exit(3)
+end
+
+RECFILE = arg[1]
+
+if not unix.stat(RECFILE) then
+  print("")
+  print("RECFILE file does not exist: " .. RECFILE)
+  print("Won't bother starting server because of the above (for now).")
+  print("(example recfile: " .. _ExampleRecfile() .. ")")
+  unix.exit(3)
+end
+
+-- END
+
 require 'io'
 
-function _ProcessEditCapability (params_list)  -- #here2
-  local params = _DictionaryViaParams(params_list)
-  local fh = _OpenCallToBackend('process_form', recfile_path, 'Capability', params)
-  _MaybeRedirect(fh)
-end
+function OnHttpRequest()
+  -- Override this API hook to pass back the entire doo-hah as-is
+  local path = GetPath()
 
-function _ProcessCreateNote (params_list)  -- #here2
-  local params = _DictionaryViaParams(params_list)
-  local fh = _OpenCallToBackend('process_form', recfile_path, 'Note', params)
-  _MaybeRedirect(fh)
-end
-
-function _ShowCreateNoteForm (parent_EID)
-  local qid = "parent_EID:" .. parent_EID
-  local fh = _OpenCallToBackend('show_form', recfile_path, 'Note', qid)
-  _WriteEveryLineAndClose(fh)
-end
-
-function _ShowEditCapabilityForm (EID)
-  local qid = "EID:" .. EID
-  local fh = _OpenCallToBackend('show_form', recfile_path, 'Capability', qid)
-  _WriteEveryLineAndClose(fh)
-end
-
-function _ViewCapability (eid)
-  local fh = _OpenCallToBackend('view_capability', recfile_path, eid)
-  _WriteEveryLineAndClose(fh)
-end
-
-function _ShowIndex ()
-  local action_name
-  if HasParam('index_style') and 'tree' == GetParam('index_style') then
-    action_name = 'tree'
-  else
-    action_name = 'table'
+  -- If the url is for a static asset, serve normally
+  local to_here = string.find(path, '/', 2)
+  if nil ~= to_here then
+    local first_entry = string.sub(path, 2, to_here-1)
+    if 'assets' == first_entry or 'vendor-themes' == first_entry then
+      Route()  -- Do what you would do normally
+      return
+    end
   end
-  _WriteEveryLineAndClose(_OpenCallToBackend(action_name, recfile_path))
-end
 
-function _TestUI ()
-  _WriteEveryLineAndClose(_OpenCallToBackend('test_UI'))
-end
+  -- THE FIRST ARG is the python routing executable itself
+  local system_command_args = {"./kiss_rdb/cap_server/generate_html.py"}
 
-function _ShowPing ()
-  fh = _OpenCallToBackend('ping')
-  line = fh:read('L')
-  Write(line)
-  fh:close()
+  -- THE SECOND ARG is whatever the
+  table.insert(system_command_args, _MyEscape('fparam:url=' .. path))
+
+  -- THE THIRD ARG is the HTTP method used
+  local http_method = GetMethod()
+  table.insert(system_command_args, 'fparam:http_method=' .. http_method)
+
+  -- THE FOURTH ARG is the recfile (whether they need it or not)
+  table.insert(system_command_args, _MyEscape('fparam:collection=' .. RECFILE))
+
+  -- MAYBE there are params
+  local params = GetParams()
+  if #params then
+    params = _DictionaryViaParams(params)  -- eek
+    -- #todo under what circumstances does 'bparams' have nothing following it?
+    table.insert(system_command_args, 'bparams')
+    for k, v in pairs(params) do
+      table.insert(system_command_args, _MyEscape(k .. '=' .. v))
+    end
+  end
+
+  local system_command_line = table.concat(system_command_args, ' ')
+
+  if true then
+    print("\n\n\n\nOPENING SUBPROCESS:\n")
+    print(system_command_line)
+    print("\n\n\n\n")
+  end
+
+  if false then
+    return
+  end
+
+  local fh = io.popen(system_command_line)
+  _MaybeRedirect(fh)
+
 end
 
 -- Support
 
 function _MaybeRedirect (fh)
-  if not fh then  -- (when debugging, we print stuff ourselves and return nil)
-    return
-  end
   -- Big flex (fragile hack): If the first line "looks like" an html doc, etc
   local line = fh:read('L')
   if nil == line then
     Write("Strange -- file was empty\n")
     return
   end
+
+  -- If it looks like the start of an html document (lol), assume it is
   local first_char = string.sub(line, 1, 1)
   if "<" == first_char then
     Write(line)
@@ -74,12 +111,20 @@ function _MaybeRedirect (fh)
     return
   end
 
+  -- If the line looks like a response header .. (new in #history-C.4)
+  local digits = string.find(line, '^%d%d%d ')
+  if digits then
+    Write(line .. '<br>\n')
+    Write("(we don't actually send the actual header response code yet)")  -- #todo
+    return
+  end
+
   -- Otherwise, look for one of our "custom" "headers" (probably just this one)
   if "redirect " == string.sub(line, 1, 9) then
     return _DoRedirect(string.sub(line, 9, -2))  -- chomp
   end
 
-  Write("unrecognized directive: " .. first_line)  -- #todo
+  Write("unrecognized directive: " .. line)  -- #todo
 end
 
 function _DoRedirect (url)
@@ -88,10 +133,6 @@ function _DoRedirect (url)
 end
 
 function _WriteEveryLineAndClose (fh)
-  if not fh then  -- #here3 and #todo
-    Write("No open filehandle to write. Debugging line turned on?\n")
-    return
-  end
   local line = fh:read('L')
   while line do
     Write(line)
@@ -100,37 +141,7 @@ function _WriteEveryLineAndClose (fh)
   fh:close()
 end
 
-function _OpenCallToBackend (sanitized_action_name, ...)
-  -- Every backend call will have at least the script name and the
-  -- action name:
-  local rest = {...}
-  local args = {"./kiss_rdb/cap_server/generate_html.py", sanitized_action_name}
-
-  -- Typically, if a parameter was passed, it's the recfile path.
-  -- Maybe there will be other parameters.
-  -- #todo is there a more idiomatic way to glob this alla python?
-
-  if #rest then
-    _HandleTheRest(args, rest)
-  end
-
-  local line = table.concat(args, ' ')
-
-  if true then
-    print("\n\n\n\n\n\n")
-    print("OPENING SUBRPOCESS:\n")
-    print(line)
-    print("\n\n\n\n\n\n")
-  end
-
-  if false then  -- :#here3
-    return
-  end
-
-  return io.popen(line)
-end
-
-function _HandleTheRest (args, rest)
+function _HandleTheRest_USE_ME (args, rest)
   local params = nil
 
   -- If last item is a table, it's k-v pairs to be encoded (e.g #here2)
@@ -262,6 +273,7 @@ function _MyEscape (s)
   return "'" .. inside .. "'"
 end
 
+-- #history-C.4: massive overhaul of architecture: send back the request url
 -- #history-C.3: renamed to .init.lua from index.lua
 -- #history-C.2
 -- #history-C.1

@@ -19,7 +19,8 @@ bash_source="${BASH_SOURCE[0]}"
 
 main() {
     ensure_correct_getopt_version_is_installed
-    parse_argv
+    parse_opts
+    parse_args
     do_pathnames
     ensure_recutils_is_installed
     ensure_redbean_is_installed
@@ -29,7 +30,7 @@ main() {
 
 port='8080'
 
-parse_argv() {
+parse_opts() {
     local s
     s=`getopt -o hp: -l help,port: -- "${argv[@]}"`
     local es="$?"
@@ -51,6 +52,32 @@ parse_argv() {
             *) >&2 echo "oops, write me: $1" ; exit 1 ;;
         esac
     done
+
+    # copy what remains in $@ into (global) argv SO#35235707, SO#19417015
+    # argv=("${@[@]}")  # not on your life would it be this easy
+    argv=()
+    for var ; do
+        argv+=("$var")
+    done
+}
+
+parse_args() {
+    local num="${#argv[@]}"
+    if [[ "$num" < 1 ]] ; then
+        >&2 echo "expecitng RECFILE"
+        >&2 echo "(example recfile: ./kiss-rdb-doc/recfiles/857.12.recutils-capabilities.rec)"
+        # './kiss_rdb_test/fixture-directories/2969-rec/0150-native-capabilities.rec'
+        exit 3
+    fi
+    if [[ 1 < "$num" ]] ; then
+        >&2 echo "unexpected argument: ${argv[1]}"
+        exit 3
+    fi
+    RECFILE="${argv[0]}"
+    if [[ $RECFILE != +([-a-zA-Z0-9_./]) ]] ; then  # :#here1
+        >&2 echo "Sorry, RECFILE must be a plain \"word\" (had \"$RECFILE\")"
+        exit 3
+    fi
 }
 
 show_help() {
@@ -90,7 +117,13 @@ exec_out_to_redbean() {
     opts+=" -a"  # log resource usage
     opts+=" -g"  # log handler latency
 
-    local do_this=("$redbean_exe_path" "$opts" -p "$port" -D "$doc_root")
+    local do_this=("$redbean_exe_path" "$opts" -p "$port" -D "$doc_root" "$RECFILE")
+    # XXX CAUTION we absolutely rely on the #here1 validation or else we would
+    # be vulnerable to an "injection attack" (in its way) because of our use of
+    # eval below. User could pass arbitrary shell commands in the recfile name.
+    # We don't know how to expand things in bash "the right way". Maybe with the
+    # rosetta stone we could figure it out..
+
     echo "${do_this[*]}"
     eval "${do_this[*]}"
     # (we used to exec before #history-C.1 but it is no longer nec. w/ --assimilate)

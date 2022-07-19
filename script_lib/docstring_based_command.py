@@ -8,6 +8,7 @@
 # - The Command structure is evaluated lazily, only as needed
 # - within the Command structure, parsing the docstring is only done lazily
 
+# at #history-C.1 we refactored-out the decorator-based thing
 
 import re
 
@@ -18,7 +19,7 @@ class build_new_decorator:
         self._funcs = {}
 
     def __call__(self, f):
-        f.command = None
+        f.command = None  # #here2
         self._funcs[f.__name__] = f
         return f
 
@@ -29,26 +30,33 @@ class build_new_decorator:
         return alternate_value
 
     def __getitem__(self, k):
-        return _command(self._funcs[k])
+        return command_of_function(self._funcs[k])
 
     def command_keys(self):
         return self._funcs.keys()
 
 
-def _command(function):
+def command_of_function(function):
+    """(memoize our "Command" structure into the user function itself #here2)"""
+
     memo = function
     cmd = memo.command
     if cmd:
         return cmd
-    cmd = _Command(function)
+    cmd = _command_via_function(function)
     memo.command = cmd
     return cmd
 
 
-class _Command:
+class _command_via_function:
+
     def __init__(self, function):
         self.function = function
         self._did_parse_syntax = False
+
+    def to_formal_arguments(self):
+        return _formal_arguments_via_usage_line(
+                self._first_line_of_docstring_no_newline)
 
     @property
     def single_line_description(self):
@@ -75,12 +83,6 @@ class _Command:
         lines[0] = lines[0].replace('{prog_name}', f'{prog_name} {fname}')
         return lines
 
-    @property
-    def has_only_positional_args(self):
-        if not self._did_parse_syntax:
-            self._parse_syntax()
-        return self._has_only_positional_args
-
     def validate_positionals(self, stderr, stack, prog_namer):
         act_len = len(stack)
         formal_len = self._formal_leng
@@ -96,32 +98,13 @@ class _Command:
             stderr.write(f"Unexpected extra argument for {_1!r}: {_2!r}\n")
         return 3
 
-    def _parse_syntax(self):
-        self._did_parse_syntax = True
+    @property
+    def _first_line_of_docstring_no_newline(self):
         big_s = self._doc_string
-        first_line = big_s[0:big_s.index('\n')]
-        assert 0 == first_line.index('usage: {prog_name}')
-
-        # If there is nothing after the program name, it takes no arguments
-        if 18 == len(first_line):  # (NOTE but meh)
-            self._formal_positional_args = ()
-
-        # Otherwise, it takes arguments (either positional+required or not)
-        else:
-            assert ' ' == first_line[18]
-            rest = first_line[19:]
-
-            # If it matches this strict pattern, it's all positional+required
-            # Otherwise it takes arguments but the function must parse them
-
-            import re
-            if not re.match(r'^[A-Z0-9_]+(?: [A-Z0-9_]+)*\Z', rest):
-                self._has_only_positional_args = False
-                return
-
-            self._formal_positional_args = tuple(rest.split(' '))
-        self._formal_leng = len(self._formal_positional_args)
-        self._has_only_positional_args = True
+        offset = big_s.find('\n')
+        if -1 == offset:
+            return big_s
+        return big_s[0:offset]
 
     def _to_docstring_line_scanner(self):
         return _docstring_line_scanner(self._doc_string)
@@ -133,6 +116,90 @@ class _Command:
     @property
     def _name(self):
         return self.function.__name__
+
+
+def _formal_arguments_via_usage_line(usage_string):  # #testpoint
+    """this is for this shady syntax syntax used in one place"""
+
+    def from_beginning_state():
+        yield if_required_head_string, advance_past_head, from_main_state
+
+    def from_main_state():
+        yield if_normal_token, yield_normal_token_and_advance
+        yield if_glob_token, yield_glob_token_and_assert_empty
+
+    # == Actions
+
+    def yield_glob_token_and_assert_empty():
+        label = release_matchdata_and_advance_over_it()[1]
+        if state.pos != leng:
+            xx(f"expected end had {usage_string[state.pos:]!r}")
+        return _Positional(label, is_glob=True)
+
+    def yield_normal_token_and_advance():
+        label = release_matchdata_and_advance_over_it()[1]
+        return _Positional(label)
+
+    def release_matchdata_and_advance_over_it():
+        md = state.last_matchdata
+        del state.last_matchdata
+        state.pos = md.end()
+        return md
+
+    def advance_past_head():
+        state.pos = len(required_head_string)
+
+    # == Matchers
+
+    def if_glob_token():
+        return match(rx_glob_token)
+
+    def if_normal_token():
+        return match(rx_normal_token)
+
+    def match(rx):
+        md = rx.match(usage_string, state.pos)
+        state.last_matchdata = md
+        return True if md else False
+
+    def if_required_head_string():
+        return 0 == usage_string.find(required_head_string)
+
+    state = from_beginning_state  # #watch-the-world-burn
+    state.current_state_function = from_beginning_state
+
+    leng = len(usage_string)
+
+    same = '[A-Z0-9_]+'
+    rx_normal_token = re.compile(f'[ ]({same})\\b')
+    rx_glob_token = re.compile(f'[ ]\\*({same})\\b')
+
+    required_head_string = 'usage: {prog_name}'
+
+    def find_transition():
+        for tup in state.current_state_function():
+            yn = tup[0]()
+            if yn:
+                return tup[1:] if 3 == len(tup) else (*tup[1:], None)
+        from_here = state.current_state_function.__name__.replace('_', ' ')
+        the_rest = usage_string[state.pos:]
+        xx(f"no transition {from_here} with rest: {the_rest!r}")
+
+    state.pos = 0
+    while state.pos != leng:
+        action, next_state_func = find_transition()
+        yield_me = action()
+        if yield_me:
+            yield yield_me
+        if next_state_func:
+            state.current_state_function = next_state_func
+
+
+class _Positional:
+
+    def __init__(self, label, is_glob=False):
+        self.label = label
+        self.is_glob = is_glob
 
 
 def _docstring_line_scanner(big_s):  # custom just to avoid deps
@@ -210,4 +277,5 @@ def _docstring_iterator(big_s):
 def xx(msg=None):
     raise RuntimeError(''.join(('cover me', *((': ', msg) if msg else ()))))
 
+# #history-C.1
 # #born

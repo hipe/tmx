@@ -203,7 +203,7 @@ def _collectioner_via(model, recfile, listener):
 
     from importlib import import_module as func
     mod = func(model)  # ..
-    func = mod.collections_via_recfile_
+    func = mod.collections_via_main_recfile_
 
     if not recfile:
         def lines():

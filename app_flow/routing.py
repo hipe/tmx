@@ -105,8 +105,16 @@ class matcher_via_routes:
             stack = list(reversed(tup))
             string = stack.pop()
             rav = stack.pop()  # rav = route-associated value (anything from user)
-            GET_params_query = stack.pop() if stack else None
-            method = stack.pop() if stack else None
+            method = None
+            GET_params_query = None
+            if stack:
+                # (hotfix refactor at #history-C.2. overload this position)
+                mixed, = stack
+                if isinstance(mixed, str):
+                    method = mixed
+                else:
+                    assert isinstance(mixed, dict)
+                    GET_params_query = mixed
 
             # If it's POST, do this
             if method:
@@ -282,6 +290,13 @@ class _routing_failure:
 
     def __init__(self, msg):
         self.message = msg
+
+    @property
+    def some_returncode(self):
+        md = re.match(r'^(\d+)[ ]-[ ]', self.message)
+        if md:
+            return int(md[1])
+        return 0  # meh
 
     OK = False
 
@@ -587,5 +602,6 @@ class DefinitionError(RuntimeError):
     pass
 
 
+# #history-C.2
 # #history-C.1
 # #born

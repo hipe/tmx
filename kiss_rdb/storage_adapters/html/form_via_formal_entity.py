@@ -255,24 +255,21 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
     (at present) enums can be rendered:)
     """
 
-    general_message_lines = tms = None  # tms = targeted message structures
     if ui_msgs:
-        general_message_lines, tms = ui_msgs
+        general_message_lines, tms = ui_msgs  # tms=targeted message structure
+    else:
+        general_message_lines = tms = None
 
     # In a first pass, partition the hiddens from the non-hiddens
     hiddens = []
     non_hiddens = []
-
-    # (currently single endpoint, namespaces getting munged #here4)
-    if '#' != action:
-        hiddens.append(_HiddenFormElement('action', action))
 
     form_values_pool = form_values.copy() if form_values else _empty_dict
 
     form_componenter = _build_form_componenter(
             model_class_via_name, tms, listener)
 
-    attr_via_fpn = {}  # (fpn = form parameter name.
+    attr_via_fpn = {}  # fpn = form parameter name
     for attr in FORMAL_ATTRIBUTES:
 
         # Determine existing value with the form values param
@@ -299,14 +296,12 @@ def html_form_via_SOMETHING_ON_THE_MOVE_(
 
     # Open the form before opening the table (hiddens don't go in the table)
 
-    if '#' == action:
-        _ = '#'
-    else:
-        _ = '/'  # #here4
+    assert '"' not in action  # or urlencode? or what?   # #history-C.7
+    use_action = action
 
     yield (f'{margin}<form '
            'method="post" '  # for now, hard-coded
-           f'action="{_}" '
+           f'action="{use_action}" '
            'class="kiss-generated">\n')
 
     # Do the hiddens before opening the table
@@ -447,7 +442,7 @@ def _htmls_via_emission_tail(emi_tail, attr, do_express_subject):
 def _build_form_componenter(mcvn, tms, listener):
     # mcvn = model class via name
 
-    def form_componenter(ev, fa):
+    def form_componenter(ev, fa):  # fa = formal attribute
 
         # Foreign key references are hidden (for now)
         if fa.is_foreign_key_reference:
@@ -467,7 +462,8 @@ def _build_form_componenter(mcvn, tms, listener):
 
     def form_component_for_foreign_key(ev, fa):
         if ev is None:
-            return _explain_FKs_must_be_provided(listener, fpn())
+            return  # #history-C.7 FK no longer required (embedded in url)
+            # return _explain_FKs_must_be_provided(listener, fa)
             # (confusingly, render a form that cannot be used :#here2)
         return hidden_form_component(ev, fa)
 
@@ -772,11 +768,11 @@ def render_as_placeholder_or_IDK(stem, margin, indent):
 
 # == Explanations
 
-def _explain_FKs_must_be_provided(listener, fpn):
+def _explain_FKs_must_be_provided(listener, fa):
     def lines():
         yield "is required to generate form."
     listener('error', 'expression', 'about_field',
-             fpn, 'missing_required_hidden', lines)
+             _form_key(fa), 'missing_required_hidden', lines)
 
 
 # ==
@@ -952,8 +948,6 @@ def _html_escape_function():
     return func
 
 
-# :#here4 :[#872.C]: #feat:namespace_for_CGI_params munging namespaces
-
 def _build_keyed_decorator():
     def for_which(key):
         def decorator(func):
@@ -997,6 +991,7 @@ if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))
 
+# #history-C.7
 # #history-C.6
 # #history-C.5
 # #history-C.4

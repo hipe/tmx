@@ -74,6 +74,7 @@ woah boy.
 |[#873.A]                   | #open | modernize the CLI of this hidden exe
 |[#873]                     |       | internal tracking (extended)
 |[#872.X]                   | #hole | (easier to find this part)
+|[#872.L]                   | #open | unnecessary file index.lua
 |[#872.K]                   | #open | lua open subprocess with tokens not expanded string
 |[#872.J]                   | #open | component renderers system needs to bye DRY'ed (see)
 |[#872.I]                   |       | isomorphing between web and store (in [#867.I])
@@ -82,7 +83,7 @@ woah boy.
 |[#872.F]                   | #open | (on stack)
 |[#872.E]                   |       | recutils: the hybrid approach to abstract schema
 |[#872.D]                   |       | digraph of "UI workflow" of capserver
-|[#872.C]                   |       | ting ting ting
+|[#872.C]                   | #wish | the dream of fully 2-directional routes
 |[#872.B]                   | #edit | edit documentation
 |[#872]                     |       | multi-line strings: the document
 |[#871.1]                   | #prov | markdown provision: leftmost is identifier

@@ -35,5 +35,6 @@ Somewhere near here, imagine integration with VCS
 (expand this section) Implement the targeted caps, at each step updating cap tree
 Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
-Refactor: Get business logic out of index.lua as much as possible
-Overhaul the lua "frontend" and the "middleware" (CLI) to have sane url's
+Imagine the several things you could do with routes (expand this. names. down links, up links)
+Abstract really nasty parts out of generate_html and refactor them in app_flow
+Get that form processing stuff out of kiss and in to app_flow

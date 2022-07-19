@@ -215,7 +215,7 @@ class Case1339_introduce_POST_method(CommonCase):
     @property
     def given_routes(self):
         yield '/zap/daddy/', 'version_1'
-        yield '/zap/daddy/', 'version_2', None, 'POST'
+        yield '/zap/daddy/', 'version_2', 'POST'
 
 
 def subject_module():
