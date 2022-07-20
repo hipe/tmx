@@ -169,7 +169,7 @@ def _consume_params_for_matcher_call(parse_tree, listener):
 
 
 def _parse_ARGV_into_fparams_and_bparams(stack, listener):
-    from kiss_rdb.cap_server._parse_argv import parse_argv as func
+    from app_flow.server_CLI import parse_argv as func
     return func(stack, listener)
 
 
