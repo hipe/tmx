@@ -154,7 +154,7 @@ def build_datamodel_bridge(collections):
 
 
 def subject_module():
-    import kiss_rdb.storage_adapters_.rec as mod
+    import kiss_rdb.storage_adapters.rec as mod
     return mod
 
 

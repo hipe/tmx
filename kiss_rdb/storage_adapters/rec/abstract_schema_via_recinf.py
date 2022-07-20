@@ -435,7 +435,7 @@ def _context_lines(line, lineno, column, filehandle):
 def _snake_via_camel(camel):
     memo = _snake_via_camel
     if memo.value is None:
-        from kiss_rdb.storage_adapters_.rec import \
+        from kiss_rdb.storage_adapters.rec import \
                 name_convention_converters_ as nccs
         memo.value = nccs().snake_via_camel
     return memo.value(camel)
@@ -449,7 +449,7 @@ def xx(msg=None):
 
 
 if '__main__' == __name__:
-    from kiss_rdb.storage_adapters_.rec._create_collection import \
+    from kiss_rdb.storage_adapters.rec._recinf_via_abstract_schema import \
             CLI_for_abstract_schema_via_recinf_ as _CLI
     from sys import stdin, stdout, stderr, argv
     exit(_CLI(stdin, stdout, stderr, argv))

@@ -203,7 +203,7 @@ def _collectioner_via(model, recfile, listener):
 
     from importlib import import_module as func
     mod = func(model)  # ..
-    func = mod.collections_via_main_recfile_
+    func = mod.collections_via_main_recfile
 
     if not recfile:
         def lines():
@@ -290,7 +290,7 @@ _defaulter_thing_via_thing = {
 
 def _parse_saved_file(recfile, listener):
 
-    from kiss_rdb.storage_adapters_.rec \
+    from kiss_rdb.storage_adapters.rec \
         import native_records_via_recsel_ as func
 
     these = tuple(func(recfile, (), listener))

@@ -144,12 +144,12 @@ def lazy(func):
 def _build_collection(recfile, dataclass, name_converterer, colz):
 
     def update_entity(eid, param_direcs, listener=None, is_dry=False):
-        from kiss_rdb.storage_adapters_.rec._create_and_update import \
+        from kiss_rdb.storage_adapters.rec._create_and_update import \
                 UPDATE_ENTITY_ as func
         return func(eid, param_direcs, coll, colz, listener, is_dry)
 
     def create_entity(params, listener=None, is_dry=False):
-        from kiss_rdb.storage_adapters_.rec._create_and_update import \
+        from kiss_rdb.storage_adapters.rec._create_and_update import \
                 CREATE_ENTITY_ as func
         return func(params, coll, colz, listener, is_dry)
 
@@ -256,7 +256,7 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
 
     def build_store_fent(listener):
         store_fent_name = name_converterer().store_record_type
-        from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
+        from kiss_rdb.storage_adapters.rec.abstract_schema_via_recinf import \
                 abstract_entity_via_recfile_ as func
         return func(recfile, store_fent_name, listener=listener)
 
@@ -302,7 +302,7 @@ def _build_collection(recfile, dataclass, name_converterer, colz):
 
 
     def _build_hybrid_fent(listener):
-        from kiss_rdb.storage_adapters_.rec._hybrid_abstract_schema \
+        from kiss_rdb.storage_adapters.rec._hybrid_abstract_schema \
                 import EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_VIA_ as func
         return func(coll, listener)
 
@@ -643,11 +643,11 @@ _nccs = name_convention_converters_  # shorter name for local use
 
 def native_records_via_recsel_(recfile, recsel_args, listener):
     with _open_recsel_process(recfile, recsel_args, listener) as lines:
-        for rec_dct in _native_records_via_lines(lines, listener):
+        for rec_dct in native_records_via_lines(lines, listener):
             yield rec_dct
 
 
-def _native_records_via_lines(lines, listener):  # #testpoint
+def native_records_via_lines(lines, listener):
     # NOTE this intentionally has known holes in it, holding off until etc
 
     # from text_lib.magnetics.scanner_via import scanner_via_iterator as func
@@ -1098,7 +1098,7 @@ def _open_recsel_process(recfile, recsel_args, listener):
 # ==
 
 def CREATE_COLLECTION(collection_path, listener, is_dry, opn=None):
-    from ._create_collection import create_collection as func
+    from ._recinf_via_abstract_schema import create_collection as func
     return func(collection_path, listener, is_dry, opn=opn)
 
 
@@ -1170,7 +1170,6 @@ def xx(msg=None):
     raise RuntimeError('ohai' + ('' if msg is None else f": {msg}"))
 
 
-# #pending-rename: publicize "rec"
 # #history-B.7
 # #history-B.6
 # #history-B.5

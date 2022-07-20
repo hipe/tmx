@@ -8,7 +8,7 @@ class CommonCase(unittest_TestCase):
     @shared_subject
     def abstract_schema_one(self):
         lines = self.expected_sexp_lines_one
-        return subject_module().abstract_schema_via_sexp_lines_(lines)
+        return subject_module().abstract_schema_via_sexp_lines(lines)
 
     @shared_subject
     def expected_sexp_lines_one(self):
@@ -134,7 +134,7 @@ def lines_via_big_string(big_s):
 
 
 def subject_module():
-    import kiss_rdb.magnetics_.abstract_schema_via_sexp as mod
+    import kiss_rdb.magnetics.abstract_schema_via_sexp as mod
     return mod
 
 

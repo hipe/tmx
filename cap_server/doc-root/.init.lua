@@ -48,7 +48,7 @@ function OnHttpRequest()
   end
 
   -- THE FIRST ARG is the python routing executable itself
-  local system_command_args = {"./kiss_rdb/cap_server/generate_html.py"}
+  local system_command_args = {"./cap_server/generate_html.py"}
 
   -- THE SECOND ARG is whatever the
   table.insert(system_command_args, _MyEscape('fparam:url=' .. path))

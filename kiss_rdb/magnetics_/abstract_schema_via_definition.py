@@ -759,7 +759,7 @@ class _AbstractColumn:
         yield f"{ch_m}Foreign key: {' '.join(pcs)!r}\n"
 
     def to_sexp_lines(self, margin, indent_for_children):
-        from kiss_rdb.magnetics_.abstract_schema_via_sexp import \
+        from kiss_rdb.magnetics.abstract_schema_via_sexp import \
                 pretty_print_sexp_ as func
         return func(self._to_sexp_pieces(), indent_for_children, margin)
 

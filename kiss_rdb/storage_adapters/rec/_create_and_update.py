@@ -1056,7 +1056,7 @@ def _value_is_considered_to_be_set(x):
 
 
 def _call_subprocess(args, listener):
-    from kiss_rdb.storage_adapters_.rec import call_subprocess_ as func
+    from kiss_rdb.storage_adapters.rec import call_subprocess_ as func
     return func(args, listener)
 
 

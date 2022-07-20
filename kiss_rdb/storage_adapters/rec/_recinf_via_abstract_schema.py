@@ -77,7 +77,7 @@ def CLI_for_abstract_schema_via_recinf_(sin, sout, serr, argv):  # 1x
     # == END
 
     listener = _CLI_listener(serr)
-    from kiss_rdb.storage_adapters_.rec.abstract_schema_via_recinf import \
+    from kiss_rdb.storage_adapters.rec.abstract_schema_via_recinf import \
             abstract_schema_via_recinf_lines as func
     with fh:
         abs_sch = func(fh, listener)
@@ -215,6 +215,5 @@ if '__main__' == __name__:
     exit(_CLI(sys.stdin, sys.stdout, sys.stderr, sys.argv))
 
 # #history-C.2: "engine" not hand-written
-# #pending-rename: maybe to "recinf_via_abstract_schema" to mirror the other
 # #history-C.1: spike CLI for sibling concern
 # #born

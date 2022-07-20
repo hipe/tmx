@@ -104,7 +104,7 @@ def _CLI(sin, sout, serr, argv):
 
     # (variables we need because we parse in two passes)
     prog_name_long = argv[0]
-    asset_function = html_form_via_SOMETHING_ON_THE_MOVE_
+    asset_function = html_form_via_SOMETHING_ON_THE_MOVE
     from script_lib.via_usage_line import build_invocation
 
     # Parse the first part
@@ -167,8 +167,8 @@ def _CLI(sin, sout, serr, argv):
         fh = sin
 
     with fh:  # #here1
-        from kiss_rdb.magnetics_.abstract_schema_via_sexp import \
-                abstract_schema_via_sexp_lines_ as func
+        from kiss_rdb.magnetics.abstract_schema_via_sexp import \
+                abstract_schema_via_sexp_lines as func
         abs_sch = func(fh)  # listener one day
 
     if abs_sch is None:
@@ -234,7 +234,7 @@ def _value_normalizer_on_omit_parameter(
     return 'use_value', (fattr_name,)
 
 
-def html_form_via_SOMETHING_ON_THE_MOVE_(
+def html_form_via_SOMETHING_ON_THE_MOVE(
         FORMAL_ATTRIBUTES,  # an iterator (or tuple)
         action='#',  # a string for the FORM html element attribute value.
         form_values=None,  # use the "use" keys and values as strings
@@ -509,7 +509,7 @@ class _NonHiddenFormElement:
 
 # == BEGIN XXX
 
-def EXPERIMENTAL_populate_form_values_(ent, fe, listener):
+def EXPERIMENTAL_populate_form_values(ent, fe, listener):
     # NOTE we're really not sure we want to "know" about entities.
     # wouldn't it be better to just take dicts?
     # NOTE keeping this close to render-related derivations (below) for now
@@ -654,7 +654,7 @@ def _fall_back_to_view_only_component_renderer(fa):
     one-to-many UI component was too hard/out of scope.)
     """
 
-    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+    from app_flow.view_via_formal_entity import \
             component_renderer_via_formal_attribute as func
 
     vendor_component_renderer = func(fa, attr='existing_value')

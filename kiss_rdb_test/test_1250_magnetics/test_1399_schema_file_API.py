@@ -95,7 +95,7 @@ class CommonCase(unittest.TestCase):
     def build_recfile_scanner(self):
         fs = build_fake_filesystem(('file', same_path, self.given_lines))
         fake_file = fs.open_file_for_reading(fs.first_path)
-        from kiss_rdb.storage_adapters_.rec import ErsatzScanner
+        from kiss_rdb.storage_adapters.rec import ErsatzScanner
         return ErsatzScanner(fake_file)
 
     do_debug = False

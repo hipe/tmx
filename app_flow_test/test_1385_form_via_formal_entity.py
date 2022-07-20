@@ -13,7 +13,7 @@ class CommonCase(unittest_TestCase):
                 ("abstract_attribute", "CC", "text", "optional"),
             )))
         fattrs = abs_sch['AA'].to_formal_attributes()
-        lines = subject_module().html_form_via_SOMETHING_ON_THE_MOVE_(fattrs)
+        lines = subject_module().html_form_via_SOMETHING_ON_THE_MOVE(fattrs)
         seen = {}
         import re
         rx = re.compile('^[ ]*</?([a-z]+)')
@@ -31,13 +31,13 @@ class CommonCase(unittest_TestCase):
 
 
 def abstract_schema_via_sexp(sx):
-    from kiss_rdb.magnetics_.abstract_schema_via_sexp import \
-            _abstract_schema_via_sexp as func
+    from kiss_rdb.magnetics.abstract_schema_via_sexp import \
+            abstract_schema_via_sexp as func
     return func(sx)
 
 
 def subject_module():
-    import kiss_rdb.storage_adapters.html.form_via_formal_entity as mod
+    import app_flow.form_via_formal_entity as mod
     return mod
 
 

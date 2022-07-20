@@ -8,7 +8,7 @@ class CommonCase(unittest.TestCase):
         subject_func = subject_module().lines_via_tree_dictionary
         arg_lines = self.given_recfile_lines()
         recs_itr = my_records_via_lines(arg_lines)
-        from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
+        from app_flow.tree_toolkit import tree_dictionary_via_tree_nodes as func
         tree_dct = func(recs_itr, listener=None)
         actual_lines = subject_func(
             tree_dct,
@@ -26,7 +26,7 @@ class CommonCase(unittest.TestCase):
         return unindent(self.given_recfile_lines_big_string())
 
 
-class Case2750_tree_lines_via_tree_typical_case(CommonCase):
+class Case0525_tree_lines_via_tree_typical_case(CommonCase):
 
     def test_500_everything(self):
         self.expect_expected_lines()
@@ -84,9 +84,8 @@ unindent.f = None
 #    denativization is out of scope for this level of testing
 
 def my_records_via_lines(lines):
-    from kiss_rdb.storage_adapters_.rec import \
-            _native_records_via_lines as func1
-    native_recs = func1(lines, listener=None)
+    from kiss_rdb.storage_adapters.rec import native_records_via_lines as func
+    native_recs = func(lines, listener=None)
     return (my_rec_via_native_rec(rec) for rec in native_recs)
 
 
@@ -127,7 +126,7 @@ class MyRec:
 
 
 def subject_module():
-    from kiss_rdb import tree_toolkit as mod
+    from app_flow import tree_toolkit as mod
     return mod
 
 

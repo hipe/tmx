@@ -37,7 +37,7 @@ def _CLI(sin, sout, serr, argv):
             assert not sin.isatty()
             fh = sin
         with fh:  # file will close at exit #here1
-            abs_sch = abstract_schema_via_sexp_lines_(fh)  # listener one day
+            abs_sch = abstract_schema_via_sexp_lines(fh)  # listener one day
     else:  # #here5
         assert sin.isatty()
         assert not dct
@@ -376,14 +376,14 @@ def _human_via_fname(fname):
 
 # ==
 
-def abstract_schema_via_sexp_lines_(fh):  # #testpoint
+def abstract_schema_via_sexp_lines(fh):
 
     def main():
         read_file_into_big_string()
         avoid_common_errors_from_vendor_lib()
         from sexpdata import loads as sexpdata_loads
         sx = sexpdata_loads(state.big_string)
-        return _abstract_schema_via_sexp(sx)
+        return abstract_schema_via_sexp(sx)
 
     state = main  # #watch-the-world-burn
 
@@ -418,7 +418,7 @@ def abstract_schema_via_sexp_lines_(fh):  # #testpoint
     xx(''.join(msgs))
 
 
-def _abstract_schema_via_sexp(sx):  # #testpoint
+def abstract_schema_via_sexp(sx):
     # #todo needs a context stack too
 
     def main():

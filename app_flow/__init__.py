@@ -1,6 +1,6 @@
 def app_design_via_recfile(main_recfile, listener):
 
-    from kiss_rdb.storage_adapters_.rec import collections_via_main_recfile as func
+    from kiss_rdb.storage_adapters.rec import collections_via_main_recfile as func
     colz = func(main_recfile, 'PageNode', _build_datamodel_bridge)
 
     def export(func):

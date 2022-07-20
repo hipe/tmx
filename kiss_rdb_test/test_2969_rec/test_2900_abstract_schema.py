@@ -67,7 +67,7 @@ def build_recording_listener_for(tc):
 
 
 def subject_module():
-    from kiss_rdb.storage_adapters_.rec import \
+    from kiss_rdb.storage_adapters.rec import \
             abstract_schema_via_recinf as mod
     return mod
 

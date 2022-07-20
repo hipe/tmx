@@ -8,13 +8,13 @@
 # == Public API functions
 #    (shrunk down to one function at #history-C.3)
 
-def collections_via_main_recfile_(main_recfile):
+def my_collections_via_main_recfile_(main_recfile):
     def renames(fent_name):
         if 'Capability' == fent_name:
             return ('NativeCapability', {'EID': 'ID', 'children_EIDs': 'Child'})
         if 'Note' == fent_name:
             return (None, {'parent_EID': 'Parent', 'body_lines': 'Body'})
-    from kiss_rdb.storage_adapters_.rec import collections_via_main_recfile as func
+    from kiss_rdb.storage_adapters.rec import collections_via_main_recfile as func
     return func(main_recfile, 'Capability', _build_datamodel_bridge, renames)
 
 

@@ -374,7 +374,7 @@ def view_capability(sout, serr, recfile, EID):
     # Experimental pipeline thing
     vp = coll.dataclass.VIEW_PIPELINES
 
-    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+    from app_flow.view_via_formal_entity import \
             create_entity_renderer__ as func
     _ = func(fe, additional_renderers=ar, view_pipelines=vp)
     lines = _(ent)
@@ -403,7 +403,7 @@ def _build_note_renderer(collz, listener):
     fattrs = tuple(fattrs())
 
     # Let's try this
-    from kiss_rdb.storage_adapters.html.view_via_formal_entity import \
+    from app_flow.view_via_formal_entity import \
             component_renderer_via_formal_attribute as func
     component_renderers = tuple(func(fa) for fa in fattrs)
     def render_note(ent, margin, indent):
@@ -590,8 +590,8 @@ def _show_form(
         assert 'updatee_EID' == typ
         ent = coll.retrieve_entity(eid, listener)
         assert ent  # for now
-        from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
-                EXPERIMENTAL_populate_form_values_ as func
+        from app_flow.form_via_formal_entity import \
+                EXPERIMENTAL_populate_form_values as func
         outgoing_form_values = {k: v for k, v in func(ent, fe, listener)}
         # #here7: we no longer want the EID in the hidden form vars
         me_go_away = outgoing_form_values.pop('ID')
@@ -634,8 +634,8 @@ def _do_show_form(
         _ = coll.collectioner[fent_name]  # key error okay
         return _.dataclass
 
-    from kiss_rdb.storage_adapters.html.form_via_formal_entity import \
-            html_form_via_SOMETHING_ON_THE_MOVE_ as func
+    from app_flow.form_via_formal_entity import \
+            html_form_via_SOMETHING_ON_THE_MOVE as func
     lines = func(
         FORMAL_ATTRIBUTES=fattrs,
         action=form_action, form_values=form_args,
@@ -841,7 +841,7 @@ td.the_buttons_tabledata { text-align: center; }
 
 
 def _inner_html_lines_for_table(recs_itr, colz, listener):
-    from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
+    from app_flow.tree_toolkit import tree_dictionary_via_tree_nodes as func
     tree_dct = func(recs_itr, _childrener, listener)
 
     if 0 == len(tree_dct):
@@ -878,7 +878,7 @@ def _inner_html_lines_for_table(recs_itr, colz, listener):
             f'<td>{other}</td>'
             '</tr>\n')
 
-    from kiss_rdb.tree_toolkit import lines_via_tree_dictionary as func
+    from app_flow.tree_toolkit import lines_via_tree_dictionary as func
     lines = func(
         tree_dct,
         branch_node_opening_line_by=table_row_for,
@@ -902,7 +902,7 @@ def _inner_html_lines_for_table(recs_itr, colz, listener):
 
 
 def _inner_html_lines_for_tree(recs_itr, _colz_NOT_USED, listener):
-    from kiss_rdb.tree_toolkit import tree_dictionary_via_tree_nodes as func
+    from app_flow.tree_toolkit import tree_dictionary_via_tree_nodes as func
     tree_dct = func(recs_itr, _childrener, listener)
     if 0 == len(tree_dct):
         return  # ..
@@ -919,7 +919,7 @@ def _inner_html_lines_for_tree(recs_itr, _colz_NOT_USED, listener):
         link_html = _link_and_label_of_record(rec)
         return f'<li>{link_html}</li>\n'
 
-    from kiss_rdb.tree_toolkit import lines_via_tree_dictionary as func
+    from app_flow.tree_toolkit import lines_via_tree_dictionary as func
     lines = func(
         tree_dct,
         branch_node_opening_line_by=branch_node_opening_line_for,
@@ -1105,7 +1105,7 @@ def _html_escape_function():
 
 
 def _collz(recfile):
-    from kiss_rdb.cap_server.model_ import collections_via_main_recfile_ as func
+    from cap_server.model_ import my_collections_via_main_recfile_ as func
     return func(recfile)
 
 

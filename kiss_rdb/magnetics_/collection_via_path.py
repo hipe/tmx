@@ -979,7 +979,7 @@ def _schema_parse_narrator(opened, main, listener):
     class reso:
         pass
 
-    from kiss_rdb.storage_adapters_.rec import ErsatzScanner
+    from kiss_rdb.storage_adapters.rec import ErsatzScanner
     scn = ErsatzScanner(opened)
     from kiss_rdb.magnetics_.schema_file_scanner_via_recfile_scanner \
         import func

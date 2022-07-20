@@ -12,7 +12,7 @@ class CommonCase(CreateCollectionCaseMethods, unittest_TestCase):
 
     @property
     def storage_adapter_module(self):
-        from kiss_rdb.storage_adapters_ import rec as mod
+        from kiss_rdb.storage_adapters import rec as mod
         return mod
 
     do_debug = False

@@ -82,9 +82,12 @@ parse_args() {
 
 show_help() {
     local use_prog_name=$(dirname "$bash_source")
-    >&2 echo "usage: $use_prog_name [-p PORT]"
+    >&2 echo "usage: $use_prog_name [-p PORT] RECFILE"
     >&2 echo ""
     >&2 echo "description: Start the \"capabilities server\" (using redbean)."
+    >&2 echo ""
+    >&2 echo "arguments:"
+    >&2 echo "  RECFILE           the main 'recfile' data file of the collection"
     >&2 echo ""
     >&2 echo "options:"
     >&2 echo "  -p|--port         passed through to redbean"
@@ -189,7 +192,7 @@ do_pathnames() {
     # https://stackoverflow.com/questions/59895/how-can-i-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
 
     local cap_server_dir=$(cd "$(dirname "$bash_source")" &> /dev/null && pwd )
-    local mono_repo_dir=$(dirname $(dirname "$cap_server_dir"))
+    local mono_repo_dir=$(dirname "$cap_server_dir")
     redbean_exe_path="$mono_repo_dir/$tmpdir_entry/$redbean_exe_file"
     doc_root="$cap_server_dir/doc-root"
 }
