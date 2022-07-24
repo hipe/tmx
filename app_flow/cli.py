@@ -1,4 +1,4 @@
-def cli_for_production():
+def cli_for_production():  # (at writing mounted as "tmx-app-flow" in setup.py)
     from sys import stdin, stdout, stderr, argv
     return _CLI(stdin, stdout, stderr, argv)
 

@@ -1,258 +1,32 @@
 #!/usr/bin/env -S python3 -W error::::
 
-def endpoint(route_string, http_method=None, GET_params=None):  # #decorator
-    """The decorator for defining endpoints ("command" functions)
+"""Introduction
 
-    probably similar to something in flask..
-    """
+This whole "backend" to our "web app" serves a practical purpose and a loftier,
+more experimental purpose.
 
-    def decorator(func):
-        func.command = None  # for #here5
-        args = [route_string, (func,)]
-        # (If you don't wrap the function, it binds to some guy :#here3)
+The practical purse is: be the frontier app of the "capabilities server".
+What a capabilities server *is* is as-yet undocumented XX.
 
-        if http_method:
-            args.append(http_method)
-        if GET_params:
-            assert not http_method  # the func syntax overloads the position
-            args.append(GET_params)
-        route_definitions.append(args)
-        # return nothing. we never call the functions directly
+The lofier purpose: We want to see how far we can go with one of the grand
+experiments of "app flow": Can you model the backend of a web-ap as simply
+a CLI that outputs html?
+"""
 
-    route_definitions = endpoint._defs_volatile
-    return decorator
 
-endpoint._defs_volatile = []
-
+# == Pattern definitions:
+#    These are the special slots in our routes (url's).
+#    Here is where we define their patterns, else 404.
 
 def _pattern_definitions(placeholder_name):
     if 'EID' == placeholder_name:
         return '^[A-Z0-9]+$'
 
 
-def _CLI(sin, sout, serr, argv):
+# == Endpoints
 
-    stack = list(reversed(argv))
-    program_name = stack.pop()
-
-    # (Throw a stop as soon as someone emits an error)
-    # (Eventually this should emit a 500 error or w/e but why)
-    def listener(severity, shape, *rest):
-        assert 'expression' == shape
-        lines = tuple(rest[-1]())
-        for line in lines:
-            if 0 == len(line) or '\n' != line[-1]:
-                line = f'{line}\n'
-            serr.write(line)
-        if 'error' != severity:
-            return
-        if 0 == listener.returncode:
-            listener.returncode = 123
-        raise _Stop()
-    listener.returncode = 0
-
-    def main():
-        # Parse the CLI into fparams and bparams (framework p. and business p.)
-        parse_tree = _parse_ARGV_into_fparams_and_bparams(stack, listener)
-
-        # Consume those parts of the fparams needed to resolve the endpoint func
-        resp = _consume_params_for_matcher_call(parse_tree, listener)
-
-        if not resp.OK:
-            sout.write(f"{resp.message}\n")  # EXPERIMENTAL
-            return resp.some_returncode % 256  # we can't
-
-        if not resp.had_trailing_slash:
-            xx('we want to correct these somehow')
-
-        parse_tree.url_pattern_values = resp.parse_tree  # abuse. ick/meh
-
-        endpoint_func, = resp.route_associated_value  # #here3 func is wrapped
-
-        # Use the endpoint function's docstring-based signature to parse params
-        from script_lib.docstring_based_command import \
-                command_of_function as func
-        command = func(endpoint_func)
-        terms = _scanner_via_iter(command.to_formal_arguments())  # #here5
-        del command
-
-        # Every endpoint function takes at least these
-        args = [sout, serr]
-
-        # For each next "normal" term, you must resolve it somehow
-        if terms.more:
-            resolvers = build_resolvers_scanner()
-
-        while terms.more and not terms.peek.is_glob:
-            # We're pop off each next remaining resolver until we find one
-            while True:
-                if resolvers.empty:
-                    xx("as the prophecy foretold. unexpected here: {terms.peek.label!r}")
-
-                if resolvers.peek[0] == terms.peek.label:
-                    break
-
-                resolvers.advance()
-
-            # If you got here, you have a lineup with term and resolver
-            term = terms.next()
-            _, resolver_func = resolvers.next()
-            args.append(resolver_func(parse_tree))
-
-        if terms.more:
-            assert terms.peek.is_glob
-            glob_term = terms.next()
-            assert terms.empty  # can't have '*FOO *FOO' in syntax
-
-            # There is magic here - not matter what the syntax calls it,
-            # it's the form args (bparams)
-            form_args = parse_tree.bparams
-            parse_tree.bparams = None
-            args.append(form_args)
-
-        # We should have unloaded everything now
-        if parse_tree.bparams:
-            xx('bparams were passed but not consumed by endpoint function')
-
-        if parse_tree.url_pattern_values:
-            xx('the url had pattern matchers not consumed by the endpoint func')
-
-        parse_tree.fparams.pop('collection', None)  # if not already consumed
-        if parse_tree.fparams:
-            xx('not sure this is bad - ununsed fparams')
-
-        return endpoint_func(*args)  # you should be proud
-
-    def build_resolvers_scanner():
-        return _scanner_via_iter(each_term_resolver_pair())
-
-    def each_term_resolver_pair():
-        yield 'RECFILE', resolve_recfile
-        yield 'EID', resolve_EID
-
-    def resolve_EID(parse_tree):
-        return parse_tree.url_pattern_values.pop('EID')
-
-    def resolve_recfile(parse_tree):
-        return parse_tree.fparams.pop('collection')  # note label change
-
-    rc = None
-    try:
-        rc = main()
-    except _Stop:
-        pass
-
-    return listener.returncode if rc is None else rc
-
-
-def _consume_params_for_matcher_call(parse_tree, listener):
-    fparams = parse_tree.fparams
-
-    # Like a madman, let's consume the fparams
-    use_url_tail = fparams.pop('url')
-    use_http_method = fparams.pop('http_method')
-
-    # This is HIGHLY EXPERIMENTAL -- is routing expected to consume fully
-    # the GET params, or should it just consume what it wants?
-    if parse_tree.bparams and 'GET' == use_http_method:
-        use_GET_params = parse_tree.bparams
-        parse_tree.bparams = None
-    else:
-        use_GET_params = None
-
-    # messy and expensive as CLI, especially as CLI that's also backend #here4
-    defs = endpoint._defs_volatile
-    del endpoint._defs_volatile
-    from app_flow.routing import matcher_via_routes as func
-    matcher = func(defs, _pattern_definitions)
-    return matcher.match(use_url_tail, use_http_method, use_GET_params)
-
-
-def _parse_ARGV_into_fparams_and_bparams(stack, listener):
-    from app_flow.server_CLI import parse_argv as func
-    return func(stack, listener)
-
-
-# == OLD CLI BELOW
-
-
-def _OLD_CLI(sin, sout, serr, argv):
-    """backend endpoints for our capability server,
-
-    exposed (here) as CLI commands. Pass "-h" to the specific commands.
-    """
-
-    # == BEGIN #history-C.2
-
-    def usage_lines():
-        yield "usage: {{prog_name}} COMMAND [command args..]\n"  # #[#857.13]
-
-    def docstring_for_help_description(invo):
-        for line in invo.description_lines_via_docstring(_CLI.__doc__):
-            yield line
-        for line in lines_for_description_of_commands():
-            yield line
-
-    import re
-    help_rx = re.compile(r'^--?h(?:e(?:lp?)?)?\Z')
-
-    def lines_for_description_of_commands():
-        lines = []
-        e = lines.append
-        e('\n')
-        e('commands:\n')
-        maxwidth = 0
-        for fname in _commands.command_keys():
-            width = len(fname)
-            if maxwidth < width:
-                maxwidth = width
-        fmt = f'  %{maxwidth}s  %s\n'
-        for fname in _commands.command_keys():
-            e(fmt % (fname, _commands[fname].single_line_description))
-        e('\n')
-        e("example recfile: "
-        "kiss-rdb-doc/recfiles/857.12.recutils-capabilities.rec\n"
-        )
-        return lines
-
-    from script_lib.via_usage_line import build_invocation
-    invo = build_invocation(
-            sin, sout, serr, argv,
-            usage_lines=usage_lines(),
-            docstring_for_help_description=docstring_for_help_description)
-
-    rc, pt = invo.returncode_or_parse_tree()
-    if rc is not None:
-        return rc
-    dct = pt.values
-    stack = invo.argv_stack
-    prog_name = lambda: invo.program_name
-    del pt
-    command_arg = dct.pop('command')
-    assert not dct
-
-    # ==
-
-    e = serr.write
-
-    cmd = _commands.get(command_arg)
-    if not cmd:
-        e(f"not a command: {command_arg!r}\n")
-        return 3
-
-    # Maybe show help for a specific command
-    if len(stack) and help_rx.match(stack[0]):
-        for line in cmd.build_doc_lines(prog_name()):
-            e(line)
-        return 0
-
-    # Validate & send the parameters to the command func
-    _ = None  # (historic value of stderr)
-    if cmd.has_only_positional_args_GONE:
-        if (rc := cmd.validate_positionals(stderr, stack, prog_name)):
-            return rc
-        return cmd.function(_, sout, serr, *reversed(stack))
-    return cmd.function(_, sout, serr, stack)
+from app_flow.routing import begin_endpointer_EXPERIMENTAL as func
+endpoint = func(_pattern_definitions)
 
 
 @endpoint('/ping/')
@@ -455,7 +229,7 @@ def _do_process_form(
     coll = _collz(recfile)[fent_name]
 
     # Go
-    custom_listener, ui_msgs = _build_listener_custom_to_this_module(serr)
+    custom_listener, ui_msgs = MOVING_build_listener_custom_to_this_module(serr)
 
     # == BEGIN break this up when the dust settles
 
@@ -578,7 +352,7 @@ def _show_form(
 
     coll = _collz(recfile)[fent_name]
 
-    listener, ui_msgs = _build_listener_custom_to_this_module(serr)
+    listener, ui_msgs = MOVING_build_listener_custom_to_this_module(serr)
 
     fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
 
@@ -628,7 +402,7 @@ def _do_show_form(
     fattrs = fe.to_formal_attributes()
     VF_dct = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
     if VF_dct:
-        fattrs = _filter_out_these(fattrs, VF_dct)
+        fattrs = WILL_MOVE_filter_out_these(fattrs, VF_dct)
 
     def model_class_via_name(fent_name):
         _ = coll.collectioner[fent_name]  # key error okay
@@ -653,45 +427,13 @@ def _form_nav_links_via(parent_UI_node_url):
 
 
 def _parent_UI_node_url_via_form_action(form_action):
-    """TEMPORARY HACK and EXPERIMENTAL:
-    This is:
-    - a somewhat improvement over other hacks we did before #history-C.5
-    - still a hack, probably temporary, just a stand-in for whatever is next
-
-    From the form action (a url tail ("path")) we can derive these:
-    - The "verb stem" (`CREATE` or `UPDATE` (from '../add/' or '../edit/')
-    - The parent "UI node" (hackishly always at a fixed depth of *two* lol)
-      (Think of this as the "referrer" if you like)
-
-    (Currently we only derive the one data element but we could derive more.
-    This may seem like a minor point but it's the underpinning of etc)
-
-    In practice, our arguments will be just these:
-        /capability/AB/edit/
-        /capability/AB/nodes/add/
-    """
-
-    pcs = form_action.split('/')
-    assert '' == pcs[0]
-    assert '' == pcs[-1]
-    here_url_components = pcs[1:-1]
-
-    verb_url_entry = here_url_components[-1]
-    if 'add' == verb_url_entry:
-        # verb_stem = 'CREATE'
-        pass
-    else:
-        assert 'edit' == verb_url_entry
-        # verb_stem = 'UPDATE'
-
-    num_components = len(here_url_components)
-    assert 2 < num_components and num_components < 5
-
-    return '/'.join(('', *here_url_components[:2], ''))
+    from app_flow.routing import \
+        parent_UI_node_url_via_form_action_EXPERIMENTAL as func
+    return func(form_action)
     # (#here1:route-name:view_capability)
 
 
-def _filter_out_these(fattrs, these):
+def WILL_MOVE_filter_out_these(fattrs, these):
     pool = {k: True for k in these.keys()}
     _DATACLASS_FIELD_NAME_PURPOSE = ('DATACLASS_FIELD_NAME_PURPOSE_',)
     for attr in fattrs:
@@ -705,7 +447,7 @@ def _filter_out_these(fattrs, these):
 
 # == Listeners
 
-def _build_listener_custom_to_this_module(serr):
+def MOVING_build_listener_custom_to_this_module(serr):
     """Create listener that stores certain emissions to a custom structure.
     Purpose-built for form interaction.
 
@@ -763,7 +505,7 @@ def _build_listener_custom_to_this_module(serr):
             w(line)
 
     w = _line_writer_via_write_function(serr.write)
-    ui_msgs = _UI_Messages()
+    ui_msgs = _MOVING_UI_Messages()
     custom_listener.did_error = False
     return custom_listener, ui_msgs
 
@@ -1035,7 +777,7 @@ def _html_lines_for_button(label, directive_sexp, margin, indent):
     yield f'{margin}</form>\n'
 
 
-class _UI_Messages:
+class _MOVING_UI_Messages:
     # might either become named tuple or go back to before #history-C.4
 
     def __init__(self):
@@ -1043,32 +785,6 @@ class _UI_Messages:
 
     def __iter__(self):
         return iter((self.general, self.specific))
-
-
-def _scanner_via_iter(itr):  # exists elsewhere too
-    class Scanner:
-        def next(self):
-            item = self.peek
-            self.advance()
-            return item
-
-        def advance(self):
-            item = next(itr, None)
-            if item:
-                self.peek = item
-                return
-            del self.peek
-            self.more = False
-
-        @property
-        def empty(self):
-            return not self.more
-
-    scn = Scanner()
-    scn.peek = None
-    scn.more = True
-    scn.advance()
-    return scn
 
 
 def _add_safely(dct, k, val):
@@ -1079,7 +795,6 @@ def _add_safely(dct, k, val):
 # :#here7: EID used to be hidden form var but now is embedded in url #history-C.5
 # :#here6: rebuild the same url that was used in our invocation ick
 #   - Every one of these is also a #here1
-# :#here4: One day we might make this long-running. Change these then (placeheld)
 # :#here1: #wish [#872.C]: The dream of fully two-directional routes:
 #   - While doing #history-C.5 we re-invented the utility (alla rails, but for
 #     us a vaporware nice-to-have) of having each route available to be
@@ -1088,6 +803,8 @@ def _add_safely(dct, k, val):
 #     Fow now, we create each url "manually" (and with duplication).
 #   - Every `button_url` and `nav_link_url` falls under this tag scope too.
 
+
+# == BEGIN experiment in lazy-loading
 
 def _html_escape(msg):  # (experiment in lazy loading)
     assert _html_escape.sanity
@@ -1104,27 +821,29 @@ def _html_escape_function():
     return func
 
 
+def _this_module():
+    import sys
+    return sys.modules[__name__]
+
+# == END experiment in lazy-loading
+
+
 def _collz(recfile):
     from cap_server.model_ import my_collections_via_main_recfile_ as func
     return func(recfile)
 
 
-def _this_module():
-    import sys
-    return sys.modules[__name__]
-
-
-class _Stop(RuntimeError):
-    pass
-
-
 if '__main__' == __name__:
     from sys import stdin, stdout, stderr, argv
-    rc = _CLI(stdin, stdout, stderr, argv)
+    from app_flow.server_CLI import web_app_as_CLI_EXPERIMENTAL as func
+    rc = func(
+        stdin, stdout, stderr, argv,
+        endpoint.consume_params_for_matcher_call_EXPERIMENTAL)
     if isinstance(rc, int):
         exit(rc)
     stdout.write(f"(oops, expected int had {type(rc)} for returncode)\n")
 
+# #history-C.6 a great exodous. no more command splay, no more help (for now)
 # #history-C.5 overhaul to parse it the new way with "send URL back"
 # #history-C.4 (as referenced)
 # #history-C.3 (can be temporary)

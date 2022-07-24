@@ -63,7 +63,98 @@ ROUTE_ASSOCIATED_VALUE (wrapped)
 import re
 
 
-class matcher_via_routes:
+def begin_endpointer_EXPERIMENTAL(pattern_definitions):
+    """Create the decorator for defining endpoints ("command" functions)
+
+    Probably similar to something in flask..
+
+    This is EXPERIMENTAL because XX
+    """
+
+    def endpoint(route_string, http_method=None, GET_params=None):  # #decorator
+        def decorator(func):
+            func.command = None  # for [#891.C] eek
+            args = [route_string, (func,)]
+            # (If you don't wrap the function, it binds to some guy [#891.B])
+
+            if http_method:
+                args.append(http_method)
+            if GET_params:
+                assert not http_method  # the func syntax overloads the position
+                args.append(GET_params)
+            defs_VOLATILE.append(args)
+            # return nothing. we never call the functions directly
+        return decorator
+
+    def func(parse_tree, listener):
+      assert func.is_first_call  # probably re-entrant, but not covered #here3
+      func.is_first_call = False
+
+      fparams = parse_tree.fparams
+
+      # Like a madman, let's consume the fparams
+      use_url_tail = fparams.pop('url')
+      use_http_method = fparams.pop('http_method')
+
+      # This is HIGHLY EXPERIMENTAL -- is routing expected to consume fully
+      # the GET params, or should it just consume what it wants?
+      if parse_tree.bparams and 'GET' == use_http_method:
+          use_GET_params = parse_tree.bparams
+          parse_tree.bparams = None
+      else:
+          use_GET_params = None
+
+      matcher = _matcher_via_routes(defs_VOLATILE, pattern_definitions)
+      # (messy and expensive CLI #here3)
+
+      return matcher.match(use_url_tail, use_http_method, use_GET_params)
+
+    func.is_first_call = True
+    endpoint.consume_params_for_matcher_call_EXPERIMENTAL = func
+
+    defs_VOLATILE = []
+    return endpoint
+
+
+def parent_UI_node_url_via_form_action_EXPERIMENTAL(form_action):
+    """TEMPORARY HACK and EXPERIMENTAL:
+    This is:
+    - a somewhat improvement over other hacks we did before #history-C.5
+    - still a hack, probably temporary, just a stand-in for whatever is next
+
+    From the form action (a url tail ("path")) we can derive these:
+    - The "verb stem" (`CREATE` or `UPDATE` (from '../add/' or '../edit/')
+    - The parent "UI node" (hackishly always at a fixed depth of *two* lol)
+      (Think of this as the "referrer" if you like)
+
+    (Currently we only derive the one data element but we could derive more.
+    This may seem like a minor point but it's the underpinning of etc)
+
+    In practice, our arguments will be just these:
+        /capability/AB/edit/
+        /capability/AB/nodes/add/
+    """
+
+    pcs = form_action.split('/')
+    assert '' == pcs[0]
+    assert '' == pcs[-1]
+    here_url_components = pcs[1:-1]
+
+    verb_url_entry = here_url_components[-1]
+    if 'add' == verb_url_entry:
+        # verb_stem = 'CREATE'
+        pass
+    else:
+        assert 'edit' == verb_url_entry
+        # verb_stem = 'UPDATE'
+
+    num_components = len(here_url_components)
+    assert 2 < num_components and num_components < 5
+
+    return '/'.join(('', *here_url_components[:2], ''))
+
+
+class _matcher_via_routes:  # #testpoint
 
     def __init__(self, route_definitions, PATTERN_DEFINITIONS=None):
         self._root_node_for_parameterless_GET_request = None
@@ -256,7 +347,7 @@ def _match_url(url_tail, root_node):
         had_trailing_slash = scn.skip_any_slash()
         # (advance the scanner past the any next slash now so that subsequently
         # if we generate expressions of the url, it will include the slash if
-        # it was provided, to look more "normal" #here3)
+        # it was provided, to look more "normal")
 
         if not had_trailing_slash:
             # (sanity check: the only way there could be no slash is at the end)
@@ -596,12 +687,19 @@ def _validate_and_strip_surface_placeholder(placeholder):
     return md[1]
 
 
+# :#here5: experimenting with return value of route entry matches
+# :#here4: this pair
+# :#here3: [#891.A]: One day we might make this long-running. Change these then
+# :#here2: return wrapped values here (wrapped values are returned here)
+# :#here1: the structure for cached, lazy reification
+
 # ==
 
 class DefinitionError(RuntimeError):
     pass
 
 
+# #history-C.3 receive exodus of frameworky code from first client
 # #history-C.2
 # #history-C.1
 # #born

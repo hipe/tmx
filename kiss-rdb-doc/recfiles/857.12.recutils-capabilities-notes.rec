@@ -1,3 +1,4 @@
+# See sibling file ending in "*-recutils-capabilities.rec" for explanation.
 # NOTE schema is EXPERIMENTAL at this time.
 # At #birth we hand-populated this with some records just
 # to visual-test the view of notes before we do form gen & CREATE.

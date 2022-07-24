@@ -51,7 +51,7 @@ class CommonCase(unittest_TestCase):
                 yield mixed
 
         these = these()
-        return subject_module().matcher_via_routes(
+        return subject_module()._matcher_via_routes(
                 these, self.given_pattern_definitions)
 
     given_http_method = 'GET'

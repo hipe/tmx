@@ -1,4 +1,117 @@
-def parse_argv(stack, listener):
+def web_app_as_CLI_EXPERIMENTAL(
+        sin, sout, serr, argv,
+        consume_params_for_matcher_call):
+
+    """One of the many experimental avenues of "app flow" is: How painful will
+    it be to conceive of a web app as simply a CLI that outputs html?
+
+    This particular function is EXPERIMENTAL because have no idea (or even plan)
+    yet of what the interface should be for this function in terms of its
+    formal arguments.
+    """
+
+    stack = list(reversed(argv))
+    program_name = stack.pop()
+
+    def main():
+        # Parse the CLI into fparams and bparams (framework p. and business p.)
+        parse_tree = _parse_argv(stack, listener)
+        if not parse_tree:
+            raise _Stop()
+
+        # Consume those parts of the fparams needed to resolve the endpoint func
+        resp = consume_params_for_matcher_call(parse_tree, listener)
+
+        if not resp.OK:
+            sout.write(f"{resp.message}\n")  # EXPERIMENTAL
+            return resp.some_returncode % 256  # we can't
+
+        if not resp.had_trailing_slash:
+            xx('we want to correct these somehow')
+
+        parse_tree.url_pattern_values = resp.parse_tree  # abuse. ick/meh
+
+        endpoint_func, = resp.route_associated_value  # [#891.B] func is wrapped
+
+        # Use the endpoint function's docstring-based signature to parse params
+        from script_lib.docstring_based_command import \
+                command_of_function as func
+        command = func(endpoint_func)  # :[#891.C]
+        terms = _scanner_via_iter(command.to_formal_arguments())
+        del command
+
+        # Every endpoint function takes at least these
+        args = [sout, serr]
+
+        # For each next "normal" term, you must resolve it somehow
+        if terms.more:
+            resolvers = build_resolvers_scanner()
+
+        while terms.more and not terms.peek.is_glob:
+            # We're pop off each next remaining resolver until we find one
+            while True:
+                if resolvers.empty:
+                    xx("as the prophecy foretold. unexpected here: {terms.peek.label!r}")
+
+                if resolvers.peek[0] == terms.peek.label:
+                    break
+
+                resolvers.advance()
+
+            # If you got here, you have a lineup with term and resolver
+            term = terms.next()
+            _, resolver_func = resolvers.next()
+            args.append(resolver_func(parse_tree))
+
+        if terms.more:
+            assert terms.peek.is_glob
+            glob_term = terms.next()
+            assert terms.empty  # can't have '*FOO *FOO' in syntax
+
+            # There is magic here - not matter what the syntax calls it,
+            # it's the form args (bparams)
+            form_args = parse_tree.bparams
+            parse_tree.bparams = None
+            args.append(form_args)
+
+        # We should have unloaded everything now
+        if parse_tree.bparams:
+            xx('bparams were passed but not consumed by endpoint function')
+
+        if parse_tree.url_pattern_values:
+            xx('the url had pattern matchers not consumed by the endpoint func')
+
+        parse_tree.fparams.pop('collection', None)  # if not already consumed
+        if parse_tree.fparams:
+            xx('not sure this is bad - ununsed fparams')
+
+        return endpoint_func(*args)  # you should be proud
+
+    def build_resolvers_scanner():
+        return _scanner_via_iter(each_term_resolver_pair())
+
+    def each_term_resolver_pair():
+        yield 'RECFILE', resolve_recfile
+        yield 'EID', resolve_EID
+
+    def resolve_EID(parse_tree):
+        return parse_tree.url_pattern_values.pop('EID')
+
+    def resolve_recfile(parse_tree):
+        return parse_tree.fparams.pop('collection')  # note label change
+
+    listener = _build_stateful_listener(serr)
+
+    rc = None
+    try:
+        rc = main()
+    except _Stop:
+        pass
+
+    return listener.returncode if rc is None else rc
+
+
+def _parse_argv(stack, listener):
 
     formal_fparams = {
         'url': 'required',
@@ -203,7 +316,55 @@ def _when_no_FSA_transition(listener, state_func_name, token_prefix, token):
     listener('error', 'expression', 'cannot_parse_token', lines)
 
 
+def _build_stateful_listener(serr):
+    """(Throw a stop as soon as someone emits an error)
+    (Eventually this should emit a 500 error or w/e but why)
+    """
+
+    def listener(severity, shape, *rest):
+        assert 'expression' == shape
+        lines = tuple(rest[-1]())
+        for line in lines:
+            if 0 == len(line) or '\n' != line[-1]:
+                line = f'{line}\n'
+            serr.write(line)
+        if 'error' != severity:
+            return
+        if 0 == listener.returncode:
+            listener.returncode = 123
+        raise _Stop()
+    listener.returncode = 0
+    return listener
+
+
+def _scanner_via_iter(itr):  # exists elsewhere too
+    class Scanner:
+        def next(self):
+            item = self.peek
+            self.advance()
+            return item
+
+        def advance(self):
+            item = next(itr, None)
+            if item:
+                self.peek = item
+                return
+            del self.peek
+            self.more = False
+
+        @property
+        def empty(self):
+            return not self.more
+
+    scn = Scanner()
+    scn.peek = None
+    scn.more = True
+    scn.advance()
+    return scn
+
+
 class _Stop(RuntimeError):
     pass
 
+# #history-C.1 receive exodus of frameworky code from first client
 # #abstracted

@@ -307,8 +307,9 @@ alias pi='py pho/cli/commands/issues.py'
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |[#900]-[#910]              |       | (anim)
-|[#876]-[#899]              |       | (pho)
-|[#851]-[#875]              |       | (kiss-rdb)
+|[#890]-[#899]              |       | (app-flow & cap server)
+|[#880]-[#889]              |       | (pho)
+|[#851]-[#879]              |       | (kiss-rdb)
 |[#811]-[#850]              |       | (reserved for [#406] CMS app for now)
 |[#801]-[#810]              |       | (for redbean experiment)
 |[#701]-[#799]              |       | (for tag lyfe)

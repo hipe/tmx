@@ -37,4 +37,3 @@ Create abstract capabilities tree. Commit. (more in doc)
 Determine implementation status of each capability. (more in doc)
 Imagine the several things you could do with routes (expand this. names. down links, up links)
 Abstract really nasty parts out of generate_html and refactor them in app_flow
-Get that form processing stuff out of kiss and in to app_flow

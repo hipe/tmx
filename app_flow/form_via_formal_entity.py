@@ -925,7 +925,7 @@ def _html_lines_via_existing_value(existing_value, margin):
     h = _html_escape_function()
     for line in lines:
 
-        # (no leading margin: it shows up "cosmetically" in text area) #here5
+        # (no leading margin: it shows up "cosmetically" in text area)
         # pcs = [margin, h(line)]
         pcs = [h(line)]
 

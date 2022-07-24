@@ -1,3 +1,5 @@
+# ./cap_server/start-server [this file]
+
 %rec: StringTemplateVariable
 
 TemplateVariableName: doc_url_head
