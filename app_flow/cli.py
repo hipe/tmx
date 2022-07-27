@@ -55,7 +55,7 @@ def _(sin, sout, serr, main_recfile):
     """Use GraphViz to create a visualization of the app flow"""
 
     listener = _listener_via_outstream(serr)
-    from app_flow import app_design_via_recfile as func
+    from app_flow._app_design_via_recfile import app_design_via_recfile as func
     ad = func(main_recfile, listener)
     if not ad:
         return listener.returncode or 123
@@ -70,7 +70,7 @@ def _(sin, sout, serr, main_recfile):
     """Check that references (node names) resolve"""
 
     listener = _listener_via_outstream(sout)
-    from app_flow import app_design_via_recfile as func
+    from app_flow._app_design_via_recfile import app_design_via_recfile as func
     ad = func(main_recfile, listener)
     if not ad:
         return listener.returncode or 123

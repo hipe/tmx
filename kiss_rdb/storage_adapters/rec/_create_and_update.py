@@ -1010,7 +1010,7 @@ def _encode_for_subprocess(mixed_value):
         to be blank to the value "--verbose" (the token that just *happens* to
         come after this part of the expression yikes!).
         This could be fixed by using *two* tokens instead of one for for "--set"
-        and "--add" parts, HOWEVER per [#872.I], we should never be storing
+        and "--add" parts, HOWEVER per [#891.6], we should never be storing
         a blank string as an attribute value anyway. It's convenient using this
         function as a last-line of defense sanity check against that (currently)
         """

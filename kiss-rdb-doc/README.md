@@ -77,7 +77,7 @@ woah boy.
 |[#872.L]                   | #open | unnecessary file index.lua
 |[#872.K]                   | #open | lua open subprocess with tokens not expanded string
 |[#872.J]                   | #open | component renderers system needs to bye DRY'ed (see)
-|[#872.I]                   |       | isomorphing between web and store (in [#867.I])
+|[#872.I]                   | #hole |
 |[#872.H]                   |       | type macros, generics, annotations & form generation
 |[#872.7]                   |       | purpose-sensitive name conventions
 |[#872.F]                   | #open | (on stack)
@@ -105,10 +105,8 @@ woah boy.
 |[#867.M]                   | #open | track some not all CLI endpoint stubs
 |[#867.L]                   | #open | track complaints about click
 |[#867.K]                   | #trak | places where we use the toml vendor lib
-|[#867.J]                   |       | (document) digraph for recutils dev roadmap
-|[#867.I]                   |       | (document) recfiles capabilities plan
-|[#867.H]                   | #open | blank lines during update move weirdly.
-|[#867.G]                   | #wish | empty files would tell you they're empty
+|[#867.J]                   | #hole |
+|[#867.I]                   | #hole |
 |[#867.F]                   | #trak | track where we use `'#' == line[0]` as etc
 |[#867.E]                   | #prov | markdown provision: you must always employ an example row
 |[#867.D]                   | #open | these datetime forms not supported in python toml
