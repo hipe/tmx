@@ -9,7 +9,7 @@ The practical purse is: be the frontier app of the "capabilities server".
 What a capabilities server *is* is as-yet undocumented XX.
 
 The lofier purpose: We want to see how far we can go with one of the grand
-experiments of "app flow": Can you model the backend of a web-ap as simply
+experiments of "app flow": Can you model the backend of a web-app as simply
 a CLI that outputs html?
 """
 
@@ -19,7 +19,7 @@ a CLI that outputs html?
 #    Here is where we define their patterns, else 404.
 
 def _pattern_definitions(placeholder_name):
-    if 'EID' == placeholder_name:
+    if 'EID' == placeholder_name:  # EID = entity identifier
         return '^[A-Z0-9]+$'
 
 
@@ -114,7 +114,8 @@ def view_capability(sout, serr, recfile, EID):
 
     ar = {}  # ar = additional renderers
 
-    _add_safely(ar, '_top_nav', _build_top_nav(_top_nav_from_view_cap()))
+    from app_flow.common_html import build_navigation_component as func
+    _add_safely(ar, '_top_nav', func(_top_nav_from_view_cap()))
 
     _add_safely(ar, '_THE_MIDDLE_', None)  # divide top and bottom lol
 
@@ -136,7 +137,8 @@ def view_capability(sout, serr, recfile, EID):
         buttons = _buttons_for_capability(ent)
         assert buttons  # one day maybe dynamically off
         # == BEGIN will move
-        for html in _html_lines_for_buttons(buttons, margin, indent):
+        from app_flow.common_html import html_lines_for_buttons as func
+        for html in func(buttons, margin, indent):
             yield html
         # == END
 
@@ -199,7 +201,7 @@ def _build_note_renderer(collz, listener):
 def edit_capability(sout, serr, recfile, eid, form_args):
     """usage: {prog_name} RECFILE EID *FORM_ARGS"""
 
-    return _do_process_form(
+    return _process_form(
             sout, serr, form_args=form_args,
             qualified_EID=('updatee_EID', eid), verb_stem='UPDATE',
             form_action=f'/capability/{eid}/edit/',  # #here6
@@ -210,14 +212,14 @@ def edit_capability(sout, serr, recfile, eid, form_args):
 def add_note(sout, serr, recfile, eid, form_args):
     """usage: {prog_name} RECFILE EID *FORM_ARGS"""
 
-    return _do_process_form(
+    return _process_form(
             sout, serr, form_args=form_args,
             qualified_EID=('parent_EID', eid), verb_stem='CREATE',
             form_action=f'/capability/{eid}/notes/add/',  # #here6
             fent_name='Note', recfile=recfile)
 
 
-def _do_process_form(
+def _process_form(
         sout, serr, form_args, qualified_EID, verb_stem,
         form_action, fent_name, recfile):
 
@@ -228,99 +230,15 @@ def _do_process_form(
 
     coll = _collz(recfile)[fent_name]
 
-    # Go
-    custom_listener, ui_msgs = MOVING_build_listener_custom_to_this_module(serr)
+    from app_flow.forming import process_form, build_UI_wired_listener
 
-    # == BEGIN break this up when the dust settles
+    listener = build_UI_wired_listener(serr)
 
-    parent_UI_node_url = _parent_UI_node_url_via_form_action(form_action)
-
-    def same_nav_links():
-        return _form_nav_links_via(parent_UI_node_url)
-
-    if 'UPDATE' == verb_stem:
-        typ, eid = qualified_EID
-        assert 'updatee_EID' == typ
-
-        def param_direcs():
-            # Assume `strip` happened above. See [#867.I] about below semantics
-            for k, v in form_args.items():
-                if len(v):
-                    yield k, ('SET_ATTRIBUTE', v)
-                else:
-                    yield k, ('DELETE_ANY_EXISTING_ATTRIBUTE',)
-        param_direcs = {k: v for k, v in param_direcs()}
-
-        """Filter out these notices when the value is unchanged.
-        (If we were a CLI we would want the notice, but, the nature of
-        forms is such that the whole "comb" is submitted even if your
-        intention is only to change certain attributes)
-        """
-        def use_listener(*emi):
-            if ( 'about_field' == emi[2] and
-                 'attribute_is_already_this_value' == emi[4] ):
-               return
-            custom_listener(*emi)
-
-        # (roo = result of operation)
-        roo = coll.update_entity(eid, param_direcs, use_listener)
-
-        if roo:
-            assert 'result_of_CREATE_or_UPDATE' == roo[0]
-            assert 'result_of_UPDATE' == roo[1]
-
-        # For now, high-level UI choice: for this one type of case,
-        # turn a success into a failure (sort of):
-        if roo and 'UPDATE_was_no_op' == roo[2]:
-            ui_msgs.general.append(
-                    "Everything was unchanged. No values need updating.")
-            roo = None
-
-        if roo:
-            assert 'UPDATE_succeeded' == roo[2]
-            these_args = 'UPDATE', eid
-            # (disregarding ordered prepared direcs. not nec to make redirect)
-        else:
-            top_nav_links = same_nav_links()
-    else:
-        assert 'CREATE' == verb_stem
-        # The incoming form args need these mutations to be CREATE params:
-        #   - Add 'parent' (EID) (which was embedded in the url) #here7
-
-        typ, eid = qualified_EID
-        assert 'parent_EID' == typ
-        assert 'parent' not in form_args
-        form_args['parent'] = eid
-        roo = coll.create_entity(form_args, custom_listener)
-        if roo:
-            assert 'result_of_CREATE_or_UPDATE' == roo[0]
-            assert 'result_of_CREATE' == roo[1]
-            assert 'CREATE_succeeded' == roo[2]
-            these_args = 'CREATE', roo[3]  # just realized this will need the new ID eventually
-        else:
-            top_nav_links = same_nav_links()
-            form_args.pop('parent')
-            # (don't put this in hidden form arg in repop #here7)
-
-    if not roo:
-        # If it failed, assume messages were written to ui_msgs and re-show form
-
-        assert top_nav_links
-        additional_renderers = {}
-        additional_renderers['_top_nav'] = _build_top_nav(top_nav_links)
-        additional_renderers['_THE_MIDDLE_'] = None
-
-        fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(custom_listener)
-        return _do_show_form(
-                sout, form_args, form_action, fe, coll, custom_listener,
-                additional_renderers, ui_msgs)
-
-    # An attempt is made to handle successes of *both* CREATE and UPDATE
-    # here in one place but..
-
-    # == END
-    sout.write(f"redirect {parent_UI_node_url}\n")
-    return 0
+    return process_form(
+            out=sout, qualified_EID=qualified_EID, verb_stem=verb_stem,
+            form_args=form_args, form_action=form_action,
+            line_nester=_wrap_lines_commonly, label_for_CANCEL=_label_for_CANCEL,
+            collection=coll, listener=listener)
 
 
 @endpoint('/capability/{EID}/edit/')
@@ -352,162 +270,16 @@ def _show_form(
 
     coll = _collz(recfile)[fent_name]
 
-    listener, ui_msgs = MOVING_build_listener_custom_to_this_module(serr)
+    from app_flow.forming import show_form, build_UI_wired_listener
+    listener = build_UI_wired_listener(serr)
 
     fe = coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
-
     # (experimental - wiring a listener on form GENERATION for reasons)
-
-    # == BEGIN NEW
-    if 'UPDATE' == verb_stem:
-        typ, eid = qualified_EID
-        assert 'updatee_EID' == typ
-        ent = coll.retrieve_entity(eid, listener)
-        assert ent  # for now
-        from app_flow.form_via_formal_entity import \
-                EXPERIMENTAL_populate_form_values as func
-        outgoing_form_values = {k: v for k, v in func(ent, fe, listener)}
-        # #here7: we no longer want the EID in the hidden form vars
-        me_go_away = outgoing_form_values.pop('ID')
-        assert eid == me_go_away
-    else:
-        assert 'CREATE' == verb_stem
-        # (Before #history-C.5 parent EID was in hidden form field. now in url)
-        typ, eid = qualified_EID
-        del eid
-        outgoing_form_values = {}  # _empty_dict
-        # outgoing_form_values = {'parent': eid}
-
-    parent_UI_node_url = _parent_UI_node_url_via_form_action(form_action)
-    # (#todo this is redundant with the only other call of it & could be pushed down)
-
-    additional_renderers = {
-        '_top_nav': _build_top_nav(_form_nav_links_via(parent_UI_node_url)),
-        '_THE_MIDDLE_': None,
-    }
-
-    return _do_show_form(
-            sout, outgoing_form_values, form_action, fe, coll, listener,
-            additional_renderers, ui_msgs)
-
-
-def _do_show_form(
-        sout, form_args, form_action, fe, coll, listener,
-        additional_renderers=None, ui_msgs=None):
-
-    assert '/' == form_action[0]  # should be url tail
-
-    # If it has VALUE_FACTORIES, take those attrs out
-    # (we could put this knowledge in the downstream function, but why)
-    fattrs = fe.to_formal_attributes()
-    VF_dct = getattr(coll.dataclass, 'VALUE_FACTORIES', None)
-    if VF_dct:
-        fattrs = WILL_MOVE_filter_out_these(fattrs, VF_dct)
-
-    def model_class_via_name(fent_name):
-        _ = coll.collectioner[fent_name]  # key error okay
-        return _.dataclass
-
-    from app_flow.form_via_formal_entity import \
-            html_form_via_SOMETHING_ON_THE_MOVE as func
-    lines = func(
-        FORMAL_ATTRIBUTES=fattrs,
-        action=form_action, form_values=form_args,
-        model_class_via_name=model_class_via_name,
-        additional_renderers=additional_renderers,
-        ui_msgs=ui_msgs, listener=listener)
-    w = sout.write
-    for line in _wrap_lines_commonly(lines):
-        w(line)
-    return 0
-
-
-def _form_nav_links_via(parent_UI_node_url):
-    yield _label_for_CANCEL, ('nav_link_url', parent_UI_node_url)
-
-
-def _parent_UI_node_url_via_form_action(form_action):
-    from app_flow.routing import \
-        parent_UI_node_url_via_form_action_EXPERIMENTAL as func
-    return func(form_action)
-    # (#here1:route-name:view_capability)
-
-
-def WILL_MOVE_filter_out_these(fattrs, these):
-    pool = {k: True for k in these.keys()}
-    _DATACLASS_FIELD_NAME_PURPOSE = ('DATACLASS_FIELD_NAME_PURPOSE_',)
-    for attr in fattrs:
-        use_k = attr.identifier_for_purpose(_DATACLASS_FIELD_NAME_PURPOSE)
-        if pool.pop(use_k, False):
-            continue
-        yield attr
-    if pool:
-        xx(f'oops: {tuple(pool.keys())!r}')
-
-
-# == Listeners
-
-def MOVING_build_listener_custom_to_this_module(serr):
-    """Create listener that stores certain emissions to a custom structure.
-    Purpose-built for form interaction.
-
-    Discussion: An essential piece of this module, routing emissions either
-    to the UI (essential for UX) or to the terminal (critical part of
-    developing tooling, seeing the sub-process commands etc.)
-
-    There's a wide variety of emissions across the spectrum from high-level
-    to low of every variety of severity. Some may need refinement of how
-    they're routed.
-    """
-
-    def custom_listener(*emi):
-        return handle_emission(emi)
-
-    def handle_emission(emi):
-        if 'error' == emi[0]:
-            custom_listener.did_error = True
-        if 'expression' == emi[1]:
-            return handle_expression(emi)
-        return handle_strange_emission_shape(emi)
-
-    def handle_strange_emission_shape(emi):
-        line = "error-error: can't express " + repr(tuple(emi[:-1]))
-        use_emi = 'error', 'expression', 'error_error', lambda: (line,)
-        return handle_emission(use_emi)
-
-    def handle_expression(emi):
-        # (for now) All expressions targeting a specific field, show to user in UI
-        if 'about_field' == emi[2]:
-            return handle_expression_about_field(emi)
-
-        # (for now) All errors, show to user in UI
-        # (this will be ugly for e.g. the "error_error" above, but UI design is later or never)
-        if 'error' == emi[0]:
-            return show_this_non_targeted_error_to_user(emi)
-
-        # (for now) All other emissions, just write to terminal or /dev/null
-        write_info_lines_to_my_stderr_FOR_NOW(emi)
-
-    def handle_expression_about_field(emi):
-        sev, shape, _, WRONG_ATTR_KEY, cat, lineser = emi
-        dct = ui_msgs.specific
-        k = WRONG_ATTR_KEY
-        if not (lis := dct.get(k)):
-            dct[k] = (lis := [])
-        lis.append((cat, tuple(lineser())))
-
-    def show_this_non_targeted_error_to_user(emi):
-        for line in emi[-1]():
-            ui_msgs.general.append(line)
-
-    def write_info_lines_to_my_stderr_FOR_NOW(emi):
-        for line in emi[-1]():
-            w(line)
-
-    w = _line_writer_via_write_function(serr.write)
-    ui_msgs = _MOVING_UI_Messages()
-    custom_listener.did_error = False
-    return custom_listener, ui_msgs
+    return show_form(
+        out=sout, qualified_EID=qualified_EID, verb_stem=verb_stem,
+        form_action=form_action,
+        line_nester=_wrap_lines_commonly, label_for_CANCEL=_label_for_CANCEL,
+        formal_entity=fe, collection=coll, listener=listener)
 
 
 def _common_listener(serr):
@@ -515,7 +287,7 @@ def _common_listener(serr):
     return _listener_via_line_receiver(write_line)
 
 
-def _line_writer_via_write_function(w):
+def _line_writer_via_write_function(w):  # there is an at-writing copy-paste
     def write_line(line):
         w(line)
         if 0 == len(line) or '\n' != line[-1]:
@@ -735,57 +507,7 @@ def _buttons_for_capability(ent):
     yield 'Edit', ('button_url', f'/capability/{ent.EID}/edit/')
     yield 'Add Note', ('button_url', f'/capability/{ent.EID}/notes/add/')
 
-# --
-
-def _build_top_nav(links):
-    def render_top_nav(_, margin, indent):
-        return _html_lines_for_nav_links(links, margin, indent)
-    render_top_nav.component_label = None
-    return render_top_nav
-
-
-def _html_lines_for_nav_links(link_pairs, margin, indent):
-    for label, params in link_pairs:
-        for line in _html_lines_for_nav_link(label, params, margin, indent):
-            yield line
-
-
-def _html_lines_for_buttons(button_pairs, margin, indent):
-    for label, params in button_pairs:
-        for line in _html_lines_for_button(label, params, margin, indent):
-            yield line
-
-
-def _html_lines_for_nav_link(label, params, margin, indent):
-    if False:  # #todo keeping the below for reference for now (searchable)
-        from urllib.parse import urlencode
-        url_tail = ''.join(('?', urlencode(params)))
-    if 'nav_link_url' != params[0]:
-        raise RuntimeError(f"Where? {params[0]!r}")
-    url_tail, = params[1:]
-    assert '/' == url_tail[0]  # seems to be new in #history-C.5
-    use_label = _html_escape(label)  # this isn't giving &nbsp; to each space
-    yield f'{margin}<a href="{url_tail}">{use_label}</a>\n'
-
-
-def _html_lines_for_button(label, directive_sexp, margin, indent):
-    assert 'button_url' == directive_sexp[0]  # for now the only way.
-    url_tail, = directive_sexp[1:]
-    yield f'{margin}<form method="GET" action="{url_tail}">\n'
-    m2 = f"{margin}{indent}"
-    yield f'{m2}<input type="submit" value="{label}" />\n'
-    yield f'{margin}</form>\n'
-
-
-class _MOVING_UI_Messages:
-    # might either become named tuple or go back to before #history-C.4
-
-    def __init__(self):
-        self.general, self.specific = [], {}
-
-    def __iter__(self):
-        return iter((self.general, self.specific))
-
+# ==
 
 def _add_safely(dct, k, val):
     assert k not in dct
@@ -843,6 +565,7 @@ if '__main__' == __name__:
         exit(rc)
     stdout.write(f"(oops, expected int had {type(rc)} for returncode)\n")
 
+# #history-C.7 form processing and custom listeners are abstracted away
 # #history-C.6 a great exodous. no more command splay, no more help (for now)
 # #history-C.5 overhaul to parse it the new way with "send URL back"
 # #history-C.4 (as referenced)
