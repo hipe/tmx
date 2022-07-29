@@ -34,7 +34,7 @@ def _html_lines_for_nav_link(label, params, margin, indent):
     if 'nav_link_url' != params[0]:
         raise RuntimeError(f"Where? {params[0]!r}")
     url_tail, = params[1:]
-    assert '/' == url_tail[0]  # seems to be new in #history-C.5
+    assert '/' == url_tail[0]
     use_label = _html_escape(label)  # this isn't giving &nbsp; to each space
     yield f'{margin}<a href="{url_tail}">{use_label}</a>\n'
 

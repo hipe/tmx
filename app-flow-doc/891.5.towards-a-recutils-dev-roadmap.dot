@@ -15,7 +15,7 @@ DONE0050->HPB
 DONE0050[label="Neato"]
 EAEAA->DONE0050
 JOINNOTES->DONE0050
-ITERUSE[label="Iterate until\nthis feels actually\nusable"]
+ITERUSE[label="Iterate until\nthis feels actually\nusable" style=filled]
 CUSTOM->ITERUSE
 ITERUSE->ITERUSE
 JOIN->ITERUSE
@@ -34,7 +34,7 @@ RFIOK[label="Receive form input\nand show a successful\ncreate or update" style=
 CREATEOK->RFIOK
 VIEW->RFIOK
 RRI[label="Read the output of\nrecinf for use in\nderiving a formal entity" style=filled]
-JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough"]
+JOINNOTES[label="a webform for\nwriting notes,\nbarebones, just good enough" style=filled]
 ITERUSE->JOINNOTES
 JOIN[label="Learn about how recutils join\nworks for the purpose\nof notes" style=filled]
 VCS[label="timestamp (and author)\nderived from VCS woot"]

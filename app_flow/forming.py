@@ -14,59 +14,68 @@ def process_form(
         form_action,  # the string - a url path ("tail")
         line_nester,  # (when not redirect) output lines go thru this
         label_for_CANCEL,  # probably will broaden to a FORM_STYLESHEET
+        formal_entityer,  # (re-)create the formal entity if necessary (it's
+                          # not always necessary and there can be a build cost)
         collection,  # used to actually UPDATE or CREATE the entity
         listener  # must be the special one, with UI Messages structure
     ):
 
-    values = _EXPERIMENTAL_Common_Value_Derivations(form_action, label_for_CANCEL)
-    ui_msgs = listener.UI_messages  # ..
+    def main():
+        if is_CREATE_not_UPDATE():
+            attempt_CREATE()
+        else:
+            attempt_UPDATE()
 
-    if 'UPDATE' == verb_stem:
+        # If it failed, assume messages were written to ui_msgs and re-show form
+        if not state.roo:
+            return repopulate_form_with_UI_messages()
+
+        # Since it succeeded, redirect to the parent UI node
+        out.write(f"redirect {values.parent_UI_node_url()}\n")
+        return 0
+
+    def repopulate_form_with_UI_messages():
+        formal_entity = formal_entityer()
+        return _do_show_form(
+                out=out, form_args=form_args, derived_values=values,
+                form_action=form_action, line_nester=line_nester,
+                formal_entity=formal_entity,
+                collection=collection,listener=listener)
+
+    def attempt_UPDATE():
         typ, eid = qualified_EID
         assert 'updatee_EID' == typ
-
-        def param_direcs():
-            # Assume `strip` happened above. See [#867.I] about below semantics
-            for k, v in form_args.items():
-                if len(v):
-                    yield k, ('SET_ATTRIBUTE', v)
-                else:
-                    yield k, ('DELETE_ANY_EXISTING_ATTRIBUTE',)
-        param_direcs = {k: v for k, v in param_direcs()}
-
-        """Filter out these notices when the value is unchanged.
-        (If we were a CLI we would want the notice, but, the nature of
-        forms is such that the whole "comb" is submitted even if your
-        intention is only to change certain attributes)
-        """
-        def use_listener(*emi):
-            if ( 'about_field' == emi[2] and
-                 'attribute_is_already_this_value' == emi[4] ):
-               return
-            listener(*emi)
-
-        # (roo = result of operation)
+        use_listener = _modify_listener_for_UPDATE(listener)
+        param_direcs = {k: v for k, v in _build_param_direcs_for_UPDATE(form_args)}
         roo = collection.update_entity(eid, param_direcs, use_listener)
+        # (roo = result of operation)
+        state.roo = roo
 
-        if roo:
-            assert 'result_of_CREATE_or_UPDATE' == roo[0]
-            assert 'result_of_UPDATE' == roo[1]
+        # If something failed, stop now
+        if not roo:
+            return
+
+        assert 'result_of_CREATE_or_UPDATE' == roo[0]
+        assert 'result_of_UPDATE' == roo[1]
 
         # For now, high-level UI choice: for this one type of case,
         # turn a success into a failure (sort of):
-        if roo and 'UPDATE_was_no_op' == roo[2]:
+        if 'UPDATE_was_no_op' == roo[2]:
             ui_msgs.general.append(
                     "Everything was unchanged. No values need updating.")
-            roo = None
+            state.roo = None
+            return
 
-        if roo:
-            assert 'UPDATE_succeeded' == roo[2]
-            these_args = 'UPDATE', eid
-            # (disregarding ordered prepared direcs. not nec to make redirect)
-        else:
-            pass  # used to make nav links
-    else:
-        assert 'CREATE' == verb_stem
+        assert 'UPDATE_succeeded' == roo[2]
+        result_direcs, = roo[3:]
+        del result_direcs
+        # (This result is the "ordered, prepared direcs". It's interesting
+        # but we discard it because it's not useful or necessary as we are
+        # about to redirect and we don't do "flash".)
+
+        state.these_args = 'UPDATE', eid
+
+    def attempt_CREATE():
         # The incoming form args need these mutations to be CREATE params:
         #   - Add 'parent' (EID) (which was embedded in the url) #here7
 
@@ -75,30 +84,53 @@ def process_form(
         assert 'parent' not in form_args
         form_args['parent'] = eid
         roo = collection.create_entity(form_args, listener)
-        if roo:
-            assert 'result_of_CREATE_or_UPDATE' == roo[0]
-            assert 'result_of_CREATE' == roo[1]
-            assert 'CREATE_succeeded' == roo[2]
-            these_args = 'CREATE', roo[3]  # just realized this will need the new ID eventually
-        else:
+        state.roo = roo
+        if not roo:
             # (used to make nav links here)
             form_args.pop('parent')
             # (don't put this in hidden form arg in repop #here7)
+            return
+        assert 'result_of_CREATE_or_UPDATE' == roo[0]
+        assert 'result_of_CREATE' == roo[1]
+        assert 'CREATE_succeeded' == roo[2]
+        what, = roo[3:]
+        state.these_args = 'CREATE', what
+        # just realized this will need the new ID eventually
 
-    if not roo:
-        # If it failed, assume messages were written to ui_msgs and re-show form
+    def is_CREATE_not_UPDATE():
+        if 'CREATE' == verb_stem:
+            return True
+        assert 'UPDATE' == verb_stem
 
-        fe = collection.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
-        return _do_show_form(
-                out=out, form_args=form_args, derived_values=values,
-                form_action=form_action, line_nester=line_nester,
-                formal_entity=fe, collection=collection, listener=listener)
+    state = main  # #watch-the-world-burn
+    values = _EXPERIMENTAL_Common_Value_Derivations(form_action, label_for_CANCEL)
+    ui_msgs = listener.UI_messages  # ..
+    return main()
 
-    # An attempt is made to handle successes of *both* CREATE and UPDATE
-    # here in one place but..
 
-    out.write(f"redirect {values.parent_UI_node_url()}\n")
-    return 0
+def _modify_listener_for_UPDATE(listener):
+    """Filter out these notices that occurr when the value is unchanged.
+    (If we were a CLI we would want the notice, but, the nature of forms is
+    such that the whole "comb" is submitted even if your intention is only to
+    change certain attributes.)
+    """
+
+    def use_listener(*emi):
+        if ( 'about_field' == emi[2] and
+             'attribute_is_already_this_value' == emi[4] ):
+            return
+        listener(*emi)
+    return use_listener
+
+
+def _build_param_direcs_for_UPDATE(form_args):
+    """Assume `strip` happened above. See [#867.I] about below semantics."""
+
+    for k, s in form_args.items():
+        if len(s):
+            yield k, ('SET_ATTRIBUTE', s)
+        else:
+            yield k, ('DELETE_ANY_EXISTING_ATTRIBUTE',)
 
 
 def show_form(
@@ -129,7 +161,7 @@ def show_form(
         assert eid == me_go_away
     else:
         assert 'CREATE' == verb_stem
-        # (Before #history-C.5 parent EID was in hidden form field. now in url)
+        # (Before #abstraction parent EID was in hidden form field. now in url)
         typ, eid = qualified_EID
         del eid
         outgoing_form_values = {}  # _empty_dict
@@ -267,7 +299,12 @@ def memoized(func):  # #decorator
 
 
 class _UI_Messages:
-    # might either become named tuple or go back to before #history-C.4
+    """EXPERIMENTAL custom structure for UI messages
+    (which get displayed to user).
+
+    (Was once a plain tuple. Could become a named tuple or a dataclass.
+    Has more history in other file before #abstraction)
+    """
 
     def __init__(self):
         self.general, self.specific = [], {}
@@ -288,7 +325,6 @@ class _EXPERIMENTAL_Common_Value_Derivations:
         from app_flow.routing import \
             parent_UI_node_url_via_form_action_EXPERIMENTAL as func
         return func(self._form_action)
-        # (#here1:route-name:view_capability)
 
     def label_for_CANCEL(self):
         return self._label_for_CANCEL
@@ -314,5 +350,8 @@ def _filter_out_these(fattrs, these):
         yield attr
     if pool:
         xx(f'oops: {tuple(pool.keys())!r}')
+
+
+# :#here7: EID used to be hidden form var but now is embedded in url
 
 # #abstraction

@@ -44,7 +44,7 @@ def _fattrs_via(coll, listener):
             IDENTIFIER_FUNCTION=identifier_for_purpose,
             is_primary_key=store_FA.is_primary_key,
             null_is_OK=combined_NIO,
-            is_unique=False,  # improve at [#872.F]
+            is_unique=False,  # #open [#872.F]
             is_foreign_key_reference=store_FA.is_foreign_key_reference,
             referenced_table_name=store_FA.referenced_table_name,
             referenced_column_name=store_FA.referenced_column_name)

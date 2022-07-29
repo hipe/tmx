@@ -228,6 +228,9 @@ def _process_form(
     For CREATE *and* UPDATE wow!
     """
 
+    def formal_entityer():
+        return coll.EXPERIMENTAL_HYBRIDIZED_FORMAL_ENTITY_(listener)
+
     coll = _collz(recfile)[fent_name]
 
     from app_flow.forming import process_form, build_UI_wired_listener
@@ -238,6 +241,7 @@ def _process_form(
             out=sout, qualified_EID=qualified_EID, verb_stem=verb_stem,
             form_args=form_args, form_action=form_action,
             line_nester=_wrap_lines_commonly, label_for_CANCEL=_label_for_CANCEL,
+            formal_entityer=formal_entityer,
             collection=coll, listener=listener)
 
 
@@ -514,7 +518,6 @@ def _add_safely(dct, k, val):
     dct[k] = val
 
 
-# :#here7: EID used to be hidden form var but now is embedded in url #history-C.5
 # :#here6: rebuild the same url that was used in our invocation ick
 #   - Every one of these is also a #here1
 # :#here1: #wish [#872.C]: The dream of fully two-directional routes:

@@ -22,6 +22,13 @@ database-ish.
 woah boy.
 
 
+## Wishlist/Itches
+
++ for the "recutils" adaptation:
+  + integration with VCS (git) (moved off stack at #history-C.1)
+  + make mutations atomic using above (moved off stack at #history-C.1)
+
+
 
 
 ## (the identifier registry)
@@ -80,7 +87,7 @@ woah boy.
 |[#872.I]                   | #hole |
 |[#872.H]                   |       | type macros, generics, annotations & form generation
 |[#872.7]                   |       | purpose-sensitive name conventions
-|[#872.F]                   | #open | (on stack)
+|[#872.F]                   | #open | (Moved from stack to here #history-C.1) `is_unique` (see)
 |[#872.E]                   |       | recutils: the hybrid approach to abstract schema
 |[#872.D]                   |       | digraph of "UI workflow" of capserver
 |[#872.C]                   | #wish | the dream of fully 2-directional routes
@@ -149,4 +156,5 @@ woah boy.
 
 ## (document-meta)
 
+  - #history-C.1
   - #born.
