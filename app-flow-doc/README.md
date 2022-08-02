@@ -16,7 +16,7 @@
 
 # (the identifier registry)
 
-(Our range: [#890-#899))
+(Our range: [#890-#894])
 
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|

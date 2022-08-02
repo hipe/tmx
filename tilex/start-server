@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# at #birth, a fair amount of this (20-30%?) is copy-pasted from our
+# "apprentice file" which is the erstwhile same-named file in [cap-server].
+# The reason we aren't abstracting and re-using the same bash code from there
+# is mostly to avoid a dependency nightmare since these are, after all,
+# supposed to be simple, standalone startup scripts. But bear in mind we might
+# eventually DRY these two if the duplication starts to feel absurd
+
+redbean_version='2.0.4'
+redbean_build_stem='unsecure'
+redbean_exe_file="redbean-${redbean_build_stem}-${redbean_version}.com"
+tmpdir_entry='z'
+port=8080
+
+bash_source="${BASH_SOURCE[0]}"
+
+main() {
+    do_pathnames
+    >&2 echo "You don't have a choice of port number yet. it's hardwired to $port"
+    ensure_redbean_is_installed
+    exec_out_to_redbean
+}
+
+exec_out_to_redbean () {
+    local opts="-vv"  # increase verbosity
+    # opts+=" -VV" # increase SSL verbosity
+    opts+=" -z"  # print port
+    opts+=" -u"  # uniprocess
+    # opts+=" -k"  # disable ssl fetch verify
+    opts+=" -m"  # log messages
+    opts+=" -b"  # log message bodies
+    opts+=" -a"  # log resource usage
+    opts+=" -g"  # log handler latency
+
+    local do_this=("$redbean_exe_path" "$opts" -p "$port" -D "$doc_root")
+    # (see apprentice file which has more about the above including CAUTION)
+
+    echo "${do_this[*]}"
+    eval "${do_this[*]}"
+}
+
+ensure_redbean_is_installed() {
+    if [ -f "$redbean_exe_path" ]; then
+        return
+    fi
+    >&2 echo "redbean executable is not here: ${redbean_exe_path}"
+    >&2 echo ""
+    >&2 echo -n "See our 'apprentice file' for more on how to download it"
+
+    local this="${mono_repo_dir}/cap-server/start-serve"
+    if [ -f "$this" ]; then
+        >&2 echo ":\n    $this"
+        exit 3
+    fi
+    >&2 echo "\nApprentice file not found: $this"
+    exit 3
+}
+
+do_pathnames() {
+    # (copy-pasted at #birth from apprentice file)
+
+    local subproj_dir=$(cd "$(dirname "$bash_source")" &> /dev/null && pwd )
+    # (https://stackoverflow.com/questions/59895/how-can-i-get-the-source-directory-of-a-bash-script-from-within-the-script-itself)
+
+    local mono_repo_dir=$(dirname "$subproj_dir")
+    redbean_exe_path="$mono_repo_dir/$tmpdir_entry/$redbean_exe_file"
+    doc_root="$subproj_dir/public"
+}
+
+main
+
+# #birth

@@ -30,7 +30,13 @@ Imagine programmer's phrasebook
 Make flask-mount
 Make a [partial, probably] "cap-server" for flask, hand-written for learning
 Devlop a GUI for a "cap-server"-like documentation tree using a graph-editing lib
+Develop backend for write
+Develop backend for read (populate database with small collection of dummy data)
+Wire the demo to a mocked backend service for write (static response)
+Wire the demo you want with a static payload
+Get the demo that you want working (as-is)
+Learn `fetch` and hackishly wire a static payload (frontend and back)
+Get basic intro tutorial working of GoJS
 Write some kind of installer for the dependency (the library you chose)
-Try several out, finding "one" (or more) that's worth hacking down on
-Fine-tune our "criteria" (requirements) and write it in "tilex"
-dim-sum of different graph-editing things (GUI-less recfile-based "database")
+Youtube tutorials dim-sum lol
+Static fileserver (with redbean)

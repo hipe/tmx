@@ -1,0 +1,37 @@
+digraph g {
+label="\nfig 890.F) the future"
+node[shape=rect style=rounded]
+rankdir=BT;  /* from bottom to top (vertical) */
+item_final[label="Self-Actualization"]
+item_goal->item_final
+
+item_goal[label="The Dream of Tilex"]
+item_dream_part_frontend->item_goal
+item_dream_part_backend->item_goal
+
+item_dream_part_frontend[label="Dream Part: Frontend\n(JS for now)"]
+item_question_mark->item_dream_part_frontend
+
+item_dream_part_backend[label="Dream Part:\nBackend CRUD"]
+item_question_mark->item_dream_part_backend
+
+item_question_mark[label="??"]
+item_videos->item_question_mark
+
+item_videos[label="watch every video\nwhile taking reading notes"]
+item_crazy->item_videos  /* forward-declare #here1 to keep it out of group */
+
+item_crazy[label="wire up treemap\nto read from recfile\ndatabase"]
+item_proof_of_concept->item_crazy
+
+item_proof_of_concept[label="take out randomizer code\n(where you are now)"]
+item_demo->item_proof_of_concept
+
+item_demo[label="treemap demo as-is"]
+item_installer->item_demo
+
+item_installer[label="installer/server" style=filled]
+}
+/*
+# #born
+*/

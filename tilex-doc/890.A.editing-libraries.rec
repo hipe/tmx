@@ -1,0 +1,53 @@
+# remember: https://modeling-languages.com/javascript-drawing-libraries-diagrams
+
+ID: XXX7
+Moniker: GoJS
+FavoriteThingsAboutIt: everything? Really impressive list of demos.
+URL: https://gojs.net/latest/samples/basic.html
+ID: XXX6
+Moniker: JointJS
+DisqualifactionReason: seems too commercial
+
+ID: XXX5
+Moniker: react-digraph
+FavoriteThingsAboutIt: "digraph" focused, and a chance to play with React
+URL: https://github.com/uber/react-digraph
+
+ID: XXX4
+Moniker: Drawflow
+FavoriteThingsAboutIt: Works and active
+URL: https://github.com/jerosoler/Drawflow/
+
+ID: XXX3
+Moniker: X6
+DisqualifactionReason: Advanced documentation is all in Chinese
+FavoriteThingsAboutIt: Seems active up to the last few minutes
+Discussion: Chinese af but seems good
+URL: https://github.com/antvis/X6/blob/master/README.en-us.md
+
+ID: XXX2
+Moniker: rete.js
+DisqualificationReason: Seems like overkill, a whole programming thing
+FavoriteThingsAboutIt: The programming thing has novelty
+URL: https://github.com/retejs/rete
+
+ID: XXX1
+Moniker: mxGraph JavaScript
+OverallFiveStarRating: 4.75
+DisqualificationReason: see discussion
+Discussion:
++ The demos look like (in total) they have everything I want.
++ But ouch:
++ > Over time you can expect this codebase will break features against
++ > new browser releases, it's not advised to start new projects against
++ > this codebase for that reason.
++
++ (from their [README](read1))
++
++ (discoverd [BPMN Workflow](bpmn1))
++
++ [read1]: https://github.com/jgraph/mxgraph/
++ [bpmn1]: https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation
+URL: https://jgraph.github.io/mxgraph/javascript/index.html
+
+# #born

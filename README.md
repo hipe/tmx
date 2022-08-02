@@ -307,7 +307,8 @@ alias pi='py pho/cli/commands/issues.py'
 |Id                         | Main Tag | Content |
 |---------------------------|:-----:|-
 |[#900]-[#910]              |       | (anim)
-|[#890]-[#899]              |       | (app-flow & cap server)
+|[#895]-[#899]              |       | ([tilex])
+|[#890]-[#894]              |       | (app-flow & cap server)
 |[#880]-[#889]              |       | (pho)
 |[#851]-[#879]              |       | (kiss-rdb)
 |[#811]-[#850]              |       | (reserved for [#406] CMS app for now)

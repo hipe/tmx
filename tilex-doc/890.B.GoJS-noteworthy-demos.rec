@@ -1,0 +1,662 @@
+# - The objective of this collection is find the best demos for tilex project
+# - This format is for use with "recutils", e.g: recsel --count [this-file]
+# - The order of the entries corresponds to that of source website at #birth
+# - The "Identifier" is derived directly from the url of the demo (2 ways)
+# - source: https://gojs.net/latest/samples/
+
+Identifier: flowchart
+NotOfInterestReasons: overkill: many node types. neato
+
+Identifier: orgChartStatic
+NotOfInterestReasons: static
+
+Identifier: orgChartEditor
+OfInterestReasons: meets most of criteria. images are overkill
+OutOfFiveStars: 4.45
+
+Identifier: stateChart
+NotOfInterestReasons: overkill: named transitions.
++ missing features: node attributes
+TicklerComment: would be good for app-flow
+
+Identifier: basic
+OfInterestReasons: seems to have everything. Will get ungainly.
+OutOfFiveStars: 4.5
+
+Identifier: blockEditor
+NotOfInterestReasons: overkill: all the shape options
+
+Identifier: genogram
+NotOfInterestReasons: too domain-specific
+
+Identifier: entityRelationship
+NotOfInterestReasons: too static. missing features: create node
+
+Identifier: icons
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: This would be cool for the future
+
+Identifier: sankey
+NotOfInterestReasons: too domain-specific
+
+Identifier: PERT
+NotOfInterestReasons: is a domain-specific viz tool
++ missing features: create node
+TicklerComment: PERT is interesting
+
+Identifier: gantt
+NotOfInterestReasons: is a domain-specific viz tool
+
+Identifier: euler
+NotOfInterestReasons: missing features: is read-only
+TicklerComment: pretty
+
+Identifier: shapes
+NotOfInterestReasons: is a comprehensive capabilities demonstration
+
+Identifier: umlClass
+NotOfInterestReasons: missing features: create node
+
+Identifier: planogram
+NotOfInterestReasons: is a domain-specific viz tool
+
+Identifier: classHierarchy
+NotOfInterestReasons: missing features: create node
+OfInterestReasons: layout looks pretty relevant
+
+Identifier: DOMTree
+NotOfInterestReasons: missing features: create node
+OfInterestReasons: tree is not wide but is deep
+
+Identifier: visualTree
+NotOfInterestReasons:
+
+Identifier: familyTree
+NotOfInterestReasons: missing features: create node
+TicklerComment: has zoom-to-fit, center-on-root
+
+Identifier: familyTreeJP
+NotOfInterestReasons: (same as "familyTree")
+
+Identifier: orgChartExtras
+OfInterestReasons: expand/collapse is very cool. editable properties is excellent
+NotOfInterestReasons: (we don't need named links but that's okay)
+OutOfFiveStars: 4.75
+
+Identifier: orgChartAssistants
+NotOfInterestReasons: is a domain-specific viz tool
+
+Identifier: localView
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: very cool viz
+
+Identifier: decisionTree
+NotOfInterestReasons: a specific mechanic
+TicklerComment: very cool mechanic
+
+Identifier: incrementalTree
+NotOfInterestReasons: missing features: node attributes. will be hard to adapt
+OfInterestReasons: great viz
+OutOfFiveStars: 4.35
+
+Identifier: doubleTree
+NotOfInterestReasons: is a domain-specific viz
+
+Identifier: mindMap
+NotOfInterestReasons: (same as "doubleTree")
+
+Identifier: tournament
+NotOfInterestReasons: is a domain-specific viz tool
+
+Identifier: treeView
+OfInterestReasons: XX
+NotOfInterestReasons: XX
+OutOfFiveStars: 4.51
+
+Identifier: triStateCheckBoxTree
+OfInterestReasons: VERY close to what we had in "cap-server"
+NotOfInterestReasons: missing features: create node, node attributes
+OutOfFiveStars: 4.52
+
+Identifier: treeMapper
+NotOfInterestReasons: specific, irrelevant mechanic
+
+Identifier: parseTree
+NotOfInterestReasons: missing features: create node, node attributes
+OfInterestReasons: very cool viz
+TicklerComment: very cool
+OutOfFiveStars: 4.0
+
+Identifier: pipeTree
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: faultTree
+NotOfInterestReasons: is a domain-specific visualization
+TicklerComment: share with the boyz. see its comment about RCA and "Fishbone"
+
+Identifier: IVRtree
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: beatPaths
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: conceptMap
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: very cool viz
+
+Identifier: pathAnimation
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: very cool animation of flow
+
+Identifier: distances
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: very cool mechanic: finding distances
+
+Identifier: arrowheads
+NotOfInterestReasons: is a comprehensive capabilities demonstration
+
+Identifier: relationships
+NotOfInterestReasons: is a comprehensive capabilities demonstration
+
+Identifier: multiNodePathLinks
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: very cool visual dynamic: multi-node paths (with curves)
+
+Identifier: multiColorLinks
+NotOfInterestReasons: is an extraneous visual feature
+
+Identifier: taperedLinks
+NotOfInterestReasons: is an extraneous visual feature
+
+Identifier: multiArrow
+NotOfInterestReasons: is an extraneous visual feature
+
+Identifier: draggableLink
+NotOfInterestReasons: missing features: etc
+OfInterestReasons: we want this (but elminate this classification if etc)
+
+Identifier: linksToLinks
+NotOfInterestReasons: is an extraneous graphing feature
+
+Identifier: navigation
+NotOfInterestReasons: is an extraneous graphic feature
+
+Identifier: grouping
+NotOfInterestReasons: hm..
+TicklerComment: come back to this
+
+Identifier: regrouping
+NotOfInterestReasons: hm..
+TicklerComment: come back to this
+
+Identifier: roundedGroups
+NotOfInterestReasons: is a domain-specific graphing technique
+
+Identifier: kanban
+NotOfInterestReasons: is a domain-specific graphing technique
+
+Identifier: swimBands
+NotOfInterestReasons: is a domain-specific graphing technique
+
+Identifier: swimLanes
+NotOfInterestReasons: is a domain-specific graphing technique
+
+Identifier: swimLanesVertical
+NotOfInterestReasons: is a domain-specific graphing technique
+
+Identifier: visualTreeGrouping
+NotOfInterestReasons: is like that other one
+
+Identifier: sharedStates
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: gLayout
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: tLayout
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: revisit these tree options
+
+Identifier: fdLayout
+NotOfInterestReasons: missing features: create node, node attributes
+TicklerComment: revisit this force-directed viz. looks like skill tree.
+
+Identifier: ldLayout
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: cLayout
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: interactiveForce
+NotOfInterestReasons: missing features: etc
+TicklerComment: very cool
+
+Identifier: doubleCircle
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: friendWheel
+NotOfInterestReasons: is an extraneous graphing mechanic
+
+Identifier: radial
+NotOfInterestReasons: missing features: etc
+TicklerComment: very cool mechanic
+
+Identifier: radialPartition
+NotOfInterestReasons: missing features: etc
+TicklerComment: might be an interesting viz for the subject
+OutOfFiveStars: 3.5
+
+Identifier: pageFlow
+NotOfInterestReasons: missing features: etc
+TicklerComment: would be an interesting viz for app-flow
+
+Identifier: processFlow
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: productionProcess
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: productionEditor
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: systemDynamics
+NotOfInterestReasons: is a domain-specific visualization
+
+Identifier: sequentialFunction
+NotOfInterestReasons: is a domain-specific mechanic
+
+Identifier: grafcet
+NotOfInterestReasons: is a domain-specific tool
+TicklerComment: maybe share with the boyz
+
+Identifier: sequenceDiagram
+NotOfInterestReasons: is a domain-specific visualization tool
+
+Identifier: logicCircuit
+NotOfInterestReasons: is domain-specific
+
+Identifier: dataFlow
+NotOfInterestReasons: is domain-specific
+
+Identifier: dataFlowVertical
+NotOfInterestReasons: (see "dataFlow")
+
+Identifier: dynamicPorts
+NotOfInterestReasons: is an extraneous mechanic: ports
+
+Identifier: connectionBoxNode
+NotOfInterestReasons: is an extraneous mechanic: ports
+
+Identifier: selectablePorts
+NotOfInterestReasons:
+
+Identifier: barCharts
+NotOfInterestReasons:
+
+Identifier: pieCharts
+NotOfInterestReasons:
+
+Identifier: dynamicPieChart
+NotOfInterestReasons:
+
+Identifier: donutCharts
+NotOfInterestReasons:
+
+Identifier: candlestickCharts
+NotOfInterestReasons:
+
+Identifier: sparklineGraphs
+NotOfInterestReasons:
+
+Identifier: thermometer
+NotOfInterestReasons:
+
+Identifier: instrumentGauge
+NotOfInterestReasons:
+
+Identifier: controlGauges
+NotOfInterestReasons:
+
+Identifier: contentAlign
+NotOfInterestReasons:
+
+Identifier: htmlInteraction
+NotOfInterestReasons:
+
+Identifier: customTextEditingTool
+NotOfInterestReasons:
+
+Identifier: customContextMenu
+NotOfInterestReasons:
+
+Identifier: canvases
+NotOfInterestReasons:
+
+Identifier: dataVisualization
+NotOfInterestReasons:
+
+Identifier: customAnimations
+NotOfInterestReasons:
+
+Identifier: animatedFocus
+NotOfInterestReasons:
+
+Identifier: treeLoadAnimation
+NotOfInterestReasons:
+
+Identifier: leaflet
+NotOfInterestReasons:
+
+Identifier: seatingChart
+NotOfInterestReasons:
+
+Identifier: pipes
+NotOfInterestReasons:
+
+Identifier: adornmentButtons
+NotOfInterestReasons:
+
+Identifier: radialAdornment
+NotOfInterestReasons:
+
+Identifier: timeline
+NotOfInterestReasons:
+
+Identifier: ruleredDiagram
+NotOfInterestReasons:
+
+Identifier: shopFloorMonitor
+NotOfInterestReasons:
+
+Identifier: kittenMonitor
+NotOfInterestReasons:
+
+Identifier: spreadsheet
+NotOfInterestReasons:
+
+Identifier: records
+NotOfInterestReasons:
+
+Identifier: selectableFields
+NotOfInterestReasons:
+
+Identifier: addRemoveColumns
+NotOfInterestReasons:
+
+Identifier: updateDemo
+NotOfInterestReasons:
+
+Identifier: singlePage
+NotOfInterestReasons:
+
+Identifier: absolute
+NotOfInterestReasons:
+
+Identifier: magnifier
+NotOfInterestReasons:
+
+Identifier: comments
+NotOfInterestReasons:
+
+Identifier: wordcloud
+NotOfInterestReasons:
+
+Identifier: extensionsJSM/PackedHierarchy
+NotOfInterestReasons:
+
+Identifier: svgDataUrl
+NotOfInterestReasons:
+
+Identifier: tiger
+NotOfInterestReasons:
+
+Identifier: extensions/Arranging
+NotOfInterestReasons:
+
+Identifier: extensions/Fishbone
+NotOfInterestReasons:
+
+Identifier: extensions/Parallel
+NotOfInterestReasons:
+
+Identifier: extensions/Serpentine
+NotOfInterestReasons:
+
+Identifier: extensions/Spiral
+NotOfInterestReasons:
+
+Identifier: extensions/SwimLaneLayout
+NotOfInterestReasons:
+
+Identifier: extensions/TreeMap
+NotOfInterestReasons:
+
+Identifier: extensions/Table
+NotOfInterestReasons:
+
+Identifier: extensions/PackedLayout
+NotOfInterestReasons:
+
+Identifier: extensions/FlowPanelLayout
+NotOfInterestReasons:
+
+Identifier: extensions/RealtimeDragSelecting
+NotOfInterestReasons:
+
+Identifier: extensions/DragCreating
+NotOfInterestReasons:
+
+Identifier: extensions/DragZooming
+NotOfInterestReasons:
+
+Identifier: extensions/ResizeMultiple
+NotOfInterestReasons:
+
+Identifier: extensions/RotateMultiple
+NotOfInterestReasons:
+
+Identifier: extensions/SpotRotating
+NotOfInterestReasons:
+
+Identifier: extensions/Rescaling
+NotOfInterestReasons:
+
+Identifier: extensions/CurvedLinkReshaping
+NotOfInterestReasons:
+
+Identifier: extensions/OrthogonalLinkReshaping
+NotOfInterestReasons:
+
+Identifier: extensions/OverviewResizing
+NotOfInterestReasons:
+
+Identifier: extensions/SnapLinkReshaping
+NotOfInterestReasons:
+
+Identifier: extensions/GeometryReshaping
+NotOfInterestReasons:
+
+Identifier: extensions/SectorReshaping
+NotOfInterestReasons:
+
+Identifier: extensions/FreehandDrawing
+NotOfInterestReasons:
+
+Identifier: extensions/PolygonDrawing
+NotOfInterestReasons:
+
+Identifier: extensions/PolylineLinking
+NotOfInterestReasons:
+
+Identifier: extensions/LinkShifting
+NotOfInterestReasons:
+
+Identifier: extensions/LinkLabelDragging
+NotOfInterestReasons:
+
+Identifier: extensions/LinkLabelOnPathDragging
+NotOfInterestReasons:
+
+Identifier: extensions/NodeLabelDragging
+NotOfInterestReasons:
+
+Identifier: extensions/NonRealtimeDragging
+NotOfInterestReasons:
+
+Identifier: extensions/GuidedDragging
+NotOfInterestReasons:
+
+Identifier: extensions/PortShifting
+NotOfInterestReasons:
+
+Identifier: extensions/ColumnResizing
+NotOfInterestReasons:
+
+Identifier: extensions/DataInspector
+NotOfInterestReasons:
+
+Identifier: extensions/Checkboxes
+NotOfInterestReasons:
+
+Identifier: extensions/Hyperlinks
+NotOfInterestReasons:
+
+Identifier: extensions/TextEditor
+NotOfInterestReasons:
+
+Identifier: extensions/ScrollingTable
+NotOfInterestReasons:
+
+Identifier: twoHalves
+NotOfInterestReasons:
+
+Identifier: extensions/BalloonLinks
+NotOfInterestReasons:
+
+Identifier: extensions/ParallelRoute
+NotOfInterestReasons:
+
+Identifier: extensions/Dimensioning
+NotOfInterestReasons:
+
+Identifier: extensions/DrawCommandHandler
+NotOfInterestReasons:
+
+Identifier: extensions/LocalStorageCommandHandler
+NotOfInterestReasons:
+
+Identifier: extensions/GoCloudStorageManager
+NotOfInterestReasons:
+
+Identifier: extensions/Robot
+NotOfInterestReasons:
+
+Identifier: extensions/ZoomSlider
+NotOfInterestReasons:
+
+Identifier: extensions/minimalPDF
+NotOfInterestReasons:
+
+Identifier: projects/bpmn/BPMN
+NotOfInterestReasons:
+
+Identifier: projects/floorplannerTS/floorplannerTSSample
+NotOfInterestReasons:
+
+Identifier: minimal
+NotOfInterestReasons:
+
+Identifier: minimalBlob
+NotOfInterestReasons:
+
+Identifier: minimalSvg
+NotOfInterestReasons:
+
+Identifier: vue
+NotOfInterestReasons:
+
+Identifier: spacingZoom
+NotOfInterestReasons:
+
+Identifier: gestureBehavior
+NotOfInterestReasons:
+
+Identifier: pinchResizing
+NotOfInterestReasons:
+
+Identifier: hoverButtons
+NotOfInterestReasons:
+
+Identifier: scrollModes
+NotOfInterestReasons:
+
+Identifier: customExpandCollapse
+NotOfInterestReasons:
+
+Identifier: constantSize
+NotOfInterestReasons:
+
+Identifier: virtualized
+NotOfInterestReasons:
+
+Identifier: virtualizedTree
+NotOfInterestReasons:
+
+Identifier: virtualizedTreeLayout
+NotOfInterestReasons:
+
+Identifier: virtualizedForceLayout
+NotOfInterestReasons:
+
+Identifier: extensionsJSM/virtualizedPacked
+NotOfInterestReasons:
+
+Identifier: flowBuilder
+NotOfInterestReasons:
+
+Identifier: flowgrammer
+NotOfInterestReasons:
+
+Identifier: network
+NotOfInterestReasons:
+
+Identifier: stateChartIncremental
+NotOfInterestReasons:
+
+Identifier: regroupingTreeView
+NotOfInterestReasons:
+
+Identifier: dragOutFields
+NotOfInterestReasons:
+
+Identifier: dragDropFields
+NotOfInterestReasons:
+
+Identifier: twoDiagrams
+NotOfInterestReasons:
+
+Identifier: htmlDragDrop
+NotOfInterestReasons:
+
+Identifier: macros
+NotOfInterestReasons:
+
+Identifier: addToPalette
+NotOfInterestReasons:
+
+Identifier: dragUnoccupied
+NotOfInterestReasons:
+
+Identifier: htmlLightBoxContextMenu
+NotOfInterestReasons:
+
+Identifier: panelLayout
+NotOfInterestReasons:
+
+Identifier: gameOfLife
+NotOfInterestReasons:
+
+Identifier: belts
+NotOfInterestReasons:
+
+# #birth
