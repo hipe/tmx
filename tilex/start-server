@@ -7,7 +7,11 @@
 # supposed to be simple, standalone startup scripts. But bear in mind we might
 # eventually DRY these two if the duplication starts to feel absurd
 
-redbean_version='2.0.4'
+gojs_repo_url="https://github.com/NorthwoodsSoftware/GoJS.git"
+gojs_version="2.2.14"
+gojs_tag_name="v${gojs_version}"
+
+redbean_version='2.0.15'  # last upgrade #history-C.1
 redbean_build_stem='unsecure'
 redbean_exe_file="redbean-${redbean_build_stem}-${redbean_version}.com"
 tmpdir_entry='z'
@@ -19,6 +23,8 @@ main() {
     do_pathnames
     >&2 echo "You don't have a choice of port number yet. it's hardwired to $port"
     ensure_redbean_is_installed
+    ensure_git_checkout_of_gojs
+    ensure_gojs_vendor_assets
     exec_out_to_redbean
 }
 
@@ -39,6 +45,81 @@ exec_out_to_redbean () {
     echo "${do_this[*]}"
     eval "${do_this[*]}"
 }
+
+ensure_gojs_vendor_assets() {
+    local vendor_dir="${doc_root}/vendor"
+    if [ ! -d "$vendor_dir" ] ; then
+        >&2 echo "mkdir $vendor_dir"
+        mkdir $vendor_dir
+    fi
+    local version_dir="${vendor_dir}/gojs@${gojs_version}"
+    if [ ! -d "$version_dir" ] ; then
+        >&2 echo mkdir "$version_dir"
+        mkdir "$version_dir"
+    fi
+
+    local tail
+    for tail in \
+            release/go-debug.js \
+            extensions/TreeMapLayout.js \
+            ; do
+
+        local src="${gojs_working_copy}/${tail}"
+        local dest="${version_dir}/${tail}"
+        # If the destination file alread exists, skip
+        if [ -e "$dest" ] ; then
+            >&2 echo "exists: $dest"
+        else
+            # If the dest dirname not exists,
+            local dn=$(dirname "$dest")
+            if [ ! -d "$dn" ] ; then
+                # If the parent dir not exists, fail because too deep
+                local dn2=$(dirname "$dn")
+                if [ ! -d "$dn2" ] ; then
+                    >&2 echo "we are avoiding doing mkdir -p. but: $dn2"
+                    exit 3
+                fi
+                >&2 echo mkdir "$dn"
+                mkdir "$dn"
+            fi
+            >&2 echo cp "$src" "$dest"
+            cp "$src" "$dest"
+        fi
+    done
+}
+
+ensure_git_checkout_of_gojs() {
+    # Resolve semi-permanent tmpdir
+    if [ ! -d "$tmpdir" ] ; then
+        >&2 echo "tmpdir not found, can't procede: $tmpdir"
+        exit 3
+    fi
+
+    # Resolve repository checkout
+    local ec
+    if [ -e "$gojs_working_copy" ] ; then
+        >&2 echo "exists, won't git checkout again: $gojs_working_copy"
+    else
+        git clone "$gojs_repo_url"  "$gojs_working_copy"
+        ec="$?"
+        if [ 0 != "$ec" ] ; then
+            >&2 echo "something went wrong with git. Aborting. (exit code $ec)"
+            exit "$ec"
+        fi
+    fi
+
+    # Change to tag
+    pushd "$gojs_working_copy"
+    local wat=$(git describe --tags)
+    if [ "$wat" == "$gojs_tag_name" ] ; then
+        >&2 echo "(as expecteded, already on tag ${gojs_tag_name})"
+    else
+        >&2 echo "(checking out tag for target stable version: ${gojs_tag_name})"
+        git checkout tags/"$gojs_tag_name"
+    fi
+    popd
+}
+
 
 ensure_redbean_is_installed() {
     if [ -f "$redbean_exe_path" ]; then
@@ -63,11 +144,15 @@ do_pathnames() {
     local subproj_dir=$(cd "$(dirname "$bash_source")" &> /dev/null && pwd )
     # (https://stackoverflow.com/questions/59895/how-can-i-get-the-source-directory-of-a-bash-script-from-within-the-script-itself)
 
-    local mono_repo_dir=$(dirname "$subproj_dir")
-    redbean_exe_path="$mono_repo_dir/$tmpdir_entry/$redbean_exe_file"
     doc_root="$subproj_dir/public"
+
+    local mono_repo_dir=$(dirname "$subproj_dir")
+    tmpdir="$mono_repo_dir/$tmpdir_entry"
+    gojs_working_copy="$tmpdir/GoJS"
+    redbean_exe_path="$tmpdir/$redbean_exe_file"
 }
 
 main
 
+# #history-C.1: Add install vendor lib (via git checkout)
 # #birth

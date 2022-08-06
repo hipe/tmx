@@ -27,7 +27,7 @@ item_proof_of_concept->item_crazy
 item_proof_of_concept[label="take out randomizer code\n(where you are now)"]
 item_demo->item_proof_of_concept
 
-item_demo[label="treemap demo as-is"]
+item_demo[label="treemap demo as-is" style=filled]
 item_installer->item_demo
 
 item_installer[label="installer/server" style=filled]

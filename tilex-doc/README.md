@@ -59,6 +59,8 @@ For the complete scattered notes leading up to this, see notecard
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|
 |[#895]   | #exmp | This is an example issue
+|[#890.E] |       | (a file)
+|[#890.D] |       | (a file)
 |[#890.C] |       | (a file)
 |[#890.B] |       | (a file)
 |[#890.A] |       | (a file)

@@ -1,0 +1,14 @@
+# xx
+
+# GOOD: https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/TreeMap.html
+#  BAD: https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/treeMap.html
+# COMPARE_A: the file they say is the sample source
+# COMPARE B: the file thats on github
+# COMPARE C: the file that is actually getting served
+# xxxx xx xx xx . file B and C look the sma
+
+# 13:56 one mystery solved: the difference is line-endings (between B and C)
+
+
+
+# #born
