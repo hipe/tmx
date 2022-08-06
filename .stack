@@ -43,4 +43,3 @@ Whichever way you decided, wire up treemap to have your live data. Cry about lab
 Decide if we're gonna do php-like or ajax
 Take out randomizer code and add that totalling code with dummy data
 Commit exactly the changes you need to get it working (and ignore vendor, installer etc)
-Commit treemap demo starter code *exactly* as it for posterity
