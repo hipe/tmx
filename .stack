@@ -39,4 +39,8 @@ Learn `fetch` and hackishly wire a static payload (frontend and back)
 Get basic intro tutorial working of GoJS
 Write some kind of installer for the dependency (the library you chose)
 Youtube tutorials dim-sum lol
-Static fileserver (with redbean)
+Whichever way you decided, wire up treemap to have your live data. Cry about labels
+Decide if we're gonna do php-like or ajax
+Take out randomizer code and add that totalling code with dummy data
+Commit exactly the changes you need to get it working (and ignore vendor, installer etc)
+Commit treemap demo starter code *exactly* as it for posterity

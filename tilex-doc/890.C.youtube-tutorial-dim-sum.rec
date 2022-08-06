@@ -1,0 +1,104 @@
+# source: https://www.youtube.com/user/gojshtml5canvas
+# (redirected from https://www.nwoods.com/videos.html,
+# which is linked to from https://gojs.net/latest/learn/)
+
+VideoOrdinal: 1
+VideoTitle: GoJS in 12 Minutes: Javascript Diagramming
+Playlist: GoJS Beginners
+Duration: 12:01
+
+VideoOrdinal: 2
+VideoTitle: What's in a GoJS Javascript Application?
+Playlist: GoJS Beginners
+Duration: 8:03
+
+VideoOrdinal: 3
+VideoTitle: Building Parts: Parts and Panels
+Playlist: GoJS Beginners
+Duration: 16:02
+
+VideoOrdinal: 4
+VideoTitle: The GoJS Diagram Model
+Playlist: GoJS Beginners
+Duration: 12:10
+
+VideoOrdinal: 5
+VideoTitle: Building Parts: Templates
+Playlist: GoJS Beginners
+Duration: 15:48
+
+VideoOrdinal: 6
+VideoTitle: GoJS GraphicalObject Properties
+Playlist: GoJS Beginners
+Duration: 9:54
+
+VideoOrdinal: 7
+VideoTitle: Exploring a GoJS Application in Real-time
+Playlist: GoJS Beginners
+Duration: 11:01
+
+
+VideoOrdinal: 1
+VideoTitle: An Overview Tutorial
+Playlist: Layouts
+Duration: 6:12
+
+VideoOrdinal: 2
+VideoTitle: GridLayout
+Playlist: Layouts
+Duration: 8:46
+
+VideoOrdinal: 3
+VideoTitle: TreeLayout
+Playlist: Layouts
+Duration: 7:55
+
+VideoOrdinal: 4
+VideoTitle: ForceDirectedLayout
+Playlist: Layouts
+Duration: 5:15
+
+VideoOrdinal: 5
+VideoTitle: LayeredDigraphLayout
+Playlist: Layouts
+Duration: 5:46
+
+VideoOrdinal: 6
+VideoTitle: CircularLayout
+Playlist: Layouts
+Duration: 7:04
+
+
+VideoOrdinal: 1
+VideoTitle: TablePanel
+Playlist: Panels
+Duration: 6:23
+
+VideoOrdinal: 2
+VideoTitle: GridPanel
+Playlist: Panels
+Duration: 5:37
+
+VideoOrdinal: 3
+VideoTitle: GraduatedPanel
+Playlist: Panels
+Duration: 7:21
+
+
+VideoOrdinal: 1
+VideoTitle: Resizing, Rotating, Adornments
+Playlist: Tools
+Duration: 8:16
+
+VideoOrdinal: 2
+VideoTitle: Overview
+Playlist: Tools
+Duration: 5:53
+
+VideoOrdinal: 3
+VideoTitle: Relinking, Link Reshaping, Parts
+Playlist: Tools
+Duration: 7:51
+
+
+# #born
