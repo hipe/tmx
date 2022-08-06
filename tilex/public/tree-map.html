@@ -16,7 +16,6 @@
 
 <script id="code">
   function init() {
-    if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
     var $ = go.GraphObject.make;  // for conciseness in defining templates
 
     myDiagram =
@@ -103,83 +102,83 @@
   }
 
   function rebuildGraph() {
-    var minNodes = document.getElementById("minNodes").value;
-    minNodes = parseInt(minNodes, 10);
-
-    var maxNodes = document.getElementById("maxNodes").value;
-    maxNodes = parseInt(maxNodes, 10);
-
-    var minChil = document.getElementById("minChil").value;
-    minChil = parseInt(minChil, 10);
-
-    var maxChil = document.getElementById("maxChil").value;
-    maxChil = parseInt(maxChil, 10);
+    /* at #history-C.3 we took RNG code out from here */
 
     // create and assign a new model
     var model = new go.GraphLinksModel();
     model.nodeGroupKeyProperty = "parent";
-    model.nodeDataArray = generateNodeData(minNodes, maxNodes, minChil, maxChil);
+    model.nodeDataArray = generateNodeData();
     myDiagram.model = model;
   }
 
   // Creates a random number (between MIN and MAX) of randomly colored nodes.
-  function generateNodeData(minNodes, maxNodes, minChil, maxChil) {
+  function generateNodeData() {
     var nodeArray = [];
-    if (minNodes === undefined || isNaN(minNodes) || minNodes < 1) minNodes = 1;
-    if (maxNodes === undefined || isNaN(maxNodes) || maxNodes < minNodes) maxNodes = minNodes;
+    nodeArray.push({
+      key: 0,  /* BE CAREFUL */
+      isGroup: false,
+      parent: 4,
+      text: "text for item 1",
+      fill: go.Brush.randomColor(),
+      size: 333,
+    });
+    nodeArray.push({
+      key: 1,  /* BE CAREFUL */
+      isGroup: false,
+      parent: 4,
+      text: "text for item 2",
+      fill: go.Brush.randomColor(),
+      size: 666,
+    });
+    nodeArray.push({
+      key: 2,  /* BE CAREFUL */
+      isGroup: false,
+      parent: undefined,
+      text: "text for item 3",
+      fill: go.Brush.randomColor(),
+      size: 222,
+    });
+    nodeArray.push({
+      key: 3,  /* BE CAREFUL */
+      isGroup: false,
+      parent: undefined,
+      text: "text for item 4",
+      fill: go.Brush.randomColor(),
+      size: 20,
+    });
+    /* groups */
 
-    // Create a bunch of node data
-    var numNodes = Math.floor(Math.random() * (maxNodes - minNodes + 1)) + minNodes;
-    for (var i = 0; i < numNodes; i++) {
-      var size = Math.random() * Math.random() * 10000;  // non-uniform distribution
-      nodeArray.push({
-        key: i,  // the unique identifier
-        isGroup: false,  // many of these turn into groups, by code below
-        parent: undefined,  // is set by code below that assigns children
-        text: i.toString(),  // some text to be shown by the node template
-        fill: go.Brush.randomColor(),  // a color to be shown by the node template
-        size: size,
-        total: -1  // use a negative value to indicate that the total for the group has not been computed
-      });
-    }
+    nodeArray.push({
+      key: 4,  /* BE CAREFUL */
+      isGroup: true,
+      parent: undefined,
+      text: "Group A",
+      fill: go.Brush.randomColor(),
+    });
 
-    // Takes the random collection of node data and creates a random tree with them.
-    // Respects the minimum and maximum number of links from each node.
-    // The minimum can be disregarded if we run out of nodes to link to.
-    if (nodeArray.length > 1) {
-      if (minChil === undefined || isNaN(minChil) || minChil < 0) minChil = 0;
-      if (maxChil === undefined || isNaN(maxChil) || maxChil < minChil) maxChil = minChil;
-
-      // keep the Set of node data that do not yet have a parent
-      var available = new go.Set();
-      available.addAll(nodeArray);
-      for (var i = 0; i < nodeArray.length; i++) {
-        var parent = nodeArray[i];
-        available.remove(parent);
-
-        // assign some number of node data as children of this parent node data
-        var children = Math.floor(Math.random() * (maxChil - minChil + 1)) + minChil;
-        for (var j = 0; j < children; j++) {
-          var child = available.first();
-          if (child === null) break;  // oops, ran out already
-          available.remove(child);
-          // have the child node data refer to the parent node data by its key
-          child.parent = parent.key;
-          if (!parent.isGroup) {  // make sure PARENT is a group
-            parent.isGroup = true;
-          }
-          var par = parent;
-          while (par !== null) {
-            par.total += child.total;  // sum up sizes of all children
-            if (par.parent !== undefined) {
-              par = nodeArray[par.parent];
-            } else {
-              break;
-            }
-          }
-        }
+    // For every node that is a leaf node, set its total to its own size.
+    // Otherwise start its total to zero.
+    // (NOTE there is confusion here as to what role "size" plays in groups)
+    for (var i = nodeArray.length; i--;) {
+      var node = nodeArray[i];
+      if (node.isGroup) {
+        node.total = 0;
+      } else {
+        node.total = node.size;
       }
     }
+
+    // For every node, traverse upwards to its each next parent, adding
+    // to its total. Assume each parent (i.e. group) started with total 0
+    for (var i = nodeArray.length; i--;) {
+      var child = nodeArray[i]
+      while (child.parent !== undefined) {
+        var parent = nodeArray[child.parent];
+        parent.total += child.total;
+        child = parent;
+      }
+    }
+
     return nodeArray;
   }
   window.addEventListener('DOMContentLoaded', init);
@@ -189,10 +188,7 @@
   <div style="margin-bottom: 5px; padding: 5px; background-color: aliceblue">
     <span style="display: inline-block; vertical-align: top; padding: 5px">
       <b>New Tree</b><br>
-      MinNodes: <input type="number" id="minNodes" value="300" width="2"><br>
-      MaxNodes: <input type="number" id="maxNodes" value="500" width="2"><br>
-      MinChildren: <input type="number" id="minChil" value="2" width="2"><br>
-      MaxChildren: <input type="number" id="maxChil" value="5" width="2"><br>
+      <p style="font-style: italic">(At #history-C.2 we took RNG controls out)</p>
       <button type="button" onclick="rebuildGraph()">Generate Tree</button>
     </span>
   </div>
@@ -212,5 +208,6 @@
     <p><a href="https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/treeMap.html" target="_blank">View this sample page's source on GitHub</a></p></div>
   </body>
   </html>
+<!-- #history-C.2: took away RNG logic from sample code -->
 <!-- #history-C.1: sample code as-is but 2 lines changed to work locally -->
 <!-- #born: exactly as came from vendor (except for this line) -->

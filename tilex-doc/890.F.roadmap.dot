@@ -24,7 +24,7 @@ item_crazy->item_videos  /* forward-declare #here1 to keep it out of group */
 item_crazy[label="wire up treemap\nto read from recfile\ndatabase"]
 item_proof_of_concept->item_crazy
 
-item_proof_of_concept[label="take out randomizer code\n(where you are now)"]
+item_proof_of_concept[label="take out randomizer code" style=filled]
 item_demo->item_proof_of_concept
 
 item_demo[label="treemap demo as-is" style=filled]

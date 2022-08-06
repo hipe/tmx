@@ -21,7 +21,7 @@ bash_source="${BASH_SOURCE[0]}"
 
 main() {
     do_pathnames
-    >&2 echo "You don't have a choice of port number yet. it's hardwired to $port"
+    >&2 echo "Listening on port $port (which is hardwired for now)."
     ensure_redbean_is_installed
     ensure_git_checkout_of_gojs
     ensure_gojs_vendor_assets
@@ -117,7 +117,8 @@ ensure_git_checkout_of_gojs() {
         >&2 echo "(checking out tag for target stable version: ${gojs_tag_name})"
         git checkout tags/"$gojs_tag_name"
     fi
-    popd
+    popd > /dev/null
+    # (otherwise it echos the new pwd)
 }
 
 
