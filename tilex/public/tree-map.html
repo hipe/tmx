@@ -98,73 +98,58 @@
     }
 
     // generate a tree with the default values
-    rebuildGraph();
+    console.log("OHAI WE COMMENTED OUT AUTOMATIC TING");
+    // rebuildGraph();
   }
 
   function rebuildGraph() {
-    /* at #history-C.3 we took RNG code out from here */
+    /* at #history-C.3 we turned it into a backend request,
+          copy-pasted code from [#890.D.XXX1] */
+    /* at #history-C.2 we took RNG code out from here */
+    fetch("/API/hard-coded.json", {cache: "reload"})
+      .then((resp) => (resp.json()))
+      .then(rebuildGraphWithData);
+  }
+
+  function rebuildGraphWithData(resp) {
+    if ("ok" != resp.tilexResponseType) {
+      console.log("response not recognized. Aborting. see window.RESPONSE");
+      window.RESPONSE = resp;
+      return;
+    }
+    const nodeArray = resp.responsePayload;
+    mutateAndPrepareNodeDataArray(nodeArray);
 
     // create and assign a new model
     var model = new go.GraphLinksModel();
     model.nodeGroupKeyProperty = "parent";
-    model.nodeDataArray = generateNodeData();
+    model.nodeDataArray = nodeArray;
     myDiagram.model = model;
   }
 
-  // Creates a random number (between MIN and MAX) of randomly colored nodes.
-  function generateNodeData() {
-    var nodeArray = [];
-    nodeArray.push({
-      key: 0,  /* BE CAREFUL */
-      isGroup: false,
-      parent: 4,
-      text: "text for item 1",
-      fill: go.Brush.randomColor(),
-      size: 333,
-    });
-    nodeArray.push({
-      key: 1,  /* BE CAREFUL */
-      isGroup: false,
-      parent: 4,
-      text: "text for item 2",
-      fill: go.Brush.randomColor(),
-      size: 666,
-    });
-    nodeArray.push({
-      key: 2,  /* BE CAREFUL */
-      isGroup: false,
-      parent: undefined,
-      text: "text for item 3",
-      fill: go.Brush.randomColor(),
-      size: 222,
-    });
-    nodeArray.push({
-      key: 3,  /* BE CAREFUL */
-      isGroup: false,
-      parent: undefined,
-      text: "text for item 4",
-      fill: go.Brush.randomColor(),
-      size: 20,
-    });
-    /* groups */
-
-    nodeArray.push({
-      key: 4,  /* BE CAREFUL */
-      isGroup: true,
-      parent: undefined,
-      text: "Group A",
-      fill: go.Brush.randomColor(),
-    });
-
+  function mutateAndPrepareNodeDataArray(nodeArray) {
     // For every node that is a leaf node, set its total to its own size.
     // Otherwise start its total to zero.
     // (NOTE there is confusion here as to what role "size" plays in groups)
     for (var i = nodeArray.length; i--;) {
       var node = nodeArray[i];
+
+      // WE DON'T LOVE this
+      if (i != node.key) {
+        console.log("YIKES corrupt data; expected "+i+" had " +node.key);
+      }
+
       if (node.isGroup) {
         node.total = 0;
       } else {
         node.total = node.size;
+      }
+
+      // FOR NOW, do random color
+      if ("(random color)" == node.fill) {
+        node.fill = go.Brush.randomColor();
+      } else {
+        console.log("strange 'fill' value: " + node.fill);
       }
     }
 
@@ -178,8 +163,6 @@
         child = parent;
       }
     }
-
-    return nodeArray;
   }
   window.addEventListener('DOMContentLoaded', init);
 </script>
@@ -208,6 +191,7 @@
     <p><a href="https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/treeMap.html" target="_blank">View this sample page's source on GitHub</a></p></div>
   </body>
   </html>
+<!-- #history-C.3 (as referenced) -->
 <!-- #history-C.2: took away RNG logic from sample code -->
 <!-- #history-C.1: sample code as-is but 2 lines changed to work locally -->
 <!-- #born: exactly as came from vendor (except for this line) -->

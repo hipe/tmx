@@ -1,14 +1,10 @@
-# xx
+Identifier: XXX1
+ReadingNoteTitle: some notes about the "new" fetch method
+Body: We don't remember how we found out about it, except maybe we
++ googled  "ajax" (lol) and found it.
++
++ This worked as documented for us at #history-C.1
+URL: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
-# GOOD: https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/TreeMap.html
-#  BAD: https://github.com/NorthwoodsSoftware/GoJS/blob/master/extensions/treeMap.html
-# COMPARE_A: the file they say is the sample source
-# COMPARE B: the file thats on github
-# COMPARE C: the file that is actually getting served
-# xxxx xx xx xx . file B and C look the sma
-
-# 13:56 one mystery solved: the difference is line-endings (between B and C)
-
-
-
+# #history-C.1 retire some notes about a vendor samples issue
 # #born
