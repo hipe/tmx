@@ -106,7 +106,7 @@
     /* at #history-C.3 we turned it into a backend request,
           copy-pasted code from [#890.D.XXX1] */
     /* at #history-C.2 we took RNG code out from here */
-    fetch("/API/hard-coded.json", {cache: "reload"})
+    fetch("/API/youtubes-treemap.json", {cache: "reload"})
       .then((resp) => (resp.json()))
       .then(rebuildGraphWithData);
   }

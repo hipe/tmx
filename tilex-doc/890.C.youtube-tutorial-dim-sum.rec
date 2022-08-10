@@ -2,6 +2,8 @@
 # (redirected from https://www.nwoods.com/videos.html,
 # which is linked to from https://gojs.net/latest/learn/)
 
+%rec: YoutubeVideo
+
 VideoOrdinal: 1
 VideoTitle: GoJS in 12 Minutes: Javascript Diagramming
 Playlist: GoJS Beginners

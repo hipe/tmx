@@ -39,5 +39,4 @@ Learn `fetch` and hackishly wire a static payload (frontend and back)
 Get basic intro tutorial working of GoJS
 Write some kind of installer for the dependency (the library you chose)
 Youtube tutorials dim-sum lol
-Whichever way you decided, wire up treemap to have your live data. Cry about labels
-Make a backend "service" that returns static json payload
+Make colors change somehow based on completed-ness. Border?
