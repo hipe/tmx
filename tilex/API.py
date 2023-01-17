@@ -35,24 +35,32 @@ def _main(sout, argv):
     path_tail = _imagine_parsing_many_things_from_ARGV(argv)
 
     # Load the module for the endpoint
-    mod = _module_via_path_tail(path_tail)
+    mod, typ = _path_tail_splitext(path_tail)
 
-    endpoint_func = mod.WRITE_JSON__INTERFACE_IS_EXPLORATORY
+    if 'JSON' == typ:
+        func_name = 'WRITE_JSON__INTERFACE_IS_EXPLORATORY'
+    else:
+        assert 'LINES' == typ
+        func_name = 'WRITE_LINES__INTERFACE_IS_EXPLORATORY'
+
+    endpoint_func = getattr(mod, func_name)  # ..
 
     return endpoint_func(sout, _stop)
 
 
-def _module_via_path_tail(path_tail):
+def _path_tail_splitext(path_tail):
     assert len(path_tail)
     assert '/' != path_tail[0]  # just helpful sanity reminder
     from os.path import splitext
     slug, ext = splitext(path_tail)
-    assert '.json' == ext
+    assert ext in ('.json', '.lines')
+    typ = ext[1:].upper()
     use_stem = slug.replace('-', '_')
     pcs = 'tilex', '_endpoints', use_stem
     mod_name = '.'.join(pcs)
     from importlib import import_module
-    return import_module(mod_name)  # ..
+    mod = import_module(mod_name)  # ..
+    return mod, typ
 
 
 def _imagine_parsing_many_things_from_ARGV(argv):
@@ -64,9 +72,12 @@ def _imagine_parsing_many_things_from_ARGV(argv):
     scn.mandatory('API', '/')
     path_tail = scn.flush()
     literal = 'youtubes-treemap.json'
-    if path_tail != literal:
+    if path_tail == literal:
+        return path_tail
+    if 'front-page-thing.lines' == path_tail:
+        return path_tail
+    if True:
         _stop(f"expecting {literal!r} had {path_tail!r}")
-    return path_tail
 
 
 class _CustomStringScanner:

@@ -2,13 +2,27 @@
 <html>
 <body>
 
+<!-- BEGIN commenting out at #history-C.1
 <script src="bundles/d3.js"></script>
 <script>
 
 d3.select("body").append("h1").text("Hello, Rollup!");
 
 </script>
+END -->
+
+
+<script>
+  function init() {
+    fetch("/API/front-page-thing.lines", {cache: "reload"})
+      .then((resp) => resp.text())
+      .then((text) => console.log("here is text: "+text))
+  }
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+
 <script> /*
+# #history-C.1: was in the middle of something, idk what
 # #history-B.4: rollup hello world
 # #born
 */ </script>

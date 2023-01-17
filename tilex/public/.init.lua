@@ -32,7 +32,8 @@ function OnHttpRequest()
     return Route()  -- Do what you would do normally -- serve files
   end
 
-  assert('.json' == string.sub(path, -5))  -- :#here1
+  local ext = path:match("(%.[^.]+)$")
+  assert ('.json' == ext or '.lines' == ext)  -- :#here1
 
   local system_command_args = {"./tilex/API.py"}
   table.insert(system_command_args, _MyEscape('fparam:url=' .. path))
@@ -51,7 +52,9 @@ function OnHttpRequest()
     return
   end
 
-  SetHeader("Content-Type", "application/json")  -- because #here1
+  if '.json' == ext then
+    SetHeader("Content-Type", "application/json")  -- because #here1
+  end
 
   while line do
     Write(line)
@@ -91,4 +94,5 @@ function _FirstEntryOfPath(path)
   return string.sub(path, 2, to_here-1)
 end
 
+-- #history-C.1: was in the middle of something, idr what
 -- #birth
