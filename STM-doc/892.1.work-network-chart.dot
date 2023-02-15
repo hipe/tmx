@@ -1,0 +1,79 @@
+digraph g {
+label="fix 892.1) Flutter toy app work network chart (sketch)"
+
+/*
+Note: at writing, this graph exists "in parallel" as a hand-written
+table in our notebook, roughly following a PERT-chart structure.
+
+(We switched from analog to digital for this one part of it because we
+did not want to attempt this visualization by hand!)
+
+The node identifiers are allocated "by hand" pseudo-randomly. As such, the
+identifiers (and especially their relative "size") are meaningless. (We *did*
+step over some allocations that could be confusing, like "QA" and "UX".)
+
+The order of the nodes in this file corresponds to the order we wrote
+the nodes in our notebook, which was from the bottom of the page upwards
+in the order in which we thought of them.
+*/
+
+rankdir=LR
+_HX [label="milestone:\nOffline 'CRD'" shape=rect]
+_AA->_HX
+_7A->_HX
+_SN [label="Make this\ndigraph" style=filled]
+_4G->_SN
+_TU [label="Introduce Canvas"]
+_HX->_TU
+_4G [label="Write/design\nintial draft of this content" style=filled]
+_8K [label="Create, delete, list\nis live HML"]
+_WG->_8K
+_QD [label="Review\nFirebase API"]
+_WG [label="Introduce online\nmode: hard-coded"]
+_HX->_WG
+_QD->_WG
+_AA [label="Good name\n(cover)"]
+_QU->_AA
+_6G->_AA
+_KG [label="Duplicate name\n(cover)"]
+_6G->_KG
+_7X [label="Invalid/incomplete\nname (cover)"]
+_6G->_7X
+_LA [label="Cancel out\nof it (cover)"]
+_6G->_LA
+_6G [label="Click on 'add item'\npops-up new item\nscreen (cover)"]
+_YU->_6G
+_TA [label="Review cookbook\nfor modal"]
+_LH [label="Click 'delete'\nsay 'no' (cover)"]
+_TA->_LH
+_2N->_LH
+_7A [label="Click 'delete'\nsay 'yes' (cover)"]
+_QU->_7A
+_TA->_7A
+_2N->_7A
+_LU [label="Dismiss 'view item'\nscreen shows\nlist (cover)"]
+_2N->_LU
+_2N [label="Click on item\nopens 'view item'\nscreen (cover)"]
+_YU->_2N
+_UK [label="Delete one\nfrom sqlite (cover)"]
+_DR->_UK
+_QU [label="Make hard-coded list of 3\nbe from sqlite (cover)"]
+_DR->_QU
+_YU->_QU
+_DR [label="Create sqlite schema\non paper and in code"]
+_YU->_DR
+_GN [label="milestone: widget test\ncovering an interaction" shape=rect]
+_2N->_GN
+_YU [label="List-view of\nhard-coded\n3 items (cover)"]
+_AX->_YU
+_9B [label="milestone: eventually\nhave a sync-model:\ndown & up" shape=rect]
+_WG->_9B
+_AX [label="Barebones, do-nothing\nflutter app committed"]
+_QN->_AX
+_SN->_AX
+_QN [label="Research how to\nversion-control\na flutter app"]
+}
+
+/*
+# #born
+*/
