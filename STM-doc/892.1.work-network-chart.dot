@@ -68,10 +68,26 @@ _YU [label="List-view of\nhard-coded\n3 items (cover)"]
 _AX->_YU
 _9B [label="milestone: eventually\nhave a sync-model:\ndown & up" shape=rect]
 _WG->_9B
-_AX [label="Barebones, do-nothing\nflutter app committed"]
-_QN->_AX
-_SN->_AX
-_QN [label="Research how to\nversion-control\na flutter app"]
+_AX [label="Barebones, do-nothing\nflutter app committed" style=filled]
+_BR->_AX
+_BR [label="Do the\ncodelab!"]
+
+/* begin mishmash */
+
+_SG [label="chrome debug\nservice"]
+_CX [label="vim dart\nplugin"]
+_3G [label="VS Code\n(one day maybe)"]
+_01 [label="(in some\norder)" style=filled]
+_01->_3G
+_01->_BR
+_01->_CX
+_01->_SG
+
+/* end */
+
+_QN->_01
+_SN->_01
+_QN [label="Research how to\nversion-control\na flutter app" style=filled]
 }
 
 /*

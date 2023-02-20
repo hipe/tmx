@@ -1,0 +1,201 @@
+#!/usr/bin/env -S python3 -W error::::
+
+
+def _description_lines(prog_name):
+    yield "The `flutter create` command generates many hundreds\n"
+    yield "of files. (148 files at time of writing. (21 more files\n"
+    yield "than it reports?))\n"
+    yield "\n"
+    yield "To start, we only want to version the minimum set of files\n"
+    yield "that we need to .. start.\n"
+    yield "\n"
+    yield "We made this one-off script as an easily-reproduced and rigid\n"
+    yield "\"proof\" of files (and directories) we versioned and (just as\n"
+    yield "importantly) which we did _not_ version to start this project.\n"
+    yield "\n"
+    yield "The practical utility of this over-engineered one-off is threefold:\n"
+    yield "(one) it helps us get started today; (two) we can reproduce it for\n"
+    yield "our next project tomorrow; and (three) it can be used in the\n"
+    yield "distant future to direct our attention to structural changes as\n"
+    yield "reflected in the filetree the generator produces.\n"
+    yield "\n"
+    yield "Here's how we actually used this script (partially):\n"
+    yield ("    find STM-source -maxdepth 1 -mindepth 1 | "
+           f"{prog_name} 1>source_me\n")
+
+
+def _entries():
+    # Sort criteria: Ignore any leading dot. Digits before alpha. Ignoring
+    # case, "group by" letter but within the group, lower then upper.
+    #
+    # The initial constituency here was generated with:
+    #
+    #     $ ls -1Fa STM-source | xsel -ib
+    #
+    # In the (at writing) README for the frontier toy app, we reference sources
+
+    yield 'analysis_options.yaml', _DO_NOT_VERSION_PER_ME
+    yield 'android/', _DO_NOT_VERSION_PER_ME
+    yield 'build/', _DO_NOT_VERSION_PER_DOCS
+    yield '.dart_tool/', _DO_NOT_VERSION_PER_DOCS
+    yield '.gitignore', _YES_VERSION_PER_ME
+    yield '.idea/', _DO_NOT_VERSION_PER_DOCS
+    yield 'ios/', _DO_NOT_VERSION_PER_ME
+    yield 'lib/', _YES_VERSION_PER_ME
+    yield 'linux/', _YES_VERSION_PER_ME
+    yield 'macos/', _DO_NOT_VERSION_PER_ME
+    yield '.metadata', _DO_NOT_VERSION_PER_ME
+    yield 'pubspec.lock', _YES_VERSION_PER_DOCS
+    yield 'pubspec.yaml', _YES_VERSION_PER_ME
+    yield 'README.md', _YES_VERSION_PER_ME
+    yield 'stm.iml', _DO_NOT_VERSION_PER_ME  # generated name
+    yield 'test/', _YES_VERSION_PER_ME
+    yield 'web/', _DO_NOT_VERSION_PER_ME
+    yield 'windows/', _DO_NOT_VERSION_PER_ME
+
+
+_DO_NOT_VERSION_PER_DOCS = False, "Do not version (per docs)"
+_DO_NOT_VERSION_PER_ME = False, "Do not version (per us)"
+_YES_VERSION_PER_DOCS = True, "Version (per docs)"
+_YES_VERSION_PER_ME = True, "Version (per us)"
+
+
+# ==
+
+def _CLI_for_production(sin, sout, serr, argv):
+    if (1 < len(argv)):
+        import re
+        if (re.match('^--?h(?:e(?:lp?)?)?$', argv[1])):
+            for line in _usage_lines():
+                serr.write(line)
+            serr.write('\n')
+            lines = _description_lines(argv[0])
+            first_line = next(lines)
+            serr.write(f"description: {first_line}")
+            for line in lines:
+                if 1 == len(line):
+                    serr.write(line)
+                    continue
+                serr.write(f"    {line}")
+            return 0
+        serr.write(f"unexpected argument {argv[1]!r}\n")
+        return _express_usage(serr)
+    if (sin.isatty()):
+        serr.write("for now, pipe from STDIN\n")
+        return _express_usage(serr)
+
+    def input_line_provider():
+        for line in sin:
+            assert '\n' == line[-1]
+            entry = line[:-1]
+            yield entry
+
+    _go_do_thing(sout, serr, input_line_provider(), _entries)
+    serr.write("SUCCESS!.\n")
+    return 0
+
+
+def _express_usage(serr):
+    for line in _usage_lines():
+        serr.write(line)
+    return 3
+
+
+def _usage_lines():
+    yield "usage: <some-process> | <this-script>\n"
+
+
+# ==
+
+def _go_do_thing(sout, serr, input_strings, model_definition_func):
+    pool = {k: v for k, v in _pool_parts_via(model_definition_func())}
+    seen_dirname = None
+    seen_entry = set()
+
+    from os import sep as os_sep
+    from os.path import dirname, basename, join as os_path_join
+
+    is_first = True
+
+    for input_string in input_strings:
+
+        # Allow "qualified" paths but use only the basename for this logic
+        if os_sep in input_string:
+            use_dirname = dirname(input_string)
+            use_basename = basename(input_string)
+        else:
+            use_dirname = None
+            use_basename = input_string
+
+        # Annoyingly, be sure that dirnames are all or nothing and same
+        if is_first:
+            is_first = False
+            model_dirname = use_dirname
+        elif model_dirname != use_dirname:
+            # all possible: (None, str), (str, None), (str, str)
+            raise RuntimeError(f"dirname mismatch: {model_dirname!r} then"
+                               f" {use_dirname!r}")
+
+        # Be sure the input stream doesn't repeat a basename (it might)
+        if use_basename in seen_entry:
+            raise RuntimeError(f"cover me: collision on entry {use_basename!r}")
+        seen_entry.add(use_basename)
+
+        # Handle strange entry
+        item_model = pool.pop(use_basename, None)
+        if item_model is None:
+            serr.write(f"unrec: {use_basename!r}\n")
+            continue
+
+        # Do main
+        do_version = item_model.do_version
+        msg = item_model.message
+
+        if do_version:
+            dest_head = 'VERSION_THIS_DIRECTORY'
+        else:
+            dest_head = 'DISCARD_THIS_DIRECTORY'
+
+        dest_path = os_path_join(dest_head, use_basename)
+        sout.write(f"mv {input_string} {dest_path}\n")
+        serr.write(f"({msg})\n")
+
+    if len(pool):
+        for k, v in pool.items():
+            serr.write(f"not found: {k!r}\n")
+        return 3
+    return 0
+
+
+def _pool_parts_via(defns):
+    for k, rhs in defns:
+        is_dir = False
+        if '/' == k[-1]:
+            is_dir = True
+            k = k[:-1]
+
+        tf, msg = rhs  # ..
+        assert isinstance(tf, bool)
+        assert isinstance(msg, str)
+
+        ed = _EntryDefinition(k, tf, msg, is_dir=is_dir)
+        yield k, ed
+
+
+class _EntryDefinition:
+
+    def __init__(self, entry, tf, msg, is_dir=False):
+        self.entry = entry
+        self.do_version = tf
+        self.message = msg
+        self.is_dir = is_dir
+
+    def to_string(self):
+        return self.RHS
+
+
+if '__main__' == __name__:
+    from sys import stdin, stdout, stderr, argv
+    exit(_CLI_for_production(stdin, stdout, stderr, argv))
+
+# #born
