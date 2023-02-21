@@ -32,6 +32,13 @@ We are following [this codelab][cl1].
 
 
 
+## We upgraded flutter when it told us a version was available
+
+```bash
+$ flutter upgrade
+```
+
+
 ## beginnings: .. the beginnings.
 
 Googled "flutter what to commit" got [dart what not to commit][g01].
