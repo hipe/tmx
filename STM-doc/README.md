@@ -26,6 +26,10 @@ into "app flow".
 $ cd STM ; flutter run -d linux
 ```
 
+## We are following this codelab
+
+We are following [this codelab][cl1].
+
 
 
 ## beginnings: .. the beginnings.
@@ -47,7 +51,9 @@ commit as this writing.
 |[#892.1] |       | Digraph of things from notebook
 
 
+
 [g01]: https://dart.dev/guides/libraries/private-files
+[cl1]: https://codelabs.developers.google.com/codelabs/flutter-codelab-first
 
 
 

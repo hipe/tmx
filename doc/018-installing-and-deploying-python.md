@@ -262,7 +262,7 @@ own sections next.
 
 ## `vim` plugin: `coc.nvim`
 
-To get autocomplete, we chose this plugin as a workaround for whataver plugin
+To get autocomplete, we chose this plugin as a workaround for whatever plugin
 we used to use (we don't remember). This one requires node:
 
 ```bash
