@@ -2,8 +2,8 @@
 
 
 def _description_lines(prog_name):
-    yield "The `flutter create` command generates many hundreds\n"
-    yield "of files. (148 files at time of writing. (21 more files\n"
+    yield "The `flutter create` command creates 100+ files.\n"
+    yield "(148 files at time of writing. (21 more files\n"
     yield "than it reports?))\n"
     yield "\n"
     yield "To start, we only want to version the minimum set of files\n"
