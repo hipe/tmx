@@ -51,6 +51,44 @@ class MyAppState extends ChangeNotifier {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],  // destinations
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),  // NavigationRail
+          ),  // SafeArea
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),  // Container
+          ),  // Expanded
+        ],  // Children
+      ),  // Row
+    );
+  }
+}
+
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
@@ -61,40 +99,39 @@ class MyHomePage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('A random idea?'),
-            BigCard(pair: pair),
-            SizedBox(height: 10),  // create space between
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    print('LIKE pressed');
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: Text('Like'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    print('NEXT pressed');
-                    appState.getNext();
-                  },
-                  child: Text('Next'),
-                ),
-              ],  // End of children
-            ),  // Row
-          ],
-        ),  // Column
-      ),  // Body
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('A random idea?'),
+          BigCard(pair: pair),
+          SizedBox(height: 10),  // create space between
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  print('LIKE pressed');
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  print('NEXT pressed');
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],  // End of children
+          ),  // Row
+        ],
+      ),  // Column
     );
   }
 }
+
 
 class BigCard extends StatelessWidget {
   const BigCard({
