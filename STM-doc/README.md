@@ -18,13 +18,24 @@ into "app flow".
 
 
 
-# Development Notes
+# Development Quick Reference
 
-## Reminder of how to run the app
+## Running the app
 
 ```bash
 $ cd STM ; flutter run -d linux
 ```
+
+
+## Run the tests (example for one test)
+
+(from the app directory)
+
+```bash
+flutter test test/replication_test.dart --name '^TEST TWO'
+```
+
+
 
 ## We are following this codelab
 
