@@ -36,6 +36,26 @@ flutter test test/replication_test.dart --name '^TEST TWO'
 ```
 
 
+# Development Log (most recent at top)
+
+This section is to keep a record "for posterity" of how we arrived at various
+xx
+
+The contents herein won't generally  xx (and at some point xx)
+
+
+## `sqflite` on linux
+
+Only once we sat down to follow the cookbook we discovered that sqlite
+isn't available on linux desktop out of the box.
+
+1. We googled "sqflite linux" (sic)
+1. found [this][gh1]
+
+Our unit test awkwardly creates a database file with the schema the code
+defines, which we consider as "passing" at writing.
+
+
 
 ## We are following this codelab
 
@@ -70,6 +90,7 @@ commit as this writing.
 
 
 
+[gh1]: https://github.com/tekartik/sqflite/blob/master/sqflite_common_ffi/doc/using_ffi_instead_of_sqflite.md#initialization
 [g01]: https://dart.dev/guides/libraries/private-files
 [cl1]: https://codelabs.developers.google.com/codelabs/flutter-codelab-first
 

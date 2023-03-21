@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'dart:io' show Platform;
 
 
 class ThingDing {
@@ -8,9 +10,17 @@ class ThingDing {
 
   Future<void> tryThis() async {
     print('yes beginning');
-    WidgetsFlutterBinding.ensureInitialized();
-    final database = openDatabase(
-      join(await getDatabasesPath(), 'some_derta_berse.db'),
+    if (Platform.isWindows || Platform.isLinux) {
+      sqfliteFfiInit();
+    } else {
+      WidgetsFlutterBinding.ensureInitialized();
+    }
+    databaseFactory = databaseFactoryFfi;
+    String xx = await getDatabasesPath();
+    print("thing: " + xx);
+
+    final database = await openDatabase(
+      join(xx, 'some_derta_berse.db'),
       onCreate: (db, version) {
         return db.execute(
           'CREATE TABLE erase_me(id INTEGER PRIMARY KEY, name TEXT)',
@@ -18,7 +28,7 @@ class ThingDing {
       },
       version: 1,  // makes the onCreate get called
     );
-    print('hello did it work?');
+    print('hello did it work?: ' + database.path);
   }
 
   void increment() => value++;
@@ -28,5 +38,6 @@ class ThingDing {
 }
 
 /*
+# #history-A.1: connect to database
 # #born
 */
