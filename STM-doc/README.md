@@ -85,6 +85,7 @@ commit as this writing.
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|
 |[#895]   | #exmp | This is an example issue
+|[#892.D] | #open | You don't know how to require not at the top of the file
 |[#892.3] |       | Replication notes
 |[#892.2] |       | Flutter from scratch
 |[#892.1] |       | Digraph of things from notebook

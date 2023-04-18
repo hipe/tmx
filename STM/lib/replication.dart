@@ -5,10 +5,14 @@ import 'package:path/path.dart';
 import 'dart:io' show Platform;
 
 
-class ThingDing {
+class VariousThingsTester {
   int value = 0;
 
-  Future<void> tryThis() async {
+  Future<void> canYouImportHere() async {
+
+  }
+
+  Future<void> createSchema() async {
     print('yes beginning');
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
