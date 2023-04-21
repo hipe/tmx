@@ -1,3 +1,5 @@
+import 'database.dart';
+import 'model.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,8 +10,13 @@ import 'dart:io' show Platform;
 class VariousThingsTester {
   int value = 0;
 
-  Future<void> canYouImportHere() async {
+  Future<void> imagineDoingThis() async {
 
+    final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+
+    final personDao = database.personDao;
+    final List<Person> peeps = await personDao.findAllPersons();
+    print('wow we got some kind of result: ' + peeps.length.toString());
   }
 
   Future<void> createSchema() async {

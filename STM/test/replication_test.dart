@@ -4,10 +4,11 @@ import 'package:stm/model.dart';  /* #open [#892.D] we don't know how to .. */
 
 void main() {
 
-  test('TEST THREE', () {
-    final ting = FooZizzle();
-    final number = ting.canYouCallThis();
-    print('ok great job here is number: ' + number.toString());
+  test('TEST THREE - fah fah', () async {
+    print('hallo starting test THREE');
+    final ting = VariousThingsTester();
+    await ting.imagineDoingThis();
+    print('Great job! There is a god.');
   });
 
   test('TEST TWO', () async {
