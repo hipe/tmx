@@ -14,9 +14,9 @@ class VariousThingsTester {
 
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
 
-    final personDao = database.personDao;
-    final List<Person> peeps = await personDao.findAllPersons();
-    print('wow we got some kind of result: ' + peeps.length.toString());
+    final like_DAO = database.likeDao;
+    final List<Like> ents = await like_DAO.findAllLikes();
+    print('wow we got some kind of result: ' + ents.length.toString());
   }
 
   Future<void> createSchema() async {

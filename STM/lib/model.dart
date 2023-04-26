@@ -1,34 +1,30 @@
 import 'package:floor/floor.dart';
 
-class FooZizzle {
-  int canYouCallThis() {
-    return 1234;
-  }
-}
-
-
 /* For now we'll put the DAO right above the entity class but let's not
 assume that's a hard & fast rule */
 
 @dao
-abstract class PersonDao {  /* #open [#XXX] change this casing */
+abstract class LikeDao {
 
-  @Query('SELECT * FROM Person')  /* #open [#XXX] change this casing */
-  Future<List<Person>> findAllPersons();
+  @Query('SELECT * FROM Like')  /* #open [#XXX] change this casing */
+  Future<List<Like>> findAllLikes();
 
 }
 
 
 @entity
-class Person {
+class Like {
   @primaryKey
   final int id;
 
-  final String name;
+  final String word1;
+  final String word2;
 
-  Person(this.id, this.name);
+  Like(this.id, this.word1, this.word2);
 }
 
 /*
+
+# #history-A.1: begin introduce model for example
 # #born
 */

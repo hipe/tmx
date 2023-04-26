@@ -6,9 +6,9 @@ import 'model.dart';
 
 part 'database.g.dart';  // generated code
 
-@Database(version: 1, entities: [Person])
+@Database(version: 1, entities: [Like])
 abstract class AppDatabase extends FloorDatabase {
-  PersonDao get personDao;
+  LikeDao get likeDao;
 }
 
 /*

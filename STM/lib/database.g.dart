@@ -61,7 +61,7 @@ class _$AppDatabase extends AppDatabase {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  PersonDao? _personDaoInstance;
+  LikeDao? _likeDaoInstance;
 
   Future<sqflite.Database> open(
     String path,
@@ -85,7 +85,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Like` (`id` INTEGER NOT NULL, `word1` TEXT NOT NULL, `word2` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -94,13 +94,13 @@ class _$AppDatabase extends AppDatabase {
   }
 
   @override
-  PersonDao get personDao {
-    return _personDaoInstance ??= _$PersonDao(database, changeListener);
+  LikeDao get likeDao {
+    return _likeDaoInstance ??= _$LikeDao(database, changeListener);
   }
 }
 
-class _$PersonDao extends PersonDao {
-  _$PersonDao(
+class _$LikeDao extends LikeDao {
+  _$LikeDao(
     this.database,
     this.changeListener,
   ) : _queryAdapter = QueryAdapter(database);
@@ -112,9 +112,9 @@ class _$PersonDao extends PersonDao {
   final QueryAdapter _queryAdapter;
 
   @override
-  Future<List<Person>> findAllPersons() async {
-    return _queryAdapter.queryList('SELECT * FROM Person',
-        mapper: (Map<String, Object?> row) =>
-            Person(row['id'] as int, row['name'] as String));
+  Future<List<Like>> findAllLikes() async {
+    return _queryAdapter.queryList('SELECT * FROM Like',
+        mapper: (Map<String, Object?> row) => Like(
+            row['id'] as int, row['word1'] as String, row['word2'] as String));
   }
 }
