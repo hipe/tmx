@@ -8,7 +8,7 @@ part 'database.g.dart';  // generated code
 
 @Database(version: 1, entities: [Like])
 abstract class AppDatabase extends FloorDatabase {
-  LikeDao get likeDao;
+  LikeDAO get likeDAO;
 }
 
 /*

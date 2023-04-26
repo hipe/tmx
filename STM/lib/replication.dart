@@ -14,8 +14,8 @@ class VariousThingsTester {
 
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
 
-    final like_DAO = database.likeDao;
-    final List<Like> ents = await like_DAO.findAllLikes();
+    final likeDAO = database.likeDAO;
+    final List<Like> ents = await likeDAO.findAllLikes();
     print('wow we got some kind of result: ' + ents.length.toString());
   }
 

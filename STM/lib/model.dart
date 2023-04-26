@@ -4,7 +4,7 @@ import 'package:floor/floor.dart';
 assume that's a hard & fast rule */
 
 @dao
-abstract class LikeDao {
+abstract class LikeDAO {
 
   @Query('SELECT * FROM Like')  /* #open [#XXX] change this casing */
   Future<List<Like>> findAllLikes();

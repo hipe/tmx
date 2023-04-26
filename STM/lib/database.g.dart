@@ -61,7 +61,7 @@ class _$AppDatabase extends AppDatabase {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  LikeDao? _likeDaoInstance;
+  LikeDAO? _likeDAOInstance;
 
   Future<sqflite.Database> open(
     String path,
@@ -94,13 +94,13 @@ class _$AppDatabase extends AppDatabase {
   }
 
   @override
-  LikeDao get likeDao {
-    return _likeDaoInstance ??= _$LikeDao(database, changeListener);
+  LikeDAO get likeDAO {
+    return _likeDAOInstance ??= _$LikeDAO(database, changeListener);
   }
 }
 
-class _$LikeDao extends LikeDao {
-  _$LikeDao(
+class _$LikeDAO extends LikeDAO {
+  _$LikeDAO(
     this.database,
     this.changeListener,
   ) : _queryAdapter = QueryAdapter(database);

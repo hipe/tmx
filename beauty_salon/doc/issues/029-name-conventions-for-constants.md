@@ -7,7 +7,7 @@
 we use these conventions not because they are pretty (they are not) but
 because they pack a lot of self-documentation into a small space.
 
-a const's style exhibits both is "scope" and the kind of object it references.
+a const's style exhibits both its "scope" and the kind of object it references.
 
 (when we say "node", we typically mean "module (e.g class)".)
 a node's scope is expressed by the number of trailing underscores
@@ -61,6 +61,11 @@ document. (in the below example we use "cozy scope" because it is common):
         Invalid_HTTP_RequestResponse   # better
         Invalid_HTTP_Request_Response  # worse
 
+    (EDIT 2023): We now prefer either all underscores or no underscores
+    (in one name). Use underscores if the acronym touches a non-acronym
+    capital letter, otherwise don't? Not sure, experimental.
+
+    We may now leave this up to the author: underscores or none.
 
   - we use this convention for names of some modules whose files are
     loaded with simplified autoloading (e.g test support nodes) because
@@ -73,7 +78,6 @@ document. (in the below example we use "cozy scope" because it is common):
     "asset code" node without getting hits for its test support node
     (for those names with multiple pieces).
 
-
   - we use underscores mixed in with conventional looking class name
     elements as special higher-level syntactic separators, like
     for [#ta-005] "magnetics":
@@ -81,7 +85,6 @@ document. (in the below example we use "cozy scope" because it is common):
         SomeThing_via_OneIngredient_and_OtherIngredient
 
     (this is a quite bespoke convention.)
-
 
   - at one point we adopted this as the default for typical classes
     and modules (reasons don't matter); so there is still a lot of
