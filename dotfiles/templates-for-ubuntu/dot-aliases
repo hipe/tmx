@@ -3,6 +3,7 @@
 # As you make edits here, you should commit the changes to the target file,
 # or (as appropriate) move the edits to an appropriate unversioned file.
 
+alias f=flutter
 alias g=git
 alias gb="git branch"
 alias gd="git diff"

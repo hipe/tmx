@@ -17,7 +17,7 @@ the nodes in our notebook, which was from the bottom of the page upwards
 in the order in which we thought of them.
 */
 
-rankdir=LR
+rankdir="BT"
 _HX [label="milestone:\nOffline 'CRD'" shape=rect]
 _AA->_HX
 _7A->_HX
@@ -65,8 +65,7 @@ _YU->_DR
 _GN [label="milestone: widget test\ncovering an interaction" shape=rect]
 _2N->_GN
 _YU [label="List-view of\nhard-coded\n3 items (cover)"]
-_KR->_YU
-_AX->_YU
+_PN->_YU
 _9B [label="milestone: eventually\nhave a sync-model:\ndown & up" shape=rect]
 _WG->_9B
 _UG [label="Figure out\nmodule system" style=filled]
@@ -74,6 +73,15 @@ _EK->_UG
 _EK [label="Any test\nat all" style=filled]
 _AX->_EK
 _PN [label="SQLite in parallel\nwith example"]
+_RN->_PN
+_RN [label="Fold-in\nfancy stuff"]
+_QR->_RN
+_QR [label="Add\nto db"]
+_VG->_QR
+_VG [label="Remove\nfrom db"]
+_JK->_VG
+_JK [label="Create new schema\nand read-only\nfrom db"]
+_KR->_JK
 _KR [label="SQLite persistence\ntest" style=filled]
 _UG->_KR
 _AX [label="Barebones, do-nothing\nflutter app committed" style=filled]
