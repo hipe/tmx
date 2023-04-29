@@ -14,8 +14,15 @@ class MyApp extends StatelessWidget {
     const color = Color.fromRGBO(0, 0, 25, 1.0);
     // const color = Colors.deepOrange;
 
+    /* BEGIN
+    */
+    var mas = MyAppState();
+    var ting = WordPair("alpha", "beta");
+    mas.favorites.add(ting);
+    // END
+
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+      create: (context) => mas,
       child: MaterialApp(
         title: 'Namer App',
         theme: ThemeData(
