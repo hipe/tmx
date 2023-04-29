@@ -1,3 +1,4 @@
+import 'package:stm/replication.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
 
     /* BEGIN
     */
+    HELLO_DO_ANYTHING();
     var mas = MyAppState();
     var ting = WordPair("alpha", "beta");
     mas.favorites.add(ting);
