@@ -1,4 +1,6 @@
-import 'package:stm/replication.dart';
+import 'replication.dart';
+import 'database.dart' show AppDatabase;
+import 'model.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +17,12 @@ class MyApp extends StatelessWidget {
     const color = Color.fromRGBO(0, 0, 25, 1.0);
     // const color = Colors.deepOrange;
 
-    /* BEGIN
+    /* BEGIN #[#892.E] do this "right" when we learn how
     */
-    HELLO_DO_ANYTHING();
-    var mas = MyAppState();
-    var ting = WordPair("alpha", "beta");
+
+    final mas = MyAppState();
+    _populateSavedFavoritesAsynchronously(mas.favorites);
+    final ting = WordPair("Hard", "Coded");
     mas.favorites.add(ting);
     // END
 
@@ -225,6 +228,27 @@ class BigCard extends StatelessWidget {
     ); // Card
   }
 }
+
+/* BEGIN [#892.E]
+We're trying to call the async functions from the sync world and this is eew
+*/
+
+void _populateSavedFavoritesAsynchronously(List<WordPair> favorites) {
+  BUILD_THE_DATABASE()
+    .then((db) => _doPopulateSavedFavoritesAsynchronously(favorites, db));
+}
+
+void _doPopulateSavedFavoritesAsynchronously(List<WordPair> favs, AppDatabase db) {
+  final likesCollection = db.likeDAO;
+  likesCollection.findAllLikes()
+    .then((likes) => _do2PopulateSavedFavoritesAsynchronously(favs, likes));
+}
+
+void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> likes) {
+  print("WOW YOU'RE REALLY THE MAN: " + likes.length.toString());
+}
+
+// END
 
 /*
 #history-A.1: per codelab

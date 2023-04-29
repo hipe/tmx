@@ -11,7 +11,7 @@ class VariousThingsTester {
   int value = 0;
 
   Future<void> imagineDoingThis() async {
-    final database = await _GET_THE_DATABASE();
+    final database = await BUILD_THE_DATABASE();
     final likeDAO = database.likeDAO;
     final List<Like> ents = await likeDAO.findAllLikes();
     print('wow we got some kind of result: ' + ents.length.toString());
@@ -46,7 +46,7 @@ class VariousThingsTester {
 
 }
 
-Future<AppDatabase> _GET_THE_DATABASE() async {  // #[#892.E] weird name
+Future<AppDatabase> BUILD_THE_DATABASE() async {  // #[#892.E] weird name
   return $FloorAppDatabase.databaseBuilder('app_database.db').build();
 }
 
