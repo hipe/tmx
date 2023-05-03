@@ -43,5 +43,4 @@ Make colors change somehow based on completed-ness. Border?
 -- items from HERE to HERE2 (:HERE2) are of an era
 Add to db
 Remove from db
-Create new schema and (at beginning) read-only from db
 Clean up early tests

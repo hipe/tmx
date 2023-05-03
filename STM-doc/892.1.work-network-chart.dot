@@ -80,7 +80,7 @@ _QR [label="Add\nto db"]
 _VG->_QR
 _VG [label="Remove\nfrom db"]
 _JK->_VG
-_JK [label="Create new schema\nand read-only\nfrom db"]
+_JK [label="Create new schema\nand read-only\nfrom db" style=filled]
 _KR->_JK
 _KR [label="SQLite persistence\ntest" style=filled]
 _UG->_KR

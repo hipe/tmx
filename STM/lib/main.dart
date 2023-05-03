@@ -19,11 +19,8 @@ class MyApp extends StatelessWidget {
 
     /* BEGIN #[#892.E] do this "right" when we learn how
     */
-
     final mas = MyAppState();
     _populateSavedFavoritesAsynchronously(mas.favorites);
-    final ting = WordPair("Hard", "Coded");
-    mas.favorites.add(ting);
     // END
 
     return ChangeNotifierProvider(
@@ -245,7 +242,18 @@ void _doPopulateSavedFavoritesAsynchronously(List<WordPair> favs, AppDatabase db
 }
 
 void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> likes) {
-  print("WOW YOU'RE REALLY THE MAN: " + likes.length.toString());
+
+  if (0 == likes.length) {
+    print("(info: zero likes in local database)");
+    return;
+  }
+
+  print("(info: adding " + likes.length.toString() + " like(s) from local db)");
+
+  for (final like in likes) {
+    final newPair = WordPair(like.word1, like.word2);  // #[#892.E] unserialize
+    favs.add(newPair);
+  }
 }
 
 // END
