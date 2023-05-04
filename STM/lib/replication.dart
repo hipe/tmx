@@ -47,6 +47,7 @@ class VariousThingsTester {
 }
 
 Future<AppDatabase> BUILD_THE_DATABASE() async {  // #[#892.E] weird name
+  print("(debug: hopefully only build the db ONCE)");
   return $FloorAppDatabase.databaseBuilder('app_database.db').build();
 }
 

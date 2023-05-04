@@ -103,7 +103,15 @@ class _$LikeDAO extends LikeDAO {
   _$LikeDAO(
     this.database,
     this.changeListener,
-  ) : _queryAdapter = QueryAdapter(database);
+  )   : _queryAdapter = QueryAdapter(database),
+        _likeInsertionAdapter = InsertionAdapter(
+            database,
+            'Like',
+            (Like item) => <String, Object?>{
+                  'id': item.id,
+                  'word1': item.word1,
+                  'word2': item.word2
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -111,10 +119,18 @@ class _$LikeDAO extends LikeDAO {
 
   final QueryAdapter _queryAdapter;
 
+  final InsertionAdapter<Like> _likeInsertionAdapter;
+
   @override
   Future<List<Like>> findAllLikes() async {
     return _queryAdapter.queryList('SELECT * FROM Like',
         mapper: (Map<String, Object?> row) => Like(
             row['id'] as int, row['word1'] as String, row['word2'] as String));
+  }
+
+  @override
+  Future<int> createLike(Like like) {
+    return _likeInsertionAdapter.insertAndReturnId(
+        like, OnConflictStrategy.abort);
   }
 }

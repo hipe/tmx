@@ -76,7 +76,7 @@ _PN [label="SQLite in parallel\nwith example"]
 _RN->_PN
 _RN [label="Fold-in\nfancy stuff"]
 _QR->_RN
-_QR [label="Add\nto db"]
+_QR [label="Add\nto db" style=filled]
 _VG->_QR
 _VG [label="Remove\nfrom db"]
 _JK->_VG

@@ -14,13 +14,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const color = Color.fromRGBO(0, 0, 25, 1.0);
-    // const color = Colors.deepOrange;
+    const color = Color.fromRGBO(0, 0, 25, 1.0);  // or Colors.deepOrange
 
     /* BEGIN #[#892.E] do this "right" when we learn how
     */
     final mas = MyAppState();
-    _populateSavedFavoritesAsynchronously(mas.favorites);
+    _populateSavedFavoritesAsynchronously(mas);
     // END
 
     return ChangeNotifierProvider(
@@ -49,12 +48,16 @@ class MyAppState extends ChangeNotifier {
 
   void toggleFavorite() {
     if (favorites.contains(current)) {
+      print("(NOTICE: remove is not implemented on local db yet!)");
       favorites.remove(current);
     } else {
+      _createLike(this, current);
       favorites.add(current);
     }
     notifyListeners();
   }
+
+  late Future<AppDatabase> local_database = BUILD_THE_DATABASE();
 }
 
 class MyHomePage extends StatefulWidget {
@@ -230,8 +233,24 @@ class BigCard extends StatelessWidget {
 We're trying to call the async functions from the sync world and this is eew
 */
 
-void _populateSavedFavoritesAsynchronously(List<WordPair> favorites) {
-  BUILD_THE_DATABASE()
+// WRITE
+
+void _createLike(MyAppState mas, WordPair pair) {
+  mas.local_database
+    .then((db) => _doCreateLike(db, pair));
+}
+
+void _doCreateLike(AppDatabase db, WordPair pair) {
+  final Like like = Like(null, pair.first, pair.second);  /* #[#892.E] `.id` */
+  db.likeDAO.createLike(like)
+    .then((int i) => print("(WOW: amazing: added ID: " + i.toString() + ")"));
+}
+
+// READ
+
+void _populateSavedFavoritesAsynchronously(MyAppState mas) {
+  final List<WordPair> favorites = mas.favorites;
+  mas.local_database
     .then((db) => _doPopulateSavedFavoritesAsynchronously(favorites, db));
 }
 

@@ -6,6 +6,9 @@ assume that's a hard & fast rule */
 @dao
 abstract class LikeDAO {
 
+  @insert
+  Future<int> createLike(Like like);  // this is amazing if this works
+
   @Query('SELECT * FROM Like')  /* #open [#XXX] change this casing */
   Future<List<Like>> findAllLikes();
 
@@ -15,7 +18,8 @@ abstract class LikeDAO {
 @entity
 class Like {
   @primaryKey
-  final int id;
+  final int? id;
+  // changed to nullable so we can get autoincrement on create at #history-A.2
 
   final String word1;
   final String word2;
@@ -25,6 +29,7 @@ class Like {
 
 /*
 
+# #history-A.2: (as referenced)
 # #history-A.1: begin introduce model for example
 # #born
 */
