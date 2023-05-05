@@ -39,9 +39,34 @@ flutter test test/replication_test.dart --name '^TEST TWO'
 # Development Log (most recent at top)
 
 This section is to keep a record "for posterity" of how we arrived at various
-xx
+development processes and tools.
 
-The contents herein won't generally  xx (and at some point xx)
+The contents herein won't generally need to be referenced again after
+roundabout their first use; except _during development_ (but this remains
+to be seen - maybe it _will_ be useful generally).
+
+At some point we may go back and clean this up; in an ongoing manner as
+the development ecosystem changes.
+
+
+## reminder of reverse direction
+
+Reminder: the below sections in this document are added most recent first.
+So if you want to read the narrative from the beginning; start at the end
+of the section and read each "next" subsection upwards back up to here.
+
+
+## Fold-in UI changes from the "advanced version"
+
+At the end of [this first codelab][cl1] they link to [this advanced version][cl2]
+that does some cool animation transitions.
+
+We're gonna attempt to fold-in these changes so we get "all of" the example
+UI and functionality; the main reason being: this version of the app has
+functionality that we require in our own app. Also this version has usability
+improvements that will look good in our app.
+
+(This was accomplished in #history-A.2.)
 
 
 ## `sqflite` on linux
@@ -102,11 +127,13 @@ commit as this writing.
 
 [gh1]: https://github.com/tekartik/sqflite/blob/master/sqflite_common_ffi/doc/using_ffi_instead_of_sqflite.md#initialization
 [g01]: https://dart.dev/guides/libraries/private-files
+[cl2]: https://dartpad.dev/e7076b40fb17a0fa899f9f7a154a02e8
 [cl1]: https://codelabs.developers.google.com/codelabs/flutter-codelab-first
 
 
 
 # (document-meta)
 
+- #history-A.2: as referenced
 - #history-A.1: as referenced
 - #born

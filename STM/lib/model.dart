@@ -7,9 +7,9 @@ assume that's a hard & fast rule */
 abstract class LikeDAO {
 
   @insert
-  Future<int> createLike(Like like);  // this is amazing if this works
+  Future<int> createLike(Like like);  // note to self: amazed that this works
 
-  @Query('SELECT * FROM Like')  /* #open [#XXX] change this casing */
+  @Query('SELECT * FROM Like')  // #[#892.E] change name convention for table?
   Future<List<Like>> findAllLikes();
 
 }
