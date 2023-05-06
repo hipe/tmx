@@ -9,7 +9,7 @@ abstract class LikeDAO {
   @insert
   Future<int> createLike(Like like);  // note to self: amazed that this works
 
-  @Query('SELECT * FROM Like')  // #[#892.E] change name convention for table?
+  @Query('SELECT * FROM `Like`')  // #[#892.E] change name convention for table?
   Future<List<Like>> findAllLikes();
 
 }
