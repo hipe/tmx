@@ -109,6 +109,19 @@ Using that as a basis for our one-off script committed in this same
 commit as this writing.
 
 
+# Appendix: Other things we learned about dart
+
+Our main learning of dart happened with pen & paper. Subsections in this
+section are addendum to that. We order them aesthetically (top to bottom).
+
+
+## Streams
+
+Googled "dart stream", got [this](https://dart.dev/tutorials/language/streams).
+
+(We ended up not using `Stream` at the one particular place. We suspect
+an issue with the vendor library but we aren't sure yet. #[#892.E].)
+
 
 # (the identifier registry)
 

@@ -111,6 +111,15 @@ class _$LikeDAO extends LikeDAO {
                   'id': item.id,
                   'word1': item.word1,
                   'word2': item.word2
+                }),
+        _likeDeletionAdapter = DeletionAdapter(
+            database,
+            'Like',
+            ['id'],
+            (Like item) => <String, Object?>{
+                  'id': item.id,
+                  'word1': item.word1,
+                  'word2': item.word2
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -120,6 +129,20 @@ class _$LikeDAO extends LikeDAO {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Like> _likeInsertionAdapter;
+
+  final DeletionAdapter<Like> _likeDeletionAdapter;
+
+  @override
+  Future<List<Like>> findAllLikesWithThisNaturalKeyAsStream(
+    String word1,
+    String word2,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM `Like` WHERE `word1` = ?1 AND `word2` = ?2',
+        mapper: (Map<String, Object?> row) => Like(
+            row['id'] as int?, row['word1'] as String, row['word2'] as String),
+        arguments: [word1, word2]);
+  }
 
   @override
   Future<List<Like>> findAllLikes() async {
@@ -132,5 +155,10 @@ class _$LikeDAO extends LikeDAO {
   Future<int> createLike(Like like) {
     return _likeInsertionAdapter.insertAndReturnId(
         like, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> deleteLike(Like like) {
+    return _likeDeletionAdapter.deleteAndReturnChangedRows(like);
   }
 }

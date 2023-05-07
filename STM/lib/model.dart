@@ -9,9 +9,21 @@ abstract class LikeDAO {
   @insert
   Future<int> createLike(Like like);  // note to self: amazed that this works
 
+  @delete
+  Future<int?> deleteLike(Like like);
+
+  @Query('SELECT * FROM `Like` WHERE `word1` = :word1 AND `word2` = :word2')
+  Future<List<Like>> findAllLikesWithThisNaturalKeyAsStream(
+      String word1, String word2);
+
+  /* #[#892.E] the above used to be `<Stream<List<Like>>` but it would block
+  forever waiting for the stream to exit (probably).
+
+  Same problem with `<Stream<Like?>>`.
+  */
+
   @Query('SELECT * FROM `Like`')  // #[#892.E] change name convention for table?
   Future<List<Like>> findAllLikes();
-
 }
 
 

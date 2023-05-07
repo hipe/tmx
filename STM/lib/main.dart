@@ -55,16 +55,21 @@ class MyAppState extends ChangeNotifier {
   void toggleFavorite([WordPair? pair]) {
     pair = pair ?? current;
     if (favorites.contains(pair)) {
-      print("(NOTICE: remove is not implemented on local db yet!)");
-      favorites.remove(pair);
+      removeFavorite(pair);
     } else {
-      _createLike(this, pair);
-      favorites.add(pair);
+      _addFavoriteAndNotify(pair);
     }
+  }
+
+  void _addFavoriteAndNotify(WordPair pair) {
+    // NOTE name this function to accord with `removeFavorite` IFF you publicize
+    _createLike(this, pair);
+    favorites.add(pair);
     notifyListeners();
   }
 
   void removeFavorite(WordPair pair) {
+    _deleteLike(this, pair);
     favorites.remove(pair);
     notifyListeners();
   }
@@ -374,14 +379,65 @@ We're trying to call the async functions from the sync world and this is eew
 // WRITE
 
 void _createLike(MyAppState mas, WordPair pair) {
-  mas.local_database
-    .then((db) => _doCreateLike(db, pair));
+  mas.local_database.then((db) => _doCreateLike(db, pair));
+}
+
+void _deleteLike(MyAppState mas, WordPair pair) {
+  mas.local_database.then((db) => _doDeleteLike(db, pair));
 }
 
 void _doCreateLike(AppDatabase db, WordPair pair) {
   final Like like = Like(null, pair.first, pair.second);  /* #[#892.E] `.id` */
   db.likeDAO.createLike(like)
-    .then((int i) => print("(WOW: amazing: added ID: " + i.toString() + ")"));
+    .then((int i) => print("(local db: CREATEd Like #${i})"));
+}
+
+void _doDeleteLike(AppDatabase db, WordPair pair) {
+  /* Buckle up: It's a totally reasonable convention of RDBMS that we use
+  (integer) primary key ID's to indicate a specific row (e.g when DELETEing).
+
+  Floor bakes this assumption in to it and that is okay and normal and good.
+
+  Note, however, that the google example app (word pairs) does NOT have as
+  "robust" a manifestation of identity for its business objects: The identity
+  of a word pair _is_ the two strings. We see this in multiple places where
+  it simply calls `List.remove`, and there is some "identity function" that
+  determines what to remove.
+
+  It's worth noting that this analysis unintentionally reveals a behavioral
+  grey area if not a bug: the RNG could (hypothetically) generate a duplicate
+  word pair. The behavior of this edge case is undefined, as far as we know.
+  */
+
+  print("(local db: TRACE: DELETEing ('${pair.first}', '${pair.second}')");
+  db.likeDAO.findAllLikesWithThisNaturalKeyAsStream(pair.first, pair.second)
+    .then((List<Like> founds) => _doDoDeleteLike(db, founds, pair));
+}
+
+void _doDoDeleteLike(AppDatabase db, List<Like> founds, WordPair pair) {
+
+  List<Like> deleteTheseLikes = [];  // this feels redundant now but ..
+  // .. once upon a time, vendor returned <Stream<List<Like>>
+
+  for (final like in founds) {
+    deleteTheseLikes.add(like);
+  }
+
+  final len = deleteTheseLikes.length;
+  if (1 < len) {
+    print("(local db: INTERESTING: ${len} likes with same words?)");
+  }
+  else if (0 == len) {
+    print("(local db: WARNING: corrupted? No items found for '${pair}')");
+  }
+  else {
+    print("(local db: DELETEing ${len} Like(s))");
+  }
+  for (final like in deleteTheseLikes) {
+    db.likeDAO.deleteLike(like)
+      .then((int? i) => print("(local db: info: DELETEd a Like (rc: ${i}))"));
+    // #[#892.E] expected PK but had 1/0 probably
+  }
 }
 
 // READ
@@ -401,11 +457,11 @@ void _doPopulateSavedFavoritesAsynchronously(List<WordPair> favs, AppDatabase db
 void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> likes) {
 
   if (0 == likes.length) {
-    print("(info: zero likes in local database)");
+    print("(local db: info: zero likes in local database)");
     return;
   }
 
-  print("(info: adding " + likes.length.toString() + " like(s) from local db)");
+  print("(local db: info: adding ${likes.length} like(s) from local db)");
 
   for (final like in likes) {
     final newPair = WordPair(like.word1, like.word2);  // #[#892.E] unserialize

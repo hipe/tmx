@@ -72,13 +72,13 @@ _UG [label="Figure out\nmodule system" style=filled]
 _EK->_UG
 _EK [label="Any test\nat all" style=filled]
 _AX->_EK
-_PN [label="SQLite in parallel\nwith example"]
+_PN [label="SQLite in parallel\nwith example" style=filled]
 _RN->_PN
 _RN [label="Fold-in\nfancy stuff" style=filled]
 _QR->_RN
 _QR [label="Add\nto db" style=filled]
 _VG->_QR
-_VG [label="Remove\nfrom db"]
+_VG [label="Remove\nfrom db" style=filled]
 _JK->_VG
 _JK [label="Create new schema\nand read-only\nfrom db" style=filled]
 _KR->_JK
