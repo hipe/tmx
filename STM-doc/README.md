@@ -98,6 +98,7 @@ We don't know the "right" way to keep this information in
 version control. There has been at least one other time that
 we upgraded the flutter version.
 
+- At #history-A.3 we upgraded flutter to version 3.10.0
 - At #history-A.1 we upgraded flutter to version 3.7.12
 
 
@@ -147,6 +148,7 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 
 # (document-meta)
 
+- #history-A.3: as referenced
 - #history-A.2: as referenced
 - #history-A.1: as referenced
 - #born
