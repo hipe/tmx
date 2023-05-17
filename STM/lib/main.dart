@@ -110,22 +110,34 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
 
+    // (one handler for nav clicks, regardless of which layout (widget) we use)
+    final onNavClick = (offset) {
+      this.setState(() {
+        this.selectedIndex = offset;
+      });
+    };
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           // On narrow screens, use more mobile-friendly layout
-          if (constraints.maxWidth < 450) {
-            return _whenScreenIsNarrow(mainArea, this);
-          } else {
-            return _whenScreenIsWide(mainArea, constraints, this);
-          }
+          final bool isNarrowNotWide = constraints.maxWidth < 450;
+
+          final args = [
+            mainArea,
+            if (! isNarrowNotWide) constraints,
+            this.selectedIndex,
+            onNavClick,
+          ];
+          final func = isNarrowNotWide ? _whenScreenIsNarrow : _whenScreenIsWide;
+          return Function.apply(func, args);
         },
       ),  // body:: LayoutBuilder
     );  // Scaffold
   }  // build()
 }
 
-Widget _whenScreenIsWide(mainArea, constraints, guy) {
+Widget _whenScreenIsWide(mainArea, constraints, selectedIndex, onNavClick) {
   final navRail = NavigationRail(
     extended: constraints.maxWidth >= 600,
     destinations: [
@@ -138,12 +150,8 @@ Widget _whenScreenIsWide(mainArea, constraints, guy) {
         label: Text('Favorites'),
       ),
     ],
-    selectedIndex: guy.selectedIndex,
-    onDestinationSelected: (value) {
-      guy.setState(() {
-        guy.selectedIndex = value;
-      });
-    },
+    selectedIndex: selectedIndex,
+    onDestinationSelected: (offset) => onNavClick(offset),  // hi
   );
 
   return Row(
@@ -154,7 +162,7 @@ Widget _whenScreenIsWide(mainArea, constraints, guy) {
   );  // Row
 }
 
-Widget _whenScreenIsNarrow(Widget mainArea, guy) {
+Widget _whenScreenIsNarrow(Widget mainArea, selectedIndex, onNavClick) {
   final bnb = BottomNavigationBar(
     items: [
       BottomNavigationBarItem(
@@ -166,12 +174,8 @@ Widget _whenScreenIsNarrow(Widget mainArea, guy) {
         label: 'Favorites',
       ),
     ],
-    currentIndex: guy.selectedIndex,
-    onTap: (value) {
-      guy.setState(() {
-        guy.selectedIndex = value;
-      });
-    },
+    currentIndex: selectedIndex,
+    onTap: (offset) => onNavClick(offset),  // hi
   );
   return Column(children: [Expanded(child: mainArea), SafeArea(child: bnb)]);
 }
@@ -189,6 +193,32 @@ class GeneratorPage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
+    final spacer = SizedBox(width: 10);
+
+    final buttons = [
+      ElevatedButton.icon(
+        label: Text('Like'),
+        icon: Icon(icon),
+        onPressed: () {
+          print('LIKE pressed');
+          appState.toggleFavorite();
+        },
+      ),
+      spacer,
+      ElevatedButton(
+        child: Text('Next'),
+        onPressed: () {
+          print('NEXT pressed');
+          appState.getNext();
+        },
+      ),
+    ];
+
+    final Row buttonsContainer = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: buttons,
+    );
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -197,27 +227,7 @@ class GeneratorPage extends StatelessWidget {
           SizedBox(height: 10),
           BigCard(pair: pair),
           SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  print('LIKE pressed');
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  print('NEXT pressed');
-                  appState.getNext();
-                },
-                child: Text('Next'),
-              ),
-            ],  // End of children
-          ),  // Row
+          buttonsContainer,
           Spacer(flex: 2),
         ],
       ),  // Column
