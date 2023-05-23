@@ -204,7 +204,7 @@ class GeneratorPage extends StatelessWidget {
           appState.toggleFavorite();
         },
       ),
-      spacer,
+      /* GONE */
       ElevatedButton(
         child: Text('Next'),
         onPressed: () {
@@ -214,10 +214,14 @@ class GeneratorPage extends StatelessWidget {
       ),
     ];
 
-    final Row buttonsContainer = Row(
-      mainAxisSize: MainAxisSize.min,
+    Widget buttonsContainer = GridView(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: _THIS_WIDTH,
+        childAspectRatio: _THIS_WIDTH / _THIS_NARROWER_WIDTH,
+      ),
       children: buttons,
     );
+    buttonsContainer = Expanded(child: buttonsContainer);
 
     return Center(
       child: Column(
@@ -316,8 +320,8 @@ class FavoritesPage extends StatelessWidget {
         Expanded(
           child: GridView(
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 400,
-              childAspectRatio: 400 / 80,
+              maxCrossAxisExtent: _THIS_WIDTH,
+              childAspectRatio: _THIS_WIDTH / _THIS_NARROWER_WIDTH,
             ),
             children: favs,
           ),
@@ -480,6 +484,9 @@ void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> li
 }
 
 // END
+
+const double _THIS_WIDTH = 400;
+const double _THIS_NARROWER_WIDTH = 80;
 
 /*
 #history-A.2: fold-in UI & func from advanced version of example

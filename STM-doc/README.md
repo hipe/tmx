@@ -131,6 +131,8 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|
 |[#895]   | #exmp | This is an example issue
+|[#892.G] |       | "Cupertino Panopticon": grok [this link][cu1] somehow
+|[#892.6] |       | case study: grid view case study
 |[#892.E] |       | track various needs for refactoring
 |[#892.D] | #open | You don't know how to require not at the top of the file
 |[#892.3] |       | Replication notes
@@ -141,6 +143,7 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 
 [gh1]: https://github.com/tekartik/sqflite/blob/master/sqflite_common_ffi/doc/using_ffi_instead_of_sqflite.md#initialization
 [g01]: https://dart.dev/guides/libraries/private-files
+[cu1]: https://api.flutter.dev/flutter/cupertino/cupertino-library.html
 [cl2]: https://dartpad.dev/e7076b40fb17a0fa899f9f7a154a02e8
 [cl1]: https://codelabs.developers.google.com/codelabs/flutter-codelab-first
 
