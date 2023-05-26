@@ -290,6 +290,10 @@ sudo apt-get install silversearcher-ag
 
 (The rest is not documented but it was straightforward.)
 
+Reminder: `vim-grepper` is the name of the vim plugin we're using for ag.
+
+At writing we don't know how to use it, nor how to get `:help GrepperAg` on it.
+
 
 [ag1]: https://github.com/ggreer/the_silver_searcher
 [coc1]: https://github.com/neoclide/coc.nvim/wiki/Install-coc.nvim

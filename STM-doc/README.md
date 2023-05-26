@@ -6,7 +6,6 @@ See "app flow" documentation for a journal of how we set up
 our Flutter development environment.
 
 
-
 # Development Notes (scope)
 
 The main objective of this project (a toy app) is to figure out what our
@@ -15,7 +14,6 @@ own process is for other, non-toy apps.
 We'll write things we do here for this project as a "scratch space".
 As the thing feels like it's part of our process, we'll move the content
 into "app flow".
-
 
 
 # Development Quick Reference
@@ -99,10 +97,10 @@ is supposed to be versioned so here's how we're doing it instead.
 $ flutter upgrade
 ```
 
+- At #history-A.4 we upgraded flutter to version 3.10.2 (sic)
 - At #history-A.4 we upgraded flutter to version 3.10.1
 - At #history-A.3 we upgraded flutter to version 3.10.0
 - At #history-A.1 we upgraded flutter to version 3.7.12
-
 
 
 ## beginnings: .. the beginnings.
@@ -142,13 +140,11 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 |[#892.1] |       | Digraph of things from notebook
 
 
-
 [gh1]: https://github.com/tekartik/sqflite/blob/master/sqflite_common_ffi/doc/using_ffi_instead_of_sqflite.md#initialization
 [g01]: https://dart.dev/guides/libraries/private-files
 [cu1]: https://api.flutter.dev/flutter/cupertino/cupertino-library.html
 [cl2]: https://dartpad.dev/e7076b40fb17a0fa899f9f7a154a02e8
 [cl1]: https://codelabs.developers.google.com/codelabs/flutter-codelab-first
-
 
 
 # (document-meta)

@@ -1,6 +1,8 @@
+import 'common_ui.dart' as cui;
 import 'replication.dart';
 import 'database.dart' show AppDatabase;
 import 'model.dart';
+import 'routes/list_skilltrees.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          bool narrowNotWide = _narrowNotWide(constraints);
+          bool narrowNotWide = cui.narrowNotWide(constraints);
           Widget page = _buildPage(selectedIndex, constraints);
           Widget mainArea = _wrapAsMainArea(page, colorScheme);
           final args = [
@@ -123,7 +125,6 @@ Widget _buildPage(int selectedIndex, BoxConstraints bc) {
 }
 
 /* END */
-
 
 Widget _wrapAsMainArea(Widget page, ColorScheme colorScheme) {
   // the container for the current page, with its bg color & switching anim
@@ -212,9 +213,20 @@ class GeneratorPage extends StatelessWidget {
           appState.getNext();
         },
       ),
+      ElevatedButton(
+        child: Text("IMAGINE"),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (ctxt) {
+              return const IMAGINE_A_ROUTE();
+            }),
+          );
+        },
+      ),
     ];
 
-    final buttonsContainer = _layoutButtons_WIP(buttons, _bc);
+    final buttonsContainer = cui.layOutButtonsCommonly(buttons, _bc);
 
     // BEGIN #history-A.3 hack around layout
 
@@ -324,8 +336,8 @@ class FavoritesPage extends StatelessWidget {
         Expanded(
           child: GridView(
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: _THIS_WIDTH,
-              childAspectRatio: _THIS_WIDTH / _THIS_HEIGHT,
+              maxCrossAxisExtent: cui.THIS_WIDTH,
+              childAspectRatio: cui.THIS_WIDTH / cui.THIS_HEIGHT,
             ),
             children: favs,
           ),
@@ -389,96 +401,6 @@ class _HistoryListViewState extends State<HistoryListView> {
     );  // ShaderMask
   }
 }
-
-// Generic button layout
-// this is a stand-in for the *idea*. but at birth (#history-A.3) it's messy
-
-Widget _layoutButtons_WIP(List<Widget> buttons, BoxConstraints bc) {
-
-  print("layout buttons (maxWidth: ${bc.maxWidth})");
-
-  final _HowMany howMany = _howMany(buttons.length);
-
-  // error case early
-  if (_HowMany.zero == howMany) return Text('[no buttons]');
-
-  // If it's narrow..
-  if (_narrowNotWide(bc)) {
-    return _buttonsAsColumnLike(buttons);
-  }
-
-  // If there's only one button..
-  if (_HowMany.one == howMany) {
-    return _buttonsAsColumnLike(buttons);  // hi
-  }
-
-  // If there's two buttons..
-  if (_HowMany.two == howMany) {
-    assert(_wideNotNarrow(bc));
-    // ..do what we did in the original demo
-    List<Widget> useThese = [buttons[0], _spacer(), buttons[1]];  // yuck
-    return Row(children: useThese, mainAxisSize: MainAxisSize.min);
-  }
-
-  // If there's three or more..
-  assert(_HowMany.many == howMany);
-  assert(_wideNotNarrow(bc));
-  return _buttonsAsGrid(buttons);
-}
-
-Widget _buttonsAsGrid(List<Widget> buttons) {
-  final Widget buttonsContainer = GridView(
-    children: buttons,
-    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: 245.0,
-      mainAxisSpacing: 20.0,
-      crossAxisSpacing: 15.0,
-      childAspectRatio: 4.5,  // the golden ratio for a button rectangle lol
-    ),
-    padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 10.0),
-  );
-  return Expanded(child: buttonsContainer);
-}
-
-Widget _buttonsAsColumnLike(List<Widget> buttons) {  // DRY ME WITH ABOVE
-  final Widget buttonsContainer = GridView(
-    children: buttons,
-    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: 400.0,
-      mainAxisSpacing: 13.0,
-      crossAxisSpacing: 0.0,  // you won't see cross-axis spacing here
-      childAspectRatio: 8,  // the golden ratio for a button rectangle lol
-    ),
-    padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 7.0),
-  );
-  return Expanded(child: buttonsContainer);
-}
-
-Widget _spacer() {
-  return SizedBox(width: 10);
-}
-
-// Screen metrics - centralize responsive layout magic numbers
-
-bool _wideNotNarrow(BoxConstraints constraints) {
-  return ! _narrowNotWide(constraints);
-}
-
-bool _narrowNotWide(BoxConstraints constraints) {
-  return constraints.maxWidth < 450;
-}
-
-// How Many
-
-_HowMany _howMany(int num) {
-  if (1 == num) return _HowMany.one;
-  if (2 == num) return _HowMany.two;
-  if (0 == num) return _HowMany.zero;
-  if (2 < num) return _HowMany.many;
-  throw UnimplementedError('need zero or more, had $num');
-}
-
-enum _HowMany { zero, one, two, many }
 
 /* BEGIN [#892.E]
 We're trying to call the async functions from the sync world and this is eew
@@ -578,9 +500,6 @@ void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> li
 }
 
 // END
-
-const double _THIS_WIDTH = 400;
-const double _THIS_HEIGHT = 80;
 
 /*
 #history-A.3: hack around our ignorance of layout

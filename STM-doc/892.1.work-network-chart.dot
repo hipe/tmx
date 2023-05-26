@@ -108,7 +108,7 @@ _6G [label="Click on 'add item'\npops-up new item\nscreen (cover)"]
 _X32->_6G
 
 subgraph cluster_C33_111 {
-_TA [label="Review cookbook\nfor modal" shape=oval]
+_TA [label="Review cookbook\nfor modal" shape=oval style=filled]
 }
 
 subgraph cluster_C33_222 {
@@ -145,9 +145,9 @@ subgraph cluster_C33_111 {
 _GN [label="milestone: widget test\ncovering an interaction" shape=rect style=""]
 _2N->_GN
 _LU->_GN
-_YU [label="List-view of\nhard-coded\n3 items (cover)"]
+_YU [label="List-view of\nhard-coded\n3 items (cover)" style=filled]
 _MR->_YU
-_MR [label="GRID GRID\nGRID GRID\nGRID GRID"]
+_MR [label="GRID GRID\nGRID GRID\nGRID GRID" style=filled]
 }
 }
 
