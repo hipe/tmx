@@ -89,27 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
-        break;
-      case 1:
-        page = FavoritesPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-
-    // the container for the current page, with its bg color & switching anim
-    var mainArea = ColoredBox(
-      color: colorScheme.surfaceVariant,
-      child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 200),
-        child: page,
-      ),
-    );
-
     // (one handler for nav clicks, regardless of which layout (widget) we use)
     final onNavClick = (offset) {
       this.setState(() {
@@ -120,21 +99,41 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // On narrow screens, use more mobile-friendly layout
-          final bool isNarrowNotWide = constraints.maxWidth < 450;
-
+          bool narrowNotWide = _narrowNotWide(constraints);
+          Widget page = _buildPage(selectedIndex, constraints);
+          Widget mainArea = _wrapAsMainArea(page, colorScheme);
           final args = [
             mainArea,
-            if (! isNarrowNotWide) constraints,
+            if (! narrowNotWide) constraints,
             this.selectedIndex,
             onNavClick,
           ];
-          final func = isNarrowNotWide ? _whenScreenIsNarrow : _whenScreenIsWide;
+          final func = narrowNotWide ? _whenScreenIsNarrow : _whenScreenIsWide;
           return Function.apply(func, args);
         },
       ),  // body:: LayoutBuilder
     );  // Scaffold
   }  // build()
+}
+
+Widget _buildPage(int selectedIndex, BoxConstraints bc) {
+  if (1 == selectedIndex) return FavoritesPage();
+  if (0 == selectedIndex) return GeneratorPage(bc);
+  throw UnimplementedError('no widget for $selectedIndex');
+}
+
+/* END */
+
+
+Widget _wrapAsMainArea(Widget page, ColorScheme colorScheme) {
+  // the container for the current page, with its bg color & switching anim
+  return ColoredBox(
+    color: colorScheme.surfaceVariant,
+    child: AnimatedSwitcher(
+      duration: Duration(milliseconds: 200),
+      child: page,
+    ),
+  );
 }
 
 Widget _whenScreenIsWide(mainArea, constraints, selectedIndex, onNavClick) {
@@ -181,7 +180,11 @@ Widget _whenScreenIsNarrow(Widget mainArea, selectedIndex, onNavClick) {
 }
 
 class GeneratorPage extends StatelessWidget {
-  @override
+
+  final BoxConstraints _bc;
+
+  GeneratorPage(this._bc);
+
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
@@ -193,8 +196,6 @@ class GeneratorPage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
-    final spacer = SizedBox(width: 10);
-
     final buttons = [
       ElevatedButton.icon(
         label: Text('Like'),
@@ -204,7 +205,6 @@ class GeneratorPage extends StatelessWidget {
           appState.toggleFavorite();
         },
       ),
-      /* GONE */
       ElevatedButton(
         child: Text('Next'),
         onPressed: () {
@@ -214,28 +214,32 @@ class GeneratorPage extends StatelessWidget {
       ),
     ];
 
-    Widget buttonsContainer = GridView(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: _THIS_WIDTH,
-        childAspectRatio: _THIS_WIDTH / _THIS_NARROWER_WIDTH,
-      ),
-      children: buttons,
-    );
-    buttonsContainer = Expanded(child: buttonsContainer);
+    final buttonsContainer = _layoutButtons_WIP(buttons, _bc);
+
+    // BEGIN #history-A.3 hack around layout
+
+    int headFlex = 3;
+    int tailFlex = 2;
+
+    if (2 < buttons.length) {
+      headFlex--;
+      tailFlex--;
+    }
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(flex: 3, child: HistoryListView(),),
+          Expanded(flex: headFlex, child: HistoryListView(),),
           SizedBox(height: 10),
           BigCard(pair: pair),
           SizedBox(height: 10),
           buttonsContainer,
-          Spacer(flex: 2),
+          if (3 > buttons.length) Spacer(flex: tailFlex),
         ],
       ),  // Column
     );
+    // END #history-A.3 hack around layout
   }
 }
 
@@ -321,7 +325,7 @@ class FavoritesPage extends StatelessWidget {
           child: GridView(
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: _THIS_WIDTH,
-              childAspectRatio: _THIS_WIDTH / _THIS_NARROWER_WIDTH,
+              childAspectRatio: _THIS_WIDTH / _THIS_HEIGHT,
             ),
             children: favs,
           ),
@@ -385,6 +389,96 @@ class _HistoryListViewState extends State<HistoryListView> {
     );  // ShaderMask
   }
 }
+
+// Generic button layout
+// this is a stand-in for the *idea*. but at birth (#history-A.3) it's messy
+
+Widget _layoutButtons_WIP(List<Widget> buttons, BoxConstraints bc) {
+
+  print("layout buttons (maxWidth: ${bc.maxWidth})");
+
+  final _HowMany howMany = _howMany(buttons.length);
+
+  // error case early
+  if (_HowMany.zero == howMany) return Text('[no buttons]');
+
+  // If it's narrow..
+  if (_narrowNotWide(bc)) {
+    return _buttonsAsColumnLike(buttons);
+  }
+
+  // If there's only one button..
+  if (_HowMany.one == howMany) {
+    return _buttonsAsColumnLike(buttons);  // hi
+  }
+
+  // If there's two buttons..
+  if (_HowMany.two == howMany) {
+    assert(_wideNotNarrow(bc));
+    // ..do what we did in the original demo
+    List<Widget> useThese = [buttons[0], _spacer(), buttons[1]];  // yuck
+    return Row(children: useThese, mainAxisSize: MainAxisSize.min);
+  }
+
+  // If there's three or more..
+  assert(_HowMany.many == howMany);
+  assert(_wideNotNarrow(bc));
+  return _buttonsAsGrid(buttons);
+}
+
+Widget _buttonsAsGrid(List<Widget> buttons) {
+  final Widget buttonsContainer = GridView(
+    children: buttons,
+    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      maxCrossAxisExtent: 245.0,
+      mainAxisSpacing: 20.0,
+      crossAxisSpacing: 15.0,
+      childAspectRatio: 4.5,  // the golden ratio for a button rectangle lol
+    ),
+    padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 10.0),
+  );
+  return Expanded(child: buttonsContainer);
+}
+
+Widget _buttonsAsColumnLike(List<Widget> buttons) {  // DRY ME WITH ABOVE
+  final Widget buttonsContainer = GridView(
+    children: buttons,
+    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      maxCrossAxisExtent: 400.0,
+      mainAxisSpacing: 13.0,
+      crossAxisSpacing: 0.0,  // you won't see cross-axis spacing here
+      childAspectRatio: 8,  // the golden ratio for a button rectangle lol
+    ),
+    padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 7.0),
+  );
+  return Expanded(child: buttonsContainer);
+}
+
+Widget _spacer() {
+  return SizedBox(width: 10);
+}
+
+// Screen metrics - centralize responsive layout magic numbers
+
+bool _wideNotNarrow(BoxConstraints constraints) {
+  return ! _narrowNotWide(constraints);
+}
+
+bool _narrowNotWide(BoxConstraints constraints) {
+  return constraints.maxWidth < 450;
+}
+
+// How Many
+
+_HowMany _howMany(int num) {
+  if (1 == num) return _HowMany.one;
+  if (2 == num) return _HowMany.two;
+  if (0 == num) return _HowMany.zero;
+  if (2 < num) return _HowMany.many;
+  throw UnimplementedError('need zero or more, had $num');
+}
+
+enum _HowMany { zero, one, two, many }
 
 /* BEGIN [#892.E]
 We're trying to call the async functions from the sync world and this is eew
@@ -486,9 +580,10 @@ void _do2PopulateSavedFavoritesAsynchronously(List<WordPair> favs, List<Like> li
 // END
 
 const double _THIS_WIDTH = 400;
-const double _THIS_NARROWER_WIDTH = 80;
+const double _THIS_HEIGHT = 80;
 
 /*
+#history-A.3: hack around our ignorance of layout
 #history-A.2: fold-in UI & func from advanced version of example
 #history-A.1: per codelab
 */
