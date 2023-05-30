@@ -142,7 +142,7 @@ _X15->_DR
 }
 
 subgraph cluster_C33_111 {
-_GN [label="milestone: widget test\ncovering an interaction" shape=rect style=""]
+_GN [label="milestone: widget test\ncovering an interaction" shape=rect style="filled"]
 _2N->_GN
 _LU->_GN
 _YU [label="List-view of\nhard-coded\n3 items (cover)" style=filled]

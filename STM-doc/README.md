@@ -131,6 +131,7 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|
 |[#895]   | #exmp | This is an example issue
+|[#892.8] |       | learning how to test
 |[#892.G] |       | "Cupertino Panopticon": grok [this link][cu1] somehow
 |[#892.6] |       | case study: grid view case study
 |[#892.E] |       | track various needs for refactoring

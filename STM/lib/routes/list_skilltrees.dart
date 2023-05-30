@@ -48,7 +48,7 @@ Widget _buildWholeThing(tiles, buttons, BoxConstraints bc, context) {
     children: [
       Padding(
         padding: const EdgeInsets.all(30), // #todo
-        child: Text('Hello this is some kind of header XYZZY 2'),
+        child: Text('XYZZY 2'),  // #case0250
       ),
       _popularGridView(tiles),
       SizedBox(height: 120.0, child: Center(child: butts)),  // #todo
