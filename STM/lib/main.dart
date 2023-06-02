@@ -219,7 +219,7 @@ class GeneratorPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (ctxt) {
-              return const IMAGINE_A_ROUTE();
+              return const RouteForListSkillTrees();
             }),
           );
         },

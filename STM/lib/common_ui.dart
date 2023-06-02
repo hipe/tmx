@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
 
+Widget buildCommonScaffold(
+    Widget Function(BuildContext, BoxConstraints) builder
+  ) {
+  return Scaffold(
+    appBar: AppBar(title: const Text('XYZZY 1')),
+    body: LayoutBuilder(builder: builder),
+  );
+}
+
+// Header
+
+Widget buildCommonHeaderRow(String label) {
+  return Padding(
+    padding: const EdgeInsets.all(30), // came from the first tut?
+    child: Text(label),
+  );
+}
+
 // Generic button layout
 // this is a stand-in for the dream of it, but at #abstraction it's messy
 

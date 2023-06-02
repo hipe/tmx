@@ -124,6 +124,12 @@ Googled "dart stream", got [this](https://dart.dev/tutorials/language/streams).
 an issue with the vendor library but we aren't sure yet. #[#892.E].)
 
 
+## Data tables
+
+Googled "flutter data table", found its class page and a widget of the week
+video.
+
+
 # (the identifier registry)
 
 (Our range: [#892-#894])
@@ -131,6 +137,7 @@ an issue with the vendor library but we aren't sure yet. #[#892.E].)
 | ID      | Main Tag | Content  |
 |---------|:-----:|----|
 |[#895]   | #exmp | This is an example issue
+|[#892.I] |       | this one issue
 |[#892.8] |       | learning how to test
 |[#892.G] |       | "Cupertino Panopticon": grok [this link][cu1] somehow
 |[#892.6] |       | case study: grid view case study

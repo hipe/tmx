@@ -125,9 +125,9 @@ _X15 [label="Click on 'edit'\n(similar to add)\n(cover)"]
 _GN->_X15
 
 subgraph cluster_C33_111 {
-_LU [label="Dismiss 'view item'\nscreen shows\nlist (cover)"]
+_LU [label="Dismiss 'view item'\nscreen shows\nlist (cover)" style=filled]
 _2N->_LU
-_2N [label="Click on item\nopens 'view item'\nscreen (cover)"]
+_2N [label="Click on item\nopens 'view item'\nscreen (cover)" style=filled]
 _YU->_2N
 _TA->_2N
 }

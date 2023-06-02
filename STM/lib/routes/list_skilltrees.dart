@@ -1,22 +1,29 @@
+import './view_skilltree.dart';
 import '../common_ui.dart' as cui;
+import '../model.dart' show IMAGINE_SkillTree;
 import 'package:flutter/material.dart';
 
-class IMAGINE_A_ROUTE extends StatelessWidget {
-  const IMAGINE_A_ROUTE({super.key});
+class RouteForListSkillTrees extends StatelessWidget {
+  const RouteForListSkillTrees({super.key});
 
   @override
   Widget build(BuildContext context) {
 
     final dataItems = [
       for (var str in _TEMP_HARD_CODED)
-        _DataItem(label: str),  // was const but (try it)
+        IMAGINE_SkillTree(label: str),
     ];
 
     final color = Theme.of(context).colorScheme.primary;
-    final List<ListTile> tiles = [
+    final tileBuilder = _buildTileBuilder(color, context);
+    final List<Widget> tiles = [for (final x in dataItems.map(tileBuilder)) x];
+
+    /*
+    final List<Widget> tiles = [
       for (var item in dataItems)
         _listTileViaDataItem(item, color),
     ];
+    */
 
     final buttons = [
       ElevatedButton.icon(
@@ -30,26 +37,18 @@ class IMAGINE_A_ROUTE extends StatelessWidget {
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('XYZZY 1')),
-      body: LayoutBuilder(  // NOT USED YET. no responsiveness yet
-        builder: (context, constraints) {
-          return _buildWholeThing(tiles, buttons, constraints, context);
-        },
-      ),
-    );
+    return cui.buildCommonScaffold((context, constraints) {
+      return _buildRouteBody(tiles, buttons, constraints, context);
+    });
   }
 }
 
-Widget _buildWholeThing(tiles, buttons, BoxConstraints bc, context) {
+Widget _buildRouteBody(tiles, buttons, BoxConstraints bc, context) {
   final butts = cui.layOutButtonsCommonly(buttons, bc);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: const EdgeInsets.all(30), // #todo
-        child: Text('XYZZY 2'),  // #case0250
-      ),
+      cui.buildCommonHeaderRow('XYZZY 2'),  // #case0250
       _popularGridView(tiles),
       SizedBox(height: 120.0, child: Center(child: butts)),  // #todo
     ],
@@ -68,20 +67,22 @@ Widget _popularGridView(List<Widget> tiles) {
   );
 }
 
-ListTile _listTileViaDataItem(dataItem, color) {
-  /* note to self in the future: probably we don't want just the leading
-  icon (IconButton) to be clickable. probably we want etc.  */
+Function(IMAGINE_SkillTree) _buildTileBuilder(color, context) {
+  return (dataItem) {
+    final text = Text(dataItem.label);
+    final onClick = _itemClickHandlerVia(dataItem, context);
+    final clickable = _clickableVia(text, onClick);
+    final mouseRegion = _mouseRegionVia(clickable);
 
-  return ListTile(
-    leading: IconButton(
-      icon: Icon(Icons.token, semanticLabel: 'SOMETHING'),
-      color: color,
-      onPressed: () {
-        print("(this used to do a thing)");
-      },
-    ),
-    title: Text(dataItem.label),
-  );
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.token, semanticLabel: 'SOMETHING'),
+        color: color,
+        onPressed: () => onClick(),
+      ),
+      title: mouseRegion,
+    );
+  };
 }
 
 Widget _buildDismissButton(context) {
@@ -95,9 +96,24 @@ Widget _buildDismissButton(context) {
   );
 }
 
-class _DataItem {
-  final String label;
-  const _DataItem({required String this.label});  // keymash
+Widget _mouseRegionVia(Widget child) {
+  return MouseRegion(child: child, cursor: SystemMouseCursors.click);
+}
+
+Widget _clickableVia(Widget child, Function handler) {
+  return GestureDetector(child: child, onTap: () => handler());  // #todo xx
+}
+
+Function _itemClickHandlerVia(IMAGINE_SkillTree dataItem, BuildContext context) {
+  return (() {
+    print("IMAGINE VIEW '${dataItem.label}'");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (ctxt) {
+        return RouteForViewSkillTree(skillTree: dataItem);
+      }),
+    );
+  });
 }
 
 const _TEMP_HARD_CODED = ['Item 1', 'Item 2', 'Item 3'];

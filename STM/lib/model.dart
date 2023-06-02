@@ -39,8 +39,12 @@ class Like {
   Like(this.id, this.word1, this.word2);
 }
 
-/*
+class IMAGINE_SkillTree {
+  final String label;
+  const IMAGINE_SkillTree({required String this.label});  // keymash
+}
 
+/*
 # #history-A.2: (as referenced)
 # #history-A.1: begin introduce model for example
 # #born
