@@ -1,0 +1,63 @@
+digraph g {
+
+label = "\nDay graph 23-06-03:
+Learning resources visualized";
+rankdir="BT";
+
+node [shape=rect];
+
+nx_header [label="NOTE: In most of our graphs that look like this,
+the arrows go in the direction of the suggested
+order of steps (dependency graph reversed).
+These arrows, in contrast, track the chronologial/
+narrative order in which the tangents (resources)
+were discovered. But where there is branching,
+it's more taxonomic." shape=rect, style=""];
+nVF->nx_header [color=white];
+
+
+nVF [label="..which delegates to\nDidier blog
+which delegates to
+flutteris blog" style=rounded];
+nWW->nVF;
+
+
+nWW [label="pub.dev\n'bloc' package\n(google and read)" style=rounded];
+nYM->nWW;
+
+
+nYM [label="Odinachi\nblog" style=rounded];
+nWL->nYM;
+
+
+nUJ [label="google\n\"flutter BLoC\""];
+nYJ->nUJ;
+
+
+nWL [label="google \"flutter\ntest database\""];
+nYJ->nWL;
+
+
+nYJ [label="google various\nthings (from\nvarious devices)"];
+nYT->nYJ;
+
+
+nYT [label="We need to
+test database stuff
+(setUp etc)" shape=rect];
+
+
+/*
+"pool" (of remaining available identifiers)
+U:  A  B  C  D  E  F  H     K  L  M  N  P  Q  R  S  T  U  V  W  X  Y  Z
+V:  A  B  C  D  E     H  J  K  L  M  N  P  Q  R  S  T  U  V  W  X  Y  Z
+W:  A  B  C  D  E  F  H  J  K     M  N  P  Q  R  S  T  U  V     X  Y  Z
+X:  A  B  C  D  E  F  H  J  K  L  M  N  P  Q  R  S  T  U  V  W  X  Y  Z
+Y:  A  B  C  D  E  F  H     K  L     N  P  Q  R  S     U  V  W  X  Y  Z
+Z:  A  B  C  D  E  F  H  J  K  L  M  N  P  Q  R  S  T  U  V  W  X  Y  Z
+*/
+
+}
+/*
+# #born
+*/

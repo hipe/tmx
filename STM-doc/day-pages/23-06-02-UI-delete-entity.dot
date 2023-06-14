@@ -1,0 +1,44 @@
+digraph g {
+node [shape=rect];
+
+rankdir=BT;
+
+node_9050 [label="done!"];
+node_7050->node_9050;
+node_4050->node_9050;
+
+
+node_7050 [label="use it!
+(NOTE we are
+currently HERE)" style=filled color="lightBlue"];
+node_3942->node_7050 [label="yes"];
+node_3838->node_7050 [label="yes"];
+
+
+node_4050 [label="come up with something
+yourself. Imagine writing
+a blog about it"];
+node_3942->node_4050 [label="no"];
+
+
+node_3942 [label="google around
+for \"flutter test fixtures\"
+or database something"
+shape=diamond];
+node_3838->node_3942 [label="no"];
+
+
+node_3838 [label="does unit test
+cookbook cover the
+use of fixtures/
+database setup?
+" shape=diamond];
+node_0010->node_3838;
+
+
+node_0010 [label="Start the\nday here"];
+}
+
+/*
+# #born
+*/

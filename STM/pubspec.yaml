@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  bloc:
+  flutter_bloc:
   floor:
   sqflite:
   sqflite_common_ffi:

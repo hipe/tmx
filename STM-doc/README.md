@@ -97,6 +97,7 @@ is supposed to be versioned so here's how we're doing it instead.
 $ flutter upgrade
 ```
 
+- At #history-A.5 we upgraded flutter to version 3.10.4
 - At #history-A.4 we upgraded flutter to version 3.10.2 (sic)
 - At #history-A.4 we upgraded flutter to version 3.10.1
 - At #history-A.3 we upgraded flutter to version 3.10.0
@@ -157,6 +158,7 @@ video.
 
 # (document-meta)
 
+- #history-A.5: as referenced
 - #history-A.4: as referenced
 - #history-A.3: as referenced
 - #history-A.2: as referenced

@@ -1,13 +1,22 @@
+import 'package:stm/app.dart';
+import 'package:stm/counter_observer.dart';
 import 'common_ui.dart' as cui;
 import 'replication.dart';
 import 'database.dart' show AppDatabase;
 import 'model.dart';
 import 'routes/list_skilltrees.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  Bloc.observer = const CounterObserver();
+  runApp(const CounterApp());
+}
+
+void _ASIDE_ORIG_main() {
   runApp(const MyApp());
 }
 
