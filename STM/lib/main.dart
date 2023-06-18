@@ -11,12 +11,14 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() => runApp(const TimerApp());
+
+void _SIDELINED_TUT1_main() {
   Bloc.observer = const CounterObserver();
   runApp(const CounterApp());
 }
 
-void _ASIDE_ORIG_main() {
+void _SIDELINED_ORIG_main() {
   runApp(const MyApp());
 }
 

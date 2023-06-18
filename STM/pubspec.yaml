@@ -6,13 +6,17 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  # At #history-A.2:
+  # - 'sealed-class' language feature requires language version >3.0.0.
+  # - Pinpointing exact patch level (for reproducability, experimentally, dev)
+  sdk: '3.0.5'
 
 dependencies:
   flutter:
     sdk: flutter
 
   bloc:
+  equatable:
   flutter_bloc:
   floor:
   sqflite:
@@ -40,4 +44,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+# #history-A.2: bump language version to access 'sealed-class' language feature
 # #history-A.1: remove many generated (& informative) comments per codelab
