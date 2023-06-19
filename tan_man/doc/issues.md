@@ -49,7 +49,7 @@
 [#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
 
-[#069] #hole
+[#069] #open wish for tabular format more compatible with toggl (start stop)
              ( #was: whether or not to be case insensitive when resolving
               nodes, etc. now this is an option in the supporting actor, and
               changing it would be trivial..)

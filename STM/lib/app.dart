@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'posts/posts.dart';
 import 'timer/timer.dart';
 import 'counter/counter.dart';
+
+class InfiniteListApp extends MaterialApp {
+  const InfiniteListApp({super.key}) : super(home: const PostsPageXX());
+}
 
 class TimerApp extends StatelessWidget {
   const TimerApp({super.key});
@@ -23,7 +28,6 @@ class TimerApp extends StatelessWidget {
 class CounterApp extends MaterialApp {
   const CounterApp({super.key}) : super(home: const CounterPage());
 }
-
 /*
 # #born
 */

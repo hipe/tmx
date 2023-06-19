@@ -16,7 +16,9 @@ dependencies:
     sdk: flutter
 
   bloc:
+  bloc_concurrency:
   equatable:
+  http:
   flutter_bloc:
   floor:
   sqflite:

@@ -5,13 +5,19 @@ import 'replication.dart';
 import 'database.dart' show AppDatabase;
 import 'model.dart';
 import 'routes/list_skilltrees.dart';
+// import 'simple_bloc_observer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(const TimerApp());
+void main() {
+  // Bloc.observer = const SimpleBlocObserver();
+  runApp(const InfiniteListApp());
+}
+
+void _SIDELINED_TUT2_main() => runApp(const TimerApp());
 
 void _SIDELINED_TUT1_main() {
   Bloc.observer = const CounterObserver();
